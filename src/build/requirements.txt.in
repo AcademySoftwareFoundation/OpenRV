@@ -1,10 +1,14 @@
 # This file contains all the packages that will be packaged with RV. Please add the license next to the package.
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
-#       To update OpenTimelineIO version, edit _opentimelineio_version in cmake/dependencies/python3.cmake
+#       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
+#       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
 # NOTE: Using --no-binary :all: in pip install ensures all packages are built from source against our custom Python.
+# NOTE: pip, setuptools, and wheel are exceptions - they use pre-built binaries for compatibility.
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
+wheel                   # License: MIT License (MIT)
+numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 
@@ -18,9 +22,8 @@ PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') a
 
 # Additional packages required by RV and for testing the Python distribution
 
-certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0) - required by test_python.py
 six                     # License: MIT License (MIT)
-wheel                   # License: MIT License (MIT)
 packaging               # License: Apache Software License, BSD License
 requests                # License: Apache Software License (Apache 2.0)
 cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)

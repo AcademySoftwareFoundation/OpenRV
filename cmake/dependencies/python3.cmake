@@ -38,6 +38,10 @@ SET(_pyside_version
     "${RV_DEPS_PYSIDE_VERSION}"
 )
 
+SET(_numpy_version
+    "${RV_DEPS_NUMPY_VERSION}"
+)
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -241,7 +245,7 @@ ELSE()
   SET(_python3_cmake_library ${_python3_lib})
 ENDIF()
 
-# Generate requirements.txt from template with the OpenTimelineIO version substituted
+# Generate requirements.txt from template with the OpenTimelineIO and NumPy versions substituted
 SET(_requirements_input_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
@@ -282,7 +286,7 @@ ENDIF()
 
 LIST(APPEND _requirements_install_command
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: -r "${_requirements_output_file}"
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: --only-binary pip,setuptools,wheel -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -373,7 +377,7 @@ SET(${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_output_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file} pyside and other dependencies"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
@@ -427,7 +431,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
             ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
     COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
@@ -438,9 +442,9 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
     OUTPUT ${${_pyside_target}-build-flag}
-    COMMAND ${CMAKE_COMMAND} -E env "RV_DEPS_NUMPY_VERSION=$ENV{RV_DEPS_NUMPY_VERSION}" ${_pyside_make_command} --prepare --build
+    COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
