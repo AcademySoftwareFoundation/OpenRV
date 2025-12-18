@@ -383,9 +383,8 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
-
-        GLView* glview = dynamic_cast<GLView*>(w);
+        GLView* glview = doc->view();
+        QWidget* w = doc->viewContainer();
 
         Mu::Vector4f v;
         v[0] = 0;
@@ -653,7 +652,7 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        rvDoc->viewContainer()->setFocus(Qt::OtherFocusReason);
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -776,7 +775,7 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        rvDoc->viewContainer()->setFocus(Qt::OtherFocusReason);
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -885,7 +884,7 @@ namespace Rv
         {
             rvDoc->setDocumentDisabled(false, true);
             bool result = dialog.exec();
-            rvDoc->view()->setFocus(Qt::OtherFocusReason);
+            rvDoc->viewContainer()->setFocus(Qt::OtherFocusReason);
             rvDoc->setDocumentDisabled(false, false);
 
             if (result)
@@ -1016,7 +1015,7 @@ namespace Rv
         else if (box.clickedButton() == q3 && b3)
             result = 2;
 
-        doc->view()->setFocus(Qt::OtherFocusReason);
+        doc->viewContainer()->setFocus(Qt::OtherFocusReason);
         NODE_RETURN(result);
     }
 
@@ -1721,7 +1720,7 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
+        QWidget* w = doc->viewContainer();
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 

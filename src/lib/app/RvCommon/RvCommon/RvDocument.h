@@ -72,6 +72,7 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewContainer() const;
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
 
@@ -167,6 +168,7 @@ namespace Rv
         DiagnosticsView* m_diagnosticsView;
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
+        QWidget* m_glViewContainer;
         GLView* m_oldGLView;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;

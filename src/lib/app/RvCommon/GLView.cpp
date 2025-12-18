@@ -119,9 +119,9 @@ namespace Rv
 
     } // namespace
 
-    GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red,
+    GLView::GLView(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red,
                    int green, int blue, int alpha, bool noResize)
-        : QOpenGLWidget(parent)
+        : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate)
         , m_sharedContext(sharedContext)
         , m_doc(doc)
         , m_red(red)
@@ -138,29 +138,43 @@ namespace Rv
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
         , m_syncThreadData(0)
+        , m_eventWidget(nullptr)
     {
+        cout << "DEBUG: GLView constructor start (this=" << this << ", sharedContext=" << sharedContext << ")" << endl;
+        cout << "DEBUG: Setting surface format (RGBA " << red << "-" << green << "-" << blue << "-" << alpha << ")" << endl;
         setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+        cout << "DEBUG: Surface format set" << endl;
         
-        // Set FBO internal texture format to GL_RGB10_A2 for 10-10-10-2 mode
-        if (red == 10 && green == 10 && blue == 10 && alpha == 2)
-        {
-            setTextureFormat(GL_RGB10_A2);
-            cout << "INFO: Setting QOpenGLWidget FBO texture format to GL_RGB10_A2" << endl;
-        }
+        // QOpenGLWindow renders directly to surface - no FBO needed!
+        cout << "INFO: Using QOpenGLWindow - direct rendering to 10-10-10-2 surface (no FBO)" << endl;
 
+        cout << "DEBUG: Creating QTGLVideoDevice" << endl;
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
-        m_videoDevice = new QTGLVideoDevice(0, str.str(), this);
+        // Note: eventWidget will be set later by RvDocument after creating the container
+        m_videoDevice = new QTGLVideoDevice(0, str.str(), this, nullptr);
+        cout << "DEBUG: QTGLVideoDevice created: " << m_videoDevice << endl;
 
-        setObjectName((m_doc->session()) ? m_doc->session()->name().c_str() : "no session");
+        cout << "DEBUG: Getting session from doc" << endl;
+        RvSession* sess = m_doc ? m_doc->session() : nullptr;
+        cout << "DEBUG: session = " << sess << endl;
+        setTitle(sess ? sess->name().c_str() : "no session");
+        cout << "DEBUG: Title set" << endl;
 
         m_activityTimer.start();
-        setMouseTracking(true);
-        setAcceptDrops(true);
-        setFocusPolicy(Qt::StrongFocus);
 
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
+        cout << "DEBUG: GLView constructor complete" << endl;
+    }
+
+    void GLView::setEventWidget(QWidget* widget)
+    {
+        m_eventWidget = widget;
+        if (m_videoDevice)
+        {
+            m_videoDevice->setEventWidget(widget);
+        }
     }
 
     GLView::~GLView()
@@ -429,7 +443,7 @@ namespace Rv
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
-                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && hasFocus())
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
                 {
                     TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
@@ -707,7 +721,7 @@ namespace Rv
         case QEvent::FocusIn:
             m_videoDevice->translator().resetModifiers();
         case QEvent::Enter:
-            setFocus(Qt::MouseFocusReason);
+            if (m_eventWidget) m_eventWidget->setFocus(Qt::MouseFocusReason);
             break;
         default:
             break;
@@ -730,7 +744,7 @@ namespace Rv
                     session->userGenericEvent("view-resized", contents.str());
                 }
             }
-            return QOpenGLWidget::event(event);
+            return QOpenGLWindow::event(event);
         }
 
         if (session && session->outputVideoDevice()
@@ -797,7 +811,7 @@ namespace Rv
         }
         else
         {
-            bool result = QOpenGLWidget::event(event);
+            bool result = QOpenGLWindow::event(event);
 
             return result;
         }

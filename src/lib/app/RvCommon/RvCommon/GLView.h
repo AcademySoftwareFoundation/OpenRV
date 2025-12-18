@@ -8,7 +8,7 @@
 #ifndef __rv_qt__GLView__h__
 #define __rv_qt__GLView__h__
 #include <TwkGLF/GL.h>
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLFunctions>
 #include <QSurfaceFormat>
 #include <QOffscreenSurface>
@@ -23,7 +23,7 @@ namespace Rv
     class QTGLVideoDevice;
 
     class GLView
-        : public QOpenGLWidget
+        : public QOpenGLWindow
         , protected QOpenGLFunctions
     {
         Q_OBJECT
@@ -31,7 +31,7 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo = false, bool vsync = true,
+        GLView(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo = false, bool vsync = true,
                bool doubleBuffer = true, int red = 0, int green = 0, int blue = 0, int alpha = 0, bool noResize = true);
         ~GLView();
 
@@ -41,6 +41,8 @@ namespace Rv
         void absolutePosition(int& x, int& y) const;
 
         QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
+
+        void setEventWidget(QWidget* widget);
 
         void stopProcessingEvents();
 
@@ -97,6 +99,7 @@ namespace Rv
         bool m_stopProcessingEvents;
         void* m_syncThreadData;
         QOpenGLContext* m_sharedContext;
+        QWidget* m_eventWidget;
     };
 
 } // namespace Rv
