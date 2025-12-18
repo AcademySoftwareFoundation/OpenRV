@@ -296,6 +296,90 @@ if [ -z "$RV_CLEAN_PROMPT" ]; then
   RV_CLEAN_PROMPT="$PS1"
 fi
 
+# Function to build with better error reporting
+__rv_build_with_errors() {
+  local target="$1"
+  local build_log="${RV_BUILD_DIR}/build_errors.log"
+  local error_summary="${RV_BUILD_DIR}/error_summary.txt"
+  
+  echo "Building target: ${target}"
+  echo "Build errors will be logged to: ${build_log}"
+  echo ""
+  
+  # Set ninja to keep going after failures to see all errors
+  # The -k flag tells ninja to keep building as far as possible
+  if [[ "${CMAKE_GENERATOR}" == "Ninja" ]]; then
+    export NINJA_STATUS="[%f/%t %p] "
+    local ninja_flags="-k 0"  # Keep going, don't stop on first error
+  else
+    local ninja_flags=""
+  fi
+  
+  # Run the build, capturing output
+  # Using set -o pipefail to ensure we catch the cmake exit code through the pipe
+  set -o pipefail
+  cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target ${target} -- ${ninja_flags} 2>&1 | tee "${build_log}"
+  local exit_code=$?
+  set +o pipefail
+  
+  echo ""
+  
+  if [[ $exit_code -eq 0 ]]; then
+    echo "✓ Build completed successfully!"
+    rm -f "${error_summary}"
+    return 0
+  else
+    echo ""
+    echo "════════════════════════════════════════════════════════════════"
+    echo "✗ BUILD FAILED - Error Summary"
+    echo "════════════════════════════════════════════════════════════════"
+    echo ""
+    
+    # Extract and display compilation errors
+    if [[ -f "${build_log}" ]]; then
+      # Extract error messages (looking for common error patterns across platforms)
+      # Patterns cover:
+      #   - GCC/Clang:  "error:", "fatal error:", "undefined reference"
+      #   - MSVC:       "error C####:", "error LNK####:", ": error :"
+      #   - Ninja:      "FAILED:"
+      #   - CMake:      "CMake Error"
+      #   - Linker:     "unresolved external symbol", "undefined symbol"
+      grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
+        grep -v "warnings being treated as errors" | \
+        grep -v "0 error" | \
+        head -50 > "${error_summary}" 2>/dev/null || true
+      
+      if [[ -s "${error_summary}" ]]; then
+        echo "🔥 Compilation Errors Found:"
+        echo "────────────────────────────────────────────────────────────────"
+        cat "${error_summary}"
+        echo "────────────────────────────────────────────────────────────────"
+        echo ""
+        echo "📝 Full build log: ${build_log}"
+        echo "📝 Error summary: ${error_summary}"
+      else
+        echo "Build failed but no specific errors extracted."
+        echo "Check the full build log: ${build_log}"
+        echo ""
+        echo "Last 30 lines of build output:"
+        echo "────────────────────────────────────────────────────────────────"
+        tail -30 "${build_log}"
+        echo "────────────────────────────────────────────────────────────────"
+      fi
+    fi
+    
+    echo ""
+    echo "💡 Tips:"
+    echo "  • Review the error summary above"
+    echo "  • Check full log: less ${build_log}"
+    echo "  • Search for specific errors: grep -i 'your_error' ${build_log}"
+    echo "════════════════════════════════════════════════════════════════"
+    echo ""
+    
+    return $exit_code
+  fi
+}
+
 # Single set of aliases using current build variables
 # Note: Single quotes preserve variables for expansion at execution time
 alias rvappdir='cd ${RV_APP_DIR}'
@@ -303,7 +387,7 @@ alias rvhomedir='cd ${RV_HOME}'
 alias rvenv='rvhomedir && __rv_env_shell'
 alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
 alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -DRV_DEPS_QT_LOCATION=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
-alias rvbuildt='rvenv && cmake --build ${RV_BUILD_DIR} --config ${RV_BUILD_TYPE} -v --parallel=${RV_BUILD_PARALLELISM} --target '
+alias rvbuildt='rvenv && __rv_build_with_errors'
 alias rvbuild='rvenv && rvbuildt main_executable'
 alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'
 alias rvinst='rvenv && cmake --install ${RV_BUILD_DIR} --prefix ${RV_INST_DIR} --config ${RV_BUILD_TYPE}'
@@ -311,6 +395,8 @@ alias rvclean='rvhomedir && __rv_clean_build'
 alias rvmk='rvcfg && rvbuild'
 alias rvbootstrap='rvsetup && rvmk'
 alias rvrun='rvappdir && ./rv'
+alias rverrors='less ${RV_BUILD_DIR}/build_errors.log'
+alias rverrsummary='cat ${RV_BUILD_DIR}/error_summary.txt 2>/dev/null || echo "No error summary found. Build may have succeeded or not run yet."'
 
 __rv_update_paths
 
@@ -332,6 +418,8 @@ echo
 echo "Use 'rvrelease' (default) or 'rvdebug' to switch between build configurations."
 echo "Call 'rvbootstrap' if its your first time building or after calling rvclean."
 echo "After 'rvbootstrap', use 'rvbuild' or 'rvmk' for incremental builds."
+echo
+echo "If build fails, use 'rverrsummary' to see error summary or 'rverrors' to view full log."
 echo
 
 # Initialize with appropriate build mode

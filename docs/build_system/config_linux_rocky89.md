@@ -172,16 +172,12 @@ cmake version 3.31.6
 Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography).
 ````
 
-Install Rust using rustup:
+Install Rust using rustup, and add its installation path to your ~/.bashrc and apply the changes to your current terminal window:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-```
-
-This will install the latest stable version of Rust. After installation, add Rust to your current shell session:
-
-```bash
-source $HOME/.cargo/env
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 Verify that Rust is installed correctly:

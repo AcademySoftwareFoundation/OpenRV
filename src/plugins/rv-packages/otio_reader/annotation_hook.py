@@ -7,6 +7,7 @@
 
 
 import logging
+import uuid
 import effectHook
 import opentimelineio as otio
 from rv import commands, extra_commands
@@ -85,18 +86,13 @@ def _transform_otio_to_world_coordinate(point):
 def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None) -> None:
     """A hook for the annotation schema"""
     try:
-        if argument_map["effect_metadata"]:
-            effect_metadata = argument_map["effect_metadata"]
-            commands.setIntProperty("#Session.paintEffects.hold", [effect_metadata.get("hold", 0)])
-            commands.setIntProperty("#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)])
-        else:
-            commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
-            commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
+        commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
+        commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
 
         commands.setIntProperty("#Session.paintEffects.ghostBefore", [in_timeline.ghost_before])
         commands.setIntProperty("#Session.paintEffects.ghostAfter", [in_timeline.ghost_after])
     except Exception:
-        logging.exception("Unable to set Hold and Ghost properties")
+        logging.warning("Unable to set Hold and Ghost properties")
 
     for layer in in_timeline.layers:
         if layer.name == "Paint":
@@ -136,20 +132,20 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
                     "mode": 0 if layer.type == "COLOR" else 1,
                     "startFrame": start_time,
                     "duration": duration,
+                    "uuid": layer.id
+                    if layer.id
+                    else str(uuid.uuid4()),  # TODO: Remove when CR starts sending this property
                 },
             )
 
-            if not commands.propertyExists(f"{frame_component}.order"):
-                commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
-
-            commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
-
             points_property = f"{pen_component}.points"
             width_property = f"{pen_component}.width"
+
             if not commands.propertyExists(points_property):
                 commands.newProperty(points_property, commands.FloatType, 2)
             if not commands.propertyExists(width_property):
                 commands.newProperty(width_property, commands.FloatType, 1)
+
             for point in layer.points:
                 world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(
                     point
@@ -160,3 +156,9 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
                     [world_coordinate_x, world_coordinate_y],
                 )
                 commands.insertFloatProperty(width_property, [world_coordinate_width])
+
+            if not layer.soft_deleted:
+                if not commands.propertyExists(f"{frame_component}.order"):
+                    commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
+
+                commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])

@@ -1,5 +1,5 @@
 # *****************************************************************************
-# Copyright 2024 Autodesk, Inc. All rights reserved.
+# Copyright 2025 Autodesk, Inc. All rights reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -29,13 +29,14 @@ import opentimelineio as otio
 class Paint(otio.core.SerializableObject):
     """A schema for the start of an annotation"""
 
-    _serializable_label = "Paint.1"
+    _serializable_label = "Paint.2"
     _name = "Paint"
 
     def __init__(
         self,
         name: str = "",
         id: str = "",
+        soft_deleted: bool = False,
         points: list = [],
         rgba: list = [],
         type: str = "",
@@ -46,6 +47,7 @@ class Paint(otio.core.SerializableObject):
         super().__init__()
         self.name = name
         self.id = id
+        self.soft_deleted = soft_deleted
         self.points = points
         self.rgba = rgba
         self.type = type
@@ -56,6 +58,8 @@ class Paint(otio.core.SerializableObject):
     name = otio.core.serializable_field("name", required_type=str, doc=("name: expects a string"))
 
     id = otio.core.serializable_field("id", required_type=str, doc=("name: expects a string"))
+
+    soft_deleted = otio.core.serializable_field("soft_deleted", required_type=bool, doc=("name: expects a bool"))
 
     _points = otio.core.serializable_field(
         "points", required_type=list, doc=("points: expects a list of point objects")
@@ -101,13 +105,13 @@ class Paint(otio.core.SerializableObject):
 
     def __str__(self) -> str:
         return (
-            f"Paint({self.name}, {self.id}, {self.points}, {self.rgba}, {self.type}, "
+            f"Paint({self.id}, {self.soft_deleted}, {self.points}, {self.rgba}, {self.type}, "
             f"{self.brush}, {self.layer_range}, {self.visible})"
         )
 
     def __repr__(self) -> str:
         return (
-            f"otio.schema.Paint(name={self.name!r}, id={self.id!r}, points={self.points!r}, "
+            f"otio.schema.Paint(id={self.id!r}, soft_deleted={self.soft_deleted!r}, points={self.points!r}, "
             f"rgba={self.rgba!r}, type={self.type!r}, brush={self.brush!r}, "
             f"layer_range={self.layer_range!r}, visible={self.visible!r})"
         )
