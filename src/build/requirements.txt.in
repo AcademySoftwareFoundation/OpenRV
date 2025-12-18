@@ -16,7 +16,7 @@ PyOpenGL                # License: BSD License (BSD)
 # Use PyOpenGL_accelerate only on x86_64 platform.
 PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
 
-# Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
+# Additional packages required by RV and for testing the Python distribution
 
 certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
 six                     # License: MIT License (MIT)

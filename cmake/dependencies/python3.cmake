@@ -380,6 +380,23 @@ ADD_CUSTOM_COMMAND(
   DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
 )
 
+# Test the Python distribution after requirements are installed
+SET(${_python3_target}-test-flag
+    ${_install_dir}/${_python3_target}-test-flag
+)
+
+SET(_test_python_script
+    "${PROJECT_SOURCE_DIR}/src/build/test_python.py"
+)
+
+ADD_CUSTOM_COMMAND(
+  COMMENT "Testing Python distribution"
+  OUTPUT ${${_python3_target}-test-flag}
+  COMMAND python3 "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
+  COMMAND cmake -E touch ${${_python3_target}-test-flag}
+  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_script}
+)
+
 IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
@@ -454,7 +471,7 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name} ${_copy_commands}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
 
   ADD_CUSTOM_TARGET(
@@ -468,7 +485,7 @@ ELSE()
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL
