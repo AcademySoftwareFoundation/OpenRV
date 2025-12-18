@@ -140,6 +140,13 @@ namespace Rv
         , m_syncThreadData(0)
     {
         setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+        
+        // Set FBO internal texture format to GL_RGB10_A2 for 10-10-10-2 mode
+        if (red == 10 && green == 10 && blue == 10 && alpha == 2)
+        {
+            setTextureFormat(GL_RGB10_A2);
+            cout << "INFO: Setting QOpenGLWidget FBO texture format to GL_RGB10_A2" << endl;
+        }
 
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window" << "/" << m_doc;
@@ -263,6 +270,25 @@ namespace Rv
 
             // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
             QSurfaceFormat f = context()->format();
+
+            // Print actual RGBA color depths
+            cout << "INFO: OpenGL context RGBA color depths: "
+                 << f.redBufferSize() << "-" << f.greenBufferSize() << "-" 
+                 << f.blueBufferSize() << "-" << f.alphaBufferSize() << endl;
+
+            // Validate FBO creation for 10-10-10-2 mode
+            if (m_red == 10 && m_green == 10 && m_blue == 10 && m_alpha == 2)
+            {
+                if (!isValid())
+                {
+                    cout << "ERROR: QOpenGLWidget initialization failed!" << endl;
+                    cout << "       10-10-10-2 surface format or GL_RGB10_A2 FBO may not be supported." << endl;
+                }
+                else
+                {
+                    cout << "INFO: Successfully initialized with 10-10-10-2 surface and GL_RGB10_A2 FBO!" << endl;
+                }
+            }
 
 #ifndef PLATFORM_DARWIN
             //

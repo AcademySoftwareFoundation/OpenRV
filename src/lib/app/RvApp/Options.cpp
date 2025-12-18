@@ -299,10 +299,10 @@ namespace Rv
         sync = 0;
         lqt_decoder = 0;
         exrcpus = 0;
-        dispRedBits = 8;
-        dispGreenBits = 8;
-        dispBlueBits = 8;
-        dispAlphaBits = 8;
+        dispRedBits = 10;
+        dispGreenBits = 10;
+        dispBlueBits = 10;
+        dispAlphaBits = 2;
         networkPort = 0;
         networkHost = NULL;
         networkTag = NULL;
