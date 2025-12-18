@@ -78,7 +78,14 @@ def delete_rpath(object_file_path, rpath):
         rpath,
         object_file_path,
     ]
-    subprocess.run(delete_rpath_command).check_returncode()
+    result = subprocess.run(delete_rpath_command, capture_output=True, text=True)
+    # Don't fail if the rpath doesn't exist (can happen during incremental rebuilds)
+    if result.returncode != 0:
+        if "no LC_RPATH load command" not in result.stderr:
+            # Only fail for actual errors, not missing rpaths
+            result.check_returncode()
+        else:
+            logging.info(f"\tRpath {rpath} not found in {object_file_path}, skipping")
 
 
 def change_shared_library_path(object_file_path, old_library_path):
