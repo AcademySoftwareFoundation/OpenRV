@@ -163,6 +163,10 @@ ENDIF()
 # OpenEXR tools are not needed.
 LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
 
+# Disable OpenEXR's automatic rpath setup to avoid conflicts with RV's rpath management
+# OpenEXR 3.3+ automatically adds @loader_path/../lib which conflicts with our install scripts
+LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
