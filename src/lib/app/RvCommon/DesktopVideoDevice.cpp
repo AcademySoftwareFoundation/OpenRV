@@ -157,12 +157,23 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
-        QSurfaceFormat fmt = shareDevice()->widget()->format();
+        QSurfaceFormat fmt;
+        if (shareDevice()->window())
+        {
+            fmt = shareDevice()->window()->format();
+        }
+        else if (shareDevice()->widget())
+        {
+            fmt = shareDevice()->widget()->format();
+        }
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        // Note: Cannot share context between QOpenGLWindow and QOpenGLWidget
+        // ScreenView will have its own context - data will be transferred via FBO copy
+        ScreenView* vw = new ScreenView(fmt, 0, nullptr, Qt::Window);
         setViewWidget(vw);
 
+        // Create QTGLVideoDevice with QOpenGLWidget overload
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
         setViewDevice(vd);
 
