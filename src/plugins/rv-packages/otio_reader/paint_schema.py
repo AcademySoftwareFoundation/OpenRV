@@ -34,9 +34,8 @@ class Paint(otio.core.SerializableObject):
 
     def __init__(
         self,
-        name: str = "",
         id: str = "",
-        soft_deleted: bool = False,
+        soft_deleted: bool | None = None,
         points: list = [],
         rgba: list = [],
         type: str = "",
@@ -45,7 +44,6 @@ class Paint(otio.core.SerializableObject):
         visible: bool = True,
     ) -> None:
         super().__init__()
-        self.name = name
         self.id = id
         self.soft_deleted = soft_deleted
         self.points = points
@@ -54,8 +52,6 @@ class Paint(otio.core.SerializableObject):
         self.brush = brush
         self.layer_range = layer_range
         self.visible = visible
-
-    name = otio.core.serializable_field("name", required_type=str, doc=("name: expects a string"))
 
     id = otio.core.serializable_field("id", required_type=str, doc=("name: expects a string"))
 
