@@ -52,6 +52,7 @@ an up to date list, we're going to pull it from the certifi module, which incorp
 all the certificate authorities that are distributed with Firefox.
 """
 import site
+import sys
 
 try:
     import os

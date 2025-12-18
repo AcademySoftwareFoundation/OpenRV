@@ -158,10 +158,10 @@ if __name__ == "__main__":
 
     try:
         test_python_distribution(args.python_home, args.variant)
-        print("\n✓ Python distribution validation completed successfully")
+        print("\n[OK] Python distribution validation completed successfully")
         sys.exit(0)
     except Exception as e:
-        print(f"\n✗ Python distribution validation failed: {e}", file=sys.stderr)
+        print(f"\n[FAILED] Python distribution validation failed: {e}", file=sys.stderr)
         import traceback
         traceback.print_exc()
         sys.exit(1)
