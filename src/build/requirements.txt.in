@@ -2,8 +2,9 @@
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
 #       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
 #       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
-# NOTE: Using --no-binary :all: in pip install ensures all packages are built from source against our custom Python.
-# NOTE: pip, setuptools, and wheel are exceptions - they use pre-built binaries for compatibility.
+# NOTE: Packages with C/C++/Rust extensions (opentimelineio, numpy, PyOpenGL-accelerate, cryptography, pydantic)
+#       are built from source to ensure proper linking with our custom Python. Other packages use pre-built wheels.
+#       See python3.cmake
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License

@@ -272,8 +272,15 @@ ELSE()
   SET(_otio_debug_env "")
 ENDIF()
 
-# Using --no-binary :all: to ensure all packages with native extensions are built from source
-# against our custom Python build, preventing ABI compatibility issues.
+# Force source builds only for packages with C/C++/Rust extensions that need to link against our custom Python.
+# All other packages (including build tools like Cython) can use pre-built wheels, which avoids
+# path length issues on Windows and improves build speed.
+# Packages built from source:
+#   - opentimelineio: C++ extensions, uses CMAKE_ARGS for proper linking
+#   - numpy: C extensions that need our Python ABI
+#   - PyOpenGL-accelerate: Cython extensions
+#   - cryptography: C extensions linking to OpenSSL
+#   - pydantic: Has Rust extensions (pydantic-core) in v2+
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env
     ${_otio_debug_env}
@@ -286,7 +293,7 @@ ENDIF()
 
 LIST(APPEND _requirements_install_command
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary :all: --only-binary pip,setuptools,wheel -r "${_requirements_output_file}"
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary opentimelineio,numpy,PyOpenGL-accelerate,cryptography,pydantic -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
