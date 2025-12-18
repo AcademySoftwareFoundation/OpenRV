@@ -6,27 +6,26 @@
 #       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
 #       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
 
-pip                     # License: MIT License (MIT)
-setuptools              # License: MIT License
-wheel                   # License: MIT License (MIT)
+pip==24.0               # License: MIT License (MIT)
+setuptools==69.5.1      # License: MIT License
+wheel==0.43.0           # License: MIT License (MIT)
 numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
-PyOpenGL                # License: BSD License (BSD)
+PyOpenGL==3.1.7         # License: BSD License (BSD)
 
 # MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix
 # is merged in the main branch.
 # See https://github.com/mcfletch/pyopengl/issues/147 and https://github.com/mcfletch/pyopengl/pull/146
 
-# PyOpenGL_accelerate as issue with native arm64 build on MacOS.
+# PyOpenGL_accelerate has issue with native arm64 build on MacOS.
 # Use PyOpenGL_accelerate only on x86_64 platform.
-PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
+PyOpenGL_accelerate==3.1.7 ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
 
 # Additional packages required by RV and for testing the Python distribution
 
-certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0) - required by test_python.py
-six                     # License: MIT License (MIT)
-packaging               # License: Apache Software License, BSD License
-requests                # License: Apache Software License (Apache 2.0)
-cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
-pydantic                # License: MIT License (MIT)
-
+certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+six==1.16.0             # License: MIT License (MIT)
+packaging==24.0         # License: Apache Software License, BSD License
+requests==2.31.0        # License: Apache Software License (Apache 2.0)
+cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+pydantic==2.7.1         # License: MIT License (MIT)
