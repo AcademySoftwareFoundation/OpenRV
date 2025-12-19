@@ -237,12 +237,15 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
-# Set the appropriate library for CMAKE_ARGS based on platform
-# Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
+# Set the appropriate library for CMAKE_ARGS based on platform Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
 IF(RV_TARGET_WINDOWS)
-  SET(_python3_cmake_library ${_python3_implib})
+  SET(_python3_cmake_library
+      ${_python3_implib}
+  )
 ELSE()
-  SET(_python3_cmake_library ${_python3_lib})
+  SET(_python3_cmake_library
+      ${_python3_lib}
+  )
 ENDIF()
 
 # Generate requirements.txt from template with the OpenTimelineIO and NumPy versions substituted
@@ -255,36 +258,42 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
-# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses
-# the correct custom-built Python libraries. This is required for both old and new
-# versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection.
-# Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
-# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
-# --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
+# new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
 # --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
 
-# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions
-# are built with debug symbols and proper optimization levels matching RV's build type.
-# On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
+# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions are built with debug symbols and proper optimization levels matching RV's build
+# type. On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  SET(_otio_debug_env "OTIO_CXX_DEBUG_BUILD=1")
+  SET(_otio_debug_env
+      "OTIO_CXX_DEBUG_BUILD=1"
+  )
 ELSE()
-  SET(_otio_debug_env "")
+  SET(_otio_debug_env
+      ""
+  )
 ENDIF()
 
-# Force source builds only for packages with C/C++/Rust extensions that need to link against our custom Python.
-# All other packages (including build tools like Cython) can use pre-built wheels, which avoids
-# path length issues on Windows and improves build speed.
-# Packages built from source:
-#   - opentimelineio: C++ extensions, uses CMAKE_ARGS for proper linking
-#   - numpy: C extensions that need our Python ABI
-#   - PyOpenGL-accelerate: Cython extensions
-#   - cryptography: Rust extensions with C bindings to OpenSSL
-#   - pydantic: Has Rust extensions (pydantic-core) in v2+
-#   - cffi: C extensions (_cffi_backend module), required by cryptography as build dependency
+# List of pure Python packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source
+# to ensure proper linking against our custom Python build. Packages are built from source unless explicitly listed here
+SET(RV_PYTHON_WHEEL_SAFE
+    "pip" # Package installer (pure Python)
+    "setuptools" # Build system (pure Python)
+    "wheel" # Wheel format support (pure Python)
+    "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
+    "certifi" # SSL certificate bundle (just data files)
+    "six" # Python 2/3 compatibility (pure Python)
+    "packaging" # Version parsing (pure Python)
+    "requests" # HTTP library (pure Python)
+    CACHE STRING "Pure Python packages safe to install from wheels"
+)
+
+# Convert list to comma-separated string for pip's --only-binary flag
+STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
+
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env
-    ${_otio_debug_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env}
 )
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
@@ -292,9 +301,28 @@ IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
 ENDIF()
 
-LIST(APPEND _requirements_install_command
-    "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary opentimelineio,numpy,PyOpenGL-accelerate,cryptography,pydantic,cffi -r "${_requirements_output_file}"
+# Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
+# cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
+LIST(
+  APPEND
+  _requirements_install_command
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  "${_python3_executable}"
+  -s
+  -E
+  -I
+  -m
+  pip
+  install
+  --upgrade
+  --no-cache-dir
+  --force-reinstall
+  --no-binary
+  :all:
+  --only-binary
+  ${_wheel_safe_packages}
+  -r
+  "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -412,8 +440,8 @@ ADD_CUSTOM_COMMAND(
 IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
-  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
-  # Also, Rust libraries (like cryptography via pyo3) look for python3.lib.
+  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib. Also, Rust libraries (like cryptography via pyo3) look for
+  # python3.lib.
   ADD_CUSTOM_COMMAND(
     TARGET ${_python3_target}
     POST_BUILD
@@ -421,8 +449,8 @@ IF(RV_TARGET_WINDOWS
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath}
     COMMAND cmake -E copy_if_different ${_lib_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_lib_dir}/python${PYTHON_VERSION_MAJOR}.lib
-    COMMAND cmake -E copy_if_different ${_bin_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_bin_dir}/python${PYTHON_VERSION_MAJOR}.lib
-    DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_bin_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_bin_dir}/python${PYTHON_VERSION_MAJOR}.lib DEPENDS ${_python3_target}
+            ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 
