@@ -21,7 +21,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
 
     # NumPy
     # https://numpy.org/doc/stable/release.html
-    SET(ENV{RV_DEPS_NUMPY_VERSION} "2.3.0")
+    SET(RV_DEPS_NUMPY_VERSION "2.3.0")
 
     # OCIO
     # https://github.com/AcademySoftwareFoundation/OpenColorIO
