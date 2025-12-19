@@ -73,7 +73,7 @@ def test_python_distribution(python_home: str, variant: str) -> None:
                     # Check for tkinter
                     "try:",
                     "    import tkinter",
-                    "except:",
+                    "except Exception:",
                     "    import Tkinter as tkinter",
                     # Make sure certifi is available
                     "import certifi",
