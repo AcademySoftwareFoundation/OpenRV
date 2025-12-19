@@ -17,8 +17,6 @@ import shutil
 import sys
 import subprocess
 import platform
-import tempfile
-import uuid
 
 from typing import List
 from datetime import datetime
