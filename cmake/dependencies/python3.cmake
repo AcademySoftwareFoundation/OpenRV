@@ -279,8 +279,9 @@ ENDIF()
 #   - opentimelineio: C++ extensions, uses CMAKE_ARGS for proper linking
 #   - numpy: C extensions that need our Python ABI
 #   - PyOpenGL-accelerate: Cython extensions
-#   - cryptography: C extensions linking to OpenSSL
+#   - cryptography: Rust extensions with C bindings to OpenSSL
 #   - pydantic: Has Rust extensions (pydantic-core) in v2+
+#   - cffi: C extensions (_cffi_backend module), required by cryptography as build dependency
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env
     ${_otio_debug_env}
@@ -293,7 +294,7 @@ ENDIF()
 
 LIST(APPEND _requirements_install_command
     "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary opentimelineio,numpy,PyOpenGL-accelerate,cryptography,pydantic -r "${_requirements_output_file}"
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall --no-binary opentimelineio,numpy,PyOpenGL-accelerate,cryptography,pydantic,cffi -r "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
