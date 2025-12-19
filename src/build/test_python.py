@@ -130,16 +130,14 @@ def test_python_distribution(python_home: str, variant: str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Test a Python distribution built by make_python.py"
-    )
+    parser = argparse.ArgumentParser(description="Test a Python distribution built by make_python.py")
 
     parser.add_argument(
         "--python-home",
         dest="python_home",
         type=pathlib.Path,
         required=True,
-        help="Path to the Python installation directory to test"
+        help="Path to the Python installation directory to test",
     )
     parser.add_argument(
         "--variant",
@@ -147,7 +145,7 @@ if __name__ == "__main__":
         type=str,
         required=True,
         choices=["Debug", "Release"],
-        help="Build variant (Debug or Release)"
+        help="Build variant (Debug or Release)",
     )
 
     args = parser.parse_args()
@@ -163,6 +161,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAILED] Python distribution validation failed: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
-

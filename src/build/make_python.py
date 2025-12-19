@@ -157,11 +157,10 @@ def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
             f"No Python interpreter found in {python_home}. "
             f"Searched for pattern '{python_name_pattern}' in {python_home} (recursively) and {os.path.join(python_home, 'bin')}. "
         )
-    
+
     if not os.path.exists(python_interpreters[0]):
         raise FileNotFoundError(
-            f"Python interpreter does not exist: {python_interpreters[0]}. "
-            f"Found interpreters: {python_interpreters}"
+            f"Python interpreter does not exist: {python_interpreters[0]}. Found interpreters: {python_interpreters}"
         )
 
     print(f"Found python interpreters {python_interpreters}")
