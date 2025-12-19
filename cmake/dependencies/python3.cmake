@@ -275,18 +275,22 @@ ELSE()
   )
 ENDIF()
 
-# List of pure Python packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source
-# to ensure proper linking against our custom Python build. Packages are built from source unless explicitly listed here
+# List of packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source to ensure
+# proper linking against our custom Python build. Packages are built from source unless explicitly listed here. This includes: pure Python packages, build tools
+# that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
     "pip" # Package installer (pure Python)
     "setuptools" # Build system (pure Python)
     "wheel" # Wheel format support (pure Python)
+    "Cython" # Build tool (compiles Python to C, but the tool itself can use pre-built wheels)
+    "meson-python" # Build backend (pure Python)
+    "ninja" # Build tool (native but doesn't link to Python)
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
-    CACHE STRING "Pure Python packages safe to install from wheels"
+    CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
 # Convert list to comma-separated string for pip's --only-binary flag
