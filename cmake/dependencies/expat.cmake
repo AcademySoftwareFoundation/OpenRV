@@ -14,8 +14,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "${RV_DEPS_EXPAT_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
-
-string(REPLACE "." "_" _version_underscored ${_version})
+STRING(REPLACE "." "_" _version_underscored ${_version})
 SET(_download_url
     "https://github.com/libexpat/libexpat/archive/refs/tags/R_${_version_underscored}.tar.gz"
 )
@@ -31,7 +30,7 @@ SET(_libexpat_lib_version
 RV_MAKE_STANDARD_LIB_NAME("libexpat" "" "SHARED" "d")
 
 # Remove the -S argument from _configure_options, and adjust the path for Expat.
-list(REMOVE_ITEM _configure_options "-S ${_source_dir}")
+LIST(REMOVE_ITEM _configure_options "-S ${_source_dir}")
 # Expat source is under expat folder and not directly under repository root.
 LIST(APPEND _configure_options "-S ${_source_dir}/expat")
 
@@ -66,16 +65,15 @@ ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 ADD_LIBRARY(EXPAT::EXPAT SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(EXPAT::EXPAT ${_target})
 
-# An import library (.lib) file is often used to resolve references to 
-# functions and variables in a DLL, enabling the linker to generate code 
-# for loading the DLL and calling its functions at runtime.
+# An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
+# DLL and calling its functions at runtime.
 SET_PROPERTY(
-    TARGET EXPAT::EXPAT
-    PROPERTY IMPORTED_LOCATION "${_libpath}"
+  TARGET EXPAT::EXPAT
+  PROPERTY IMPORTED_LOCATION "${_libpath}"
 )
 SET_PROPERTY(
-    TARGET EXPAT::EXPAT
-    PROPERTY IMPORTED_IMPLIB "${_implibpath}"
+  TARGET EXPAT::EXPAT
+  PROPERTY IMPORTED_IMPLIB "${_implibpath}"
 )
 
 # It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path

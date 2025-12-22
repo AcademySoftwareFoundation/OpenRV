@@ -20,12 +20,11 @@ LIST(APPEND _configure_options "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTU
 LIST(APPEND _configure_options "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
 # Windows Release mode workaround - testing minimal working set
-IF(RV_TARGET_WINDOWS AND CMAKE_BUILD_TYPE STREQUAL "Release")
-  # /O2 - Keep speed optimization
-  # /GL- - Disable whole program optimization (prevents hangs)
-  # /Ob0 - Disable inlining (prevents template hang)
-  # /bigobj - Allow large object files (needed for nanobind)
-  # /DNDEBUG - Keep release mode defines
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE STREQUAL "Release"
+)
+  # /O2 - Keep speed optimization /GL- - Disable whole program optimization (prevents hangs) /Ob0 - Disable inlining (prevents template hang) /bigobj - Allow
+  # large object files (needed for nanobind) /DNDEBUG - Keep release mode defines
   LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS_RELEASE=/O2 /GL- /Ob0 /bigobj /DNDEBUG")
   LIST(APPEND _configure_options "-DCMAKE_C_FLAGS_RELEASE=/O2 /GL- /Ob0 /bigobj /DNDEBUG")
   MESSAGE(STATUS "PyImGui: Testing reduced Windows Release workaround flags")
@@ -36,9 +35,13 @@ LIST(APPEND _configure_options "-B ${_build_dir}")
 
 # Set the correct library name - Windows needs .pyd extension for Python modules
 IF(RV_TARGET_WINDOWS)
-  SET(_libname "pyimgui.pyd")
+  SET(_libname
+      "pyimgui.pyd"
+  )
 ELSE()
-  SET(_libname "pyimgui${CMAKE_SHARED_MODULE_SUFFIX}")
+  SET(_libname
+      "pyimgui${CMAKE_SHARED_MODULE_SUFFIX}"
+  )
 ENDIF()
 
 # The built library will be at the root of the build directory.
@@ -73,12 +76,13 @@ EXTERNALPROJECT_ADD(
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists_PyImGUI.cmake
     ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/CMakeLists.txt && ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_imgui_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/bindings
-    && ${_patch_command_for_imgui_bindings}
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_imgui_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/bindings &&
+    ${_patch_command_for_imgui_bindings}
   UPDATE_COMMAND ""
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
-                    -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file} -Dnanobind_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_NANOBIND/install/nanobind
-                    -DRV_TARGET_WINDOWS=${RV_TARGET_WINDOWS}
+  CONFIGURE_COMMAND
+    ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install
+    -Dimgui_INCLUDE_DIRS=${_imgui_include_dirs} -Dimgui_LIBRARY=${_imgui_library_file} -Dnanobind_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_NANOBIND/install/nanobind
+    -DRV_TARGET_WINDOWS=${RV_TARGET_WINDOWS}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
   BUILD_BYPRODUCTS ${_build_output_path}
@@ -88,10 +92,14 @@ EXTERNALPROJECT_ADD(
 )
 
 # Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
-IF (RV_TARGET_WINDOWS)
-  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/site-packages")
+IF(RV_TARGET_WINDOWS)
+  SET(_pybindings_location
+      "${RV_STAGE_LIB_DIR}/site-packages"
+  )
 ELSE()
-  SET(_pybindings_location "${RV_STAGE_LIB_DIR}/${_PYTHON_LIB_DIR}")
+  SET(_pybindings_location
+      "${RV_STAGE_LIB_DIR}/${_PYTHON_LIB_DIR}"
+  )
 ENDIF()
 
 ADD_CUSTOM_COMMAND(
