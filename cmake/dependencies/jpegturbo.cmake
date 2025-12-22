@@ -108,8 +108,7 @@ EXTERNALPROJECT_ADD(
 IF(NOT RV_TARGET_WINDOWS)
   RV_COPY_LIB_BIN_FOLDERS()
 ELSE()
-  # Don't use RV_COPY_LIB_BIN_FOLDERS() because RV don't need the whole bin directory.
-  # Copying the two DLLs from jpegturbo.
+  # Don't use RV_COPY_LIB_BIN_FOLDERS() because RV don't need the whole bin directory. Copying the two DLLs from jpegturbo.
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
     POST_BUILD
