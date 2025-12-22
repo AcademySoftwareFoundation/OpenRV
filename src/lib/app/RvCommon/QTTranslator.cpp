@@ -663,7 +663,9 @@ namespace Rv
 
         n += "wheel";
         // use pixelDelta() or angleDelta() instead of delta() (deprecated)
-        if (event->angleDelta().y() < 0)
+        // Alt key means horizontal scroll
+        int delta = (event->modifiers() & Qt::AltModifier) ? event->angleDelta().x() : event->angleDelta().y();
+        if (delta < 0)
             n += "down";
         else
             n += "up";
