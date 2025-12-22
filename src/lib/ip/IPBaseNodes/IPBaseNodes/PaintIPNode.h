@@ -26,7 +26,6 @@ namespace IPCore
     //          float angle
     //          string text
     //
-
     struct PaintEffects
     {
         int hold = 0;
