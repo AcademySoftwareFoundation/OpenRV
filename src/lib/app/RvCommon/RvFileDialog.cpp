@@ -225,7 +225,7 @@ namespace Rv
         m_rename = m_selectionPopup->addAction("Rename");
         m_delete = m_selectionPopup->addAction("Delete");
         m_selectionPopup->addSeparator();
-        m_reload =  m_selectionPopup->addAction("Refresh");
+        m_reload = m_selectionPopup->addAction("Refresh");
 
         QIcon backIcon = colorAdjustedIcon(":images/back_32x32.png");
         QIcon forwardIcon = colorAdjustedIcon(":images/forwd_32x32.png");
@@ -320,8 +320,7 @@ namespace Rv
 
         connect(m_delete, SIGNAL(triggered(bool)), this, SLOT(deleteSelected(bool)));
 
-        connect(m_ui.previousButton, SIGNAL(triggered(QAction*)), this,
-                SLOT(prevButtonTrigger(QAction*)));
+        connect(m_ui.previousButton, SIGNAL(triggered(QAction*)), this, SLOT(prevButtonTrigger(QAction*)));
 
         connect(m_ui.nextButton, SIGNAL(triggered(QAction*)), this, SLOT(nextButtonTrigger(QAction*)));
 
@@ -376,13 +375,9 @@ namespace Rv
 
         connect(m_ui.fileTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(fileTypeChanged(int)));
 
-        connect(m_columnView,
-                SIGNAL(customContextMenuRequested(const QPoint&)), this,
-                SLOT(selectionPopup(const QPoint&)));
+        connect(m_columnView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(selectionPopup(const QPoint&)));
 
-        connect(m_detailTree,
-                SIGNAL(customContextMenuRequested(const QPoint&)), this,
-                SLOT(selectionPopup(const QPoint&)));
+        connect(m_detailTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(selectionPopup(const QPoint&)));
 
         QCompleter* completer = new QCompleter(this);
 #if defined(RV_VFX_CY2023)
@@ -653,14 +648,13 @@ namespace Rv
 
         if (m_currentDir.isEmpty() || !dir.exists())
         {
-            QMessageBox::critical(this, "Create New Folder Error",
-                QString("Current Directory does not exist: %1").arg(m_currentDir));
+            QMessageBox::critical(this, "Create New Folder Error", QString("Current Directory does not exist: %1").arg(m_currentDir));
 
             return;
         }
 
-        QString folderName = QInputDialog::getText(this, "Create New Folder",
-            "Folder name:", QLineEdit::Normal, QString("untitled folder"), &ok);
+        QString folderName =
+            QInputDialog::getText(this, "Create New Folder", "Folder name:", QLineEdit::Normal, QString("untitled folder"), &ok);
 
         if (ok && !folderName.isEmpty())
         {
@@ -670,8 +664,9 @@ namespace Rv
             }
             else
             {
-                QMessageBox::critical(this, "Create New Folder Error", "Failed to create the folder.\n"
-                    "It may already exist or the name is invalid.");
+                QMessageBox::critical(this, "Create New Folder Error",
+                                      "Failed to create the folder.\n"
+                                      "It may already exist or the name is invalid.");
             }
         }
     }
@@ -681,14 +676,16 @@ namespace Rv
         QStringList files = selectedFiles();
         if (files.size() == 0)
         {
-            QMessageBox::critical(this, "Rename Error", "No folder or file selected.\n"
-                "Please select only one file or folder.");
+            QMessageBox::critical(this, "Rename Error",
+                                  "No folder or file selected.\n"
+                                  "Please select only one file or folder.");
             return;
         }
         else if (files.size() > 1)
         {
-            QMessageBox::critical(this, "Rename Error", "Too many folders and files selected.\n"
-               "Please select only one file or folder.");
+            QMessageBox::critical(this, "Rename Error",
+                                  "Too many folders and files selected.\n"
+                                  "Please select only one file or folder.");
             return;
         }
 
@@ -697,14 +694,12 @@ namespace Rv
 
         if (!info.exists())
         {
-            QMessageBox::critical(this, "Rename Error",
-                QString("Unable to rename: %1").arg(info.fileName()));
+            QMessageBox::critical(this, "Rename Error", QString("Unable to rename: %1").arg(info.fileName()));
             return;
         }
 
         bool ok;
-        QString newName = QInputDialog::getText(this, "Rename",
-            "New name:", QLineEdit::Normal, info.fileName(), &ok);
+        QString newName = QInputDialog::getText(this, "Rename", "New name:", QLineEdit::Normal, info.fileName(), &ok);
 
         if (!ok || newName.isEmpty() || newName == info.fileName())
             return;
@@ -721,36 +716,36 @@ namespace Rv
         else
         {
             QMessageBox::critical(this, "Error",
-                QString("Failed to rename the %1.\nIt may already exist or you may not have permission.")
-                .arg(info.isDir() ? "folder" : "file"));
+                                  QString("Failed to rename the %1.\nIt may already exist or you may not have permission.")
+                                      .arg(info.isDir() ? "folder" : "file"));
         }
     }
 
-    bool RvFileDialog::confirmDeleteDialog(const QStringList &paths)
+    bool RvFileDialog::confirmDeleteDialog(const QStringList& paths)
     {
         QDialog dialog(this);
         dialog.setWindowTitle("Confirm Deletion");
 
-        QVBoxLayout *layout = new QVBoxLayout(&dialog);
+        QVBoxLayout* layout = new QVBoxLayout(&dialog);
 
-        QHBoxLayout *messageLayout = new QHBoxLayout;
-        QLabel *iconLabel = new QLabel;
+        QHBoxLayout* messageLayout = new QHBoxLayout;
+        QLabel* iconLabel = new QLabel;
         QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion);
         iconLabel->setPixmap(icon.pixmap(48, 48));
         messageLayout->addWidget(iconLabel, 0, Qt::AlignTop);
 
-        QLabel *label = new QLabel("Are you sure you want to delete the following paths?");
+        QLabel* label = new QLabel("Are you sure you want to delete the following paths?");
         messageLayout->addWidget(label, 1);
 
         layout->addLayout(messageLayout);
 
-        QListWidget *listWidget = new QListWidget;
+        QListWidget* listWidget = new QListWidget;
         listWidget->addItems(paths);
         listWidget->setMinimumWidth(500);
         listWidget->setSelectionMode(QAbstractItemView::NoSelection);
         layout->addWidget(listWidget);
 
-        QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No);
         layout->addWidget(buttonBox);
 
         QObject::connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
@@ -764,30 +759,29 @@ namespace Rv
         QStringList paths = selectedFiles();
         if (paths.size() == 0)
         {
-            QMessageBox::critical(
-                this, "Delete Error", "No items selected.\n"
-                "You must have one or more files selected");
+            QMessageBox::critical(this, "Delete Error",
+                                  "No items selected.\n"
+                                  "You must have one or more files selected");
             return;
         }
 
         // check all paths exists and aren't image sequences
         QString currentDir = m_currentDir;
 
-        for (const QString &path : paths)
+        for (const QString& path : paths)
         {
             DB("deleteSelected: " << path.toUtf8().data());
             QFileInfo info(path);
             if (!info.exists() || !(info.isFile() || info.isDir()))
             {
-                QMessageBox::critical(
-                    this, "Delete Error",  QString("Unable to delete: %1").arg(info.fileName()));
+                QMessageBox::critical(this, "Delete Error", QString("Unable to delete: %1").arg(info.fileName()));
                 return;
             }
 
             if (path == currentDir)
             {
                 QDir dir(path);
-                if(dir.cdUp())
+                if (dir.cdUp())
                     currentDir = dir.absolutePath();
             }
         }
@@ -796,17 +790,15 @@ namespace Rv
             return;
 
         // Sort paths in depth first order
-        std::sort(paths.begin(), paths.end(), [](const QString& a, const QString& b) {
-            return a.count(QDir::separator()) > b.count(QDir::separator());
-        });
+        std::sort(paths.begin(), paths.end(),
+                  [](const QString& a, const QString& b) { return a.count(QDir::separator()) > b.count(QDir::separator()); });
 
-        for (const QString &path : paths)
+        for (const QString& path : paths)
         {
             QFileInfo info(path);
             if (!info.exists())
             {
-                QMessageBox::critical(
-                    this, "Delete Error",  QString("Path does not exist: %1").arg(path));
+                QMessageBox::critical(this, "Delete Error", QString("Path does not exist: %1").arg(path));
                 return;
             }
 
@@ -814,8 +806,7 @@ namespace Rv
             {
                 if (!QFile::remove(path))
                 {
-                    QMessageBox::critical(
-                        this, "Delete Error",  QString("Failed to delete file: %1").arg(path));
+                    QMessageBox::critical(this, "Delete Error", QString("Failed to delete file: %1").arg(path));
                     return;
                 }
             }
@@ -824,15 +815,13 @@ namespace Rv
                 QDir dir(path);
                 if (!dir.removeRecursively())
                 {
-                    QMessageBox::critical(
-                        this, "Delete Error",  QString("Failed to delete directory: %1").arg(path));
+                    QMessageBox::critical(this, "Delete Error", QString("Failed to delete directory: %1").arg(path));
                     return;
                 }
             }
             else
             {
-                QMessageBox::critical(
-                    this, "Delete Error",  QString("Unknown path type: %1").arg(path));
+                QMessageBox::critical(this, "Delete Error", QString("Unknown path type: %1").arg(path));
                 return;
             }
         }

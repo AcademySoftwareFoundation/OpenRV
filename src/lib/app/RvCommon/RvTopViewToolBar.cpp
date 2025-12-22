@@ -1404,9 +1404,8 @@ namespace Rv
                 }
                 else
                 {
-                    QString tooltip = m_customDisabledPrefix.isEmpty() 
-                                      ? mapping.defaultTooltip 
-                                      : m_customDisabledPrefix + mapping.defaultTooltip;
+                    QString tooltip =
+                        m_customDisabledPrefix.isEmpty() ? mapping.defaultTooltip : m_customDisabledPrefix + mapping.defaultTooltip;
                     mapping.action->setToolTip(tooltip);
                 }
             }

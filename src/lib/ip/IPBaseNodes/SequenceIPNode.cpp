@@ -269,23 +269,15 @@ namespace IPCore
     {
         const IPNodes& ins = inputs();
 
-        if (!ins.size()
-            || m_edlSource->size() < 1
-            || m_edlSourceIn->size() < 1
-            || m_edlSourceOut->size() < 1
-            || m_edlGlobalIn->size() < 1)
+        if (!ins.size() || m_edlSource->size() < 1 || m_edlSourceIn->size() < 1 || m_edlSourceOut->size() < 1 || m_edlGlobalIn->size() < 1)
         {
             return EvalPoint(-1, 0, -1);
         }
 
-        const int index =
-            (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
+        const int index = (forceIndex == -1) ? indexAtFrame(frame) : forceIndex;
 
-        if (index >= (m_edlSource->size() - 1)
-            || index >= (m_edlSourceIn->size() - 1)
-            || index >= (m_edlSourceOut->size() - 1)
-            || index >= (m_edlGlobalIn->size() - 1)
-            || index < 0 )
+        if (index >= (m_edlSource->size() - 1) || index >= (m_edlSourceIn->size() - 1) || index >= (m_edlSourceOut->size() - 1)
+            || index >= (m_edlGlobalIn->size() - 1) || index < 0)
         {
             return EvalPoint(-1, 0, -1);
         }
@@ -809,7 +801,6 @@ namespace IPCore
         const IPNodes& ins = inputs();
         const float vw = interactive ? context.viewWidth : float(m_structInfo.width);
         const float vh = interactive ? context.viewHeight : float(m_structInfo.height);
-
 
         if (ins.empty() || interactive)
         {
