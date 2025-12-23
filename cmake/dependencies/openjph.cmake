@@ -1,5 +1,4 @@
 #
-#
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -32,22 +31,20 @@ SET(_download_hash
 IF(RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("openjph.${_version_major}.${_version_minor}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
   SET(_libname
-        "openjph.${_version_major}.${_version_minor}.lib"
-    )
-    SET(_implibpath
-        ${_lib_dir}/${_libname}
-    )
+      "openjph.${_version_major}.${_version_minor}.lib"
+  )
+  SET(_implibpath
+      ${_lib_dir}/${_libname}
+  )
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("openjph" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
 ENDIF()
- MESSAGE("****OPENJPH RV_MAKE_STANDARD_LIB_NAME IMPLIB _implibpath:${_implibpath} _implibname:${_implibname} _libname:${_libname} _libpath:${_libpath}")
-
+MESSAGE("****OPENJPH RV_MAKE_STANDARD_LIB_NAME IMPLIB _implibpath:${_implibpath} _implibname:${_implibname} _libname:${_libname} _libpath:${_libpath}")
 
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 
-# Do not build the executables (Openjph calls them "codec executables"). 
-# BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON.
-# PNG, TIFF and ZLIB are not needed anymore because they are used for the executables only.
+# Do not build the executables (Openjph calls them "codec executables"). BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON. PNG, TIFF and ZLIB are not
+# needed anymore because they are used for the executables only.
 LIST(APPEND _configure_options "-DBUILD_CODEC=OFF")
 
 EXTERNALPROJECT_ADD(
@@ -90,9 +87,8 @@ IF(NOT RV_TARGET_WINDOWS)
   )
 ELSE()
   MESSAGE("****OPENJPH IMPORTEDLOCATION ${_implibpath} IMPLIB ${_implibpath} ${_libname} ${_libpath}")
-  # An import library (.lib) file is often used to resolve references to 
-  # functions and variables in a DLL, enabling the linker to generate code 
-  # for loading the DLL and calling its functions at runtime.
+  # An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
+  # DLL and calling its functions at runtime.
   SET_PROPERTY(
     TARGET OpenJph::OpenJph
     PROPERTY IMPORTED_LOCATION "${_libpath}"

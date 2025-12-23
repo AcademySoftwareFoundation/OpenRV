@@ -1,6 +1,5 @@
 #
-# Copyright (C) 2025 Sam Richards
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2025 Sam Richards SPDX-License-Identifier: Apache-2.0
 #
 
 INCLUDE(cxx_defaults)
