@@ -39,10 +39,11 @@ SET(_oiio_utils_implibpath
     ${_implibpath}
 )
 
-# Strips that last group from the version number 
-# and stores it in _oiio_ver_major_minor
-# eg. 1.2.3.4 -> 1.2.3
-string(REGEX REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+)\\..*" "\\1" _oiio_ver_major_minor ${RV_DEPS_OIIO_VERSION})
+# Strips that last group from the version number and stores it in _oiio_ver_major_minor eg. 1.2.3.4 -> 1.2.3
+STRING(
+  REGEX
+  REPLACE "^([0-9]+\\.[0-9]+\\.[0-9]+)\\..*" "\\1" _oiio_ver_major_minor ${RV_DEPS_OIIO_VERSION}
+)
 
 RV_MAKE_STANDARD_LIB_NAME("OpenImageIO" "${_oiio_ver_major_minor}" "SHARED" "${RV_DEBUG_POSTFIX}")
 LIST(APPEND _byproducts ${_byprojects_copy})

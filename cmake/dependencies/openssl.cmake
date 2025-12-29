@@ -7,8 +7,8 @@
 SET(_target
     "RV_DEPS_OPENSSL"
 )
-SET( _version 
-  ${RV_DEPS_OPENSSL_VERSION}
+SET(_version
+    ${RV_DEPS_OPENSSL_VERSION}
 )
 
 IF(RV_TARGET_IS_RHEL8
@@ -90,15 +90,17 @@ ELSE()
 
   IF(${_version} STREQUAL "1.1.1u")
     SET(_download_url
-      "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz"
+        "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz"
     )
   ELSE()
     SET(_download_url
-      "https://github.com/openssl/openssl/releases/download/openssl-${_version}/openssl-${_version}.tar.gz"
+        "https://github.com/openssl/openssl/releases/download/openssl-${_version}/openssl-${_version}.tar.gz"
     )
   ENDIF()
 
-  SET(_download_hash ${RV_DEPS_OPENSSL_HASH})
+  SET(_download_hash
+      ${RV_DEPS_OPENSSL_HASH}
+  )
 
   SET(_make_command_script
       "${PROJECT_SOURCE_DIR}/src/build/make_openssl.py"
@@ -145,8 +147,12 @@ ELSE()
 
   # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
 
-  SET(_dot_version ${RV_DEPS_OPENSSL_VERSION_DOT})
-  SET(_underscore_version ${RV_DEPS_OPENSSL_VERSION_UNDERSCORE})
+  SET(_dot_version
+      ${RV_DEPS_OPENSSL_VERSION_DOT}
+  )
+  SET(_underscore_version
+      ${RV_DEPS_OPENSSL_VERSION_UNDERSCORE}
+  )
 
   IF(RV_TARGET_LINUX)
     SET(_crypto_lib_name
