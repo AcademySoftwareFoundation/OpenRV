@@ -37,12 +37,10 @@ ELSE()
   RV_MAKE_STANDARD_LIB_NAME("openjp2" "${RV_DEPS_OPENJPEG_VERSION}" "SHARED" "")
 ENDIF()
 
-
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 
-# Do not build the executables (OpenJPEG calls them "codec executables"). 
-# BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON.
-# PNG, TIFF and ZLIB are not needed anymore because they are used for the executables only.
+# Do not build the executables (OpenJPEG calls them "codec executables"). BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON. PNG, TIFF and ZLIB are not
+# needed anymore because they are used for the executables only.
 LIST(APPEND _configure_options "-DBUILD_CODEC=OFF")
 
 EXTERNALPROJECT_ADD(

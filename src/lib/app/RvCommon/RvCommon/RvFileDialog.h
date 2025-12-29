@@ -83,7 +83,7 @@ namespace Rv
         QString existingFileChoice() const { return m_currentFile; }
 
         QStringList selectedFiles() const;
-        bool confirmDeleteDialog(const QStringList &paths);
+        bool confirmDeleteDialog(const QStringList& paths);
         void centerOverApp();
 
     public slots:
