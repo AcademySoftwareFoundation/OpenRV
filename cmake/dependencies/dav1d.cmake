@@ -60,7 +60,8 @@ SET(_make_command
 )
 
 IF(APPLE)
-  # Cross-file must be specified because if Rosetta is used to compile for x86_64 from ARM64, Meson still detects ARM64 as the default architecture.
+  # Cross-file must be specified because if Rosetta is used to compile for x86_64 from ARM64,
+  # Meson still detects ARM64 as the default architecture.
 
   IF(RV_TARGET_APPLE_X86_64)
     SET(_meson_cross_file
@@ -68,12 +69,12 @@ IF(APPLE)
     )
   ELSEIF(RV_TARGET_APPLE_ARM64)
     SET(_meson_cross_file
-        "${PROJECT_SOURCE_DIR}/src/build/meson_arch_arm64.txt"
+      "${PROJECT_SOURCE_DIR}/src/build/meson_arch_arm64.txt"
     )
   ENDIF()
 
   SET(_configure_command
-      ${_configure_command} "--cross-file" ${_meson_cross_file}
+    ${_configure_command} "--cross-file" ${_meson_cross_file}
   )
 ENDIF()
 
@@ -96,8 +97,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_configure_command} ./_build --libdir=${_lib_dir_name} --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false
-                    -Denable_tools=false
+  CONFIGURE_COMMAND ${_configure_command} ./_build --libdir=${_lib_dir_name} --default-library=${_default_library} --prefix=${_install_dir} -Denable_tests=false -Denable_tools=false
   BUILD_COMMAND ${_make_command} -C _build
   INSTALL_COMMAND ${_make_command} -C _build install
   COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}

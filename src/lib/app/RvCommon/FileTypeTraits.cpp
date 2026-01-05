@@ -111,7 +111,7 @@ namespace Rv
         }
 
 #ifndef PLATFORM_WINDOWS
-#if defined(QT65ON)
+    #if defined(QT65ON)
         // Adding more heuristics to find the right icon for a file based on the
         // MIME type. The following heuristics should work for Qt5, but in
         // order to keep the same behavior as before, this code will only run

@@ -14,17 +14,19 @@ ELSE()
 ENDIF()
 
 IF(NOT RV_TARGET_APPLE_ARM64)
-  SET(__compiler_options_x86_64
-      -msse -msse2 -msse3 -mmmx
-  )
+  SET(__compiler_options_x86_64 -msse -msse2 -msse3 -mmmx)
 ENDIF()
 
 SET(__compiler_options__
-    -Wall ${__compiler_options_x86_64}
+  -Wall ${__compiler_options_x86_64}
 )
 
 # Common options
-ADD_COMPILE_OPTIONS(${_verbose_invocation} ${_compiler_options__} -Wnonportable-include-path)
+ADD_COMPILE_OPTIONS(
+  ${_verbose_invocation}
+  ${_compiler_options__}
+  -Wnonportable-include-path
+)
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options

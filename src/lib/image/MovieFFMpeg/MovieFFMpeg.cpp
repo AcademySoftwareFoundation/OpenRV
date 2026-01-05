@@ -31,7 +31,6 @@
 #include <set>
 #include <limits>
 #include <cmath>
-#include <mutex>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/thread/mutex.hpp>
@@ -1421,14 +1420,14 @@ namespace TwkMovie
         {
             if (!videoToolboxInit(avCodec, avCodecContext, hardwareContext))
             {
-                static std::once_flag warnOnce;
-                std::call_once(warnOnce,
-                               []()
-                               {
-                                   std::cout << "WARNING: Hardware decoder is not available "
-                                                "or failed to intialize."
-                                             << std::endl;
-                               });
+                static bool hasDisplayedError = false;
+                if (!hasDisplayedError)
+                {
+                    std::cout << "WARNING: Hardware decoder is not available "
+                                 "or failed to intialize."
+                              << std::endl;
+                    hasDisplayedError = true;
+                }
             }
         }
 #endif
@@ -3786,15 +3785,14 @@ namespace TwkMovie
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         if (!desc && nativeFormat == AV_PIX_FMT_NONE)
         {
-            static std::once_flag warnOnce;
-            std::call_once(warnOnce,
-                           [this]()
-                           {
-                               std::cout << "WARNING: FFmpeg detected pixel format "
-                                            "AV_PIX_FMT_NONE for frames in "
-                                         << m_filename << ". Using fallback pixel format: " << av_get_pix_fmt_name(m_pxlFormatOnOpen)
-                                         << std::endl;
-                           });
+            static bool warned = false;
+            if (!warned)
+            {
+                std::cout << "WARNING: FFmpeg detected pixel format "
+                             "AV_PIX_FMT_NONE for frames in "
+                          << m_filename << ". Using fallback pixel format: " << av_get_pix_fmt_name(m_pxlFormatOnOpen) << std::endl;
+                warned = true;
+            }
             // Use the pixel format detected when the file was opened as a
             // fallback. Assumes that m_pxlFormatOnOpen is set because the file
             // was opened.

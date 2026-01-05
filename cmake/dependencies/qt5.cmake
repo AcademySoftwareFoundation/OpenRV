@@ -109,11 +109,7 @@ IF(RV_TARGET_DARWIN)
     lib_to_copy
     ${libs_to_copy}
   )
-    IF(lib_to_copy MATCHES "framework"
-       AND NOT
-           (CMAKE_BUILD_TYPE STREQUAL "Release"
-            AND lib_to_copy MATCHES "\\.dSYM$")
-    )
+    IF(lib_to_copy MATCHES "framework" AND NOT (CMAKE_BUILD_TYPE STREQUAL "Release" AND lib_to_copy MATCHES "\\.dSYM$"))
       FILE(
         COPY ${_qt5_lib_dir}/${lib_to_copy}
         DESTINATION ${RV_STAGE_FRAMEWORKS_DIR}
