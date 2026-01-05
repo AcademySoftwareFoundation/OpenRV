@@ -1,7 +1,7 @@
 #
-# Copyright( C ) 2024 Autodesk, Inc.All Rights Reserved.
+#Copyright( C ) 2024 Autodesk, Inc.All Rights Reserved.
 #
-# SPDX - License - Identifier : Apache - 2.0
+#SPDX - License - Identifier : Apache - 2.0
 #
 
-ADD_SUBDIRECTORY(TwkPython)
+ADD_SUBDIRECTORY( TwkPython )

@@ -11,7 +11,7 @@
 #
 
 SET(_target
-    "media_library_demo"
+        "media_library_demo"
 )
 
 RV_STAGE(TYPE "RVPKG" TARGET ${_target})

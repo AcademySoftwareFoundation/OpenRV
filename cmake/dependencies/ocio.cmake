@@ -31,7 +31,7 @@ ELSE()
 ENDIF()
 
 SET(_download_hash
-    ${RV_DEPS_OCIO_DOWNLOAD_HASH}
+  ${RV_DEPS_OCIO_DOWNLOAD_HASH}
 )
 
 SET(_download_url
@@ -48,7 +48,7 @@ IF(RV_TARGET_WINDOWS)
 
   # OpenColorIO shared library has the same name on Release and Debug.
   SET(_ocio_win_sharedlibname
-      "OpenColorIO_${RV_DEPS_OCIO_VERSION_SHORT}.dll"
+    "OpenColorIO_${RV_DEPS_OCIO_VERSION_SHORT}.dll"
   )
 
   SET(_ocio_win_sharedlib_path
@@ -99,7 +99,7 @@ ENDIF()
 
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   SET(_pyocio_lib_dir
-      "${_pyocio_lib_dir}/PyOpenColorIO"
+    "${_pyocio_lib_dir}/PyOpenColorIO"
   )
 ENDIF()
 
@@ -119,16 +119,14 @@ LIST(APPEND _configure_options "-DOCIO_BUILD_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_GPU_TESTS=OFF")
 LIST(APPEND _configure_options "-DOCIO_BUILD_PYTHON=ON") # This build PyOpenColorIO
 
-# SIMD CPU performance optimizations OCIO 2.2.1 only supports SSE OCIO 2.3.X can utilize SSE/AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
+# SIMD CPU performance optimizations
+# OCIO 2.2.1 only supports SSE
+# OCIO 2.3.X can utilize SSE/AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
 IF(RV_VFX_CY2023)
-  SET(_ocio_simd_options_str
-      "-DOCIO_USE_SSE=ON"
-  )
-ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  SET(_ocio_simd_options_str
-      "-DOCIO_USE_SIMD=ON"
-  )
-  LIST(APPEND _configure_options "${_ocio_simd_options_str}")
+  SET(_ocio_simd_options_str "-DOCIO_USE_SSE=ON")
+ELSEIF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
+  SET(_ocio_simd_options_str "-DOCIO_USE_SIMD=ON")
+LIST(APPEND _configure_options "${_ocio_simd_options_str}")
 ENDIF()
 
 # Ref.: https://cmake.org/cmake/help/latest/module/FindPython.html#hints
@@ -188,9 +186,11 @@ ELSE() # Windows
       ""
   )
   STRING(REPLACE "." "" PYTHON_VERSION_SHORT_NO_DOT ${RV_DEPS_PYTHON_VERSION_SHORT})
-
-  # Windows only. Because of an issue in Debug with minizip-ng finding ZLIB at two locations, ZLIB_LIBRARY and ZLIB_INCLUDE_DIR is used for both Release and
-  # Debug. ZLIB_ROOT is not enough to fix the issue.
+  
+  # Windows only.
+  # Because of an issue in Debug with minizip-ng finding ZLIB at two locations,
+  # ZLIB_LIBRARY and ZLIB_INCLUDE_DIR is used for both Release and Debug. 
+  # ZLIB_ROOT is not enough to fix the issue.
   GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
   GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
 
@@ -208,9 +208,10 @@ ELSE() # Windows
     "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
     "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     # Mandatory param: OCIO CMake code finds Python.
-    "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
-    # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
-    # want and doesn't build.
+    "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"                                                                                                # with this param
+    # DRV_Python_LIBRARIES: 
+    # A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, 
+    # which we don't want and doesn't build.
     "-DRV_Python_LIBRARIES=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"
     "-DPython_INCLUDE_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/include"
     "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}"
@@ -252,7 +253,8 @@ ELSE() # Windows
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB EXPAT::EXPAT
-    PATCH_COMMAND python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
+    PATCH_COMMAND 
+      python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_ocio_build_options}
     INSTALL_COMMAND ${_cmake_install_command}
@@ -263,13 +265,9 @@ ELSE() # Windows
   )
 ENDIF()
 
-SET(_ocio_stage_plugins_python_dir
-    "${RV_STAGE_PLUGINS_PYTHON_DIR}"
-)
-IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  SET(_ocio_stage_plugins_python_dir
-      "${_ocio_stage_plugins_python_dir}/PyOpenColorIO"
-  )
+SET(_ocio_stage_plugins_python_dir "${RV_STAGE_PLUGINS_PYTHON_DIR}")
+IF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
+  SET(_ocio_stage_plugins_python_dir "${_ocio_stage_plugins_python_dir}/PyOpenColorIO")
 ENDIF()
 
 IF(RV_VFX_CY2023)
@@ -280,7 +278,7 @@ IF(RV_VFX_CY2023)
     COMMENT "Copying PyOpenColorIO lib into '${_ocio_stage_plugins_python_dir}'."
     COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}
   )
-ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
+ELSEIF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
   # All platform CY2024 and above
   ADD_CUSTOM_COMMAND(
     TARGET ${_target}
@@ -300,13 +298,9 @@ ADD_CUSTOM_COMMAND(
 )
 
 IF(RV_TARGET_WINDOWS)
-  SET(_rv_stage_lib_site_package_dir
-      "${RV_STAGE_LIB_DIR}/site-packages"
-  )
-  IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-    SET(_rv_stage_lib_site_package_dir
-        "${_rv_stage_lib_site_package_dir}/PyOpenColorIO"
-    )
+  SET(_rv_stage_lib_site_package_dir "${RV_STAGE_LIB_DIR}/site-packages")
+  IF( RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024" )
+    SET(_rv_stage_lib_site_package_dir "${_rv_stage_lib_site_package_dir}/PyOpenColorIO")
   ENDIF()
 
   # Windows only.
@@ -315,9 +309,10 @@ IF(RV_TARGET_WINDOWS)
     POST_BUILD
     # Copy OCIO shared library to the stage python plugins directory.
     COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${_ocio_stage_plugins_python_dir}
-  )
+  ) 
 
-  # Windows only. Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.
+  # Windows only.
+  # Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     ADD_CUSTOM_COMMAND(
       TARGET ${_target}

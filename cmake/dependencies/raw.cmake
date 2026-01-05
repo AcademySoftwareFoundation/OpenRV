@@ -5,8 +5,9 @@
 #
 
 #
-# LibRaw official Web page: https://www.libraw.org/about LibRaw official sources:  https://www.libraw.org/data/LibRaw-0.21.1.tar.gz LibRaw build from sources:
-# https://www.libraw.org/docs/Install-LibRaw-eng.html
+# LibRaw official Web page: https://www.libraw.org/about
+# LibRaw official sources:  https://www.libraw.org/data/LibRaw-0.21.1.tar.gz
+# LibRaw build from sources: https://www.libraw.org/docs/Install-LibRaw-eng.html
 #
 
 INCLUDE(ProcessorCount) # require CMake 3.15+
@@ -29,7 +30,8 @@ SET(_download_hash
     "${RV_DEPS_RAW_DOWNLOAD_HASH}"
 )
 
-# LIBRAW_SHLIB_CURRENT value in libraw_version.h https://github.com/LibRaw/LibRaw/blob/master/libraw/libraw_version.h
+# LIBRAW_SHLIB_CURRENT value in libraw_version.h
+# https://github.com/LibRaw/LibRaw/blob/master/libraw/libraw_version.h
 SET(_libraw_lib_version
     ${RV_DEPS_RAW_VERSION_LIB}
 )
@@ -67,7 +69,8 @@ IF(RV_TARGET_WINDOWS)
     COMMENT "Installing ${_target}'s libs & files into ${_install_dir}"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/lib ${_lib_dir}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_base_dir}/src/libraw ${_include_dir}/libraw
-    # Copy only the DLL on Windows because there is no option to disable the "examples/samples" with Makefile.msvc.
+    # Copy only the DLL on Windows because there is no option to disable the "examples/samples" 
+    # with Makefile.msvc.
     COMMAND ${CMAKE_COMMAND} -E make_directory ${_bin_dir}
     COMMAND ${CMAKE_COMMAND} -E copy ${_base_dir}/src/bin/${_libname} ${_bin_dir}
     COMMAND ${CMAKE_COMMAND} -E rm ${_lib_dir}/Makefile
@@ -90,7 +93,9 @@ ELSE()
   )
 
   SET(_configure_command
-      ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}' ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}' ${_configure_command}
+    ${CMAKE_COMMAND} -E env LCMS2_CFLAGS='${_lcms2_flags}'
+    ${CMAKE_COMMAND} -E env LCMS2_LIBS='${_lcms2_libs}'
+    ${_configure_command}
   )
 
   EXTERNALPROJECT_ADD(

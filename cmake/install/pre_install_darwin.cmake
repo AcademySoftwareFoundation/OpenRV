@@ -30,7 +30,8 @@ FUNCTION(before_copy_platform FILE_PATH RET_VAL)
   RETURN()
 ENDFUNCTION()
 
-# It's really slow to try to fix the rpaths on all the files. This list contains extensions that are known to not be mach-o
+# It's really slow to try to fix the rpaths on all the files. 
+# This list contains extensions that are known to not be mach-o
 SET(KNOWN_EXTENSIONS_TO_SKIP
     ".h"
     ".c"
@@ -83,17 +84,14 @@ MACRO(after_copy_platform FILE_PATH FILES_TO_FIX_RPATH)
 ENDMACRO()
 
 MACRO(post_install_platform)
-  SET(_output_file_to_fix_
-      "${RV_DEPS_BASE_DIR}/files_to_fix.txt"
-  )
-  FILE(
-    WRITE ${_output_file_to_fix_}
-    ${FILES_TO_FIX_RPATH}
-  )
+  set(_output_file_to_fix_ "${RV_DEPS_BASE_DIR}/files_to_fix.txt")
+  FILE(WRITE ${_output_file_to_fix_} ${FILES_TO_FIX_RPATH})
 
   MESSAGE(STATUS "python3 ${CMAKE_CURRENT_LIST_DIR}/../../src/build/remove_absolute_rpath.py --files-list ${_output_file_to_fix_} --root ${CMAKE_SOURCE_DIR}")
   EXECUTE_PROCESS(
-    COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../../src/build/remove_absolute_rpath.py --files-list ${_output_file_to_fix_} --root ${CMAKE_SOURCE_DIR}
+    COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../../src/build/remove_absolute_rpath.py 
+            --files-list ${_output_file_to_fix_} 
+            --root ${CMAKE_SOURCE_DIR} 
             COMMAND_ERROR_IS_FATAL ANY
   )
 ENDMACRO()

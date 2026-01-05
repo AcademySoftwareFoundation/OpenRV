@@ -48,13 +48,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PRIVATE TwkMath
-          TwkGLText
-          OpenGL::GLU
-          Qt::Gui
-          Qt::OpenGL
-          Qt::Widgets
-          ${QT6_QOPENGLWIDGET_TARGET}
+  PRIVATE TwkMath TwkGLText OpenGL::GLU Qt::Gui Qt::OpenGL Qt::Widgets ${QT6_QOPENGLWIDGET_TARGET}
 )
 
 TARGET_COMPILE_OPTIONS(

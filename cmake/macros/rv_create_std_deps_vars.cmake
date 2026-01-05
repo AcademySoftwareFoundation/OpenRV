@@ -49,39 +49,28 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   SET(_version
       ${version}
   )
+  
+    # Attempt to match Major.Minor.Patch
+    # CMAKE_MATCH_1 will be Major, CMAKE_MATCH_2 Minor, etc.
+    string(REGEX MATCH "^([0-9]+)\\.?([0-9]*)\\.?([0-9]*)" _dummy "${_version}")
+    # If the group was found, use it; otherwise default to 0
+    if(CMAKE_MATCH_1)
+        set(_version_major ${CMAKE_MATCH_1})
+    else()
+        set(_version_major 0)
+    endif()
 
-  # Attempt to match Major.Minor.Patch CMAKE_MATCH_1 will be Major, CMAKE_MATCH_2 Minor, etc.
-  STRING(REGEX MATCH "^([0-9]+)\\.?([0-9]*)\\.?([0-9]*)" _dummy "${_version}")
-  # If the group was found, use it; otherwise default to 0
-  IF(CMAKE_MATCH_1)
-    SET(_version_major
-        ${CMAKE_MATCH_1}
-    )
-  ELSE()
-    SET(_version_major
-        0
-    )
-  ENDIF()
+    if(CMAKE_MATCH_2)
+        set(_version_minor ${CMAKE_MATCH_2})
+    else()
+        set(_version_minor 0)
+    endif()
 
-  IF(CMAKE_MATCH_2)
-    SET(_version_minor
-        ${CMAKE_MATCH_2}
-    )
-  ELSE()
-    SET(_version_minor
-        0
-    )
-  ENDIF()
-
-  IF(CMAKE_MATCH_3)
-    SET(_version_patch
-        ${CMAKE_MATCH_3}
-    )
-  ELSE()
-    SET(_version_patch
-        0
-    )
-  ENDIF()
+    if(CMAKE_MATCH_3)
+        set(_version_patch ${CMAKE_MATCH_3})
+    else()
+        set(_version_patch 0)
+    endif()
   SET(${target_name}_VERSION
       ${_version}
       CACHE INTERNAL "" FORCE
@@ -95,7 +84,7 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   )
 
   SET(_cmake_build_command
-      ${CMAKE_COMMAND} --build ${_build_dir} --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
+    ${CMAKE_COMMAND} --build ${_build_dir} --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
   )
 
   IF(RV_TARGET_WINDOWS)
@@ -127,8 +116,9 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   LIST(APPEND _configure_options "-S ${_source_dir}")
   LIST(APPEND _configure_options "-B ${_build_dir}")
 
+
   SET(_cmake_install_command
-      ${CMAKE_COMMAND} --install ${_build_dir} --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
+    ${CMAKE_COMMAND} --install ${_build_dir} --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
   )
 
   #

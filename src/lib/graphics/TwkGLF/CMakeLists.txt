@@ -89,12 +89,8 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 TARGET_LINK_LIBRARIES(
-  ${_target}
-  TwkApp
-  TwkFB
-  TwkGLText
-  TwkUtil
-  TwkAudio
+  ${_target} 
+  TwkApp TwkFB TwkGLText TwkUtil TwkAudio
   Qt::Core
   Qt::Gui
   Qt::Widgets

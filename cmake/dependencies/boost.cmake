@@ -12,15 +12,10 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-SET(_ext_boost_version
-    ${RV_DEPS_BOOST_VERSION}
-)
-SET(_major_minor_version
-    ${RV_DEPS_BOOST_MAJOR_MINOR_VERSION}
-)
-SET(_download_hash
-    ${RV_DEPS_BOOST_DOWNLOAD_HASH}
-)
+SET(_ext_boost_version ${RV_DEPS_BOOST_VERSION})
+SET(_major_minor_version ${RV_DEPS_BOOST_MAJOR_MINOR_VERSION})
+SET(_download_hash ${RV_DEPS_BOOST_DOWNLOAD_HASH})
+
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_BOOST" "${_ext_boost_version}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
