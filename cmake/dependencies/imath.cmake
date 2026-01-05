@@ -23,7 +23,9 @@ SET(_install_dir
 SET(_include_dir
     ${_install_dir}/include/Imath
 )
-SET(RV_DEPS_IMATH_ROOT_DIR ${_install_dir})
+SET(RV_DEPS_IMATH_ROOT_DIR
+    ${_install_dir}
+)
 
 IF(RV_TARGET_DARWIN)
   SET(_libname
