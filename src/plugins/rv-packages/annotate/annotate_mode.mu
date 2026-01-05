@@ -12,6 +12,7 @@ use glu;
 require glyph;
 require io;
 require system;
+require python;
 
 class: DrawDockWidget : QDockWidget
 {
@@ -197,6 +198,38 @@ class: AnnotateMinorMode : MinorMode
     {
         float s = (1.0 - c.w) * 0.75 + 0.25;
         return c * Color(s,s,s,c.w);
+    }
+
+    method: generateUuid (string;)
+    {
+        let pyModule = python.PyImport_Import("uuid");
+        python.PyObject pyMethod = python.PyObject_GetAttr(pyModule, "uuid4");
+        let uuidObj = python.PyObject_CallObject(pyMethod, python.PyTuple_New(0));
+        string uuid = to_string(python.PyObject_Str(uuidObj));
+
+        return uuid;
+    }
+
+    method: findStrokeByUuid (string; string node, int frame, string uuid)
+    {
+        regex uuidPattern = regex("^" + regex.replace("\\.", node, "\\.") + "\\.(pen|text):[0-9]+:[0-9]+:.*\\.uuid$");
+        
+        for_each (property; properties(node))
+        {
+            if (uuidPattern.match(property))
+            {
+                let storedId = getStringProperty(property).front();
+                if (storedId == uuid)
+                {
+                    let parts = property.split(".");
+                    if (parts.size() >= 2)
+                    {
+                        return parts[1];
+                    }
+                }
+            }
+        }
+        return "";
     }
 
     method: findPaintNodes (MetaEvalInfo[];)
@@ -532,6 +565,15 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
 
+        let uuid = generateUuid();
+        let uuidProperty = "%s.uuid" % n;
+        newProperty(uuidProperty, StringType, 1);
+        setStringProperty(uuidProperty, string[] {uuid}, true);
+
+        let softDeletedProperty = "%s.softDeleted" % n;
+        newProperty(softDeletedProperty, IntType, 1);
+        setIntProperty(softDeletedProperty, int[] {0}, true);
+
         let stroke = n.split(".").back();
 
         if (!propertyExists(orderName))
@@ -546,7 +588,7 @@ class: AnnotateMinorMode : MinorMode
             newProperty(undoName, StringType, 1);
         }
 
-        insertStringProperty(undoName, string[] {stroke, "create"});
+        insertStringProperty(undoName, string[] {uuid, "create"});
 
         let redoName = frameUserRedoStackName(node, frame);
         if (propertyExists(redoName))
@@ -664,6 +706,16 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
 
+        let uuid = generateUuid();
+        let uuidProperty = "%s.uuid" % n;
+
+        newProperty(uuidProperty, StringType, 1);
+        setStringProperty(uuidProperty, string[] {uuid}, true);
+
+        let softDeletedProperty = "%s.softDeleted" % n;
+        newProperty(softDeletedProperty, IntType, 1);
+        setIntProperty(softDeletedProperty, int[] {0}, true);
+
         let stroke = n.split(".").back();
 
         if (!propertyExists(orderName))
@@ -678,7 +730,7 @@ class: AnnotateMinorMode : MinorMode
             newProperty(undoName, StringType, 1);
         }
 
-        insertStringProperty(undoName, string[] {stroke, "create"});
+        insertStringProperty(undoName, string[] {uuid, "create"});
 
         let redoName = frameUserRedoStackName(node, frame);
         if (propertyExists(redoName))
@@ -1551,24 +1603,38 @@ class: AnnotateMinorMode : MinorMode
             // clearAllUndo format: ["clearAllFrames", "node1", "stroke1", "node2", "stroke2"]
             if (clearAllUndo.size() > 1 && clearAllUndo[0] == "clearAllFrames")
             {
+                string[] affectedStrokes;
+                
                 beginCompoundStateChange();
                 
                 for (int i = 1; i < clearAllUndo.size(); i += 2)
                 {
                     let node = clearAllUndo[i];
-                    let stroke = clearAllUndo[i + 1];
-
-                    let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
-                    let frame = int(parts[2]);
-
-                    let orderName = frameOrderName(node, frame);
-
-                    if (!propertyExists(orderName))
+                    let uuid = clearAllUndo[i + 1];
+                    
+                    affectedStrokes.push_back(uuid);
+                    
+                    let stroke = findStrokeByUuid(node, frame(), uuid);
+                    if (stroke != "")
                     {
-                        newProperty(orderName, StringType, 1);
-                    }
+                        let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
+                        let frame = int(parts[2]);
 
-                    insertStringProperty(orderName, string[] {stroke});
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
+                        {
+                            setIntProperty(softDeleted, int[] {0}, true);
+                        }
+
+                        let orderName = frameOrderName(node, frame);
+
+                        if (!propertyExists(orderName))
+                        {
+                            newProperty(orderName, StringType, 1);
+                        }
+
+                        insertStringProperty(orderName, string[] {stroke});
+                    }
                 }
 
                 if (!propertyExists(clearAllRedoProperty))
@@ -1580,6 +1646,13 @@ class: AnnotateMinorMode : MinorMode
                 setStringProperty(clearAllUndoProperty, string[] {}, true);
                 
                 endCompoundStateChange();
+                
+                if (affectedStrokes.size() > 0)
+                {
+                    string eventContents = string.join(affectedStrokes, "|");
+                    sendInternalEvent("undo-paint", eventContents);
+                }
+                
                 return;
             }
         }
@@ -1602,28 +1675,42 @@ class: AnnotateMinorMode : MinorMode
         let undo = getStringProperty(undoProperty);
         let redo = getStringProperty(redoProperty);
         let order = getStringProperty(orderProperty);
-        
+
         let action = undo.back();
         undo.resize(undo.size() - 1);
+
+        string[] affectedStrokes;
         
         if (action == "create")
         {
             if (undo.size() > 0)
             {
-                let stroke = undo.back();
+                let uuid = undo.back();
                 undo.resize(undo.size() - 1);
+
+                affectedStrokes.push_back(uuid);
                 
-                for_index(i; order)
+                let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                if (stroke != "")
                 {
-                    if (order[i] == stroke)
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
                     {
-                        order.erase(i, 1);
-                        break;
+                        setIntProperty(softDeleted, int[] {1}, true);
                     }
+                    
+                    for_index(i; order)
+                    {
+                        if (order[i] == stroke)
+                        {
+                            order.erase(i, 1);
+                            break;
+                        }
+                    }
+                    
+                    redo.push_back(uuid);
+                    redo.push_back("create");
                 }
-                
-                redo.push_back(stroke);
-                redo.push_back("create");
             }
         }
         else if (action == "clearAll")
@@ -1634,24 +1721,33 @@ class: AnnotateMinorMode : MinorMode
                 undo.resize(undo.size() - 1);
                 let count = int(strokeCount);
                 
-                string[] strokes;
+                string[] uuids;
                 for (int i = 0; i < count; i++)
                 {
                     if (undo.size() > 0)
                     {
-                        strokes.push_back(undo.back());
+                        uuids.push_back(undo.back());
                         undo.resize(undo.size() - 1);
                     }
                 }
 
-                for_each(stroke; strokes)
+                for_each(uuid; uuids)
                 {
+                    affectedStrokes.push_back(uuid);
+                    let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                    
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {0}, true);
+                    }
+                    
                     order.push_back(stroke);
                 }
                 
-                for_each(stroke; strokes)
+                for_each(uuid; uuids)
                 {
-                    redo.push_back(stroke);
+                    redo.push_back(uuid);
                 }
                 redo.push_back(strokeCount);
                 redo.push_back("clearAll");
@@ -1663,6 +1759,12 @@ class: AnnotateMinorMode : MinorMode
         setStringProperty(redoProperty, redo, true);
         setStringProperty(orderProperty, order, true);
         endCompoundStateChange();
+
+        if (affectedStrokes.size() > 0)
+        {
+            string eventContents = string.join(affectedStrokes, "|");
+            sendInternalEvent("undo-paint", eventContents);
+        }
     }
 
     method: redoPaint (void;)
@@ -1677,29 +1779,43 @@ class: AnnotateMinorMode : MinorMode
             // clearAllRedo format: ["clearAllFrames", "node1", "stroke1", "node2", "stroke2"]
             if (clearAllRedo.size() > 1 && clearAllRedo[0] == "clearAllFrames")
             {
+                string[] affectedStrokes;
+                
                 beginCompoundStateChange();
                 
                 for (int i = 1; i < clearAllRedo.size(); i += 2)
                 {
                     let node = clearAllRedo[i];
-                    let stroke = clearAllRedo[i + 1];
+                    let uuid = clearAllRedo[i + 1];
                     
-                    let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
-                    let frame = int(parts[2]);
-
-                    let orderName = frameOrderName(node, frame);
-                    if (propertyExists(orderName))
+                    affectedStrokes.push_back(uuid);
+                    
+                    let stroke = findStrokeByUuid(node, frame(), uuid);
+                    if (stroke != "")
                     {
-                        let order = getStringProperty(orderName);
-                        for_index(index; order)
+                        let parts = stroke.split(":"); // Stroke format: type:id:frame:user_processId
+                        let frame = int(parts[2]);
+
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
                         {
-                            if (order[index] == stroke)
-                            {
-                                order.erase(index, 1);
-                                break;
-                            }
+                            setIntProperty(softDeleted, int[] {1}, true);
                         }
-                        setStringProperty(orderName, order, true);
+
+                        let orderName = frameOrderName(node, frame);
+                        if (propertyExists(orderName))
+                        {
+                            let order = getStringProperty(orderName);
+                            for_index(index; order)
+                            {
+                                if (order[index] == stroke)
+                                {
+                                    order.erase(index, 1);
+                                    break;
+                                }
+                            }
+                            setStringProperty(orderName, order, true);
+                        }
                     }
                 }
                 
@@ -1712,6 +1828,13 @@ class: AnnotateMinorMode : MinorMode
                 setStringProperty(clearAllRedoProperty, string[] {}, true);
                 
                 endCompoundStateChange();
+                
+                if (affectedStrokes.size() > 0)
+                {
+                    string eventContents = string.join(affectedStrokes, "|");
+                    sendInternalEvent("redo-paint", eventContents);
+                }
+                
                 return;
             }
         }
@@ -1734,21 +1857,35 @@ class: AnnotateMinorMode : MinorMode
         let undo = getStringProperty(undoProperty);
         let redo = getStringProperty(redoProperty);
         let order = getStringProperty(orderProperty);
-        
+
         let action = redo.back();
         redo.resize(redo.size() - 1);
+
+        string[] affectedStrokes;
         
         if (action == "create")
         {
             if (redo.size() > 0)
             {
-                let stroke = redo.back();
+                let uuid = redo.back();
                 redo.resize(redo.size() - 1);
+
+                affectedStrokes.push_back(uuid);
                 
-                order.push_back(stroke);
-                
-                undo.push_back(stroke);
-                undo.push_back("create");
+                let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                if (stroke != "")
+                {
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {0}, true);
+                    }
+                    
+                    order.push_back(stroke);
+                    
+                    undo.push_back(uuid);
+                    undo.push_back("create");
+                }
             }
         }
         else if (action == "clearAll")
@@ -1759,18 +1896,27 @@ class: AnnotateMinorMode : MinorMode
                 redo.resize(redo.size() - 1);
                 let count = int(countStr);
                 
-                string[] strokes;
+                string[] uuids;
                 for (int i = 0; i < count; i++)
                 {
                     if (redo.size() > 0)
                     {
-                        strokes.push_back(redo.back());
+                        uuids.push_back(redo.back());
                         redo.resize(redo.size() - 1);
                     }
                 }
                 
-                for_each(stroke; strokes)
+                for_each(uuid; uuids)
                 {
+                    affectedStrokes.push_back(uuid);
+                    let stroke = findStrokeByUuid(_currentNode, frame, uuid);
+                    
+                    let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
+                    if (propertyExists(softDeleted))
+                    {
+                        setIntProperty(softDeleted, int[] {1}, true);
+                    }
+                    
                     for_index(i; order)
                     {
                         if (order[i] == stroke)
@@ -1781,9 +1927,9 @@ class: AnnotateMinorMode : MinorMode
                     }
                 }
                 
-                for_each(stroke; strokes)
+                for_each(uuid; uuids)
                 {
-                    undo.push_back(stroke);
+                    undo.push_back(uuid);
                 }
                 undo.push_back(countStr);
                 undo.push_back("clearAll");
@@ -1795,6 +1941,12 @@ class: AnnotateMinorMode : MinorMode
         setStringProperty(redoProperty, redo, true);
         setStringProperty(orderProperty, order, true);
         endCompoundStateChange();
+
+        if (affectedStrokes.size() > 0)
+        {
+            string eventContents = string.join(affectedStrokes, "|");
+            sendInternalEvent("redo-paint", eventContents);
+        }
     }
 
     method: clearAllUsersUndoRedoStacks (void; string node, int frame, string excludeUser="")
@@ -1832,10 +1984,24 @@ class: AnnotateMinorMode : MinorMode
             {
                 string[] undo;
                 string[] redo;
-                
+                string[] affectedStrokes;
+
                 for_each(stroke; order)
                 {
-                    undo.push_back(stroke);
+                    let uuidProperty = "%s.%s.uuid" % (node, stroke);
+                    
+                    if (propertyExists(uuidProperty))
+                    {
+                        let uuid = getStringProperty(uuidProperty).front();
+                        undo.push_back(uuid);
+                        affectedStrokes.push_back(uuid);
+                        
+                        let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                        if (propertyExists(softDeleted))
+                        {
+                            setIntProperty(softDeleted, int[] {1}, true);
+                        }
+                    }
                 }
                 undo.push_back(string(order.size()));
                 undo.push_back("clearAll");
@@ -1861,6 +2027,12 @@ class: AnnotateMinorMode : MinorMode
                 clearAllUsersUndoRedoStacks(node, frame, excludeUser);
                 
                 endCompoundStateChange();
+
+                if (affectedStrokes.size() > 0)
+                {
+                    string eventContents = string.join(affectedStrokes, "|");
+                    sendInternalEvent("clear-paint", eventContents);
+                }
             }
         }
     }
@@ -1869,6 +2041,7 @@ class: AnnotateMinorMode : MinorMode
     {
         string[] clearAllActions;
         clearAllActions.push_back("clearAllFrames");
+        string[] affectedStrokes;
 
         beginCompoundStateChange();
         
@@ -1883,8 +2056,21 @@ class: AnnotateMinorMode : MinorMode
                     let order = getStringProperty(orderProperty);
                     for_each(stroke; order)
                     {
-                        clearAllActions.push_back(node);
-                        clearAllActions.push_back(stroke);
+                        let uuidProperty = "%s.%s.uuid" % (node, stroke);
+                        
+                        if (propertyExists(uuidProperty))
+                        {
+                            let uuid = getStringProperty(uuidProperty).front();
+                            clearAllActions.push_back(node);
+                            clearAllActions.push_back(uuid);
+                            affectedStrokes.push_back(uuid);
+                            
+                            let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                            if (propertyExists(softDeleted))
+                            {
+                                setIntProperty(softDeleted, int[] {1}, true);
+                            }
+                        }
                     }
 
                     setStringProperty(orderProperty, string[] {}, true);
@@ -1899,8 +2085,21 @@ class: AnnotateMinorMode : MinorMode
                         let srcOrder = getStringProperty(sourceFrameOrderProperty);
                         for_each(stroke; srcOrder)
                         {
-                            clearAllActions.push_back(node);
-                            clearAllActions.push_back(stroke);
+                            let uuidProperty = "%s.%s.uuid" % (node, stroke);
+                            
+                            if (propertyExists(uuidProperty))
+                            {
+                                let uuid = getStringProperty(uuidProperty).front();
+                                clearAllActions.push_back(node);
+                                clearAllActions.push_back(uuid);
+                                affectedStrokes.push_back(uuid);
+                                
+                                let softDeleted = "%s.%s.softDeleted" % (node, stroke);
+                                if (propertyExists(softDeleted))
+                                {
+                                    setIntProperty(softDeleted, int[] {1}, true);
+                                }
+                            }
                         }
                         
                         setStringProperty(sourceFrameOrderProperty, string[] {}, true);
@@ -1930,6 +2129,13 @@ class: AnnotateMinorMode : MinorMode
         }
 
         endCompoundStateChange();
+
+        if (affectedStrokes.size() > 0)
+        {
+            string eventContents = string.join(affectedStrokes, "|");
+            sendInternalEvent("clear-all-paint", eventContents);
+        }
+
         updateFrameDependentState();
         redraw();
     }
@@ -2054,13 +2260,6 @@ class: AnnotateMinorMode : MinorMode
         return if _syncAutoStart then CheckedMenuState else UncheckedMenuState;
     }
 
-    method: undoSlot (void; bool checked)
-    {
-        undoPaint();
-        updateFrameDependentState();
-        redraw();
-    }
-
     method: clearSlot (void; bool checked)
     {
         clearPaint(_currentNode, _currentNodeInfo.frame);
@@ -2082,6 +2281,13 @@ class: AnnotateMinorMode : MinorMode
 
         clearAllPaint();
 
+        updateFrameDependentState();
+        redraw();
+    }
+
+    method: undoSlot (void; bool checked)
+    {
+        undoPaint();
         updateFrameDependentState();
         redraw();
     }
@@ -2922,6 +3128,8 @@ class: AnnotateMinorMode : MinorMode
 
         _clearButton.setMenu(clearMenu);
         _clearButton.setPopupMode(QToolButton.InstantPopup);
+
+        connect(clearMenu, QMenu.aboutToShow, undoRedoClearUpdate);
 
         connect(_clearFrameAct, QAction.triggered, clearSlot);
         connect(_clearAllFramesAct, QAction.triggered, clearAllSlot);

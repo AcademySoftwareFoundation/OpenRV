@@ -85,78 +85,74 @@ def _transform_otio_to_world_coordinate(point):
 def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None) -> None:
     """A hook for the annotation schema"""
     try:
-        if argument_map["effect_metadata"]:
-            effect_metadata = argument_map["effect_metadata"]
-            commands.setIntProperty("#Session.paintEffects.hold", [effect_metadata.get("hold", 0)])
-            commands.setIntProperty("#Session.paintEffects.ghost", [effect_metadata.get("ghost", 0)])
-        else:
-            commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
-            commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
+        commands.setIntProperty("#Session.paintEffects.hold", [in_timeline.hold])
+        commands.setIntProperty("#Session.paintEffects.ghost", [in_timeline.ghost])
 
         commands.setIntProperty("#Session.paintEffects.ghostBefore", [in_timeline.ghost_before])
         commands.setIntProperty("#Session.paintEffects.ghostAfter", [in_timeline.ghost_after])
     except Exception:
-        logging.exception("Unable to set Hold and Ghost properties")
+        logging.warning("Unable to set Hold and Ghost properties")
 
     for layer in in_timeline.layers:
-        if layer.name == "Paint":
-            if isinstance(layer.layer_range, otio.opentime.TimeRange):
-                time_range = layer.layer_range
-            else:
-                time_range = otio.opentime.TimeRange(layer.layer_range["start_time"], layer.layer_range["duration"])
+        if isinstance(layer.layer_range, otio.opentime.TimeRange):
+            time_range = layer.layer_range
+        else:
+            time_range = otio.opentime.TimeRange(layer.layer_range["start_time"], layer.layer_range["duration"])
 
-            relative_time = time_range.end_time_inclusive()
-            frame = relative_time.to_frames()
+        relative_time = time_range.end_time_inclusive()
+        frame = relative_time.to_frames()
 
-            source_node = argument_map.get("source_group")
-            paint_node = extra_commands.nodesInGroupOfType(source_node, "RVPaint")[0]
-            paint_component = f"{paint_node}.paint"
-            stroke_id = commands.getIntProperty(f"{paint_component}.nextId")[0] + 1
-            pen_component = f"{paint_node}.pen:{stroke_id}:{frame}:annotation"
-            frame_component = f"{paint_node}.frame:{frame}"
+        source_node = argument_map.get("source_group")
+        paint_node = extra_commands.nodesInGroupOfType(source_node, "RVPaint")[0]
+        paint_component = f"{paint_node}.paint"
+        stroke_id = commands.getIntProperty(f"{paint_component}.nextId")[0] + 1
+        pen_component = f"{paint_node}.pen:{stroke_id}:{frame}:annotation"
+        frame_component = f"{paint_node}.frame:{frame}"
 
-            # Set properties on the paint component of the RVPaint node
-            effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id})
+        # Set properties on the paint component of the RVPaint node
+        effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id})
 
-            start_time = int(time_range.start_time.value)
-            end_time = int(start_time + time_range.duration.value)
+        start_time = int(time_range.start_time.value)
+        end_time = int(start_time + time_range.duration.value)
 
-            duration = end_time - start_time
+        duration = end_time - start_time
 
-            # Add and set properties on the pen component of the RVPaint node
-            effectHook.add_rv_effect_props(
-                pen_component,
-                {
-                    "color": list(map(float, layer.rgba)),
-                    "brush": layer.brush,
-                    "debug": 1,
-                    "join": 3,
-                    "cap": 1,
-                    "splat": 0,
-                    "mode": 0 if layer.type == "COLOR" else 1,
-                    "startFrame": start_time,
-                    "duration": duration,
-                },
+        # Add and set properties on the pen component of the RVPaint node
+        effectHook.add_rv_effect_props(
+            pen_component,
+            {
+                "color": list(map(float, layer.rgba)),
+                "brush": layer.brush,
+                "debug": 1,
+                "join": 3,
+                "cap": 1,
+                "splat": 0,
+                "mode": 0 if layer.type == "COLOR" else 1,
+                "startFrame": start_time,
+                "duration": duration,
+                "uuid": layer.id,
+            },
+        )
+
+        points_property = f"{pen_component}.points"
+        width_property = f"{pen_component}.width"
+
+        if not commands.propertyExists(points_property):
+            commands.newProperty(points_property, commands.FloatType, 2)
+        if not commands.propertyExists(width_property):
+            commands.newProperty(width_property, commands.FloatType, 1)
+
+        for point in layer.points:
+            world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(point)
+
+            commands.insertFloatProperty(
+                points_property,
+                [world_coordinate_x, world_coordinate_y],
             )
+            commands.insertFloatProperty(width_property, [world_coordinate_width])
 
+        if not layer.soft_deleted:
             if not commands.propertyExists(f"{frame_component}.order"):
                 commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
 
             commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
-
-            points_property = f"{pen_component}.points"
-            width_property = f"{pen_component}.width"
-            if not commands.propertyExists(points_property):
-                commands.newProperty(points_property, commands.FloatType, 2)
-            if not commands.propertyExists(width_property):
-                commands.newProperty(width_property, commands.FloatType, 1)
-            for point in layer.points:
-                world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(
-                    point
-                )
-
-                commands.insertFloatProperty(
-                    points_property,
-                    [world_coordinate_x, world_coordinate_y],
-                )
-                commands.insertFloatProperty(width_property, [world_coordinate_width])

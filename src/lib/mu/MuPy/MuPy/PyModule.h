@@ -54,6 +54,7 @@ namespace Mu
         static NODE_DECLARATION(nPyTuple_GetItem, Pointer);
         static NODE_DECLARATION(nPyString_Check, bool);
         static NODE_DECLARATION(nPyFunction_Check, bool);
+        static NODE_DECLARATION(nPyObject_Str, Pointer);
         static NODE_DECLARATION(nPyImport_Import, Pointer);
         static NODE_DECLARATION(nPy_TYPE, Pointer);
         static NODE_DECLARATION(nPyModule_GetName, Pointer);
