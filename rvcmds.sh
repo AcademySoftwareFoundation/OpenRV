@@ -81,58 +81,53 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-    QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-    QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-  elif [[ "$OSTYPE" == "darwin"* ]]; then
-    QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-    QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-    QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-
-    # If no macos installation found, try clang_64
-    if [ -z "$QT_HOME_6_8" ]; then
-      QT_HOME_6_8=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-    fi
-    if [ -z "$QT_HOME_6_5" ]; then
-      QT_HOME_6_5=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-    fi
-    if [ -z "$QT_HOME_5" ]; then
-      QT_HOME_5=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-    fi
-
-  elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
-    QT_HOME_6_8=$(find c:/Qt*/6.8* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-    QT_HOME_6_5=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-    QT_HOME_5=$(find c:/Qt*/5.15* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-  fi
-
-  # Set Qt based on RV_VFX_PLATFORM
-  if [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
-    if [ -n "$QT_HOME_5" ]; then
-      QT_HOME="$QT_HOME_5"
-      QT_VERSION="5.15"
-    else
-      echo "Error: CY2023 requires a Qt 5.15 installation, but none was found."
-    fi
-  elif [[ "$RV_VFX_PLATFORM" == "CY2024" || "$RV_VFX_PLATFORM" == "CY2025" ]]; then
-    if [ -n "$QT_HOME_6_5" ]; then
-      QT_HOME="$QT_HOME_6_5"
-      QT_VERSION="6.5"
-    else
-      echo "Error: $RV_VFX_PLATFORM requires a Qt 6.5 installation, but none was found."
-    fi
-  elif [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
-    if [ -n "$QT_HOME_6_8" ]; then
-      QT_HOME="$QT_HOME_6_8"
+    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
+      QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
       QT_VERSION="6.8"
-    else
-      echo "Error: $RV_VFX_PLATFORM requires a Qt 6.8.3 installation, but none was found."
+    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
+      QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
+      QT_VERSION="6.5"
+    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+      QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
+      QT_VERSION="5.15"
+    fi
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
+      QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+      if [ -z "$QT_HOME" ]; then
+        QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+      fi
+      QT_VERSION="6.8"
+    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
+      QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+      if [ -z "$QT_HOME" ]; then
+        QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+      fi
+      QT_VERSION="6.5"
+    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+      QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
+      if [ -z "$QT_HOME" ]; then
+        QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
+      fi
+      QT_VERSION="5.15"
+    fi
+  elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
+      QT_HOME=$(find c:/Qt*/6.8* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+      QT_VERSION="6.8"
+    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
+      QT_HOME=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+      QT_VERSION="6.5"
+    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+      QT_HOME=$(find c:/Qt*/5.15* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
+      QT_VERSION="5.15"
     fi
   fi
 
   if [ -n "$QT_HOME" ]; then
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
   else
+    echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."
     echo "Could not find required Qt installation. Please set QT_HOME to the correct path in your environment variables."
   fi
  
