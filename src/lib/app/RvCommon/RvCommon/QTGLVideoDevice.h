@@ -9,6 +9,7 @@
 #define __RvCommon__QTGLVideoDevice__h__
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
+#include <QOpenGLWindow>
 #include <QOpenGLWidget>
 #include <QWindow>
 #include <QtWidgets/QWidget>
@@ -20,7 +21,7 @@ namespace Rv
     //
     //  QTGLVideoDevice
     //
-    //  Wraps a QGLWidget as a TwkGLF::GLVideoDevice. This gives a handle
+    //  Wraps a QOpenGLWindow as a TwkGLF::GLVideoDevice. This gives a handle
     //  on a concrete window system device. QTGLVideoDevice can generate
     //  events from the window system
     //
@@ -28,13 +29,22 @@ namespace Rv
     class QTGLVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
+        // QOpenGLWindow constructors (for main GLView)
+        QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWindow* view, QWidget* eventWidget = nullptr);
+        
+        // QOpenGLWidget constructors (for ScreenView and legacy code)
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWidget* view);
+        
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
+        void setWindow(QOpenGLWindow*);
         void setWidget(QOpenGLWidget*);
+        void setEventWidget(QWidget* widget);
 
-        QOpenGLWidget* widget() const { return m_view; }
+        QOpenGLWindow* window() const { return m_window; }
+        QOpenGLWidget* widget() const { return m_widget; }
+        QWidget* eventWidget() const { return m_eventWidget; }
 
         virtual void makeCurrent() const;
 
@@ -77,6 +87,7 @@ namespace Rv
         float devicePixelRatio() const override { return m_devicePixelRatio; }
 
     protected:
+        QTGLVideoDevice(const std::string& name, QOpenGLWindow* view, QWidget* eventWidget = nullptr);
         QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
     protected:
@@ -84,7 +95,9 @@ namespace Rv
         int m_y;
         float m_refresh;
         float m_devicePixelRatio{1.0f};
-        QOpenGLWidget* m_view;
+        QOpenGLWindow* m_window;
+        QOpenGLWidget* m_widget;
+        QWidget* m_eventWidget;
         QTTranslator* m_translator;
     };
 
