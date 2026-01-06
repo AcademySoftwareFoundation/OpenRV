@@ -308,7 +308,7 @@ namespace Rv
         //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
 
         b->setMenu(m_playModeMenu);
-        
+
         // Install event filter to show tooltips on disabled menu items
         m_playModeMenu->installEventFilter(this);
 
@@ -357,8 +357,8 @@ namespace Rv
             {m_backwardPlayAction, IPCore::EventCategories::backwardplayCategory, m_backwardPlayAction->toolTip()},
             {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
             {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
-            
-            {m_backMarkAction, IPCore::EventCategories::markBackBackwardCategory, m_backMarkAction->toolTip()},
+
+            {m_backMarkAction, IPCore::EventCategories::markBackwardCategory, m_backMarkAction->toolTip()},
             {m_forwardMarkAction, IPCore::EventCategories::markForwardCategory, m_forwardMarkAction->toolTip()},
         }};
 
@@ -697,7 +697,7 @@ namespace Rv
         // Disable the whole playmode button if all three options are disabled
         bool anyEnabled = loopEnabled || onceEnabled || pingPongEnabled;
         m_playModeAction->setEnabled(anyEnabled);
-        
+
         QString tooltip;
         if (anyEnabled)
         {
@@ -778,7 +778,7 @@ namespace Rv
             if (mouseEvent)
             {
                 QAction* action = m_playModeMenu->actionAt(mouseEvent->pos());
-                
+
                 if (action && !action->isEnabled() && !action->toolTip().isEmpty())
                 {
                     QToolTip::showText(mouseEvent->globalPos(), action->toolTip(), m_playModeMenu);
@@ -844,9 +844,8 @@ namespace Rv
                     }
                     else
                     {
-                        QString tooltip = m_customDisabledPrefix.isEmpty() 
-                                          ? mapping.defaultTooltip 
-                                          : m_customDisabledPrefix + mapping.defaultTooltip;
+                        QString tooltip =
+                            m_customDisabledPrefix.isEmpty() ? mapping.defaultTooltip : m_customDisabledPrefix + mapping.defaultTooltip;
                         mapping.action->setToolTip(tooltip);
                     }
                 }

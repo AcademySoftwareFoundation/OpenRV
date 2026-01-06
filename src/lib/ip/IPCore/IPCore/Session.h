@@ -61,7 +61,7 @@ namespace IPCore
         inline constexpr std::string_view helpCategory = "help_category";
         inline constexpr std::string_view infoCategory = "info_category";
         inline constexpr std::string_view markCategory = "mark_category";
-        inline constexpr std::string_view markBackBackwardCategory = "mark_backward_category";
+        inline constexpr std::string_view markBackwardCategory = "mark_backward_category";
         inline constexpr std::string_view markForwardCategory = "mark_forward_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
@@ -84,14 +84,38 @@ namespace IPCore
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 32>{
-                annotateCategory,         annotateAirbrushCategory, annotateBurnCategory,      annotateCloneCategory,  annotateDodgeCategory,
-                annotateHarderaseCategory, annotatePenCategory,     annotateSampleCategory,    annotateSelectCategory, annotateSmudgeCategory,
-                annotateSofteraseCategory, annotateTextCategory,    backwardplayCategory,          clearCategory,          exportCategory,
-                flowptCategory,           helpCategory,            infoCategory,              markCategory,           mediaCategory,
-                playcontrolCategory,      playmodeLoopCategory,    playmodeOnceCategory,      playmodePingPongCategory, presentationCategory,
-                sessionmanagerCategory,   sourceCategory,          systemCategory,            screeningroomCategory,  unclassifiedCategory,
-                viewmodeCategory,         wipesCategory};
+            return std::array<std::string_view, 32>{annotateCategory,
+                                                    annotateAirbrushCategory,
+                                                    annotateBurnCategory,
+                                                    annotateCloneCategory,
+                                                    annotateDodgeCategory,
+                                                    annotateHarderaseCategory,
+                                                    annotatePenCategory,
+                                                    annotateSampleCategory,
+                                                    annotateSelectCategory,
+                                                    annotateSmudgeCategory,
+                                                    annotateSofteraseCategory,
+                                                    annotateTextCategory,
+                                                    backwardplayCategory,
+                                                    clearCategory,
+                                                    exportCategory,
+                                                    flowptCategory,
+                                                    helpCategory,
+                                                    infoCategory,
+                                                    markCategory,
+                                                    mediaCategory,
+                                                    playcontrolCategory,
+                                                    playmodeLoopCategory,
+                                                    playmodeOnceCategory,
+                                                    playmodePingPongCategory,
+                                                    presentationCategory,
+                                                    sessionmanagerCategory,
+                                                    sourceCategory,
+                                                    systemCategory,
+                                                    screeningroomCategory,
+                                                    unclassifiedCategory,
+                                                    viewmodeCategory,
+                                                    wipesCategory};
         }
     } // namespace EventCategories
 
