@@ -61,8 +61,6 @@ namespace IPCore
         inline constexpr std::string_view helpCategory = "help_category";
         inline constexpr std::string_view infoCategory = "info_category";
         inline constexpr std::string_view markCategory = "mark_category";
-        inline constexpr std::string_view markBackwardCategory = "mark_backward_category";
-        inline constexpr std::string_view markForwardCategory = "mark_forward_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
         inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";

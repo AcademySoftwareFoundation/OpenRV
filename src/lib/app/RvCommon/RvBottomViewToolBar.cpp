@@ -358,8 +358,8 @@ namespace Rv
             {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
             {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
 
-            {m_backMarkAction, IPCore::EventCategories::markBackwardCategory, m_backMarkAction->toolTip()},
-            {m_forwardMarkAction, IPCore::EventCategories::markForwardCategory, m_forwardMarkAction->toolTip()},
+            {m_backMarkAction, IPCore::EventCategories::playcontrolCategory, m_backMarkAction->toolTip()},
+            {m_forwardMarkAction, IPCore::EventCategories::playcontrolCategory, m_forwardMarkAction->toolTip()},
         }};
 
         if (m_session)
