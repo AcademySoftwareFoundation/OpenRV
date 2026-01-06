@@ -14,3 +14,7 @@ repos:
     hooks:
       - id: clang-format
         types_or: [c++, c]
+
+ci:
+  autofix_prs: false
+  skip: [cmake-format, black, clang-format]
