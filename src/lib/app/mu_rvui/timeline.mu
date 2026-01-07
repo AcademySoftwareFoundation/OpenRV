@@ -290,17 +290,19 @@ class: Timeline : Widget
                 (frame, _pointerInInCap, _pointerInOutCap));
 
         State state = data();
-        if (_pointerInInCap)
+        bool canModifyInOut = commands.isEventCategoryEnabled("mark_category");
+        
+        if (canModifyInOut && _pointerInInCap)
         {
             setInPoint(min(frame,outPoint()-1));
         }
         else
-        if (_pointerInOutCap)
+        if (canModifyInOut && _pointerInOutCap)
         {
             setOutPoint(max(frame,inPoint()+1));
         }
         else
-        if (_clickedInInOutRegion)
+        if (canModifyInOut && _clickedInInOutRegion)
         {
             let targetIn  = frame - _inOutRegionOffsetLeft,
                 finalIn   = max(frameStart(), min(targetIn, frameEnd()-1)),
@@ -347,20 +349,22 @@ class: Timeline : Widget
     {
 
         deb ("setFrameAndInOut f %s _drag %s\n" % (f,_drag));
-        if (_pointerInInCap)
+        bool canModifyInOut = commands.isEventCategoryEnabled("mark_category");
+        
+        if (canModifyInOut && _pointerInInCap)
         {
             deb ("    pointerInInCap\n");
             if (!isPlaying()) setFrame(inPoint());
             //setInPoint(f);
         }
         else
-        if (_pointerInOutCap)
+        if (canModifyInOut && _pointerInOutCap)
         {
             deb ("    pointerInOutCap\n");
             if (!isPlaying()) setFrame(outPoint());
         }
         else
-        if (_pointerInInOutRegion &&
+        if (canModifyInOut && _pointerInInOutRegion &&
                 (inPoint() != frameStart() || outPoint() != frameEnd()))
         {
             deb ("    pointerInOutRegion\n");
@@ -1049,25 +1053,25 @@ class: Timeline : Widget
     method: Timeline (Timeline; string name)
     {
         init(name,
-             [ ("pointer-1--push", makeCategoryEventFunc("timeline_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
-               ("pointer-1--drag", makeCategoryEventFunc("timeline_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
-               ("pointer-1--shift--push", makeCategoryEventFunc("timeline_category", clickFunction(,setInPoint)), "Set In Point on Timeline"),
-               ("pointer-1--shift--drag", makeCategoryEventFunc("timeline_category", clickFunction(,setOutPoint)), "Select In/Out Region on Timeline"),
+             [ ("pointer-1--push", makeCategoryEventFunc("playcontrol_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
+               ("pointer-1--drag", makeCategoryEventFunc("playcontrol_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
+               ("pointer-1--shift--push", makeCategoryEventFunc("mark_category", clickFunction(,setInPoint)), "Set In Point on Timeline"),
+               ("pointer-1--shift--drag", makeCategoryEventFunc("mark_category", clickFunction(,setOutPoint)), "Select In/Out Region on Timeline"),
                ("pointer-3--push", popupOpts, "Popup Timeline Options"),
                ("pointer-1--meta--push", popupOpts, "Popup Timeline Options"),
                ("pointer--move", handleMotion, ""),
                ("pointer--leave", handleLeave, "Track pointer leave"),
                ("pointer-1--shift--release", releaseDrag, ""),
                ("pointer-1--release", release, ""),
-               ("pointer-1--double",  makeCategoryEventFunc("timeline_category", doubleClick), ""),
+               ("pointer-1--double",  makeCategoryEventFunc("mark_category", doubleClick), ""),
                ("after-graph-view-change", updateMainNodeEvent, ""),
                ("graph-node-inputs-changed", updateMainNodeEvent, ""),
-               ("stylus-pen--push", makeCategoryEventFunc("timeline_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
-               ("stylus-pen--drag", makeCategoryEventFunc("timeline_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
+               ("stylus-pen--push", makeCategoryEventFunc("playcontrol_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
+               ("stylus-pen--drag", makeCategoryEventFunc("playcontrol_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
                ("stylus-pen--move", handleMotion, ""),
                ("stylus-pen--release", release, ""),
-               ("stylus-eraser--push", makeCategoryEventFunc("timeline_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
-               ("stylus-eraser--drag", makeCategoryEventFunc("timeline_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
+               ("stylus-eraser--push", makeCategoryEventFunc("playcontrol_category", clickFunction(,setFrameAndInOut)), "Set Frame On Timeline"),
+               ("stylus-eraser--drag", makeCategoryEventFunc("playcontrol_category", clickFunction(,scrubSetFrameAndInOut)), "Drag Frame On Timeline"),
                ("stylus-eraser--move", handleMotion, ""),
                ("stylus-eraser--release", release, ""),
                ("range-changed", dirtyBoundaries, ""),
