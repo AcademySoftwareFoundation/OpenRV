@@ -40,7 +40,7 @@ A special recognition to the Tweak Software original founders, and to all the de
 * Alan Trombla
 * Jon Morley
 * Arkell Rasiah
-* Danielle Ann
+* Danielle An
 * Louise Rasmussen
 * Chris Horvath
 * Seth Rosenthal
