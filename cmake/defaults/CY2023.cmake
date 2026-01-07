@@ -61,11 +61,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
       "3_1"
   )
 
-  # NumPy
-  # NumPy for CY2023 VFX platform is 1.23.x series, but PySide2 requires < 1.23
-  # Using numpy 1.22.4 (last version before 1.23) for PySide2 compatibility
-  SET(RV_DEPS_NUMPY_VERSION "1.22.4")
-    
+  # NumPy NumPy for CY2023 VFX platform is 1.23.x series, but PySide2 requires < 1.23 Using numpy 1.22.4 (last version before 1.23) for PySide2 compatibility
+  SET(RV_DEPS_NUMPY_VERSION
+      "1.22.4"
+  )
+
   # OCIO https://github.com/AcademySoftwareFoundation/OpenColorIO
   SET(RV_DEPS_OCIO_VERSION
       "2.2.1"
