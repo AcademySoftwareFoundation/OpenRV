@@ -1021,7 +1021,6 @@ class: Timeline : Widget
 
     method: doubleClick (void; Event event)
     {
-        // filtered by mark_category in the binding list.
         if (! _pointerInTimeline)
         {
             event.reject();
