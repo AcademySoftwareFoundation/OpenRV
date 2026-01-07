@@ -1,5 +1,4 @@
-# CY2025 VFX Reference Platform versions of dependencies
-# see https://vfxplatform.com/
+# CY2025 VFX Reference Platform versions of dependencies see https://vfxplatform.com/
 
 IF(RV_VFX_PLATFORM STREQUAL "CY2025")
     # Year

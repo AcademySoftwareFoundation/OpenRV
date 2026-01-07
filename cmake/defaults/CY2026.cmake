@@ -1,5 +1,4 @@
-# CY2026 VFX Reference Platform versions of dependencies
-# see https://vfxplatform.com/
+# CY2026 VFX Reference Platform versions of dependencies see https://vfxplatform.com/
 
 IF(RV_VFX_PLATFORM STREQUAL "CY2026")
     # Year
