@@ -1,10 +1,15 @@
 # This file contains all the packages that will be packaged with RV. Please add the license next to the package.
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
-#       To update OpenTimelineIO version, edit _opentimelineio_version in cmake/dependencies/python3.cmake
-# NOTE: Using --no-binary :all: in pip install ensures all packages are built from source against our custom Python.
+#       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
+#       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
+# NOTE: By default, all packages are built from source to ensure proper ABI compatibility with our custom Python.
+#       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
+#       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
 
 pip                     # License: MIT License (MIT)
 setuptools              # License: MIT License
+wheel                   # License: MIT License (MIT)
+numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL                # License: BSD License (BSD)
 
@@ -16,11 +21,10 @@ PyOpenGL                # License: BSD License (BSD)
 # Use PyOpenGL_accelerate only on x86_64 platform.
 PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
 
-# Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
+# Additional packages required by RV and for testing the Python distribution
 
-certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0) - required by test_python.py
 six                     # License: MIT License (MIT)
-wheel                   # License: MIT License (MIT)
 packaging               # License: Apache Software License, BSD License
 requests                # License: Apache Software License (Apache 2.0)
 cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)

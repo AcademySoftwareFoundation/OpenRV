@@ -1,6 +1,5 @@
 #
-# Copyright (C) 2025 Sam Richards
-# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2025 Sam Richards SPDX-License-Identifier: Apache-2.0
 #
 
 INCLUDE(cxx_defaults)
@@ -26,8 +25,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkFB
-  PRIVATE  TwkUtil OpenJph::OpenJph
-  )
-
+  PRIVATE TwkUtil OpenJph::OpenJph
+)
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
