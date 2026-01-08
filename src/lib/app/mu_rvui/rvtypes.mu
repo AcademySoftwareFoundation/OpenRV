@@ -48,7 +48,7 @@ class: FeedbackMessage
 {
     string  text;
     float   duration;
-    Glyph   glyph;
+    Glyph   glyphFunc;
     float[] textSizes;
     
     method: FeedbackMessage (FeedbackMessage; 
@@ -59,10 +59,10 @@ class: FeedbackMessage
     {
         text = t;
         duration = d;
-        glyph = g;
+        glyphFunc = g;
         textSizes = sizes;
     }
-};
+}
 
 StringPair          := (string, string);
 MenuStateFunc       := (int;);
