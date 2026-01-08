@@ -13,13 +13,9 @@ numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySi
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL==3.1.7         # License: BSD License (BSD)
 
-# MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix
-# is merged in the main branch.
+# PyOpenGL_accelerate is built from source with a patch in python3.cmake for all x86_64 platforms.
+# The patch fixes Python 3 compatibility issues (long -> ctypes.c_long) with newer Cython versions.
 # See https://github.com/mcfletch/pyopengl/issues/147 and https://github.com/mcfletch/pyopengl/pull/146
-
-# PyOpenGL_accelerate has issue with native arm64 build on MacOS.
-# Use PyOpenGL_accelerate only on x86_64 platform.
-PyOpenGL_accelerate==3.1.7 ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
 
 # Additional packages required by RV and for testing the Python distribution
 
