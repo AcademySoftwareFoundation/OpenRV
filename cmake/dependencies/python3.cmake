@@ -275,16 +275,24 @@ ELSE()
   )
 ENDIF()
 
+# Build dependencies that must be installed FIRST before building other packages.
+# These are installed from wheels in a separate pip command to ensure they're available
+# when packages like PyOpenGL_accelerate need Cython to compile .pyx files.
+SET(RV_PYTHON_BUILD_DEPS
+    "pip" # Package installer (pure Python)
+    "setuptools" # Build system (pure Python)
+    "wheel" # Wheel format support (pure Python)
+    "Cython" # Build tool - MUST be installed before packages with .pyx files
+    "meson-python" # Build backend (pure Python)
+    "ninja" # Build tool (native but doesn't link to Python)
+    CACHE STRING "Build dependencies to install first (from wheels)"
+)
+
 # List of packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source to ensure
 # proper linking against our custom Python build. Packages are built from source unless explicitly listed here. This includes: pure Python packages, build tools
 # that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
-    "pip" # Package installer (pure Python)
-    "setuptools" # Build system (pure Python)
-    "wheel" # Wheel format support (pure Python)
-    "Cython" # Build tool (compiles Python to C, but the tool itself can use pre-built wheels)
-    "meson-python" # Build backend (pure Python)
-    "ninja" # Build tool (native but doesn't link to Python)
+    ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
@@ -293,9 +301,25 @@ SET(RV_PYTHON_WHEEL_SAFE
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
-# Convert list to comma-separated string for pip's --only-binary flag
+# Convert lists to space/comma-separated strings for pip commands
+STRING(REPLACE ";" " " _build_deps_packages "${RV_PYTHON_BUILD_DEPS}")
 STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
 
+# Phase 1: Install build dependencies for phase 2.
+SET(_build_deps_install_command
+    "${_python3_executable}"
+    -s
+    -E
+    -I
+    -m
+    pip
+    install
+    --upgrade
+    --no-cache-dir
+    ${_build_deps_packages}
+)
+
+# Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env ${_otio_debug_env}
 )
@@ -412,6 +436,20 @@ IF(APPLE
 ENDIF()
 # ##############################################################################################################################################################
 
+# Phase 1 flag: Build dependencies (Cython, etc.)
+SET(${_python3_target}-build-deps-flag
+    ${_install_dir}/${_python3_target}-build-deps-flag
+)
+
+ADD_CUSTOM_COMMAND(
+  COMMENT "Installing Python build dependencies (pip, setuptools, wheel, Cython, etc.)"
+  OUTPUT ${${_python3_target}-build-deps-flag}
+  COMMAND ${_build_deps_install_command}
+  COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
+  DEPENDS ${_python3_target}
+)
+
+# Phase 2 flag: Main requirements (depends on build deps being installed first)
 SET(${_python3_target}-requirements-flag
     ${_install_dir}/${_python3_target}-requirements-flag
 )
@@ -421,7 +459,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
 )
 
 # Test the Python distribution after requirements are installed

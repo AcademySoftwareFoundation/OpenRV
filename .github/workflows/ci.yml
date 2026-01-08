@@ -353,10 +353,6 @@ jobs:
         run: |
           python3 -m pip install --user --upgrade -r requirements.txt
 
-      - name: Install Cython for building PyOpenGL_accelerate
-        run: |
-          python3 -m pip install --user Cython
-
       - name: Install Rust toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
