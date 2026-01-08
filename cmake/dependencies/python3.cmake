@@ -38,6 +38,10 @@ SET(_pyside_version
     "${RV_DEPS_PYSIDE_VERSION}"
 )
 
+SET(_numpy_version
+    "${RV_DEPS_NUMPY_VERSION}"
+)
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -244,7 +248,7 @@ ELSE()
   )
 ENDIF()
 
-# Generate requirements.txt from template with the OpenTimelineIO version substituted
+# Generate requirements.txt from template with the OpenTimelineIO and NumPy versions substituted
 SET(_requirements_input_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
@@ -271,8 +275,27 @@ ELSE()
   )
 ENDIF()
 
-# Using --no-binary :all: to ensure all packages with native extensions are built from source against our custom Python build, preventing ABI compatibility
-# issues.
+# List of packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source to ensure
+# proper linking against our custom Python build. Packages are built from source unless explicitly listed here. This includes: pure Python packages, build tools
+# that don't need ABI compatibility, and packages with data files only.
+SET(RV_PYTHON_WHEEL_SAFE
+    "pip" # Package installer (pure Python)
+    "setuptools" # Build system (pure Python)
+    "wheel" # Wheel format support (pure Python)
+    "Cython" # Build tool (compiles Python to C, but the tool itself can use pre-built wheels)
+    "meson-python" # Build backend (pure Python)
+    "ninja" # Build tool (native but doesn't link to Python)
+    "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
+    "certifi" # SSL certificate bundle (just data files)
+    "six" # Python 2/3 compatibility (pure Python)
+    "packaging" # Version parsing (pure Python)
+    "requests" # HTTP library (pure Python)
+    CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
+)
+
+# Convert list to comma-separated string for pip's --only-binary flag
+STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
+
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env ${_otio_debug_env}
 )
@@ -282,6 +305,8 @@ IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
 ENDIF()
 
+# Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
+# cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
 LIST(
   APPEND
   _requirements_install_command
@@ -298,6 +323,8 @@ LIST(
   --force-reinstall
   --no-binary
   :all:
+  --only-binary
+  ${_wheel_safe_packages}
   -r
   "${_requirements_output_file}"
 )
@@ -390,11 +417,28 @@ SET(${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_output_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file} pyside and other dependencies"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+)
+
+# Test the Python distribution after requirements are installed
+SET(${_python3_target}-test-flag
+    ${_install_dir}/${_python3_target}-test-flag
+)
+
+SET(_test_python_script
+    "${PROJECT_SOURCE_DIR}/src/build/test_python.py"
+)
+
+ADD_CUSTOM_COMMAND(
+  COMMENT "Testing Python distribution"
+  OUTPUT ${${_python3_target}-test-flag}
+  COMMAND python3 "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
+  COMMAND cmake -E touch ${${_python3_target}-test-flag}
+  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_script}
 )
 
 IF(RV_TARGET_WINDOWS
@@ -427,7 +471,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
             ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
     COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
@@ -438,9 +482,9 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
     OUTPUT ${${_pyside_target}-build-flag}
-    COMMAND ${CMAKE_COMMAND} -E env "RV_DEPS_NUMPY_VERSION=$ENV{RV_DEPS_NUMPY_VERSION}" ${_pyside_make_command} --prepare --build
+    COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
@@ -471,7 +515,7 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name} ${_copy_commands}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
 
   ADD_CUSTOM_TARGET(
@@ -485,7 +529,7 @@ ELSE()
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL
