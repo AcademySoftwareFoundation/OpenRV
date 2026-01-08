@@ -301,12 +301,11 @@ SET(RV_PYTHON_WHEEL_SAFE
 )
 
 # Convert lists to space/comma-separated strings for pip commands
-STRING(REPLACE ";" " " _build_deps_packages "${RV_PYTHON_BUILD_DEPS}")
 STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
 
-# Phase 1: Install build dependencies for phase 2.
+# Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${_build_deps_packages}
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
