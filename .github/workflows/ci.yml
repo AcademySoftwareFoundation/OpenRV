@@ -353,6 +353,17 @@ jobs:
         run: |
           python3 -m pip install --user --upgrade -r requirements.txt
 
+      - name: Install Rust toolchain
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Verify Rust installation
+        run: |
+          source $HOME/.cargo/env
+          rustc --version
+          cargo --version
+
       # For Rocky Linux, we can't cache the dependencies of Open RV 
       # because there is not enough room in the cache (10GB limit) for all platforms.
 
