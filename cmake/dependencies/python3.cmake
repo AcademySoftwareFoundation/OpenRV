@@ -275,9 +275,8 @@ ELSE()
   )
 ENDIF()
 
-# Build dependencies that must be installed FIRST before building other packages.
-# These are installed from wheels in a separate pip command to ensure they're available
-# when packages like PyOpenGL_accelerate need Cython to compile .pyx files.
+# Build dependencies that must be installed FIRST before building other packages. These are installed from wheels in a separate pip command to ensure they're
+# available when packages like PyOpenGL_accelerate need Cython to compile .pyx files.
 SET(RV_PYTHON_BUILD_DEPS
     "pip" # Package installer (pure Python)
     "setuptools" # Build system (pure Python)
@@ -307,16 +306,7 @@ STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
 
 # Phase 1: Install build dependencies for phase 2.
 SET(_build_deps_install_command
-    "${_python3_executable}"
-    -s
-    -E
-    -I
-    -m
-    pip
-    install
-    --upgrade
-    --no-cache-dir
-    ${_build_deps_packages}
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${_build_deps_packages}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
