@@ -12,10 +12,7 @@ wheel==0.43.0           # License: MIT License (MIT)
 numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL==3.1.7         # License: BSD License (BSD)
-
-# PyOpenGL_accelerate is built from source with a patch in python3.cmake for all x86_64 platforms.
-# The patch fixes Python 3 compatibility issues (long -> ctypes.c_long) with newer Cython versions.
-# See https://github.com/mcfletch/pyopengl/issues/147 and https://github.com/mcfletch/pyopengl/pull/146
+PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
 
 # Additional packages required by RV and for testing the Python distribution
 
