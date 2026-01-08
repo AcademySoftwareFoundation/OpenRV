@@ -4905,7 +4905,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                 // Extract values from FeedbackMessage class
                 state.feedbackText = nextMessage.text;
                 state.feedback = nextMessage.duration;
-                state.feedbackGlyph = nextMessage.glyph;
+                state.feedbackGlyph = nextMessage.glyphFunc;
                 state.feedbackTextSizes = nextMessage.textSizes;
                 startTimer();
             }
