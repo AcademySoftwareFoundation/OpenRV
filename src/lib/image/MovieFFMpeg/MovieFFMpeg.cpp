@@ -1422,11 +1422,13 @@ namespace TwkMovie
             if (!videoToolboxInit(avCodec, avCodecContext, hardwareContext))
             {
                 static std::once_flag warnOnce;
-                std::call_once(warnOnce, []() {
-                    std::cout << "WARNING: Hardware decoder is not available "
-                                 "or failed to intialize."
-                              << std::endl;
-                });
+                std::call_once(warnOnce,
+                               []()
+                               {
+                                   std::cout << "WARNING: Hardware decoder is not available "
+                                                "or failed to intialize."
+                                             << std::endl;
+                               });
             }
         }
 #endif
@@ -3785,11 +3787,14 @@ namespace TwkMovie
         if (!desc && nativeFormat == AV_PIX_FMT_NONE)
         {
             static std::once_flag warnOnce;
-            std::call_once(warnOnce, [this]() {
-                std::cout << "WARNING: FFmpeg detected pixel format "
-                             "AV_PIX_FMT_NONE for frames in "
-                          << m_filename << ". Using fallback pixel format: " << av_get_pix_fmt_name(m_pxlFormatOnOpen) << std::endl;
-            });
+            std::call_once(warnOnce,
+                           [this]()
+                           {
+                               std::cout << "WARNING: FFmpeg detected pixel format "
+                                            "AV_PIX_FMT_NONE for frames in "
+                                         << m_filename << ". Using fallback pixel format: " << av_get_pix_fmt_name(m_pxlFormatOnOpen)
+                                         << std::endl;
+                           });
             // Use the pixel format detected when the file was opened as a
             // fallback. Assumes that m_pxlFormatOnOpen is set because the file
             // was opened.
