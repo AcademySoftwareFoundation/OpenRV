@@ -250,7 +250,8 @@ class: MotionScope : Widget
 
         let sampFrame = frame - inPoint();
         if (sampFrame < 0) sampFrame = 0;
-        if (sampFrame > _frameMap.size()-1) sampFrame = _frameMap[_frameMap.size()-1];
+        // Clamp to last valid index
+        if (sampFrame > _frameMap.size()-1) sampFrame = _frameMap.size()-1;
         //deb ("sampFrame %s sz %s" % (sampFrame, _frameMap.size()));
         return _frameMap[sampFrame];
     }
