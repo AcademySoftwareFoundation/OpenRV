@@ -39,6 +39,9 @@ LIST(APPEND _configure_options "-DPNG_EXECUTABLES=OFF")
 LIST(APPEND _configure_options "-DPNG_TESTS=OFF")
 LIST(APPEND _configure_options "-DPNG_FRAMEWORK=OFF")
 
+# Disable PNG's automatic rpath setup to avoid conflicts with RV's rpath management
+LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}

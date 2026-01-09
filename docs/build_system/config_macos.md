@@ -126,11 +126,16 @@ Most of the build requirements can be installed by running the following brew in
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2024
-brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew rust
 ```
 ```{code-tab} bash VFX-CY2023
-brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew rust
 ```
+````
+
+````{warning}
+Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography) that contain Rust components.
+Homebrew will install the latest stable version of Rust.
 ````
 
 Make sure `xcode-select -p` still returns `/Applications/Xcode.app/Contents/Developer`. If that is not the case, run `sudo xcode-select -s /Applications/Xcode.app`

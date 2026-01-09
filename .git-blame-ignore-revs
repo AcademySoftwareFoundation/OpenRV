@@ -6,3 +6,6 @@
 
 # Format all Python files with Ruff
 c2f5280d213a71e4b20da0025bfa705bfc7fab1b
+
+# Update clang-format to 140 chars per line
+9fec424bfff02193205d9e2ac18f9ea82f451324

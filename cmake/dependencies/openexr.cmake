@@ -7,7 +7,6 @@
 INCLUDE(ProcessorCount) # require CMake 3.15+
 PROCESSORCOUNT(_cpu_count)
 
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
 SET(_install_dir
@@ -63,7 +62,7 @@ SET(_openexr_lib
 )
 
 SET(LIB_VERSION_SUFFIX
-  "${RV_DEPS_OPENEXR_LIB_VERSION_SUFFIX}"
+    "${RV_DEPS_OPENEXR_LIB_VERSION_SUFFIX}"
 )
 
 IF(RV_TARGET_DARWIN)
@@ -137,19 +136,20 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 SET(_openexr_patch_file_
-  "${CMAKE_CURRENT_SOURCE_DIR}/patch/${RV_DEPS_OPENEXR_PATCH_NAME}.patch"
+    "${CMAKE_CURRENT_SOURCE_DIR}/patch/${RV_DEPS_OPENEXR_PATCH_NAME}.patch"
 )
 
 IF(EXISTS "${_openexr_patch_file_}")
-    SET(_patch_command 
+  SET(_patch_command
       patch -p1 < ${_openexr_patch_file_}
-    )
-    MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
+  )
+  MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
 ELSE()
-    # If it does not exist, set the command to an empty string.
-    # ExternalProject_Add will skip the patch step if the command is empty.
-    SET(_patch_command "")
-    MESSAGE(STATUS "ERROR Patch file not found, skipping patch for ${_target}: ${_patch_file}")
+  # If it does not exist, set the command to an empty string. ExternalProject_Add will skip the patch step if the command is empty.
+  SET(_patch_command
+      ""
+  )
+  MESSAGE(STATUS "ERROR Patch file not found, skipping patch for ${_target}: ${_patch_file}")
 ENDIF()
 
 LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
@@ -162,6 +162,10 @@ ENDIF()
 
 # OpenEXR tools are not needed.
 LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
+
+# Disable OpenEXR's automatic rpath setup to avoid conflicts with RV's rpath management OpenEXR 3.3+ automatically adds @loader_path/../lib which conflicts with
+# our install scripts
+LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
 
 EXTERNALPROJECT_ADD(
   ${_target}

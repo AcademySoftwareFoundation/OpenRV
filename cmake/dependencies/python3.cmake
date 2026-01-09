@@ -29,8 +29,7 @@ SET(RV_DEPS_PYTHON_VERSION_SHORT
     "${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-# This version is used for generating src/build/requirements.txt from requirements.txt.in template All platforms install OpenTimelineIO from git to ensure
-# consistent source builds.
+# This version is used for generating src/build/requirements.txt from requirements.txt.in template
 SET(_opentimelineio_version
     "${RV_DEPS_OTIO_VERSION}"
 )
@@ -38,9 +37,9 @@ SET(_opentimelineio_version
 SET(_pyside_version
     "${RV_DEPS_PYSIDE_VERSION}"
 )
-# Construct the full git URL for pip to use in requirements.txt Using this avoids @ symbol conflicts in CONFIGURE_FILE
-SET(_opentimelineio_pip_url
-    "git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO@v${_opentimelineio_version}#egg=OpenTimelineIO"
+
+SET(_numpy_version
+    "${RV_DEPS_NUMPY_VERSION}"
 )
 
 SET(_python3_download_url
@@ -76,9 +75,6 @@ SET(_source_dir
 SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
-
-# Note: OpenTimelineIO is now installed via requirements.txt from git URL for all platforms. This ensures consistent source builds across Windows, Mac, and
-# Linux.
 
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
@@ -241,15 +237,18 @@ ELSE() # Not WINDOWS
   )
 ENDIF()
 
-# Set the appropriate library for CMAKE_ARGS based on platform
-# Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
+# Set the appropriate library for CMAKE_ARGS based on platform Windows needs the import library (.lib), Unix needs the shared library (.so/.dylib)
 IF(RV_TARGET_WINDOWS)
-  SET(_python3_cmake_library ${_python3_implib})
+  SET(_python3_cmake_library
+      ${_python3_implib}
+  )
 ELSE()
-  SET(_python3_cmake_library ${_python3_lib})
+  SET(_python3_cmake_library
+      ${_python3_lib}
+  )
 ENDIF()
 
-# Generate requirements.txt from template with the OpenTimelineIO version substituted
+# Generate requirements.txt from template with the OpenTimelineIO and NumPy versions substituted
 SET(_requirements_input_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
 )
@@ -259,29 +258,88 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
-# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses
-# the correct custom-built Python libraries. This is required for both old and new
-# versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection.
-# Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
-# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables.
-# --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
+# new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
 # --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
 
-# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions
-# are built with debug symbols and proper optimization levels matching RV's build type.
-# On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
+# Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions are built with debug symbols and proper optimization levels matching RV's build
+# type. On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  SET(_otio_debug_env "OTIO_CXX_DEBUG_BUILD=1")
+  SET(_otio_debug_env
+      "OTIO_CXX_DEBUG_BUILD=1"
+  )
 ELSE()
-  SET(_otio_debug_env "")
+  SET(_otio_debug_env
+      ""
+  )
 ENDIF()
 
-# Single unified command for all platforms and build types
+# Build dependencies that must be installed FIRST before building other packages. These are installed from wheels in a separate pip command to ensure they're
+# available when packages like PyOpenGL_accelerate need Cython to compile .pyx files.
+SET(RV_PYTHON_BUILD_DEPS
+    "pip" # Package installer (pure Python)
+    "setuptools" # Build system (pure Python)
+    "wheel" # Wheel format support (pure Python)
+    "Cython" # Build tool - MUST be installed before packages with .pyx files
+    "meson-python" # Build backend (pure Python)
+    "ninja" # Build tool (native but doesn't link to Python)
+    CACHE STRING "Build dependencies to install first (from wheels)"
+)
+
+# List of packages that are safe to install from pre-built wheels. All other packages (those with C/C++/Rust extensions) will be built from source to ensure
+# proper linking against our custom Python build. Packages are built from source unless explicitly listed here. This includes: pure Python packages, build tools
+# that don't need ABI compatibility, and packages with data files only.
+SET(RV_PYTHON_WHEEL_SAFE
+    ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
+    "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
+    "certifi" # SSL certificate bundle (just data files)
+    "six" # Python 2/3 compatibility (pure Python)
+    "packaging" # Version parsing (pure Python)
+    "requests" # HTTP library (pure Python)
+    CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
+)
+
+# Convert lists to space/comma-separated strings for pip commands
+STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
+
+# Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
+SET(_build_deps_install_command
+    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+)
+
+# Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env
-    ${_otio_debug_env}
-    "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir --force-reinstall -r "${_requirements_output_file}"
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env}
+)
+
+# Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
+IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
+  LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
+ENDIF()
+
+# Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
+# cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
+LIST(
+  APPEND
+  _requirements_install_command
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  "${_python3_executable}"
+  -s
+  -E
+  -I
+  -m
+  pip
+  install
+  --upgrade
+  --no-cache-dir
+  --force-reinstall
+  --no-binary
+  :all:
+  --only-binary
+  ${_wheel_safe_packages}
+  -r
+  "${_requirements_output_file}"
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -330,66 +388,63 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-# ##############################################################################################################################################################
-# This is temporary until the patch gets into the official PyOpenGL repo.      #
-# ##############################################################################################################################################################
-# Only for Apple Intel. Windows and Linux uses the requirements.txt file to install PyOpenGL-accelerate.
-IF(APPLE
-   AND RV_TARGET_APPLE_X86_64
+# Phase 1 flag: Build dependencies (Cython, etc.)
+SET(${_python3_target}-build-deps-flag
+    ${_install_dir}/${_python3_target}-build-deps-flag
 )
-  MESSAGE(STATUS "Patching PyOpenGL and building PyOpenGL from source")
-  SET(_patch_pyopengl_command
-      patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pyopengl-accelerate.patch
-  )
 
-  # TODO: pyopengl is now at 3.1.10. Need to check if this is an improvement Still need the patch
-  # https://github.com/mcfletch/pyopengl/blob/master/accelerate/src/vbo.pyx https://github.com/mcfletch/pyopengl/compare/release-3.1.8...3.1.10
-  EXTERNALPROJECT_ADD(
-    pyopengl_accelerate
-    URL "https://github.com/mcfletch/pyopengl/archive/refs/tags/release-3.1.8.tar.gz"
-    URL_MD5 "d7a9e2f8c2d981b58776ded865b3e22a"
-    DOWNLOAD_NAME release-3.1.8.tar.gz
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${CMAKE_BINARY_DIR}/pyopengl_accelerate
-    PATCH_COMMAND ${_patch_pyopengl_command}
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND "${_python3_executable}" -m pip install ./accelerate
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/pyopengl_accelerate/.pip_installed
-    BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/pyopengl_accelerate/setup.py
-    DEPENDS ${${_python3_target}-requirements-flag}
-    BUILD_IN_SOURCE TRUE
-    USES_TERMINAL_BUILD TRUE
-  )
+ADD_CUSTOM_COMMAND(
+  COMMENT "Installing Python build dependencies (pip, setuptools, wheel, Cython, etc.)"
+  OUTPUT ${${_python3_target}-build-deps-flag}
+  COMMAND ${_build_deps_install_command}
+  COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
+  DEPENDS ${_python3_target}
+)
 
-  # Ensure pyopengl_accelerate is built as part of the dependencies target
-  ADD_DEPENDENCIES(dependencies pyopengl_accelerate)
-ENDIF()
-# ##############################################################################################################################################################
-
+# Phase 2 flag: Main requirements (depends on build deps being installed first)
 SET(${_python3_target}-requirements-flag
     ${_install_dir}/${_python3_target}-requirements-flag
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Installing requirements from ${_requirements_output_file}"
+  COMMENT "Installing requirements from ${_requirements_output_file} pyside and other dependencies"
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${_requirements_output_file} ${_requirements_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
+)
+
+# Test the Python distribution after requirements are installed
+SET(${_python3_target}-test-flag
+    ${_install_dir}/${_python3_target}-test-flag
+)
+
+SET(_test_python_script
+    "${PROJECT_SOURCE_DIR}/src/build/test_python.py"
+)
+
+ADD_CUSTOM_COMMAND(
+  COMMENT "Testing Python distribution"
+  OUTPUT ${${_python3_target}-test-flag}
+  COMMAND python3 "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
+  COMMAND cmake -E touch ${${_python3_target}-test-flag}
+  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_script}
 )
 
 IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
-  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib.
+  # OCIO v2.2's pybind11 doesn't find python<ver>.lib in Debug since the name is python<ver>_d.lib. Also, Rust libraries (like cryptography via pyo3) look for
+  # python3.lib.
   ADD_CUSTOM_COMMAND(
     TARGET ${_python3_target}
     POST_BUILD
     COMMENT "Copying Debug Python lib as a unversionned file for Debug"
     COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_libpath}
-    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath} DEPENDS ${_python3_target} ${_requirements_output_file}
-            ${_requirements_input_file}
+    COMMAND cmake -E copy_if_different ${_python3_implib} ${_python_release_in_bin_libpath}
+    COMMAND cmake -E copy_if_different ${_lib_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_lib_dir}/python${PYTHON_VERSION_MAJOR}.lib
+    COMMAND cmake -E copy_if_different ${_bin_dir}/python${PYTHON_VERSION_MAJOR}_d.lib ${_bin_dir}/python${PYTHON_VERSION_MAJOR}.lib DEPENDS ${_python3_target}
+            ${_requirements_output_file} ${_requirements_input_file}
   )
 ENDIF()
 
@@ -406,7 +461,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
             ${rv_deps_pyside2_SOURCE_DIR}/build_scripts/platforms/windows_desktop.py
     COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
@@ -417,9 +472,9 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
   ADD_CUSTOM_COMMAND(
     COMMENT "Building PySide6 using ${_pyside_make_command_script}"
     OUTPUT ${${_pyside_target}-build-flag}
-    COMMAND ${CMAKE_COMMAND} -E env "RV_DEPS_NUMPY_VERSION=$ENV{RV_DEPS_NUMPY_VERSION}" ${_pyside_make_command} --prepare --build
+    COMMAND ${_pyside_make_command} --prepare --build
     COMMAND cmake -E touch ${${_pyside_target}-build-flag}
-    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag}
+    DEPENDS ${_python3_target} ${_pyside_make_command_script} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag}
     USES_TERMINAL
   )
 
@@ -450,7 +505,7 @@ IF(RV_TARGET_WINDOWS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Installing ${_python3_target}'s include and libs into ${RV_STAGE_LIB_DIR}"
     OUTPUT ${RV_STAGE_BIN_DIR}/${_python3_lib_name} ${_copy_commands}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
 
   ADD_CUSTOM_TARGET(
@@ -464,7 +519,7 @@ ELSE()
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/include ${RV_STAGE_INCLUDE_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${_build_flag_depends}
+    DEPENDS ${_python3_target} ${${_python3_target}-requirements-flag} ${${_python3_target}-test-flag} ${_build_flag_depends}
   )
   ADD_CUSTOM_TARGET(
     ${_python3_target}-stage-target ALL
