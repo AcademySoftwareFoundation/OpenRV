@@ -431,11 +431,19 @@ FUNCTION(rv_stage)
         MESSAGE(DEBUG "Found version for '${arg_TARGET}.rvpkg' package version ${_pkg_version} ...")
       ENDIF()
 
+      # Normalize version for filename: strip .0 patch if present, keep non-zero patches
+      # Only strip if it's a 3-part version ending in .0 (e.g. 2.5.0 -> 2.5, but keep 2.0 as-is)
+      SET(_pkg_version_normalized "${_pkg_version}")
+      STRING(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\.0$" "\\1" _pkg_version_normalized "${_pkg_version}")
+      IF(NOT "${_pkg_version}" STREQUAL "${_pkg_version_normalized}")
+        MESSAGE(DEBUG "Normalized package version from '${_pkg_version}' to '${_pkg_version_normalized}' for filename")
+      ENDIF()
+
       SET(_package_filename
-          "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg"
+          "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version_normalized}.rvpkg"
       )
 
-      LIST(APPEND RV_PACKAGE_LIST "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version}.rvpkg")
+      LIST(APPEND RV_PACKAGE_LIST "${RV_PACKAGES_DIR}/${arg_TARGET}-${_pkg_version_normalized}.rvpkg")
       LIST(REMOVE_DUPLICATES RV_PACKAGE_LIST)
       SET(RV_PACKAGE_LIST
           ${RV_PACKAGE_LIST}
@@ -472,11 +480,11 @@ FUNCTION(rv_stage)
       )
 
       ADD_CUSTOM_TARGET(
-        ${arg_TARGET}-${_pkg_version}.rvpkg ALL
+        ${arg_TARGET}-${_pkg_version_normalized}.rvpkg ALL
         DEPENDS ${_package_filename}
       )
 
-      ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version}.rvpkg)
+      ADD_DEPENDENCIES(packages ${arg_TARGET}-${_pkg_version_normalized}.rvpkg)
     ENDIF()
 
   ELSEIF(${arg_TYPE} STREQUAL "IMAGE_FORMAT")
