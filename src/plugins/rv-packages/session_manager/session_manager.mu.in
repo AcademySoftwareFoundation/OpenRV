@@ -2950,7 +2950,7 @@ class: SessionManagerMode : MinorMode
             configAction       = QAction(auxIcon("confg_48x48.png", true), "Configure", _configButton),
             editInfoAction     = QAction(auxIcon("sinfo_48x48.png", true), "Edit View Info", _editViewInfoButton),
             orderUpAction      = QAction(auxIcon("up_48x48.png", true), "Move Input Higher in List", _orderUpButton),
-            orderDownAction    = QAction(auxIcon("down_48x48.png", true), "Movie Input Lower in List", _orderDownButton),
+            orderDownAction    = QAction(auxIcon("down_48x48.png", true), "Move Input Lower in List", _orderDownButton),
             sortAscAction      = QAction(auxIcon("sortup_48x48.png", true), "A - Z", _sortAscButton),
             sortDescAction     = QAction(auxIcon("sortdown_48x48.png", true), "Z - A", _sortDescButton),
             inputsDeleteAction = QAction(auxIcon("trash_48x48.png", true), "Delete Input", _inputsDeleteButton),
