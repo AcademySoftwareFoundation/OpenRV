@@ -337,6 +337,8 @@ namespace TwkFB
             if (fip->field_tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
                 fip->field_tag != EXIFTAG_COLORSPACE &&
 
+                fip->field_tag != TIFFTAG_COMPRESSION && // prevent the overwriting of the compression type with numerical value
+
                 fip->field_tag != TIFFTAG_XRESOLUTION && fip->field_tag != TIFFTAG_YRESOLUTION && fip->field_tag != TIFFTAG_SOFTWARE
                 && fip->field_tag != EXIFTAG_PIXELXDIMENSION && fip->field_tag != EXIFTAG_PIXELYDIMENSION
                 && fip->field_tag != TIFFTAG_RESOLUTIONUNIT && fip->field_tag != TIFFTAG_PLANARCONFIG &&
@@ -1543,7 +1545,7 @@ namespace TwkFB
 
             char* software = NULL;
             bool isMaya = false;
-            unsigned int compression;
+            unsigned short compression;
 
             if (TIFFGetField(tif, TIFFTAG_COMPRESSION, &compression))
             {
