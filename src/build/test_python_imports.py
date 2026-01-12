@@ -21,8 +21,6 @@ import traceback
 REQUIRED_IMPORTS = [
     # Core packages
     ("pip", "Package installer"),
-    ("setuptools", "Build system"),
-    ("wheel", "Wheel format support"),
     # Scientific/Data packages
     ("numpy", "Numerical computing"),
     ("opentimelineio", "Editorial timeline"),
