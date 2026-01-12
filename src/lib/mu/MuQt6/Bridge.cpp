@@ -808,19 +808,15 @@ namespace Mu
         // Special case for QItemSelectionModel::select method.
         if (method.name().toStdString() == "select")
         {
-            int parametersCount = method.parameterCount();
-            if (parametersCount > 0)
+            const int parametersCount = method.parameterCount();
+            for (int i = 0; i < parametersCount; i++)
             {
-                for (int i = 0; i < parametersCount; i++)
+                if (method.parameterTypeName(i).toStdString() == "QItemSelectionModel::SelectionFlags" && T->name() == "int")
                 {
-                    std::string tName = T->name().c_str();
-                    // Check if the parameter is a
-                    // QItemSelectionModel::SelectionFlags and passed as int.
-                    if (method.parameterTypeName(i).toStdString() == "QItemSelectionModel::SelectionFlags" && tName == "int")
-                    {
-                        QItemSelectionModel::SelectionFlags flags = QItemSelectionModel::SelectionFlags(v._int);
-                        return Q_ARG(QItemSelectionModel::SelectionFlags, flags);
-                    }
+                    // Store in qv to ensure lifetime extends beyond this function return until after invoke() completes in invokeMethod2()
+                    qv.setValue(QItemSelectionModel::SelectionFlags(v._int));
+                    return Q_ARG(QItemSelectionModel::SelectionFlags,
+                                 *static_cast<const QItemSelectionModel::SelectionFlags*>(qv.constData()));
                 }
             }
         }
