@@ -18,6 +18,7 @@ manual synchronization errors.
 """
 
 import os
+import platform
 import re
 import sys
 import traceback
@@ -80,6 +81,28 @@ def try_import(package_name):
 
 def test_imports():
     """Test that all required packages can be imported."""
+    # On Windows, ensure Python bin directory is on PATH for DLL loading.
+    # This is required for .pyd extensions (like _opentime.pyd) to find Python DLL and dependencies.
+    if platform.system() == "Windows":
+        python_bin = os.path.dirname(sys.executable)
+        path_env = os.environ.get("PATH", "")
+        paths_to_add = []
+
+        if python_bin not in path_env:
+            paths_to_add.append(python_bin)
+
+        # For Python 3.11+, also check for DLLs directory.
+        python_root = os.path.dirname(python_bin)
+        dlls_dir = os.path.join(python_root, "DLLs")
+        if os.path.exists(dlls_dir) and dlls_dir not in path_env:
+            paths_to_add.append(dlls_dir)
+
+        if paths_to_add:
+            # Add paths to the front of PATH.
+            new_path = os.pathsep.join(paths_to_add) + os.pathsep + path_env
+            os.environ["PATH"] = new_path
+            print(f"Added to PATH for DLL loading: {', '.join(paths_to_add)}")
+
     # Get requirements.txt.in from same directory as this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     requirements_file = os.path.join(script_dir, "requirements.txt.in")
@@ -110,9 +133,23 @@ def test_imports():
 
     print("=" * 80)
     print("Testing Python package imports at build time")
+    print(f"Python: {sys.version}")
+    print(f"Platform: {sys.platform}")
+    print(f"Executable: {sys.executable}")
     print(f"Source: {requirements_file}")
     if skipped_packages:
         print(f"Skipping: {', '.join(skipped_packages)}")
+
+    # On Windows, show PATH info for DLL debugging
+    if platform.system() == "Windows":
+        python_bin = os.path.dirname(sys.executable)
+        print(f"Python bin directory: {python_bin}")
+        path_env = os.environ.get("PATH", "")
+        if python_bin in path_env:
+            print("Python bin is on PATH: Yes")
+        else:
+            print("Python bin is on PATH: No (this should not happen - PATH was modified at startup)")
+
     print("=" * 80)
     print()
 
@@ -126,6 +163,33 @@ def test_imports():
             print("FAILED")
             print(f"  Error: {type(e).__name__}: {e}")
             failed_imports.append((module_name, e))
+
+            # For opentimelineio failures, provide diagnostics
+            if "opentimelineio" in module_name.lower():
+                print("  Diagnostic info for OpenTimelineIO:")
+                try:
+                    import site
+
+                    site_packages = site.getsitepackages()
+                    print(f"  Site-packages: {site_packages}")
+
+                    # Check if opentimelineio is installed
+                    for sp in site_packages:
+                        otio_path = os.path.join(sp, "opentimelineio")
+                        if os.path.exists(otio_path):
+                            print(f"  Found opentimelineio at: {otio_path}")
+                            # List contents
+                            contents = os.listdir(otio_path)
+                            print(f"  Contents: {', '.join(contents[:10])}")
+                            # Check for _opentime
+                            opentime_files = [f for f in contents if "_opentime" in f]
+                            if opentime_files:
+                                print(f"  _opentime files: {opentime_files}")
+                            else:
+                                print("  WARNING: No _opentime extension found!")
+                except Exception as diag_e:
+                    print(f"  Could not get diagnostic info: {diag_e}")
+
             # Print full traceback for debugging
             if "--verbose" in sys.argv:
                 print("  Traceback:")
@@ -151,6 +215,14 @@ def test_imports():
                 "  - Rebuild OpenSSL to generate openssl.cnf: ninja -t clean RV_DEPS_OPENSSL && ninja RV_DEPS_OPENSSL"
             )
             print("  - Check that OPENSSL_CONF is set in sitecustomize.py")
+            print()
+
+        if any("opentimelineio" in str(m).lower() for m, _ in failed_imports):
+            print("NOTE: If you see OpenTimelineIO import errors:")
+            print("  - Check that opentimelineio was built from source (not from wheel)")
+            print("  - Verify CMAKE_ARGS were passed correctly to pip install")
+            print("  - On Windows, check that the C++ extension (_opentime.pyd) was built")
+            print("  - Try rebuilding: ninja -t clean RV_DEPS_PYTHON3 && ninja RV_DEPS_PYTHON3")
             print()
         return 1
     else:
