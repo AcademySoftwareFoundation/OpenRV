@@ -414,21 +414,40 @@ ADD_CUSTOM_COMMAND(
   DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
 )
 
-# Test the Python distribution after requirements are installed
+# Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,
+# etc.) can be imported successfully and tests for ABI compatibility issues. Runs in-place using the built Python executable.
+SET(${_python3_target}-imports-test-flag
+    ${_install_dir}/${_python3_target}-imports-test-flag
+)
+
+SET(_test_python_imports_script
+    "${PROJECT_SOURCE_DIR}/src/build/test_python_imports.py"
+)
+
+ADD_CUSTOM_COMMAND(
+  COMMENT "Testing Python package imports (build-time validation)"
+  OUTPUT ${${_python3_target}-imports-test-flag}
+  COMMAND "${_python3_executable}" "${_test_python_imports_script}"
+  COMMAND cmake -E touch ${${_python3_target}-imports-test-flag}
+  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_imports_script}
+)
+
+# Test the Python distribution's relocatability and environment setup. This moves Python to a temporary location to ensure it works when relocated and validates
+# SSL_CERT_FILE setup via sitecustomize.py. Uses system Python to orchestrate the test (since the built Python gets moved during testing).
 SET(${_python3_target}-test-flag
     ${_install_dir}/${_python3_target}-test-flag
 )
 
 SET(_test_python_script
-    "${PROJECT_SOURCE_DIR}/src/build/test_python.py"
+    "${PROJECT_SOURCE_DIR}/src/build/test_python_distribution.py"
 )
 
 ADD_CUSTOM_COMMAND(
-  COMMENT "Testing Python distribution"
+  COMMENT "Testing Python distribution relocatability and environment"
   OUTPUT ${${_python3_target}-test-flag}
   COMMAND python3 "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
   COMMAND cmake -E touch ${${_python3_target}-test-flag}
-  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_script}
+  DEPENDS ${${_python3_target}-imports-test-flag} ${_test_python_script}
 )
 
 IF(RV_TARGET_WINDOWS
