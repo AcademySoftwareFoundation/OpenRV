@@ -17,11 +17,8 @@ import shutil
 import sys
 import subprocess
 import platform
-import tempfile
-import uuid
 
 from typing import List
-from datetime import datetime
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(ROOT_DIR)
@@ -35,80 +32,16 @@ ARCH = ""
 
 LIB_DIR = ""
 
-SITECUSTOMIZE_FILE_CONTENT = f'''
-#
-# Copyright (c) {datetime.now().year} Autodesk, Inc. All rights reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
 
-"""
-Site-level module that ensures OpenSSL will have up to date certificate authorities
-on Linux and macOS. It gets imported when the Python interpreter starts up, both
-when launching Python as a standalone interpreter or as an embedded one.
-The OpenSSL shipped with Desktop requires a list of certificate authorities to be
-distributed with the build instead of relying on the OS keychain. In order to keep
-an up to date list, we're going to pull it from the certifi module, which incorporates
-all the certificate authorities that are distributed with Firefox.
-"""
-import site
+def get_sitecustomize_content() -> str:
+    """
+    Load and return the sitecustomize.py content.
 
-try:
-    import os
-    import certifi
-
-    # Do not set SSL_CERT_FILE to our own if it is already set. Someone could
-    # have their own certificate authority that they specify with this env var.
-    # Unfortunately this is not a PATH like environment variable, so we can't
-    # concatenate multiple paths with ":".
-    #
-    # To learn more about SSL_CERT_FILE and how it is being used by OpenSSL when
-    # verifying certificates, visit
-    # https://www.openssl.org/docs/man1.1.0/ssl/SSL_CTX_set_default_verify_paths.html
-    if "SSL_CERT_FILE" not in os.environ and "DO_NOT_SET_SSL_CERT_FILE" not in os.environ:
-        os.environ["SSL_CERT_FILE"] = certifi.where()
-
-except Exception as e:
-    print("Failed to set certifi.where() as SSL_CERT_FILE.", file=sys.stderr)
-    print(e, file=sys.stderr)
-    print("Set DO_NOT_SET_SSL_CERT_FILE to skip this step in RV's Python initialization.", file=sys.stderr)
-
-try:
-    import os
-
-    if "DO_NOT_REORDER_PYTHON_PATH" not in os.environ:
-        import site
-        import sys
-
-        prefixes = list(set(site.PREFIXES))
-
-        # Python libs and site-packages is the first that should be in the PATH
-        new_path_list = list(set(site.getsitepackages()))
-        new_path_list.insert(0, os.path.dirname(new_path_list[0]))
-
-        # Then any paths in RV's app package
-        for path in sys.path:
-            for prefix in prefixes:
-                if path.startswith(prefix) is False:
-                    continue
-
-                if os.path.exists(path):
-                    new_path_list.append(path)
-
-        # Then the remaining paths
-        for path in sys.path:
-            if os.path.exists(path):
-                new_path_list.append(path)
-
-        # Save the new sys.path
-        sys.path = new_path_list
-        site.removeduppaths()
-
-except Exception as e:
-    print("Failed to reorder RV's Python search path", file=sys.stderr)
-    print(e, file=sys.stderr)
-    print("Set DO_NOT_REORDER_PYTHON_PATH to skip this step in RV's Python initialization.", file=sys.stderr)
-'''
+    :return: The sitecustomize.py content as a string
+    """
+    template_path = os.path.join(ROOT_DIR, "sitecustomize.py")
+    with open(template_path, "r") as f:
+        return f.read()
 
 
 def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
@@ -138,8 +71,16 @@ def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
         ),
     )
 
-    if not python_interpreters or os.path.exists(python_interpreters[0]) is False:
-        raise FileNotFoundError()
+    if not python_interpreters:
+        raise FileNotFoundError(
+            f"No Python interpreter found in {python_home}. "
+            f"Searched for pattern '{python_name_pattern}' in {python_home} (recursively) and {os.path.join(python_home, 'bin')}. "
+        )
+
+    if not os.path.exists(python_interpreters[0]):
+        raise FileNotFoundError(
+            f"Python interpreter does not exist: {python_interpreters[0]}. Found interpreters: {python_interpreters}"
+        )
 
     print(f"Found python interpreters {python_interpreters}")
 
@@ -221,27 +162,6 @@ def patch_python_distribution(python_home: str) -> None:
     print(f"Ensuring pip with {ensure_pip_args}")
     subprocess.run(ensure_pip_args).check_returncode()
 
-    pip_args = python_interpreter_args + ["-m", "pip"]
-
-    for package in ["pip", "certifi", "six", "wheel", "packaging", "requests", "pydantic"]:
-        package_install_args = pip_args + [
-            "install",
-            "--upgrade",
-            "--force-reinstall",
-            package,
-        ]
-        print(f"Installing {package} with {package_install_args}")
-        subprocess.run(package_install_args).check_returncode()
-
-    wheel_install_args = pip_args + [
-        "install",
-        "--upgrade",
-        "--force-reinstall",
-        "wheel",
-    ]
-    print(f"Installing wheel with {wheel_install_args}")
-    subprocess.run(wheel_install_args).check_returncode()
-
     site_packages = glob.glob(os.path.join(python_home, "**", "site-packages"), recursive=True)[0]
 
     if os.path.exists(site_packages) is False:
@@ -260,97 +180,7 @@ def patch_python_distribution(python_home: str) -> None:
         os.remove(site_customize_path)
 
     with open(site_customize_path, "w") as sitecustomize_file:
-        sitecustomize_file.write(SITECUSTOMIZE_FILE_CONTENT)
-
-
-def test_python_distribution(python_home: str) -> None:
-    """
-    Test the Python distribution.
-
-    :param python_home: Package root of an Python package
-    """
-    tmp_dir = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
-    os.makedirs(tmp_dir)
-
-    tmp_python_home = os.path.join(tmp_dir, os.path.basename(python_home))
-    try:
-        print(f"Moving {python_home} to {tmp_python_home}")
-        shutil.move(python_home, tmp_python_home)
-
-        python_interpreter_args = get_python_interpreter_args(tmp_python_home, VARIANT)
-
-        # Note: OpenTimelineIO is installed via requirements.txt for all platforms and build types.
-        # The git URL in requirements.txt ensures it builds from source with proper linkage.
-
-        wheel_install_arg = python_interpreter_args + [
-            "-m",
-            "pip",
-            "install",
-            "cryptography",
-        ]
-
-        print(f"Validating that we can install a wheel with {wheel_install_arg}")
-        subprocess.run(wheel_install_arg).check_returncode()
-
-        python_validation_args = python_interpreter_args + [
-            "-c",
-            "\n".join(
-                [
-                    # Check for tkinter
-                    "try:",
-                    "    import tkinter",
-                    "except:",
-                    "    import Tkinter as tkinter",
-                    # Make sure certifi is available
-                    "import certifi",
-                    # Make sure the SSL_CERT_FILE variable is sett
-                    "import os",
-                    "assert certifi.where() == os.environ['SSL_CERT_FILE']",
-                    # Make sure ssl is correctly built and linked
-                    "import ssl",
-                    # Misc
-                    "import sqlite3",
-                    "import ctypes",
-                    "import ssl",
-                    "import _ssl",
-                    "import zlib",
-                ]
-            ),
-        ]
-        print(f"Validating the python package with {python_validation_args}")
-        subprocess.run(python_validation_args).check_returncode()
-
-        dummy_ssl_file = os.path.join("Path", "To", "Dummy", "File")
-        python_validation2_args = python_interpreter_args + [
-            "-c",
-            "\n".join(
-                [
-                    "import os",
-                    f"assert os.environ['SSL_CERT_FILE'] == '{dummy_ssl_file}'",
-                ]
-            ),
-        ]
-        print(f"Validating the python package with {python_validation2_args}")
-        subprocess.run(python_validation2_args, env={**os.environ, "SSL_CERT_FILE": dummy_ssl_file}).check_returncode()
-
-        python_validation3_args = python_interpreter_args + [
-            "-c",
-            "\n".join(
-                [
-                    "import os",
-                    "assert 'SSL_CERT_FILE' not in os.environ",
-                ]
-            ),
-        ]
-        print(f"Validating the python package with {python_validation3_args}")
-        subprocess.run(
-            python_validation3_args,
-            env={**os.environ, "DO_NOT_SET_SSL_CERT_FILE": "bleh"},
-        ).check_returncode()
-
-    finally:
-        print(f"Moving {tmp_python_home} to {python_home}")
-        shutil.move(tmp_python_home, python_home)
+        sitecustomize_file.write(get_sitecustomize_content())
 
 
 def clean() -> None:
@@ -608,7 +438,7 @@ def install_python_vfx2023() -> None:
         os.symlink(os.path.basename(python3_path), python_path)
 
     patch_python_distribution(OUTPUT_DIR)
-    test_python_distribution(OUTPUT_DIR)
+    # Note: Testing is now done via test_python.py after requirements.txt installation
 
 
 def install_python_vfx2024() -> None:
@@ -722,7 +552,7 @@ def install_python_vfx2024() -> None:
         os.symlink(os.path.basename(python3_path), python_path)
 
     patch_python_distribution(OUTPUT_DIR)
-    test_python_distribution(OUTPUT_DIR)
+    # Note: Testing is now done via test_python.py after requirements.txt installation
 
 
 if __name__ == "__main__":

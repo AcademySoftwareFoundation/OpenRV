@@ -1,28 +1,24 @@
 # This file contains all the packages that will be packaged with RV. Please add the license next to the package.
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
-#       To update OpenTimelineIO version, edit _opentimelineio_version in cmake/dependencies/python3.cmake
-# NOTE: Using --no-binary :all: in pip install ensures all packages are built from source against our custom Python.
+#       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
+#       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
+# NOTE: By default, all packages are built from source to ensure proper ABI compatibility with our custom Python.
+#       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
+#       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
 
-pip                     # License: MIT License (MIT)
-setuptools              # License: MIT License
+pip==24.0               # License: MIT License (MIT)
+setuptools==69.5.1      # License: MIT License
+wheel==0.43.0           # License: MIT License (MIT)
+numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
 opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
-PyOpenGL                # License: BSD License (BSD)
+PyOpenGL==3.1.7         # License: BSD License (BSD)
+PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
 
-# MacOS only - PyOpenGL_accelerate is built from source in python3.cmake as a workaround until the fix
-# is merged in the main branch.
-# See https://github.com/mcfletch/pyopengl/issues/147 and https://github.com/mcfletch/pyopengl/pull/146
+# Additional packages required by RV and for testing the Python distribution
 
-# PyOpenGL_accelerate as issue with native arm64 build on MacOS.
-# Use PyOpenGL_accelerate only on x86_64 platform.
-PyOpenGL_accelerate ; (platform_system=='Windows' or platform_system=='Linux') and platform_machine=='x86_64' # License: BSD License (BSD)
-
-# Those are installed by the src/build/make_python.py script, adding them here to list their licenses.
-
-certifi                 # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
-six                     # License: MIT License (MIT)
-wheel                   # License: MIT License (MIT)
-packaging               # License: Apache Software License, BSD License
-requests                # License: Apache Software License (Apache 2.0)
-cryptography            # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
-pydantic                # License: MIT License (MIT)
-
+certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+six==1.16.0             # License: MIT License (MIT)
+packaging==24.0         # License: Apache Software License, BSD License
+requests==2.31.0        # License: Apache Software License (Apache 2.0)
+cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+pydantic==2.7.1         # License: MIT License (MIT)
