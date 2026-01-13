@@ -17,9 +17,11 @@ Package list is automatically generated from requirements.txt.in to prevent
 manual synchronization errors.
 """
 
+import glob
 import os
 import platform
 import re
+import shutil
 import sys
 import traceback
 
@@ -61,6 +63,43 @@ def parse_requirements(file_path):
     return packages
 
 
+def fix_opentimelineio_debug_windows():
+    """Fix OpenTimelineIO Debug extension naming on Windows.
+
+    In Debug builds, OTIO creates _opentimed.pyd but Python expects _opentime_d.pyd.
+    This copies the file to the correct name if needed.
+    """
+    if platform.system() != "Windows" or "_d.exe" not in sys.executable.lower():
+        return  # Only needed for Windows Debug builds
+
+    try:
+        import site
+
+        site_packages = site.getsitepackages()
+
+        for sp in site_packages:
+            otio_path = os.path.join(sp, "opentimelineio")
+            if not os.path.exists(otio_path):
+                continue
+
+            # Is there more modules to rename?
+
+            # Look for misnamed Debug extension: _opentimed.*.pyd
+            misnamed_files = glob.glob(os.path.join(otio_path, "_opentimed*.pyd"))
+
+            for misnamed_file in misnamed_files:
+                # Create correct name: _opentime_d.*.pyd
+                correct_name = os.path.basename(misnamed_file).replace("_opentimed", "_opentime_d")
+                correct_path = os.path.join(otio_path, correct_name)
+
+                if not os.path.exists(correct_path):
+                    shutil.copy2(misnamed_file, correct_path)
+                    print(f"Fixed OTIO Debug extension: {os.path.basename(misnamed_file)} -> {correct_name}")
+    except Exception as e:
+        # Don't fail if fix doesn't work, let import fail naturally
+        print(f"Warning: Could not fix OTIO Debug naming: {e}")
+
+
 def try_import(package_name):
     """Try importing package, with fallback to stripped 'Py' prefix.
 
@@ -70,6 +109,10 @@ def try_import(package_name):
 
     Raises ImportError if both attempts fail.
     """
+    # Fix OpenTimelineIO Debug naming issue before importing
+    if "opentimelineio" in package_name.lower():
+        fix_opentimelineio_debug_windows()
+
     try:
         return __import__(package_name)
     except ImportError:
