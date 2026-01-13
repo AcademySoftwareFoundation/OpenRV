@@ -182,6 +182,30 @@ __rv_env_shell() {
       export PS1="dbg (.venv) $RV_CLEAN_PROMPT"
     fi
   fi
+  
+  # Install pre-commit hooks if not already installed.
+  __rv_install_precommit_hooks
+}
+
+# Install pre-commit hooks if in a git repository.
+__rv_install_precommit_hooks() {
+  # Check if we're in a git repository.
+  if [ ! -d "${RV_HOME}/.git" ]; then
+    return 0
+  fi
+  
+  # Check if hooks are already installed to avoid redundant messages.
+  if [ -f "${RV_HOME}/.git/hooks/pre-commit" ] && grep -q "pre-commit" "${RV_HOME}/.git/hooks/pre-commit" 2>/dev/null; then
+    return 0
+  fi
+  
+  echo "Installing pre-commit hooks..."
+  pre-commit install 2>/dev/null
+  if [ $? -eq 0 ]; then
+    echo "  Pre-commit hooks installed successfully."
+  else
+    echo "  Failed to install pre-commit hooks."
+  fi
 }
 
 # Update all path variables based on current RV_PATH_SUFFIX
