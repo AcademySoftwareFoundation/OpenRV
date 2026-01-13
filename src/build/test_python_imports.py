@@ -82,19 +82,30 @@ def fix_opentimelineio_debug_windows():
             if not os.path.exists(otio_path):
                 continue
 
-            # Is there more modules to rename?
+            # Look for ALL misnamed Debug extensions that end with 'd' before the Python tag
+            # Examples: _opentimed.*.pyd, _otiod.*.pyd
+            # These should be: _opentime_d.*.pyd, _otio_d.*.pyd
+            all_pyd_files = glob.glob(os.path.join(otio_path, "*.pyd"))
 
-            # Look for misnamed Debug extension: _opentimed.*.pyd
-            misnamed_files = glob.glob(os.path.join(otio_path, "_opentimed*.pyd"))
+            for pyd_file in all_pyd_files:
+                basename = os.path.basename(pyd_file)
 
-            for misnamed_file in misnamed_files:
-                # Create correct name: _opentime_d.*.pyd
-                correct_name = os.path.basename(misnamed_file).replace("_opentimed", "_opentime_d")
-                correct_path = os.path.join(otio_path, correct_name)
+                # Check if it matches pattern: _<name>d.cp<version>-win_amd64.pyd
+                # where <name> ends with 'd' but should be <name>_d
+                if basename.startswith("_") and "d.cp" in basename and "_d.cp" not in basename:
+                    # Extract the module name (between '_' and 'd.cp')
+                    # Example: _opentimed.cp311 -> _opentime
+                    parts = basename.split("d.cp")
+                    if len(parts) == 2:
+                        module_base = parts[0]  # e.g., "_opentime"
 
-                if not os.path.exists(correct_path):
-                    shutil.copy2(misnamed_file, correct_path)
-                    print(f"Fixed OTIO Debug extension: {os.path.basename(misnamed_file)} -> {correct_name}")
+                        # Create correct name with _d suffix
+                        correct_name = f"{module_base}_d.cp{parts[1]}"
+                        correct_path = os.path.join(otio_path, correct_name)
+
+                        if not os.path.exists(correct_path):
+                            shutil.copy2(pyd_file, correct_path)
+                            print(f"Fixed OTIO Debug extension: {basename} -> {correct_name}")
     except Exception as e:
         # Don't fail if fix doesn't work, let import fail naturally
         print(f"Warning: Could not fix OTIO Debug naming: {e}")
