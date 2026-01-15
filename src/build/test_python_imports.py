@@ -22,6 +22,7 @@ import os
 import platform
 import re
 import shutil
+import subprocess
 import sys
 import traceback
 
@@ -178,10 +179,134 @@ def try_import(package_name):
         raise
 
 
+def find_dumpbin():
+    """Find dumpbin.exe in Visual Studio installation."""
+    vs_paths = [
+        r"C:\Program Files\Microsoft Visual Studio",
+        r"C:\Program Files (x86)\Microsoft Visual Studio",
+    ]
+
+    for vs_base in vs_paths:
+        if not os.path.exists(vs_base):
+            continue
+
+        try:
+            for vs_year in os.listdir(vs_base):
+                vs_year_path = os.path.join(vs_base, vs_year)
+                if not os.path.isdir(vs_year_path):
+                    continue
+
+                for edition in ["Enterprise", "Professional", "Community", "BuildTools"]:
+                    edition_path = os.path.join(vs_year_path, edition)
+                    if not os.path.exists(edition_path):
+                        continue
+
+                    vc_tools = os.path.join(edition_path, "VC", "Tools", "MSVC")
+                    if os.path.exists(vc_tools):
+                        try:
+                            msvc_versions = sorted(os.listdir(vc_tools), reverse=True)
+                            for msvc_ver in msvc_versions[:3]:
+                                dumpbin_path = os.path.join(vc_tools, msvc_ver, "bin", "Hostx64", "x64", "dumpbin.exe")
+                                if os.path.exists(dumpbin_path):
+                                    return dumpbin_path
+                        except (OSError, PermissionError):
+                            pass
+        except (OSError, PermissionError):
+            pass
+
+    return None
+
+
+def check_pyd_dependencies(pyd_path):
+    """Check dependencies of a .pyd file using dumpbin.
+
+    Returns list of dependency DLL names, or None if check failed.
+    """
+    if not os.path.exists(pyd_path):
+        return None
+
+    dumpbin_path = find_dumpbin()
+    if not dumpbin_path:
+        return None
+
+    try:
+        result = subprocess.run([dumpbin_path, "/dependents", pyd_path], capture_output=True, text=True, timeout=10)
+
+        if result.returncode != 0:
+            return None
+
+        # Parse output to extract dependencies
+        dependencies = []
+        in_dependencies_section = False
+
+        for line in result.stdout.split("\n"):
+            line = line.strip()
+
+            if "Image has the following dependencies:" in line:
+                in_dependencies_section = True
+                continue
+
+            if in_dependencies_section:
+                if line == "Summary" or line == "":
+                    break
+
+                if line.endswith(".dll"):
+                    dependencies.append(line)
+
+        return dependencies
+
+    except Exception:
+        return None
+
+
+def check_otio_pyd_dependencies(otio_path):
+    """Check and report OTIO .pyd dependencies."""
+    pyd_files = glob.glob(os.path.join(otio_path, "*_d.cp*.pyd"))
+
+    if not pyd_files:
+        print("  No Debug .pyd files found")
+        return
+
+    for pyd_file in pyd_files[:2]:  # Check first 2 files to avoid too much output
+        basename = os.path.basename(pyd_file)
+        print(f"  Checking: {basename}")
+
+        deps = check_pyd_dependencies(pyd_file)
+
+        if deps:
+            # Categorize dependencies
+            debug_runtime = []
+            release_runtime = []
+            python_dlls = []
+
+            for dep in deps:
+                dep_lower = dep.lower()
+                if "d.dll" in dep_lower and ("msvcp" in dep_lower or "vcruntime" in dep_lower):
+                    debug_runtime.append(dep)
+                elif "msvcp" in dep_lower or "vcruntime" in dep_lower:
+                    release_runtime.append(dep)
+                elif "python" in dep_lower:
+                    python_dlls.append(dep)
+
+            if python_dlls:
+                print(f"    Python: {', '.join(python_dlls)}")
+
+            if debug_runtime:
+                print(f"    MSVC Debug Runtime: {', '.join(debug_runtime)}")
+
+            if release_runtime:
+                print(f"    ⚠️  MSVC Release Runtime: {', '.join(release_runtime)}")
+                print("    ERROR: Debug extension should NOT link against Release runtime!")
+                print("           This causes 'DLL initialization routine failed' errors")
+        else:
+            print("    Could not check dependencies (dumpbin not available or failed)")
+
+
 def find_msvc_runtime_dlls():
     """Find MSVC runtime DLL directories from Visual Studio installation.
 
     Returns list of directories containing MSVC runtime DLLs (both Release and Debug).
+    Searches in both VC\Tools (build tools) and VC\Redist (redistributable packages).
     """
     msvc_dll_dirs = []
 
@@ -208,7 +333,39 @@ def find_msvc_runtime_dlls():
                     if not os.path.exists(edition_path):
                         continue
 
-                    # Look for MSVC runtime in VC\Tools
+                    # 1. Check VC\Redist for Debug runtime DLLs (for Debug builds)
+                    vc_redist = os.path.join(edition_path, "VC", "Redist", "MSVC")
+                    if os.path.exists(vc_redist):
+                        try:
+                            msvc_versions = sorted(os.listdir(vc_redist), reverse=True)
+                            for msvc_ver in msvc_versions[:3]:  # Check up to 3 latest versions
+                                # Check Debug redistributables
+                                debug_redist_paths = [
+                                    os.path.join(
+                                        vc_redist, msvc_ver, "debug_nonredist", "x64", "Microsoft.VC143.DebugCRT"
+                                    ),
+                                    os.path.join(
+                                        vc_redist,
+                                        msvc_ver,
+                                        "onecore",
+                                        "debug_nonredist",
+                                        "x64",
+                                        "Microsoft.VC143.DebugCRT",
+                                    ),
+                                ]
+                                for debug_path in debug_redist_paths:
+                                    if os.path.exists(debug_path):
+                                        # Check for Debug runtime DLLs
+                                        if glob.glob(os.path.join(debug_path, "*140d.dll")):
+                                            if debug_path not in msvc_dll_dirs:
+                                                msvc_dll_dirs.append(debug_path)
+                                            break
+                                if msvc_dll_dirs:
+                                    break
+                        except (OSError, PermissionError):
+                            pass
+
+                    # 2. Check VC\Tools for runtime DLLs (fallback for Release or if Redist not found)
                     vc_tools = os.path.join(edition_path, "VC", "Tools", "MSVC")
                     if os.path.exists(vc_tools):
                         try:
@@ -229,7 +386,8 @@ def find_msvc_runtime_dlls():
                                             if bin_path not in msvc_dll_dirs:
                                                 msvc_dll_dirs.append(bin_path)
                                             break
-                                if msvc_dll_dirs:
+                                if msvc_dll_dirs and len(msvc_dll_dirs) >= 2:
+                                    # Found both Redist and Tools, that's enough
                                     break
                         except (OSError, PermissionError):
                             pass
@@ -398,16 +556,11 @@ def test_imports():
                             else:
                                 print("  No DLL files in OTIO directory")
 
-                            # On Windows Debug, check if this is a DLL dependency issue
-                            if platform.system() == "Windows" and "_d.exe" in sys.executable.lower():
-                                if "DLL load failed" in str(e):
-                                    print("  ")
-                                    print("  This is a DLL dependency issue in Debug build.")
-                                    print("  The .pyd extension exists but can't load its dependencies.")
-                                    print("  Possible causes:")
-                                    print("    - Missing Debug C++ runtime DLLs (msvcp140d.dll, vcruntime140d.dll)")
-                                    print("    - OTIO built with different compiler/runtime than Python")
-                                    print("    - Missing OTIO library DLLs")
+                            # On Windows, check DLL dependencies
+                            if platform.system() == "Windows" and "DLL load failed" in str(e):
+                                print()
+                                print("  Checking .pyd dependencies...")
+                                check_otio_pyd_dependencies(otio_path)
 
                 except Exception as diag_e:
                     print(f"  Could not get diagnostic info: {diag_e}")
@@ -443,8 +596,12 @@ def test_imports():
             print("NOTE: If you see OpenTimelineIO import errors:")
             print("  - Check that opentimelineio was built from source (not from wheel)")
             print("  - Verify CMAKE_ARGS were passed correctly to pip install")
-            print("  - On Windows, check that the C++ extension (_opentime.pyd) was built")
+            print("  - On Windows Debug builds: OTIO may link against Release runtime (msvcp140.dll)")
+            print("    instead of Debug runtime (msvcp140d.dll), causing initialization failures")
             print("  - Try rebuilding: ninja -t clean RV_DEPS_PYTHON3 && ninja RV_DEPS_PYTHON3")
+            print()
+            print("To diagnose DLL dependencies, run:")
+            print(f"  python {os.path.join(script_dir, 'check_pyd_dependencies.py')}")
             print()
         return 1
     else:
