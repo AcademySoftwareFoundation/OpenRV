@@ -311,10 +311,6 @@ IF(RV_TARGET_DARWIN
   SET(_sdkroot_env
       "SDKROOT=${CMAKE_OSX_SYSROOT}"
   )
-ELSE()
-  SET(_sdkroot_env
-      ""
-  )
 ENDIF()
 
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
