@@ -51,9 +51,14 @@ def parse_requirements(file_path):
     packages = []
     with open(file_path, encoding="utf-8") as f:
         for line in f:
-            line = line.strip()
+            # Remove inline comments and whitespace
+            line = line.split("#", 1)[0].strip()
             # Skip comments and empty lines
             if not line or line.startswith("#"):
+                continue
+            # Handle VCS/URL form: name @ git+...
+            if " @ " in line:
+                packages.append(line.split(" @ ", 1)[0].strip())
                 continue
             # Extract package name (before ==, <, >, etc.)
             match = re.match(r"^([A-Za-z0-9_-]+)", line)
