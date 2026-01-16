@@ -181,6 +181,14 @@ def try_import(package_name):
 
 def find_dumpbin():
     """Find dumpbin.exe in Visual Studio installation."""
+    # First, prefer PATH (build systems often add dumpbin's directory to PATH).
+    try:
+        found = shutil.which("dumpbin.exe")
+        if found and os.path.exists(found):
+            return found
+    except Exception:
+        pass
+
     vs_paths = [
         r"C:\Program Files\Microsoft Visual Studio",
         r"C:\Program Files (x86)\Microsoft Visual Studio",
@@ -230,9 +238,22 @@ def check_pyd_dependencies(pyd_path):
         return None
 
     try:
-        result = subprocess.run([dumpbin_path, "/dependents", pyd_path], capture_output=True, text=True, timeout=10)
+        result = subprocess.run(
+            [dumpbin_path, "/dependents", pyd_path],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
 
         if result.returncode != 0:
+            # Keep the import test resilient, but include enough info for diagnosis.
+            sys.stderr.write(f"dumpbin failed (code={result.returncode}) for: {pyd_path}\n")
+            if result.stdout:
+                sys.stderr.write("--- dumpbin stdout ---\n")
+                sys.stderr.write(result.stdout + "\n")
+            if result.stderr:
+                sys.stderr.write("--- dumpbin stderr ---\n")
+                sys.stderr.write(result.stderr + "\n")
             return None
 
         # Parse output to extract dependencies
@@ -255,7 +276,8 @@ def check_pyd_dependencies(pyd_path):
 
         return dependencies
 
-    except Exception:
+    except Exception as e:
+        sys.stderr.write(f"dumpbin invocation error for {pyd_path}: {e}\n")
         return None
 
 

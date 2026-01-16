@@ -15,12 +15,21 @@ Uses PowerShell to call dumpbin if available, otherwise provides manual instruct
 
 import glob
 import os
+import shutil
 import subprocess
 import sys
 
 
 def find_dumpbin():
     """Find dumpbin.exe in Visual Studio installation."""
+    # Prefer PATH first (CI/build environments may pre-configure this).
+    try:
+        found = shutil.which("dumpbin.exe")
+        if found and os.path.exists(found):
+            return found
+    except Exception:
+        pass
+
     vs_paths = [
         r"C:\Program Files\Microsoft Visual Studio",
         r"C:\Program Files (x86)\Microsoft Visual Studio",
@@ -82,11 +91,21 @@ def check_pyd_dependencies(pyd_path, dumpbin_path=None):
         return None
 
     try:
-        result = subprocess.run([dumpbin_path, "/dependents", pyd_path], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            [dumpbin_path, "/dependents", pyd_path],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
 
         if result.returncode != 0:
             print(f"dumpbin failed with return code {result.returncode}")
-            print(result.stderr)
+            if result.stdout:
+                print("--- dumpbin stdout ---")
+                print(result.stdout)
+            if result.stderr:
+                print("--- dumpbin stderr ---")
+                print(result.stderr)
             return None
 
         # Parse output to extract dependencies
@@ -101,10 +120,17 @@ def check_pyd_dependencies(pyd_path, dumpbin_path=None):
                 continue
 
             if in_dependencies_section:
-                if line == "Summary" or line == "":
+                # dumpbin prints "Summary" with indentation; treat it whitespace-insensitively.
+                if line.strip() == "Summary":
                     break
 
-                if line.endswith(".dll"):
+                # Blank lines appear inside the dependency block; ignore them.
+                if line == "":
+                    continue
+
+                # dumpbin prints DLL names in uppercase (e.g. KERNEL32.dll).
+                # Be case-insensitive here.
+                if line.lower().endswith(".dll"):
                     dependencies.append(line)
 
         return dependencies
