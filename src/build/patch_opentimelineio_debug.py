@@ -98,6 +98,11 @@ def main() -> int:
     # Work around rare pip/pyproject_hooks KeyError on _PYPROJECT_HOOKS_BUILD_BACKEND
     # by providing a default backend name when unset.
     env.setdefault("_PYPROJECT_HOOKS_BUILD_BACKEND", "setuptools.build_meta")
+    # Avoid pip self-upgrade/uninstall churn in CI build envs
+    env.setdefault("PIP_NO_BUILD_ISOLATION", "1")
+    env.setdefault("PIP_NO_DEPS", "1")
+    env.setdefault("PIP_DISABLE_PIP_VERSION_CHECK", "1")
+    env.setdefault("PIP_NO_PYTHON_VERSION_WARNING", "1")
 
     with tempfile.TemporaryDirectory() as td:
         td_path = Path(td)
@@ -108,8 +113,12 @@ def main() -> int:
                 "pip",
                 "download",
                 f"opentimelineio=={version}",
+                "--no-deps",
                 "--no-binary",
                 ":all:",
+                "--no-build-isolation",
+                "--progress-bar",
+                "off",
                 "-d",
                 str(td_path),
             ],
@@ -136,6 +145,9 @@ def main() -> int:
                 "--no-cache-dir",
                 "--force-reinstall",
                 "--no-build-isolation",
+                "--no-deps",
+                "--progress-bar",
+                "off",
                 str(root),
             ],
             env,
