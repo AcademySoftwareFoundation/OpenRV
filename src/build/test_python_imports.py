@@ -22,9 +22,7 @@ import os
 import platform
 import re
 import shutil
-import subprocess
 import sys
-import traceback
 
 # Packages to skip from requirements.txt.in (e.g., build dependencies that don't need import testing).
 SKIP_IMPORTS = [
@@ -177,151 +175,6 @@ def try_import(package_name):
             # Try without "Py" prefix
             return __import__(package_name[2:])
         raise
-
-
-def find_dumpbin():
-    """Find dumpbin.exe in Visual Studio installation."""
-    # First, prefer PATH (build systems often add dumpbin's directory to PATH).
-    try:
-        found = shutil.which("dumpbin.exe")
-        if found and os.path.exists(found):
-            return found
-    except Exception:
-        pass
-
-    vs_paths = [
-        r"C:\Program Files\Microsoft Visual Studio",
-        r"C:\Program Files (x86)\Microsoft Visual Studio",
-    ]
-
-    for vs_base in vs_paths:
-        if not os.path.exists(vs_base):
-            continue
-
-        try:
-            for vs_year in os.listdir(vs_base):
-                vs_year_path = os.path.join(vs_base, vs_year)
-                if not os.path.isdir(vs_year_path):
-                    continue
-
-                for edition in ["Enterprise", "Professional", "Community", "BuildTools"]:
-                    edition_path = os.path.join(vs_year_path, edition)
-                    if not os.path.exists(edition_path):
-                        continue
-
-                    vc_tools = os.path.join(edition_path, "VC", "Tools", "MSVC")
-                    if os.path.exists(vc_tools):
-                        try:
-                            msvc_versions = sorted(os.listdir(vc_tools), reverse=True)
-                            for msvc_ver in msvc_versions[:3]:
-                                dumpbin_path = os.path.join(vc_tools, msvc_ver, "bin", "Hostx64", "x64", "dumpbin.exe")
-                                if os.path.exists(dumpbin_path):
-                                    return dumpbin_path
-                        except (OSError, PermissionError):
-                            pass
-        except (OSError, PermissionError):
-            pass
-
-    return None
-
-
-def check_pyd_dependencies(pyd_path):
-    """Check dependencies of a .pyd file using dumpbin.
-
-    Returns list of dependency DLL names, or None if check failed.
-    """
-    if not os.path.exists(pyd_path):
-        return None
-
-    dumpbin_path = find_dumpbin()
-    if not dumpbin_path:
-        return None
-
-    try:
-        result = subprocess.run(
-            [dumpbin_path, "/dependents", pyd_path],
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-
-        if result.returncode != 0:
-            # Keep the import test resilient, but include enough info for diagnosis.
-            sys.stderr.write(f"dumpbin failed (code={result.returncode}) for: {pyd_path}\n")
-            if result.stdout:
-                sys.stderr.write("--- dumpbin stdout ---\n")
-                sys.stderr.write(result.stdout + "\n")
-            if result.stderr:
-                sys.stderr.write("--- dumpbin stderr ---\n")
-                sys.stderr.write(result.stderr + "\n")
-            return None
-
-        # Parse output to extract dependencies
-        dependencies = []
-        in_dependencies_section = False
-
-        for line in result.stdout.split("\n"):
-            line = line.strip()
-
-            if "Image has the following dependencies:" in line:
-                in_dependencies_section = True
-                continue
-
-            if in_dependencies_section:
-                if line == "Summary" or line == "":
-                    break
-
-                if line.endswith(".dll"):
-                    dependencies.append(line)
-
-        return dependencies
-
-    except Exception as e:
-        sys.stderr.write(f"dumpbin invocation error for {pyd_path}: {e}\n")
-        return None
-
-
-def check_otio_pyd_dependencies(otio_path):
-    """Check and report OTIO .pyd dependencies."""
-    pyd_files = glob.glob(os.path.join(otio_path, "*_d.cp*.pyd"))
-
-    if not pyd_files:
-        print("  No Debug .pyd files found")
-        return
-
-    for pyd_file in pyd_files[:2]:  # Check first 2 files to avoid too much output
-        basename = os.path.basename(pyd_file)
-        print(f"  Checking: {basename}")
-
-        deps = check_pyd_dependencies(pyd_file)
-
-        if deps:
-            # Categorize dependencies
-            debug_runtime = []
-            release_runtime = []
-            python_dlls = []
-
-            for dep in deps:
-                dep_lower = dep.lower()
-                if "d.dll" in dep_lower and ("msvcp" in dep_lower or "vcruntime" in dep_lower):
-                    debug_runtime.append(dep)
-                elif "msvcp" in dep_lower or "vcruntime" in dep_lower:
-                    release_runtime.append(dep)
-                elif "python" in dep_lower:
-                    python_dlls.append(dep)
-
-            if python_dlls:
-                print(f"    Python: {', '.join(python_dlls)}")
-
-            if debug_runtime:
-                print(f"    MSVC Debug Runtime: {', '.join(debug_runtime)}")
-
-            if release_runtime:
-                print(f"    ⚠️  MSVC Release Runtime: {', '.join(release_runtime)}")
-                print("    ERROR: Debug extension should NOT link against Release runtime!")
-                print("           This causes 'DLL initialization routine failed' errors")
-        else:
-            print("    Could not check dependencies (dumpbin not available or failed)")
 
 
 def find_msvc_runtime_dlls():
@@ -546,51 +399,7 @@ def test_imports():
             print(f"  Error: {type(e).__name__}: {e}")
             failed_imports.append((module_name, e))
 
-            # For opentimelineio failures, provide diagnostics
-            if "opentimelineio" in module_name.lower():
-                print("  Diagnostic info for OpenTimelineIO:")
-                try:
-                    import site
-
-                    site_packages = site.getsitepackages()
-                    print(f"  Site-packages: {site_packages}")
-
-                    # Check if opentimelineio is installed
-                    for sp in site_packages:
-                        otio_path = os.path.join(sp, "opentimelineio")
-                        if os.path.exists(otio_path):
-                            print(f"  Found opentimelineio at: {otio_path}")
-                            # List contents
-                            contents = os.listdir(otio_path)
-                            print(f"  Contents: {', '.join(contents[:10])}")
-
-                            # Check for extensions
-                            opentime_files = [f for f in contents if "_opentime" in f or "_otio" in f]
-                            if opentime_files:
-                                print(f"  Extensions found: {opentime_files}")
-                            else:
-                                print("  WARNING: No OTIO extensions found!")
-
-                            # Check for DLL files
-                            dll_files = glob.glob(os.path.join(otio_path, "*.dll"))
-                            if dll_files:
-                                print(f"  DLL files: {[os.path.basename(d) for d in dll_files]}")
-                            else:
-                                print("  No DLL files in OTIO directory")
-
-                            # On Windows, check DLL dependencies
-                            if platform.system() == "Windows" and "DLL load failed" in str(e):
-                                print()
-                                print("  Checking .pyd dependencies...")
-                                check_otio_pyd_dependencies(otio_path)
-
-                except Exception as diag_e:
-                    print(f"  Could not get diagnostic info: {diag_e}")
-
-            # Print full traceback for debugging
-            if "--verbose" in sys.argv:
-                print("  Traceback:")
-                traceback.print_exc(file=sys.stdout)
+            # Keep failure output minimal; detailed diagnostics removed.
 
     print()
     print("=" * 80)
