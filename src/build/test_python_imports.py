@@ -11,7 +11,7 @@
 """
 Test script to validate all Python package imports at build time.
 This catches issues like missing dependencies, ABI incompatibilities, and
-configuration problems (like OpenSSL legacy provider) before runtime.
+configuration problems (like OpenSSL legacy provider) before running the build.
 
 Package list is automatically generated from requirements.txt.in to prevent
 manual synchronization errors.

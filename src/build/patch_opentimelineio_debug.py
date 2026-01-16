@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# *****************************************************************************
+# Copyright 2025 Autodesk, Inc. All rights reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# *****************************************************************************
+
 """
 Patch OpenTimelineIO debug build to avoid pybind11 GIL assertions and ensure debug
 module naming on Windows.
@@ -13,7 +22,6 @@ Actions:
 from __future__ import annotations
 
 import argparse
-import glob
 import os
 import shutil
 import subprocess
@@ -26,9 +34,7 @@ def _run(cmd: list[str], env: dict[str, str]) -> None:
 
 
 def _patch_otio_utils(root: Path) -> None:
-    target = next(
-        root.glob("**/src/py-opentimelineio/opentimelineio-bindings/otio_utils.cpp")
-    )
+    target = next(root.glob("**/src/py-opentimelineio/opentimelineio-bindings/otio_utils.cpp"))
     text = target.read_text(encoding="utf-8")
     # Make _value_to_any lazy-initialized to avoid pybind11 GIL asserts at static init.
     if "static py::object _value_to_any = py::none();" not in text:
@@ -49,7 +55,7 @@ def _patch_otio_utils(root: Path) -> None:
     target.write_text(text, encoding="utf-8")
 
 
-def _maybe_copy_debug_names(site_packages: Path) -> None:
+def copy_debug_names(site_packages: Path) -> None:
     otio_path = site_packages / "opentimelineio"
     if not otio_path.exists():
         return
@@ -135,7 +141,7 @@ def main() -> int:
             env,
         )
 
-    _maybe_copy_debug_names(sp)
+    copy_debug_names(sp)
     return 0
 
 

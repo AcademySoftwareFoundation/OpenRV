@@ -323,11 +323,9 @@ ENDIF()
 LIST(
   APPEND
   _requirements_install_command
-  # Force downstream CMake projects (notably OpenTimelineIO + pybind11) to use the *same* custom-built Python.
-  # OTIO depends on pybind11 and can use different FindPython variants depending on version/environment:
-  # - legacy: FindPythonInterp/FindPythonLibsNew via PYTHON_* variables
-  # - modern: FindPython / FindPython3 via Python*_EXECUTABLE / Python*_INCLUDE_DIR / Python*_LIBRARY
-  # Passing all of them avoids Debug/Release mismatches on Windows.
+  # Force downstream CMake projects (notably OpenTimelineIO + pybind11) to use the *same* custom-built Python. OTIO depends on pybind11 and can use different
+  # FindPython variants depending on version/environment: - legacy: FindPythonInterp/FindPythonLibsNew via PYTHON_* variables - modern: FindPython / FindPython3
+  # via Python*_EXECUTABLE / Python*_INCLUDE_DIR / Python*_LIBRARY Passing all of them avoids Debug/Release mismatches on Windows.
   "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython3_ROOT_DIR=${_install_dir} -DPython3_EXECUTABLE=${_python3_executable} -DPython3_INCLUDE_DIR=${_include_dir} -DPython3_LIBRARY=${_python3_cmake_library} -DPython_ROOT_DIR=${_install_dir} -DPython_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library}"
   "${_python3_executable}"
   -s
@@ -347,25 +345,26 @@ LIST(
   "${_requirements_output_file}"
 )
 
-# Patch OpenTimelineIO for Windows Debug pybind11 GIL assertion and ensure debug naming.
-SET(_otio_patch_script
-    "${PROJECT_SOURCE_DIR}/src/build/patch_opentimelineio_debug.py"
-)
-SET(${_python3_target}-otio-patch-flag
-    ${_install_dir}/${_python3_target}-otio-patch-flag
-)
+IF(RV_TARGET_WINDOWS)
+  # Patch OpenTimelineIO for Windows Debug pybind11 GIL assertion and ensure debug naming.
+  SET(_otio_patch_script
+      "${PROJECT_SOURCE_DIR}/src/build/patch_opentimelineio_debug.py"
+  )
+  SET(${_python3_target}-otio-patch-flag
+      ${_install_dir}/${_python3_target}-otio-patch-flag
+  )
 
-ADD_CUSTOM_COMMAND(
-  COMMENT "Patching OpenTimelineIO for Debug Python (lazy GIL init + debug pyd naming)"
-  OUTPUT ${${_python3_target}-otio-patch-flag}
-  COMMAND "${_python3_executable}" "${_otio_patch_script}"
-          --python-exe "${_python3_executable}"
-          --otio-version "${_opentimelineio_version}"
-          --site-packages "${_install_dir}/Lib/site-packages"
-          --cmake-args "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython3_ROOT_DIR=${_install_dir} -DPython3_EXECUTABLE=${_python3_executable} -DPython3_INCLUDE_DIR=${_include_dir} -DPython3_LIBRARY=${_python3_cmake_library} -DPython_ROOT_DIR=${_install_dir} -DPython_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library}"
-  COMMAND cmake -E touch ${${_python3_target}-otio-patch-flag}
-  DEPENDS ${${_python3_target}-requirements-flag} ${_otio_patch_script}
-)
+  ADD_CUSTOM_COMMAND(
+    COMMENT "Patching OpenTimelineIO for Debug Python (lazy GIL init + debug pyd naming)"
+    OUTPUT ${${_python3_target}-otio-patch-flag}
+    COMMAND
+      "${_python3_executable}" "${_otio_patch_script}" --python-exe "${_python3_executable}" --otio-version "${_opentimelineio_version}" --site-packages
+      "${_install_dir}/Lib/site-packages" --cmake-args
+      "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython3_ROOT_DIR=${_install_dir} -DPython3_EXECUTABLE=${_python3_executable} -DPython3_INCLUDE_DIR=${_include_dir} -DPython3_LIBRARY=${_python3_cmake_library} -DPython_ROOT_DIR=${_install_dir} -DPython_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library}"
+    COMMAND cmake -E touch ${${_python3_target}-otio-patch-flag}
+    DEPENDS ${${_python3_target}-requirements-flag} ${_otio_patch_script}
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_patch_python_command
