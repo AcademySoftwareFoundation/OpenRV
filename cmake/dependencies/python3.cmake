@@ -50,14 +50,6 @@ SET(_python3_download_hash
     "${RV_DEPS_PYTHON_DOWNLOAD_HASH}"
 )
 
-SET(_opentimelineio_download_url
-    "https://github.com/AcademySoftwareFoundation/OpenTimelineIO"
-)
-
-SET(_opentimelineio_git_tag
-    "v${_opentimelineio_version}"
-)
-
 SET(_pyside_archive_url
     "${RV_DEPS_PYSIDE_ARCHIVE_URL}"
 )
@@ -346,27 +338,6 @@ LIST(
 )
 
 IF(RV_TARGET_WINDOWS)
-  # Patch OpenTimelineIO for Windows Debug pybind11 GIL assertion and ensure debug naming.
-  SET(_otio_patch_script
-      "${PROJECT_SOURCE_DIR}/src/build/patch_opentimelineio_debug.py"
-  )
-  SET(${_python3_target}-otio-patch-flag
-      ${_install_dir}/${_python3_target}-otio-patch-flag
-  )
-
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Patching OpenTimelineIO for Debug Python (lazy GIL init + debug pyd naming)"
-    OUTPUT ${${_python3_target}-otio-patch-flag}
-    COMMAND
-      "${_python3_executable}" "${_otio_patch_script}" --python-exe "${_python3_executable}" --otio-version "${_opentimelineio_version}" --site-packages
-      "${_install_dir}/Lib/site-packages" --cmake-args
-      "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython3_ROOT_DIR=${_install_dir} -DPython3_EXECUTABLE=${_python3_executable} -DPython3_INCLUDE_DIR=${_include_dir} -DPython3_LIBRARY=${_python3_cmake_library} -DPython_ROOT_DIR=${_install_dir} -DPython_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library}"
-    COMMAND cmake -E touch ${${_python3_target}-otio-patch-flag}
-    DEPENDS ${${_python3_target}-requirements-flag} ${_otio_patch_script}
-  )
-ENDIF()
-
-IF(RV_TARGET_WINDOWS)
   SET(_patch_python_command
       "patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.openssl.props.patch &&\
        patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.python.props.patch &&\
@@ -453,7 +424,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-imports-test-flag}
   COMMAND "${_python3_executable}" "${_test_python_imports_script}"
   COMMAND cmake -E touch ${${_python3_target}-imports-test-flag}
-  DEPENDS ${${_python3_target}-requirements-flag} ${${_python3_target}-otio-patch-flag} ${_test_python_imports_script}
+  DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_imports_script}
 )
 
 # Test the Python distribution's relocatability and environment setup. This moves Python to a temporary location to ensure it works when relocated and validates
