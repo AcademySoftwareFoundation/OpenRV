@@ -315,10 +315,7 @@ ENDIF()
 LIST(
   APPEND
   _requirements_install_command
-  # Force downstream CMake projects (notably OpenTimelineIO + pybind11) to use the *same* custom-built Python. OTIO depends on pybind11 and can use different
-  # FindPython variants depending on version/environment: - legacy: FindPythonInterp/FindPythonLibsNew via PYTHON_* variables - modern: FindPython / FindPython3
-  # via Python*_EXECUTABLE / Python*_INCLUDE_DIR / Python*_LIBRARY Passing all of them avoids Debug/Release mismatches on Windows.
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython3_ROOT_DIR=${_install_dir} -DPython3_EXECUTABLE=${_python3_executable} -DPython3_INCLUDE_DIR=${_include_dir} -DPython3_LIBRARY=${_python3_cmake_library} -DPython_ROOT_DIR=${_install_dir} -DPython_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library}"
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
   "${_python3_executable}"
   -s
   -E
