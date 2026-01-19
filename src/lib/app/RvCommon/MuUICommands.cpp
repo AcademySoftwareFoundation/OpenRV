@@ -896,25 +896,35 @@ namespace Rv
                 v = pathConform(UTF8::qconvert(files.at(0)));
                 QFileInfo info(UTF8::qconvert(v.c_str()));
 
-                //
-                //  QFileInfo says a non-existant file is not writable, so have
-                //  to check the directory in that case.
-                //
-                const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(info.absolutePath()).c_str());
-                const bool isFileWritable = TwkUtil::isWritable(v.c_str());
-                if ((!info.exists() && !isDirWritable) || (info.exists() && !isFileWritable))
+                // Allow skipping permissions check via environment variable
+                static const bool skipPermissionsCheck = (getenv("RV_SKIP_SAVE_FILE_DIALOG_PERMISSIONS_CHECK") != nullptr);
+                if (!skipPermissionsCheck)
                 {
-                    QString message = QString("File '") + UTF8::qconvert(v.c_str())
-                                      + "' is not writable; please check the permissions or "
-                                        "choose another location.";
-                    QMessageBox confirm(QMessageBox::Warning, "Permissions", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
+                    //
+                    //  QFileInfo says a non-existant file is not writable, so have
+                    //  to check the directory in that case.
+                    //
+                    const bool isDirWritable = TwkUtil::isWritable(UTF8::qconvert(info.absolutePath()).c_str());
+                    const bool isFileWritable = TwkUtil::isWritable(v.c_str());
 
-                    QPushButton* q1 = confirm.addButton("OK", QMessageBox::AcceptRole);
-                    confirm.setIcon(QMessageBox::Question);
-                    confirm.exec();
-                    v = "";
+                    if ((!info.exists() && !isDirWritable) || (info.exists() && !isFileWritable))
+                    {
+                        QString message = QString("File '") + UTF8::qconvert(v.c_str())
+                                          + "' is not writable; please check the permissions or "
+                                            "choose another location.";
+                        QMessageBox confirm(QMessageBox::Warning, "Permissions", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
+
+                        QPushButton* q1 = confirm.addButton("Try to Save Anyway", QMessageBox::AcceptRole);
+                        QPushButton* q2 = confirm.addButton("Choose Another Location", QMessageBox::RejectRole);
+                        confirm.setDefaultButton(q2);
+                        confirm.setIcon(QMessageBox::Question);
+                        confirm.exec();
+                        if (confirm.clickedButton() != q1)
+                            v = "";
+                    }
                 }
-                else if (info.exists())
+
+                if (info.exists())
                 {
                     QString message = QString("File '") + UTF8::qconvert(v.c_str()) + "' exists; overwrite ?";
                     QMessageBox confirm(QMessageBox::Warning, "Overwrite", message, QMessageBox::NoButton, rvDoc, Qt::Sheet);
