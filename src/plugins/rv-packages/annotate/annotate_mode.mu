@@ -1622,10 +1622,11 @@ class: AnnotateMinorMode : MinorMode
                         let frame = int(parts[2]);
 
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {0}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {0}, true);
 
                         let orderName = frameOrderName(node, frame);
 
@@ -1695,10 +1696,11 @@ class: AnnotateMinorMode : MinorMode
                 if (stroke != "")
                 {
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {1}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {1}, true);
                     
                     for_index(i; order)
                     {
@@ -1738,10 +1740,11 @@ class: AnnotateMinorMode : MinorMode
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                     
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {0}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {0}, true);
                     
                     order.push_back(stroke);
                 }
@@ -1798,10 +1801,11 @@ class: AnnotateMinorMode : MinorMode
                         let frame = int(parts[2]);
 
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {1}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {1}, true);
 
                         let orderName = frameOrderName(node, frame);
                         if (propertyExists(orderName))
@@ -1877,10 +1881,11 @@ class: AnnotateMinorMode : MinorMode
                 if (stroke != "")
                 {
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {0}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {0}, true);
                     
                     order.push_back(stroke);
                     
@@ -1913,10 +1918,11 @@ class: AnnotateMinorMode : MinorMode
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                     
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {1}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {1}, true);
                     
                     for_index(i; order)
                     {
@@ -1998,10 +2004,11 @@ class: AnnotateMinorMode : MinorMode
                         affectedStrokes.push_back(uuid);
                         
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {1}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {1}, true);
                     }
                 }
                 undo.push_back(string(order.size()));
@@ -2067,10 +2074,11 @@ class: AnnotateMinorMode : MinorMode
                             affectedStrokes.push_back(uuid);
                             
                             let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                            if (propertyExists(softDeleted))
+                            if (!propertyExists(softDeleted))
                             {
-                                setIntProperty(softDeleted, int[] {1}, true);
+                                newProperty(softDeleted, IntType, 1);
                             }
+                            setIntProperty(softDeleted, int[] {1}, true);
                         }
                     }
 
@@ -2096,10 +2104,11 @@ class: AnnotateMinorMode : MinorMode
                                 affectedStrokes.push_back(uuid);
                                 
                                 let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                                if (propertyExists(softDeleted))
+                                if (!propertyExists(softDeleted))
                                 {
-                                    setIntProperty(softDeleted, int[] {1}, true);
+                                    newProperty(softDeleted, IntType, 1);
                                 }
+                                setIntProperty(softDeleted, int[] {1}, true);
                             }
                         }
                         
