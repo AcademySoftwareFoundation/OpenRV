@@ -20,7 +20,7 @@ class: DrawDockWidget : QDockWidget
 
     method: DrawDockWidget (DrawDockWidget; QWidget parent, Mode m)
     {
-        QDockWidget.QDockWidget("Draw", parent, Qt.Tool);
+        QDockWidget.QDockWidget("Draw", parent, Qt.Widget);
         _mode = m;
     }
 
@@ -176,6 +176,7 @@ class: AnnotateMinorMode : MinorMode
 
     int               _hideDrawPane;
     bool              _skipConfirmations;
+    bool              _isActivating;  // Guard to prevent recursive toggle calls during activation
 
     // filtering control based on time and dx/dy deltas during drag events
     // to prevent sending ridiculous number of mouse/tablet events if using
@@ -2478,7 +2479,8 @@ class: AnnotateMinorMode : MinorMode
         }
         else
         {
-            if (!_active && commands.isEventCategoryEnabled("annotate_category"))
+            // Prevent recursion: activate() → updateDrawModeUI() → toggle() → activate()
+            if (!_active && commands.isEventCategoryEnabled("annotate_category") && !_isActivating)
             {
                 toggle();
             }
@@ -2713,6 +2715,7 @@ class: AnnotateMinorMode : MinorMode
         _userSelectedNode   = "";
         _disabledTooltipMessage = "This tool is currently unavailable";
         _skipConfirmations = system.getenv("RV_SKIP_CONFIRMATIONS", nil) neq nil;
+        _isActivating      = false;
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -3357,6 +3360,10 @@ class: AnnotateMinorMode : MinorMode
 
     method: activate (void;)
     {
+        // Guard against recursive activation due to updateDrawModeUI() calling toggle()
+        if (_isActivating) return;
+        _isActivating = true;
+        
         updateCurrentNode();
         updateToolAvailability();
         undoRedoClearUpdate();
@@ -3378,6 +3385,13 @@ class: AnnotateMinorMode : MinorMode
         updateDrawModeUI();
         setTags();
         sendInternalEvent("annotate-mode-activated");
+        
+        // Force focus to prevent the toolbar from disappearing
+        let m = mainWindowWidget();
+        m.update();
+        m.activateWindow();
+        
+        _isActivating = false;
     }
 
     method: render (void; Event event)
