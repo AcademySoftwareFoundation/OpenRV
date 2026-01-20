@@ -214,15 +214,16 @@ class: ModeManagerMode : MinorMode
         \: (int; )
         {
             // Special handling of mode toggling if certain categories of actions are disabled.
+            // Note: We only return the disabled state here. The "category-event-blocked" event
+            // is sent by toggleModeEntry() when the user actually tries to invoke the action,
+            // not when just checking if the menu item should be disabled.
             if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
             {
-                sendInternalEvent("category-event-blocked", "annotate_category");
                 return DisabledMenuState;
             }
     
             if (!commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager")
             {
-                sendInternalEvent("category-event-blocked", "sessionmanager_category");
                 return DisabledMenuState;
             }
     
