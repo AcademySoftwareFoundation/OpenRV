@@ -382,6 +382,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         QWidget* w = doc->view();
 
@@ -462,6 +464,8 @@ namespace Rv
     NODE_IMPLEMENTATION(startupResize, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         NODE_RETURN(rvDoc->startupResize());
     }
@@ -491,6 +495,8 @@ namespace Rv
     NODE_IMPLEMENTATION(popupMenu, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
 
         TwkApp::EventType::EventInstance* e = NODE_ARG_OBJECT(0, TwkApp::EventType::EventInstance);
@@ -513,6 +519,8 @@ namespace Rv
     NODE_IMPLEMENTATION(popupMenuAtPoint, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         int x = NODE_ARG(0, int);
         int y = NODE_ARG(1, int);
@@ -528,7 +536,8 @@ namespace Rv
         const StringType::String* title = NODE_ARG_OBJECT(0, StringType::String);
 
         Session* s = Session::currentSession();
-        assert(s);
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         assert(rvDoc);
@@ -539,7 +548,8 @@ namespace Rv
     NODE_IMPLEMENTATION(center, void)
     {
         Session* s = Session::currentSession();
-        assert(s);
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         assert(rvDoc);
@@ -551,7 +561,8 @@ namespace Rv
     NODE_IMPLEMENTATION(close, void)
     {
         Session* s = Session::currentSession();
-        assert(s);
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         assert(rvDoc);
@@ -562,7 +573,8 @@ namespace Rv
     NODE_IMPLEMENTATION(toggleMenuBar, void)
     {
         Session* s = Session::currentSession();
-        assert(s);
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         rvDoc->toggleMenuBar();
     }
@@ -570,7 +582,8 @@ namespace Rv
     NODE_IMPLEMENTATION(isMenuBarVisible, bool)
     {
         Session* s = Session::currentSession();
-        assert(s);
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         NODE_RETURN(rvDoc->menuBarShown());
     }
@@ -582,6 +595,8 @@ namespace Rv
         HOP_PROF_FUNC();
 
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         Process* p = NODE_THREAD.process();
         bool sheet = NODE_ARG(0, bool);
@@ -701,6 +716,8 @@ namespace Rv
     NODE_IMPLEMENTATION(openFileDialog, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         Process* p = NODE_THREAD.process();
         bool sheet = NODE_ARG(0, bool);
@@ -813,6 +830,8 @@ namespace Rv
     NODE_IMPLEMENTATION(saveFileDialog, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         Process* p = NODE_THREAD.process();
         bool sheet = NODE_ARG(0, bool);
@@ -954,6 +973,8 @@ namespace Rv
     NODE_IMPLEMENTATION(setCursor, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         rvDoc->view()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
     }
@@ -961,6 +982,8 @@ namespace Rv
     NODE_IMPLEMENTATION(alertPanel, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = (RvDocument*)s->opaquePointer();
         Process* p = NODE_THREAD.process();
         bool sheet = NODE_ARG(0, bool);
@@ -1033,6 +1056,8 @@ namespace Rv
     NODE_IMPLEMENTATION(stereoSupported, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = (RvDocument*)s->opaquePointer();
 
         NODE_RETURN(true);
@@ -1041,6 +1066,8 @@ namespace Rv
     NODE_IMPLEMENTATION(watchFile, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = (RvDocument*)s->opaquePointer();
         StringType::String* file = NODE_ARG_OBJECT(0, StringType::String);
         bool watch = NODE_ARG(1, bool);
@@ -1159,6 +1186,8 @@ namespace Rv
     NODE_IMPLEMENTATION(remoteConnections, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = static_cast<const StringType*>(atype->elementType());
@@ -1186,6 +1215,8 @@ namespace Rv
     NODE_IMPLEMENTATION(remoteApplications, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = static_cast<const StringType*>(atype->elementType());
@@ -1206,6 +1237,8 @@ namespace Rv
     NODE_IMPLEMENTATION(remoteContacts, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = static_cast<const StringType*>(atype->elementType());
@@ -1535,6 +1568,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* url = NODE_ARG_OBJECT(0, StringType::String);
         ClassInstance* hlist = NODE_ARG_OBJECT(1, ClassInstance);
         StringType::String* replyEvent = NODE_ARG_OBJECT(2, StringType::String);
@@ -1570,6 +1605,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* url = NODE_ARG_OBJECT(0, StringType::String);
         ClassInstance* hlist = NODE_ARG_OBJECT(1, ClassInstance);
         StringType::String* postString = NODE_ARG_OBJECT(2, StringType::String);
@@ -1606,6 +1643,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* url = NODE_ARG_OBJECT(0, StringType::String);
         ClassInstance* hlist = NODE_ARG_OBJECT(1, ClassInstance);
         DynamicArray* postData = NODE_ARG_OBJECT(2, DynamicArray);
@@ -1644,6 +1683,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* url = NODE_ARG_OBJECT(0, StringType::String);
         ClassInstance* hlist = NODE_ARG_OBJECT(1, ClassInstance);
         StringType::String* putString = NODE_ARG_OBJECT(2, StringType::String);
@@ -1680,6 +1721,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* url = NODE_ARG_OBJECT(0, StringType::String);
         ClassInstance* hlist = NODE_ARG_OBJECT(1, ClassInstance);
         DynamicArray* putData = NODE_ARG_OBJECT(2, DynamicArray);
@@ -1718,6 +1761,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
         const QMainWindowType* type = c->findSymbolOfTypeByQualifiedName<QMainWindowType>(c->internName("qt.QMainWindow"), false);
@@ -1730,6 +1775,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         QWidget* w = doc->view();
 
@@ -1743,6 +1790,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         QTabWidget* w = RvApp()->prefDialog()->tabWidget();
 
@@ -1756,6 +1805,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
         QToolBar* toolBar = doc->bottomViewToolBar();
@@ -1770,6 +1821,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvWebManager* m = RvApp()->webManager();
 
         const QNetworkAccessManagerType* type =
@@ -1783,6 +1836,8 @@ namespace Rv
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
         QWebEnginePage* frame = Mu::object<QWebEnginePage>(NODE_ARG_OBJECT(0, ClassInstance));
@@ -1962,6 +2017,8 @@ namespace Rv
         //  kick cache to be sure we recache if necessary.
         //
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Session::CachingMode mode = s->cachingMode();
         s->setCaching(Session::NeverCache);
 
@@ -1971,7 +2028,6 @@ namespace Rv
         }
         else if (value)
         {
-            Session* s = Session::currentSession();
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
 
             QString message = "Cannot start presentation mode when multiple "
@@ -2000,6 +2056,8 @@ namespace Rv
         {
             bool presenting = RvApp()->isInPresentationMode();
             Session* s = Session::currentSession();
+            if (!s)
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
             Session::CachingMode mode = s->cachingMode();
 
             if (presenting)
@@ -2065,6 +2123,8 @@ namespace Rv
     NODE_IMPLEMENTATION(showTopViewToolbar, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         bool value = NODE_ARG(0, bool);
         doc->topViewToolBar()->makeActive(value);
@@ -2073,6 +2133,8 @@ namespace Rv
     NODE_IMPLEMENTATION(isTopViewToolbarVisible, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         NODE_RETURN(doc->topViewToolBar()->isVisible());
     }
@@ -2080,6 +2142,8 @@ namespace Rv
     NODE_IMPLEMENTATION(showBottomViewToolbar, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         bool value = NODE_ARG(0, bool);
         doc->bottomViewToolBar()->makeActive(value);
@@ -2088,6 +2152,8 @@ namespace Rv
     NODE_IMPLEMENTATION(isBottomViewToolbarVisible, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         NODE_RETURN(doc->bottomViewToolBar()->isVisible());
     }
@@ -2095,6 +2161,8 @@ namespace Rv
     NODE_IMPLEMENTATION(editNodeSource, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         StringType::String* node = NODE_ARG_OBJECT(0, StringType::String);
 
@@ -2143,6 +2211,8 @@ namespace Rv
         //        Process* p = NODE_THREAD.process();
         //        MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         doc->showDiagnostics();
     }
@@ -2152,6 +2222,8 @@ namespace Rv
         float devicePixelRatio = 1.0f;
 
         const Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
         if (doc != nullptr && doc->view() != nullptr)

@@ -315,12 +315,16 @@ namespace IPMu
     NODE_IMPLEMENTATION(inPoint, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->inPoint());
     }
 
     NODE_IMPLEMENTATION(outPoint, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->outPoint() - 1);
     }
 
@@ -328,6 +332,8 @@ namespace IPMu
     {
         int f = NODE_ARG(0, int);
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int newOut = f + 1, oldIn = s->inPoint();
         {
             IPGraph::GraphEdit edit(s->graph());
@@ -342,6 +348,8 @@ namespace IPMu
     {
         int f = NODE_ARG(0, int);
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int oldOut = s->outPoint();
         {
             IPGraph::GraphEdit edit(s->graph());
@@ -357,6 +365,8 @@ namespace IPMu
         Vector4f m = NODE_ARG(0, Vector4f);
         const bool allDevices = NODE_ARG(1, bool);
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setMargins(m[0], m[1], m[2], m[3], allDevices);
         s->askForRedraw(true /*force*/);
     }
@@ -364,6 +374,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(margins, Mu::Vector4f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const VideoDevice* d = s->eventVideoDevice() ? s->eventVideoDevice() : s->outputVideoDevice();
         TwkApp::VideoDevice::Margins m = d->margins();
 
@@ -380,6 +392,8 @@ namespace IPMu
     {
         int m = NODE_ARG(0, int);
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         switch (m)
         {
@@ -398,6 +412,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(playMode, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int rval = 0;
 
         switch (s->playMode())
@@ -420,7 +436,8 @@ namespace IPMu
     {
         int f = NODE_ARG(0, int);
         Session* s = Session::currentSession();
-
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->graph().cache().lock();
         s->graph().cache().clearAllButFrame(f);
         s->graph().cache().unlock();
@@ -430,6 +447,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(reload, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            return;
         Session::NodeVector nodes;
 
         s->findCurrentNodesByTypeName(nodes, "RVFileSource");
@@ -451,6 +470,8 @@ namespace IPMu
         int start = NODE_ARG(0, int);
         int end = NODE_ARG(1, int);
         Session* s = Session::currentSession();
+        if (!s)
+            return;
         Session::NodeVector nodes;
 
         s->findNodesByTypeName(nodes, "RVFileSource");
@@ -470,6 +491,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(loadChangedFrames, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            return;
         DynamicArray* inputs = NODE_ARG_OBJECT(0, DynamicArray);
 
         //  Turn off cache
@@ -524,6 +547,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(play, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            return;
         s->play();
         s->askForRedraw(true);
     }
@@ -531,12 +556,17 @@ namespace IPMu
     NODE_IMPLEMENTATION(isPlaying, bool)
     {
         Session* s = Session::currentSession();
-        NODE_RETURN(bool(s->isPlaying()));
+        if (!s)
+            NODE_RETURN(bool(false));
+        else
+            NODE_RETURN(bool(s->isPlaying()));
     }
 
     NODE_IMPLEMENTATION(stop, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            return;
         s->stop();
         s->askForRedraw(true);
     }
@@ -544,13 +574,18 @@ namespace IPMu
     NODE_IMPLEMENTATION(frame, int)
     {
         Session* s = Session::currentSession();
-        NODE_RETURN(s->currentFrame());
+        if (!s)
+            NODE_RETURN(0);
+        else
+            NODE_RETURN(s->currentFrame());
     }
 
     NODE_IMPLEMENTATION(metaEvaluate, Pointer)
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const int frame = NODE_ARG(0, int);
         const DynamicArrayType* dtype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(dtype, 1);
@@ -646,6 +681,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const int frame = NODE_ARG(0, int);
         const DynamicArrayType* dtype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(dtype, 1);
@@ -724,6 +761,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         int depth = NODE_ARG(1, int);
         StringType::String* root = NODE_ARG_OBJECT(2, StringType::String);
@@ -786,6 +825,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* dtype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(dtype, 1);
         StringType::String* typeName = NODE_ARG_OBJECT(0, StringType::String);
@@ -827,30 +868,40 @@ namespace IPMu
     NODE_IMPLEMENTATION(frameStart, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->rangeStart());
     }
 
     NODE_IMPLEMENTATION(frameEnd, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->rangeEnd() - 1);
     }
 
     NODE_IMPLEMENTATION(narrowedFrameStart, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->narrowedRangeStart());
     }
 
     NODE_IMPLEMENTATION(narrowedFrameEnd, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->narrowedRangeEnd() - 1);
     }
 
     NODE_IMPLEMENTATION(narrowToRange, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setNarrowedRange(NODE_ARG(0, int), NODE_ARG(1, int) + 1);
         s->askForRedraw(true);
     }
@@ -858,42 +909,56 @@ namespace IPMu
     NODE_IMPLEMENTATION(setRealtime, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setRealtime(NODE_ARG(0, bool));
     }
 
     NODE_IMPLEMENTATION(isRealtime, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->realtime());
     }
 
     NODE_IMPLEMENTATION(skipped, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->skipped());
     }
 
     NODE_IMPLEMENTATION(isCurrentFrameIncomplete, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->currentStateIsIncomplete());
     }
 
     NODE_IMPLEMENTATION(isCurrentFrameError, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->currentStateIsError());
     }
 
     NODE_IMPLEMENTATION(currentFrameStatus, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->currentFrameState());
     }
 
     NODE_IMPLEMENTATION(setFPS, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         float fps = NODE_ARG(0, float);
         s->setFPS(double(fps));
     }
@@ -901,24 +966,32 @@ namespace IPMu
     NODE_IMPLEMENTATION(setFrameStart, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setRangeStart(NODE_ARG(0, int));
     }
 
     NODE_IMPLEMENTATION(setFrameEnd, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setRangeEnd(NODE_ARG(0, int) + 1);
     }
 
     NODE_IMPLEMENTATION(realFPS, float)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(float(s->realFPS()));
     }
 
     NODE_IMPLEMENTATION(fps, float)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(float(s->fps()));
     }
 
@@ -929,6 +1002,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setInc, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int inc = NODE_ARG(0, int);
         s->setInc(inc);
     }
@@ -936,12 +1011,16 @@ namespace IPMu
     NODE_IMPLEMENTATION(inc, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->inc());
     }
 
     NODE_IMPLEMENTATION(markFrame, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int frame = NODE_ARG(0, int);
         bool mark = NODE_ARG(1, bool);
 
@@ -954,6 +1033,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(isMarked, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int frame = NODE_ARG(0, int);
 
         NODE_RETURN(s->isMarked(frame));
@@ -962,6 +1043,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(markedFrames, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
 
@@ -982,6 +1065,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setCacheMode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Session::CachingMode mode = Session::CachingMode(NODE_ARG(0, int));
         s->setCaching(mode);
 
@@ -1011,6 +1096,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(releaseAllCachedImages, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setCaching(Session::NeverCache);
 
         s->graph().cache().lock();
@@ -1021,6 +1108,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(releaseAllUnusedImages, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         FBCache& cache = s->graph().cache();
         cache.lock();
         cache.freeAllTrash();
@@ -1030,18 +1119,24 @@ namespace IPMu
     NODE_IMPLEMENTATION(setAudioCacheMode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->setAudioCaching(Session::CachingMode(NODE_ARG(0, int)));
     }
 
     NODE_IMPLEMENTATION(audioCacheMode, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(int(s->audioCachingMode()));
     }
 
     NODE_IMPLEMENTATION(cacheMode, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(int(s->cachingMode()));
     }
 
@@ -1050,6 +1145,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setCacheOutsideRegion, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Session::CachingMode mode = s->cachingMode();
         s->setCaching(Session::NeverCache);
 
@@ -1061,13 +1158,19 @@ namespace IPMu
 
     NODE_IMPLEMENTATION(isCaching, bool)
     {
-        bool b = Session::currentSession()->isCaching();
+        Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        bool b = s->isCaching();
         NODE_RETURN(b);
     }
 
     NODE_IMPLEMENTATION(isBuffering, bool)
     {
-        bool b = Session::currentSession()->isBuffering();
+        Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        bool b = s->isBuffering();
         NODE_RETURN(b);
     }
 
@@ -1122,6 +1225,8 @@ namespace IPMu
     {
         Process* p = NODE_THREAD.process();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const Class* ttype = (const Class*)NODE_THIS.type();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(ttype->fieldType(1));
 
@@ -1149,9 +1254,21 @@ namespace IPMu
         NODE_RETURN(tuple);
     }
 
-    NODE_IMPLEMENTATION(fullScreenMode, void) { Session::currentSession()->fullScreenMode(NODE_ARG(0, bool)); }
+    NODE_IMPLEMENTATION(fullScreenMode, void)
+    {
+        Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        s->fullScreenMode(NODE_ARG(0, bool));
+    }
 
-    NODE_IMPLEMENTATION(isFullScreen, bool) { NODE_RETURN(Session::currentSession()->isFullScreen()); }
+    NODE_IMPLEMENTATION(isFullScreen, bool)
+    {
+        Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        NODE_RETURN(s->isFullScreen());
+    }
 
     struct FrameBufferFinder
     {
@@ -1177,6 +1294,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(getCurrentImageSize, Mu::Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Vector2f v;
 
         FrameBufferFinder finder;
@@ -1217,6 +1336,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
         const StringType::String* tname = NODE_ARG_OBJECT(0, StringType::String);
@@ -1242,6 +1363,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* tname = NODE_ARG_OBJECT(0, StringType::String);
         const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
@@ -1265,6 +1388,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(event2image, Mu::Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         Vector2f inp = NODE_ARG(1, Vector2f);
         bool normalize = NODE_ARG(2, bool);
@@ -1486,6 +1611,8 @@ namespace IPMu
         Vector2f inp = NODE_ARG(0, Vector2f);
         bool strict = NODE_ARG(1, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Box2f vp = session->renderer()->viewport();
         float x = (inp[0] - vp.min.x) / (vp.size().x - 1.0) * 2.0 - 1.0;
         float y = (inp[1] - vp.min.y) / (vp.size().y - 1.0) * 2.0 - 1.0;
@@ -1601,6 +1728,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(image2event, Mu::Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         Vector2f inp = NODE_ARG(1, Vector2f);
         bool normalize = NODE_ARG(2, bool);
@@ -1678,6 +1807,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(event2camera, Mu::Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         Vector2f inp = NODE_ARG(1, Vector2f);
         float x = inp[0];
@@ -1732,6 +1863,8 @@ namespace IPMu
         // this doesn't matter one bit.
         //
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Vector2f inp = NODE_ARG(0, Vector2f);
         float x = inp[0];
         float y = inp[1];
@@ -1763,6 +1896,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType* stype = c->stringType();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* rtype = static_cast<const Class*>(atype->elementType());
@@ -1936,6 +2071,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType* stype = c->stringType();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const int frame = NODE_ARG(0, int);
@@ -1966,6 +2103,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType* stype = c->stringType();
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* rtype = static_cast<const Class*>(atype->elementType());
@@ -2088,6 +2227,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Box2f vp = s->renderer()->viewport();
         const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* ttype = static_cast<const Class*>(atype->elementType());
@@ -2122,6 +2263,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Box2f vp = s->renderer()->viewport();
         const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* ttype = static_cast<const Class*>(atype->elementType());
@@ -2160,6 +2303,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Box2f vp = s->renderer()->viewport();
         const DynamicArrayType* atype = reinterpret_cast<const DynamicArrayType*>(NODE_THIS.type());
         const Class* ttype = static_cast<const Class*>(atype->elementType());
@@ -2200,6 +2345,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(sessionFileName, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         const StringType* t = static_cast<const StringType*>(NODE_THIS.type());
         NODE_RETURN(t->allocate(s->fileName()));
@@ -2248,6 +2395,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(readProfile, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* filename = NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* nodename = NODE_ARG_OBJECT(1, StringType::String);
         const bool usePath = NODE_ARG(2, bool);
@@ -2298,6 +2447,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(writeProfile, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* filename = NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* nodename = NODE_ARG_OBJECT(1, StringType::String);
         const StringType::String* comments = NODE_ARG_OBJECT(2, StringType::String);
@@ -2342,6 +2493,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(saveSession, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         bool ascopy = NODE_ARG(1, bool);
         bool compressed = NODE_ARG(2, bool);
@@ -2370,6 +2523,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(writeNodeDefinition, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* typeName = NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* fileName = NODE_ARG_OBJECT(1, StringType::String);
         const NodeManager* nodeManager = s->graph().nodeManager();
@@ -2406,6 +2561,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(writeAllNodeDefinitions, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* fileName = NODE_ARG_OBJECT(0, StringType::String);
         const NodeManager* nodeManager = s->graph().nodeManager();
         bool inlineSource = NODE_ARG(1, bool);
@@ -2430,6 +2587,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* type = (const DynamicArrayType*)NODE_THIS.type();
         DynamicArray* array = new DynamicArray(type, 1);
         const StringType* stype = c->stringType();
@@ -2459,6 +2618,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(updateNodeDefinition, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* nodeType = NODE_ARG_OBJECT(0, StringType::String);
         NodeManager* nodeManager = IPCore::App()->nodeManager();
         const NodeDefinition* def = nodeManager->definition(nodeType->c_str());
@@ -2494,6 +2655,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(clearSession, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         IPMu::RemoteRvCommand remoteRvCommand(s, "clearSession");
 
@@ -2504,6 +2667,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(newSession, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         DynamicArray* newValues = NODE_ARG_OBJECT(0, DynamicArray);
@@ -2575,6 +2740,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         bool allowResize = NODE_ARG(2, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2620,7 +2787,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         int index = NODE_ARG(2, int);
         Session* session = Session::currentSession();
-
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
 
@@ -2700,6 +2868,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         bool allowResize = NODE_ARG(2, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2745,6 +2915,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         int index = NODE_ARG(2, int);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2825,6 +2997,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         bool allowResize = NODE_ARG(2, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2869,6 +3043,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         int index = NODE_ARG(2, int);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2948,6 +3124,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         bool allowResize = NODE_ARG(2, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -2992,6 +3170,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         int index = NODE_ARG(2, int);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -3072,6 +3252,8 @@ namespace IPMu
         DynamicArray* newValues = NODE_ARG_OBJECT(1, DynamicArray);
         bool allowResize = NODE_ARG(2, bool);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -3141,6 +3323,8 @@ namespace IPMu
         DynamicArray* newValues0 = NODE_ARG_OBJECT(1, DynamicArray);
         int index = NODE_ARG(2, int);
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
@@ -3198,6 +3382,8 @@ namespace IPMu
     {
         Process* p = NODE_THREAD.process();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int filter = NODE_ARG(0, int);
 
         if (filter != GL_LINEAR && filter != GL_NEAREST)
@@ -3214,12 +3400,16 @@ namespace IPMu
     NODE_IMPLEMENTATION(getFiltering, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->renderer()->filterType());
     }
 
     NODE_IMPLEMENTATION(viewSize, Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Vector2f v = {static_cast<float>(s->eventVideoDevice()->width()), static_cast<float>(s->eventVideoDevice()->height())};
         NODE_RETURN(v);
     }
@@ -3229,6 +3419,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType* stype = c->stringType();
 
         const char* n = "";
@@ -3267,6 +3459,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const Class* stype = c->stringType();
         const StringType::String* method = NODE_ARG_OBJECT(0, StringType::String);
 
@@ -3309,6 +3503,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setRendererType, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!name)
@@ -3324,6 +3520,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         StringType::String* n = c->stringType()->allocate(s->renderer()->name());
 
@@ -3333,6 +3531,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setSessionType, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int type = NODE_ARG(0, int);
         s->setSessionType((Session::SessionType)type);
     }
@@ -3340,12 +3540,16 @@ namespace IPMu
     NODE_IMPLEMENTATION(getSessionType, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(int(s->getSessionType()));
     }
 
     NODE_IMPLEMENTATION(setHardwareStereoMode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         bool on = NODE_ARG(0, bool);
 
         if (on)
@@ -3361,6 +3565,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(scrubAudio, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         bool on = NODE_ARG(0, bool);
         float duration = NODE_ARG(1, float);
         int count = NODE_ARG(2, int);
@@ -3537,6 +3743,8 @@ namespace IPMu
     {
         Process* p = NODE_THREAD.process();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         int type = NODE_ARG(1, int);
         int width = NODE_ARG(2, int);
@@ -3548,6 +3756,8 @@ namespace IPMu
     {
         Process* p = NODE_THREAD.process();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         int type = NODE_ARG(1, int);
         ClassInstance* dims = NODE_ARG_OBJECT(2, ClassInstance);
@@ -3560,6 +3770,8 @@ namespace IPMu
     {
         Process* p = NODE_THREAD.process();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!name)
@@ -3689,6 +3901,8 @@ namespace IPMu
 
         Session::PropertyVector props;
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         std::string newName = session->nextUIName(name->c_str());
 
         return stype->allocate(newName);
@@ -3705,6 +3919,8 @@ namespace IPMu
 
         Session::PropertyVector props;
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         session->findProperty(props, name->c_str());
         NODE_RETURN(!props.empty());
     }
@@ -3714,6 +3930,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Mu::StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         const DynamicArrayType* type = (const DynamicArrayType*)NODE_THIS.type();
         DynamicArray* array = new DynamicArray(type, 1);
@@ -3795,6 +4013,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* type = (const DynamicArrayType*)NODE_THIS.type();
         DynamicArray* array = new DynamicArray(type, 1);
         const StringType* stype = c->stringType();
@@ -3817,6 +4037,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* node = NODE_ARG_OBJECT(0, StringType::String);
         const StringType* stype = c->stringType();
         StringType::String* type = 0;
@@ -3842,6 +4064,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(deleteNode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!name)
@@ -3865,18 +4089,18 @@ namespace IPMu
     NODE_IMPLEMENTATION(sendInternalEvent, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         StringType::String* contents = NODE_ARG_OBJECT(1, StringType::String);
         StringType::String* sender = NODE_ARG_OBJECT(2, StringType::String);
-        const StringType* stype = static_cast<const StringType*>(name->type());
 
         if (!name)
-        {
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no event name specified");
-        }
 
         string r = s->userGenericEvent(name->c_str(), contents ? contents->c_str() : "", sender ? sender->c_str() : "");
 
+        const StringType* stype = static_cast<const StringType*>(name->type());
         NODE_RETURN(stype->allocate(r));
     }
 
@@ -3885,6 +4109,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         bool shouldFilterEvents = NODE_ARG(0, bool);
 
         if (s && shouldFilterEvents)
@@ -3943,6 +4169,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nextViewNode, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
@@ -3957,6 +4185,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(previousViewNode, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
@@ -3971,6 +4201,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setViewNode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         if (!name)
@@ -3997,6 +4229,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(viewNodes, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const DynamicArrayType* type = (const DynamicArrayType*)NODE_THIS.type();
@@ -4018,6 +4252,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(viewNode, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
 
@@ -4040,6 +4276,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeConnections, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const TupleType* type = (const TupleType*)NODE_THIS.type();
@@ -4142,6 +4380,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodesInGroup, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const TupleType* type = (const TupleType*)NODE_THIS.type();
@@ -4199,6 +4439,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeGroup, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const TupleType* type = (const TupleType*)NODE_THIS.type();
@@ -4223,6 +4465,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeGroupRoot, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         const TupleType* type = (const TupleType*)NODE_THIS.type();
@@ -4251,6 +4495,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeExists, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4262,6 +4508,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeImageGeometry, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4308,6 +4556,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(nodeRangeInfo, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4354,6 +4604,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(newNode, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* type = NODE_ARG_OBJECT(0, StringType::String);
@@ -4386,6 +4638,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(setNodeInputs, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4450,6 +4704,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(testNodeInputs, Pointer)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4510,6 +4766,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(flushCachedNode, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         Process* p = NODE_THREAD.process();
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
@@ -4616,6 +4874,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* dtype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(dtype, 1);
         const Class* itype = static_cast<const Class*>(dtype->elementType());
@@ -4702,6 +4962,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const DynamicArrayType* dtype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         DynamicArray* array = new DynamicArray(dtype, 1);
         const Class* itype = static_cast<const Class*>(dtype->elementType());
@@ -4761,6 +5023,8 @@ namespace IPMu
     {
         MuLangContext* c = TwkApp::muContext();
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const Class* vtype = static_cast<const Class*>(NODE_THIS.type());
         const StringType* stype = c->stringType();
 
@@ -4875,6 +5139,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(refreshOutputVideoDevice, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         auto outputDevice = s->outputVideoDevice();
 
         s->setOutputVideoDevice(outputDevice);
@@ -4883,6 +5149,8 @@ namespace IPMu
     NODE_IMPLEMENTATION(audioTextureID, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         ImageRenderer* renderer = s->renderer();
 
         IPCore::RenderQuery::TaggedTextureImagesMap taggedTextures;
@@ -4900,6 +5168,8 @@ namespace IPMu
     {
         Session::NodeVector nodes;
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         s->findNodesByTypeName(nodes, "RVSoundTrack");
 
         float complete = 0.0;
@@ -4951,6 +5221,8 @@ namespace IPMu
         Process* p = NODE_THREAD.process();
         MuLangContext* c = TwkApp::muContext();
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         const StringType::String* media = NODE_ARG_OBJECT(1, StringType::String);
         const MovieInfo* info = 0;
