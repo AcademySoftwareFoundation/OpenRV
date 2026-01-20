@@ -122,7 +122,7 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
             pen_component,
             {
                 "color": list(map(float, layer.rgba)),
-                "brush": layer.brush,
+                "brush": [layer.brush],
                 "debug": 1,
                 "join": 3,
                 "cap": 1,
@@ -130,7 +130,8 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
                 "mode": 0 if layer.type == "COLOR" else 1,
                 "startFrame": start_time,
                 "duration": duration,
-                "uuid": layer.id,
+                "softDeleted": layer.soft_deleted,
+                "uuid": [layer.id],
             },
         )
 
