@@ -664,7 +664,7 @@ namespace Rv
         n += "wheel";
         // use pixelDelta() or angleDelta() instead of delta() (deprecated)
         // Alt key means horizontal scroll on Linux and Windows, whereas it is the Shift key on macOS
-        Qt::KeyboardModifier horizontalModifier = 
+        Qt::KeyboardModifier horizontalModifier =
 #ifdef PLATFORM_DARWIN
             Qt::ShiftModifier;
 #else
