@@ -17,10 +17,10 @@ SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
 
 # dav1d https://github.com/videolan/dav1d
 SET(RV_DEPS_DAV1D_VERSION
-    "1.4.3"
+    "1.5.3"
 )
 SET(RV_DEPS_DAV1D_DOWNLOAD_HASH
-    "2c62106fda87a69122dc8709243a34e8"
+    "6a195752588586acf13349a1cceedab8"
 )
 
 # doctest https://github.com/doctest/doctest
