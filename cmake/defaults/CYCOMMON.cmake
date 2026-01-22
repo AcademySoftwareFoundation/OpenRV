@@ -1,9 +1,10 @@
-# Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
+# Common build dependencies for all CY20XX platforms 
+# aja https://github.com/aja-video/libajantv2
 SET(RV_DEPS_AJA_VERSION
-    "17.1.0"
+    "17.6.0"
 )
 SET(RV_DEPS_AJA_DOWNLOAD_HASH
-    "b9d189f77e18dbdff7c39a339b1a5dd4"
+    "9fe9a7996305f646e07fb2078ff5dc8d"
 )
 
 # atomic_ops https://github.com/ivmai/libatomic_ops
