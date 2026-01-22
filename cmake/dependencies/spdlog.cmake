@@ -10,7 +10,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
 
 SET(_download_url
-    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
+    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.tar.gz"
 )
 
 SET(_download_hash
@@ -64,7 +64,7 @@ LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src

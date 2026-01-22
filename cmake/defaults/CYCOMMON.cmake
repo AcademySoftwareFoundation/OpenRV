@@ -234,10 +234,10 @@ SET(RV_DEPS_RAW_VERSION_LIB
 
 # spdlog https://github.com/gabime/spdlog
 SET(RV_DEPS_SPDLOG_VERSION
-    "1.11.0"
+    "1.17.0"
 )
 SET(RV_DEPS_SPDLOG_DOWNLOAD_HASH
-    "cd620e0f103737a122a3b6539bd0a57a"
+    "f0d8dd02539fe609bdfd42c0549fe28d"
 )
 
 # tiff https://gitlab.com/libtiff/libtiff
