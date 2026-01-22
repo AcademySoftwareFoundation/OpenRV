@@ -7,12 +7,12 @@ SET(RV_DEPS_AJA_DOWNLOAD_HASH
     "9fe9a7996305f646e07fb2078ff5dc8d"
 )
 
-# atomic_ops https://github.com/ivmai/libatomic_ops
+# atomic_ops https://github.com/bdwgc/libatomic_ops
 SET(RV_DEPS_ATOMIC_OPS_VERSION
-    "7.7.0"
+    "7.10.0"
 )
 SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
-    "cc7fad1e71b3064abe1ea821ae9a9a6e"
+    "35e417e4e49cd97976ef14c50e06db9b"
 )
 
 # dav1d https://github.com/videolan/dav1d
