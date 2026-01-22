@@ -253,10 +253,10 @@ SET(RV_DEPS_TIFF_VERSION_LIB
 
 # webp https://github.com/webmproject/libwebp
 SET(RV_DEPS_WEBP_VERSION
-    "1.2.1"
+    "1.6.0"
 )
 SET(RV_DEPS_WEBP_DOWNLOAD_HASH
-    "ef5ac6de4b800afaebeb10df9ef189b2"
+    "d498caf9323a24ce3ed40b84c22a32cd"
 )
 
 # zlib https://github.com/madler/zlib
