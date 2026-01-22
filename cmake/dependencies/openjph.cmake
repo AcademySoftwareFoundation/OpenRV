@@ -13,12 +13,7 @@ PROCESSORCOUNT(_cpu_count)
 
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPH" "${RV_DEPS_OPENJPH_VERSION}" "make" "")
-IF(RV_TARGET_LINUX)
-  # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
+
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
