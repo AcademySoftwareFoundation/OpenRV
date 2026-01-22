@@ -22,17 +22,25 @@ SET(_download_url
 SET(_download_hash
     ${RV_DEPS_OPENJPH_DOWNLOAD_HASH}
 )
+# https://github.com/aous72/OpenJPH/blob/8e597d11715552a6c63e3963d940fa29a4c5831b/src/core/CMakeLists.txt#L119
+IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+  IF(RV_TARGET_WINDOWS)
+      SET(RV_OPENJPH_DEBUG_POSTFIX "d")
+  ELSE()
+    SET(RV_OPENJPH_DEBUG_POSTFIX "_d")
+  ENDIF()
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME("openjph.${_version_major}.${_version_minor}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjph${RV_OPENJPH_DEBUG_POSTFIX}.${_version_major}.${_version_minor}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
   SET(_libname
-      "openjph.${_version_major}.${_version_minor}.lib"
+      "openjph${RV_OPENJPH_DEBUG_POSTFIX}.${_version_major}.${_version_minor}.lib"
   )
   SET(_implibpath
       ${_lib_dir}/${_libname}
   )
 ELSE()
-  RV_MAKE_STANDARD_LIB_NAME("openjph" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjph${RV_OPENJPH_DEBUG_POSTFIX}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
 ENDIF()
 MESSAGE("****OPENJPH RV_MAKE_STANDARD_LIB_NAME IMPLIB _implibpath:${_implibpath} _implibname:${_implibname} _libname:${_libname} _libpath:${_libpath}")
 
