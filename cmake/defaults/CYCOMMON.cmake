@@ -185,10 +185,10 @@ SET(RV_DEPS_OIIO_DOWNLOAD_HASH
 
 # openjpeg https://github.com/uclouvain/openjpeg
 SET(RV_DEPS_OPENJPEG_VERSION
-    "2.5.0"
+    "2.5.4"
 )
 SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH
-    "5cbb822a1203dd75b85639da4f4ecaab"
+    "6160de075bb5191e482bc0f024b375e4"
 )
 
 # openjph https://github.com/aous72/OpenJPH
