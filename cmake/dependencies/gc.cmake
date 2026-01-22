@@ -10,7 +10,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "${RV_DEPS_GC_VERSION}" "" "")
 
 SET(_download_url
-    "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.zip"
+    "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.tar.gz"
 )
 SET(_download_hash
     ${RV_DEPS_GC_DOWNLOAD_HASH}
@@ -94,7 +94,7 @@ ENDIF()
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
