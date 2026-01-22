@@ -223,13 +223,13 @@ SET(RV_DEPS_PNG_DOWNLOAD_HASH
 # raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
 # https://github.com/LibRaw/LibRaw/blob/0.21-stable/libraw/libraw_version.h
 SET(RV_DEPS_RAW_VERSION
-    "0.21.1"
+    "0.22.0"
 )
 SET(RV_DEPS_RAW_DOWNLOAD_HASH
     "3ad334296a7a2c8ee841f353cc1b450b"
 )
 SET(RV_DEPS_RAW_VERSION_LIB
-    "23"
+    "24"
 )
 
 # spdlog https://github.com/gabime/spdlog
