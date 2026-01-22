@@ -66,6 +66,8 @@ namespace Rv
 
     private:
         void closeEvent(QCloseEvent*);
+        void done(int result);
+        void saveSettings();
 
     private:
         QMutex m_lock;
