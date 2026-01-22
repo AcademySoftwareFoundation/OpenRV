@@ -185,7 +185,7 @@
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>RvConsoleDialog</receiver>
-   <slot>close()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>493</x>
