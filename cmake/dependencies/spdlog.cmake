@@ -54,6 +54,7 @@ IF(RV_TARGET_WINDOWS)
   SET(_make_command
       ninja
   )
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
 ELSE()
   SET(_make_command
       make
@@ -98,6 +99,13 @@ TARGET_INCLUDE_DIRECTORIES(
   spdlog::spdlog
   INTERFACE ${_include_dir}
 )
+
+IF(RV_TARGET_WINDOWS)
+  SET_TARGET_PROPERTIES(
+    spdlog::spdlog PROPERTIES INTERFACE_COMPILE_OPTIONS "/utf-8"
+  )
+ENDIF()
+
 LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
 
 IF(RV_TARGET_WINDOWS)
