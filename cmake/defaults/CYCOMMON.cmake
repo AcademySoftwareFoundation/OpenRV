@@ -208,7 +208,7 @@ SET(RV_DEPS_PCRE2_VERSION
     "10.47"
 )
 SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
-    "2261078304c4e6904d1c94c9ffd04fd8"
+    "b55ec5acca85ffddc7d81c23f22bf176"
 )
 
 # png https://github.com/glennrp/libpng
