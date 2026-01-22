@@ -25,10 +25,10 @@ SET(RV_DEPS_DAV1D_DOWNLOAD_HASH
 
 # doctest https://github.com/doctest/doctest
 SET(RV_DEPS_DOCTEST_VERSION
-    "2.4.9"
+    "2.4.12"
 )
 SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH
-    "a7948b5ec1f69de6f84c7d7487aaf79b"
+    "92bcfd6352ebf6c741f9ffaa3cad8808"
 )
 
 # expat https://github.com/libexpat/libexpat
