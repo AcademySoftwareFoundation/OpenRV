@@ -1573,7 +1573,7 @@ class: AnnotateMinorMode : MinorMode
             _clearFrameAct.setEnabled(hasCurrentFrameStrokes);
 
             bool hasAnyStrokes = false;
-            for_each(node; nodes())
+            for_each(node; nodesOfType("RVPaint"))
             {
                 let annotatedFrames = findAnnotatedFrames(node);
                 if (!annotatedFrames.empty())
@@ -2052,7 +2052,7 @@ class: AnnotateMinorMode : MinorMode
 
         beginCompoundStateChange();
         
-        for_each(node; nodes())
+        for_each(node; nodesOfType("RVPaint"))
         {
             let annotatedFrames = findAnnotatedFrames(node);
             for_each(frame; annotatedFrames)
