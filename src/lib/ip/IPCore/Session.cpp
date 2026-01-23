@@ -707,7 +707,7 @@ namespace IPCore
         // Don't add duplicates
         if (std::find(m_disabledEventCategories.begin(), m_disabledEventCategories.end(), category) == m_disabledEventCategories.end())
         {
-            m_disabledEventCategories.emplace_back(category);
+            m_disabledEventCategories.push_back(std::string(category));
         }
     }
 
