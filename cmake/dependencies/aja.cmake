@@ -21,7 +21,7 @@ SET(_download_hash
 )
 
 IF(RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME(ajantv2_vs143_MT "" "SHARED" "d")
+  RV_MAKE_STANDARD_LIB_NAME(ajantv2 "" "SHARED" "d")
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME(ajantv2 "" "SHARED" "d")
 ENDIF()
