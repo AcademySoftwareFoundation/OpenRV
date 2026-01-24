@@ -363,13 +363,26 @@ namespace Rv
 
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
+
             m_postFirstNonEmptyRender = true;
 
             if (!session->isFullScreen())
             {
-                m_doc->resizeToFit(false, false);
-                m_doc->center();
-                TWK_GLDEBUG;
+                // Issue #1063: resizeToFit calls QMainWindow::resize
+                // during this first non-empty render step. In Qt6,
+                // this caused a crash when subsequently resizing the
+                // window again.
+                //
+                // Calling resizeToFit in a singleShot runs after this
+                // paintGL routine completes. This avoids the
+                // condition that was causing the crash.
+                QTimer::singleShot(0, this,
+                                   [this]()
+                                   {
+                                       m_doc->resizeToFit(false, false);
+                                       m_doc->center();
+                                       TWK_GLDEBUG;
+                                   });
             }
         }
 
