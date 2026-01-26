@@ -84,7 +84,7 @@ namespace IPCore
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 33>{annotateCategory,
+            return std::array<std::string_view, 34>{annotateCategory,
                                                     annotateAirbrushCategory,
                                                     annotateBurnCategory,
                                                     annotateCloneCategory,
