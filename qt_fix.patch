@@ -2,7 +2,7 @@ diff --git a/lib/cmake/Qt6/FindWrapOpenGL.cmake b/lib/cmake/Qt6/FindWrapOpenGL.c
 index 3f95561..e794e78 100644
 --- a/lib/cmake/Qt6/FindWrapOpenGL.cmake
 +++ b/lib/cmake/Qt6/FindWrapOpenGL.cmake
-@@ -35,14 +35,6 @@ if (OpenGL_FOUND)
+@@ -35,16 +35,7 @@ if (OpenGL_FOUND)
              set(__opengl_fw_path "-framework OpenGL")
          endif()
  
