@@ -1572,17 +1572,7 @@ class: AnnotateMinorMode : MinorMode
                                           propertyInfo(orderProperty).size > 0;
             _clearFrameAct.setEnabled(hasCurrentFrameStrokes);
 
-            bool hasAnyStrokes = false;
-            for_each(node; nodesOfType("RVPaint"))
-            {
-                let annotatedFrames = findAnnotatedFrames(node);
-                if (!annotatedFrames.empty())
-                {
-                    hasAnyStrokes = true;
-                    break;
-                }
-            }
-            _clearAllFramesAct.setEnabled(hasAnyStrokes);
+            _clearAllFramesAct.setEnabled(true);
         }
         else
         {
