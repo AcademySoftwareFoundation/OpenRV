@@ -52,6 +52,7 @@ LIST(APPEND _byproducts ${_byprojects_copy})
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
 LIST(APPEND _configure_options "-DUSE_OCIO=0")
+LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
@@ -94,6 +95,7 @@ GET_TARGET_PROPERTY(_openjpeg_library OpenJpeg::OpenJpeg IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
 LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
+LIST(APPEND _configure_options "-DOPENJPEG_VERSION=${RV_DEPS_OPENJPEG_VERSION}")
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
