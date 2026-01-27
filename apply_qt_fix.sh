@@ -12,6 +12,10 @@
 # https://github.com/qt/qtbase/commit/cdb33c3d5621ce035ad6950c8e2268fe94b73de5
 # https://github.com/Homebrew/homebrew-core/commit/9ef09378761c7d975da890566451726fba53ea51
 
+if [[ "$(uname)" != "Darwin" ]]; then
+    echo "Error: This script is only intended for macOS (Darwin)."
+    exit 0
+fi
 
 if [ -z "$QT_HOME" ]; then
     echo "Error: QT_HOME environment variable is not set."
@@ -38,22 +42,22 @@ for version in "${QT_VERSIONS[@]}"; do
     if [ -d "$QT_DIR" ]; then
         echo "Checking Qt version $version in $QT_DIR..."
         
-        # Check if patch is already applied
-        if patch -p1 -d "$QT_DIR" -R --dry-run < "$PATCH_FILE" >/dev/null 2>&1; then
+        # Check if patch is already applied (by checking if AGL is still in FindWrapOpenGL.cmake)
+        if ! grep -q "AGL" "$QT_DIR/lib/cmake/Qt6/FindWrapOpenGL.cmake"; then
              echo "Patch is already applied for version $version. Skipping."
              continue
         fi
 
         # Check if patch applies cleanly
-        if patch -p1 -d "$QT_DIR" --dry-run < "$PATCH_FILE" >/dev/null 2>&1; then
+        if patch -p1 -d "$QT_DIR" --dry-run --batch < "$PATCH_FILE" >/dev/null 2>&1; then
             echo "Applying patch to $version..."
-            patch -p1 -d "$QT_DIR" < "$PATCH_FILE"
+            patch -p1 -d "$QT_DIR" --batch < "$PATCH_FILE"
             echo "Successfully patched $version."
         else
              echo "Error: Could not apply patch for version $version. It might be incompatible or already modified."
              echo "Please check the files in $QT_DIR manually."
              # Show dry run output for debugging
-             patch -p1 -d "$QT_DIR" --dry-run < "$PATCH_FILE"
+             patch -p1 -d "$QT_DIR" --dry-run --batch < "$PATCH_FILE"
         fi
     else
         echo "Warning: Qt version $version not found at $QT_DIR. Skipping."

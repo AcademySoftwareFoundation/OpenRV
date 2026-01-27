@@ -153,6 +153,18 @@ else
   fi
 fi
 
+# If on macOS and Xcode version is 26 or higher, apply the Qt AGL fix
+if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$QT_HOME" ] && command -v xcodebuild >/dev/null 2>&1; then
+  XCODE_MAJOR_VERSION=$(xcodebuild -version | head -n 1 | awk '{print $2}' | cut -d. -f1)
+  if [ -n "$XCODE_MAJOR_VERSION" ] && [ "$XCODE_MAJOR_VERSION" -ge 26 ]; then
+    QT_BASE_DIR=$(dirname $(dirname "$QT_HOME"))
+    if [ -d "$QT_BASE_DIR" ]; then
+      echo "Xcode 26+ detected, ensuring Qt AGL fix is applied..."
+      QT_HOME="$QT_BASE_DIR" bash "$SCRIPT_HOME/apply_qt_fix.sh"
+    fi
+  fi
+fi
+
 # Must be executed in a function as it changes the shell environment
 __rv_env_shell() {
   local activate_path=".venv/bin/activate"
