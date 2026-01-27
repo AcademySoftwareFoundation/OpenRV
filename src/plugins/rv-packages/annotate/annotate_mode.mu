@@ -2041,10 +2041,24 @@ class: AnnotateMinorMode : MinorMode
         string[] affectedStrokes;
 
         beginCompoundStateChange();
-        
+
         for_each(node; nodesOfType("RVPaint"))
         {
-            let annotatedFrames = findAnnotatedFrames(node);
+            int[] annotatedFrames;
+            
+            for_each (property; properties(node))
+            {
+                let parts = property.split(".");
+                let propertyName = parts[2];
+                let propertyComponent = parts[1];
+                let ComponentParts = propertyComponent.split(":");
+
+                if (ComponentParts[0] == "frame" && propertyName == "order" && ComponentParts.size() == 2)
+                {
+                    annotatedFrames.push_back(int(ComponentParts[1]));
+                }
+            }
+            
             for_each(frame; annotatedFrames)
             {
                 let orderProperty = frameOrderName(node, frame);
