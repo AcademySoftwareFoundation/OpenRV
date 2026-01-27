@@ -63,6 +63,7 @@ namespace IPCore
         inline constexpr std::string_view markCategory = "mark_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playControlClickCategory = "playcontrol_click_category";
         inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
         inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
         inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
@@ -83,7 +84,7 @@ namespace IPCore
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 33>{annotateCategory,
+            return std::array<std::string_view, 34>{annotateCategory,
                                                     annotateAirbrushCategory,
                                                     annotateBurnCategory,
                                                     annotateCloneCategory,
@@ -104,6 +105,7 @@ namespace IPCore
                                                     markCategory,
                                                     mediaCategory,
                                                     playcontrolCategory,
+                                                    playControlClickCategory,
                                                     playmodeLoopCategory,
                                                     playmodeOnceCategory,
                                                     playmodePingPongCategory,
