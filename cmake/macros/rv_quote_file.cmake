@@ -104,52 +104,18 @@ FUNCTION(quote_file OUTPUT_FILENAME)
       "${CMAKE_CURRENT_BINARY_DIR}/${_stem}.cpp"
   )
 
-  GET_FILENAME_COMPONENT(input_file_name ${arg_INPUT_FILENAME} NAME)
-  SET(input_timestamp_file
-      ${CMAKE_CURRENT_BINARY_DIR}/${input_file_name}.timestamp
-  )
-  FILE(TIMESTAMP ${arg_INPUT_FILENAME} _input_file_timestamp)
-  IF(EXISTS ${input_timestamp_file})
-    FILE(READ ${input_timestamp_file} _saved_input_file_timestamp)
-    IF(${_input_file_timestamp} EQUAL ${_saved_input_file_timestamp})
-      SET(${OUTPUT_FILENAME}
-          ${_dest_name}
-          PARENT_SCOPE
-      )
-      RETURN()
-    ENDIF()
-  ENDIF()
-  FILE(
-    WRITE ${input_timestamp_file}
-    ${_input_file_timestamp}
+  # Use ADD_CUSTOM_COMMAND to track the dependency properly
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${_dest_name}
+    COMMAND python3 ${_quote_file} "${_src_name}" "${_dest_name}" "${arg_CPP_SYMBOL}"
+    DEPENDS ${_src_name}
+    COMMENT "Quoting '${arg_INPUT_FILENAME}' as '${_stem}.cpp'"
+    VERBATIM
   )
 
-  # This check is about creating file if it doesn't exists
-  IF(NOT EXISTS ${_dest_name})
-    MESSAGE(STATUS "Quoting '${_src_name}' as '${_dest_name}'")
-    EXECUTE_PROCESS(
-      COMMAND python3 ${_quote_file} "${_src_name}" "${_dest_name}" "${arg_CPP_SYMBOL}"
-      RESULT_VARIABLE _result
-    )
-    IF(_result)
-      MESSAGE(FATAL_ERROR "Couldn't create file from '${_src_name}'")
-    ENDIF()
-  ENDIF()
-
-  # This check is about confirming the above did created a file
-  IF(EXISTS ${_dest_name})
-    # File exists ... check size
-    FILE(SIZE ${_dest_name} _size)
-    IF(_size LESS_EQUAL 50) # arbitrary, but we ain't expecting anything that small
-      MESSAGE(FATAL_ERROR "Generated file '${_dest_name}' is smaller than expected, size:${_size}")
-    ENDIF()
-
-    # All checks are green returns the generated filename back to caller
-    SET(${OUTPUT_FILENAME}
-        ${_dest_name}
-        PARENT_SCOPE
-    )
-  ELSE()
-    MESSAGE(FATAL_ERROR "Couldn't find the created file '${_dest_name}'")
-  ENDIF()
+  # Return the generated filename back to caller
+  SET(${OUTPUT_FILENAME}
+      ${_dest_name}
+      PARENT_SCOPE
+  )
 ENDFUNCTION()

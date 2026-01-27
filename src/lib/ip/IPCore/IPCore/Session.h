@@ -63,6 +63,7 @@ namespace IPCore
         inline constexpr std::string_view markCategory = "mark_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playControlClickCategory = "playcontrol_click_category";
         inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
         inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
         inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
@@ -76,13 +77,14 @@ namespace IPCore
         inline constexpr std::string_view fullscreenModeCategory = "fullscreenMode_category";
         inline constexpr std::string_view backgroundStyleCategory = "backgroundStyle_category";
         inline constexpr std::string_view wipesCategory = "wipes_category";
+        inline constexpr std::string_view panzoomCategory = "panzoom_category";
 
         constexpr auto all_categories()
         {
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 32>{annotateCategory,
+            return std::array<std::string_view, 34>{annotateCategory,
                                                     annotateAirbrushCategory,
                                                     annotateBurnCategory,
                                                     annotateCloneCategory,
@@ -103,6 +105,7 @@ namespace IPCore
                                                     markCategory,
                                                     mediaCategory,
                                                     playcontrolCategory,
+                                                    playControlClickCategory,
                                                     playmodeLoopCategory,
                                                     playmodeOnceCategory,
                                                     playmodePingPongCategory,
@@ -113,7 +116,8 @@ namespace IPCore
                                                     screeningroomCategory,
                                                     unclassifiedCategory,
                                                     viewmodeCategory,
-                                                    wipesCategory};
+                                                    wipesCategory,
+                                                    panzoomCategory};
         }
     } // namespace EventCategories
 
@@ -816,7 +820,7 @@ namespace IPCore
         void disableEventCategory(std::string_view category);
         bool isEventCategoryDisabled(std::string_view category) const;
         bool isEventCategoryEnabled(std::string_view category) const;
-        const std::vector<std::string_view>& disabledEventCategories() const;
+        const std::vector<std::string>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -1264,7 +1268,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        std::vector<std::string_view> m_disabledEventCategories; // List of blocked event categories
+        std::vector<std::string> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;
         struct FBStatusCheck;
