@@ -136,20 +136,21 @@ class: PresentationControlMinorMode : MinorMode
     method: move (void; Event event)
     {
         event.reject();
-	State state = data();
-	state.perPixelInfoValid = false;
+        State state = data();
+        state.perPixelInfoValid = false;
     }
 
     method: _drawCross (void; Point p, float t)
     {
-        let x0 = Vec2(2, 0),
-            x1 = Vec2(10, 0),
-            y0 = Vec2(0, 2),
-            y1 = Vec2(0, 10);
+        let devicePixelRatio = devicePixelRatio(),
+            x0 = Vec2(2*devicePixelRatio, 0),
+            x1 = Vec2(10*devicePixelRatio, 0),
+            y0 = Vec2(0, 2*devicePixelRatio),
+            y1 = Vec2(0, 10*devicePixelRatio);
 
        float f = t/2.0;
 
-        glLineWidth(3.0);
+        glLineWidth(3.0*devicePixelRatio);
 
         glColor(0.5-t,0.5-t,0.5-t,1);
 
@@ -160,7 +161,7 @@ class: PresentationControlMinorMode : MinorMode
         glVertex(p - y0); glVertex(p - y1);
         glEnd();
 
-        glLineWidth(1.0);
+        glLineWidth(1.0*devicePixelRatio);
         glColor(0.5+t,0.5+t,0.5+t,1);
 
         glBegin(GL_LINES);

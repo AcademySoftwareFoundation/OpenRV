@@ -295,14 +295,24 @@ SET(RV_PYTHON_WHEEL_SAFE
 # Convert lists to space/comma-separated strings for pip commands
 STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")
 
+# On Mac, Ensure we build the python packages with the SDK that matches the version of XCode we use to build python
+IF(RV_TARGET_DARWIN
+   AND CMAKE_OSX_SYSROOT
+)
+  MESSAGE(STATUS "Using macOS SDK for Python packages: ${CMAKE_OSX_SYSROOT}")
+  SET(_sdkroot_env
+      "SDKROOT=${CMAKE_OSX_SYSROOT}"
+  )
+ENDIF()
+
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env ${_otio_debug_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
 )
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)

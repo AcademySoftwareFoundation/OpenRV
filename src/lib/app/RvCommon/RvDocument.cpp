@@ -1469,6 +1469,7 @@ namespace Rv
 
     void RvDocument::aboutToShowMenu()
     {
+        session()->userGenericEvent("about-to-show-menu", "");
         if (QMenu* menu = dynamic_cast<QMenu*>(sender()))
         {
             QList<QAction*> actions = menu->actions();

@@ -284,14 +284,14 @@
               <item>
                <widget class="QToolButton" name="sortAscButton">
                 <property name="text">
-                 <string>...</string>
+                 <string>A-Z</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QToolButton" name="sortDescButton">
                 <property name="text">
-                 <string>...</string>
+                 <string>Z-A</string>
                 </property>
                </widget>
               </item>
