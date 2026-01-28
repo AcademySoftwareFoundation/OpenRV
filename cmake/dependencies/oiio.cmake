@@ -51,7 +51,8 @@ LIST(APPEND _byproducts ${_byprojects_copy})
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
-LIST(APPEND _configure_options "-DUSE_OCIO=0")
+LIST(APPEND _configure_options "-DUSE_OCIO=ON")
+LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
@@ -156,6 +157,7 @@ IF(NOT RV_TARGET_WINDOWS)
             Webp::Webp
             Raw::Raw
             ZLIB::ZLIB
+            ocio::ocio
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
     INSTALL_COMMAND ${_cmake_install_command}
@@ -210,6 +212,7 @@ ELSE()
             Webp::Webp
             Raw::Raw
             ZLIB::ZLIB
+            ocio::ocio
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
     INSTALL_COMMAND ${CMAKE_COMMAND} ${_oiio_install_options}
