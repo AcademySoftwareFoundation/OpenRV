@@ -367,9 +367,40 @@ namespace Rv
 
             if (!session->isFullScreen())
             {
-                m_doc->resizeToFit(false, false);
+                // We are painting the first non-empty
+                // render, and user has selected the option
+                // "Resize window to first image loaded".
+                // So we pass firstTime=true to the resize
+                // function.
+                m_doc->resizeToFit(false, true);
                 m_doc->center();
                 TWK_GLDEBUG;
+
+                // OpenRV Issue #1063
+                //
+                // When upgrading Qt6, calling resizeToFit the first time
+                // previously resulted in a crashable state when
+                // QMainWindow::resize was called.
+                //
+                // Now we skip calling that on the first time (above).
+                // In resizeToFit, the function also doesn't execute
+                // "m_resetPolicyTimer->start()" the first time, as that
+                // interferes with the "Fit Window to First Media Loaded"
+                // option.
+                //
+                // As a result, the main window is now in a state where
+                // it has resized, but the user can't manually resize
+                // it smaller than the image. To get the main window
+                // back in an expected state, we call this function
+                // once more, in a singleShot, so QMainWindow::resize
+                // can safely run after the paintGL handling is complete.
+                QTimer::singleShot(0, this,
+                                   [this]()
+                                   {
+                                       m_doc->resizeToFit(false, false);
+                                       m_doc->center();
+                                       TWK_GLDEBUG;
+                                   });
             }
         }
 
