@@ -94,8 +94,11 @@ From macOS System Settings > Privacy & Security > App Management, allow Terminal
 ## Install Xcode
 
 **Heads Up:**
-Xcode 26 isn't supported yet because it needs the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687). This fix is available in Qt 6.5.10, but there isn't a PySide6 version that matches this Qt version as of now.
-In the meantime, you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
+If you are using >= Xcode 26 you will need to patch Qt 6.5.3 and 6.8.3 to implement the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687).
+
+This patch is ran during the sourcing of rvcmds.sh.  You can also run it directly via `sh apply_qt_fix.sh` 
+
+Alternately you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
 
 From the App Store, download Xcode 16.4. Make sure that it is the source of the active developer directory.
 
