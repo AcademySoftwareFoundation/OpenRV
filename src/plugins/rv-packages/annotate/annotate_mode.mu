@@ -1573,7 +1573,7 @@ class: AnnotateMinorMode : MinorMode
             _clearFrameAct.setEnabled(hasCurrentFrameStrokes);
 
             bool hasAnyStrokes = false;
-            for_each(node; nodes())
+            for_each(node; nodesOfType("RVPaint"))
             {
                 let annotatedFrames = findAnnotatedFrames(node);
                 if (!annotatedFrames.empty())
@@ -2052,7 +2052,7 @@ class: AnnotateMinorMode : MinorMode
 
         beginCompoundStateChange();
         
-        for_each(node; nodes())
+        for_each(node; nodesOfType("RVPaint"))
         {
             let annotatedFrames = findAnnotatedFrames(node);
             for_each(frame; annotatedFrames)
@@ -2318,6 +2318,7 @@ class: AnnotateMinorMode : MinorMode
     method: redoEvent (void; Event event) { redoSlot(true); }
     method: clearEvent (void; Event event) { clearSlot(true); }
     method: clearAllEvent (void; Event event) { clearAllSlot(true); }
+    method: undoRedoClearUpdateEvent (void; Event event) { undoRedoClearUpdate(); }
 
     method: keyUndoEvent (void; Event event)
     {
@@ -3206,6 +3207,7 @@ class: AnnotateMinorMode : MinorMode
               ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
               ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
               ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current paint node"),
+              ("undo-redo-clear-ui-update", undoRedoClearUpdateEvent, "Update the undo, redo and clear state"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),
