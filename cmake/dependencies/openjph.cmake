@@ -36,9 +36,9 @@ IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
-  RV_MAKE_STANDARD_LIB_NAME("openjph${RV_OPENJPH_DEBUG_POSTFIX}.${_version_major}.${_version_minor}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
+  RV_MAKE_STANDARD_LIB_NAME("openjph.${_version_major}.${_version_minor}${RV_OPENJPH_DEBUG_POSTFIX}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
   SET(_libname
-      "openjph${RV_OPENJPH_DEBUG_POSTFIX}.${_version_major}.${_version_minor}.lib"
+      "openjph.${_version_major}.${_version_minor}${RV_OPENJPH_DEBUG_POSTFIX}.lib"
   )
   SET(_implibpath
       ${_lib_dir}/${_libname}
