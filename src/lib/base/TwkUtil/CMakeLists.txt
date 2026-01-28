@@ -62,7 +62,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Boost::thread TwkExc TwkMath spdlog::spdlog
-  PRIVATE Boost::system Qt::Core stl_ext
+  PRIVATE Boost::system Qt::Core stl_ext TwkQtCoreUtil
 )
 
 IF(RV_TARGET_LINUX)
@@ -91,7 +91,7 @@ ENDIF()
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE nedmalloc win_posix win_pthreads TwkQtCoreUtil
+    PRIVATE nedmalloc win_posix win_pthreads
     PUBLIC pcre2-8 pcre2-posix
   )
 ENDIF()
