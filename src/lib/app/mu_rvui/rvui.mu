@@ -7203,7 +7203,10 @@ global bool debugGC = false;
 \: clickTimerTimeout (void; )
 {
     State state = data();
-    if (! state.clickToPlayDisabled) togglePlayIfNoScrub();
+    if (!state.clickToPlayDisabled && commands.isEventCategoryEnabled("playcontrol_click_category"))
+    {
+        togglePlayIfNoScrub();
+    }
 }
 
 \: dropTimerTimeout (void; )

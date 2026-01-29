@@ -377,9 +377,9 @@ namespace Rv
         connect(m_dither10, SIGNAL(triggered()), this, SLOT(dither10()));
 
         // Map toolbar actions to their corresponding event categories
-        m_actionCategoryMappings = {{{m_viewBackAction, IPCore::EventCategories::viewmodeCategory, m_viewBackAction->toolTip()},
-                                     {m_viewForwardAction, IPCore::EventCategories::viewmodeCategory, m_viewForwardAction->toolTip()},
-                                     {m_viewMenuAction, IPCore::EventCategories::viewmodeCategory, m_viewMenuAction->toolTip()},
+        m_actionCategoryMappings = {{{m_viewBackAction, IPCore::EventCategories::viewNavigationCategory, m_viewBackAction->toolTip()},
+                                     {m_viewForwardAction, IPCore::EventCategories::viewNavigationCategory, m_viewForwardAction->toolTip()},
+                                     {m_viewMenuAction, IPCore::EventCategories::viewNavigationCategory, m_viewMenuAction->toolTip()},
                                      {m_fullScreenAction, IPCore::EventCategories::fullscreenModeCategory, m_fullScreenAction->toolTip()},
                                      {m_frameAction, IPCore::EventCategories::viewmodeCategory, m_frameAction->toolTip()},
                                      {m_bgMenuAction, IPCore::EventCategories::backgroundStyleCategory, m_bgMenuAction->toolTip()},
