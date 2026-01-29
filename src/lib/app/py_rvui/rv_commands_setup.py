@@ -315,6 +315,7 @@ all_mu_commands = [
     "sourceMediaRepSourceNode",
     "sourceMediaRepsAndNodes",
     "devicePixelRatio",
+    "waitForProgressiveLoading",
 ]
 
 

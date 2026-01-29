@@ -745,6 +745,22 @@ For example a single stereo source might look like string[]
 {"[", "left.mov", "right.mov", "+rs", "1001", "]" }
 """
 
+waitForProgressiveLoading """
+Blocks execution until all progressive source loading has completed. This 
+command waits for the 'after-progressive-loading' event to be triggered, 
+which occurs when all media from previously called addSource() or addSources() 
+has finished loading.
+
+This is particularly useful when:
+- You need to ensure all sources are fully loaded before performing operations
+- Scripting workflows that depend on complete media availability
+
+The command processes Qt events while waiting to keep the UI responsive, but 
+excludes user input events to prevent interference during the loading process.
+
+For reference: addSource(), addSources(), before-progressive-loading, 
+after-progressive-loading events
+"""
 
 startPreloadingMedia """
 When called with a media name (eg: a movie filename or url for mp4 media), 
