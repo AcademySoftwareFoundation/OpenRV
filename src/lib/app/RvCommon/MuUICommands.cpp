@@ -1793,7 +1793,10 @@ namespace Rv
         if (!s)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
-        QTabWidget* w = RvApp()->prefDialog()->tabWidget();
+        RvPreferences* pref = RvApp()->prefDialog();
+        if (!pref)
+            NODE_RETURN(nullptr);
+        QTabWidget* w = pref->tabWidget();
 
         const QTabWidgetType* type = c->findSymbolOfTypeByQualifiedName<QTabWidgetType>(c->internName("qt.QTabWidget"), false);
 
