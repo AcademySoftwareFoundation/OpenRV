@@ -1725,7 +1725,10 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     //  to mean "open media".
     //
     {
-        addMovieOrImageSources (nil, false, false);
+        if (checkAndBlockEventCategory("media_category"))
+        {
+            addMovieOrImageSources (nil, false, false);
+        }
         return;
     }
 
@@ -7200,7 +7203,10 @@ global bool debugGC = false;
 \: clickTimerTimeout (void; )
 {
     State state = data();
-    if (! state.clickToPlayDisabled) togglePlayIfNoScrub();
+    if (!state.clickToPlayDisabled && commands.isEventCategoryEnabled("playcontrol_click_category"))
+    {
+        togglePlayIfNoScrub();
+    }
 }
 
 \: dropTimerTimeout (void; )
