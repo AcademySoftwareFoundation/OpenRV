@@ -19,6 +19,7 @@
 #include <iterator>
 #include <assert.h>
 #include <string.h>
+#include <QGuiApplication>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -286,6 +287,20 @@ struct LexinumericCompare
             minSequenceSize = defaultMinSequenceSize;
 
         //
+        //  If Alt/Option key is held, don't form sequences.
+        //
+        if (QGuiApplication::queryKeyboardModifiers() & Qt::AltModifier)
+        {
+            minSequenceSize = numeric_limits<int>::max();
+        }
+
+        //
+        //  Read the no-sequence pattern from environment variable.
+        //
+        const char* patternVar = getenv("RV_NO_SEQUENCE_PATTERN");
+        const string noSequencePattern = patternVar ? patternVar : "";
+
+        //
         //  NOTE: this function needs to maintain as much order as
         //  possible in the in input file list.
         //
@@ -307,6 +322,16 @@ struct LexinumericCompare
             const string& f = allfiles.front();
 
             if (P && !P(f))
+            {
+                frameSequences.push_back(f);
+                allfiles.pop_front();
+                continue;
+            }
+
+            //
+            //  Skip sequence detection for files matching the no-sequence pattern.
+            //
+            if (!noSequencePattern.empty() && f.find(noSequencePattern) != string::npos)
             {
                 frameSequences.push_back(f);
                 allfiles.pop_front();
