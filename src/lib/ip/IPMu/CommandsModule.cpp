@@ -1941,6 +1941,14 @@ namespace IPMu
         const int frame = NODE_ARG(0, int);
         DynamicArray* array = new DynamicArray(atype, 1);
 
+        // Return empty array if session is being cleared or deleted to avoid
+        // accessing a partially-destroyed node graph.
+        if (s->beingCleared() || s->beingDeleted())
+        {
+            array->resize(0);
+            NODE_RETURN(array);
+        }
+
         IPNode::MetaEvalInfoVector infos;
         IPNode::MetaEvalInfoCollectorByType<SourceIPNode> collector(infos);
         s->graph().root()->metaEvaluate(s->graph().contextForFrame(frame), collector);
