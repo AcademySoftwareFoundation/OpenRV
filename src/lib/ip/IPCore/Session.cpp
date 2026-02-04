@@ -1695,6 +1695,8 @@ namespace IPCore
 
     void Session::clear()
     {
+        m_beingCleared = true;
+
         if (!m_beingDeleted)
         {
             userGenericEvent("before-clear-session", "");
@@ -1760,6 +1762,8 @@ namespace IPCore
             // Restore caching mode
             setCaching(mode);
         }
+
+        m_beingCleared = false;
     }
 
     void Session::setRealtime(bool r)
