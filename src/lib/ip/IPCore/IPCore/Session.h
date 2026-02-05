@@ -1089,6 +1089,7 @@ namespace IPCore
         void waitForUploadToFinish();
 
         bool beingDeleted() { return m_beingDeleted; }
+
         bool beingCleared() { return m_beingCleared; }
 
         void physicalDeviceChanged(const VideoDevice*);
