@@ -52,6 +52,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/scope_exit.hpp>
 #include <iterator>
 
 #ifndef PLATFORM_WINDOWS
@@ -1696,6 +1697,7 @@ namespace IPCore
     void Session::clear()
     {
         m_beingCleared = true;
+        BOOST_SCOPE_EXIT_ALL(&) { m_beingCleared = false; };
 
         if (!m_beingDeleted)
         {
@@ -1762,8 +1764,6 @@ namespace IPCore
             // Restore caching mode
             setCaching(mode);
         }
-
-        m_beingCleared = false;
     }
 
     void Session::setRealtime(bool r)
