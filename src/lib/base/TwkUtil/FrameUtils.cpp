@@ -19,7 +19,6 @@
 #include <iterator>
 #include <assert.h>
 #include <string.h>
-#include <optional>
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -289,11 +288,8 @@ struct LexinumericCompare
         //
         //  Read the no-sequence substring from environment variable.
         //
-        std::optional<std::string> noSequenceSubstring;
-        if (auto* substring = getenv("RV_NO_SEQUENCE_SUBSTRING"))
-        {
-            noSequenceSubstring = substring;
-        }
+        const char* substringVar = getenv("RV_NO_SEQUENCE_SUBSTRING");
+        const string noSequenceSubstring = substringVar ? substringVar : "";
 
         //
         //  NOTE: this function needs to maintain as much order as
@@ -326,7 +322,7 @@ struct LexinumericCompare
             //
             //  Skip sequence detection for files containing the no-sequence substring.
             //
-            if (noSequenceSubstring && f.find(*noSequenceSubstring) != string::npos)
+            if (!noSequenceSubstring.empty() && f.find(noSequenceSubstring) != string::npos)
             {
                 frameSequences.push_back(f);
                 allfiles.pop_front();
