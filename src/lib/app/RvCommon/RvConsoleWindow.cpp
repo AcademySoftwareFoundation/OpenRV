@@ -119,7 +119,6 @@ namespace Rv
             m_cerr = new ostream(m_stderrBuf);
         }
 #endif
-
         RV_QSETTINGS;
 
         settings.beginGroup("Console");
@@ -291,31 +290,35 @@ namespace Rv
             lineLogLevel = spdlog::level::err;
             line.erase(0, 6);
             out = m_cerr;
-            *out << "ERROR: ";
+            if (out)
+                *out << "ERROR: ";
         }
         else if (line.find("WARNING:") == 0)
         {
             lineLogLevel = spdlog::level::warn;
             line.erase(0, 8);
             out = m_cerr;
-            *out << "WARNING: ";
+            if (out)
+                *out << "WARNING: ";
         }
         else if (line.find("INFO:") == 0)
         {
             lineLogLevel = spdlog::level::info;
             line.erase(0, 5);
-            *out << "INFO: ";
+            if (out)
+                *out << "INFO: ";
         }
         else if (line.find("DEBUG:") == 0)
         {
             lineLogLevel = spdlog::level::debug;
             line.erase(0, 6);
-            *out << "DEBUG: ";
+            if (out)
+                *out << "DEBUG: ";
         }
 
         // We removed the message type from the line, let's make sure
         // that we also remove the space between the type and the line
-        if (std::isspace(line.at(0)))
+        if (!line.empty() && std::isspace(line.at(0)))
         {
             line.erase(0, 1);
         }
@@ -341,7 +344,8 @@ namespace Rv
         m_fileLogger.logToFile(lineLogLevel, line);
         if (line.size() && line[0] != '<')
         {
-            *out << line;
+            if (out)
+                *out << line;
             html += "<br>";
         }
 
@@ -375,7 +379,8 @@ namespace Rv
             textEdit()->insertPlainText("ERROR: ");
             line.erase(0, 6);
             out = m_cerr;
-            *out << "ERROR: ";
+            if (out)
+                *out << "ERROR: ";
             lineLogLevel = spdlog::level::err;
         }
         else if (line.find("WARNING:") == 0)
@@ -385,7 +390,8 @@ namespace Rv
             textEdit()->insertPlainText("WARNING: ");
             line.erase(0, 8);
             out = m_cerr;
-            *out << "WARNING: ";
+            if (out)
+                *out << "WARNING: ";
             lineLogLevel = spdlog::level::warn;
         }
         else if (line.find("INFO:") == 0)
@@ -393,7 +399,8 @@ namespace Rv
             textEdit()->setTextColor(Qt::cyan);
             textEdit()->insertPlainText("INFO: ");
             line.erase(0, 5);
-            *out << "INFO: ";
+            if (out)
+                *out << "INFO: ";
             lineLogLevel = spdlog::level::info;
         }
         else if (line.find("DEBUG:") == 0)
@@ -401,20 +408,22 @@ namespace Rv
             textEdit()->setTextColor(Qt::green);
             textEdit()->insertPlainText("DEBUG: ");
             line.erase(0, 6);
-            *out << "DEBUG: ";
+            if (out)
+                *out << "DEBUG: ";
             lineLogLevel = spdlog::level::debug;
         }
 
         // We removed the message type from the line, let's make sure
         // that we also remove the space between the type and the line
-        if (std::isspace(line.at(0)))
+        if (!line.empty() && std::isspace(line.at(0)))
         {
             line.erase(0, 1);
         }
 
         textEdit()->setTextColor(Qt::white);
         textEdit()->insertPlainText(line.c_str());
-        *out << line;
+        if (out)
+            *out << line;
         m_fileLogger.logToFile(lineLogLevel, line);
 
         int showIndex = m_ui.showComboBox->currentIndex();
