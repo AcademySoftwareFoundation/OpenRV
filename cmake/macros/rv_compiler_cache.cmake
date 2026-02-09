@@ -112,14 +112,18 @@ IF(COMPILER_CACHE)
           ${CMAKE_MATCH_2}
       )
 
-      # Convert to GB for easier comparison
+      # Convert to GB for easier comparison (strip decimals for integer math)
+      STRING(
+        REGEX
+        REPLACE "\\.[0-9]+$" "" _cache_size_value_int "${_cache_size_value}"
+      )
       IF(_cache_size_unit STREQUAL "kB")
-        MATH(EXPR _cache_size_gb "${_cache_size_value} / 1024 / 1024")
+        MATH(EXPR _cache_size_gb "${_cache_size_value_int} / 1024 / 1024")
       ELSEIF(_cache_size_unit STREQUAL "MB")
-        MATH(EXPR _cache_size_gb "${_cache_size_value} / 1024")
+        MATH(EXPR _cache_size_gb "${_cache_size_value_int} / 1024")
       ELSEIF(_cache_size_unit STREQUAL "GB")
         SET(_cache_size_gb
-            ${_cache_size_value}
+            ${_cache_size_value_int}
         )
       ELSE()
         SET(_cache_size_gb
@@ -142,17 +146,21 @@ IF(COMPILER_CACHE)
           ${CMAKE_MATCH_2}
       )
 
-      # Convert to GB
+      # Convert to GB (strip decimals for integer math)
+      STRING(
+        REGEX
+        REPLACE "\\.[0-9]+$" "" _max_size_value_int "${_max_size_value}"
+      )
       IF(_max_size_unit STREQUAL "k")
-        MATH(EXPR _max_size_gb "${_max_size_value} / 1024 / 1024")
+        MATH(EXPR _max_size_gb "${_max_size_value_int} / 1024 / 1024")
       ELSEIF(_max_size_unit STREQUAL "M")
-        MATH(EXPR _max_size_gb "${_max_size_value} / 1024")
+        MATH(EXPR _max_size_gb "${_max_size_value_int} / 1024")
       ELSEIF(
         _max_size_unit STREQUAL "G"
         OR _max_size_unit STREQUAL ""
       )
         SET(_max_size_gb
-            ${_max_size_value}
+            ${_max_size_value_int}
         )
       ELSE()
         SET(_max_size_gb

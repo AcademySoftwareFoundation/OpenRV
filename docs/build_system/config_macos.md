@@ -1,10 +1,10 @@
 # Preparing Open RV on macOS
 
-Open RV 2025 can be built for macOS using the [VFX reference platform](https://vfxplatform.com/).  Dependencies can be viewed in the `cmake/defaults/` folder.  eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
+Open RV 2025 can be built for macOS using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
-* NOTE: CY2025 and CY2026 are experimental.  Noteably CY2026 for RV is still on Qt 6.5.3 pending changes necessary for 6.8.3
+- NOTE: CY2025 and CY2026 are experimental. Noteably CY2026 for RV is still on Qt 6.5.3 pending changes necessary for 6.8.3
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2026
@@ -95,9 +95,7 @@ From macOS System Settings > Privacy & Security > App Management, allow Terminal
 
 ## Install Xcode
 
-**Heads Up:**
-Xcode 26 isn't supported yet because it needs the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687). This fix is available in Qt 6.5.10, but there isn't a PySide6 version that matches this Qt version as of now.
-In the meantime, you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
+**Heads Up:** Xcode 26 isn't supported yet because it needs the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687). This fix is available in Qt 6.5.10, but there isn't a PySide6 version that matches this Qt version as of now. In the meantime, you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
 
 From the App Store, download Xcode 16.4. Make sure that it is the source of the active developer directory.
 
@@ -107,14 +105,13 @@ From the App Store, download Xcode 16.4. Make sure that it is the source of the 
 
 ## Install CMake
 
-Homebrew's CMake could previously be used to build Open RV on macOS, but now it installs CMake version 4, which is too recent and causes dependency issues. An earlier version of CMake must be installed separately:
-[cmake-3.31.7-macos-universal.dmg](https://github.com/Kitware/CMake/releases/download/v3.31.7/cmake-3.31.7-macos-universal.dmg).
+Homebrew's CMake could previously be used to build Open RV on macOS, but now it installs CMake version 4, which is too recent and causes dependency issues. An earlier version of CMake must be installed separately: [cmake-3.31.7-macos-universal.dmg](https://github.com/Kitware/CMake/releases/download/v3.31.7/cmake-3.31.7-macos-universal.dmg).
 
 Add the CMake tool to the PATH using the following command:
 
 ```bash
 sudo "/Applications/CMake.app/Contents/bin/cmake-gui" --install=/usr/local/bin
-````
+```
 
 (install_homebrew)=
 
@@ -139,21 +136,23 @@ brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool p
 ```
 ````
 
-````{warning}
+```{warning}
 Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography) that contain Rust components.
 Homebrew will install the latest stable version of Rust.
-````
+```
 
 ### Compiler Caching (ccache)
 
 ccache dramatically speeds up rebuild times by caching compiled objects (50-80% faster rebuilds). It was installed in the previous step.
 
 Configure ccache with a larger cache size:
+
 ```bash
 ccache --max-size=10G
 ```
 
 OpenRV will automatically detect and use ccache when available. To verify it's working after building:
+
 ```bash
 ccache --show-stats
 ```
@@ -220,53 +219,49 @@ For a general understanding on how to debug C++ code in VSCode, please refer to 
 To set up the C++ debugger in VSCode for Open RV, use the following steps:
 
 1. **Install the [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb) extension**
-2. **Configure the debugger**  
-    Create a `.vscode` folder at the root of the project if it doesn't already exist. Inside this folder, create a `launch.json` file to configure the debugger with the following content:
 
-    ```json
-    {
-        "version": "0.2.0",
-        "configurations": [
-            {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug Open RV (Debug Build)",
-            "program": "${workspaceFolder}/_build_debug/stage/app/RV.app/Contents/MacOS/RV",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "preLaunchTask": "build"
-            }
-        ]
-    }
-    ```
+2. **Configure the debugger**\
+   Create a `.vscode` folder at the root of the project if it doesn't already exist. Inside this folder, create a `launch.json` file to configure the debugger with the following content:
 
-    **NOTE:** `program` should point to the build of the Open RV executable you want to debug. `preLaunchTask` is only necessary if you decide to follow step 3.
+   ```json
+   {
+     "version": "0.2.0",
+     "configurations": [
+       {
+         "type": "lldb",
+         "request": "launch",
+         "name": "Debug Open RV (Debug Build)",
+         "program": "${workspaceFolder}/_build_debug/stage/app/RV.app/Contents/MacOS/RV",
+         "args": [],
+         "cwd": "${workspaceFolder}",
+         "preLaunchTask": "build"
+       }
+     ]
+   }
+   ```
 
-3. **Set up automatic rebuild (Optional)**  
-    If you want to automatically rebuild Open RV before starting the debugger, add a `tasks.json` file in the `.vscode` folder created in the previous step:
+   **NOTE:** `program` should point to the build of the Open RV executable you want to debug. `preLaunchTask` is only necessary if you decide to follow step 3.
 
-    ```json
-    {
-      "version": "2.0.0",
-      "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            "command": "cmake",
-            "args": [
-                "--build",
-                "_build_debug",
-                "--target",
-                "main_executable"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "reveal": "always"
-            }
-        }
-      ]
-    }
-    ```
+3. **Set up automatic rebuild (Optional)**\
+   If you want to automatically rebuild Open RV before starting the debugger, add a `tasks.json` file in the `.vscode` folder created in the previous step:
+
+   ```json
+   {
+     "version": "2.0.0",
+     "tasks": [
+       {
+         "label": "build",
+         "type": "shell",
+         "command": "cmake",
+         "args": ["--build", "_build_debug", "--target", "main_executable"],
+         "group": {
+           "kind": "build",
+           "isDefault": true
+         },
+         "presentation": {
+           "reveal": "always"
+         }
+       }
+     ]
+   }
+   ```

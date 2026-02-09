@@ -1,6 +1,6 @@
 # Preparing Open RV on Rocky 8 and 9
 
-Open RV 2025 can be built for Rocky 8 and Rocky 9, using the [VFX reference platform](https://vfxplatform.com/).  Dependencies can be viewed in the `cmake/defaults/` folder.  eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults), with only minor differences for the config manager repo and the requirement for Perl-CPAN.
+Open RV 2025 can be built for Rocky 8 and Rocky 9, using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults), with only minor differences for the config manager repo and the requirement for Perl-CPAN.
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
@@ -75,13 +75,13 @@ All other dependencies are shared across variations.
 4. [Install Rust](rocky_install_rust)
 5. [Install Qt](rocky_install_qt)
 6. [Build Open RV](rocky_build_openrv)
-6. [Building with Docker (Optional)](rocky_building_with_docker)
+7. [Building with Docker (Optional)](rocky_building_with_docker)
 
 (rocky_install_tools_and_dependencies)=
 
-### 1. Install tools and build dependencies
+## 1. Install tools and build dependencies
 
-#### 1.1. Set the config manager
+### 1.1. Set the config manager
 
 ````{tabs}
 ```{code-tab} bash Rocky 8
@@ -129,21 +129,24 @@ sudo dnf install -y ccache
 ```
 
 Configure ccache with a larger cache size:
+
 ```bash
 ccache --max-size=10G
 ```
 
 OpenRV will automatically detect and use ccache when available. To verify it's working after building:
+
 ```bash
 ccache --show-stats
 ```
 
-````{note}
+```{note}
 **First-time build**: ccache has no effect on the first build as it establishes the cache.
 **Subsequent builds**: You'll see significant speedups (50-80% faster) on incremental or clean rebuilds.
-````
+```
 
-#### 1.4. Disable the devel repo afterwards since dnf will warn about it:
+### 1.4. Disable the devel repo afterwards since dnf will warn about it
+
 ```bash
 sudo dnf config-manager --set-disabled devel
 ```
@@ -199,9 +202,9 @@ cmake version 3.31.6
 
 ### 4. Install Rust
 
-````{warning}
+```{warning}
 Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography).
-````
+```
 
 Install Rust using rustup, and add its installation path to your ~/.bashrc and apply the changes to your current terminal window:
 
