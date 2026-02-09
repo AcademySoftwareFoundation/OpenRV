@@ -364,8 +364,20 @@ jobs:
           rustc --version
           cargo --version
 
-      # For Rocky Linux, we can't cache the dependencies of Open RV 
+      # For Rocky Linux, we can't cache the dependencies of Open RV
       # because there is not enough room in the cache (10GB limit) for all platforms.
+      # However, we CAN cache compiled objects with ccache (much smaller cache size).
+
+      - name: Install ccache
+        run: |
+          dnf install -y ccache
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: rocky-${{ matrix.rocky-version }}-${{ matrix.vfx-platform }}-${{ matrix.build-type }}
+          max-size: 2G
+          verbose: 2
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
@@ -557,7 +569,7 @@ jobs:
           until [ $retry_count -ge $max_retries ]; do
             echo "Attempt $((retry_count + 1)) of $max_retries"
             
-            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew && \
+            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew ccache && \
                brew install --formula icu4c; then
               echo "Homebrew dependencies installed successfully"
               break
@@ -612,6 +624,13 @@ jobs:
             ./_build/cmake/dependencies
             ./_build/_deps
           key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
+
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: macos-${{ matrix.os }}-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-${{ matrix.build-type }}
+          max-size: 2G
+          verbose: 2
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
@@ -854,6 +873,17 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install --user --upgrade -r ./requirements.txt
+        shell: msys2 {0}
+
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.6
+        with:
+          version: "v0.8.1"
+
+      - name: Configure sccache for msys2
+        run: |
+          echo "export PATH=\"/c/Users/runneradmin/.cargo/bin:\$PATH\"" >> ~/.bash_profile
+          sccache --version || echo "WARNING: sccache not found in PATH"
         shell: msys2 {0}
 
       - name: Configure OpenRV

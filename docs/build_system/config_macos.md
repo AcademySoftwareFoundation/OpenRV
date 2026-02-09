@@ -132,16 +132,40 @@ Most of the build requirements can be installed by running the following brew in
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2024
-brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew rust
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.11 yasm clang-format black meson nasm pkg-config glew rust ccache
 ```
 ```{code-tab} bash VFX-CY2023
-brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew rust
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 autoconf automake libtool python@3.10 yasm clang-format black meson nasm pkg-config glew rust ccache
 ```
 ````
 
 ````{warning}
 Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography) that contain Rust components.
 Homebrew will install the latest stable version of Rust.
+````
+
+### Compiler Caching (ccache)
+
+ccache dramatically speeds up rebuild times by caching compiled objects (50-80% faster rebuilds). It was installed in the previous step.
+
+Configure ccache with a larger cache size:
+```bash
+ccache --max-size=10G
+```
+
+OpenRV will automatically detect and use ccache when available. To verify it's working after building:
+```bash
+ccache --show-stats
+```
+
+````{note}
+**First-time build**: ccache has no effect on the first build as it establishes the cache.
+**Subsequent builds**: You'll see significant speedups (50-80% faster) on incremental or clean rebuilds.
+
+To disable ccache if needed:
+```bash
+export RV_DISABLE_COMPILER_CACHE=1
+```
 ````
 
 Make sure `xcode-select -p` still returns `/Applications/Xcode.app/Contents/Developer`. If that is not the case, run `sudo xcode-select -s /Applications/Xcode.app`

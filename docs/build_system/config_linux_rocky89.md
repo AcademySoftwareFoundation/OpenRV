@@ -120,8 +120,30 @@ sudo dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
 sudo dnf clean all
 ```
 
-#### 1.4. Disable the devel repo afterwards since dnf will warn about it
+#### 1.3. Install ccache for faster builds (recommended)
 
+ccache dramatically speeds up rebuild times by caching compiled objects (50-80% faster rebuilds).
+
+```bash
+sudo dnf install -y ccache
+```
+
+Configure ccache with a larger cache size:
+```bash
+ccache --max-size=10G
+```
+
+OpenRV will automatically detect and use ccache when available. To verify it's working after building:
+```bash
+ccache --show-stats
+```
+
+````{note}
+**First-time build**: ccache has no effect on the first build as it establishes the cache.
+**Subsequent builds**: You'll see significant speedups (50-80% faster) on incremental or clean rebuilds.
+````
+
+#### 1.4. Disable the devel repo afterwards since dnf will warn about it:
 ```bash
 sudo dnf config-manager --set-disabled devel
 ```

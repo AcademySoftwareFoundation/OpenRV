@@ -456,6 +456,43 @@ pacman -Sy --needed \
 
 While installing the MSYS packages, review the list for any missing package. Some packages might not be installed after the first command.
 
+### 8.2 Install sccache for faster builds (recommended)
+
+sccache dramatically speeds up rebuild times by caching compiled objects (50-80% faster rebuilds). On Windows, sccache is preferred over ccache for better MSVC compatibility.
+
+From the same MSYS2-MinGW64 shell, install sccache using the Mozilla-Actions installer or download directly:
+
+**Option 1: Using Chocolatey (if available on your system)**
+```powershell
+choco install sccache
+```
+
+**Option 2: Manual download (recommended for MSYS2)**
+
+1. Download the latest sccache release from [https://github.com/mozilla/sccache/releases](https://github.com/mozilla/sccache/releases)
+2. Extract `sccache.exe` to a directory in your PATH (e.g., `C:\msys64\mingw64\bin`)
+
+Verify sccache is available:
+```shell
+sccache --version
+```
+
+OpenRV will automatically detect and use sccache when available.
+
+````{note}
+**First-time build**: sccache has no effect on the first build as it establishes the cache.
+**Subsequent builds**: You'll see significant speedups (50-80% faster) on incremental or clean rebuilds.
+
+To check sccache statistics after building:
+```shell
+sccache --show-stats
+```
+
+To disable sccache if needed:
+```shell
+export RV_DISABLE_COMPILER_CACHE=1
+```
+````
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
 (setup_env)=
