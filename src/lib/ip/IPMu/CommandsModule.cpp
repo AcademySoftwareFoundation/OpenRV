@@ -999,6 +999,15 @@ namespace IPMu
         }
     }
 
+    NODE_IMPLEMENTATION(flushImageFBOs, void)
+    {
+        Session* session = Session::currentSession();
+        if ((session != nullptr) && (session->renderer() != nullptr))
+        {
+            session->renderer()->flushImageFBOs();
+        }
+    }
+
     NODE_IMPLEMENTATION(releaseAllCachedImages, void)
     {
         Session* s = Session::currentSession();
@@ -5637,6 +5646,8 @@ namespace IPMu
             new Function(c, "getFiltering", getFiltering, None, Return, "int", End),
 
             new Function(c, "setCacheMode", setCacheMode, None, Return, "void", Parameters, new Param(c, "mode", "int"), End),
+
+            new Function(c, "flushImageFBOs", flushImageFBOs, None, Return, "void", End),
 
             new Function(c, "releaseAllCachedImages", releaseAllCachedImages, None, Return, "void", End),
 
