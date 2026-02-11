@@ -20,6 +20,11 @@ namespace TwkUtil
 
     string base64Encode(const char* data, size_t size)
     {
+        if ((data == nullptr) || size == 0)
+        {
+            return "";
+        }
+
         namespace bai = boost::archive::iterators;
         stringstream os;
 
