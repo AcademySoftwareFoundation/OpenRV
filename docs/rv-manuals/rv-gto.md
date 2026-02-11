@@ -1053,7 +1053,7 @@ Only text GTO files will be accepte by reader. | [Constructor] |
 | `bool Reader::open` *(std::istream&, const cha\* `name` )* | Reads the GTO file data from a stream. The *name* is supplied to make error messages make sense. | [Method] |
 | `void Reader::close ()` | Close the file and clean up temporary data. If the stream constructor was used, the stream is *not* closed. | [Method] |
 | `std::string& Reader::fail` *(std::string `why` )* | Sets the error condition on the Reader and sets the human readable reason to *why* . | [Method] |
-| `std::string& Reader::why ()` | Returns a human readable description of why the last error occured. (Set by the `fail()` function). | [Method] |
+| `std::string& Reader::why ()` | Returns a human readable description of why the last error occurred. (Set by the `fail()` function). | [Method] |
 | `const std::string& Reader::stringFromId` *(unsigned int)* | Given a string identifier, this method will return the actual string from the string table. | [Method] |
 | `const StringTable& Reader::stringTable ()` | Returns a reference to the entire string table. | [Method] |
 | `bool Reader::isSwapped ()` *const* | Returns true if the file being read needed to be swapped. This occurs if the machine the file was written on is a different sex than the machine reading the file (for example a Mac PPC written file read on an x86 GNU/Linux box). | [Method] |
