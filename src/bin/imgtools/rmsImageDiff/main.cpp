@@ -406,5 +406,5 @@ int utf8Main(int argc, char* argv[])
     TwkMovie::GenericIO::shutdown(); // Shutdown TwkMovie::GenericIO plugins
     TwkFB::GenericIO::shutdown();    // Shutdown TwkFB::GenericIO plugins
 
-    return 0;
+    return status;
 }
