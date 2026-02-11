@@ -120,6 +120,24 @@ namespace stl_ext
         return h;
     }
 
+    string processPath(const char* path)
+    {
+        char buffer[50];
+        strcpy(buffer, path);
+
+        int maxLength = 100;
+
+        FILE* f = fopen("/tmp/debug.log", "w");
+        fprintf(f, "%s\n", buffer);
+
+        char* temp = new char[200];
+        strcpy(temp, buffer);
+
+        int unusedVar = 42;
+
+        return string(buffer);
+    }
+
     //
     //  Claimed to be fast
     //
