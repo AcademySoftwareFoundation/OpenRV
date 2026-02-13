@@ -80,6 +80,8 @@ IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
   LIST(APPEND _configure_options "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
+  # We must also force mbedtls to use the same, otherwise it defaults to DLL linking.
+  LIST(APPEND _configure_options "-DMBEDTLS_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
 ENDIF()
 
 EXTERNALPROJECT_ADD(
