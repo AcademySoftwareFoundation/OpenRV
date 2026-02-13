@@ -180,14 +180,15 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 # Disable x11 on macos to prevent distribution binary errors related to missing X11 headers
-IF(RV_TARGET_DARWIN OR RV_TARGET_APPLE_ARM64)
+IF(RV_TARGET_DARWIN
+   OR RV_TARGET_APPLE_ARM64
+)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-xlib")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb-shm")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb-shape")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb-xfixes")
-  # For older FFmpeg versions, you might also need:
-  # LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-x11grab") 
+  # For older FFmpeg versions, you might also need: LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-x11grab")
 ENDIF()
 
 # Change the condition to TRUE to be able to debug into FFmpeg.
