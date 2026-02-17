@@ -7,7 +7,7 @@
 # The script requires the QT_HOME environment variable to be set to the directory
 # where your Qt versions are installed.
 #
-# Refereces: 
+# References: 
 # https://qt-project.atlassian.net/browse/QTBUG-137687
 # https://github.com/qt/qtbase/commit/cdb33c3d5621ce035ad6950c8e2268fe94b73de5
 # https://github.com/Homebrew/homebrew-core/commit/9ef09378761c7d975da890566451726fba53ea51
