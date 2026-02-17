@@ -96,7 +96,7 @@ From macOS System Settings > Privacy & Security > App Management, allow Terminal
 **Heads Up:**
 If you are using >= Xcode 26 you will need to patch Qt 6.5.3 and 6.8.3 to implement the fix for [QTBUG-137687](https://bugreports.qt.io/browse/QTBUG-137687).
 
-This patch is ran during the sourcing of rvcmds.sh.  You can also run it directly via `sh apply_qt_fix.sh` 
+This patch is run during the sourcing of rvcmds.sh.  You can also run it directly via `sh apply_qt_fix.sh` 
 
 Alternately you can use Xcode 16.4 on the latest macOS Tahoe 26 to build Open RV.
 
