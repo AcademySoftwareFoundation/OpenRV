@@ -175,6 +175,8 @@ namespace IPCore
 
         Expression* newBlend(const IPImage*, const std::vector<Expression*>&, const IPImage::BlendMode);
 
+        Expression* newDissolveBlend(const IPImage*, const std::vector<Expression*>&, const IPImage::BlendMode, float dissolveAmount);
+
         Expression* newHistogram(const IPImage*, const std::vector<Expression*>&);
 
         Expression* newLensWarp(const IPImage*, Expression*, float k1, float k2, float k3, float d, float p1, float p2,
