@@ -543,7 +543,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
                 ("before-source-delete", self._before_source_delete, ""),
                 ("source-group-complete", self._update_media_info, ""),
                 ("frame-changed", self._update_media_info, ""),
-                ("graph-node-inputs-changed", self._update_media_info, ""),
                 ("session-clear-everything", self._update_media_info, ""),
                 ("source-media-set", self._on_force_update_media_info, ""),
                 ("source-modified", self._on_force_update_media_info, ""),

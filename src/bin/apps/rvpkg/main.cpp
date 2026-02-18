@@ -59,6 +59,7 @@
 
 #include <QtCore/QtCore>
 #include <QFileInfo>
+#include <QDateTime>
 
 //
 //  Check that a version actually exists. If we're compiling opt error
@@ -224,6 +225,7 @@ int utf8Main(int argc, char* argv[])
 
     int install = 0;
     int uninstall = 0;
+    int update = 0;
     int list = 0;
     int info = 0;
     int add = 0;
@@ -276,6 +278,9 @@ int utf8Main(int argc, char* argv[])
             "  Uninstall package(s):                    rvpkg -uninstall "
             "/path/to/file1.rvpkg ...",
             "",
+            "  Update package(s):                       rvpkg -update "
+            "/path/to/file1.rvpkg ...",
+            "",
             "  Add and install package(s):              rvpkg -install -add "
             "/path/to/area /path/to/file1.rvpkg ...",
             "",
@@ -286,7 +291,8 @@ int utf8Main(int argc, char* argv[])
             &onlyDir, "use directory as sole content of RV_SUPPORT_PATH", "-add %S", &addDir, "add packages to specified support directory",
             "-remove", ARG_FLAG(&remove), "remove packages (by name, rvpkg name, or full path to rvpkg)", "-install", ARG_FLAG(&install),
             "install packages (by name, rvpkg name, or full path to rvpkg)", "-uninstall", ARG_FLAG(&uninstall),
-            "uninstall packages (by name, rvpkg name, or full path to rvpkg)", "-optin", ARG_FLAG(&optin),
+            "uninstall packages (by name, rvpkg name, or full path to rvpkg)", "-update", ARG_FLAG(&update),
+            "update packages to newer version (by name, rvpkg name, or full path to rvpkg)", "-optin", ARG_FLAG(&optin),
             "make installed optional packages opt-in by default for all users", "-list", ARG_FLAG(&list), "list installed packages",
             "-info", ARG_FLAG(&info),
             "detailed info about packages (by name, rvpkg name, or full path "
@@ -321,13 +327,13 @@ int utf8Main(int argc, char* argv[])
         cout << "WARNING: -include ignored with -add" << endl;
     }
 
-    if ((remove && install) || (add && uninstall))
+    if ((remove && install) || (add && uninstall) || (update && (add || remove)))
     {
         cerr << "ERROR: conflicting arguments" << endl;
         exit(-1);
     }
 
-    if ((remove || add || install || uninstall) && (list || info))
+    if ((remove || add || install || uninstall || update) && (list || info))
     {
         cerr << "ERROR: -list and -info do not work with other arguments" << endl;
         exit(-1);
@@ -339,7 +345,7 @@ int utf8Main(int argc, char* argv[])
         exit(-1);
     }
 
-    if ((info || install || uninstall || remove || add) && inputArgs.empty())
+    if ((info || install || uninstall || remove || add || update) && inputArgs.empty())
     {
         cerr << "ERROR: need more arguments" << endl;
         exit(-1);
@@ -706,6 +712,227 @@ int utf8Main(int argc, char* argv[])
         }
 
         manager.removePackages(files);
+    }
+
+    if (update)
+    {
+        cout << "INFO: Updating package(s)..." << endl;
+
+        // Store the input files and handle bundles
+        QStringList newPackageFiles;
+        for (size_t i = 0; i < inputArgs.size(); i++)
+        {
+            QFileInfo fileInfo(inputArgs[i].c_str());
+
+            // Validate that it's a file, not a directory
+            if (fileInfo.isDir())
+            {
+                cerr << "ERROR: -update expects package files, not directories: " << inputArgs[i] << endl;
+                cerr << "Usage: rvpkg -update /path/to/package.rvpkg" << endl;
+                exit(-1);
+            }
+
+            if (!fileInfo.exists())
+            {
+                cerr << "ERROR: file does not exist: " << inputArgs[i] << endl;
+                continue;
+            }
+
+            // Validate file extension
+            QString suffix = fileInfo.suffix().toLower();
+            if (suffix != "rvpkg" && suffix != "rvpkgs" && suffix != "zip")
+            {
+                cerr << "ERROR: invalid package file (must be .rvpkg, .rvpkgs, or .zip): " << inputArgs[i] << endl;
+                continue;
+            }
+
+            QString absolutePath = fileInfo.absoluteFilePath();
+
+            // Check if it's a bundle
+            if (manager.isBundle(absolutePath))
+            {
+                cout << "INFO: Bundle detected, unpacking to temporary location..." << endl;
+
+                // Create a temporary directory for unpacking
+                QDir tempDir = QDir::temp();
+                QString tempBasePath =
+                    tempDir.absoluteFilePath("rvpkg_update_temp_" + QString::number(QDateTime::currentMSecsSinceEpoch()));
+                QString outputDir = tempBasePath + "/Packages";
+
+                // Create the full directory path
+                if (!QDir().mkpath(outputDir))
+                {
+                    cerr << "ERROR: Failed to create temporary directory: " << outputDir.toUtf8().constData() << endl;
+                    continue;
+                }
+
+                cout << "INFO: Extracting to: " << outputDir.toUtf8().constData() << endl;
+
+                // Unpack the bundle (pass the full path including /Packages)
+                std::vector<QString> unpackedPackages = manager.handleBundle(absolutePath, outputDir);
+
+                if (unpackedPackages.size() > 0)
+                {
+                    cout << "INFO: Bundle unpacked successfully, found " << unpackedPackages.size() << " package(s)" << endl;
+                    for (const QString& pkg : unpackedPackages)
+                    {
+                        cout << "INFO: - " << pkg.toStdString() << endl;
+                        newPackageFiles.push_back(pkg);
+                    }
+                }
+                else
+                {
+                    cerr << "ERROR: Failed to unpack bundle: " << absolutePath.toUtf8().constData() << endl;
+                }
+            }
+            else
+            {
+                newPackageFiles.push_back(absolutePath);
+            }
+        }
+
+        if (newPackageFiles.empty())
+        {
+            cerr << "ERROR: No valid package files provided" << endl;
+            exit(-1);
+        }
+
+        // Create a temporary PackageManager to read new package info
+        PackageManager tempManager;
+        for (const QString& file : newPackageFiles)
+        {
+            tempManager.loadPackageInfo(file);
+        }
+        PackageManager::PackageList& newPackages = tempManager.packageList();
+
+        if (newPackages.empty())
+        {
+            cerr << "ERROR: Failed to read package information from provided files" << endl;
+            exit(-1);
+        }
+
+        // For each new package, find and handle the old version
+        for (size_t i = 0; i < newPackages.size(); i++)
+        {
+            const PackageManager::Package& newPkg = newPackages[i];
+            cout << endl << "INFO: ========================================" << endl;
+            cout << "INFO: Processing update for package: " << newPkg.name << " (new version: " << newPkg.version << ")" << endl;
+
+            // Find the existing installed package with the same name
+            PackageManager::Package* oldPkg = nullptr;
+            for (size_t j = 0; j < packages.size(); j++)
+            {
+                if (packages[j].name == newPkg.name)
+                {
+                    oldPkg = &packages[j];
+                    break;
+                }
+            }
+
+            QString targetDir;
+
+            if (oldPkg)
+            {
+                cout << "INFO: Found existing package: " << oldPkg->name << " (version: " << oldPkg->version << ")" << endl;
+
+                // Determine target directory from old package
+                QFileInfo oldFileInfo(oldPkg->file);
+                QDir oldDir = oldFileInfo.absoluteDir();
+                targetDir = oldDir.absolutePath();
+
+                // Skipping dependency check during uninstall/removal since the new package will be installed in the same directory
+                manager.setSkipDependencyCheck();
+
+                // Uninstall the old package if it's installed
+                if (oldPkg->installed)
+                {
+                    cout << "INFO: Uninstalling old version..." << endl;
+                    manager.uninstallPackage(*oldPkg);
+                }
+
+                // Remove the old package file
+                cout << "INFO: Removing old package file..." << endl;
+                QStringList filesToRemove;
+                filesToRemove.push_back(oldPkg->file);
+                manager.removePackages(filesToRemove);
+            }
+            else
+            {
+                cout << "INFO: No existing package found with name: " << newPkg.name << " (will perform fresh install)" << endl;
+
+                // Use the first writable support path
+                TwkApp::Bundle::PathVector paths =
+                    BundleType(APPNAME, MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER).pluginPath("Packages");
+                for (size_t j = 0; j < paths.size(); j++)
+                {
+                    QFileInfo pathInfo(paths[j].c_str());
+                    if (pathInfo.isWritable())
+                    {
+                        targetDir = paths[j].c_str();
+                        break;
+                    }
+                }
+            }
+
+            if (targetDir.isEmpty())
+            {
+                cerr << "ERROR: Could not find writable directory to install package" << endl;
+                continue;
+            }
+
+            cout << "INFO: Installing new version to: " << targetDir.toUtf8().constData() << endl;
+
+            // Add the new package
+            QStringList filesToAdd;
+            filesToAdd.push_back(newPackageFiles[i]);
+            if (!manager.addPackages(filesToAdd, targetDir.toUtf8().constData()))
+            {
+                cerr << "ERROR: Failed to add new package" << endl;
+                continue;
+            }
+
+            // Reload packages to get the newly added package
+            manager.loadPackages();
+            PackageManager::PackageList& updatedPackages = manager.packageList();
+
+            // Find the newly added package and install it
+            bool installed = false;
+            for (size_t j = 0; j < updatedPackages.size(); j++)
+            {
+                PackageManager::Package& p = updatedPackages[j];
+                if (p.name == newPkg.name && p.version == newPkg.version && !p.installed)
+                {
+                    cout << "INFO: Installing new version..." << endl;
+                    if (!manager.installPackage(p))
+                    {
+                        cerr << "ERROR: Failed to install new package version" << endl;
+                    }
+                    else
+                    {
+                        cout << "INFO: Successfully updated " << p.name << " to version " << p.version << endl;
+                        installed = true;
+                    }
+                    break;
+                }
+            }
+
+            if (!installed)
+            {
+                // The package might already be installed if it's the same version
+                for (size_t j = 0; j < updatedPackages.size(); j++)
+                {
+                    PackageManager::Package& p = updatedPackages[j];
+                    if (p.name == newPkg.name && p.version == newPkg.version && p.installed)
+                    {
+                        cout << "INFO: Package " << p.name << " version " << p.version << " is already installed" << endl;
+                        break;
+                    }
+                }
+            }
+        }
+
+        cout << endl << "INFO: ========================================" << endl;
+        cout << "INFO: Update process completed" << endl;
     }
 
     return 0;
