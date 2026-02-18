@@ -954,15 +954,19 @@ namespace Rv
                     seqs = files;
                 }
                 else
-                    seqs = sequencesInFileList(files, GlobalExtensionPredicate);
+                {
+                    SequencePredicate pred = (devent->modifiers() & Qt::AltModifier) ? FalseSequencePredicate : GlobalExtensionPredicate;
+                    seqs = sequencesInFileList(files, pred);
+                }
 
+                unsigned int dropMods = modifiers(devent->modifiers());
                 for (int i = 0; i < seqs.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->pos().x(), h - devent->pos().y() - 1, w,
-                                    h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], dropMods, devent->pos().x(),
+                                    h - devent->pos().y() - 1, w, h);
 #else
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->position().toPoint().x(),
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], dropMods, devent->position().toPoint().x(),
                                     h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
@@ -974,10 +978,10 @@ namespace Rv
                 for (int i = 0; i < nonfiles.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->pos().x(), h - devent->pos().y() - 1,
-                                    w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], dropMods, devent->pos().x(),
+                                    h - devent->pos().y() - 1, w, h);
 #else
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->position().toPoint().x(),
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], dropMods, devent->position().toPoint().x(),
                                     h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
@@ -989,11 +993,12 @@ namespace Rv
             else if (devent->mimeData()->hasText())
             {
 #if defined(RV_VFX_CY2023)
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
-                                devent->pos().x(), h - devent->pos().y() - 1, w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
+                                modifiers(devent->modifiers()), devent->pos().x(), h - devent->pos().y() - 1, w, h);
 #else
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
-                                devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1, w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
+                                modifiers(devent->modifiers()), devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1,
+                                w, h);
 #endif
 
                 sendEvent(e);
