@@ -914,6 +914,11 @@ namespace Rv
 
             if (devent->mimeData()->hasUrls())
             {
+#if defined(RV_VFX_CY2023)
+                Qt::KeyboardModifiers dropEventModifiers = devent->keyboardModifiers();
+#else
+                Qt::KeyboardModifiers dropEventModifiers = devent->modifiers();
+#endif
                 QList<QUrl> urls = devent->mimeData()->urls();
 
                 FileNameList files;
@@ -955,11 +960,11 @@ namespace Rv
                 }
                 else
                 {
-                    SequencePredicate pred = (devent->modifiers() & Qt::AltModifier) ? FalseSequencePredicate : GlobalExtensionPredicate;
+                    SequencePredicate pred = (dropEventModifiers & Qt::AltModifier) ? FalseSequencePredicate : GlobalExtensionPredicate;
                     seqs = sequencesInFileList(files, pred);
                 }
 
-                unsigned int dropMods = modifiers(devent->modifiers());
+                unsigned int dropMods = modifiers(dropEventModifiers);
                 for (int i = 0; i < seqs.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
@@ -994,7 +999,7 @@ namespace Rv
             {
 #if defined(RV_VFX_CY2023)
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
-                                modifiers(devent->modifiers()), devent->pos().x(), h - devent->pos().y() - 1, w, h);
+                                modifiers(devent->keyboardModifiers()), devent->pos().x(), h - devent->pos().y() - 1, w, h);
 #else
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
                                 modifiers(devent->modifiers()), devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1,
