@@ -2,13 +2,13 @@
 
 RV can display the first two image layers as stereo. There are several options:
 
-*   Anaglyph
-*   Side-by-Side
-*   Mirrored Side-by-Side
-*   DLP Checker
-*   Scanline Interleaved
-*   Left or Right eye only
-*   Hardware Left and Right Buffers
+* Anaglyph
+* Side-by-Side
+* Mirrored Side-by-Side
+* DLP Checker
+* Scanline Interleaved
+* Left or Right eye only
+* Hardware Left and Right Buffers
 
 The stereo rendering is designed to work with the other features of RV. In most cases, color corrections, image geometry manipulations, and display corrections will work in conjunctions with stereo viewing.
 
@@ -19,7 +19,6 @@ The left and right eye images are normalized (i.e. conformed to fit the RV windo
 You can create stereo sources and set individual stereo parameters from the command line. See Section [3.2.2](rv-user-manual-chapter-three.md#322-dual-image-sequences-andor-movie-files-as-stereo) to see how to do this.
 
 ### 12.1 Anaglyph or Luminance Anaglyph
-
 
 The anaglyph modes display the left eye in the red channel and the right in eye in the green and blue channels (as cyan). If you were to wear colored red-cyan glasses and the eyes are correctly arranged, you should be able to see stereo with pseudo-color. Color anaglyph images work best for outdoor scenes (with lots of green) and in similar cases. They work very poorly with blue or green screen photography. For grey scale/non-color rendition of anaglyph, select the “Luminance Anaglyph” mode (Figure [12.4](#luminance-anaglyph-display) )..
 
@@ -45,7 +44,6 @@ Figure 12.4: Luminance Anaglyph Display <a id="luminance-anaglyph-display"></a>
 
 ### 12.2 Side-by-Side and Mirror
 
-
 Side-by-Side mode displays the left and right eyes next to each other horizontally in full color. Some people are comfortable crossing their eyes to see stereo using this mode.
 
 Mirror mode is similar, but the right eye is flopped. If you need the left eye flopped, turn on mirror mode and select Image->Flop or hit shift-"X" this will have the effect of mirroring the left eye instead. Note that the same effect can be produced by flopping the right eye only in mirror mode.
@@ -64,7 +62,6 @@ Mirror Display Mode
 
 ### 12.3 DLP Checker and Scanline
 
-
 These modes are designed to work with DLP projectors or LCD displays that directly support stereo display. In particular RV supports the SpectronIQ HD LCD display and DLP projectors using the Texas Instrument's checkerboard 3D DLP input.
 
 ![57_dice_dlp_and_scanline.png](../../images/rv-user-manual-57-rv-dice-dlp-and-scanline-57.png)  
@@ -73,20 +70,17 @@ Figure 12.7:
 
 DLP (left) and LCD Scanline (right) Stereo Display
 
-### 12.4 HDMI 1.4a 
-
+### 12.4 HDMI 1.4a
 
 HDMI 1.4a stereo modes like Side-by-Side and Top-and-Bottom are supported via RV's Presentation Mode, described in Chapter [6](rv-user-manual-chapter-six.md#6-presentation-mode-and-video-devices) . To select one of these modes for your Presentation Device, you choose the appropriate Output Data Format in the Video preferences.
 
 ### 12.5 Hardware Stereo Support
-
 
 RV can render into left and right buffers if your graphics card supports hardware stereo. You can tell if this is the case by seeing if the menu item View → Stereo → Hardware can be selected. If so, RV should be able to create left and right buffers. There are a number of different ways to view stereo with a standard graphics card. See Chapter [B](rv-user-manual-chapter-b.md#b-stereo-setup) for information about how to setup each platform and what options are available at the hardware level.
 
 Typically, hardware support requires shutter glasses (monitor or projection) or polarized glasses (projection only) in order to be useful.
 
 ### 12.6 Additional Stereo Operations
-
 
 These options can be applied per-source as well as part of the global viewing stereo options. The per-source options can be found under the Image → Stereo menu and the global view options are under View → Stereo.
 

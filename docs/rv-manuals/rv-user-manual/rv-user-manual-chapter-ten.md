@@ -10,7 +10,6 @@ The reference manual contains detailed information about how to create a package
 
 ### 10.1 Package Support Path
 
-
 When a package is added, a list of permissible directories in the support path is presented. At that time you can choose which support directory to add the package to. When RV starts, these directories are automatically added to various paths (like image I/O plugins).
 
 By default, RV will include the application directory's plug-ins directory (which is probably not writable by the user) and one of the following which is usually writable by the user:
@@ -65,7 +64,6 @@ When first installed, packages are loaded by default. To prevent a package from 
 **Note** : A restart of RV is before a change in a package Installed or Loaded state takes effect.
 
 ### 10.3 Package Dependencies
-
 
 Packages may be dependent on other packages. If you select a package to be installed but it requires that other packages be installed as well, RV will ask you if it can install them immediately. A similar situation can occur when setting the load flag for a package. When uninstalling/unloading the opposite can happen: a package may be required by another that is “using” it. In that case RV will ask to uninstall/unload the dependent packages as well.
 

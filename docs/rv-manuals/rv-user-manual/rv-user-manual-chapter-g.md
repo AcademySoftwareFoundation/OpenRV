@@ -110,7 +110,7 @@ Linear LUT with cube sides R,G,B = 2,3,4 (ie. a 2x3x4 data set)
 1.0 1.0 1.0
 ```
 
-### Notes:
+### Notes
 
 All lines starting with white space are considered not valid and are ignored. Lines can be escaped to the next line with “\\” (but note that RV does not actually implement this part of the spec, so lines should not be broken in CSP files for RV). All values on a single line are space delimited.
 

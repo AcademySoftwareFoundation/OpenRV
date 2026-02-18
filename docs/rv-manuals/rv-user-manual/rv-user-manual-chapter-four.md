@@ -65,7 +65,6 @@ For detailed information about these settings, see Chapter [7](rv-user-manual-ch
 
 ### 4.3 Loading Images, Sequences, Movies and Audio
 
-
 #### 4.3.1 Using the File Browser
 
 There are two options for loading images, sequences, and movies via the file browser: you can add to the existing session by choosing File → Open (or File → Open into Layer) or you can open images in a new window by choosing File → Open In New Session.
@@ -95,7 +94,6 @@ If multiple icons are dropped onto RV at the same time, the order in which the s
 To associate an audio file with an image sequence or movie, drop the audio file as a layer, rather than as a source.
 
 ### 4.4 Examining an Image
-
 
 RV normalizes image geometry to fit into its viewing window. If you load two files containing the same image but at different resolutions, RV will show you the images with the same apparent \`\`size''. So, for example, if these images are viewed as a sequence — one after another — the smaller of the two images will be scaled to fit the larger. Of course, if you zoom in on a high-resolution image, you will see detail compared to a lower-resolution image. When necessary you can view the image scaled so that one image pixel is mapped to each display pixel.
 
@@ -231,7 +229,6 @@ To remove the image information widget from the view either move the mouse to th
 
 ### 4.5 Playing Image Sequences, Movie Files, and Audio Files
 
-
 RV can play multiple images, image sequences and movie files as well as associated audio files. Play controls are available via the menus, keyboard, and mouse. Timing information and navigation is provided by the timeline widget which can be toggled via the Tools → Timeline menu item or by hitting the TAB key.
 
 #### 4.5.1 Timeline
@@ -342,7 +339,6 @@ Timeline Magnifier Configuration Popup Menu
 
 ### 4.6 Audio
 
-
 When playing back audio with an image sequence or movie file, RV can be in one of two modes: video locked to audio or audio locked to video.
 
 When a movie with audio plays back at its native speed, the video is locked to the audio stream. This ensures that the audio and video are in sync.
@@ -407,7 +403,6 @@ rv syncflash,start=1,end=500,interval=1,fps=24.movieproc
 
 ### 4.7 Caching
 
-
 RV has a three state cache: it's either off, caching the current in/out range, or being used as a look-ahead (also known as a ring) buffer.
 
 ![26_e_timeline_cache.png](../../images/rv-user-manual-26-rv-cx-e-timeline-cache-25.png)  
@@ -437,7 +432,6 @@ If the timeline widget is visible, cached regions will appear as a dark green st
 **Note** that there is usually no advantage to setting the lookahead cache size to something large (if playback does not overtake the caching, a small lookahead cache is sufficient, and if it does, you probably want to use region caching anyway).
 
 ### 4.8 Color, LUTs, and CDLs
-
 
 RV provides users with fine grained color management and can support various color management scenarios. See [7.1](rv-user-manual-chapter-seven.md#rv-pixel-pipeline) for detailed technical information about RV's color pipeline. Without adding any nodes the default graph in RV supports three LUTs and two CDLs per file, an overall display LUT, and has a number of useful color transforms built-in. You can load LUTs and CDLs using the File → Import menu (Display, Look, File, and Pre-Cache items), or you can drag and drop the files onto the RV window. Smart drop targets will allow you determine how the LUT or CDL will be applied. Note that there is no CDL slot for the display by default. See chapter [8](rv-user-manual-chapter-eight.md#8-using-luts-in-rv) for more information about using LUTs and [9](rv-user-manual-chapter-nine.md#9-using-cdls-in-rv) for using CDLs in RV.
 
@@ -628,7 +622,6 @@ Mouse button 1 is normally the left mouse button and button 3 is normally the ri
 **If you can't annotate with the tablet and stylus:** If you use various inputs to control RV, such as Wacom tablets, then sometimes there is an incompatibility with the events those inputs generate and Qt. Try turning ON *Treat Stylus Events as Mouse Events* from RV Preferences General tab.
 
 ### 4.11 Preferences File
-
 
 RV stores configuration information in a preferences file in the user home directory. Each platform has a different location and possibly a different format for the file.
 

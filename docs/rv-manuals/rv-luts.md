@@ -20,7 +20,7 @@ Channel LUTs differ from 3D LUTs in one critical way: they can only modify chann
 
 The other important difference between channel and 3D LUTs is the number of samples. Channel LUTs are one dimensional and therefor consume much less memory than 3D LUTs. Because of this, channel LUTs can have more samples per-channel than 3D LUTs.
 
-The implication of all this is that channel LUTs are useful for representing functions like gamma or log to linear which don’t involve cross-talk between channels whereas 3D LUTs are good for representing more general color transforms and 
+The implication of all this is that channel LUTs are useful for representing functions like gamma or log to linear which don’t involve cross-talk between channels whereas 3D LUTs are good for representing more general color transforms and
 
 3D LUTs can be very memory intensive. A 64 × 64 × 64 LUT requires 64 <sup>3 </sup> × 4 bytes of data (3Mb). You can quickly run out of memory for your image on the graphics card by making the 3D LUT too big (e.g. 128 × 128 × 128, this will slow RV down). RV does not require the 3D LUT to have the same resolution in each dimension. You may find that a particular LUT is smooth or nearly linear in one or more dimensions. In that case you can use a lower resolution in those dimensions.
 
@@ -63,7 +63,6 @@ To complicate matters, many LUT files are intended to map directly from the pixe
 
 One of the more common types of LUT files you are likely to come across is one which maps Kodak Log space to sRGB display space. The file name of that kind of LUT might be log2sRGB or something similar. A variation on that same type of LUT might include an additional component that simulates the look of the pixels when projected from a particular type of film stock. Strictly speaking, you do not need to use log to sRGB LUTs with RV because it implements these functions itself (and they are exact, not approximated). So ideally, if you require film output simulation you have a LUT which only does that one transform. Of course this is often not the case; the world of LUT formats is a complicated one.
 
-
 ### RSR LUT Format
 
 Currently, the best LUT format for use with RV is the .csp format. This format handles high dynamic range input and output as well as non-linear and linear pre-LUTs. It maps most closely to RV’s internal LUT functions.
@@ -88,6 +87,7 @@ When RV reads a pre-LUT from this file format and it can determine that the pre-
 
 ...  
 ```
+
 In the above listing, lines preLUTStart to preLUTEnd are linear pre-LUT values. In this case the pre-LUT values are mapping values int the range [0,13.5] down to [0,1] for processing by a 3D LUT (which is not shown). For a summary of the RSR .csp format see Appendix [G](../rv-manuals/rv-user-manual/rv-user-manual-chapter-g.md) .
 
 For the most part, it’s not necessary to know the distinction between a linear and non-linear pre-LUT in the file. However, the behavior of the pre-LUT outside the bounds of its largest and smallest input values will be different for linear pre-LUTs. Since the pre-LUT is represented as a matrix, it will not clamp values outside the specified range. Non-linear pre-LUTs will clamp values.

@@ -98,12 +98,11 @@ Don’t forget that you can also bring in supplementary media to compare or use 
 
 In general, to prepare to render into context, after you setup your views, you’d
 
-1.  Turn off the *View Latest Playblast* option in the *Maya* menu.
-    
-2.  Select (in the Session Manager) the previously-rendered playblast you want to swap out for new ones
-    
-3.  Pick the *Mark Selected as Target* item on the *Maya* menu.
-    
+1. Turn off the *View Latest Playblast* option in the *Maya* menu.
+
+2. Select (in the Session Manager) the previously-rendered playblast you want to swap out for new ones
+
+3. Pick the *Mark Selected as Target* item on the *Maya* menu.
 
 Henceforth, future playblasts will be swapped into the slot occupied by the one you just marked. Possible "render into context" workflows include:
 

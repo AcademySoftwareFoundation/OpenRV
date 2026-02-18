@@ -1,0 +1,27 @@
+# Exceptions for existing docs; --fix still applies for other rules.
+# MD013: line length (long URLs, code, tables)
+# MD001: heading increment (e.g. h1 -> h3 in structured docs)
+# MD003: heading style (atx vs setext)
+# MD024: duplicate heading text (same title in different sections)
+# MD028: blank line inside blockquote
+# MD029: ordered list prefix (allow 1, 2, 3 instead of 1, 1, 1)
+# MD033: inline HTML (sup, br, b, a in docs)
+# MD036: emphasis instead of heading
+# MD040: fenced code language (plain ``` without language tag)
+# MD041: first line top-level heading (front matter / title lines)
+# MD051: link fragment
+# MD055: table pipe style (leading/trailing pipes)
+# MD056: table column count
+MD013: false
+MD001: false
+MD003: false
+MD024: false
+MD028: false
+MD029: false
+MD033: false
+MD036: false
+MD040: false
+MD041: false
+MD051: false
+MD055: false
+MD056: false

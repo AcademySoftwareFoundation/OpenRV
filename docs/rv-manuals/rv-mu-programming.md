@@ -48,13 +48,12 @@ Physical simulation has been a part of CG since its inception. Over time this ha
 
 So to sumarize the computing landscape in CG film:
 
-*   **Large datasets are common.** Many applications will use one minus the number of bytes available to them.
-*   **Performance is really important.** The artist’s attention span is closely related to ren- dering and simulation times.
-*   **Workers usually have informal training for programming.**
-*   **Workers are skilled tool users.**
+* **Large datasets are common.** Many applications will use one minus the number of bytes available to them.
+* **Performance is really important.** The artist’s attention span is closely related to ren- dering and simulation times.
+* **Workers usually have informal training for programming.**
+* **Workers are skilled tool users.**
 
 ## 2. Primitive Types ‌
-
 
 Mu types have two kinds of semantics: reference and value. Types with value semanitics are always copied when assigned or passed to a function as an argument. Basic number types all have value semantics.
 
@@ -80,7 +79,7 @@ if (a == 0) doit(); // ok
 
 All of the conditional constructs take the bool type as their test argument.
 
-### 2.2 int64, int, short , and byte types.
+### 2.2 int64, int, short , and byte types
 
 Mu has four integral value types. The int64, int, and short types are represented as signed twos complement. The int64 type is 64 bits, the int type is 32 bits and the short type is 16 bits. byte is 8 bit unsigned. The binary representation in memory is machine dependant.
 
@@ -88,7 +87,7 @@ The integral types all obey basic arithmetic operations as well as the bitwise o
 
 There is a distinction between the `byte` and `char` type in Mu. The char type is not assumed to be of any particular size. There are no “unsigned” integral types.
 
-### 2.3 Floating point types.
+### 2.3 Floating point types
 
 The floating point type is called float and is a 32 bit IEEE floating point number. Mu can also be compiled with half (a 16 bit floating point number) as defined by ILM’s Imath library. The usual arithmatic operators work on floats. Underflow and overflow should behave consistantly across platforms.
 
@@ -131,7 +130,7 @@ assert(a == ’b’);
  
 ```
 
-### 2.5 The void Type.
+### 2.5 The void Type
 
 The `void` type is useful in the context of function declarations. You cannot make a variable of type `void` since it has no value. The `void` type indicates that absence of a return type for a function definition:
 
@@ -142,7 +141,7 @@ The `void` type is useful in the context of function declarations. You cannot ma
 
 In the example the function `print_it` has no return value so the type void is used to indicate that.
 
-### 2.6 The nil Type.
+### 2.6 The nil Type
 
 The value `nil` is used to set a reference variable to refer to “nothing”. It is analogous to NULL in C/C++, null in Java, nil in lisp, or None in Python.
 
@@ -256,7 +255,6 @@ mu> (void;float)(print)
 In this case the result is no longer ambiguous. If you attempt to cast to a function type for which there is no overloaded instance, the cast will throw an exception.
 
 ## 3. Built-in Types ‌ ‌ ‌
-
 
 Mu has built-in syntax for various types of arrays, lists, maps, and strings.
 
@@ -378,7 +376,7 @@ There is currently no way to make a *singleton* tuple value (a tuple of one elem
 
 #### 3.2.1 Indexing a Particular Element in a Tuple
 
-Each element in a tuple is given a numerical name. The first element is called _0 followed by _1 followed by _2, and so on. For example to get the second element:
+Each element in a tuple is given a numerical name. The first element is called _0 followed by_1 followed by _2, and so on. For example to get the second element:
 
 ```
 (1, "two")._0 ⇒ 1
@@ -386,7 +384,7 @@ Each element in a tuple is given a numerical name. The first element is called _
  
 ```
 
-The value of the first expression is 1 because the 0th element is begin indexed. It is not possible to dynamically index tuple elements because each element may have a unique type. The best way to think about a tuple is a struct with elements named _0 through _N that you don’t need to declare.
+The value of the first expression is 1 because the 0th element is begin indexed. It is not possible to dynamically index tuple elements because each element may have a unique type. The best way to think about a tuple is a struct with elements named _0 through_N that you don’t need to declare.
 
 #### 3.2.2 Pattern Matching with Tuples
 
@@ -483,7 +481,7 @@ For graphics applications, its common to
 
 ### 3.6 Sets
 
-### 3.7 String Type.
+### 3.7 String Type
 
 Strings conceptually contain a sequence of char type. However, the string type is currently independant of any sequence type. Strings in Mu are immutable; you cannot change the value of a string. Instead you make new strings by either concatenating existing strings or by using the formatting operator (%).
 
@@ -527,7 +525,6 @@ Some applications or native modules may provide an opaque type. These are types 
 An example of an opaque type can be found in the system module. This module contains analogues to POSIX functions and types in Mu. One of the declared types FILE represents a standard C library file descriptor. This type cannot be deconstructed but can be operated on by fopen, fclose, fread, and fwrite among others. Opaque types often represent external resources like FILE.
 
 ## 4. User Defined Types: Structs, Classes, and Unions ‌
-
 
 ### 4.1 Records
 
@@ -613,7 +610,7 @@ let A w = x; ⇒ *ok! w = 1*
 
 Bar has three constructors and the all take int. So the union values are really the values of the int type alone. However, the union constructor (tag) is still required to get the value. You could think of the union in this case making *flavors* of int.
 
-#### 4.3.1 Retrieving union values.
+#### 4.3.1 Retrieving union values
 
 To retrieve a union value, you must use some form of pattern matching. There are no fields of a union as there are in the C languages. For example, to get the int out of the Foo union declared above:
 
@@ -683,7 +680,6 @@ case (today) \
 ```
 
 ## 5. Functions and the Function Type. ‌
-
 
 Functions play a ubiquitous role in Mu. Constructors, operators, iteration constructs, and more are implemented as functions which can be overriden, passed as objects, or modified.
 
@@ -806,7 +802,7 @@ function: root (float; float a = 2, float b)
 
 In this case parameter "b" follows parameter "a" which has a default value. Because "a" was declared with a default value, "b" must also be declared with a default value.
 
-### 5.5 Returning from a Function.
+### 5.5 Returning from a Function
 
 There are two ways to return a value from a function. The first way is identical to C/C++: use the return statement:
 
@@ -852,7 +848,6 @@ mu> x(1,2)
 Unambiguous function objects all have operator() defined for them. So you can call the function either through a variable or an expression that returns a function.
 
 ## 6. Constants and Initialization ‌ ‌
-
 
 ### 6.1 Integral Type Constants
 
@@ -1029,13 +1024,11 @@ Unambiguous function objects all have operator() defined for them. So you can ca
 
 ## 7. Polymorphic and Parameterized Types ‌
 
-
 ### 7.1 Type Variables
 
-### 7.2 Typeclasses: Families of Types.
+### 7.2 Typeclasses: Families of Types
 
 ## 8. Variables ‌
-
 
 Mu types have two kinds of semantics: reference and value. Types with value semanitics are always copied when assigned or passed to a function as an argument. Basic number types all have value semantics.
 
@@ -1105,7 +1098,7 @@ print( foo + "\n" );
 
 In this case the string "ABC" will be printed because foo is referencing a different object than bar.
 
-### 8.2 Kinds of Variables.
+### 8.2 Kinds of Variables
 
 There are three kinds of “variables” in a Mu: global, local, and fields.
 
@@ -1185,7 +1178,6 @@ int z = 1, q = 10;
 
 ## 9. Pattern Matching ‌
 
-
 Besides the usual imperative variable assignment syntax, the let statement can be used to match patterns. There are two benefits to using let with pattern matching: multiple nested assignments can be made simultaneously and the types of the variables can be figured out by the parser so you don’t have to annotate them.
 
 Similarily, the case statement and expression can match patterns and values while as- signing symbols to values without type annotation.
@@ -1206,8 +1198,8 @@ let let-pattern1 = expression1 \
 
 The *let-pattern* can be any of the following:
 
-*   A single symbol which is assigned the value of its expression. This is the simplest usage of let and will never result in an exception being thrown. For example let x = 0 assigns the type int to the symbol x and causes the value 0 to be bound to it.
-*   A tuple destructor pattern which binds the pattern symbols to each of the elements of a tuple expression. You can only use the tuple pattern if the bound expression is a tuple type. In addition the number of elements in the pattern must match the number of elements in the expression tuple type.
+* A single symbol which is assigned the value of its expression. This is the simplest usage of let and will never result in an exception being thrown. For example let x = 0 assigns the type int to the symbol x and causes the value 0 to be bound to it.
+* A tuple destructor pattern which binds the pattern symbols to each of the elements of a tuple expression. You can only use the tuple pattern if the bound expression is a tuple type. In addition the number of elements in the pattern must match the number of elements in the expression tuple type.
 
 ```
  let (a, b, c) = (1, 2, 3);
@@ -1215,7 +1207,7 @@ The *let-pattern* can be any of the following:
  
 ```
 
-*   A list destructor pattern which bind the pattern symbols to each of the elements of a list expression. Like the tuple pattern, the list pattern requires that the number of symbols in the pattern be equal to the number of elements in the list value at runtime. If the number of elements does not match at runtime or the parser can figure out that the number does not match a parse time, an exception will be thrown.
+* A list destructor pattern which bind the pattern symbols to each of the elements of a list expression. Like the tuple pattern, the list pattern requires that the number of symbols in the pattern be equal to the number of elements in the list value at runtime. If the number of elements does not match at runtime or the parser can figure out that the number does not match a parse time, an exception will be thrown.
 
 ```
 let x = [1, 2, 3]; // without list pattern \
@@ -1227,7 +1219,7 @@ let [d, e] = [6, 7, 8];
  
 ```
 
-*   A cons pattern which pulls apart the head and tail of a list. This pattern, like the list destructor pattern, requires a list expression. Two symbols are supplied: the head and tail symbol:
+* A cons pattern which pulls apart the head and tail of a list. This pattern, like the list destructor pattern, requires a list expression. Two symbols are supplied: the head and tail symbol:
 
 ```
 let h : t = [1, 2, 3, 4]; \
@@ -1237,7 +1229,7 @@ let h0 : h1 : t = [1, 2, 3];
  
 ```
 
-*   The structure destructor pattern which pulls apart structure fields. This pattern can also be used on tuples and lists, but cannot be used on arrays.
+* The structure destructor pattern which pulls apart structure fields. This pattern can also be used on tuples and lists, but cannot be used on arrays.
 
 ```
 struct: Foo { int a; float b; } \
@@ -1257,7 +1249,7 @@ let Bar.B {x} = Bar.A(1)
  
 ```
 
-*   Finally, the symbol _ (underscore) can be bound to any expression. The expression is evaluated at runtime (if it is not pure), but the value is ignored.
+* Finally, the symbol _ (underscore) can be bound to any expression. The expression is evaluated at runtime (if it is not pure), but the value is ignored.
 
 Each of these patterns can be combined with the others and nested to arbitrary depths. This makes it easy to pull values from inside nested structs, tuples, and lists easily.
 
@@ -1276,7 +1268,6 @@ let (a, b, _) = (1, 2, [3,4,5,6]);
 ### 9.3 Case an an Expression
 
 ## 10. Flow Control ‌
-
 
 Mu has the usual cadre of flow control statements for a C-family language plus a few additions.
 
@@ -1393,7 +1384,7 @@ let y = x + (if x > 0.0 then 1.0 else -1.0);
  
 ```
 
-### 10.4 Fixed Number of Iterations Looping.
+### 10.4 Fixed Number of Iterations Looping
 
 The repeat statement has the general form:
 
@@ -1501,7 +1492,7 @@ for_index (i, j; M) T[i,j] = M[j,i];
  
 ```
 
-### 10.9 Break and Continue: Short Circuiting Loops.
+### 10.9 Break and Continue: Short Circuiting Loops
 
 All of the looping constructs can be “short-circuited” using `break` and `continue` . These function just like their C/C++ conterparts. break and continue will terminate the inner most loop.
 
@@ -1682,7 +1673,6 @@ In the above case the *testexpr* was partially evaluated to false early in the c
 
 ## 11. Namespace (Scoping) Rules ‌
 
-
 ### 11.1 How Symbols are Assigned to Namespaces
 
 When a symbol is declared (like a variable or a function) it is declared in an existing *namespace* . A namespace is itself a symbol. For example functions, types, and modules are all namespaces. The namespaces form a hierarchy; the root is called the *global namespace* . The global namespace has no name, but is pointed to by the global symbol root (which is of course in the global namespace!). Normally you don’t need to access the global namespace by name.
@@ -1708,9 +1698,9 @@ In this example, in function bar we need to add two symbols named i. In order to
 
 Each of the following is a namespace in which symbols can be declared:
 
-*   Modules. Modules are namespaces that can be accessed from any other namespace. Nested modules can access functions, variables, and types declared in the current mod- ule namespace or parent module namespaces without using a path to the symbol.
-*   Functions. Local variables, functions, modules, etc, that are declared inside a function body are only visible in the scope of that function or its child namespaces. It is not possible to reference a symbol inside a function (including its parameters) from outside of the function.
-*   Types. Fields of types are accessible to outside namespaces though the dot notation of objects. Global variables, functions, and types declared in the scope of a type are accessible from any namespace. Nested types follow the same scoping rules as nested modules (and can be intermixed with modules as well). This includes both record-like types (struct and class) as well as the union type.
+* Modules. Modules are namespaces that can be accessed from any other namespace. Nested modules can access functions, variables, and types declared in the current mod- ule namespace or parent module namespaces without using a path to the symbol.
+* Functions. Local variables, functions, modules, etc, that are declared inside a function body are only visible in the scope of that function or its child namespaces. It is not possible to reference a symbol inside a function (including its parameters) from outside of the function.
+* Types. Fields of types are accessible to outside namespaces though the dot notation of objects. Global variables, functions, and types declared in the scope of a type are accessible from any namespace. Nested types follow the same scoping rules as nested modules (and can be intermixed with modules as well). This includes both record-like types (struct and class) as well as the union type.
 
 ### 11.3 Loading a Module ‌ ‌
 
@@ -1777,7 +1767,6 @@ use *module_name*
 ```
 
 ## 12. Symbol Aliasing ‌
-
 
 Aliasing allows you to assign an identifier as a stand-in for a symbol or constant expression. The scope an alias is the enclosing scope. An alias is a first class symbol, and can be referenced through the "." notation. Aliases are made using the binary infix ":=" operator. This operator creates an alias out of the name on the left hand side from the symbol or constant expression on the right hand side.
 
@@ -1919,7 +1908,6 @@ The symbol `pi` is not a variable and so cannot have its value changed.
 
 ## 13. Separate Parse and Compilation Modules ‌
 
-
 ### 13.1 Module Definition
 
 ### 13.2 File System Locations
@@ -1932,7 +1920,6 @@ The symbol `pi` is not a variable and so cannot have its value changed.
 
 ## 14. Documenting Source Code ‌
 
-
 Mu has built-in syntax for annotating source code symbols like functions, variables, and type definitions. When parsed and compiled the documentation is assigned to a symbol and can be retrieved at runtime along with other symbol information. (See Runtime Module).
 
 Modules like autodoc can convert the documentation into various formats like plain ASCII, HTML, or a TEX dialect. (See Autodoc Module).
@@ -1943,7 +1930,7 @@ Mu uses C++ comment syntax
 
 A double slash // comments to the end of the line.
 
-A slash followed by a star /* begins a comment that may include newlines. The comment is terminated by */.
+A slash followed by a star /*begins a comment that may include newlines. The comment is terminated by*/.
 
 ### 14.2 Compiled Documentation
 
@@ -1992,7 +1979,6 @@ vector float[3] v, vector float[3] axis, vector float[3] radians)
 
 ## 15. Memory Management ‌
 
-
 Objects in Mu are automatically allocated and destroyed by the runtime environment. Objects created by the program, stack objects, and temporary objects in expressions are all handled in the same way. The Mu runtime environment uses a stanrdard mark-sweep garbage collection algorithm to find objects that are no longer being used and queues them up for finalization. When the objects are finalized, destructors are run and the object is reclaimed.
 
 ### 15.1 Allocation
@@ -2040,7 +2026,6 @@ runtime.set_collection_threshold(1000); // set object overhead parameter
 ```
 
 ## 16. Closures and Partial Evaluation ‌
-
 
 ### 16.1 Closures
 
@@ -2152,7 +2137,6 @@ Notice that when you call the function add with all its arguments it does what y
 
 ## 17. Phases ‌
 
-
 Mu has three phases: parse, compilation, and runtime evaluation.
 
 ### 17.1 Parse Phase
@@ -2163,7 +2147,6 @@ Mu has three phases: parse, compilation, and runtime evaluation.
 
 ## 18. Muc: Mu Compiler ‌
 
-
 ### 18.1 Invocation
 
 ### 18.2 Options
@@ -2173,7 +2156,6 @@ Mu has three phases: parse, compilation, and runtime evaluation.
 ### 18.4 C++ Target
 
 ## 19. Standard Library ‌
-
 
 ### 19.1 Built-in Functions
 
@@ -2201,7 +2183,6 @@ serialize
 
 ## 20. Mu Compared to Similar Languages ‌
 
-
 ### 20.1 C++
 
 ### 20.2 Python
@@ -2212,7 +2193,6 @@ serialize
 
 ## 21. Example Usage ‌
 
-
 ### 21.1 Embedding Mu in a C++ Application
 
 ### 21.2 Using Mu as a Shading Language
@@ -2222,7 +2202,6 @@ serialize
 ### 21.4 Mu by Itself
 
 ## Appendix A Reference ‌
-
 
 ### Properties
 

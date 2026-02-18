@@ -6,50 +6,47 @@ Rather than just attach a “flipbook” to Nuke, the goal of this integration e
 
 Key features include:
 
-*   Checkpointing: Save a rendered frame with a copy of the current nuke script
-    
-*   Rendering: Save a rendered sequence with a copy of the current nuke script
-    
-*   Background rendering in Nuke 6.2 **and** 6.1
-    
-*   Live update of RV during renders, showing the latest frame rendered
-    
-*   Rendered frames visible in RV as soon as they are written
-    
-*   Rendered frames from canceled renders are visible
-    
-*   Render directly into a slap comp or sequence in RV
-    
-*   Full checkpoints: copies of entire ranges of frames, for comparison
-    
-*   Visual browsing of checkpoints and renders
-    
-*   Visual comparison (wipes, tiled) of checkpoints and renders
-    
-*   Restoring the script to the state of any checkpoint or render
-    
-*   Read and Write nodes in the script dynamically mirrored as sources in RV
-    
-*   Read/Write node path, frame range, color space dynamically synced to RV
-    
-*   Node selection dynamically synced to the View in RV
-    
-*   Frame changes in Nuke dynamically synced to RV frame
-    
-*   RV Sources can be used to create the corresponding Nuke Read node
-    
-*   All Render/Checkpoint context retained in session file on disk
-    
-*   Support for `%V` -style stereoscopic Reads, Writes, renders, and checkpoints.
-    
+* Checkpointing: Save a rendered frame with a copy of the current nuke script
+
+* Rendering: Save a rendered sequence with a copy of the current nuke script
+
+* Background rendering in Nuke 6.2 **and** 6.1
+
+* Live update of RV during renders, showing the latest frame rendered
+
+* Rendered frames visible in RV as soon as they are written
+
+* Rendered frames from canceled renders are visible
+
+* Render directly into a slap comp or sequence in RV
+
+* Full checkpoints: copies of entire ranges of frames, for comparison
+
+* Visual browsing of checkpoints and renders
+
+* Visual comparison (wipes, tiled) of checkpoints and renders
+
+* Restoring the script to the state of any checkpoint or render
+
+* Read and Write nodes in the script dynamically mirrored as sources in RV
+
+* Read/Write node path, frame range, color space dynamically synced to RV
+
+* Node selection dynamically synced to the View in RV
+
+* Frame changes in Nuke dynamically synced to RV frame
+
+* RV Sources can be used to create the corresponding Nuke Read node
+
+* All Render/Checkpoint context retained in session file on disk
+
+* Support for `%V` -style stereoscopic Reads, Writes, renders, and checkpoints.
 
 ## Note to Users
-
 
 Thanks for trying out the software; the integration toolset is in active development, and we’d very much appreciate any bug reports, feature requests, or other comments.
 
 Before you send us bug reports and feature requests, however, you might want to check over the list of known issues and planned work in [this appendix](#appendix-known-issues-and-planned-work) .
-
 
 ## Updating an Existing Installation
 
@@ -59,19 +56,17 @@ If the RV and Nuke components of the integration package are mis-matched, you’
 
 ## Installation
 
-
 ### Personal Installation
 
-1.  Start RV and go to the *Packages* tab of the *Preferences* dialog
-    
-2.  Find *Nuke Integration* in the Package list and click the *Load* toggle next to it.
-    
-3.  Restart RV
-    
-4.  Click the *Nuke* item on the *Tools* menu
-    
-5.  From the *Nuke* menu, select the *Install Nuke Support Files* item and follow the directions.
-    
+1. Start RV and go to the *Packages* tab of the *Preferences* dialog
+
+2. Find *Nuke Integration* in the Package list and click the *Load* toggle next to it.
+
+3. Restart RV
+
+4. Click the *Nuke* item on the *Tools* menu
+
+5. From the *Nuke* menu, select the *Install Nuke Support Files* item and follow the directions.
 
 To confirm that the Nuke support files are properly installed, start Nuke. You should see an *RV* menu on the main menubar, and if you select *RV/Preferences…* , you should get the appropriate dialog.
 
@@ -81,29 +76,27 @@ That’s it for installation!
 
 In what follows we suppose that you’ve installed RV in `/usr/local/RV` , and that you keep your Nuke scripts in subdirectories of `/usr/local/nuke/scripts` . If you do otherwise please adjust the paths below appropriately.
 
-1.  Make a subdir in your Nuke scripts area for the rvnuke support files:
-    
+1. Make a subdir in your Nuke scripts area for the rvnuke support files:
+
     ```
      % mkdir /usr/local/nuke/scripts/rvnuke 
     ```
-    
-2.  Copy the Nuke support files into place
-    
+
+2. Copy the Nuke support files into place
+
     ```
      % cp /usr/local/rv/plugins/SupportFiles/rvnuke/* /usr/local/nuke/scripts/rvnuke 
     ```
-    
-3.  Edit the `init.py` file in `/usr/local/nuke/scripts` to include this line:
-    
+
+3. Edit the `init.py` file in `/usr/local/nuke/scripts` to include this line:
+
     ```
      nuke.pluginAddPath('./rvnuke') 
     ```
-    
 
 Done!
 
 ## Getting Started
-
 
 ### Rv Preferences
 
@@ -153,7 +146,6 @@ Note that all the items on the RV menu are also available on the RV toolbar, whi
 
 ## Read/Write Nodes
 
-
 Once you’ve set the RV path and Session Dir as described above, and have an interesting Nuke script loaded, try starting up RV with the *RV/Start RV* menu item. Assuming you have the *Sync Read Changes* setting active, as soon as RV starts you should see all the Read nodes in the script reflected as media Sources in RV.
 
 If you don’t see the Session Manager, try hitting the *x* to bring it up. In the Session Manager, You’ll see a Folder called “Read Nodes” with a Source for each Read node in the script. Each source is labeled with the name of the corresponding Read node, and a timestamp for when it was last modified.
@@ -173,7 +165,6 @@ Note that if you don’t want all Read Nodes to be synced automatically, you can
 Pretty much all the above applies to Write nodes as well.
 
 ## Checkpoints and Renders
-
 
 As with Read nodes, Checkpoints and Renders are representations in RV of particular nodes in Nuke. So the Frame and Selection syncing described in the Read Nodes section applies to Checkpoints and Renders as well.
 
@@ -229,21 +220,19 @@ You can easily Compare two or more renders or checkpoints (or any views, actuall
 
 ## Modifying the Nuke Project from Open RV
 
-
 ### Restoring Checkpoints
 
 Any Checkpoint (or Render) can provide a source from which the Nuke project can be restored to the state it was in when the Checkpoint’s media was rendered. To restore a Checkpoint, select it in the RV Session Manager, and choose *Nuke/Restore Checkpoint* . After a confirmation dialog, the Nuke script will be restored.
 
 The navigation techniques referenced above combine with checkpoint restoration to produce some nice workflows (I think). For example:
 
-1.  After lots of rendering and checkpointing of node *FinalMerge* , double-click on the *Renders of FinalMege* folder to see a layout of all the checkpoints and renders.
-    
-2.  Bring up the Image Info widget to mouse around and see the names and timestamps of all the views in the layout.
-    
-3.  Double click on one if the tiles to examine that checkpoint more closely.
-    
-4.  Decide to restore this checkpoint, it’s alread selected, so just hit *Nuke/Restore Checkpoint*
-    
+1. After lots of rendering and checkpointing of node *FinalMerge* , double-click on the *Renders of FinalMege* folder to see a layout of all the checkpoints and renders.
+
+2. Bring up the Image Info widget to mouse around and see the names and timestamps of all the views in the layout.
+
+3. Double click on one if the tiles to examine that checkpoint more closely.
+
+4. Decide to restore this checkpoint, it’s alread selected, so just hit *Nuke/Restore Checkpoint*
 
 Also note that the Restore operation is undo-able, from the Nuke *Edit* menu.
 

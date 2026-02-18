@@ -8,7 +8,6 @@ Typically a video device is set up once in the preferences and used repeatedly. 
 
 ### 6.1 Video Device Configuration
 
-
 Video devices are configured from the preferences Video tab. The interface is in two parts: the module/device selection and the video configuration parameters. For each module/device combination there is a unique set of configuration parameters.
 
 Different devices will have different configuration parameters and some devices may not use all of the available ones.
@@ -53,10 +52,9 @@ If checked, audio will be routed to the device if it has audio capabilities.
 
 Incorporate Video Latency into Audio Offset
 
-If checked, the total latency as indicated in the Configure Latency dialog box will be applied to the audio offset – but only if audio is being played by the controller instead of the output device (i.e. Output Audio to this Device is not checked). This is primarily useful if the video device has a large buffer causing a significant delay between the controller's audio output and the video output. 
+If checked, the total latency as indicated in the Configure Latency dialog box will be applied to the audio offset – but only if audio is being played by the controller instead of the output device (i.e. Output Audio to this Device is not checked). This is primarily useful if the video device has a large buffer causing a significant delay between the controller's audio output and the video output.
 
 ### 6.2 Display Profiles
-
 
 Each video device configuration can have a unique display profile associated with it or can be made to use a default device or module profile. Profiles can be created and managed via View → Create/Edit Display Profiles.... Profiles are searched for in the RV_SUPPORT_PATH in the Profiles subdirectory (folder).
 
@@ -84,7 +82,6 @@ By selecting a profile and activating the Apply button, you can set the profile 
 
 ### 6.3 Video Device Command Line Arguments
 
-
 There are five arguments which control how presentation mode starts up from the command line:
 
 | | |
@@ -103,13 +100,11 @@ The command line arguments will override any existing preferences.
 
 ### 6.4 Presentation Mode Settings
 
-
 When the controller display mode is set to Separate Output and Control Rendering you can choose which elements of the user interface are visible on the presentation device. These can be turned on/off via the View → Presentation Settings menu. This includes not only things like the timeline and image info widget, but also whether or not the pointer location should be visible or not. In addition, you can show the actual video settings as an overlay on the display itself in order to verify the format is as expected. You can also control the display of feedback messages and remote sync pointers with items on this menu. The settings are retained in the preferences.
 
 If you want your custom-build widget to be rendered on the Presentation Device, your widget just needs to set the Widget class data member _drawOnPresentation to true.
 
 ### 6.5 Platform Specific Considerations
-
 
 #### 6.5.1 Linux Desktop Video Module Issues
 
@@ -138,7 +133,6 @@ RV will configure the controller display to prevent interfering with the playbac
 On Windows, like macOS, the vertical sync is somewhat of an unknown. However, it appears that like macOS, the primary monitor (the one with the start menu) is the monitor the sync is derived from. So ideally, use the primary monitor as the presentation device, but your milage may vary.
 
 ### 6.6 HDMI Frame Packed Mode
-
 
 Stereoscopic media can be displayed in Frame Packed (or “Frame Packing”) mode on any HDMI 1.4a-compliant device (AKA 3DTV). But in order for RV to make use of this display resolution (which is roughly a double-height HD frame), the monitor or other display device must have the appropriate resolution defined in advance. The timings from the HDMI 1.4a specification are shown in the following table:
 
