@@ -20,12 +20,13 @@
 #include <unistd.h>
 #endif
 
+#include <QFileInfo>
+#include <TwkQtCoreUtil/QtConvert.h>
+
 #ifdef PLATFORM_WINDOWS
 #include <windows.h>
 #include <codecvt>
 #include <wchar.h>
-#include <QFileInfo>
-#include <TwkQtCoreUtil/QtConvert.h>
 #include <mutex>
 #endif
 
@@ -98,11 +99,11 @@ namespace TwkUtil
         }
 
         int result = 0;
-        if (mode | F_OK)
+        if (mode & F_OK)
             result = qf.exists() ? result : -1;
-        if (mode | R_OK)
+        if (mode & R_OK)
             result = qf.isReadable() ? result : -1;
-        if (mode | W_OK)
+        if (mode & W_OK)
             result = qf.isWritable() ? result : -1;
 
         {
@@ -609,20 +610,8 @@ namespace TwkUtil
 
     bool isDirectory(const char* directory)
     {
-#ifdef _MSC_VER
-        DWORD ftyp = GetFileAttributesW(to_wstring(directory).c_str());
-        return ftyp & FILE_ATTRIBUTE_DIRECTORY;
-#else
-        DIR* dir = opendir(directory);
-
-        if (dir)
-        {
-            closedir(dir);
-            return true;
-        }
-#endif
-
-        return false;
+        QFileInfo qf(TwkQtCoreUtil::UTF8::qconvert(directory));
+        return qf.isDir();
     }
 
     bool isReadable(const char* path) { return TwkUtil::access(path, R_OK) == 0; }
