@@ -281,7 +281,8 @@ require system;
 
             if (sourceName != "")
             {
-                let normalizedIP = eventToImageSpace(sourceName, p, true);
+                let devicePixelRatio = devicePixelRatio(),
+                    normalizedIP = eventToImageSpace(sourceName, p*devicePixelRatio, true);
                 state.pointerPositionNormalized = normalizedIP;
             }
         }

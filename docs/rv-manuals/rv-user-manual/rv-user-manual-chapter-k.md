@@ -40,19 +40,18 @@ In that case, you can set another triplet of environment variables to allow for
 
 Some additional details about RV_OS_PATH variables:
 
-*   If you only use two different OSs, you only need to specify the corresponding pairs of environment variables.
-*   As above, additional sets of environment variables are considered to refer to the same "root" if the portion following the OS name matches ("REF" in the above example).
-*   You can set any number of sets of environment variables.
-*   RV_OS_PATH variables affect all incoming filenames **except** those which contain RV_PATHSWAP variables.
-*   RV_OS_PATH variables do not affect outgoing filenames.
-*   If more than one match is found, the variable that matches the largest number of characters in the incoming path will be used.
+* If you only use two different OSs, you only need to specify the corresponding pairs of environment variables.
+* As above, additional sets of environment variables are considered to refer to the same "root" if the portion following the OS name matches ("REF" in the above example).
+* You can set any number of sets of environment variables.
+* RV_OS_PATH variables affect all incoming filenames **except** those which contain RV_PATHSWAP variables.
+* RV_OS_PATH variables do not affect outgoing filenames.
+* If more than one match is found, the variable that matches the largest number of characters in the incoming path will be used.
 
 > **Note:** If you need more dynamic control over your path remapping, you can author an RV package to handle transforming your paths with the ' [incoming-source-path](../rv-manuals/rv-reference-manual/rv-reference-manual-chapter-five.md) '.
 
 > **Note:** Due to how environments propagate, it is highly recommended to restart your computer after defining an environment variable on your system.
 
 ## Open RV PATHSWAP Variables
-
 
 If you're comfortable with environment variables, **RV_PATHSWAP** variables can provide a way to share session files across platforms and/or studio locations.
 

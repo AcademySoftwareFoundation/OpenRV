@@ -16,16 +16,15 @@ Will start RV (or on the mac, create a new session or replace the current sessio
 
 ### C.1 Using rvlink URLs
 
-
 You can insert rvlinks into web pages, chat sessions, emails, etc. Of course it is up to each individual application whether it recognizes the protocol. Some applications can be taught to treat anything of the form \`\`name://” as a link to the name protocol, but others are hard-coded to only recognize \`\`http://”, \`\`ftp://”, etc. Some examples of apps that will recognize rvlinks are
 
-*   Firefox
-*   Safari
-*   Chrome
-*   Internet Explorer
-*   Thunderbird
-*   Mac Mail
-*   IChat
+* Firefox
+* Safari
+* Chrome
+* Internet Explorer
+* Thunderbird
+* Mac Mail
+* IChat
 
 One example of an app that will only recognize a hard-coded set of protocol types is Pidgin.
 
@@ -71,7 +70,6 @@ rvlink://%20'my%20movie.mov'
 
 ### C.2 Installing the Protocol Handler
 
-
 RV itself is the program that handles the rvlink protocol, so all that is necessary is to register RV as the designated rvlink handler with the OS or desktop environment. This is a different process on each of the platforms that RV supports.
 
 #### Windows
@@ -102,9 +100,9 @@ Depending on the browser and desktop environment, **environment variables** set 
 
 Once RV is properly configured as your rvlink: protocol handler,  copy and paste the following URL into your browser window: `rvlink://smptebars.movieproc`. This should launch RV and display a standard SMPTE colorbar image.
 
-You can also test RV's "one-click sync" with these links ( **only** on linux and windows). 
+You can also test RV's "one-click sync" with these links ( **only** on linux and windows).
 
-* First copy and paste the following link into your browser to start your "sync target" RV (make sure no other RVs are running before you paste this link into your browser): `rvlink:// -reuse 0 -networkPort 45128 -network smptebars,start=1,end=100,fps=24.movieproc`. 
+* First copy and paste the following link into your browser to start your "sync target" RV (make sure no other RVs are running before you paste this link into your browser): `rvlink:// -reuse 0 -networkPort 45128 -network smptebars,start=1,end=100,fps=24.movieproc`.
 * Then copy and paste the following link into your browser to sync with the previously started sync target: `rvlink:// -networkPort 45129 -network -networkConnect 127.0.0.1 45128 -flags syncPullFirst`.
 
 As of RV version 3.8.6, a new "fully baked" URL format will be supported by RV. This form of URL will be much more resistant to munging by evil browsers. Here's an example of such a baked URL: `rvlink://baked/20736d707465626172732e6d6f76696570726f63202d6576616c20277072696e74282532326e6f2070726f626c656d2535436e253232293b27`.
@@ -115,7 +113,7 @@ The rvlink protocol allows you to build URLs that start and run RV. You can als
 
 To create such a link, use **Edit > Copy Sync Session URL**. It copies the link to the clipboard so you can share it with others.
 
-Imagine this scenario: You’re using RV, have some media loaded, when you decide you want your friend to look at it with you. They're in the next building, so rather than walk over there you want to start a RV Sync session with them. 
+Imagine this scenario: You’re using RV, have some media loaded, when you decide you want your friend to look at it with you. They're in the next building, so rather than walk over there you want to start a RV Sync session with them.
 
 To get connected, you can send them by email the URL from **Copy Sync Session URL**.
 

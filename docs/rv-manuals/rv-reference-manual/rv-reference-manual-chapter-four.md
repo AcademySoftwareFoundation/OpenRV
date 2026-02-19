@@ -1,6 +1,6 @@
 # Chapter 4 - Python
 
-Which language should you use to customize RV? In short, we recommend using Python. You can use Python3 in RV in conjunction with Mu, or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned. 
+Which language should you use to customize RV? In short, we recommend using Python. You can use Python3 in RV in conjunction with Mu, or in place of it. It's even possible to call Python commands from Mu and vice versa. Python is a full peer to Mu as far as RV is concerned.
 
 _Note: there are some slight differences that need to be noted when translating code between the two languages: In Python the modules names required by RV are the same as in Mu. As of this writing, these are commands, extra_commands, rvtypes, and rvui. However, the Python modules all live in the rv package. This package is in-memory and only available at RV's runtime. You can access these commands via writing your own custom MinorMode package._ So while in Mu, you can:
 
@@ -76,7 +76,7 @@ if F() == True:
     G("PLAYING") 
 ```
 
-Once a MuSymbol object has been created, the overhead to call it is minimal. All of the Mu commands module is imported on start up or reimplemented as native CPython in the Python rv.commands module so you will not need to create MuSymbol objects yourself; just import rv.commands and use the pre-existing ones. 
+Once a MuSymbol object has been created, the overhead to call it is minimal. All of the Mu commands module is imported on start up or reimplemented as native CPython in the Python rv.commands module so you will not need to create MuSymbol objects yourself; just import rv.commands and use the pre-existing ones.
 
 When a Mu function parameter takes a class instance, a Python dictionary can be passed in. When a Mu function returns a class, a dictionary will be returned. Python dictionaries should have string keys which have the same names as the Mu class fields and corresponding values of the correct types. For example, the Mu class Foo { int a; float b; } as instantiated as Foo(1, 2.0) will be converted to the Python dictionary {'a' : 1, 'b' : 2.0} and vice versa. Existing Mu code can be leveraged with the rv.runtime.eval call to evaluate arbitrary Mu from Python. The second argument to the eval function is a list of Mu modules required for the code to execute and the result of the evaluation will be returned as a string. For example, here's a function that could be a render method on a mode; it uses the Mu gltext module to draw the name of each visible source on the image:
 
@@ -227,6 +227,7 @@ app.exec_()
 
 sys.exit() 
 ```
+
 To access RV's essential session window Qt QWidgets, i.e. the main window, the GL view, top tool bar and bottom tool bar, import the Python module 'rv.qtutils'.
 
 ```python
@@ -253,7 +254,7 @@ Yes. If you bind to a render event you can draw using PyOpenGL.
 
 #### Module XXX is missing. Where can I get it?  
 
-Use `py-interp -m pip` to get the missing package, like you would any other python package. 
+Use `py-interp -m pip` to get the missing package, like you would any other python package.
 
 If the module is not included and it’s a CPython module (written in C) you will need to compile it yourself. The compiled module must be added to the `Python` plug-ins folder.
 
@@ -267,7 +268,7 @@ bind("default", "global", event, func, event_doc_string).
 
 #### Does the Python <-> Mu bridge slow things down?
 
-The Python <-> Mu bridge does not slow things down. The MuSymbol type used to interface between them completely skips interpreted Mu code if it’s calling a "native" Mu function from Python. All of the RV commands are native Mu functions. So there’s a thin layer between the Python call and the actual underlying RV command (which is largely language agnostic). 
+The Python <-> Mu bridge does not slow things down. The MuSymbol type used to interface between them completely skips interpreted Mu code if it’s calling a "native" Mu function from Python. All of the RV commands are native Mu functions. So there’s a thin layer between the Python call and the actual underlying RV command (which is largely language agnostic).
 
 The Mu calling into Python bridge is roughly the cost of calling a Python function from C.  
 

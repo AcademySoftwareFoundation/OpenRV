@@ -4,7 +4,6 @@ Nuke can easily be configured to use RV as a flipbook. Nuke can also be set up t
 
 ### D.1 Setting up a custom plugins area for Nuke
 
-
 In order to configure Nuke to work with RV, you should set up a custom scripts/plugins directory where you can add new custom Nuke functionality without disturbing the default Nuke install. This directory can be anywhere on the NUKE_PATH environment variable, but note that the \`\`$HOME/.nuke'' directory is always on that NUKE_PATH, so we'll assume we're working there for now.
 
 1. In your $HOME/.nuke directory, create a file called \`\`init.py'', if it doesn't already exist, and also one called \`\`menu.py''.
@@ -24,7 +23,6 @@ mkdir $HOME/.nuke/python
 Done! Now Nuke well pick up new stuff from this area on start-up
 
 ### D.2 Adding Open RV support in the custom plugins area
-
 
 The following assumes that you've setup a custom plugin area as described in the previous section.
 

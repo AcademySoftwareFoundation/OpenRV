@@ -1572,17 +1572,7 @@ class: AnnotateMinorMode : MinorMode
                                           propertyInfo(orderProperty).size > 0;
             _clearFrameAct.setEnabled(hasCurrentFrameStrokes);
 
-            bool hasAnyStrokes = false;
-            for_each(node; nodes())
-            {
-                let annotatedFrames = findAnnotatedFrames(node);
-                if (!annotatedFrames.empty())
-                {
-                    hasAnyStrokes = true;
-                    break;
-                }
-            }
-            _clearAllFramesAct.setEnabled(hasAnyStrokes);
+            _clearAllFramesAct.setEnabled(true);
         }
         else
         {
@@ -1621,10 +1611,11 @@ class: AnnotateMinorMode : MinorMode
                         let frame = int(parts[2]);
 
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {0}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {0}, true);
 
                         let orderName = frameOrderName(node, frame);
 
@@ -1694,10 +1685,11 @@ class: AnnotateMinorMode : MinorMode
                 if (stroke != "")
                 {
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {1}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {1}, true);
                     
                     for_index(i; order)
                     {
@@ -1737,10 +1729,11 @@ class: AnnotateMinorMode : MinorMode
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                     
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {0}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {0}, true);
                     
                     order.push_back(stroke);
                 }
@@ -1797,10 +1790,11 @@ class: AnnotateMinorMode : MinorMode
                         let frame = int(parts[2]);
 
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {1}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {1}, true);
 
                         let orderName = frameOrderName(node, frame);
                         if (propertyExists(orderName))
@@ -1876,10 +1870,11 @@ class: AnnotateMinorMode : MinorMode
                 if (stroke != "")
                 {
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {0}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {0}, true);
                     
                     order.push_back(stroke);
                     
@@ -1912,10 +1907,11 @@ class: AnnotateMinorMode : MinorMode
                     let stroke = findStrokeByUuid(_currentNode, frame, uuid);
                     
                     let softDeleted = "%s.%s.softDeleted" % (_currentNode, stroke);
-                    if (propertyExists(softDeleted))
+                    if (!propertyExists(softDeleted))
                     {
-                        setIntProperty(softDeleted, int[] {1}, true);
+                        newProperty(softDeleted, IntType, 1);
                     }
+                    setIntProperty(softDeleted, int[] {1}, true);
                     
                     for_index(i; order)
                     {
@@ -1997,10 +1993,11 @@ class: AnnotateMinorMode : MinorMode
                         affectedStrokes.push_back(uuid);
                         
                         let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                        if (propertyExists(softDeleted))
+                        if (!propertyExists(softDeleted))
                         {
-                            setIntProperty(softDeleted, int[] {1}, true);
+                            newProperty(softDeleted, IntType, 1);
                         }
+                        setIntProperty(softDeleted, int[] {1}, true);
                     }
                 }
                 undo.push_back(string(order.size()));
@@ -2044,10 +2041,24 @@ class: AnnotateMinorMode : MinorMode
         string[] affectedStrokes;
 
         beginCompoundStateChange();
-        
-        for_each(node; nodes())
+
+        for_each(node; nodesOfType("RVPaint"))
         {
-            let annotatedFrames = findAnnotatedFrames(node);
+            int[] annotatedFrames;
+            
+            for_each (property; properties(node))
+            {
+                let parts = property.split(".");
+                let propertyName = parts[2];
+                let propertyComponent = parts[1];
+                let ComponentParts = propertyComponent.split(":");
+
+                if (ComponentParts[0] == "frame" && propertyName == "order" && ComponentParts.size() == 2)
+                {
+                    annotatedFrames.push_back(int(ComponentParts[1]));
+                }
+            }
+            
             for_each(frame; annotatedFrames)
             {
                 let orderProperty = frameOrderName(node, frame);
@@ -2066,10 +2077,11 @@ class: AnnotateMinorMode : MinorMode
                             affectedStrokes.push_back(uuid);
                             
                             let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                            if (propertyExists(softDeleted))
+                            if (!propertyExists(softDeleted))
                             {
-                                setIntProperty(softDeleted, int[] {1}, true);
+                                newProperty(softDeleted, IntType, 1);
                             }
+                            setIntProperty(softDeleted, int[] {1}, true);
                         }
                     }
 
@@ -2095,10 +2107,11 @@ class: AnnotateMinorMode : MinorMode
                                 affectedStrokes.push_back(uuid);
                                 
                                 let softDeleted = "%s.%s.softDeleted" % (node, stroke);
-                                if (propertyExists(softDeleted))
+                                if (!propertyExists(softDeleted))
                                 {
-                                    setIntProperty(softDeleted, int[] {1}, true);
+                                    newProperty(softDeleted, IntType, 1);
                                 }
+                                setIntProperty(softDeleted, int[] {1}, true);
                             }
                         }
                         
@@ -2309,6 +2322,7 @@ class: AnnotateMinorMode : MinorMode
     method: redoEvent (void; Event event) { redoSlot(true); }
     method: clearEvent (void; Event event) { clearSlot(true); }
     method: clearAllEvent (void; Event event) { clearAllSlot(true); }
+    method: undoRedoClearUpdateEvent (void; Event event) { undoRedoClearUpdate(); }
 
     method: keyUndoEvent (void; Event event)
     {
@@ -3197,6 +3211,7 @@ class: AnnotateMinorMode : MinorMode
               ("clear-annotations-current-frame", clearEvent, "Clear annotations on current frame"),
               ("clear-annotations-all-frames", clearAllEvent, "Clear annotations on all frames"),
               ("set-current-annotate-mode-node", setCurrentNodeEvent, "Set current paint node"),
+              ("undo-redo-clear-ui-update", undoRedoClearUpdateEvent, "Update the undo, redo and clear state"),
               // --------------------------------------------------------------
               // For NDC drawing support used in automated testing
               ("stylus-color-rgb", setColorRGB, "Select color RGB"),

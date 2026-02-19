@@ -27,7 +27,6 @@ Table J.1:
 | 9.1                | FL:FR:FC:LF:BL:BR:SL:SR:LH:RH                                                                                                                                                                                                                                                                                                                                  |
 | 16                 |                                                                                                                                                                                                                                                                                                                                                                |
 
-
 Supported Multichannel Layouts
 
 Note that RV will mix down, mix up or reorder channels for any given media to match the intended output device channel layout format.

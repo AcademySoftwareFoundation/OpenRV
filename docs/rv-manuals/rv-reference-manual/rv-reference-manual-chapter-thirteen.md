@@ -2,15 +2,14 @@
 
 RV can communicate with multiple external programs via its network protocol. The mechanism is designed to function like a “chat” client. Once a connection is established, messages can be sent and received including arbitrary binary data.There are a number of applications which this enables:
 
-*   **Controlling RV remotely.** E.g., a program which takes input from a dial and button board or a mobile device and converts the input into commands to start/stop playback or scrubbing in RV.
-*   **Synchronizing RV sessions across a network** . This is how RV's sync mode is implemented: each RV serves as a controller for the other.
-*   **Monitoring a Running RV** . For VFX theater dailies the RV session driving the dailies could be monitored by an external program. This program could then indicate to others in the facility when their shots are coming up.
-*   **A Display Driver for a Renderer** . Renders like Pixar's RenderMan have a plug-in called a display driver which is normally used to write out rendered frames as files. Frequently this type of plug-in is also used to send pixels to an external frame buffer (like RV) to monitor the renderer's progress in real time. It's possible to write a display driver that talks to RV using the network protocol and send it pixels as they are rendered. A more advanced version might receive feedback from RV (e.g. a selected rectangle on the image) in order to recommend areas the renderer should render sooner.
+* **Controlling RV remotely.** E.g., a program which takes input from a dial and button board or a mobile device and converts the input into commands to start/stop playback or scrubbing in RV.
+* **Synchronizing RV sessions across a network** . This is how RV's sync mode is implemented: each RV serves as a controller for the other.
+* **Monitoring a Running RV** . For VFX theater dailies the RV session driving the dailies could be monitored by an external program. This program could then indicate to others in the facility when their shots are coming up.
+* **A Display Driver for a Renderer** . Renders like Pixar's RenderMan have a plug-in called a display driver which is normally used to write out rendered frames as files. Frequently this type of plug-in is also used to send pixels to an external frame buffer (like RV) to monitor the renderer's progress in real time. It's possible to write a display driver that talks to RV using the network protocol and send it pixels as they are rendered. A more advanced version might receive feedback from RV (e.g. a selected rectangle on the image) in order to recommend areas the renderer should render sooner.
 
 Any number of network connections can be established simultaneously, so for example it's possible to have a synchronized RV session with a remote RV and drive it with an external hardware device at the same time.
 
 ### 13.1 Example Code
-
 
 There are two working examples that come with RV: the rvshell program and pyNetwork.py python example. The rvshell program uses a C++ library included with the distribution called TwkQtChat which you can use to make interfacing easier — especially if your program will use Qt. We highly recommend using this library since this is code which RV uses internally so it will always be up-to-date. The library is only dependent on the QtCore and QtNetwork modules.The pyNetwork example implements the network protocol using only python native code. You can use it directly in python programs.
 
@@ -35,7 +34,6 @@ Assuming all went well, this will start rvshell connected to the running RV. The
 document here
 
 ### 13.2 TwkQtChat Library
-
 
 The TwkQtChat library is composed of three classes: Client, Connection, and Server.
 
@@ -71,7 +69,6 @@ Table 13.2:Client Signals
 A single Client instance is required to represent your process and to manage the Connections and Server instances. The Connection and Server classes are derived from the Qt QTcpSocket and QTcpServer classes which do the lower level work. Once the Client instance exists you can get pointer to the Server and existing Connections to directly manipulate them or connect their signals to slots in other QObject derived classes if needed.The application should start by creating a Client instance with its contact name (usually a user name), application name, and port on which to create the server. The Client class uses standard Qt signals and slots to communicate with other code. It's not necessary to inherit from it.The most important functions on the Client class are list in table [13.1](#important-client-member-functions) .
 
 ### 13.3 The Protocol
-
 
 There are two types of messages that RV can receive and send over its network socket: a standard message and a data message. Data messages can send arbitrary binary data while standard messages are used to send UTF-8 string data.The greeting is used only once on initial contact. The standard message is used in most cases. The data message is used primarily to send binary files or blocks of pixels to/from RV.
 
@@ -204,4 +201,5 @@ Table 13.12:DATAEVENT MessageFor example, the DATAEVENT header might appear as:
 ```
  DATAEVENT(my-data-event,unused,special-data) 
 ```
+
 Which would be sent to the user interface as a my-data-event with the content type “special-data”. The content type is retrievable with Event.contentType(). The data payload is available via Event.dataContents() method.

@@ -18,7 +18,6 @@ RV has two different algorithms for applying the LUTs on the GPU: using floating
 
 ### 8.1 Channel (1D) versus 3D LUTs
 
-
 A channel LUT (also called a 1D LUT) has three independent look-up tables: one each for the R G and B channels. The alpha channel is not affected by the channel LUT. Channel LUTs may be very high resolution with up to 4096 samples. Each entry in the channel LUT maps an input channel value to an output channel value. The input values are in the [0,1] range, but the output values are unbounded.
 
 Channel LUTs differ from 3D LUTs in one critical way: they can only modify channel values independently of one another. In other words, e.g., the output value of the red channel can only be a result of the incoming red value. In a 3D LUT, this is not the case: the output value of the red channel can be dependent on any or all of the input red, green, and blue values. This is sometimes called channel cross-talk.
@@ -33,7 +32,6 @@ Some graphics cards have resolution issues with 3D textures which can cause loss
 
 ### 8.2 Input Matrix and Pre-LUT
 
-
 For HDR applications, the incoming data needs to be rescaled and possibly shaped. RV has two separate components which do this: the LUT input matrix and a channel pre-LUT. The input matrix is a general 4 × 4 matrix. For HDR pixels, the matrix is used to scale the incoming pixel to range [0 , 1] . The pre-LUT, the channel LUT, and the 3D LUT all take inputs in that range. Figure [8.1](#3d-and-channel-lut-components) shows a diagram of the channel and 3D LUT components and their input and output ranges.
 
 The pre-LUT is identical to the channel LUT in implementation. It maps single channel values to new values. Unlike the general channel LUT, the pre-LUT must always map values in the [0 , 1] range into the same range. The purpose of the pre-LUT is to condition the data before it's transformed by the 3D LUT.
@@ -46,13 +44,11 @@ Figure 8.1: 3D and Channel LUT Components <a id="3d-and-channel-lut-components">
 
 ### 8.3 The Pre-Cache LUT
 
-
 The first LUT that the pixels can be transformed by is the pre-cache LUT. This LUT has the same parameters and features as the other LUTs, but it is applied before the cache. The pre-cache LUT is currently applied by the CPU (not on the GPU) whereas the file, look, and display LUTs are all used by the graphics hardware directly. For this reason the pre-cache LUT is slightly slower than the others.
 
 The pre-cache LUT is useful when a special caching format is desired. For example by using the pre-cache LUT and the color bit depth formatting, you can have RV convert linear OpenEXR data into 8 bit integer format in log space. By using RV's log to linear conversion on the cached 8 bit data you can effectively store high dynamic range data (albeit limited range) and get double the number of frames into the cache. Many encoding schemes are possible by coupling a custom pre-cache LUT, change of bit depth, and the hardware file LUT to decode on the card.
 
 ### 8.4 LUT File Formats
-
 
 | Extension | Type                | 1D | 3D | PreLUT | Float | Input        | Output             |
 | --------- | ------------------- | -- | -- | ------ | ----- | ------------ | ------------------ |

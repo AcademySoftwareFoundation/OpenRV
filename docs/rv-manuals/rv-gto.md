@@ -39,7 +39,6 @@ A newer geometry caching format called Alembic was introduced by ILM in 2010 whi
 
 ### New in Version 4
 
-
 Version 4 adds two new features: nested components and property types with up to four dimensions.
 
 Version 3 files always had the same structure of objects.component.property. Nested components allows any number of component names between the object and property:
@@ -76,13 +75,11 @@ The above declares 3 4x10x20x30 float data object.
 
 ## Overview
 
-
 ## Binary Format
-
 
 The GTO file has six major sections which appear in the following order.
 
-1.  **Header** (Gto::Header). The header structure contains the GTO magic number (used to determine endianness), the version of the GTO specification that the file was written as, and the number of top level objects in the file. There is one instance of a header in the file. Finally, the header indicates how many strings are in the string table.
+1. **Header** (Gto::Header). The header structure contains the GTO magic number (used to determine endianness), the version of the GTO specification that the file was written as, and the number of top level objects in the file. There is one instance of a header in the file. Finally, the header indicates how many strings are in the string table.
 
 ```
  Magic = 0x0000029f; Cigam = 0x9f020000; // means the file is opposite
@@ -99,12 +96,11 @@ struct Header
 }; 
 ```
 
-2.  **String Table** . After the header, null terminated strings are written in the file. The order of these strings is important. All names and string properties store indices into the string table instead of actual strings. In order to read the file properly, the string table must be available until the file is completely read. (Unless you don’t care about any strings!)
-    
+2. **String Table** . After the header, null terminated strings are written in the file. The order of these strings is important. All names and string properties store indices into the string table instead of actual strings. In order to read the file properly, the string table must be available until the file is completely read. (Unless you don’t care about any strings!)
+
     The index number refers the string number in the table not its byte offset. So the string index 9 (for example) refers to the 10th string in the table (string index 0 is the first string in the table).
-    
-3.  **ObjectHeader** (Gto::ObjectHeader). The object header indicates what kind of protocol to use to interpret it, the **object** name and the number of components. (More on the object protocol later). The name—like all strings in the GTO file—is stored as a string table entry. If the file header indicated N objects in the file, there will be N ObjectHeaders.
-    
+
+3. **ObjectHeader** (Gto::ObjectHeader). The object header indicates what kind of protocol to use to interpret it, the **object** name and the number of components. (More on the object protocol later). The name—like all strings in the GTO file—is stored as a string table entry. If the file header indicated N objects in the file, there will be N ObjectHeaders.
 
 ```
 struct ObjectHeader
@@ -117,7 +113,7 @@ uint32 pad; // unused
 }; 
 ```
 
-4.  **ComponentHeader** (Gto::ComponentHeader). Like the ObjectHeaders the ComponentHeaders will appear together for all objects in order. The component header indicates the number of properties in the component and the name of the component.
+4. **ComponentHeader** (Gto::ComponentHeader). Like the ObjectHeaders the ComponentHeaders will appear together for all objects in order. The component header indicates the number of properties in the component and the name of the component.
 
 ```
 enum ComponentFlags
@@ -135,7 +131,7 @@ uint32 childLevel; // nesting level
 }; 
 ```
 
-5.  **PropertyHeader** (Gto::PropertyHeader). The PropertyHeaders, like the object and component headers, appear en masse in the file. The PropertyHeader contains the name, size, type, and dimension of the property.
+5. **PropertyHeader** (Gto::PropertyHeader). The PropertyHeaders, like the object and component headers, appear en masse in the file. The PropertyHeader contains the name, size, type, and dimension of the property.
 
 ```
 enum DataType
@@ -166,11 +162,10 @@ uint32 interpretation; // string table index
 }; 
 ```
 
-6.  **Data** . The last section of the file contains all of the property data. The beginning and end of a properties data are not marked. The size must be consistent with the description of the property used in the PropertyHeader.
+6. **Data** . The last section of the file contains all of the property data. The beginning and end of a properties data are not marked. The size must be consistent with the description of the property used in the PropertyHeader.
 
 In (Text) diagram form the file looks something like this:
 
-  
 |  |
 | --- |
 | File Header |
@@ -182,11 +177,9 @@ In (Text) diagram form the file looks something like this:
 
 ## Text Format
 
-
 GTO has a text representation in addition to the binary representation. The text representation is designed for human use; it is intended to be easy to modify or create from scratch in a text editor. It is not intended to compete with XML formats (which are typically only human readable in theory) nor is it intended to be used in place of the binary format which is much faster and more economical for storage of large data sets.
 
 ### Example of a Cube Stored as a Text GTO
-
 
 Here’s the example from the overview section: a cube stored using the “polygon” protocol:
 
@@ -262,7 +255,6 @@ What cannot be omitted is the `TYPE, PROPERTYNAME,` and the assignment of values
 
 ### How Strings are Handled in the Text Format
 
-
 With the exception of keywords and type names, any string in the text GTO file can be either be quoted or non-quoted. Non-quoted strings are restricted to strings which do not represent numbers. In addition, if a string contains punctuation or whitespace, it must be quoted. For example, if the name of the object in the cube example was “four dimensional time-cube” it would have to be declared like this:
 
 ```
@@ -283,7 +275,6 @@ In this case the quoted string “int” is being used as the property name, but
 When in doubt quote.
 
 ### Value Brackets
-
 
 Generally, a property value and elements of the value are enclosed in brackets:
 
@@ -321,7 +312,6 @@ int foo = []
 ```
 
 ### The Size of a Property
-
 
 The size of a property can be declared as part of its type declaration:
 
@@ -367,7 +357,6 @@ float[3,32,32,32] floatingPoint3DLUT = [ ... ]
 
 ### Run Length Encoding of Values
 
-
 In some cases, a value will contain many copies of an element. There is a special syntax for these cases; you can use an ellipsis to indicate that all remaining elements are identical. The ellipsis can only appear directly before the final bracket character.
 
 There is one restriction when using this syntax: the type of the property value must be completely specified (including the size of the property) and the value must be enclosed in brackets. For example:
@@ -391,7 +380,6 @@ float[3][100] velocity = [ [0 ...] ... ]
 The intention here is to make all of the velocity elements `[0 0 0]` . However, this syntax is not correct and will produce a parsing error.
 
 ### Syntax Reference
-
 
 The grammar for the text GTO file. *INT* is an integer constant. *FLOAT* is a floating point constant, with a possible exponent part. *STRING* is either a quoted or non-quoted string. All other values are literal. Double quoted strings are keywords.
 
@@ -500,10 +488,8 @@ int_num::
 
 ## Types of Property Data
 
-
 The GTO format pre-defines a small number of data types that can be stored as properties. The currently defined types are:
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `double` | 64 bit IEEE floating point. | [Property Type] |
@@ -520,18 +506,17 @@ Each of these data types can be made into a vector of that type. For example the
 
 In this document, the types are all specified as 2 dimensional arrays ala the C programming language. Here is a complete list of example type forms:
 
-*   `float[3]` — the float triple type.
-*   `float[1] [1]` - a single floating point number.
-*   `float[3] []` - any number of float triples.
-*   `float[3] [3]` - three float triples.
-*   `float[16] []` - any number of a 16 float element.
-*   `float[4,4] [1]` - a 4x4 float matrix.
-*   `float[3,3] []` - any number of 3x3 float matrices.
-*   `float[4,512,128] [7]` - seven four component 512x128 images.
-*   `float[3,32,32,32] [1]` - a 3 component 32x32x32 volume.
+* `float[3]` — the float triple type.
+* `float[1] [1]` - a single floating point number.
+* `float[3] []` - any number of float triples.
+* `float[3] [3]` - three float triples.
+* `float[16] []` - any number of a 16 float element.
+* `float[4,4] [1]` - a 4x4 float matrix.
+* `float[3,3] []` - any number of 3x3 float matrices.
+* `float[4,512,128] [7]` - seven four component 512x128 images.
+* `float[3,32,32,32] [1]` - a 3 component 32x32x32 volume.
 
 ## Interpretation Strings
-
 
 Each property can have an additional string stored with it called the “interpretation”. The intent is to allow applications to provide specific information about the property. For example, a property of type `float[4]` can be interpreted as a homogeneous 3D coordinate, a quaternion, or an RGBA value. The interpretation field can be used to distinguish between them.
 
@@ -555,7 +540,6 @@ It is not an error to define the interpretation for a property as the empty stri
 
 The following strings are not currently part of the format specification but are used by the sample implementation. In a future release we may make these “official”. It’s ok to have multiple space separated strings in the interpretation strings (e.g. “4x4 row-major”).
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `coordinate` | The data can be of any width or type. For width N the data represents a point in N dimensional space. | [Interpretation String] |
@@ -578,7 +562,6 @@ The following strings are not currently part of the format specification but are
 
 ## Object Protocols
 
-
 The Object data interpretation is not defined by the GTO format. However, there are currently some protocols in use that are well defined and these are documented here. Caveat emptor: gto files in the wild may contain more data than these protocols define, but they presumably will obey the protocol if they indicate it by name. It’s also possible that some objects may obey more than one protocol yet only indicate that they follow one. Unfortunately, some protocols also specify optional components and properties in case all of this was not confusing enough.
 
 Protocols also have a version number. The version number is an integer; there are no sub-versions. If there are significant changes to a protocol, the version number should be bumped. The version number is not meant as a method of making alternate protocols with the same name. We have had to make three modifications to the protocols since the file format was invented; one to the polygon protocol and one to the transform protocol, and the introduction of a new protocol (connections). The changes are documented in those sections.
@@ -589,10 +572,8 @@ There are two kinds of protocols: major and minor. Every object must have a majo
 
 ### Object Protocol
 
-
 The name of the protocol as it appears in the ObjectHeader is “object” version 1. The protocol does not require any other protocols. Here it is:
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `object` | A container for properties which don’t fit into other component catagories well. A catch-all data “per-object” component. | [Required Component] |
@@ -609,10 +590,8 @@ The main point of this protocol is to define the **object** component. This comp
 
 ### Coordinate System Protocol
 
-
 The name of the protocol as it appears in the ObjectHeader is “transform” version 3 <sup>[1](#footnote-1) </sup> . The protocol requires the object protocol. Objects which obey the transform protocol will have global matrices and possibly a parent.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `object` | From the “object” protocol. | [Required Component] |
@@ -621,10 +600,8 @@ The name of the protocol as it appears in the ObjectHeader is “transform” ve
 
 ### Particle Protocol
 
-
 The name of the protocol as it appears in the ObjectHeader is “particle” version 1. The protocol may include the object and transform protocols.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `points` | The points component is transposable. That means that all of its properties are required to have the same number of elements. | [Required Component] |
@@ -656,10 +633,8 @@ In this case, each particle is scanned in one chunk allowing for optimizations. 
 
 ### Strand Protocol
 
-
 A **strand** object contains a collection of curves. This is somewhat analogous to an object of protocol **particle** as described above.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `points` |  | [Required Component] |
@@ -673,10 +648,8 @@ A **strand** object contains a collection of curves. This is somewhat analogous 
 
 ### NURBS Protocol
 
-
 The name of the protocol as it appears in the ObjectHeader is “NURBS” version 1. The protocol requires the **particle** protocol and optionally includes the **object** and **transform** protocols.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `points` | see **particle** protocol. The points describe data per NURBS control vertex. | [Required Component] |
@@ -694,12 +667,10 @@ The **NURBS** protocol currently does not handle trim curves, points on surface,
 
 ### Polygon Protocol
 
-
 The name of the protocol as it appears in the ObjectHeader is “polygon” version 2 <sup>[3](#footnote-3)</sup> . The protocol requires the **particle** protocol and optionally includes the **object** and **transform** protocols.
 
 There are a number of alternative configurations of this protocol depending on the value of the **smoothing.method** property. All of these involve the placement of normals in the file.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `points` | See **particle** protocol. The points describe data per vertex. | [Required Component] |
@@ -721,7 +692,6 @@ There are a number of alternative configurations of this protocol depending on t
 
 ### Subdivision Surface Protocols
 
-
 The name of the protocol as it appears in the ObjectHeader is “catmull-clark” or “loop” depending on the intended subdivision scheme. The protocol requires the **polygon** protocol.
 
 The smoothing and any normals properties on the **polygon** protocol should be ignored if they exist.
@@ -732,14 +702,12 @@ These protocols do not currently define methods for storing edge creasing parame
 
 ### Image Protocol
 
-
 The Image protocol describes image data in the form of an object. This data makes it possible to store texture maps, backgrounds, etc, directly in the GTO file.
 
 When images are stored in a GTO file, use of Gzip compression is highly recommended if the data is unencoded. The supplied Reader and Writer classes default to using zlib compression.
 
 If the image data is encoded, its better not to use compression on the GTO file (especially if the file contains only image data).
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `image` | The image data and other information will be stored in the **image** component. | [Required Component] |
@@ -749,7 +717,6 @@ If the image data is encoded, its better not to use compression on the GTO file 
 
 Any one of the following properties are required to hold the actual image data:
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `byte[N][] image.pixels` |  | [Property] |
@@ -757,17 +724,15 @@ Any one of the following properties are required to hold the actual image data:
 | `string[1][1] image.type` |  | [Property] |
 | `half[N][] image.pixels` | The element width determines the number of channels in the image. For example the type `byte[3][]` indicate a 3 channel 8-bit per channel image. The number of elements in this property should be equal to `image.size[0] &#42; image.size[1] &#42; ... image.size[N]` where **image.size** is the property defined above. | [Property] |
 
-#### Additional Image Properties Used by GTV Files.
+#### Additional Image Properties Used by GTV Files
 
 The base GTO library does not deal with encoded image data or tiling of images. GTV is a specialization of the GTO format for storing movie frames. Some of the GTV properties are documented here. (See documentation for the GTV library for more info).
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `string[1] image.encoding` | If the pixel data is encoded this property will indicate a method to decode it. Typical values are “jpeg”, “jp2000”, “piz”, “rle”, or “zip”. The pixels will be stored in the **image.pixels** as `byte[1][]` . | [OptionalProperty] |
 
 ### Material Protocol
-
 
 The name of the protocol as it appears in the ObjectHeader is “material”. The material protocol groups a parameters and a method (shader) for rendering. The material protocol can optionally include the **object** protocol.
 
@@ -775,7 +740,6 @@ The material definition is renderer and pipeline dependant. Material assignment 
 
 The **material** protocol is intended for use with software renderers. Interactive material definitions may be more easily defined on the assigned object.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `material` | Properties unrelated to parameters appear in the **material** component. | [Required Component] |
@@ -786,9 +750,7 @@ The **material** protocol is intended for use with software renderers. Interacti
 
 ### Group Protocol
 
-
 ### Inter-Object Connection Protocol
-
 
 The name of the protocol as it appears in the ObjectHeader is “connection” version 1.
 
@@ -807,15 +769,15 @@ Connection components have the following properties. Note that where **connectio
 
 The left-hand-side and right-hand-side of the connection.
 
-*   If the connection is directional, then an arrow indicating the direction would have its tail on the left-hand-side and its head pointing at the right-hand-side.
-*   If the connection type does not require a direction then these properties are still used to describe the two ends of the connection.
-*   Each entry will be the name of an object. There is no requirement that the ends of the connection exist in the file. For example, one end of the connection could be an image on disk.
-*   The empty string is a valid value. You could think of the empty string as indicating a grounded connection.
-*   It is ok for both ends of the connection to have the same value.
+* If the connection is directional, then an arrow indicating the direction would have its tail on the left-hand-side and its head pointing at the right-hand-side.
+* If the connection type does not require a direction then these properties are still used to describe the two ends of the connection.
+* Each entry will be the name of an object. There is no requirement that the ends of the connection exist in the file. For example, one end of the connection could be an image on disk.
+* The empty string is a valid value. You could think of the empty string as indicating a grounded connection.
+* It is ok for both ends of the connection to have the same value.
 
 The GTO specification includes a couple of basic connection types.
 
-#### Transformation hierarchies.
+#### Transformation hierarchies
 
 The “parent of” connection type is used to store transformation hierarchies. The connection type requires only the **lhs** and **rhs** properties. Transformation hierarchies are usually tree structures, but can also be DAGs (as is the case with Maya or Inventor).
 
@@ -831,7 +793,6 @@ The “contains” connection type indicates membership in a group or similar ty
 
 ### Difference File Protocol
 
-
 If the **object.protocol** property contains the string “difference” then the object contains difference data; the data is relative to some other reference file.
 
 For example, for animated deforming geometry its advantageous to write a reference file for geometry in its natural undeformed state then write only the **points.position** property in a gto file per frame to store animation. The **difference** minor protocol can apply to any major protocol.
@@ -840,12 +801,10 @@ If a reference file and a difference for file it exists, you can reconstruct the
 
 ### Sorted Shell File Protocol
 
-
 If the **object.protocol** property contains the string “sorted” and the object’s major protocol is **polygon** then the object contains sorted shell data.
 
 This protocol guarantees that the vertices and elements of shells—isolated sections of polygonal geometry—will be continguous in the **points** and **elements** components of the object.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `shells` | The **shells** component is transposable. Each property in the component should have the same number of elements. | [Required Component] |
@@ -853,7 +812,6 @@ This protocol guarantees that the vertices and elements of shells—isolated sec
 | `int[1][] shells.elements` | The number of contiguous elements that make up the Nth element’s shell. | [Required Property] |
 
 ### Channels Protocol
-
 
 This minor protocol declares data mapped onto geometric surfaces. Usually the data is mapped using one of the parameterizations found in the **mappings** component of polygonal or sub-d geometry or possibly using the natural parameterization of a surface as is often the case with NURBS.
 
@@ -863,7 +821,6 @@ The first element of the property should indicate the name of the mapping to use
 
 The second and subsequent elements should contain the name of data to map. This could be a texture map file on disk, an image object in the GTO file, or a special cookie string. The lack of second element can be used as a special cookie.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `channels` | The component holds the names of all the channels on the geometry. | [Required Component] |
@@ -900,7 +857,6 @@ string[1] cube.channels.bump = [ "st" "cube_bump.tif" ]
 
 ### Animation Curve Protocol
 
-
 The animation curve protocol defines a single component called **animation** in which each property holds an animation curve or data stream. The property’s interpretation string indicates how the data should be evaluated.
 
 #### Example
@@ -926,16 +882,15 @@ Object "cube" protocol "polygon"
           Property float[1][100] "xscale" interpret as "stream" 
 ```
 
-<a id="footnote-1"></a>In version 1, the transform protocol’s object.globalMatrix property used to be of type `float[1] [16]` . This was a mistake that has been corrected in version 2. 2 
+<a id="footnote-1"></a>In version 1, the transform protocol’s object.globalMatrix property used to be of type `float[1] [16]` . This was a mistake that has been corrected in version 2. 2
 
-<a id="footnote-2"></a>In version 3 of the **transform** protocol, the **object.parent** property is redundant and therefor deprecated. The **connection** protocol handles the transformation hierarchy information and in a much more elegant manner See Section Inter-Object. 
+<a id="footnote-2"></a>In version 3 of the **transform** protocol, the **object.parent** property is redundant and therefor deprecated. The **connection** protocol handles the transformation hierarchy information and in a much more elegant manner See Section Inter-Object.
 
 <a id="footnote-3"></a>In version 1 of the polygon protocol, the **element.size** and **element.type** properties were combined into an **element.primitive** property. We felt that this was adding unnecessary complexity and because the primitive property was an int, it was taking up extra space.
 
 <a id="footnote-4"></a>The indices component in a polygonal object contains values which are analogous to the RenderMan face varying type modifier.
 
 ## Naming Conventions
-
 
 GTO files can contain cross references to parts of themselves, objects outside the file, or virtual/logical objects in applications. Because of the potential morass that can result from complete free-form naming, there are conventions which are part of the file specification.
 
@@ -944,7 +899,6 @@ Failure to follow the guidelines does not mean a GTO file is ill-formed; there�
 Some of these topics are a bit “advanced” in that they build off ideas that present themselves after using the file format for a while. If you are just learning about the format, consider this a reference section and skip it. If you’re trying to decrypt a complicated GTO file with strange garbled naming, then this section is for you.
 
 ### Valid Names
-
 
 Names should be valid C identifiers, but should not contain the dollar-sign character ($). This means that no whitespace or punctuation is allowed.
 
@@ -955,7 +909,6 @@ There is nothing in the sample `Reader` or `Writer` classes which enforces the v
 This guideline is broken by Section Special Cookies. It is also broken by Section Cross References.
 
 ### Exactly Specifying a Property or Component
-
 
 By convention, the full name or path name of a property is referred to like this:
 
@@ -973,7 +926,6 @@ should suffice. In this manual, names of components and properties are disambigu
 
 ### Indicating Special Handling
 
-
 Some objects, components, or properties in the GTO file may contain data for which names are not particularly useful or that may simply pollute the object or component namespace.
 
 In other cases (component names most notably) the name may be used as information necessary to interpret data associated with it.
@@ -985,7 +937,6 @@ The **connection** object protocol, for example, requires that a special file ob
 There is no rule regarding the placement of the colon in the name; it can appear anywhere in the name that is useful for the application. However, if the entire name is a special cookie—there is not additional information encoded in the name beyond itself—the recommend form is to have the colon be the first character.
 
 ### Cross References Encoded in Names
-
 
 Sometimes there is a need to have a property or component *refer* to another property, component, or object in the file (or somewhere else).
 
@@ -1005,26 +956,22 @@ As you can guess, the intention here is that the properties called “field.dire
 
 ## Issues and Questionable Aspects of the Format
 
-
-*   There are currently no (publicly available) tools which verify that a file claiming to follow some protocol is correct.
-*   There is no 3D curve(s) protocol defined.
-*   The **NURBS** protocol does not handle trim curves. See Section NURBS Surfaces.
-*   The format does not contain dedicated space for auxillary information like the name and version of the program that wrote the file, the original owner, copyright information, etc. However, our tools use the string table for these type of data—since its not an error have an unused interned string, we store the data as such. In our opinion, this is a fairly innocuous method. You can read unreferenced strings by using the `gtoinfo` command with the `-s` option. Note that these strings are often lost when programs read and write the file. See Section gtoinfo.
-*   Although the format specification includes transposable components (those marked with the Gto::Matrix flag may be transposed), the current reader/writer library does not handle files with transposed components. It does handle components that are marked as Gto::Matrix but not transposed. See Section Particles.
-*   The use of special cookie names and special cross-reference names seems to seriously complicate the format if the protocol is not carefully conceived. For example, using `gtomerge` to merge files containing connections does not work—the connections are merged like all the other data in the file. The correct behavior would be to combine the connections, but merge the other object data. Perhaps this is just a case for integrating `gtocombine` into `gtomerge` ?
-*   Future versions should incorporate some form of check sum or some similar mechanism to do better sanity checking.
-*   There are many examples of properties whose data indexes into other property data. The most obvious of these are the polygon protocol **indices** properties. In order to combine gto files (concatenate polygonal data together for example) its necessary to know which properties are indexes and which are not. Index properties must be offset to be combined.
-*   The Boolean (bit fields) and Half data types are not implemented in the supplied writer library. Both of these types are useful in compressing geometric (and image) data.
-*   Material, Texture, and similar assignments and storage are usually very specialized at any particular production facility. The idea that a single method of encoding this information can be determined or enforced—or even usefully be stored in a GTO file—is not realistic. However, we hope that some method can be determined that at least preserves a good portion of common data for transfer.
-
+* There are currently no (publicly available) tools which verify that a file claiming to follow some protocol is correct.
+* There is no 3D curve(s) protocol defined.
+* The **NURBS** protocol does not handle trim curves. See Section NURBS Surfaces.
+* The format does not contain dedicated space for auxillary information like the name and version of the program that wrote the file, the original owner, copyright information, etc. However, our tools use the string table for these type of data—since its not an error have an unused interned string, we store the data as such. In our opinion, this is a fairly innocuous method. You can read unreferenced strings by using the `gtoinfo` command with the `-s` option. Note that these strings are often lost when programs read and write the file. See Section gtoinfo.
+* Although the format specification includes transposable components (those marked with the Gto::Matrix flag may be transposed), the current reader/writer library does not handle files with transposed components. It does handle components that are marked as Gto::Matrix but not transposed. See Section Particles.
+* The use of special cookie names and special cross-reference names seems to seriously complicate the format if the protocol is not carefully conceived. For example, using `gtomerge` to merge files containing connections does not work—the connections are merged like all the other data in the file. The correct behavior would be to combine the connections, but merge the other object data. Perhaps this is just a case for integrating `gtocombine` into `gtomerge` ?
+* Future versions should incorporate some form of check sum or some similar mechanism to do better sanity checking.
+* There are many examples of properties whose data indexes into other property data. The most obvious of these are the polygon protocol **indices** properties. In order to combine gto files (concatenate polygonal data together for example) its necessary to know which properties are indexes and which are not. Index properties must be offset to be combined.
+* The Boolean (bit fields) and Half data types are not implemented in the supplied writer library. Both of these types are useful in compressing geometric (and image) data.
+* Material, Texture, and similar assignments and storage are usually very specialized at any particular production facility. The idea that a single method of encoding this information can be determined or enforced—or even usefully be stored in a GTO file—is not realistic. However, we hope that some method can be determined that at least preserves a good portion of common data for transfer.
 
 ## C++ Library
-
 
 The GTO Reader/Writer library is written in a subset of C++. The intention was to make the library as portable as possible. Unfortunately we have only tried it on platforms that support gcc 2.95 and greater. It is known to work on various Linux versions and macOS. In either case it has been compiled with gcc.
 
 ### Gto::Reader class
-
 
 The Reader class (in namespace Gto) is designed as a fill-in-the-blank API. The user of the class derives from it; the base class defines a number of virtual functions which pass data to the derived class and ask the derived class questions about what data it wants.
 
@@ -1034,7 +981,6 @@ In addition, you can compile the GTO library with zlib support. This enables the
 
 As the file is read, the Reader class will call its virtual functions to declare objects in the file to the derived class. The derived class is expected to return a non-null pointer if it wishes to later receive data for that object.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `Reader::Reader` *(unsigned int `mode` )* | The constructor argument mode indicates how the reader will be used. This value is a bit vector of the following or’ed flags:  
@@ -1066,7 +1012,6 @@ Only text GTO files will be accepte by reader. | [Constructor] |
 
 The following functions are called by the base class.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `void Reader::header` *(const `Header& header` )* | This function is called by the Reader base class right after the file header has been read (or created). | [Virtual] |
@@ -1074,7 +1019,6 @@ The following functions are called by the base class.
 
 The following functions return a `Reader::Request` object. This object takes two parameters: a boolean indicating whether the data in question should be read by the reader and a second optional data `void*` argument of user data to associate with the file data.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `Reader::Request::Request` *(bool `want` , void\* `data` )* | *want* value of true indicates a request for the data in question. *data* can be any void\*. *data* is meaningless if the *want* is false. | [Constructor] |
@@ -1086,7 +1030,6 @@ The following functions return a `Reader::Request` object. This object takes two
 
 If you are using the Reader class in `Reader::RandomAccess` mode, you may call these functions after the read function has returned:
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `Reader::Objects& Reader::objects ()` | Returns a reference to an std::vector of Reader::ObjectInfo structures. These are only valid after `Reader::open()` has returned. You can use these structures when calling `Reader::accessObject()` . | [Method] |
@@ -1096,7 +1039,6 @@ If you are using the Reader class in `Reader::RandomAccess` mode, you may call t
 | `void Reader::accessObject` *(const ObjectInfo&)* | Calling this function on a GTO file opened for `RandomAccess` reading will cause the reader to seek into the file just for the data related to the object passed in. This is most useful when the objects’ data cannot be held in memory and the order of retrieval is unknown. The reader attempts to be efficient as possible without using too much | [Virtual] |
 
 ### Gto::Writer class
-
 
 The Writer class (in namespace Gto) is designed as an API to a state machine. You indicate a conceptual hierarchy to the file and then all the data. The writer handles generating the string table, the header information, etc.
 
@@ -1150,7 +1092,6 @@ writer.endObject();
      writer.endData(); 
 ```
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `Writer::Writer ()` | Creates a new Writer class object. Typically you’ll make one of these on the stack. This constructor requires you call the open function to actually start writing the file. | [Constructor] |
@@ -1175,18 +1116,15 @@ writer.endObject();
 
 ### Gto::RawDataReader/Gto::RawDataWriter classes
 
-
 These classes provide a quick method of reading the contents of a GTO file into memory for basic editing. The RawDataReader and RawDataWriter both use the same very primitive data structure that can be found in the RawData.h file. For examples of use, see `gtomerge` and `gtofilter` source code.
 
 The RawData class shows how to both read and write using the supplied classes. In addition the reader subclass shows how to convert string data.
 
 ## Python Module
 
-
 The gto module implements a reader/writer library for the Python language. The module is implemented on top of the C++ reader and writer classes. The API is similar to the C++ API, but takes advantage of Python’s dynamic typing to “simplify” the design. The Python module also implements a significant number of safety checks not present in the C++ library, making it an ideal way of exploring the Gto file format.
 
 ### gto.Reader
-
 
 The Reader class is designed as a fill-in-the-blank API much like the C++ library. The user of the class derives from it; the base class defines a number of functions which you override to pass data to the derived class and receive data from it.
 
@@ -1194,7 +1132,6 @@ As the file is read, the Reader class will call specific functions in itself to 
 
 The biggest difference from the C++ Reader class is that the `data()` method of the C++ class, which returns allocated memory for the library to read data into, cannot be overloaded in Python. Instead, the `dataRead()` method of the Python gto.Reader class is handed pre-allocated Python objects containing the data.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | *status* `gto.Reader` *(mode)* | Create a new gto.Reader instance. Possible values for *mode* :  
@@ -1223,8 +1160,6 @@ The reader will only accept text GTO files. | [Constructor] |
 
 ### gto.Writer
 
-
-  
 |  |  |  |
 | --- | --- | --- |
 | `gto.Writer ( )` | Creates a new writer instance, no arguments needed. | [Constructor] |
@@ -1240,7 +1175,7 @@ The reader will only accept text GTO files. | [Constructor] |
 | `gto.Writer.beginData ()` | Begins data declaration to the Writer class. Only calls to lookup(), propertyData(), and endData() are legal after beginData() is called. | [Method] |
 | `gto.Writer.propertyData` *(data)* | The propertyData() function must get exactly *one* parameter. That parameter can be any of the following:  
 • A single int, float, string, etc.  
-• An instance of mat3, vec3, mat4, vec4, or quat (http://cgkit.sourceforge. net / ). DO NOT explicitly cast mat3 or mat4 into a tuple or list: `tuple(mat4(1))` . It will be silently transposed (a bug in the cgtypes code?). ADDING it to a tuple or list is fine: `(mat4(1),)`  
+• An instance of mat3, vec3, mat4, vec4, or quat (<http://cgkit.sourceforge>. net / ). DO NOT explicitly cast mat3 or mat4 into a tuple or list: `tuple(mat4(1))` . It will be silently transposed (a bug in the cgtypes code?). ADDING it to a tuple or list is fine: `(mat4(1),)`  
 • A tuple or list of any combination of the above that makes sense.  
   
 Tuples and lists are flattened out before they are written. As long as the number of atoms is equal to size x width, it’ll work. Calls to propertyData() must appear in the same order as declared with the property() method. | [Method] |
@@ -1248,10 +1183,8 @@ Tuples and lists are flattened out before they are written. As long as the numbe
 
 ### Classes used by gto.Reader
 
-
 These classes will contain the actual strings rather than string table IDs.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `gto.ObjectInfo` | This class emulates the Gto::ObjectInfo struct from the C++ Gto library. It is passed by the Python gto.Reader class to your derived `object()` method. The only methods implemented are `___getattr__` and `__repr__` . Available attributes are:  
@@ -1278,15 +1211,12 @@ These classes will contain the actual strings rather than string table IDs.
 
 ## Utilities
 
-
 ### The `gtoinfo` Utility
-
 
 Usage: `gtoinfo [OPTIONS] infile.gto`
 
 Options:
 
-  
 |  |  |
 | --- | --- |
 | `-a/-all` | Output property data and header. |
@@ -1304,12 +1234,10 @@ Options:
 
 ### The `gtofilter` Utility
 
-
 Usage: ‘ `gtofilter [OPTIONS] -o` *out.gto in.gto* ’
 
 Options:
 
-  
 |  |  |
 | --- | --- |
 | `-v` | Set verbose output. Whenever a pattern matches gtofilter will inform you. |
@@ -1355,7 +1283,6 @@ gtofilter --include "*positions" -o out.gto cube.gto
 
 ### The `gtomerge` Utility
 
-
 Usage: ‘ `gtomerge` *-o outfile.gto infile1.gto infile2.gto …* ’
 
 Options:
@@ -1374,12 +1301,10 @@ For **difference** files, you can use gtomerge to reconstruct a final file like 
 
 ### The `gto2obj` Utility
 
-
 Usage: ‘ `gto2obj [OPTIONS]` *infile outfile* ’
 
 Options:
 
-  
 |  |  |
 | --- | --- |
 | `-o NAME` | When outputing GTO files, the name of an object in the GTO file to output. If not specified, the translator will output the first polygon, or subdivision surface it finds. |
@@ -1398,7 +1323,6 @@ gto2obj -c in.obj out.gto ## output obj as subdivision surface
 
 ### The `gtoimage` Utility
 
-
 Usage: ‘ `gtoimage` infile outfile’
 
 |  |  |
@@ -1414,17 +1338,15 @@ It is highly recommend that the resulting output GTO file be written with compre
 
 ### The `RiGtoRibOut` Utility
 
-
 The `RiGtoRibOut` command is useful for:
 
-*   It can be used as a debugging tool for the RiGtoPlugin RenderMan plugin.
-*   It can be used as a drop-in replacement for RiGtoPlugin, for RIB renderers that do not support `Procedural DynamicLoad` , but that *do* support `Procedural RunProgram` . Note that this is substantially slower than using RiGtoPlugin, as all data needs to be translated to ASCII and back. It does have the one space-saving advantage of not needing to save ASCII RIB on disk.
-*   It could be used to generate RIB files that are read with `ReadArchive` . This is not recommended, as it negates all the advantages of using GTO in the first place. But if nothing else works, this should.
+* It can be used as a debugging tool for the RiGtoPlugin RenderMan plugin.
+* It can be used as a drop-in replacement for RiGtoPlugin, for RIB renderers that do not support `Procedural DynamicLoad` , but that *do* support `Procedural RunProgram` . Note that this is substantially slower than using RiGtoPlugin, as all data needs to be translated to ASCII and back. It does have the one space-saving advantage of not needing to save ASCII RIB on disk.
+* It could be used to generate RIB files that are read with `ReadArchive` . This is not recommended, as it negates all the advantages of using GTO in the first place. But if nothing else works, this should.
 
 The command-line parameters are the same as the *CONFIG STRING* for RiGtoPlugin. See Section RiGtoPlugin.
 
 ### The `gtoIO.so` Maya Plug-In
-
 
 The Maya plugin comes in two parts: the C++ plugin which implements a Maya scene translator and an accompanying MEL script which implements the user interface.
 
@@ -1437,7 +1359,6 @@ The plugin can import everything that it exports and also particle GTO files gen
 The internal performance of Maya has changed between the 4.x and 5.0 versions. In Maya 5.0, the Maya API is *extremely* slow when importing polygonal normals. Importing of normals is turned off in Maya 5.0.
 
 ### The RiGtoPlugin RenderMan plugin
-
 
 Here you will find information on using the GTO RenderMan plugin. The documentation is complete enough to get started with, but should be considered a work in progress.
 
@@ -1459,22 +1380,22 @@ Procedural "DynamicLoad" [ "RiGtoPlugin.so" "CONFIG_STRING" ] [ -1e6 1e6 -1e6 1e
 
 The configuration string passed into RiGtoPlugin consists of a variable number of space-separated tokens. They are, in order:
 
-1.  Reference Pose GTO File Name
-2.  Shutter Open GTO File Name (optional)
-3.  Shutter Close GTO File Name (optional)
-4.  Primary On List (optional)
-5.  Primary Off List (optional)
-6.  Secondary On List (optional)
-7.  Secondary Off List (optional)
+1. Reference Pose GTO File Name
+2. Shutter Open GTO File Name (optional)
+3. Shutter Close GTO File Name (optional)
+4. Primary On List (optional)
+5. Primary Off List (optional)
+6. Secondary On List (optional)
+7. Secondary Off List (optional)
 
 As shown, the only necessary element is the reference GTO file. For objects which do not have movement and do not require on lists or off lists, this is completely sufficient.
 
 The logic behind the geometry instantiation mechanism is as follows:
 
-*   Read Reference GTO file The plugin reads all of the geometry in the reference GTO file. As a starting point, the shutter open and close geometry is set equal to the reference geometry.
-*   If requested, read Shutter Open GTO file The plugin then reads any geometry from the Shutter Open file that matches the name and geometry type of geometry that has already been read from the reference file—this geometry is stored as both the shutter open AND close geometry.
-*   If requested, read Shutter Close GTO file The plugin then reads any geometry from the Shutter Close file that matches the name and geometry type of geometry that has already been read from the reference file—this geometry is stored as the shutter close geometry
-*   Instantiate Geometry: For any piece of geometry that appears in BOTH on-lists and does not appear in EITHER off-lists, the plugin calls the appropriate RIB functions to create the requested geometry.
+* Read Reference GTO file The plugin reads all of the geometry in the reference GTO file. As a starting point, the shutter open and close geometry is set equal to the reference geometry.
+* If requested, read Shutter Open GTO file The plugin then reads any geometry from the Shutter Open file that matches the name and geometry type of geometry that has already been read from the reference file—this geometry is stored as both the shutter open AND close geometry.
+* If requested, read Shutter Close GTO file The plugin then reads any geometry from the Shutter Close file that matches the name and geometry type of geometry that has already been read from the reference file—this geometry is stored as the shutter close geometry
+* Instantiate Geometry: For any piece of geometry that appears in BOTH on-lists and does not appear in EITHER off-lists, the plugin calls the appropriate RIB functions to create the requested geometry.
 
 #### On-List/Off-List Syntax
 
@@ -1484,11 +1405,11 @@ The syntax of the on-lists and off-lists is as follows:
 
 Otherwise, the on-lists and off-lists are essentially shell-like regular expressions. The following rules apply:
 
-*   The `*` character matches any number of characters
-*   The `?` character matches any single of character
-*   Bracket expressions `[]` are supported. (See `man 7 regex` )
-*   Multiple patterns can be strung together with the `|` character.
-*   The pattern must match the *whole* object name. Thus, the pattern “ `*Sphere1` ” will match the object `nurbsSphere1` but *not* `nurbsSphere1Shape` . This is a very common “gotcha”.
+* The `*` character matches any number of characters
+* The `?` character matches any single of character
+* Bracket expressions `[]` are supported. (See `man 7 regex` )
+* Multiple patterns can be strung together with the `|` character.
+* The pattern must match the *whole* object name. Thus, the pattern “ `*Sphere1` ” will match the object `nurbsSphere1` but *not* `nurbsSphere1Shape` . This is a very common “gotcha”.
 
 As an example, suppose you wanted to turn off all of the geometry named `LeftLeg*Shape*` and `RightLeg*Shape*` in a render—you would create an off-list that looked like:
 
@@ -1502,13 +1423,13 @@ By default, RiGtoPlugin maintains an internal cache of all of the file sets it h
 
 In situations where memory is precious and the renderer needs as much memory as it can get, it may be advantageous to force RiGtoPlugin to discard its cached file sets. There is special syntax to facilitate this.
 
-*   To erase everything in RiGtoPlugin’s cache:
+* To erase everything in RiGtoPlugin’s cache:
 
 ```
  Procedural "DynamicLoad" [ "RiGtoPlugin.so" "__FLUSH__" ] [ Bounding Box ] 
 ```
 
-*   To erase the cache associated with a given file triplet: (Using REF.gto, OPEN.gto and CLOSE.gto as standins for whatever files were actually passed in)
+* To erase the cache associated with a given file triplet: (Using REF.gto, OPEN.gto and CLOSE.gto as standins for whatever files were actually passed in)
 
 ```
  Procedural "DynamicLoad" [ "RiGtoPlugin.so" "REF.gto OPEN.gto CLOSE.gto __FLUSH__" ] [ Bounding Box ] 
@@ -1518,7 +1439,6 @@ There is also an environment variable, `TWK_RI_GTO_NO_CACHE` , which if defined 
 
 #### Environment Variables
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `TWK_RI_GTO_NO_SUBDS` | If this environment variable is defined and set to anything except “0”, “FALSE”, “False”, or “false”, RiGtoPlugin will treat all catmull-clark subdivision surfaces read from a GTO file as polygons instead. | [Environment Variable] |
@@ -1559,7 +1479,6 @@ Procedural "DynamicLoad" [ "RiGtoPlugin.so" "thing.ref.gtothing.0013.open.gto th
 
 RiGtoPlugin stores some useful data in attributes that can be used by shaders if desired.
 
-  
 |  |  |  |
 | --- | --- | --- |
 | `Pref` | On ALL geometry RiGtoPlugin creates “varying point Pref” as part of its geometry declaration. This data can be accessed by simply putting “varying point Pref” in your shader parameters. The position of the model in the reference GTO file is always used for this parameter value. | [Shader parameter] |

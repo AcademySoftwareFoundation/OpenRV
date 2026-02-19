@@ -18,7 +18,7 @@ RVIO supports all of the same movie, image, and audio formats that RV does inclu
 | -rthreads *int*           | Number of reader/render threads (default=1)                                                                                                                  |
 | -wthreads *int*           | Number of writer threads (default=same as -rthreads)                                                                                                         |
 | -formats                  | Show all supported image and movie formats                                                                                                                   |
-| -iomethod *int* [_int_]   | I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=3) and optional chunk size (default=61440)        |
+| -iomethod *int* [*int*]   | I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=3) and optional chunk size (default=61440)        |
 | -view *string*            | View to render (default=defaultSequence or current view in rv file)                                                                                          |
 | -leader ...               | Insert leader/slate (can use multiple time)                                                                                                                  |
 | -leaderframes *int*       | Number of leader frames (default=1)                                                                                                                          |
@@ -33,7 +33,7 @@ RVIO supports all of the same movie, image, and audio formats that RV does inclu
 | -inunpremult              | un-premultiply alpha and color                                                                                                                               |
 | -exposure *float*         | Apply relative exposure change (in stops)                                                                                                                    |
 | -scale *float*            | Scale input image geometry                                                                                                                                   |
-| -resize *int* [_int_]     | Resize input image geometry to exact size on input (0 = maintain image aspect)                                                                               |
+| -resize *int* [*int*]     | Resize input image geometry to exact size on input (0 = maintain image aspect)                                                                               |
 | -resampleMethod *string*  | Resampling method (area, linear, cubic, nearest, default=area)                                                                                               |
 | -floatLUT *int*           | Use floating point LUTs (1=yes, 0=no, default=1)                                                                                                             |
 | -flut *string*            | Apply file LUT                                                                                                                                               |
@@ -63,12 +63,12 @@ RVIO supports all of the same movie, image, and audio formats that RV does inclu
 | -audiorate *float*        | Output audio sample rate (default from input)                                                                                                                |
 | -audiochannels *int*      | Output audio channels (default from input)                                                                                                                   |
 | -quality *float*          | Output codec quality 0.0 -> 1.0 (use varies with file format and codec default=0.900000)                                                                     |
-| -outpa* float*            | Output pixel aspect ratio (e.g. 1.33 or 4:3, etc, metadata only) default=1:1                                                                                 |
+| -outpa*float*            | Output pixel aspect ratio (e.g. 1.33 or 4:3, etc, metadata only) default=1:1                                                                                 |
 | -comment *string*         | Output comment (movie files, default="")                                                                                                                     |
 | -copyright *string*       | Output copyright (movie files, default="")                                                                                                                   |
 | -debug *string*           | Debug category                                                                                                                                               |
 | -version                  | Show RVIO version number                                                                                                                                     |
-| -exrcpus *int*            | EXR thread count (default=_platform dependant_)                                                                                                              |
+| -exrcpus *int*            | EXR thread count (default=*platform dependant*)                                                                                                              |
 | -exrRGBA                  | EXR use basic RGBA interface (default=false)                                                                                                                 |
 | -exrInherit               | EXR guesses channel inheritance (default=false)                                                                                                              |
 | -exrIOMethod int [int]    | EXR I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=0) and optional chunk size (default=61440)    |
@@ -422,7 +422,6 @@ There are a couple of fields treated in a special way: the frame_position, tv/ti
 | source/border_YB          | Border validity bottom                                                                                                                                      |
 | source/pixel_aspect_H     | Pixel aspect ratio horizontal component                                                                                                                     |
 | source/pixel_aspect_V     | Pixel aspect ratio vertical component                                                                                                                       |
-
 
 This example set the start time code of the DPX sequence:
 

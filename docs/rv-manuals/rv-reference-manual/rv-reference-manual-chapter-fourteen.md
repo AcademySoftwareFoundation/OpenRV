@@ -18,7 +18,6 @@ If inlining the Mu or Python code in each call back becomes onerous you can uplo
 
 ### 14.2 Getting Event Call Backs in JavaScript
 
-
 RV generates events which can be converted into call backs in JavaScript. This differs slightly from how events are handled in Mu and Python.
 
 | Signal | Events |
@@ -42,6 +41,7 @@ function callback_string (name, contents, sender)
 rvsession.eventString.connect(callback_string);
 rvsession.bindToRegex("source-group-complete"); 
 ```
+
 connects the function callback_string() to the eventString signal object and binds to the source-group-complete RV event. For each event the proper signal object type must be used. For example pointer events are not handled by eventString but by the eventPointer signal. There are four signals available: eventString, eventKey, eventPointer, and eventDragDrop. See tables describing which events generate which signals and what the signal call back arguments should be.In the above example, any time media is loaded into RV the callback_string() function will be called. Note that there is a single callback for each type of event. In particular if you want to handle both the “new-source” and the “frame-changed” events, your eventString handler must handle both (it can distinguish between them using the “name” parameter passed to the handler. To bind the handler to both events you can call “bindToRegex” multiple times, or specify both events in a regular expression:
 
 ```
@@ -98,12 +98,12 @@ Table 14.5:eventDragDrop Signal Arguments
 
 ### 14.3 Using the webview Example Package
 
-
 This package creates one or more docked Qt WebEngine instances, configurable from the command line as described below. JavaScript code running in the webviews can execute arbitrary Mu code in RV by calling the rvsession.evaluate() function. This package is intended as an example.These command-line options should be passed to RV after the -flags option. The webview options below are shown with their default values, and all of them can apply to any of four webviews in the Left, Right, Top, and Bottom dock locations.
 
 ```
  shell> rv -flags ModeManagerPreload=webview 
 ```
+
 The above forces the load of the webview package which will display an example web page. Additional arguments can be supplied to load specific web pages into additional panes. While this will just show the sample html/javascript file that comes with the package in a webview docked on the right. To see what's happening in this example, bring up the Session Manager so you can see the Sources appearing and disappearing, or switch to the defaultLayout view. Note that you can play while reconfiguring the session with the javascript checkboxes.The following additional arguments can be passed via the -flags mechanism. In the below, **POS** should be replaced by one of Left, Right, Bottom, or Top.
 
 ModeManagerPreload=webview

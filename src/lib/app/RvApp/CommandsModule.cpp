@@ -70,13 +70,19 @@
 #include <TwkUtil/FileStream.h>
 #include <TwkUtil/FrameUtils.h>
 #include <TwkUtil/Timer.h>
+
+#include <QtCore/QCoreApplication>
+#include <QtCore/QEventLoop>
+
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <half.h>
 #include <iostream>
 #include <iterator>
 #include <sstream>
 #include <stl_ext/string_algo.h>
+#include <thread>
 
 TwkUtil::Timer theTimer;
 
@@ -1338,6 +1344,29 @@ namespace Rv
         s->askForRedraw();
     }
 
+    NODE_IMPLEMENTATION(waitForProgressiveLoading, void)
+    {
+        // If delay session loading is not enabled, nothing to wait for
+        if (!Options::sharedOptions().delaySessionLoading)
+        {
+            return;
+        }
+
+        // Wait for local progressive loading to complete
+        RvSession* s = RvSession::currentRvSession();
+        while (s->loadTotal() != 0 || s->graph().isMediaLoading())
+        {
+            // Process Qt events to keep the UI responsive
+            // Exclude user input events to prevent interference during loading
+            if (QCoreApplication::instance())
+            {
+                QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+
     NODE_IMPLEMENTATION(addSourcesVerbose, Pointer)
     {
         RvSession* s = RvSession::currentRvSession();
@@ -2044,6 +2073,8 @@ namespace Rv
 
             new Function(c, "addSourcesVerbose", addSourcesVerbose, None, Return, "string[]", Parameters,
                          new Param(c, "filePathsAndOptions", "string[][]"), new Param(c, "tag", "string", Value()), End),
+
+            new Function(c, "waitForProgressiveLoading", waitForProgressiveLoading, None, Return, "void", End),
 
             new Function(c, "setProgressiveSourceLoading", setProgressiveSourceLoading, None, Return, "void", Parameters,
                          new Param(c, "enable", "bool"), End),

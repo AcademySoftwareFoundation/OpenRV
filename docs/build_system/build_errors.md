@@ -129,6 +129,7 @@ make: *** [Makefile:91: all] Error 2
 ```
 
 ### (Linux any Distro)
+
 ```text
 /opt/rh/devtoolset-8/root/usr/libexec/gcc/x86_64-redhat-linux/8/ld: ../../../lib/graphics/TwkGLF/libTwkGLF.a(GLFBO.cpp.o): undefined reference to symbol 'glBindFramebufferEXT'
 //lib64/libGL.so.1: error adding symbols: DSO missing from command line
@@ -144,7 +145,6 @@ make: *** [Makefile:254: rv] Error 2
 
 Ref.: [Resolve "DSO missing from command line" error](https://zhangboyi.gitlab.io/post/2020-09-14-resolve-dso-missing-from-command-line-error/)
 Ref.: [error adding symbols: DSO missing from command line](https://stackoverflow.com/questions/19901934/libpthread-so-0-error-adding-symbols-dso-missing-from-command-line)
-
 
 ### Windows 10 & Windows 11 (Windows 10+) : PIP REQUIREMENTS: py7zr fails to install
 
@@ -164,6 +164,7 @@ error: subprocess-exited-with-error
 
 × pip subprocess to install build dependencies did not run successfully.
 ```
+
 Note: There's an issue with the latest version of MSYS2 and Python3.xx versions. Enter the following command from the same MSYS2-MinGW64 shell if you encounter an error when installing the **py7zr** python requirement:
 
 ```shell
@@ -175,13 +176,16 @@ SETUPTOOLS_USE_DISTUTILS=stdlib pip install py7zr
 Another installation of vcpkg can conflict with the one installed by the build system. Currently,
 there are only two possibles solutions:
 
-  - Option A: Remove the automatic integration of the system-wide vcpkg into cmake using :
-    ```bash 
+- Option A: Remove the automatic integration of the system-wide vcpkg into cmake using :
+
+    ```bash
     vcpkg integrate remove
     ```
-  - Option B: Make sure that the right dependencies (and version) are installed in the system-wide vcpkg.
+
+- Option B: Make sure that the right dependencies (and version) are installed in the system-wide vcpkg.
 
 ### macOS, Linux, Windows
+
 ```text
 [ 99%] Linking CXX executable rv
 CMakeFiles/rv.dir/main.cpp.o: In function `utf8Main(int, char**)':
@@ -195,4 +199,4 @@ make: *** [all] Error 2
 **Solution:**
 
 Most likely missing a `qt5_add_resources` CMake statement.
-Ref.: https://forum.qt.io/topic/88959/undefined-reference-to-qinitresources/2
+Ref.: <https://forum.qt.io/topic/88959/undefined-reference-to-qinitresources/2>
