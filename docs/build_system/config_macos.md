@@ -67,15 +67,15 @@ All other dependencies are shared across variations.
 
 ## Summary
 
-* [Summary](summary)
-* [Allow Terminal to update or delete other applications](allow_terminal)
-* [Install Xcode](install_xcode)
-* [Install CMake](install_cmake)
-* [Install Homebrew](install_homebrew)
-* [Install tools and build dependencies](install_tools_and_build_dependencies)
-* [Install Qt](install_qt)
-* [Build Open RV](build_openrv)
-* [Setting up debugging in VSCode](debugging_openrv)
+- [Summary](summary)
+- [Allow Terminal to update or delete other applications](allow_terminal)
+- [Install Xcode](install_xcode)
+- [Install CMake](install_cmake)
+- [Install Homebrew](install_homebrew)
+- [Install tools and build dependencies](install_tools_and_build_dependencies)
+- [Install Qt](install_qt)
+- [Build Open RV](build_openrv)
+- [Setting up debugging in VSCode](debugging_openrv)
 
 ````{note}
 Open RV can be built for *x86_64* by changing the architecture of the terminal to *x86_64* using the following command:

@@ -495,6 +495,7 @@ To disable sccache if needed:
 export RV_DISABLE_COMPILER_CACHE=1
 ```
 ````
+
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
 (setup_env)=
@@ -525,11 +526,11 @@ which becomes `/c/Users/<username>/.cargo/bin` in MSYS2 format.
 
 The following paths **must** be added to the PATH environment variable within MSYS2:
 
-- CMake binary directory
-- Python binary directory
-- Rust cargo binary directory
-- MSYS2's `mingw64/bin`
-- Strawberry perl directory
+* CMake binary directory
+* Python binary directory
+* Rust cargo binary directory
+* MSYS2's `mingw64/bin`
+* Strawberry perl directory
 
 **The order is important**. Do not put Strawberry perl location before MSYS2's `mingw64/bin` directory.
 
