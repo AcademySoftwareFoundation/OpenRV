@@ -75,6 +75,7 @@
 #include <half.h>
 #include <iostream>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <stl_ext/string_algo.h>
 #include <unordered_set>
@@ -93,6 +94,27 @@ namespace IPMu
 
     typedef Session::PropertyVector PropertyVector;
     typedef TwkApp::EventType::EventInstance Event;
+
+    //----------------------------------------------------------------------
+    //
+    //  Helper function to check if node graph access is safe during
+    //  session clearing/deletion. Returns the provided default value
+    //  if access is unsafe, otherwise returns std::nullopt.
+    //
+    //  Usage:
+    //      if (auto val = returnIfGraphUnsafe(s, Pointer(0))) {
+    //          NODE_RETURN(*val);
+    //      }
+    //      // Continue with normal graph access...
+    //
+    template <typename T> std::optional<T> returnIfGraphUnsafe(Session* session, T defaultValue)
+    {
+        if (session->beingCleared() || session->beingDeleted())
+        {
+            return defaultValue;
+        }
+        return std::nullopt;
+    }
 
     //----------------------------------------------------------------------
 
@@ -559,6 +581,12 @@ namespace IPMu
         StringType::String* leaf = NODE_ARG_OBJECT(2, StringType::String);
         const bool unique = NODE_ARG(3, bool);
 
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
+
         IPNode::MetaEvalInfoVector infos;
         IPNode* rootNode = s->graph().viewNode();
 
@@ -654,6 +682,12 @@ namespace IPMu
         StringType::String* root = NODE_ARG_OBJECT(2, StringType::String);
         const bool unique = NODE_ARG(3, bool);
 
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
+
         IPNode* rootNode = s->graph().root();
 
         if (root)
@@ -728,6 +762,13 @@ namespace IPMu
         int depth = NODE_ARG(1, int);
         StringType::String* root = NODE_ARG_OBJECT(2, StringType::String);
         const Class* atype = static_cast<const Class*>(c->arrayType(c->intType(), 1, 0));
+        DynamicArray* array = new DynamicArray(atype, 1);
+
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
 
         IPNode* rootNode = s->graph().root();
 
@@ -768,8 +809,6 @@ namespace IPMu
         for (size_t i = 0; i < frames.size(); i++)
             frameSet.insert(frames[i]);
 
-        DynamicArray* array = new DynamicArray(atype, 1);
-
         array->resize(frameSet.size());
         size_t count = 0;
 
@@ -792,6 +831,12 @@ namespace IPMu
         StringType::String* root = NODE_ARG_OBJECT(1, StringType::String);
         int depth = NODE_ARG(2, int);
         const StringType* stype = c->stringType();
+
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
 
         IPNode* rootNode = s->graph().root();
 
@@ -1224,9 +1269,16 @@ namespace IPMu
         if (!tname)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil tname");
 
+        DynamicArray* array = new DynamicArray(atype, 1);
+
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
+
         Session::NodeVector nodes;
         s->findCurrentNodesByTypeName(nodes, tname->c_str());
-        DynamicArray* array = new DynamicArray(atype, 1);
         array->resize(nodes.size());
 
         for (int i = 0; i < nodes.size(); i++)
@@ -1249,9 +1301,16 @@ namespace IPMu
         if (!tname)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil tname");
 
+        DynamicArray* array = new DynamicArray(atype, 1);
+
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
+
         Session::NodeVector nodes;
         s->findNodesByTypeName(nodes, tname->c_str());
-        DynamicArray* array = new DynamicArray(atype, 1);
         array->resize(nodes.size());
 
         for (int i = 0; i < nodes.size(); i++)
@@ -1940,6 +1999,12 @@ namespace IPMu
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(NODE_THIS.type());
         const int frame = NODE_ARG(0, int);
         DynamicArray* array = new DynamicArray(atype, 1);
+
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
 
         IPNode::MetaEvalInfoVector infos;
         IPNode::MetaEvalInfoCollectorByType<SourceIPNode> collector(infos);
@@ -3799,6 +3864,12 @@ namespace IPMu
         DynamicArray* array = new DynamicArray(type, 1);
         const StringType* stype = c->stringType();
 
+        if (auto val = returnIfGraphUnsafe(s, array))
+        {
+            (*val)->resize(0);
+            NODE_RETURN(*val);
+        }
+
         const IPGraph::NodeMap& map = s->graph().nodeMap();
 
         array->resize(map.size());
@@ -3823,6 +3894,11 @@ namespace IPMu
 
         if (!node)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
 
         if (IPNode* n = s->graph().findNode(node->c_str()))
         {
@@ -4051,6 +4127,11 @@ namespace IPMu
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no node name specified");
         }
 
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
+
         if (IPNode* node = s->graph().findNode(name->c_str()))
         {
             IPNode::IPNodes nodeIns = node->inputs();
@@ -4152,6 +4233,11 @@ namespace IPMu
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no node name specified");
         }
 
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
+
         if (IPNode* node = s->graph().findNode(name->c_str()))
         {
             if (GroupIPNode* group = dynamic_cast<GroupIPNode*>(node))
@@ -4209,6 +4295,11 @@ namespace IPMu
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no node name specified");
         }
 
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
+
         if (IPNode* node = s->graph().findNode(name->c_str()))
         {
             if (GroupIPNode* group = node->group())
@@ -4231,6 +4322,11 @@ namespace IPMu
         if (!name)
         {
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no node name specified");
+        }
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
         }
 
         if (IPNode* node = s->graph().findNode(name->c_str()))
@@ -4270,6 +4366,11 @@ namespace IPMu
 
         if (!name)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
 
         if (IPNode* node = s->graph().findNode(name->c_str()))
         {
@@ -4315,6 +4416,11 @@ namespace IPMu
 
         if (!name)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
 
         if (IPNode* node = s->graph().findNode(name->c_str()))
         {
@@ -4960,6 +5066,11 @@ namespace IPMu
         if (!name)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil source");
         const StringType* stype = static_cast<const StringType*>(name->type());
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
 
         // for campatibility with rv, scrub the incoming name
         vector<string> tokens;
