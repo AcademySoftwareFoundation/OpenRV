@@ -30,4 +30,37 @@ Please follow the coding conventions and style in each file and in each library 
 
 ## Git Workflow
 
-Follow instructions from the [README](README.md).
+### Pull Request Process
+
+1. Fork the repository and create a feature branch from `main`.
+2. Make your changes, following the coding conventions described above.
+3. Open a pull request against `main`.
+4. Ensure CI checks pass — in particular the **semantic PR title** check (see below).
+5. Once reviewed and approved, a committer will merge your PR.
+
+### Semantic PR Titles (Required)
+
+All pull request titles **must** follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
+
+```
+type: short description
+```
+
+A CI check will block merging if the title does not match this format. The allowed types are:
+
+| Type    | When to use                                        |
+| ------- | -------------------------------------------------- |
+| `feat`  | A new feature                                      |
+| `fix`   | A bug fix                                          |
+| `perf`  | A performance improvement                          |
+| `docs`  | Documentation-only changes                         |
+| `build` | Changes to the build system or dependencies        |
+| `ci`    | Changes to CI configuration or scripts             |
+| `test`  | Adding or updating tests                           |
+| `chore` | Maintenance tasks that don't affect published code |
+
+For **breaking changes**, append `!` after the type (e.g., `feat!: remove legacy API`) or include a `BREAKING CHANGE:` footer in the PR body.
+
+### Automated Releases
+
+This project uses [Release Please](https://github.com/googleapis/release-please) to automate changelog generation and version bumps. When PRs are merged to `main`, Release Please parses their titles to determine the next version and to build the changelog entry. Your PR title is what appears in the changelog, so make it clear and descriptive.
