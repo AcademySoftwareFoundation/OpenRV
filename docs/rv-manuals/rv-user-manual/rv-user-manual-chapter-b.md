@@ -2,7 +2,6 @@
 
 ### B.1 Linux
 
-
 This is taken from an NVIDIA README file. The portions pertaining to stereo modes are reproduced here:
 
 The following driver options are supported by the NVIDIA X driver. They may be specified either in the Screen or Device sections of the X config file.
@@ -27,8 +26,6 @@ Stereo options 1, 2, and 3 (aka "active" stereo) are not supported on digital fl
 #### Option "AllowDFPStereo" "boolean"
 
 By default, the NVIDIA X driver performs a check which turns off active stereo (stereo options 1, 2, and 3) if the X screen is driving a DFP. The "AllowDFPStereo" option bypasses this check.
-
-
 
 ENSURING IDENTICAL MODE TIMINGS
 
@@ -61,7 +58,6 @@ Only the intersection of capabilities across all GPUs will be advertised.
 X configuration options that affect GLX operation (e.g.: stereo, overlays) should be set consistently across all X screens in the X server.
 
 ### B.2 macOS and Windows
-
 
 There are no special requirements (other than having a proper GPU that can produce stereo output). If the macOS or Windows graphical environment can provide RV with a stereo GL context, it will play back in stereo. If not, the console widget will pop up and you will see GL errors.
 

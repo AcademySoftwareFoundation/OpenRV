@@ -2,13 +2,12 @@
 
 RV can use custom shaders to do GPU accelerated image processing. Shaders are authored in a superset of the GLSL language. These GLSL shaders become image processing Nodes in RV's session. Note that nodes can be either “signed” or “unsigned”. As of RV6, nodes can be loaded by any product in the RV line (RV, RVIO). The most basic workflow is as follows:
 
-*   Create a file with a custom GLSL function (the Shader) using RV's extended GLSL language.
-*   Create a GTO node definition file which references the Shader file.
-*   Test and adjust the shader/node as necessary.
-*   Place the node definition and shader in the RV_SUPPORT_PATH under the Nodes directory for use by other users.
+* Create a file with a custom GLSL function (the Shader) using RV's extended GLSL language.
+* Create a GTO node definition file which references the Shader file.
+* Test and adjust the shader/node as necessary.
+* Place the node definition and shader in the RV_SUPPORT_PATH under the Nodes directory for use by other users.
 
 ### 3.1 Node Definition Files
-
 
 Node definition files are GTO files which completely describe the operation of an image processing node in the image/audio processing graph.A node definition appears as a single GTO object of type IPNodeDefinition. This makes it possible for a node definition to appear in a session file directly or in an external definition file which can contain a library of definition objects.The meat of a node definition is source code for a kernel function written in an augmented version of GLSL which is described below.The following example defines a node called "Gamma" which takes a single input image and applies a gamma correction:
 
@@ -45,7 +44,6 @@ Gamma : IPNodeDefinition (1)
 ```
 
 ### 3.2 Fields in the IPNodeDefinition
-
 
 node.evaluationType
 
@@ -128,18 +126,20 @@ A context-modifying property has 3 parts: the name (see above), an "inputImage i
     }
 }  
 ```
+
 And this shader parameter list:
 
 ```
  vec4 main (const in inputImage left, const in inputImage right) 
 ```
+
 Then:
 
-*   It's a Combine node, so it's single input can be evaluated multiple times.
-*   The shader has two inputImage parameters so the input will be evaluated twice.
-*   The node definition contains "eye" parameters, so the eye value of the evaluation context will differ in different evaluations of the input.
-*   In the first evaluation of the input (index = 0), the context's eye value will be set to 0, and in the second it will be set to 1.
-*   The results of each evaluation of the input is made available to the shader in the corresponding inputImage parameter.
+* It's a Combine node, so it's single input can be evaluated multiple times.
+* The shader has two inputImage parameters so the input will be evaluated twice.
+* The node definition contains "eye" parameters, so the eye value of the evaluation context will differ in different evaluations of the input.
+* In the first evaluation of the input (index = 0), the context's eye value will be set to 0, and in the second it will be set to 1.
+* The results of each evaluation of the input is made available to the shader in the corresponding inputImage parameter.
 
 As another example, here's a “FrameBlend” node:
 
@@ -164,6 +164,7 @@ As another example, here's a “FrameBlend” node:
     }
 } 
 ```
+
 And this shader parameter list:
 
 ```
@@ -173,21 +174,23 @@ And this shader parameter list:
            const in inputImage in3,
            const in inputImage in4) 
 ```
+
 So the result is that the input to the FrameBlend node will be evaluated 5 times, and in each case the evaluation context will have a frame value that is equal to the incoming frame value, plus the corresponding offset. Note that the shader doesn't know anything about this, and from it's point of view it has 5 input images.
 
 ### 3.3 Alternate File URL
-
 
 Language source code can be either inlined for a self contained definition or can be a modified file URL which points to an external file. An example file URL might be:
 
 ```
  file:///Users/foo/glsl/foo_shader_source.glsl 
 ```
+
 If the node definition reader sees a file URL it will also perform variable substitution from the environment and any special predefined variables. For example if the $HOME environment variable exists the following would be equivalent on a Mac:
 
 ```
  file://${HOME}/glsl/foo_shader_source.glsl 
 ```
+
 There is currently one special variable defined called $HERE which has the value of the directory in which the definition file lives. So if for example the node definition file lives in the filesystem like so:
 
 ```
@@ -196,6 +199,7 @@ There is currently one special variable defined called $HERE which has the value
 /Users/foo/nodes/glsl/node2_source_code.glsl
 /Users/foo/nodes/glsl/node3_source_code.glsl 
 ```
+
 and it references the GLSL files mentioned above then valid file URLs for the source files would like this:
 
 ```
@@ -205,7 +209,6 @@ file://${HERE}/glsl/node3_source_code.glsl
 ```
 
 ### 3.4 Augmented GLSL Syntax
-
 
 GLSL source code can contain any set of functions and global static data but may not contain any uniform block definitions. Uniform block values are managed by the underlying renderer.
 
@@ -229,6 +232,7 @@ vec4 main (const in inputImage in0, const in vec3 gamma)
     return vec4(pow(P.rgb, gamma), P.a);
 } 
 ```
+
 In this case the node can only take a single input and will have a property called parameters.gamma of type float[3]. By changing the gamma property, the user can modify the behavior of the Gamma node.
 
 #### 3.4.2 The inputImage Type
@@ -248,6 +252,7 @@ Table 3.2:Type inputImage OperationsUse of the inputImage type as a function arg
 vec4 P = i();
 return vec4(P.rgb * 0.5, P.a); 
 ```
+
 **NOTE** : The *st* value return by an inputImage has a value ranging from 0 to the width in X and 0 to the height in Y. So for example, the pixel value of the first pixel in the image is located at (0.5, 0.5) not at (0, 0). Similarily, the last pixel in the image is located at (width-0.5, height-0.5) not (width-1, height-1) as might be expected. See ARB_texture_rectangle for information on why this is. In GLSL 1.5 and greater the *rectangle* coordinates are built into the language.
 
 #### 3.4.3 The outputImage Type
@@ -278,15 +283,13 @@ In the above table, *D* would normally 1, 3, or 4 for scalar, RGB, or RGBA. A va
 
 ### 3.5 Testing the Node Definition
 
-
 Once you have a NodeDefinition GTO file that contains or references your shader code as described above, you can test the node as follows:
 
-1.  Add the node definition file to the Nodes directory on your RV_SUPPORT_PATH. For example, on Linux, you can put it in $HOME/.rv/Nodes. If the GLSL code is in a separate file, it should be in the location specified by the URL in the Node Definition file.You can use the ${HERE}/myshader.glsl notation (described above) to indicate that the GLSL is to be found in the same directory.
-2.  Start RV and from the Session Manager add a node with the “plus” button or the right-click menu (“New Viewable”) by choosing “Add Node by Type” and entering the type name of the new node (“Gamma” in the above example).
-3.  At this point you might want to save a Session File for easy testing.
-4.  You can now iterate by changing your shader code or the parameter values in the Session File and re-running RV to test.
+1. Add the node definition file to the Nodes directory on your RV_SUPPORT_PATH. For example, on Linux, you can put it in $HOME/.rv/Nodes. If the GLSL code is in a separate file, it should be in the location specified by the URL in the Node Definition file.You can use the ${HERE}/myshader.glsl notation (described above) to indicate that the GLSL is to be found in the same directory.
+2. Start RV and from the Session Manager add a node with the “plus” button or the right-click menu (“New Viewable”) by choosing “Add Node by Type” and entering the type name of the new node (“Gamma” in the above example).
+3. At this point you might want to save a Session File for easy testing.
+4. You can now iterate by changing your shader code or the parameter values in the Session File and re-running RV to test.
 
 ### 3.6 Publishing the Node Definition
-
 
 When you have tested sufficiently in RV and would like to make the new Node Definition available to other users running RV, RVIO, etc, you need to:**Make the Node Definition available to users** . RV will pick up Node Definition files from any Nodes sub-directory along the RV_SUPPORT_PATH. So your definitions can be distributed by simply inserting them into those directories, or by including them in an RV Package (any GTO/GLSL files in an RV Package will be added to the appropriate “Nodes” sub-directory when the Package is installed). With some new node types, you may want to distribute Python or or Mu code to help the user manage the creation and parameter-editing of the new nodes, so wrapping all that up in an RV Package would be appropriate in those cases.

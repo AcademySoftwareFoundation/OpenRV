@@ -66,23 +66,24 @@ DEBUG: *** Buffer underrun: -32
 DEBUG: *** Buffer underrun: -32
 DEBUG: *** Buffer underrun: -32
 ```
+
 The tuning process steps:
 
-1.  Launch RV and setup the File->Preferences->Audio tab settings as follows:
-    1.  Output Module: Platform Audio
-    2.  Output Device: Default
-    3.  Output Format: Stereo 32bit float 48000
-    4.  Enable 'Keep Audio device open when playing'
-    5.  Turn off 'Hardware Audio/Video Synchronization'
-    6.  Enable 'Scrubbing on by default'
-2.  Determine the smallest TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME settings before buffer underruns occur.
-    1.  Set Platform Audio debugging messaging on... TWK_QTAUDIOOUTPUT_ENABLE_DEBUG = 1.
-    2.  Set values for TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME.
-    3.  Try the following combinations of TWK_QTAUDIOOUTPUT_BUFFER_TIME / TWK_QTAUDIOOUTPUT_PERIOD_TIME i.e. 60000 / 10000 and 36000 / 6000.
-    4.  Launch RV with a 48Khz video clip and enable lookahead/region caching. Either cache option would do as long as you size the video cache appropriately so the entire clip is cached. Playback and observe for buffer underruns messages. Note you should also stress test running multiple RVs with the same config.
-    5.  If no underun errors occur; repeat the previous step, setting smaller values for TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME keeping in mind that the ratio of TWK_QTAUDIOOUTPUT_BUFFER_TIME/TWK_QTAUDIOOUTPUT_PERIOD_TIME must be greater than 3 and ideally around 6.
-3.  Once you have found the smallest value of TWK_QTAUDIOOUTPUT_BUFFER_TIME; use an av sync meter to measure the average av sync lag playing back RV's movieproc syncflash clip.
-    1.  With TWK_QTAUDIOOUTPUT_BUFFER_TIME fixed to the value determined in the previous step; increase and decrease TWK_QTAUDIOOUTPUT_PERIOD_TIME, bearing in mind TWK_QTAUDIOOUTPUT_BUFFER_TIME must be a integer multiple of TWK_QTAUDIOOUTPUT_PERIOD_TIME. Find the multiple with the lowest measure average av sync values (i.e. the average of at least 25 av sync measurements).
+1. Launch RV and setup the File->Preferences->Audio tab settings as follows:
+    1. Output Module: Platform Audio
+    2. Output Device: Default
+    3. Output Format: Stereo 32bit float 48000
+    4. Enable 'Keep Audio device open when playing'
+    5. Turn off 'Hardware Audio/Video Synchronization'
+    6. Enable 'Scrubbing on by default'
+2. Determine the smallest TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME settings before buffer underruns occur.
+    1. Set Platform Audio debugging messaging on... TWK_QTAUDIOOUTPUT_ENABLE_DEBUG = 1.
+    2. Set values for TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME.
+    3. Try the following combinations of TWK_QTAUDIOOUTPUT_BUFFER_TIME / TWK_QTAUDIOOUTPUT_PERIOD_TIME i.e. 60000 / 10000 and 36000 / 6000.
+    4. Launch RV with a 48Khz video clip and enable lookahead/region caching. Either cache option would do as long as you size the video cache appropriately so the entire clip is cached. Playback and observe for buffer underruns messages. Note you should also stress test running multiple RVs with the same config.
+    5. If no underun errors occur; repeat the previous step, setting smaller values for TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME keeping in mind that the ratio of TWK_QTAUDIOOUTPUT_BUFFER_TIME/TWK_QTAUDIOOUTPUT_PERIOD_TIME must be greater than 3 and ideally around 6.
+3. Once you have found the smallest value of TWK_QTAUDIOOUTPUT_BUFFER_TIME; use an av sync meter to measure the average av sync lag playing back RV's movieproc syncflash clip.
+    1. With TWK_QTAUDIOOUTPUT_BUFFER_TIME fixed to the value determined in the previous step; increase and decrease TWK_QTAUDIOOUTPUT_PERIOD_TIME, bearing in mind TWK_QTAUDIOOUTPUT_BUFFER_TIME must be a integer multiple of TWK_QTAUDIOOUTPUT_PERIOD_TIME. Find the multiple with the lowest measure average av sync values (i.e. the average of at least 25 av sync measurements).
 
 The table below provides the smallest values of TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME that prevents buffer underruns (i.e. audio corruption/static issues), minimizes the lag at play-start and average av sync. Note the default value for buffer time is 120000 and period time is 20000.
 
@@ -99,7 +100,6 @@ Table K.2:
 Some tuned configurations for 24fps on a 60Hz monitor.
 
 ### K.1 Suggestions for resolving audio static issues with PulseAudio for Linux
-
 
 In this Appendix, we outline some suggestions for configuring your linux distribution's pulseaudio to address the issue of audio static during playback when RV sees heavy and continuous use within the context of a production environment. While this issue is intermittent and hard to reproduce, it can occur with sufficient frequency to become a support burden. Please note the suggestions here should be validated by your systems/video engineering dept before you adopt them.
 

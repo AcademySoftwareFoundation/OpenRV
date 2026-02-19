@@ -2,13 +2,13 @@
 
 Aside from rendering, the most important function of the UI is to handle events. An event can be triggered by any of the following:
 
-*   The mouse pointer moved or a button on the mouse was pressed
-*   A key on the keyboard was pressed or released
-*   The window needs to be re-rendered
-*   A file being watched was changed
-*   The user became active or inactive
-*   A supported device (like the apple remote control) did something
-*   An internal event like a new source or session being created has occurred
+* The mouse pointer moved or a button on the mouse was pressed
+* A key on the keyboard was pressed or released
+* The window needs to be re-rendered
+* A file being watched was changed
+* The user became active or inactive
+* A supported device (like the apple remote control) did something
+* An internal event like a new source or session being created has occurred
 
 Each specific event has a name may also have extra data associated with it in the form of an event object. To see the name of an event (at least for keyboard and mouse pointer events) you can select the Help → Describe... which will let you interactively see the event name as you hit keys or move the mouse. You can also use Help → Describe Key.. to see what a specific key is bound to by pressing it.Table [5.1](#event-prefixes-for-basic-device-events) shows the basic event type prefixes.
 
@@ -49,7 +49,6 @@ Table 5.2:Event Object Methods. Python methods have the same names and return th
 
 ### 5.1 Binding an Event
 
-
 In Mu (or Python) you can bind an event using any of the bind() functions. The most basic version of bind() takes the name of the event and a function to call when the event occurs as arguments. The function argument (which is called when the event occurs) should take an Event object as an argument and return nothing (void). Here's a function that prints hello in the console every time the \`\`j'' key is pressed:
 
 > **Note:** If this is the first time you've seen this syntax, it's defining a Mu function. The first two characters \\: indicate a function definition follows. The name comes next. The arguments and return type are contained in the parenthesis. The first identifier is the return type followed by a semicolon, followed by an argument list.
@@ -73,6 +72,7 @@ or in Python:
 
 bind("default", "global", "key-down--j", my_event_function); 
 ```
+
 There are more complicated bind() functions to address binding functions in specific event tables (the Python example above is using the most general of these). Currently RV's user interface has one default global event table an couple of other tables which implement the parameter edit mode and help modes.Many events provide additional information in the event object. Our example above doesn't even use the event object, but we can change it to print out the key that was pressed by changing the function like so:
 
 ```
@@ -82,6 +82,7 @@ There are more complicated bind() functions to address binding functions in spec
     print("Key pressed = %c\n" % c);
 } 
 ```
+
 or in Python:
 
 ```
@@ -89,15 +90,14 @@ or in Python:
     c = event.key()
     print ("Key pressed = %s\n" % c) 
 ```
+
 In this case, the Event object's key() function is being called to retrieve the key pressed. To use the return value as a key it must be cast to a char. In Mu, the char type holds a single unicode character. In Python, a string is unicode. See the section on the Event class to find out how to retrieve information from it. At this point we have not talked about *where* you would bind an event; that will be addressed in the customization sections.
 
 ### 5.2 Keyboard Events
 
-
 There are two keyboard events: key-down and key-up. Normally the key-down events are bound to functions. The key-up events are necessary only in special cases.The specific form for key down events is key-down– *something* where *something* uniquely identifies both the key pressed and any modifiers that were active at the time.So if the \`\`a'' key was pressed the event would be called: key-down–a. If the control key were held down while hitting the \`\`a'' key the event would be called key-down–control–a.There are five modifiers that may appear in the event name: alt, caplock, control, meta, numlock, scrolllock, and shift in that order. The shift modifier is a bit different than the others. If a key is pressed with the shift modifier down and it would result in a different character being generated, then the shift modifier will not appear in the event and instead the result key will. This may sound complicated but these examples should explain it:For control + shift + A the event name would be key-down–control–A. For the \`\`\*'' key (shift + 8 on American keyboards) the event would be key-down–\*. Notice that the shift modifier does not appear in any of these. However, if you hold down shift and hit enter on most keyboards you will get key-down–shift–enter since there is no character associated with that key sequence.Some keys may have a special name (like enter above). These will typically be spelled out. For example pressing the \`\`home'' key on most keyboards will result in the event key-down–home. The only way to make sure you have the correct event name for keys is to start RV and use the Help → Describe... facility to see the true name. Sometimes keyboards will label a key and produce an unexpected event. There will be some keyboards which will not produce an event all for some keys or will produce a unicode character sequence (which you can see via the help mechanism).
 
 ### 5.3 Pointer (Mouse) Events
-
 
 The mouse (called pointer from here on) can produce events when it is moved, one of its buttons is pressed, an attached scroll wheel is rotated, or the pointer enters or leaves the window.The basic pointer events are move, enter, leave, wheelup, wheeldown, push, drag, and release. All but enter and leave will also indicate any keyboard modifiers that are being pressed along with any buttons on the mouse that are being held down. The buttons are numbered 1 through 5. For example if you hold down the left mouse button and movie the mouse the events generated are:
 
@@ -108,6 +108,7 @@ pointer-1--drag
 ...
 pointer-1-release 
 ```
+
 Pointer events involving buttons and modifiers always come in there parts: push, drag and release. So for example if you press the left mouse, move the mouse, press the shift key, move the mouse, release everything you get:
 
 ```
@@ -122,10 +123,10 @@ pointer-1--shift--drag
 ...
 pointer-1--shift--release 
 ```
+
 Notice how the first group without the shift is released before starting the second group with the shift even though you never released the mouse button. For any combination of buttons and modifiers, there will be a push-drag-release sequence that is cleanly terminated.It is also possible to hold multiple mouse buttons and modifiers down at the same time. When multiple buttons are held (for example, button 1 and 2) they are simply both included (like the modifiers) so for buttons 1 and 2 the name would be pointer-1-2–push to start the sequence.The mouse wheel behaves more like a button: when the wheel moves you get only a wheelup or wheeldown event indicating which direction the wheel was rotated. The buttons and modifiers will be applied to the event name if they are held down. Usually the motion of the wheel on a mouse will not be smooth and the event will be emitted whenever the wheel \`\`clicks''. However, this is completely a function of the hardware so you may need to experiment with any particular mouse.There are three more pointer events that can be generated. When the mouse moves with no modifiers or buttons held down it will generate the event pointer–move. When the pointer enters the view pointer–enter is generated and when it leaves pointer–leave. Something to keep in mind: when the pointer leaves the view and the device is no longer in focus on the RV window, any modifiers or buttons the user presses will not be known to RV and will not generate events. When the pointer returns to the view it may have modifiers that became active when out-of-focus. Since RV cannot know about these modifiers and track them in a consistent manner (at least on X Windows) RV will assume they do not exist.Pointer events have additional information associated with them like the coordinates of the pointer or where a push was made. These will be discussed later.
 
 ### 5.4 The Render Event
-
 
 The UI will get a render event whenever it needs to be updated. When handling the render event, a GL context is set up and you can call any GL function to draw to the screen. The event supplies additional information about the view so you can set up a projection.At the time the render event occurs, RV has already rendered whatever images need to be displayed. The UI is then called in order to add additional visual objects like an on-screen widget or annotation.Here's a render function that draws a red polygon in the middle of the view right on top of your image.Listing 5.1:Example Render Function
 
@@ -157,15 +158,14 @@ The UI will get a render event whenever it needs to be updated. When handling th
     glEnd();
 } 
 ```
+
 Note that for Python, you will need to use the PyOpenGL module or bind the symbols in the gl Mu module manually in order to draw in the render event.The UI code already has a function called render() bound the render event; so this function basically turns off existing UI rendering.
 
 ### 5.5 Remote Networking Events
 
-
 RV's networking generates a number of events indicating the status of the network. In addition, once a connection has been established, the UI may generate sent to remote programs, or remote programs may send events to RV. These are typically uniquely named events which are specific to the application that is generating and receiving them.For example the sync mechanism generates a number of events which are all named remote-sync-something.
 
 ### 5.6 Internal Events
-
 
 Some events will originate from RV itself. These include things like new-source or new-session which include information about what changed. The most useful of these is new-source which can be used to manage color and other image settings between the time a file is loaded and the time it is first displayed. (See Color Management Section). Other internal events are functional, but are placeholders which will become useful with future features.The current internal events are listed in table [5.3](#internal-events) .
 
@@ -256,6 +256,7 @@ It is possible to watch a file from the UI. If the watched file changes in any w
     print("%s changed on disk\n" % file);
 } 
 ```
+
 In order to have a file-changed event generated, you must first have called the command function watchFile().
 
 #### 5.6.2 Incoming Source Path Event
@@ -273,6 +274,7 @@ This event is sent when the user has selected a file or sequence to load from th
 
 bind("incoming-source-path", load_whole_sequence); 
 ```
+
 or in Python:
 
 ```
@@ -306,7 +308,7 @@ Sometimes an image is not available on disk when RV tries to read. This is often
 bind("missing-image", missingImage); 
 ```
 
-#### 5.6.4 Drag and Drop Filtering.
+#### 5.6.4 Drag and Drop Filtering
 
 Sometimes dragging in a directory into RV, the directory might contain files that RV cannot load (e.g. sidecar files), the directory-filter allows you to filter out certain file types.
 

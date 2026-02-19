@@ -6,7 +6,6 @@ Select your VFX reference platform by clicking on the appropriate tab. Install i
 
 * NOTE: CY2025 and CY2026 are experimental.  Noteably CY2026 for RV is still on Qt 6.5.3 pending changes necessary for 6.8.3
 
-
 ````{tabs}
 ```{code-tab} bash VFX-CY2026
 Boost               : 1.88.0
@@ -64,7 +63,6 @@ Visual Studio       : 2022 (MSVC v143 14.40.X)
 
 All other dependencies are shared across variations.
 
-
 ## Summary
 
 1. [Microsoft Visual Studio](mvs)
@@ -80,13 +78,13 @@ All other dependencies are shared across variations.
 9. [Setup environment variables](setup_env)
 10. [Build Open RV](build_windows_openrv)
 
-
 ````{warning}
 You should be cloning the repository later in the steps, but if you must clone it beforehand, clone it into the root 
 of a drive (e.g. ````c:````). See [Get Open RV source code](build_windows_openrv2).
 ````
 
 (mvs)=
+
 ## 1. Microsoft Visual Studio
 
 ````{warning}
@@ -136,10 +134,11 @@ MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.39-17.9) and MSVC v143 - VS 202
 ````
 
 (setup_default_msvc_compiler)=
+
 ## 2. Setup default MSVC compiler
 
-If Microsoft Visual Studio 2022 was installed for the first time (using the steps above), MSVC v143 v14.40 *should* be 
-the default compiler, although varying setup may affect this. 
+If Microsoft Visual Studio 2022 was installed for the first time (using the steps above), MSVC v143 v14.40 *should* be
+the default compiler, although varying setup may affect this.
 \
 \
 To ensure compatibility with Open RV, we need to make sure that MSVC v143 v14.40 is the default compiler.
@@ -167,6 +166,7 @@ Make sure that the *VCToolsVersion* is set to `14.40.33807`. The file should loo
 If the version is different, change it to `14.40.33807` in the file.
 
 (install_python)=
+
 ## 3. Install Python 3
 
 You must install the Python version corresponding to your chosen VFX reference platform using the official Python installer.
@@ -189,8 +189,6 @@ It is highly recommended that you install this Python in C:\Python310
 ### Installation
 
 The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but for VFX-CY2023 the path should be `C:\Python310` instead of `C:\Python311`.
-
-
 
 ````{carousel}
 :show_controls:
@@ -232,12 +230,14 @@ The **recommended** path is:
 ````
 
 (copy_python3)=
+
 ### 3.1 Copy python.exe and rename it to python3.exe
 
-Copy the Python executable as **python3.exe** to ensure compatibility with Open RV, which requires the `python3` command. 
+Copy the Python executable as **python3.exe** to ensure compatibility with Open RV, which requires the `python3` command.
 This also aligns with Linux and macOS conventions, where both python and python3 are valid commands.
 
 (install_cmake)=
+
 ## 4. Install CMake
 
 ````{warning}
@@ -245,7 +245,7 @@ Minimum **recommended** version for CMake is **3.27.X**.
 ````
 
 Download the lastest version of CMake from the [official CMake website](https://cmake.org/download/). Typically,
-the correct version will be **Windows x64 Installer**. Follow the installation wizard prompts to complete the setup. 
+the correct version will be **Windows x64 Installer**. Follow the installation wizard prompts to complete the setup.
 There are no special considerations or unique configuration options required.
 
 ````{note}
@@ -254,6 +254,7 @@ The default path is `C:\Program Files\CMake`.
 ````
 
 (install_windows_qt)=
+
 ## 5. Install Qt
 
 ````{warning}
@@ -365,6 +366,7 @@ Based on the recommendation above, the path would be:
 ````
 
 (install_strawberry_perl)=
+
 ## 6. Install Strawberry Perl
 
 Download and install the 64-bit version of [Strawberry Perl](https://strawberryperl.com/)
@@ -375,6 +377,7 @@ The default path is `C:\Strawberry`.
 ````
 
 (install_rust)=
+
 ## 7. Install Rust
 
 ````{warning}
@@ -400,6 +403,7 @@ The Rust installation will be located at `%USERPROFILE%\.cargo\bin` (typically `
 ````
 
 (install_msys2)=
+
 ## 8. Install MSYS2
 
 ````{warning}
@@ -415,6 +419,7 @@ Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NO
 MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Open RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
 
 (install_msys2_packages)=
+
 ### 8.1 Install required MSYS2 pacman packages
 
 ````{note}
@@ -451,13 +456,10 @@ pacman -Sy --needed \
 
 While installing the MSYS packages, review the list for any missing package. Some packages might not be installed after the first command.
 
-
-
-
-
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
 (setup_env)=
+
 ### 9. Setup environment variables
 
 ````{note}
@@ -483,11 +485,12 @@ which becomes `/c/Users/<username>/.cargo/bin` in MSYS2 format.
 ````
 
 The following paths **must** be added to the PATH environment variable within MSYS2:
-- CMake binary directory
-- Python binary directory
-- Rust cargo binary directory
-- MSYS2's `mingw64/bin`
-- Strawberry perl directory
+
+* CMake binary directory
+* Python binary directory
+* Rust cargo binary directory
+* MSYS2's `mingw64/bin`
+* Strawberry perl directory
 
 **The order is important**. Do not put Strawberry perl location before MSYS2's `mingw64/bin` directory.
 
@@ -528,7 +531,7 @@ echo "export QT_HOME=/c/Qt/5.15.2/msvc2019_64" >> ~/.bash_profile
 
 #### Apply changes to MSYS2 MINGW64
 
-All the environment variables changes above must be applied. You can do that by **closing and re-opening** 
+All the environment variables changes above must be applied. You can do that by **closing and re-opening**
 the MSYS2 MINGW64 terminal or by **running** the following command:
 
 ```shell
@@ -536,6 +539,7 @@ source ~/.bash_profile
 ```
 
 (build_windows_openrv)=
+
 ## 10. Build Open RV
 
 Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
@@ -553,12 +557,3 @@ Open RV repository **should** be cloned into the root of a drive (e.g. ````c:```
 Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look 
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
 ````
-
-
-
-
-
-
-
-
-

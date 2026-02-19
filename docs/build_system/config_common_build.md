@@ -28,7 +28,6 @@ git submodule update --init --recursive
 
 **Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's Open RV repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
 
-
 #### 1.2 Configuring Git to use the ignore file with `git blame`
 
 A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`, such as formatting commits. This allows you to use `git blame` without these commits cluttering the Git history. To configure Git to use this file when running `git blame`, use the following command:
@@ -36,7 +35,6 @@ A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`
 ```bash
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
-
 
 #### 1.3 Load command aliases to build Open RV
 
@@ -50,12 +48,11 @@ By default, the commands and aliases will be configured for a release build, but
 
 #### 1.4 First-time build only: rvbootstrap
 
-This step only needs to be done on a freshly cloned git repository, after you source rvcmds.sh. 
+This step only needs to be done on a freshly cloned git repository, after you source rvcmds.sh.
 
 Under the hood, this command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
 
 After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
-
 
 ````{tabs}
 ```{code-tab} bash Release
@@ -68,7 +65,6 @@ rvbootstrap
 ```
 ````
 
-
 Note 1: launch the default optimized build unless you have a reason to want the unoptimized debug build.
 
 Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk to complete the build.
@@ -79,8 +75,7 @@ Once you've built Open RV for the first time, there is no need to run "rvboostra
 
 #### 2.1 Build Open RV (incrementally) using rvmk
 
-To build Open RV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process. 
-
+To build Open RV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process.
 
 ````{tabs}
 ```{code-tab} bash Release
@@ -105,7 +100,6 @@ rvmk
 
 Building the source dependencies is done automatically the first time we build Open RV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
 
-
 ````{tabs}
 ```{code-tab} bash Release
 rvbuildt dependencies
@@ -121,7 +115,6 @@ Once Open RV is finished building, its executable binary can be found here:
 
 For Windows and Linux:
 
-
 ````{tabs}
 ```{code-tab} bash Release
 OpenRV/_build/stage/app/bin/rv
@@ -131,9 +124,7 @@ OpenRV/_build_debug/stage/app/bin/rv
 ```
 ````
 
-
 For macOS:
-
 
 ````{tabs}
 ```{code-tab} bash Release
@@ -196,22 +187,23 @@ To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/
 
 ### 8. Installing Blackmagicdesign&reg; Video Output Support (Optional)
 
-Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk<br>
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): <https://www.blackmagicdesign.com/desktopvideo_sdk><br>
 Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
 Example:
+
 ```bash
 rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'
 ```
 
 ### 9. NDI&reg; Video Output Support (Optional)
 
-Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): https://ndi.video/<br>
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): <https://ndi.video/><br>
 
 Installing the NDI SDK must be done before building Open RV for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
 
 ### 10. How to enable non-free FFmpeg codecs
 
-Legal Notice: Non-free FFmpeg codecs are disabled by default. Please check with your legal department whether you have the proper licenses and rights to use these codecs. 
+Legal Notice: Non-free FFmpeg codecs are disabled by default. Please check with your legal department whether you have the proper licenses and rights to use these codecs.
 ASWF is not responsible for any unlicensed use of these codecs.
 
 The RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE and RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE can optionally be specified at configure time to enable non free FFmpeg decoders and encoders respectively.
@@ -246,7 +238,7 @@ To run all tests automatically:
 rvtest
 ```
 
-To run tests manually, 
+To run tests manually,
 
 ```shell
 ctest --test-dir _build

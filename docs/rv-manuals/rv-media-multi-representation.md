@@ -72,7 +72,7 @@ The `SwitchIPNode` is available in older versions of RV. This means that older v
 
 #### string addSourceMediaRep(string sourceNode or "last" for last created source node, string mediaRepName, string[] mediaRepPathsAndOptions=[], string tag=[])
 
-Add a media representation to an existing source specified by sourceNode with an optional tag. 
+Add a media representation to an existing source specified by sourceNode with an optional tag.
 
 If the source media representation already exists, `addSourceMediaRep()` throws the following error:
 
@@ -144,12 +144,8 @@ Returns the name of the media representation currently selected by the Switch Gr
 
 When `sourceNode` is an empty string "", then `sourceMediaRep()` returns the name of the currently selected media representation corresponding to the first Switch node found at the current frame.
 
-
 #### string[] sourceMediaReps(string sourceNode)
 
 Returns the names of the media representations available for the Switch Group corresponding to the given RVFileSource node.
 
 If `sourceNode` is "", then `sourceMediaReps()` returns all the possible source media representation names.
-
-
-

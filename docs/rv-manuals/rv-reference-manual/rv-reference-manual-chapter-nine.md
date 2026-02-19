@@ -4,7 +4,6 @@ Use the package system described below to expand RV.
 
 ### 9.1 rvpkg Command Line Tool
 
-
 The rvpkg command line tool makes it possible to manage packages from the shell. If you use rvpkg you do not need to use RV's preferences UI to install/uninstall add/remove packages from the file system. We recommend using this tool instead of manually editing files to prevent the necessity of keeping abreast of how all the state is stored in new versions.The rvpkg tool can perform a superset of the functions available in RV's packages preference user interface.
 
 |  |  |
@@ -30,6 +29,7 @@ Table 9.1: rvpkg Options
 ```
  shell> rvpkg -list 
 ```
+
 Lists all packages that are available in the RV_SUPPORT_PATH directories. Typical output from rvpkg looks like this:
 
 ```
@@ -44,16 +44,19 @@ I L - 1.3 "Session Manager" /SupportPath/Packages/session_manager-1.3.rvpkg
 I L - 2.2 "RV Color/Image Management" /SupportPath/Packages/source_setup-2.2.rvpkg
 I L - 1.3 "Window Title" /SupportPath/Packages/window_title-1.3.rvpkg 
 ```
+
 The first three columns indicate installation status (I), load status (L), and whether or not the package is optional (O).If you want to include a support path directory that is not in RV_SUPPORT_PATH, you can include it like this:
 
 ```
  shell> rvpkg -list -include /path/to/other/support/area 
 ```
+
 To limit the list to a single support area:
 
 ```
  shell> rvpkg -list -only /path/to/area 
 ```
+
 The -include and -only arguments may be applied to other options as well.
 
 #### 9.1.2 Getting Information About the Environment
@@ -63,6 +66,7 @@ You can see the entire support path list with the command:
 ```
  shell> rvpkg -env 
 ```
+
 This will show alternate version package areas constructed from the RV_SUPPORT_PATH environment variable to which packages maybe added, removed, installed and uninstalled. The list may differ based on the platform.
 
 #### 9.1.3 Getting Information About a Package
@@ -70,6 +74,7 @@ This will show alternate version package areas constructed from the RV_SUPPORT_P
 ```
  shell> rvpkg -info /path/to/file.rvpkg 
 ```
+
 This will result in output like:
 
 ```
@@ -98,6 +103,7 @@ Files: window_title.mu
 ```
  shell> rvpkg -add /path/to/area /path/to/file1.rvpkg /path/to/file2.rvpkg 
 ```
+
 You can add multiple packages at the same time. Remember that adding a package makes it become available for installation, it does not install it.
 
 #### 9.1.5 Removing a Package from a Support Area
@@ -105,6 +111,7 @@ You can add multiple packages at the same time. Remember that adding a package m
 ```
  shell> rvpkg -remove /path/to/area/Packages/file1.rvpkg 
 ```
+
 Unlike adding, the package in this case is the one in the support area's Packages directory. You can remove multiple packages at the same time.If the package is installed rvpkg will interactively ask for confirmation to uninstall it first. You can override that by using -force as the first argument:
 
 ```
@@ -117,6 +124,7 @@ Unlike adding, the package in this case is the one in the support area's Package
  shell> rvpkg -install /path/to/area/Packages/file1.rvpkg
 shell> rvpkg -uninstall /path/to/area/Packages/file1.rvpkg 
 ```
+
 If files are missing when uninstalling rvpkg may complain. This can happen if multiple versions where somehow installed into the same area.
 
 #### 9.1.7 Combining Add and Install for Automated Installation
@@ -126,11 +134,13 @@ If you're using rvpkg from an automated installation script you will want to use
 ```
  shell> rvpkg -force -install -add /path/to/area /path/to/some/file1.rvpkg 
 ```
+
 Multiple packages can be specified with this command. All of the packages are installed into /path/to/area.To force uninstall followed by removal:
 
 ```
  shell> rvpkg -force -remove /path/to/area/Packages/file1.rvpkg 
 ```
+
 The -uninstall option is unnecessary in this case.
 
 #### 9.1.8 Overrideing Default Optional Package Load Behavior
@@ -140,15 +150,14 @@ If you want optional packages to be loaded by default for all users, you can do 
 ```
  shell> rvpkg -optin /path/to/area/Packages/file1.rvpkg 
 ```
+
 In this case, rvkpg will rewrite the rvload2 file associated with the support area to indicate the package is no longer optional. The user can still unload the package if they want, but it will be loaded by default after running the command.
 
 ### 9.2 Package File Contents
 
-
 A package file is zip file with at least one special file called PACKAGE along with .mu, .so, .dylib, and support files (plain text, images, icons, etc) which implement the actual package.Creating a package requires the zip binary. The zip binary is usually part of the default install on each of the OSes that RV runs on.The contents of the package should NOT be put in a parent directory before being zipped up. The PACKAGE manifest as well as any other files should be at the root level of the zip file.When a package is installed, RV will place all of its contents into subdirectories in one of the RV_SUPPORT_PATH locations. If the RV_SUPPORT_PATH is not defined in the environment, it is assumed to have the value of RV_HOME/plugins followed by the home directory support area (which varies with each OS: see the user manual for more info). Files contained in one zip file will all be under the same support path directory; they will not be installed distributed over more than one support path location.The install locations of files in the zip file is described in a filed called PACKAGE which must be present in the zip file. The minimum package file contains two files: PACKAGE and one other file that will be installed. A package zip file must reside in the subdirectory called Packages in one of the support path locations in order to be installed. When the user adds a package in the RV package manager, this is where the file is copied to.
 
 ### 9.3 PACKAGE Format
-
 
 The PACKAGE file is a [YAML](http://www.yaml.org/) file providing information about how the package is used and installed as well as user documentation. Every package must have a PACKAGE file with an accurate description of its contents.The top level of the file may contain the following fields:
 
@@ -189,6 +198,7 @@ Table 9.3:Mode Fields
 
 As an example, the package window_title-1.0.rvpkg has a relatively simple PACKAGE file shown here:
 <a id="example-PACKAGE"></a>
+
 ```
 package: Window Title
 author: Tweak Software
@@ -214,6 +224,7 @@ description: |
   <p> The events play-start, play-stop, and frame-changed, are bound to
   functions which call setWindowTitle(). </p> 
 ```
+
 When the package zip file contains additional support files (which are not specified as modes) the package manager will try to install them in locations according to the file type. However, you can also directly specify where the additional files go relative to the support path root directory.
 
 |  |  |  |  |
@@ -232,23 +243,23 @@ Table 9.4:File FieldsFor example if you package contains icon files for user int
 
 ### 9.4 Package Management Configuration Files
 
-
 There are two files which the package manager creates and uses: rvload2 (previous releases had a file called rvload) in the Mu subdirectory and rvinstall in the Packages subdirectory. rvload2 is used on start up to load package modes and create stubs in menus or events for toggling the modes on/off if they are lazy loaded. rvinstall lists the currently known package zip files with a possible an asterisk in front of each file that is installed. The rvinstall file in used only by the package manager in the preferences to keep track of which packages are which.The rvload2 file has a one line entry for each mode that it knows about. This file is automatically generated by the package manager when the user installs a package with modes in it. The first line of the file indicates the version number of the rvload2 file itself (so we can change it in the future) followed by the one line descriptions.For example, this is the contents of rvload2 after installing the window title package:
 
 ```
 3
 window_title,window_title.zip,nil,nil,nil,true,true,false 
 ```
+
 The fields are:
 
-1.  The mode name (as it appears in a require statement in Mu)
-2.  The name of the package zip file the mode originally comes from
-3.  An optional menu item name
-4.  An optional menu shortcut/accelerator if the menu item exists
-5.  An optional event to bind mode toggling to
-6.  A boolean indicating whether the mode should be loaded immediately or not
-7.  A boolean indicating whether the mode should be activated immediately
-8.  A boolean indicating whether the mode is optional so it should not be loaded by default unless the user opts-in.
+1. The mode name (as it appears in a require statement in Mu)
+2. The name of the package zip file the mode originally comes from
+3. An optional menu item name
+4. An optional menu shortcut/accelerator if the menu item exists
+5. An optional event to bind mode toggling to
+6. A boolean indicating whether the mode should be loaded immediately or not
+7. A boolean indicating whether the mode should be activated immediately
+8. A boolean indicating whether the mode is optional so it should not be loaded by default unless the user opts-in.
 
 Each field is separated by a comma and there should be no extra whitespace on the line. The rvinstall file is much simpler: it contains a single zip file name on each line and an asterisk next to any file which is current known to be installed. For example:
 
@@ -259,18 +270,18 @@ metadata_info.zip
 sequence_from_file.zip
 *window_title.zip 
 ```
+
 In this case, five modes would appear in the package manager UI, but only the window title package is actually installed. The zip files should exist in the same directory that rvinstall lives in.
 
 ### 9.5 Developing a New Package
-
 
 In order to start a new package there is a chicken and egg problem which needs to be overcome: the package system wants to have a package file to install.The best way to start is to create a source directory somewhere (like your source code repository) where you can build the zip file form its contents. Create a file called PACKAGE in that directory by copying and pasting from either this manual (listing [9.3](#example-PACKAGE) ) or from another package you know works and edit the file to reflect what you will be doing (i.e. give it a name, etc).If you are writing a Mu module implementing a mode or widget (which is also a mode) then create the .mu file in that directory also.You can at that point use zip to create the package like so:
 
 ```
  shell> zip new_package-0.0.rvpkg PACKAGE the_new_mode.mu 
 ```
-This will create the new_package-0.0.rvpkg file. At this point you're ready to install your package that doesn't do anything. Open RV's preferences and in the package manager UI add the zip file and install it (preferably in your home directory so it's visible only to you while you implement it).Once you've done this, the rvload2 and rvinstall files will have been either created or updated automatically. You can then start hacking on the installed version of your Mu file (not the one in the directory you created the zip file in). Once you have it working the way you want copy it back to your source directory and create the final zip file for distribution and delete the one that was added by RV into the Packages directory.
 
+This will create the new_package-0.0.rvpkg file. At this point you're ready to install your package that doesn't do anything. Open RV's preferences and in the package manager UI add the zip file and install it (preferably in your home directory so it's visible only to you while you implement it).Once you've done this, the rvload2 and rvinstall files will have been either created or updated automatically. You can then start hacking on the installed version of your Mu file (not the one in the directory you created the zip file in). Once you have it working the way you want copy it back to your source directory and create the final zip file for distribution and delete the one that was added by RV into the Packages directory.
 
 #### 9.5.2 Using the Mode Manager While Developing
 
@@ -279,21 +290,25 @@ It's possible to delay making an actual package file when starting development o
 ```
  shell> rv -flags ModeManagerLoad=my_new_mode 
 ```
+
 where my_new_mode is the name of the .mu file with the mode in it (without the extension).You can get verbose information on what's being loaded and why (or why not by setting the verbose flag):
 
 ```
  shell> rv -flags ModeManagerVerbose 
 ```
+
 The flags can be combined on the command line.
 
 ```
  shell> rv -flags ModeManagerVerbose ModeManagerLoad=my_new_mode 
 ```
+
 If your package is installed already and you want to force it to be loaded (this overrides the user preferences) then:
 
 ```
  shell> rv -flags ModeManagerPreload=my_already_installed_mode 
 ```
+
 similarly, if you want to force a mode not to be loaded:
 
 ```
@@ -309,7 +324,6 @@ Normally, RV will compile Mu files to conserve space in memory. Unfortunately, t
 The Mu modules are documented dynamically by the documentation browser. This is available under RV's help menu “Mu API Documentation Browser”.
 
 ### 9.6 Loading Versus Installing and User Override
-
 
 The package manager allows each user to individually install and uninstall packages in support directories that they have permission in. For directories that the user does not have permission in the package manager maintains a separate list of packages which can be excluded by the user.For example, there may be a package installed facility wide owned by an administrator. The support directory with facility wide packages only allows read permission for normal users. Packages that were installed and loaded by the administrator will be automatically loaded by all users.In order to allow a user to override the loading of system packages, the package manager keeps a list of packages not to load. This is kept in the user's preferences file (see user manual for location details). In the package manager UI the “load” column indicates the user status for loading each package in his/her path.
 

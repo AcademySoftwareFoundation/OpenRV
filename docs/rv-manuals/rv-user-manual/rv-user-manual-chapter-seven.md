@@ -8,7 +8,6 @@ Figure 7.1:  RV Pixel Pipeline <a id="rv-pixel-pipeline"></a>
 
 ### 7.1 Image Layers
 
-
 Each image source may be composed of one or more layers. Layers may come from multiple files, or a single file if the file format supports it or a combination of the two. For example a stereo source can be constructed from a left and right movie file; in that case each file is a layer. Alternately, layers may come from a single file as would be the case with a stereo QuickTime file or EXR images with left and right layers.
 
 An image source may have any number of layers. By default, only the first layer is visible in RV unless an operation exposes the additional layers.
@@ -18,7 +17,6 @@ An image source may have any number of layers. By default, only the first layer 
 RV has a number of stereo viewing options which render image layers to a left and right eye image. The left and right eye images are both layers. RV doesn't require any specific method of storing stereo images: you can store them in a single movie file as multiple tracks, as multiple movie files, or as multiple image sequences. You can even have one eye be a completely different format than the other if necessary. Stereo viewing is discussed in Chapter [12](rv-user-manual-chapter-twelve.md#12-stereo-viewing) .
 
 ### 7.2 Image Attributes
-
 
 RV tries to read as many image attributes as possible from the file. RV may also add attributes to the image to indicate things like pixel aspect ratio, alpha type, uncrop regions (data and display windows) and to indicate the color space the pixels are in. The image info window in the user interface shows all of the relevant image attributes.
 
@@ -64,7 +62,6 @@ Table 7.1:
 Basic Special Image Attributes
 
 ### 7.3 Image Channels
-
 
 RV potentially does a great deal of data conversion between reading a file and rendering an image on your display device. In some cases, you will want to have control over this process so it's important to understand what's occurring internally. For example, when RV reads a typical RGB TIFF file, you can assume the internal representation is a direct mapping from the data in the file. If, on the other hand, RV is reading an EXR file with A, B, G, T, and Z channels, and you are interested in the contents of the Z channel, you will need to tell RV specifically how to map the image data to an RGBA pixel.
 
@@ -118,14 +115,11 @@ It is also possible to add channels to incoming images using Channel Remapping. 
 
 New channels currently inherit the channel data from the first channel in the image. If the data needs to be 1.0 or 0.0 in the new channel, use Channel Reorder to insert constant data.
 
-
-
 Channel Remapping is controlled by the ChannelMap node. The names of the channels and their order is stored in the **format.channels** property. Channel Remapping occurs when the image data in the file is converted into one of the internal image formats.
 
 Note that there is overlapping functionality between Channel Remapping and Channel Reordering (See [7.8.1](#781-channel-reorder) ) and Channel Isolation (See [7.8.2](#782-isolating-channels) ) which are described below. However, Channel Remapping occurs just after pixels are read from a file. Channel Reordering and Isolation occur just before the pixel is displayed and typically happen in hardware. Channel Remapping always occurs in software.
 
 ### 7.4 Crop and Uncrop
-
 
 Cropping an image discards pixels outside of the crop region. The image size is reduced in the process. This can be beneficial when loading a large number of cached images where only a small portion of the frame is interesting or useful (e.g. a rendered element). For some formats, RV may be able to reduce I/O bandwidth by reading and decoding pixels only within the crop region.
 
@@ -166,7 +160,6 @@ Uncrop of Oversized Render
 RV considers the uncropped image geometry as the principle image geometry. Values reported relating to the width and height in the user interface will usually refer to the uncropped geometry. Wipes, mattes, and other user interface will be drawing relative to the uncropped geometry.
 
 ### 7.5 Conversion to Linear Color Space
-
 
 If an image format stores pixel values in a color space which is non-linear, the values should be converted to linear before any color correction or display correction is applied. In the ICC and EXR documentation, linear space is also called *Scene Referred Space.* The most important characteristic of scene referred space is that doubling a value results in twice the luminance.
 
@@ -212,9 +205,9 @@ Some formats may produce YUV or YUVA images to be displayed. RV can decode these
 where
 | |
 | ------------------ |
-| 0 ≤ _Y_ ≤ 1        |
-| - 0.5 ≤ _U_ ≤ 0.5 |
-| - 0.5 ≤ _V_ ≤ 0.5 |
+| 0 ≤ *Y* ≤ 1        |
+| - 0.5 ≤ *U* ≤ 0.5 |
+| - 0.5 ≤ *V* ≤ 0.5 |
 
 In the case of Photo-JPEG, the YUV data coming from a movie file is assumed to use the full gamut for the given number of bits. For example, an eight bit per channel image would have luminance values of [0, 255]. For Motion-JPEG a reduced color gamut is assumed.
 
@@ -296,7 +289,6 @@ See Chapter [9](rv-user-manual-chapter-nine.md#9-using-cdls-in-rv) for more info
 
 ### 7.6 Color Correction
 
-
 None of the color corrections affects the Alpha channel. For a good discussion on linear color corrections, check out Paul Haeberli's Graphica Obscura website [Graphica Obscura](http://www.graficaobscura.com/) .
 
 Color corrections are applied independently to each image source in an RV session. For example, if you have two movies playing in sequence in a session and you change the contrast, it will only affect the movie that is visible when the contrast is changed. (If you want to apply the same color correction to all sources, perform the correction in tiled mode: Tools → Stack, Tools → Tile.)
@@ -323,11 +315,11 @@ The unit of hue rotation is radians. RV's hue rotation is luminance preserving. 
 
 The algorithm is as follows:
 
-*   Apply a rotation that maps the grey vector to the blue axis.
-*   Compute the vector L that is perpendicular to the plane of constant luminance.
-*   Apply a skew transform to map the vector L onto the blue axis.
-*   Apply a rotation about the blue axis N radians where N is the amount of hue change.
-*   Apply a rotation that maps the blue axis back to the grey vector.
+* Apply a rotation that maps the grey vector to the blue axis.
+* Compute the vector L that is perpendicular to the plane of constant luminance.
+* Apply a skew transform to map the vector L onto the blue axis.
+* Apply a rotation about the blue axis N radians where N is the amount of hue change.
+* Apply a rotation that maps the blue axis back to the grey vector.
 
 RV computes luminance using this formula
 
@@ -342,7 +334,7 @@ This is also the formula used for luminance display.
 | *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
 | *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
 | *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
+| *0*      | *0*      | *0*      | *1*         |   |  |
 |  |  |  |  |   |  |
 |  | *R*    |  |  |  |
 |  | *G*    |  |  |  |
@@ -355,7 +347,7 @@ where
 
 Weight values for R, G, and B are applicable in linear color space. Values used for determining luminance for NTSC video are not applicable in linear color space.
 
-*R*<sub>*w*</sub> = 0.3086 
+*R*<sub>*w*</sub> = 0.3086
 *G*<sub>*w*</sub> = 0.6094
 *B*<sub>*w*</sub> = 0.0820
 
@@ -368,7 +360,7 @@ RV applies the formula:
 | *R*<sub>*w*</sub>*(1 - s) + s* | *G*<sub>*w*</sub>*(1 - s)* | *B*<sub>*w*</sub>*(1 - s)* | *0*         |   |  |
 | *R*<sub>*w*</sub>*(1 - s)* | *G*<sub>*w*</sub>*(1 - s) + s* | *B*<sub>*w*</sub>*(1 - s)* | *0*         |   |  |
 | *R*<sub>*w*</sub>*(1 - s)* | *G*<sub>*w*</sub>*(1 - s)* | *B*<sub>*w*</sub>*(1 - s) + s* | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
+| *0*      | *0*      | *0*      | *1*         |   |  |
 |  |  |  |  |   |  |
 |  | *R*    |  |  |  |
 |  | *G*    |  |  |  |
@@ -392,7 +384,7 @@ RV applies the formula:
 | *1 + k* | *0* | *0* | *- k2*         |   |  |
 | *0* | *1 + k* | *0* | *- k2*         |   |  |
 | *0* | *0* | *1 + k* | *- k2*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
+| *0*      | *0*      | *0*      | *1*         |   |  |
 |  |  |  |  |   |  |
 |  | *R*    |  |  |  |
 |  | *G*    |  |  |  |
@@ -410,7 +402,7 @@ RV applies the formula:
 | *-1* | *0* | *0* | *0*         |   |  |
 | *0* | *-1* | *0* | *0*         |   |  |
 | *0* | *0* | *-1* | *0*         |   |  |
-| *1*      | *1*      | *1*      | *1*         |   |  |   
+| *1*      | *1*      | *1*      | *1*         |   |  |
 |  |  |  |  |   |  |
 |  | *R*    |  |  |  |
 |  | *G*    |  |  |  |
@@ -423,7 +415,7 @@ ASC-CDL controls are as follows:
 
 |  |  |  |
 | ------ | ------ | ------ |
-| *SOP* | = | *Clamp* ( *C*<sub>*in*</sub> * *slope* + *offset* )<sup>*power*</sup> | 
+| *SOP* | = | *Clamp* ( *C*<sub>*in*</sub> * *slope* + *offset* )<sup>*power*</sup> |
 
 where *slope* , *offset* , and *power* are per-channel parameters
 
@@ -436,7 +428,7 @@ The CDL saturation is then applied to the result like so:
 | *R<sub>w</sub>(1 - s) + s* | *G<sub>w</sub>(1 - s)* | *B<sub>w</sub>(1 - s)* | *0*         |   |  |
 | *R<sub>w</sub>(1 - s)* | *G<sub>w</sub>(1 - s) + s* | *B<sub>w</sub>(1 - s)* | *0*         |   |  |
 | *R<sub>w</sub>(1 - s)* | *G<sub>w</sub>(1 - s)* | *B<sub>w</sub>(1 - s) + s* | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
+| *0*      | *0*      | *0*      | *1*         |   |  |
 |  |  |  |  |   |  |
 |  | *SOP<sub>R</sub>*    |  |  |  |
 |  | *SOP<sub>G</sub>*    |  |  |  |
@@ -453,7 +445,6 @@ where
 and *s* is the saturation when *s* ≥ 0
 
 ### 7.7 Display Simulation and Correction
-
 
 After color corrections have been applied in linear space and before pixels are sent to the display device, they undergo display transformations. These transforms are intended to simulate the appearance of pixels on alternate display devices (like film) and to correct for any color transform that will be applied by the primary display device. In addition, RV provides a few tools to help visualize image pixel values in various ways.
 
@@ -541,7 +532,6 @@ This is most useful when a display LUT is being used to simulate an alternate di
 The Display Brightness can be set from the View menu.
 
 ### 7.8 Final Display Filters
-
 
 These operations occur after the display correction has been applied and before the pixel is displayed. Unlike color corrections, there is only a single instance of each of these for an RV session. So if you isolate the red channel for example, it will be isolated for all source material.
 
