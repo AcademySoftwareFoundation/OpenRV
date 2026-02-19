@@ -4,7 +4,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-//
+// Fake changes
 #ifndef __ICCNodes__ColorSyncBridge__h__
 #define __ICCNodes__ColorSyncBridge__h__
 #include <iostream>
