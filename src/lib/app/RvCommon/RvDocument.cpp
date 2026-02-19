@@ -1283,10 +1283,13 @@ namespace Rv
             m_glView->setContentSize(int(w), int(h));
             m_glView->setMinimumContentSize(int(w), int(h));
             m_glView->updateGeometry();
+
+            // Note: We don't call this the first time,
+            // as it will reset the image size to its
+            // previous scale.
+            m_resetPolicyTimer->start();
         }
         DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
-
-        m_resetPolicyTimer->start();
 
         if (placement)
         {
