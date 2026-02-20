@@ -1,0 +1,15 @@
+{
+    "changelog-sections": [
+        { "type": "feat",  "section": "Features" },
+        { "type": "fix",   "section": "Bug Fixes" },
+        { "type": "perf",  "section": "Performance Improvements" },
+        { "type": "build", "section": "Build System" },
+        { "type": "ci", "section": "GitHub Actions" },
+        { "type": "docs", "section": "Documentation" }
+    ],
+    "packages": {
+      ".": {
+        "release-type": "simple"
+      }
+    }
+  }
