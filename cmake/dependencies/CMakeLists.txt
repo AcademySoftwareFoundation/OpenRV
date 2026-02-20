@@ -6,7 +6,7 @@
 
 INCLUDE(rv_create_std_deps_vars)
 INCLUDE(rv_make_std_lib_name)
-INCLUDE(rv_copy_lib_bin_folders)
+INCLUDE(rv_stage_dependency_libs)
 
 IF(NOT TARGET dependencies)
   ADD_CUSTOM_TARGET(dependencies)

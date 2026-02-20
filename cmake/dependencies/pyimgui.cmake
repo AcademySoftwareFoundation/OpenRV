@@ -91,7 +91,6 @@ EXTERNALPROJECT_ADD(
   DEPENDS Python::Python imgui::imgui RV_DEPS_NANOBIND
 )
 
-# Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
 IF(RV_TARGET_WINDOWS)
   SET(_pybindings_location
       "${RV_STAGE_LIB_DIR}/site-packages"
@@ -102,15 +101,13 @@ ELSE()
   )
 ENDIF()
 
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into site-packages"
-  OUTPUT ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_libpath} ${_pybindings_location}/${_libname}
-  DEPENDS ${_target}
+RV_STAGE_DEPENDENCY_LIBS(
+  TARGET
+  ${_target}
+  FILES
+  ${_libpath}
+  STAGE_LIB_DIR
+  ${_pybindings_location}
+  OUTPUTS
+  ${_pybindings_location}/${_libname}
 )
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
-)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)

@@ -193,30 +193,21 @@ SET(_include_dir
 
 FILE(MAKE_DIRECTORY ${_include_dir})
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
 IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_openexrcore_name} ${RV_STAGE_BIN_DIR}/${_ilmthread_name} ${RV_STAGE_BIN_DIR}/${_iex_name}
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET
+    ${_target}
+    BIN_DIR
+    ${_bin_dir}
+    OUTPUTS
+    ${RV_STAGE_BIN_DIR}/${_openexr_name}
+    ${RV_STAGE_BIN_DIR}/${_openexrcore_name}
+    ${RV_STAGE_BIN_DIR}/${_ilmthread_name}
+    ${RV_STAGE_BIN_DIR}/${_iex_name}
   )
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
   )
 ENDIF()
 

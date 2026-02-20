@@ -126,31 +126,10 @@ TARGET_INCLUDE_DIRECTORIES(
 LIST(APPEND RV_DEPS_LIST dav1d::dav1d)
 
 IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_david_lib_name}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_install_dir}/bin OUTPUTS ${RV_STAGE_LIB_DIR}/${_david_lib_name})
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_david_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_david_lib_name}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_david_lib_name})
 ENDIF()
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
 SET(RV_DEPS_DAV1D_VERSION
     ${_version}

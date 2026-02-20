@@ -93,13 +93,13 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-# PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
+# PCRE is not used for Linux and MacOS (Boost regex is used) in the current code. Copy library files manually since there are tools that are not needed in the
+# bin folder.
 ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Installing ${_target}'s shared library into ${RV_STAGE_BIN_DIR}"
-  # Copy library files manually since there are tools that are not needed in the bin folder.
+  COMMENT "Staging ${_target}'s shared library into ${RV_STAGE_BIN_DIR}"
+  OUTPUT ${RV_STAGE_BIN_DIR}/${_pcre2_libname} ${RV_STAGE_BIN_DIR}/${_pcre2_libname_posix}
   COMMAND ${CMAKE_COMMAND} -E copy ${_pcre2_libpath} ${_pcre2_libpath_posix} -t ${RV_STAGE_BIN_DIR}
+  DEPENDS ${_target}
 )
 
 ADD_CUSTOM_TARGET(

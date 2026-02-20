@@ -97,10 +97,11 @@ ADD_CUSTOM_COMMAND(
           ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
 )
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+IF(RV_TARGET_WINDOWS)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} OUTPUTS ${RV_STAGE_BIN_DIR}/${_libname})
+ELSE()
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
+ENDIF()
 
 ADD_LIBRARY(Tiff::Tiff SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(Tiff::Tiff ${_target})

@@ -104,33 +104,35 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_byproducts}
 )
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-IF(NOT RV_TARGET_WINDOWS)
-  RV_COPY_LIB_BIN_FOLDERS()
-ELSE()
-  # Don't use RV_COPY_LIB_BIN_FOLDERS() because RV don't need the whole bin directory. Copying the two DLLs from jpegturbo.
+IF(RV_TARGET_WINDOWS)
+  # Don't use copy_directory for bin/ because RV only needs specific DLLs from jpegturbo.
   ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+    COMMENT "Staging ${_target} libs and DLLs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+    OUTPUT ${RV_STAGE_BIN_DIR}/${_winlibjpegname}
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_winlibjpegname} ${RV_STAGE_BIN_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_libturbojpegname} ${RV_STAGE_BIN_DIR}
+    DEPENDS ${_target}
   )
-
   ADD_CUSTOM_TARGET(
     ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
+    DEPENDS ${RV_STAGE_BIN_DIR}/${_winlibjpegname}
   )
-ENDIF()
-
-IF(NOT RV_TARGET_WINDOWS)
-  # RV_COPY_LIB_BIN_FOLDERS doesn't copy symlinks so this command is used for _libjpeg62path
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Copying jpegturbo's libjpeg ('${_libjpeg62path}') to '${RV_STAGE_LIB_DIR}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_libjpeg62path} ${RV_STAGE_LIB_DIR}
+  ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+ELSE()
+  # copy_directory doesn't copy symlinks, so the libjpeg62 file needs an explicit copy via PRE_COMMANDS
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET
+    ${_target}
+    OUTPUTS
+    ${RV_STAGE_LIB_DIR}/${_libturbojpegname}
+    PRE_COMMANDS
+    COMMAND
+    ${CMAKE_COMMAND}
+    -E
+    copy
+    ${_libjpeg62path}
+    ${RV_STAGE_LIB_DIR}
   )
 ENDIF()
 

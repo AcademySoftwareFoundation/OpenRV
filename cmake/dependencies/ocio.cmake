@@ -291,14 +291,6 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   )
 ENDIF()
 
-# All platform
-ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Copying OpenColorIO lib into '${RV_STAGE_LIB_DIR}'."
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-)
-
 IF(RV_TARGET_WINDOWS)
   SET(_rv_stage_lib_site_package_dir
       "${RV_STAGE_LIB_DIR}/site-packages"
@@ -329,8 +321,7 @@ IF(RV_TARGET_WINDOWS)
   ENDIF()
 ENDIF()
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
 ADD_LIBRARY(ocio::ocio SHARED IMPORTED GLOBAL)
 LIST(APPEND RV_DEPS_LIST ocio::ocio)

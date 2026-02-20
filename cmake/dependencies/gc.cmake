@@ -144,18 +144,7 @@ IF(NOT RV_TARGET_WINDOWS)
   LIST(APPEND RV_DEPS_LIST BDWGC::Cord)
 ENDIF()
 
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-  OUTPUT ${_gc_stage_outputs}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  DEPENDS ${_target}
-)
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${_gc_stage_outputs}
-)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_gc_stage_outputs})
 
 SET(RV_DEPS_GC_VERSION
     ${_version}
