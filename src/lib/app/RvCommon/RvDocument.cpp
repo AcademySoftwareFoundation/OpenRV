@@ -189,18 +189,38 @@ namespace Rv
         if (docs.empty())
         {
             m_glView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
+                new GLView(0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
                            true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
         else
         {
+            cout << "DEBUG: Getting shared context from existing document" << endl;
             RvSession* s = static_cast<RvSession*>(docs.front());
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+            cout << "DEBUG: rvDoc = " << rvDoc << endl;
+            GLView* existingView = rvDoc ? rvDoc->view() : nullptr;
+            cout << "DEBUG: existingView = " << existingView << endl;
+            QOpenGLContext* sharedCtx = existingView ? existingView->context() : nullptr;
+            cout << "DEBUG: sharedCtx = " << sharedCtx << endl;
+            m_glView = new GLView(sharedCtx, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                                   opts.vsync != 0 && !m_vsyncDisabled,
                                   true, // double buffer
                                   opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            cout << "DEBUG: Created GLView with shared context" << endl;
         }
+        
+        cout << "DEBUG: Creating window container for GLView" << endl;
+        // Wrap QOpenGLWindow in a widget container for layout
+        m_glViewContainer = QWidget::createWindowContainer(m_glView, this);
+        cout << "DEBUG: Window container created: " << m_glViewContainer << endl;
+        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+        m_glViewContainer->setMouseTracking(true);
+        m_glViewContainer->setAcceptDrops(true);
+        
+        // Set the container as the event widget for QTTranslator
+        cout << "DEBUG: Setting event widget" << endl;
+        m_glView->setEventWidget(m_glViewContainer);
+        cout << "DEBUG: Event widget set" << endl;
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
@@ -215,11 +235,11 @@ namespace Rv
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
-        m_stackedLayout->addWidget(m_glView);
+        m_stackedLayout->addWidget(m_glViewContainer);
 
         setCentralWidget(m_viewContainerWidget);
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_glViewContainer->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
         // #ifdef PLATFORM_DARWIN
@@ -609,7 +629,7 @@ namespace Rv
                 setBuildMenu();
             }
 #endif
-            m_glView->setFocus(Qt::OtherFocusReason);
+            m_glViewContainer->setFocus(Qt::OtherFocusReason);
         }
         else if (m == IPCore::Session::audioUnavailbleMessage())
         {
@@ -743,7 +763,7 @@ namespace Rv
     {
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));
-        m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+        m_glViewContainer->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     }
 
     void RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
@@ -782,14 +802,22 @@ namespace Rv
         lazyDeleteGLView();
 
         GLView* oldGLView = m_glView;
+        QWidget* oldGLViewContainer = m_glViewContainer;
         Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
         oldGLView->stopProcessingEvents();
 
-        GLView* newGLView = new GLView(this, view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
+        GLView* newGLView = new GLView(view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
+        m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
+        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+        m_glViewContainer->setMouseTracking(true);
+        m_glViewContainer->setAcceptDrops(true);
+        
+        // Set the container as the event widget for QTTranslator
+        newGLView->setEventWidget(m_glViewContainer);
 
         newGLView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
 
-        newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        newGLView->setMinimumSize(QSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height()));
 
         bool resetGLPrefs = false;
 
@@ -798,16 +826,21 @@ namespace Rv
 
         if (!newGLView->isValid())
         {
+            delete m_glViewContainer;
             delete newGLView;
-            newGLView = new GLView(this, view()->context(), this);
+            newGLView = new GLView(view()->context(), this);
+            m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
+            m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+            m_glViewContainer->setMouseTracking(true);
+            m_glViewContainer->setAcceptDrops(true);
+            newGLView->setEventWidget(m_glViewContainer);
             resetGLPrefs = true;
         }
 
-        m_stackedLayout->addWidget(newGLView);
-        m_stackedLayout->removeWidget(oldGLView);
+        m_stackedLayout->addWidget(m_glViewContainer);
+        m_stackedLayout->removeWidget(oldGLViewContainer);
         m_glView = newGLView;
-        m_glView->show();
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_glViewContainer->setFocus(Qt::OtherFocusReason);
 
         m_topViewToolBar->setDevice(m_glView->videoDevice());
 
@@ -937,6 +970,8 @@ namespace Rv
 
     GLView* RvDocument::view() const { return m_glView; }
 
+    QWidget* RvDocument::viewContainer() const { return m_glViewContainer; }
+
     void RvDocument::center()
     {
         QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
@@ -1056,7 +1091,7 @@ namespace Rv
 
         m_glView->setContentSize(w, h);
         m_glView->setMinimumContentSize(w, h);
-        m_glView->updateGeometry();
+        m_glViewContainer->updateGeometry();
 
         const int dh = m_glView->height() - h;
         const int dw = m_glView->width() - w;
@@ -1066,7 +1101,7 @@ namespace Rv
             resize(width() - dw, height() - dh);
             m_glView->setContentSize(w, h);
             m_glView->setMinimumContentSize(w, h);
-            m_glView->updateGeometry();
+            m_glViewContainer->updateGeometry();
         }
 
         m_resetPolicyTimer->start();
@@ -1264,7 +1299,7 @@ namespace Rv
 
         m_glView->setContentSize(int(w), int(h));
         m_glView->setMinimumContentSize(int(w), int(h));
-        m_glView->updateGeometry();
+        m_glViewContainer->updateGeometry();
 
         DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
 
@@ -1282,7 +1317,7 @@ namespace Rv
             resize(width() - dw, height() - dh);
             m_glView->setContentSize(int(w), int(h));
             m_glView->setMinimumContentSize(int(w), int(h));
-            m_glView->updateGeometry();
+            m_glViewContainer->updateGeometry();
         }
         DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
 
@@ -1366,7 +1401,7 @@ namespace Rv
             }
         }
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_glViewContainer->setFocus(Qt::OtherFocusReason);
         activateWindow();
         raise();
         //
