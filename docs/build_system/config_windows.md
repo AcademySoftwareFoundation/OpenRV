@@ -1,6 +1,6 @@
 # Preparing Open RV on Windows
 
-Open RV 2025 can be built for Windows using the [VFX reference platform](https://vfxplatform.com/).  Dependencies can be viewed in the `cmake/defaults/` folder.  eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
+Open RV 2025 can be built for Windows using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
@@ -68,46 +68,46 @@ All other dependencies are shared across variations.
 1. [Microsoft Visual Studio](mvs)
 2. [Setup default MSVC compiler](setup_default_msvc_compiler)
 3. [Install Python 3](install_python)
-    1. [Copy python.exe and rename it to python3.exe](copy_python3)
+   1. [Copy python.exe and rename it to python3.exe](copy_python3)
 4. [Install CMake](install_cmake)
 5. [Install Qt](install_windows_qt)
 6. [Install Strawberry Perl](install_strawberry_perl)
 7. [Install Rust](install_rust)
 8. [Install MSYS2](install_msys2)
-    1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
+   1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
 9. [Setup environment variables](setup_env)
 10. [Build Open RV](build_windows_openrv)
 
 ````{warning}
 You should be cloning the repository later in the steps, but if you must clone it beforehand, clone it into the root 
 of a drive (e.g. ````c:````). See [Get Open RV source code](build_windows_openrv2).
-````
+`````
 
 (mvs)=
 
 ## 1. Microsoft Visual Studio
 
-````{warning}
-Open RV will not compile with Microsoft Visual Studio 2022 version 17.11.X with the default compiler because of issues 
+```{warning}
+Open RV will not compile with Microsoft Visual Studio 2022 version 17.11.X with the default compiler because of issues
 between PySide2 and that version of the compiler.
 \
 \
-You can still install 17.11.X, but you will need to install MSVC v143 version 14.40 to compile Open RV itself and 
+You can still install 17.11.X, but you will need to install MSVC v143 version 14.40 to compile Open RV itself and
 MSVC v143 14.39.X to compile Boost.
-````
+```
 
 Any variant of Microsoft Visual Studio 2022 will work with Open RV (e.g. Enterprise, Professional or Community).
 You can select the version on the [Visual Studio website](https://visualstudio.microsoft.com/downloads).
 
 ### Installation
 
-````{note}
+```{note}
 **Quick guide**:
 - You must select **Desktop Development with C++**
 - In the individual components section, you must install **MSVC v143 14.40.X** for Open RV and **MSVC v143 14.39.X** to compile Boost.
-````
+```
 
-````{carousel}
+`````{carousel}
 :show_controls:
 :show_indicators:
 :show_captions_below:
@@ -131,13 +131,13 @@ MSVC v143 - VS 2022 C++ x64/x86 build tools (v14.39-17.9) and MSVC v143 - VS 202
 
 ```
 
-````
+`````
 
 (setup_default_msvc_compiler)=
 
 ## 2. Setup default MSVC compiler
 
-If Microsoft Visual Studio 2022 was installed for the first time (using the steps above), MSVC v143 v14.40 *should* be
+If Microsoft Visual Studio 2022 was installed for the first time (using the steps above), MSVC v143 v14.40 _should_ be
 the default compiler, although varying setup may affect this.
 \
 \
@@ -151,16 +151,16 @@ Here are the possible methods to set the default compiler:
 The first solution is to modify the `Microsoft.VCToolsVersion.v143.default.props` under `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build`.
 The path will vary depending on whether the variant is Enterprise, Profressional or Community.
 
-Make sure that the *VCToolsVersion* is set to `14.40.33807`. The file should look similar to this:
+Make sure that the _VCToolsVersion_ is set to `14.40.33807`. The file should look similar to this:
 
 ```xml
-<?xml version = "1.0" encoding="utf-8"?> 
-<Project ToolsVersion = "4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"> 
-  <Import Project="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)Microsoft.VCRedistVersion.v143.default.props))"/> 
-  <PropertyGroup> 
-    <VCToolsVersion Condition = "'$(VCToolsVersion)' == ''" >14.40.33807</VCToolsVersion> 
-  </PropertyGroup>      
-</Project>     
+<?xml version = "1.0" encoding="utf-8"?>
+<Project ToolsVersion = "4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)Microsoft.VCRedistVersion.v143.default.props))"/>
+  <PropertyGroup>
+    <VCToolsVersion Condition = "'$(VCToolsVersion)' == ''" >14.40.33807</VCToolsVersion>
+  </PropertyGroup>
+</Project>
 ```
 
 If the version is different, change it to `14.40.33807` in the file.
@@ -186,7 +186,7 @@ It is highly recommended that you install this Python in C:\Python310
 ```
 ````
 
-### Installation
+### Python Installation Steps
 
 The carousel below shows how to install Python. The displayed images are from Python 3.11.X, but for VFX-CY2023 the path should be `C:\Python310` instead of `C:\Python311`.
 
@@ -222,12 +222,12 @@ Click on Disable path length limit
 
 ````
 
-````{note}
+```{note}
 Take note of the installation path for Python 3, as it will be required in a subsequent step.\
 The **recommended** path is:
 - `C:\Python311` for VFX-CY2024
 - `C:\Python310` for VFX-CY2023
-````
+```
 
 (copy_python3)=
 
@@ -240,30 +240,30 @@ This also aligns with Linux and macOS conventions, where both python and python3
 
 ## 4. Install CMake
 
-````{warning}
+```{warning}
 Minimum **recommended** version for CMake is **3.27.X**.
-````
+```
 
 Download the lastest version of CMake from the [official CMake website](https://cmake.org/download/). Typically,
 the correct version will be **Windows x64 Installer**. Follow the installation wizard prompts to complete the setup.
 There are no special considerations or unique configuration options required.
 
-````{note}
+```{note}
 Take note of the installation path for CMake, as it will be required in a subsequent step.\
 The default path is `C:\Program Files\CMake`.
-````
+```
 
 (install_windows_qt)=
 
 ## 5. Install Qt
 
-````{warning}
+```{warning}
 
 When obtaining Qt from a third-party source, ensure it includes **OpenSSL** support and check for the following essential modules that may not be included by default: **QtWebEngine**, **QtWebSockets**, **QtMultimedia**, and **QtDeclarative**.
 \
 \
 For example, Qt from MSYS2 is missing QtWebEngine.
-````
+```
 
 Download the Qt version corresponding to your chosen VFX reference platform from the [official Qt website](https://www.qt.io/download-open-source) using the online installer. It is **recommended** to install Qt in a location with a **short path length**. (e.g. `C:\Qt`)
 
@@ -303,11 +303,11 @@ For Qt 5.15.2, you need to access the archive packages:
 ```
 ````
 
-````{warning}
+```{warning}
 The screenshot below represent the installation for Qt 5, but the steps
 are the same for Qt 6. The only difference is the selection of Qt 6.5.3
 instead of Qt 5.15.2 in the fourth screenshot.
-````
+```
 
 ````{carousel}
 :show_controls:
@@ -358,12 +358,12 @@ Uncheck all optional packages (as shown in the image above) and click the 'Next'
 ```
 ````
 
-````{note}
+```{note}
 Take note of the installation path for Qt, as it will be required in a subsequent step.\
 Based on the recommendation above, the path would be:
 - `C:\Qt\6.5.3\msvc2019_64` for VFX-CY2024
 - `C:\Qt\5.15.2\msvc2019_64` for VFX-CY2023
-````
+```
 
 (install_strawberry_perl)=
 
@@ -371,18 +371,18 @@ Based on the recommendation above, the path would be:
 
 Download and install the 64-bit version of [Strawberry Perl](https://strawberryperl.com/)
 
-````{note}
+```{note}
 Take note of the installation path for Strawberry Perl, as it will be required in a subsequent step.\
 The default path is `C:\Strawberry`.
-````
+```
 
 (install_rust)=
 
 ## 7. Install Rust
 
-````{warning}
+```{warning}
 Rust version **1.92 or later** is required to build certain Python dependencies (such as cryptography).
-````
+```
 
 Install Rust using rustup-init:
 
@@ -398,21 +398,21 @@ rustc --version
 cargo --version
 ```
 
-````{note}
+```{note}
 The Rust installation will be located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`). Do not forget to add the location to the PATH environment variable in [Setup environment variables](#setup_env).
-````
+```
 
 (install_msys2)=
 
 ## 8. Install MSYS2
 
-````{warning}
+```{warning}
 
 The Windows' WSL2 feature conflict with MSYS2. For simplicity, it is highly recommended to **disable** Windows' WSL or WSL2 feature entirely.\
 \
 Additional information can be found on the [MSYS2 github](https://github.com/msys2/setup-msys2/issues/52).
 
-````
+```
 
 Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Open RV is built with Microsoft Visual Studio 2022 via the CMake "Visual Studio 17 2022" generator.
 
@@ -422,14 +422,14 @@ MSYS2 is only used for convenience as it comes with a package manager with utili
 
 ### 8.1 Install required MSYS2 pacman packages
 
-````{note}
+```{note}
 The MSYS2 MingGW64 (mingw64.exe) terminal MUST be used.\
 Other executables such as MSYS2 (msys2.exe) or MSYS2 MingGW32 (mingw32.exe) will not work.\
 
 ![MSYS2-MinGW64](../images/rv-msys2-mingw64-shortcut.png)
 
 
-````
+```
 
 From a MSYS2-MinGW64 shell, install the following packages which are required to build Open RV:
 
@@ -456,16 +456,56 @@ pacman -Sy --needed \
 
 While installing the MSYS packages, review the list for any missing package. Some packages might not be installed after the first command.
 
+### 8.2 Install sccache for faster builds (recommended)
+
+sccache dramatically speeds up rebuild times by caching compiled objects (50-80% faster rebuilds). On Windows, sccache is preferred over ccache for better MSVC compatibility.
+
+From the same MSYS2-MinGW64 shell, install sccache using the Mozilla-Actions installer or download directly:
+
+#### Option 1: Using Chocolatey (if available on your system)
+
+```powershell
+choco install sccache
+```
+
+#### Option 2: Manual download (recommended for MSYS2)
+
+1. Download the latest sccache release from [https://github.com/mozilla/sccache/releases](https://github.com/mozilla/sccache/releases)
+2. Extract `sccache.exe` to a directory in your PATH (e.g., `C:\msys64\mingw64\bin`)
+
+Verify sccache is available:
+
+```shell
+sccache --version
+```
+
+OpenRV will automatically detect and use sccache when available.
+
+````{note}
+**First-time build**: sccache has no effect on the first build as it establishes the cache.
+**Subsequent builds**: You'll see significant speedups (50-80% faster) on incremental or clean rebuilds.
+
+To check sccache statistics after building:
+```shell
+sccache --show-stats
+```
+
+To disable sccache if needed:
+```shell
+export RV_DISABLE_COMPILER_CACHE=1
+```
+````
+
 Note: To confirm which version/location of any tool used inside the MSYS shell, `where` can be used e.g. `where python`. If there's more than one path return, the top one will be used.
 
 (setup_env)=
 
 ### 9. Setup environment variables
 
-````{note}
+```{note}
 This is the step where the path of Strawberry Perl, Python, CMake and Qt will be needed.
 
-````
+```
 
 Some environment variables need to be set within MSYS2 for the Open RV build system. The **PATH** environment variable must be
 modified, new environment variables called **ACLOCAL_PATH** and **QT_HOME** must be created.
@@ -474,15 +514,15 @@ These modifications will be added to the `.bash_profile` file located in the Use
 
 #### PATH environment variable
 
-````{note}
-Update the CMake, Strawberry Perl, Python, and Rust locations to reflect your installation paths, using **forward slashes (/)** for a Unix-style path 
+```{note}
+Update the CMake, Strawberry Perl, Python, and Rust locations to reflect your installation paths, using **forward slashes (/)** for a Unix-style path
 to prevent issues later on.
 (e.g., C:\Python310 becomes /c/Python310).
 
 **For Rust:** Replace `<username>` with your actual Windows username. You can find your username by running `echo %USERNAME%` in a Windows command prompt.
-The Rust installation is located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`), 
+The Rust installation is located at `%USERPROFILE%\.cargo\bin` (typically `C:\Users\<username>\.cargo\bin`),
 which becomes `/c/Users/<username>/.cargo/bin` in MSYS2 format.
-````
+```
 
 The following paths **must** be added to the PATH environment variable within MSYS2:
 
@@ -503,9 +543,9 @@ echo 'export PATH="/c/Program Files/CMake/bin:/c/Python310:/c/Users/<username>/.
 ```
 ````
 
-````{warning}
+```{warning}
 Remember to replace `<username>` with your actual Windows username in the commands above.
-````
+```
 
 #### ACLOCAL_PATH
 
@@ -515,10 +555,10 @@ echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
 
 #### QT_HOME
 
-````{note}
-Update the Qt location to reflect your installation path, using forward slashes (/) for a Unix-style path 
+```{note}
+Update the Qt location to reflect your installation path, using forward slashes (/) for a Unix-style path
 (e.g., C:\Qt\5.15.2\msvc2019_64 becomes /c/Qt/5.15.2/msvc2019_64).
-````
+```
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2024
@@ -546,14 +586,14 @@ Once the platform-specific installation process is complete, building Open RV fo
 
 ### Windows-Specific Build Notes
 
-````{warning}
+```{warning}
 Even as of Windows 11, for legacy reasons, a default system path length is still limited to 254 bytes long.
 For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
-````
+```
 
-````{warning}
+`````{warning}
 Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
 \
-Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look 
+Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.
 ````

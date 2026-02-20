@@ -364,8 +364,22 @@ jobs:
           rustc --version
           cargo --version
 
-      # For Rocky Linux, we can't cache the dependencies of Open RV 
+      # For Rocky Linux, we can't cache the dependencies of Open RV
       # because there is not enough room in the cache (10GB limit) for all platforms.
+      # ccache is used for this run only (not stored in Actions cache) to speed up the build.
+      # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
+      # or by moving some dependencies from the cache to Conan or another dependency manager.
+      - name: Install ccache
+        run: |
+          dnf install -y ccache
+
+      # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
+      # - name: Setup ccache
+      #   uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639
+      #   with:
+      #     key: rocky-${{ matrix.rocky-version }}-${{ matrix.vfx-platform }}-${{ matrix.build-type }}
+      #     max-size: 2G
+      #     verbose: 2
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
@@ -557,7 +571,7 @@ jobs:
           until [ $retry_count -ge $max_retries ]; do
             echo "Attempt $((retry_count + 1)) of $max_retries"
             
-            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew && \
+            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew ccache && \
                brew install --formula icu4c; then
               echo "Homebrew dependencies installed successfully"
               break
@@ -605,13 +619,25 @@ jobs:
         # Restore only if there are no changes under cmake folder and Release build.
         if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release'
         id: cmake-dependencies
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ./_build/RV_DEPS_*
             ./_build/cmake/dependencies
             ./_build/_deps
           key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
+
+      # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
+      # - name: Setup ccache
+      #   uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639
+      #   with:
+      #     key: macos-${{ matrix.os }}-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-${{ matrix.build-type }}
+      #     max-size: 2G
+      #     verbose: 2
+
+      # ccache from Homebrew is used for this run only (not stored in Actions cache).
+      # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
+      # or by moving some dependencies from the cache to Conan or another dependency manager.
 
       - name: Configure OpenRV
         if: ${{ matrix.vfx-platform == 'CY2023' }}
@@ -644,6 +670,17 @@ jobs:
       - name: Install OpenRV
         run: |
           cmake --install _build --prefix $(pwd)/_install --config ${{ matrix.build-type }}
+
+      - name: Save dependencies cache
+        # Only save on push/schedule/workflow_dispatch so PRs use cache from main branch.
+        if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release' && github.event_name != 'pull_request'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ./_build/RV_DEPS_*
+            ./_build/cmake/dependencies
+            ./_build/_deps
+          key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
 
   windows:
     if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
@@ -700,6 +737,11 @@ jobs:
             msvc-compiler: "14.40.33807"
 
     runs-on: ${{ matrix.os }}
+    env:
+      # sccache used for this run only; do not store in Actions cache (saves repo cache limit).
+      # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
+      # or by moving some dependencies from the cache to Conan or another dependency manager.
+      SCCACHE_GHA_ENABLED: false
     steps:
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
@@ -854,6 +896,21 @@ jobs:
       - name: Install Python dependencies
         run: |
           python3 -m pip install --user --upgrade -r ./requirements.txt
+        shell: msys2 {0}
+
+      - name: Setup sccache
+        # Used for this run only (SCCACHE_GHA_ENABLED=false); not stored in Actions cache.
+        # For sccache to actually cache the Windows/MSVC build, CMake must use it as the compiler
+        # launcher, e.g. -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
+        # in the Configure OpenRV step (and sccache must be on PATH when the build runs).
+        uses: mozilla-actions/sccache-action@v0.0.6
+        with:
+          version: "v0.8.1"
+
+      - name: Configure sccache for msys2
+        run: |
+          echo "export PATH=\"/c/Users/runneradmin/.cargo/bin:\$PATH\"" >> ~/.bash_profile
+          sccache --version || echo "WARNING: sccache not found in PATH"
         shell: msys2 {0}
 
       - name: Configure OpenRV

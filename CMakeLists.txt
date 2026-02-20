@@ -91,6 +91,7 @@ SET(CMAKE_MODULE_PATH
 
 INCLUDE(rv_options) # RV's build options
 INCLUDE(rv_targets) # RV's build platform definitions
+INCLUDE(rv_compiler_cache) # RV's compiler cache (ccache/sccache) support
 INCLUDE(rv_globals) # RV's CMake-build global variables
 INCLUDE(rv_stage) # RV's local appplication packaging
 INCLUDE(rv_vfx)
