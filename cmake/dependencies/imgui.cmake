@@ -136,11 +136,7 @@ EXTERNALPROJECT_ADD(
   DEPENDS implot_download imgui_backend_qt_download imgui_node_editor_download
 )
 
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} OUTPUTS ${RV_STAGE_BIN_DIR}/${_libname})
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
-ENDIF()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
 ADD_DEPENDENCIES(imgui::imgui ${_target})

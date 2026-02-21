@@ -22,14 +22,31 @@
 #     [FILES <file1> [file2...]]    # Individual files to copy_if_different to STAGE_LIB_DIR (alternative to LIB_DIR)
 #     [DEPENDS <dep1> [dep2...]]    # Dependencies (default: ${TARGET})
 #     [PRE_COMMANDS <cmd1>...]      # Commands to run before copy (e.g., install_name_tool)
+#     [LIBNAME <filename>]          # Platform-aware shorthand: on Windows uses BIN_DIR+STAGE_BIN_DIR, otherwise STAGE_LIB_DIR
 #     [USE_FLAG_FILE]               # Use touch-based flag instead of OUTPUTS for tracking
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
-  CMAKE_PARSE_ARGUMENTS(_ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN})
+  CMAKE_PARSE_ARGUMENTS(_ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN})
 
   # Validate required args
   IF(NOT _ARG_TARGET)
     MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: TARGET is required")
+  ENDIF()
+
+  # Handle LIBNAME shorthand for platform-aware staging
+  IF(_ARG_LIBNAME)
+    IF(RV_TARGET_WINDOWS)
+      SET(_ARG_BIN_DIR
+          "${_bin_dir}"
+      )
+      SET(_ARG_OUTPUTS
+          "${RV_STAGE_BIN_DIR}/${_ARG_LIBNAME}"
+      )
+    ELSE()
+      SET(_ARG_OUTPUTS
+          "${RV_STAGE_LIB_DIR}/${_ARG_LIBNAME}"
+      )
+    ENDIF()
   ENDIF()
 
   # Default LIB_DIR to caller's _lib_dir if not explicitly passed
