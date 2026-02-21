@@ -126,7 +126,3 @@ ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_gc_stage_outputs})
 
-SET(RV_DEPS_GC_VERSION
-    ${_version}
-    CACHE INTERNAL ""
-)

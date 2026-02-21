@@ -144,11 +144,6 @@ SET(RV_DEPS_ZLIB_INCLUDE_DIR
     CACHE STRING "Path to installed includes for ${_target}"
 )
 
-SET(RV_DEPS_ZLIB_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
-
 # FFmpeg customization
 SET_PROPERTY(
   GLOBAL APPEND

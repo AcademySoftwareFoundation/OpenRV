@@ -74,7 +74,3 @@ ELSE()
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name})
 ENDIF()
 
-SET(RV_DEPS_SPDLOG_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)

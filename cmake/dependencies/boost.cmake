@@ -246,7 +246,3 @@ ELSE()
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_boost_stage_output})
 ENDIF()
 
-SET(RV_DEPS_BOOST_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
