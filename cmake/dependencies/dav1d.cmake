@@ -4,13 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-SET(_target
-    "RV_DEPS_DAV1D"
-)
-
-SET(_version
-    ${RV_DEPS_DAV1D_VERSION}
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_DAV1D" "${RV_DEPS_DAV1D_VERSION}" "ninja" "meson")
+RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
     "https://github.com/videolan/dav1d/archive/refs/tags/${_version}.zip"
@@ -19,25 +14,14 @@ SET(_download_hash
     ${RV_DEPS_DAV1D_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-SET(_include_dir
-    ${_install_dir}/include
-)
+# _lib_dir_name is needed for the meson --libdir option
 IF(RHEL_VERBOSE)
   SET(_lib_dir_name
       lib64
   )
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
 ELSE()
   SET(_lib_dir_name
       lib
-  )
-  SET(_lib_dir
-      ${_install_dir}/lib
   )
 ENDIF()
 
@@ -47,13 +31,6 @@ SET(_david_lib_name
 
 SET(_dav1d_lib
     ${_lib_dir}/${_david_lib_name}
-)
-
-SET(_configure_command
-    meson
-)
-SET(_make_command
-    ninja
 )
 
 IF(APPLE)
@@ -89,7 +66,7 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  SOURCE_DIR ${_source_dir}
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
@@ -119,11 +96,6 @@ IF(RV_TARGET_WINDOWS)
 ELSE()
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_david_lib_name})
 ENDIF()
-
-SET(RV_DEPS_DAV1D_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
 
 # FFmpeg customization adding dav1d codec support to FFmpeg
 SET_PROPERTY(
