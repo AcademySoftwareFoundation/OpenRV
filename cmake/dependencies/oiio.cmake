@@ -73,16 +73,16 @@ LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
 LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
+  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_IMPLIB)
 ELSE()
-  GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_LOCATION)
+  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_LOCATION)
 ENDIF()
-GET_TARGET_PROPERTY(_jpeg_include_dir jpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_jpeg_include_dir libjpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
 LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
 
-GET_TARGET_PROPERTY(_jpegturbo_library jpeg-turbo::turbojpeg IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_jpegturbo_include_dir jpeg-turbo::turbojpeg INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_jpegturbo_library libjpeg-turbo::turbojpeg IMPORTED_LOCATION)
+GET_TARGET_PROPERTY(_jpegturbo_include_dir libjpeg-turbo::turbojpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
 LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
 
@@ -140,18 +140,18 @@ IF(NOT RV_TARGET_WINDOWS)
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ${_depends_freetype}
-            jpeg-turbo::jpeg
-            Tiff::Tiff
+            libjpeg-turbo::jpeg
+            TIFF::TIFF
             OpenEXR::OpenEXR
             OpenJpeg::OpenJpeg
-            jpeg-turbo::turbojpeg
+            libjpeg-turbo::turbojpeg
             PNG::PNG
             Boost::headers
             Boost::thread
             Boost::filesystem
             Imath::Imath
-            Webp::Webp
-            Raw::Raw
+            WebP::webp
+            LibRaw::raw
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
@@ -194,18 +194,18 @@ ELSE()
     BINARY_DIR ${_build_dir}
     INSTALL_DIR ${_install_dir}
     DEPENDS ${_depends_freetype}
-            jpeg-turbo::jpeg
-            Tiff::Tiff
+            libjpeg-turbo::jpeg
+            TIFF::TIFF
             OpenEXR::OpenEXR
             OpenJpeg::OpenJpeg
-            jpeg-turbo::turbojpeg
+            libjpeg-turbo::turbojpeg
             PNG::PNG
             Boost::headers
             Boost::thread
             Boost::filesystem
             Imath::Imath
-            Webp::Webp
-            Raw::Raw
+            WebP::webp
+            LibRaw::raw
             ZLIB::ZLIB
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
@@ -219,7 +219,7 @@ ENDIF()
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME oiio::oiio
+  NAME OpenImageIO::OpenImageIO
   TYPE SHARED
   LOCATION ${_libpath}
   SONAME ${_libname}
@@ -230,7 +230,7 @@ RV_ADD_IMPORTED_LIBRARY(
 )
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME oiio::utils
+  NAME OpenImageIO::OpenImageIO_Util
   TYPE SHARED
   LOCATION ${_oiio_utils_libpath}
   SONAME ${_oiio_utils_libname}

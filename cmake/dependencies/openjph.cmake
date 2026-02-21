@@ -52,7 +52,7 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${_source_dir}
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-  # DEPENDS ZLIB::ZLIB Tiff::Tiff PNG::PNG
+  # DEPENDS ZLIB::ZLIB TIFF::TIFF PNG::PNG
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}

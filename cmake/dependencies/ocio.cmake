@@ -312,7 +312,8 @@ IF(RV_TARGET_WINDOWS)
       TARGET ${_target}
       POST_BUILD
       COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}' and '${_ocio_stage_plugins_python_dir}."
-      COMMAND ${CMAKE_COMMAND} -E copy ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${_rv_stage_lib_site_package_dir}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
       COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
     )
   ENDIF()
@@ -321,7 +322,7 @@ ENDIF()
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME ocio::ocio
+  NAME OpenColorIO::OpenColorIO
   TYPE SHARED
   LOCATION ${_libpath}
   IMPLIB ${_implibpath}
