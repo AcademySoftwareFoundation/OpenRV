@@ -320,23 +320,12 @@ ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
-ADD_LIBRARY(ocio::ocio SHARED IMPORTED GLOBAL)
-LIST(APPEND RV_DEPS_LIST ocio::ocio)
-ADD_DEPENDENCIES(ocio::ocio ${_target})
-SET_PROPERTY(
-  TARGET ocio::ocio
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET ocio::ocio
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  ocio::ocio
-  INTERFACE ${_include_dir}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME ocio::ocio
+  TYPE SHARED
+  LOCATION ${_libpath}
+  IMPLIB ${_implibpath}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )

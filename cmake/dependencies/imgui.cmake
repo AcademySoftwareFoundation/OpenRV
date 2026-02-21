@@ -138,30 +138,13 @@ EXTERNALPROJECT_ADD(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(imgui::imgui ${_target})
-
-SET_PROPERTY(
-  TARGET imgui::imgui
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME imgui::imgui
+  TYPE SHARED
+  LOCATION ${_libpath}
+  SONAME ${_libname}
+  IMPLIB ${_implibpath}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-SET_PROPERTY(
-  TARGET imgui::imgui
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET imgui::imgui
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  imgui::imgui
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST imgui::imgui)

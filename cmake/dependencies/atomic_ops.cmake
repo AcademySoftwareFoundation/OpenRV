@@ -76,22 +76,18 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(atomic_ops::atomic_ops STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(atomic_ops::atomic_ops ${_target})
-SET_PROPERTY(
-  TARGET atomic_ops::atomic_ops
-  PROPERTY IMPORTED_LOCATION ${_atomic_ops_lib}
-)
-
 SET(_include_dir
     ${_install_dir}/include
 )
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  atomic_ops::atomic_ops
-  INTERFACE ${_include_dir}
+
+RV_ADD_IMPORTED_LIBRARY(
+  NAME atomic_ops::atomic_ops
+  TYPE STATIC
+  LOCATION ${_atomic_ops_lib}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-LIST(APPEND RV_DEPS_LIST atomic_ops::atomic_ops)
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_atomic_ops_lib_name})
 

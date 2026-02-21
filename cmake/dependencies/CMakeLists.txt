@@ -7,6 +7,7 @@
 INCLUDE(rv_create_std_deps_vars)
 INCLUDE(rv_make_std_lib_name)
 INCLUDE(rv_stage_dependency_libs)
+INCLUDE(rv_add_imported_library)
 
 INCLUDE(ProcessorCount)
 PROCESSORCOUNT(_cpu_count)

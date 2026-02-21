@@ -96,44 +96,25 @@ ADD_CUSTOM_COMMAND(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(Tiff::Tiff SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Tiff::Tiff ${_target})
-SET_PROPERTY(
-  TARGET Tiff::Tiff
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
 IF(RV_TARGET_WINDOWS)
   IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    SET(_tiff_lib_name
-        "tiff.lib"
-    )
+    SET(_tiff_lib_name "tiff.lib")
   ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    SET(_tiff_lib_name
-        "tiffd.lib"
-    )
+    SET(_tiff_lib_name "tiffd.lib")
   ENDIF()
-
-  SET_PROPERTY(
-    TARGET Tiff::Tiff
-    PROPERTY IMPORTED_IMPLIB ${_lib_dir}/${_tiff_lib_name}
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME Tiff::Tiff TYPE SHARED LOCATION ${_libpath}
+    IMPLIB ${_lib_dir}/${_tiff_lib_name}
+    INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
   )
 ELSE()
-  SET_PROPERTY(
-    TARGET Tiff::Tiff
-    PROPERTY IMPORTED_SONAME ${_libname}
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME Tiff::Tiff TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
+    INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
   )
 ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  Tiff::Tiff
-  INTERFACE ${_include_dir}
-)
 
 TARGET_LINK_LIBRARIES(
   Tiff::Tiff
   INTERFACE ZLIB::ZLIB jpeg-turbo::jpeg
 )
-
-LIST(APPEND RV_DEPS_LIST Tiff::Tiff)

@@ -101,28 +101,7 @@ EXTERNALPROJECT_ADD(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
 
-ADD_LIBRARY(Webp::Webp STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Webp::Webp ${_target})
-SET_PROPERTY(
-  TARGET Webp::Webp
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME Webp::Webp TYPE STATIC LOCATION ${_libpath} SONAME ${_libname}
+  IMPLIB ${_implibpath} INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET Webp::Webp
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Webp::Webp
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  Webp::Webp
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST Webp::Webp)

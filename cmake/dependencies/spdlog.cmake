@@ -50,23 +50,15 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(spdlog::spdlog STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(spdlog::spdlog ${_target})
-SET_PROPERTY(
-  TARGET spdlog::spdlog
-  PROPERTY IMPORTED_LOCATION ${_spdlog_lib}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME spdlog::spdlog
+  TYPE STATIC
+  LOCATION ${_spdlog_lib}
+  SONAME ${_spdlog_lib_name}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET spdlog::spdlog
-  PROPERTY IMPORTED_SONAME ${_spdlog_lib_name}
-)
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  spdlog::spdlog
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name})
 

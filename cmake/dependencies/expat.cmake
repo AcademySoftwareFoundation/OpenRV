@@ -57,25 +57,12 @@ EXTERNALPROJECT_ADD(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(EXPAT::EXPAT SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(EXPAT::EXPAT ${_target})
-
-# An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
-# DLL and calling its functions at runtime.
-SET_PROPERTY(
-  TARGET EXPAT::EXPAT
-  PROPERTY IMPORTED_LOCATION "${_libpath}"
+RV_ADD_IMPORTED_LIBRARY(
+  NAME EXPAT::EXPAT
+  TYPE SHARED
+  LOCATION ${_libpath}
+  IMPLIB ${_implibpath}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET EXPAT::EXPAT
-  PROPERTY IMPORTED_IMPLIB "${_implibpath}"
-)
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  EXPAT::EXPAT
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST EXPAT::EXPAT)

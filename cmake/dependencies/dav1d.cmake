@@ -104,23 +104,15 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(dav1d::dav1d STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(dav1d::dav1d ${_target})
-SET_PROPERTY(
-  TARGET dav1d::dav1d
-  PROPERTY IMPORTED_LOCATION ${_dav1d_lib}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME dav1d::dav1d
+  TYPE STATIC
+  LOCATION ${_dav1d_lib}
+  SONAME ${_david_lib_name}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET dav1d::dav1d
-  PROPERTY IMPORTED_SONAME ${_david_lib_name}
-)
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  dav1d::dav1d
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST dav1d::dav1d)
 
 IF(RV_TARGET_WINDOWS)
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_install_dir}/bin OUTPUTS ${RV_STAGE_LIB_DIR}/${_david_lib_name})

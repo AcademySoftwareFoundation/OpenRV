@@ -61,35 +61,26 @@ EXTERNALPROJECT_ADD(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(PNG::PNG SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(PNG::PNG ${_target})
 IF(NOT RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET PNG::PNG
-    PROPERTY IMPORTED_LOCATION ${_libpath}
-  )
-  SET_PROPERTY(
-    TARGET PNG::PNG
-    PROPERTY IMPORTED_SONAME ${_libname}
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME PNG::PNG
+    TYPE SHARED
+    LOCATION ${_libpath}
+    SONAME ${_libname}
+    INCLUDE_DIRS ${_include_dir}
+    DEPENDS ${_target}
+    ADD_TO_DEPS_LIST
   )
 ELSE()
   # An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
   # DLL and calling its functions at runtime.
-  SET_PROPERTY(
-    TARGET PNG::PNG
-    PROPERTY IMPORTED_LOCATION "${_implibpath}"
-  )
-  SET_PROPERTY(
-    TARGET PNG::PNG
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME PNG::PNG
+    TYPE SHARED
+    LOCATION ${_implibpath}
+    IMPLIB ${_implibpath}
+    INCLUDE_DIRS ${_include_dir}
+    DEPENDS ${_target}
+    ADD_TO_DEPS_LIST
   )
 ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  PNG::PNG
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST PNG::PNG)

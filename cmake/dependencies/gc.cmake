@@ -61,8 +61,6 @@ IF(NOT RV_TARGET_WINDOWS)
   LIST(APPEND _gc_stage_outputs ${RV_STAGE_LIB_DIR}/${_cord_lib_name})
 ENDIF()
 
-FILE(MAKE_DIRECTORY ${_include_dir})
-
 LIST(APPEND _configure_options "-Denable_parallel_mark=ON")
 LIST(APPEND _configure_options "-Denable_cplusplus=ON")
 LIST(APPEND _configure_options "-Denable_large_config=yes")
@@ -89,39 +87,26 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_gc_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
-ADD_LIBRARY(BDWGC::Gc STATIC IMPORTED GLOBAL)
-
-ADD_DEPENDENCIES(BDWGC::Gc ${_target})
-SET_PROPERTY(
-  TARGET BDWGC::Gc
-  PROPERTY IMPORTED_LOCATION ${_gc_lib}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME BDWGC::Gc
+  TYPE STATIC
+  LOCATION ${_gc_lib}
+  SONAME ${_gc_lib_name}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET BDWGC::Gc
-  PROPERTY IMPORTED_SONAME ${_gc_lib_name}
-)
-TARGET_INCLUDE_DIRECTORIES(
-  BDWGC::Gc
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST BDWGC::Gc)
 
 IF(NOT RV_TARGET_WINDOWS)
-  ADD_LIBRARY(BDWGC::Cord SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(BDWGC::Cord ${_target})
-  SET_PROPERTY(
-    TARGET BDWGC::Cord
-    PROPERTY IMPORTED_LOCATION ${_cord_lib}
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME BDWGC::Cord
+    TYPE SHARED
+    LOCATION ${_cord_lib}
+    SONAME ${_cord_lib_name}
+    INCLUDE_DIRS ${_include_dir}
+    DEPENDS ${_target}
+    ADD_TO_DEPS_LIST
   )
-  SET_PROPERTY(
-    TARGET BDWGC::Cord
-    PROPERTY IMPORTED_SONAME ${_cord_lib_name}
-  )
-  TARGET_INCLUDE_DIRECTORIES(
-    BDWGC::Cord
-    INTERFACE ${_include_dir}
-  )
-  LIST(APPEND RV_DEPS_LIST BDWGC::Cord)
 ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_gc_stage_outputs})

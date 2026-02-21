@@ -72,29 +72,16 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-FILE(MAKE_DIRECTORY "${_include_dir}")
-
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(Imath::Imath SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Imath::Imath ${_target})
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME Imath::Imath
+  TYPE SHARED
+  LOCATION ${_libpath}
+  SONAME ${_libname}
+  IMPLIB ${_implibpath}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Imath::Imath
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-TARGET_INCLUDE_DIRECTORIES(
-  Imath::Imath
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST Imath::Imath)
 

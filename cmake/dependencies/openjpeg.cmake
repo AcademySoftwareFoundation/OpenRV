@@ -62,34 +62,19 @@ EXTERNALPROJECT_ADD(
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(OpenJpeg::OpenJpeg SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(OpenJpeg::OpenJpeg ${_target})
-
-SET_PROPERTY(
-  TARGET OpenJpeg::OpenJpeg
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET OpenJpeg::OpenJpeg
-    PROPERTY IMPORTED_IMPLIB ${_bin_dir}/${_implibname}
-  )
-ENDIF()
-
-SET_PROPERTY(
-  TARGET OpenJpeg::OpenJpeg
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
 SET(_openjpeg_include_dir
     "${_include_dir}/openjpeg-${_version_major}.${_version_minor}"
 )
-FILE(MAKE_DIRECTORY "${_openjpeg_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  OpenJpeg::OpenJpeg
-  INTERFACE ${_openjpeg_include_dir}
-)
 
-LIST(APPEND RV_DEPS_LIST OpenJpeg::OpenJpeg)
+IF(RV_TARGET_WINDOWS)
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME OpenJpeg::OpenJpeg TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
+    IMPLIB ${_bin_dir}/${_implibname}
+    INCLUDE_DIRS ${_openjpeg_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+  )
+ELSE()
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME OpenJpeg::OpenJpeg TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
+    INCLUDE_DIRS ${_openjpeg_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+  )
+ENDIF()

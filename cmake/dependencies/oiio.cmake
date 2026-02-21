@@ -218,50 +218,23 @@ ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(oiio::oiio SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(oiio::oiio ${_target})
-SET_PROPERTY(
-  TARGET oiio::oiio
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME oiio::oiio
+  TYPE SHARED
+  LOCATION ${_libpath}
+  SONAME ${_libname}
+  IMPLIB ${_implibpath}
+  INCLUDE_DIRS ${_include_dir}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
 
-SET_PROPERTY(
-  TARGET oiio::oiio
-  PROPERTY IMPORTED_SONAME ${_libname}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME oiio::utils
+  TYPE SHARED
+  LOCATION ${_oiio_utils_libpath}
+  SONAME ${_oiio_utils_libname}
+  IMPLIB ${_oiio_utils_implibpath}
+  DEPENDS ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET oiio::oiio
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  oiio::oiio
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST oiio::oiio)
-
-ADD_LIBRARY(oiio::utils SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(oiio::utils ${_target})
-SET_PROPERTY(
-  TARGET oiio::utils
-  PROPERTY IMPORTED_LOCATION ${_oiio_utils_libpath}
-)
-
-SET_PROPERTY(
-  TARGET oiio::utils
-  PROPERTY IMPORTED_SONAME ${_oiio_utils_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET oiio::utils
-    PROPERTY IMPORTED_IMPLIB ${_oiio_utils_implibpath}
-  )
-ENDIF()
-
-LIST(APPEND RV_DEPS_LIST oiio::utils)

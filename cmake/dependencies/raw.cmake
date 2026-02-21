@@ -114,28 +114,7 @@ ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(Raw::Raw SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Raw::Raw ${_target})
-SET_PROPERTY(
-  TARGET Raw::Raw
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME Raw::Raw TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
+  IMPLIB ${_implibpath} INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET Raw::Raw
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Raw::Raw
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  Raw::Raw
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST Raw::Raw)
