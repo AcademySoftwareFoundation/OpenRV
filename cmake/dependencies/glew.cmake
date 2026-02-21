@@ -14,20 +14,6 @@ SET(_download_hash
     ${RV_DEPS_GLEW_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
       ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.${RV_DEPS_GLEW_VERSION_LIB}${CMAKE_SHARED_LIBRARY_SUFFIX}

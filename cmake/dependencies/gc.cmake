@@ -13,20 +13,6 @@ SET(_download_hash
     ${RV_DEPS_GC_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
 SET(_gc_lib_name
     ${CMAKE_SHARED_LIBRARY_PREFIX}gc.1${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
@@ -75,9 +61,6 @@ IF(NOT RV_TARGET_WINDOWS)
   LIST(APPEND _gc_stage_outputs ${RV_STAGE_LIB_DIR}/${_cord_lib_name})
 ENDIF()
 
-SET(_include_dir
-    ${_install_dir}/include
-)
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 LIST(APPEND _configure_options "-Denable_parallel_mark=ON")

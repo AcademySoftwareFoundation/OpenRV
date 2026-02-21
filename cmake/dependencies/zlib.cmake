@@ -14,25 +14,8 @@ SET(_download_hash
     ${RV_DEPS_ZLIB_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-# This file is pretty close to being ready to use the Standrd macros: (create_lib_bin especially but maybe rv_make_std_lib). One problem is debug names for Libs
-# which is different but there's ways to fix this.
-SET(RV_DEPS_ZLIB_ROOT_DIR
-    ${_install_dir}
-)
-
-SET(_include_dir
-    ${_install_dir}/include
-)
-
 SET(_lib_dir
     ${_install_dir}/lib
-)
-SET(_bin_dir
-    ${_install_dir}/bin
 )
 
 IF(RV_TARGET_WINDOWS)

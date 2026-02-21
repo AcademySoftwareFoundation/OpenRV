@@ -15,10 +15,6 @@ SET(_download_hash
     ${RV_DEPS_PCRE2_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
 # PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
 IF(RV_TARGET_WINDOWS)
   SET(_pcre2_libname

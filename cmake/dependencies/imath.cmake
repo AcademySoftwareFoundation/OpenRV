@@ -14,14 +14,8 @@ SET(_download_hash
     "${RV_DEPS_IMATH_DOWNLOAD_HASH}"
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
 SET(_include_dir
     ${_install_dir}/include/Imath
-)
-SET(RV_DEPS_IMATH_ROOT_DIR
-    ${_install_dir}
 )
 
 IF(RV_TARGET_DARWIN)
@@ -35,16 +29,6 @@ ELSEIF(RV_TARGET_LINUX)
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_libname
       ${CMAKE_SHARED_LIBRARY_PREFIX}Imath-${RV_DEPS_IMATH_LIB_MAJOR}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
   )
 ENDIF()
 

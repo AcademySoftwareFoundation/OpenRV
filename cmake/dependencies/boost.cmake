@@ -27,19 +27,6 @@ SET(_download_url
     "https://archives.boost.io/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
 )
 
-# Set _base_dir for Clean-<target>
-SET(_base_dir
-    ${RV_DEPS_BASE_DIR}/${_target}
-)
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(${_target}_ROOT_DIR
-    ${_install_dir}
-)
-
 SET(_boost_libs
     atomic
     chrono

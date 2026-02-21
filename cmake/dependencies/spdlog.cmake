@@ -14,24 +14,6 @@ SET(_download_hash
     ${RV_DEPS_SPDLOG_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(_include_dir
-    ${_install_dir}/include
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
   SET(RV_SPDLOG_DEBUG_POSTFIX
       "d"
@@ -45,17 +27,6 @@ SET(_spdlog_lib_name
 SET(_spdlog_lib
     ${_lib_dir}/${_spdlog_lib_name}
 )
-
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
-ELSE()
-  SET(_make_command
-      make
-  )
-ENDIF()
 
 LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
 

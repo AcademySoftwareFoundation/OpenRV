@@ -19,10 +19,6 @@ SET(_imgui_download_hash
 # There is no version suffix for imgui library name.
 RV_MAKE_STANDARD_LIB_NAME("imgui" "" "SHARED" "")
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
 SET(_lib_dir
     ${_install_dir}/lib
 )

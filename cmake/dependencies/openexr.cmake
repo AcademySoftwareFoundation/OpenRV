@@ -6,24 +6,6 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(${_target}_ROOT_DIR
-    ${_install_dir}
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
 SET(_make_command
     make
 )
