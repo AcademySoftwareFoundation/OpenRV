@@ -8,9 +8,6 @@
 # Build instructions: https://github.com/aous72/OpenJPH/blob/master/docs/compiling.md
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPH" "${RV_DEPS_OPENJPH_VERSION}" "make" "")
 IF(RV_TARGET_LINUX)

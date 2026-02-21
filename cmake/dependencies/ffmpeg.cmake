@@ -16,9 +16,6 @@
 # cmake-format: on
 # ------------------------------------------------------------------------------
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 SET(_target
     "RV_DEPS_FFMPEG"
 )

@@ -8,9 +8,6 @@
 # Official source repository https://github.com/libexpat/libexpat
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "${RV_DEPS_EXPAT_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

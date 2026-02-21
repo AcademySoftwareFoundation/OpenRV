@@ -12,9 +12,6 @@
 # [OIIO -- Build instructions](https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md)
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "${RV_DEPS_OIIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

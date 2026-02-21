@@ -7,9 +7,6 @@
 # Build instructions: https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

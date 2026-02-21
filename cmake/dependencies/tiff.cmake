@@ -14,9 +14,6 @@
 # [libtiff 4.5](http://www.simplesystems.org/libtiff)
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 # OpenImageIO required >= 3.9, using latest 4.0
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "" "")
 

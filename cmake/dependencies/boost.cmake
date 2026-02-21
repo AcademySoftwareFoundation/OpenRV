@@ -9,9 +9,6 @@
 #
 # Starting from CMake 3.30, FindBoost.cmake has been removed in favor of BoostConfig.cmake (Boost 1.70+). This behavior is covered by CMake policy CMP0167.
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 SET(_ext_boost_version
     ${RV_DEPS_BOOST_VERSION}
 )

@@ -9,9 +9,6 @@
 # https://www.libraw.org/docs/Install-LibRaw-eng.html
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "${RV_DEPS_RAW_VERSION}" "make" "../src/configure")
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64

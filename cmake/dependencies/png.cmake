@@ -10,9 +10,6 @@
 # Some clone on GitHub https://github.com/glennrp/libpng
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "${RV_DEPS_PNG_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

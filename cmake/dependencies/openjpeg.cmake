@@ -10,9 +10,6 @@
 # Build instructions: https://github.com/uclouvain/openjpeg/blob/master/INSTALL.md
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPEG" "${RV_DEPS_OPENJPEG_VERSION}" "make" "")
 

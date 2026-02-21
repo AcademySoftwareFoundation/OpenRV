@@ -8,6 +8,9 @@ INCLUDE(rv_create_std_deps_vars)
 INCLUDE(rv_make_std_lib_name)
 INCLUDE(rv_stage_dependency_libs)
 
+INCLUDE(ProcessorCount)
+PROCESSORCOUNT(_cpu_count)
+
 IF(NOT TARGET dependencies)
   ADD_CUSTOM_TARGET(dependencies)
 ENDIF()

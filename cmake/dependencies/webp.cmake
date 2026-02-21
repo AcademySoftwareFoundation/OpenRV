@@ -12,9 +12,6 @@
 # WebP build from sources: -- https://github.com/webmproject/libwebp/blob/main/doc/building.md
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 # OpenImageIO was tested up to 1.2.1
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "${RV_DEPS_WEBP_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
