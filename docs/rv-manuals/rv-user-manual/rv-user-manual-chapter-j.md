@@ -7,6 +7,7 @@ On OSX, you might need to enable the multichannel (e.g. 5.1) capability of your 
 The list of possible channel layouts that RV recognises is listed in the table below.
 
 Table J.1:
+
 |  |  |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Channel Layout** | **Layout and Speaker Description** <br> **FL = Front Left** <br> **FR = Front Right** <br> **FC = Front Center** <br> **LF = Lower Frequency/Subwoofer** <br> **BL = Back Left** <br> **BR = Back Right** <br> **SL = Side Left** <br> **SR = Side Right** <br> **BC = Back Center** <br> **FLC = Front Left of Center** <br> **FRC = Front Right of Center** <br> **LH = Left Height** <br> **RH = Right Height** |

@@ -203,6 +203,7 @@ Some formats may produce YUV or YUVA images to be displayed. RV can decode these
 |   |             | *V*         |             |   |
 
 where
+
 | |
 | ------------------ |
 | 0 ≤ *Y* ≤ 1        |
@@ -514,6 +515,7 @@ The sRGB Display Correction can be set from the View menu.
 If the display device is an HD television or reference monitor it may be naturally calibrated to the Rec. 709 color space. Similar to sRGB, Rec. 709 is a gamma-like curve. RV uses the following formula to convert from linear to Rec. 709:
 
 *c*<sub>709</sub> =
+
 | | |
 | -------------------------------------- | --------------------------- |
 | 4.5*c*<sub>*linear*</sub>               | *c*<sub>*linear*</sub> ≤ *q* |
