@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <list>
+#include <memory>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -261,6 +262,8 @@ struct LexinumericCompare
     }
 
     static int defaultMinSequenceSize = -2;
+    static string cachedNoSequencePattern;
+    static unique_ptr<RegEx> noSequencePatternRe;
 
     SequenceNameList sequencesInFileList(const FileNameList& infiles, SequencePredicate P, bool includeNonMatching, bool frameRanges,
                                          int minSequenceSize)
@@ -285,6 +288,28 @@ struct LexinumericCompare
         if (minSequenceSize == -1)
             minSequenceSize = defaultMinSequenceSize;
 
+        const char* envVar = getenv("RV_NO_SEQUENCE_PATTERN");
+        if (envVar && *envVar)
+        {
+            if (cachedNoSequencePattern != envVar)
+            {
+                cachedNoSequencePattern = envVar;
+                try
+                {
+                    noSequencePatternRe = make_unique<RegEx>(envVar);
+                }
+                catch (...)
+                {
+                    noSequencePatternRe.reset();
+                }
+            }
+        }
+        else
+        {
+            cachedNoSequencePattern.clear();
+            noSequencePatternRe.reset();
+        }
+
         //
         //  NOTE: this function needs to maintain as much order as
         //  possible in the in input file list.
@@ -307,6 +332,13 @@ struct LexinumericCompare
             const string& f = allfiles.front();
 
             if (P && !P(f))
+            {
+                frameSequences.push_back(f);
+                allfiles.pop_front();
+                continue;
+            }
+
+            if (noSequencePatternRe && noSequencePatternRe->matches(f))
             {
                 frameSequences.push_back(f);
                 allfiles.pop_front();
