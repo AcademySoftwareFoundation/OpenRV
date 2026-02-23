@@ -65,7 +65,7 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp)
+  LIST(APPEND _sources DisplayLink.cpp DeepColorSupport.mm)
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
@@ -410,7 +410,7 @@ IF(RV_TARGET_DARWIN)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC TwkGLFCoreGraphics
-    PRIVATE "-framework CoreVideo"
+    PRIVATE "-framework CoreVideo" "-framework QuartzCore"
   )
 ENDIF()
 

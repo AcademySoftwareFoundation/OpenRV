@@ -187,6 +187,7 @@ namespace Rv
         int dispGreenBits;
         int dispBlueBits;
         int dispAlphaBits;
+        int deepColor;
         char* networkHost;
         std::string networkHostBuf;
         char* networkTag;
@@ -459,7 +460,8 @@ namespace Rv
         "-init %S", &opt.initscript, "Override init script", "-nofloat", ARG_FLAG(&opt.nofloat), "Turn off floating point by default",     \
         "-maxbits %d", &opt.maxbits, "Maximum default bit depth (default=%d)", opt.maxbits, "-gamma %f", &opt.gamma,                       \
         "Set display gamma (default=%g)", opt.gamma, "-sRGB", ARG_FLAG(&opt.sRGB), "Display using linear -> sRGB conversion", "-rec709",   \
-        ARG_FLAG(&opt.rec709), "Display using linear -> Rec 709 conversion", "-dlut %S", &opt.dispLUT, "Apply display LUT",                \
+        ARG_FLAG(&opt.rec709), "Display using linear -> Rec 709 conversion", "-deepColor", ARG_FLAG(&opt.deepColor),                       \
+        "Request 10-bit (10-10-10-2) display output (bypasses Qt compositor on macOS)", "-dlut %S", &opt.dispLUT, "Apply display LUT",     \
         "-brightness %f", &opt.brightness, "Set display relative brightness in stops (default=%g)", opt.brightness, "-resampleMethod %S",  \
         &opt.resampleMethod, "Resampling method (area, linear, cubic, nearest, default=%s)", opt.resampleMethod, "-eval %S", &opt.eval,    \
         "Evaluate Mu expression at every session start", "-pyeval %S", &opt.pyeval, "Evaluate Python expression at every session start",   \

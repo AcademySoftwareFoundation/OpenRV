@@ -18,6 +18,7 @@
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
 #include <QOpenGLWidget>
+#include <QOpenGLContext>
 #include <QGuiApplication>
 
 namespace Rv
@@ -57,13 +58,13 @@ namespace Rv
         class ScreenView : public QOpenGLWidget
         {
         public:
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* sharedCtx, Qt::WindowFlags flags);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
-            QOpenGLWidget* m_glViewShare = nullptr;
+            QOpenGLContext* m_sharedCtx = nullptr;
         };
 
     public:

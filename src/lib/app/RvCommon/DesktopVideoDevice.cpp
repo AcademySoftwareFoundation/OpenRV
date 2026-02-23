@@ -160,7 +160,17 @@ namespace Rv
         QSurfaceFormat fmt = shareDevice()->widget()->format();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        // Pass the main window's context so ScreenView can attempt to share it.
+        // Note: QOpenGLWidget::initializeGL() calls setShareContext() after the
+        // native context is created, which has no effect on the underlying GL
+        // context. For robust context sharing, ScreenView should be refactored
+        // to use QOpenGLWindow with the shared-context constructor.
+        QOpenGLContext* sharedCtx = nullptr;
+        if (shareDevice()->window() && shareDevice()->window()->context())
+        {
+            sharedCtx = shareDevice()->window()->context();
+        }
+        ScreenView* vw = new ScreenView(fmt, 0, sharedCtx, Qt::Window);
         setViewWidget(vw);
 
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
@@ -747,11 +757,10 @@ namespace Rv
 
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
-    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare,
-                                               Qt::WindowFlags flags)
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* sharedCtx, Qt::WindowFlags flags)
         : QOpenGLWidget(parent, flags)
     {
-        m_glViewShare = glViewShare;
+        m_sharedCtx = sharedCtx;
         setFormat(fmt);
 
         // Important: set PartialUpdate, because otherwise
@@ -764,9 +773,13 @@ namespace Rv
     {
         QOpenGLWidget::initializeGL();
 
-        if (m_glViewShare && context() && context()->isValid())
+        // Note: setShareContext() after native context creation has no effect
+        // on the underlying GL context, but we leave this as documentation of
+        // intent. For full context sharing, ScreenView would need to become a
+        // QOpenGLWindow and use the proper shared-context constructor.
+        if (m_sharedCtx && context() && context()->isValid())
         {
-            context()->setShareContext(m_glViewShare->context());
+            context()->setShareContext(m_sharedCtx);
         }
     }
 

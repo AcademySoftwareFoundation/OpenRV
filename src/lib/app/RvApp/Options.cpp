@@ -303,6 +303,7 @@ namespace Rv
         dispGreenBits = 8;
         dispBlueBits = 8;
         dispAlphaBits = 8;
+        deepColor = 0;
         networkPort = 0;
         networkHost = NULL;
         networkTag = NULL;
@@ -885,6 +886,18 @@ namespace Rv
         if (getenv("TWK_DISABLE_CACHE_STATS") != NULL)
         {
             optionMap["disableCacheStats"] = true;
+        }
+
+        //
+        //  When deep color is requested, override display bit depths
+        //
+
+        if (deepColor)
+        {
+            dispRedBits = 10;
+            dispGreenBits = 10;
+            dispBlueBits = 10;
+            dispAlphaBits = 2;
         }
 
         //

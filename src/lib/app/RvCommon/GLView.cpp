@@ -20,6 +20,9 @@
 #include <RvApp/Options.h>
 #include <iostream>
 #include <TwkApp/Event.h>
+#ifdef PLATFORM_DARWIN
+#include <RvCommon/DeepColorSupport.h>
+#endif
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -251,15 +254,17 @@ namespace Rv
             initializeGLExtensions();
             initializeOpenGLFunctions();
 
-            if (m_sharedContext)
-            {
-                context()->setShareContext(m_sharedContext);
-            }
-
             if (m_doc)
             {
                 m_doc->initializeSession();
             }
+
+#ifdef PLATFORM_DARWIN
+            if (Rv::Options::sharedOptions().deepColor)
+            {
+                configureViewForDeepColor(static_cast<unsigned long long>(winId()));
+            }
+#endif
 
             // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
             QSurfaceFormat f = context()->format();
@@ -533,7 +538,10 @@ namespace Rv
             }
             else
             {
-                m_videoDevice->widget()->context()->swapBuffers(m_videoDevice->widget()->context()->surface());
+                QOpenGLContext* ctx = m_videoDevice->window() ? m_videoDevice->window()->context()
+                                                              : (m_videoDevice->widget() ? m_videoDevice->widget()->context() : nullptr);
+                if (ctx)
+                    ctx->swapBuffers(ctx->surface());
             }
 
             trecord.swapEnd = session->profilingElapsedTime();

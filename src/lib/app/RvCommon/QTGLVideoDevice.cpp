@@ -68,11 +68,27 @@ namespace Rv
 
     GLVideoDevice* QTGLVideoDevice::newSharedContextWorkerDevice() const
     {
-        // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try
-        // to share with setShareContext.
-        QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
-        openGLWidget->context()->setShareContext(m_view->context());
-        return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
+        if (m_window)
+        {
+            // Create a shared-context QOpenGLWindow for the worker.
+            // The context must be passed to the constructor so that context
+            // sharing is established before the native GL context is created.
+            QOpenGLWindow* openGLWindow = new QOpenGLWindow(m_window->context(), QOpenGLWindow::NoPartialUpdate);
+            openGLWindow->setFormat(m_window->format());
+            return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWindow);
+        }
+        else if (m_widget)
+        {
+            // Create shared context QOpenGLWidget for worker
+            QOpenGLWidget* openGLWidget = new QOpenGLWidget();
+            openGLWidget->setFormat(m_widget->format());
+            if (m_widget->context())
+            {
+                openGLWidget->context()->setShareContext(m_widget->context());
+            }
+            return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
+        }
+        return nullptr;
     }
 
     void QTGLVideoDevice::makeCurrent() const
@@ -138,29 +154,7 @@ namespace Rv
     {
         if (!isWorkerDevice())
         {
-            if (m_view->isVisible())
-            {
-#ifdef PLATFORM_DARWIN
-                // Make sure that the QGLWidget gets redrawn by updateGL() even
-                // when completely overlapped by another window.
-                // Note that on macOS, Qt correctly detects when the QGLWidget
-                // is completely overlapped by another window and in which case
-                // resets the Qt::WA_Mapped attribute. This will prevent the
-                // GLView::paintGL() operation from being called by
-                // m_view->updateGL(), which will result in automatically
-                // interrupting any video playback that might be in progress
-                // while the RV window is completely overlapped. This is an
-                // undesirable behaviour during a review session, especially if
-                // an external video output device is used.
-                m_view->setAttribute(Qt::WA_Mapped);
-#endif
-
-                m_view->update();
-            }
-            else
-            {
-                redraw();
-            }
+            redraw();
         }
     }
 
