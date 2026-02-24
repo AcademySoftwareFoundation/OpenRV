@@ -63,7 +63,7 @@ RVIO supports all of the same movie, image, and audio formats that RV does inclu
 | -audiorate *float*        | Output audio sample rate (default from input)                                                                                                                |
 | -audiochannels *int*      | Output audio channels (default from input)                                                                                                                   |
 | -quality *float*          | Output codec quality 0.0 -> 1.0 (use varies with file format and codec default=0.900000)                                                                     |
-| -outpa*float*            | Output pixel aspect ratio (e.g. 1.33 or 4:3, etc, metadata only) default=1:1                                                                                 |
+| -outpa*float*             | Output pixel aspect ratio (e.g. 1.33 or 4:3, etc, metadata only) default=1:1                                                                                 |
 | -comment *string*         | Output comment (movie files, default="")                                                                                                                     |
 | -copyright *string*       | Output copyright (movie files, default="")                                                                                                                   |
 | -debug *string*           | Debug category                                                                                                                                               |

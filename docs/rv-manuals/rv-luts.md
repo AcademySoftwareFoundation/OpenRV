@@ -49,11 +49,11 @@ The pre-cache LUT is useful when a special caching format is desired. For exampl
 | Extension | Type | 1D | 3D | PreLUT | Float | Input | Output |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | csp | Rising Sun Research | • | • | • | • | [ - ∞ , ∞] | [ - ∞ , ∞] |
-| rv3dlut | RV 3D |  | • |  | • | [0 , 1] | [ - ∞ , ∞] |
-| rvchlut | RV Channel | • |  |  | • | [0 , 1] | [ - ∞ , ∞] |
-| 3dl | Lustre |  | • |  |  | [0 , 1] | [0 , 1] |
-| cube | IRIDAS |  | • |  | • | [0 , 1] | [ - ∞ , ∞] |
-| any | Shake | • |  |  | • | [0 , 1] | [ - ∞ , ∞] |
+| rv3dlut | RV 3D | | • | | • | [0 , 1] | [ - ∞ , ∞] |
+| rvchlut | RV Channel | • | | | • | [0 , 1] | [ - ∞ , ∞] |
+| 3dl | Lustre | | • | | | [0 , 1] | [0 , 1] |
+| cube | IRIDAS | | • | | • | [0 , 1] | [ - ∞ , ∞] |
+| any | Shake | • | | | • | [0 , 1] | [ - ∞ , ∞] |
 
 *LUT Formats (as Supported in RV)*
 

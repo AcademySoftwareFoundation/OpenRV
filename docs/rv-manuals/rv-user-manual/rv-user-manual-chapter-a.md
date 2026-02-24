@@ -4,11 +4,11 @@ On Linux, RV's Platform Audio module is based on Qt's QAudioOutput, which is imp
 
 The environment variables are as follows:
 
-| Environment Variable              | Variable values                                                                                                                                                                                                                                                                                                                                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TWK_QTAUDIOOUTPUT_ENABLE_DEBUG | 0 = No debugging msgs (default) <br> 1 = Standard debugging msgs ; displays the ALSA device hardware parameter values used to configure the audio device. It will also display errors like buffer underruns. <br> 2 = Verbose debugging msgs ; use this value for tracing crashes. Messages are displayed with each audio period write to the audio alsa device. |
-| TWK_QTAUDIOOUTPUT_BUFFER_TIME  | value in microsecs e.g. 120000 for 120ms (default is 120000)                                                                                                                                                                                                                                                                                             |
-| TWK_QTAUDIOOUTPUT_PERIOD_TIME  | value in microsecs e.g. 20000 for 20ms (default is 20000)|
+| Environment Variable              | Variable values                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TWK_QTAUDIOOUTPUT_ENABLE_DEBUG    | 0 = No debugging msgs (default) <br> 1 = Standard debugging msgs ; displays the ALSA device hardware parameter values used to configure the audio device. It will also display errors like buffer underruns. <br> 2 = Verbose debugging msgs ; use this value for tracing crashes. Messages are displayed with each audio period write to the audio alsa device. |
+| TWK_QTAUDIOOUTPUT_BUFFER_TIME     | value in microsecs e.g. 120000 for 120ms (default is 120000)                                                                                                                                                                                                                                                                                                     |
+| TWK_QTAUDIOOUTPUT_PERIOD_TIME     | value in microsecs e.g. 20000 for 20ms (default is 20000)                                                                                                                                                                                                                                                                                                        |
 
 Table K.1:
 
@@ -87,13 +87,13 @@ The tuning process steps:
 
 The table below provides the smallest values of TWK_QTAUDIOOUTPUT_BUFFER_TIME and TWK_QTAUDIOOUTPUT_PERIOD_TIME that prevents buffer underruns (i.e. audio corruption/static issues), minimizes the lag at play-start and average av sync. Note the default value for buffer time is 120000 and period time is 20000.
 
-| Hardware class   | Audio Hardware                  | OS Machine Specs                                                                                    | BUFFER_TIME | PERIOD_TIME | Avrg AV sync |
+| Hardware class   | Audio Hardware                  | OS Machine Specs                                                                                    | BUFFER_TIME  | PERIOD_TIME  | Avrg AV sync |
 | ---------------- | ------------------------------- | --------------------------------------------------------------------------------------------------- | ------------ | ------------ | ------------ |
 | Gaming machine   | onboard intel HDA/realtek 7.1ch | Centos7.2, Asus Rampage Gene IV, iCore7 3.5Ghz, 32GB 2400Mhz RAM, SSD, Quadro K2200 (nv drv 352.55) | 36000        | 6000         | ~3ms         |
 | HP workstation   | onboard intel HDA/realtek 2ch   | Centos6.6, HPZ820, Xeon 12core, 48GB RAM, SSD, Quadro K6000 (nv 352.63)                             | TDB          | TDB          | TDB          |
 | Dell workstation | onboard intel HDA/realtek 2ch   | Centos7.2                                                                                           | TDB          | TDB          | TDB          |
 | Any              | USB Soundblaster XiFi           | Centos7.2, Asus Rampage Gene IV, iCore7 3.5Ghz, 32GB 2400Mhz RAM, SSD, Quadro K2200 (nv drv 352.55) | 120000       | 20000        | TDB          |
-|                  |                                 |                                                                                                     |              |              |     |
+|                  |                                 |                                                                                                     |              |              |              |
 
 Table K.2:
 

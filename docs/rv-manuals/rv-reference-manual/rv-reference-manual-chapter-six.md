@@ -444,7 +444,7 @@ The source property indexes the inputs to the sequence node. So index 0 refers t
 
 You can think of the properties in the sequence as forming a transposed matrix in which the properties are columns and edits are rows as in [6.1](rv-reference-manual-chapter-six.md#edl-as-matrix). Note that there are only 4 edits even though there are 5 rows in the matrix. The last edit is really just a boundary condition: it indicates how RV should handle frames past the end of the EDL. To be well formed, an RV EDL needs to include this.Note that the in frame and out frame may be equal to implement a “held” frame.
 
-|  | global start frame | source | in | out |
+| | global start frame | source | in | out |
 | --- | --- | --- | --- | --- |
 | edit #1 | 1 | a.mov | 1 | 10 |
 | edit #2 | 11 | b.mov | 1 | 10 |

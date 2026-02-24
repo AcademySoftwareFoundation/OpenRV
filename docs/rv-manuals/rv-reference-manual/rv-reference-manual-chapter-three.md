@@ -49,7 +49,7 @@ node.evaluationType
 
 one of:
 
-|  |  |
+| | |
 | --- | --- |
 | color | one input, per-pixel operations only |
 | filter | one input, multiple input pixels sampled to create one output pixel |
@@ -97,7 +97,7 @@ bindable parameters should be given default values in the parameters component. 
 
 A “combine” node will evaluate its single input once for each parameter to the shader of type "inputImage".The names of the inputImage parameters in the shader may be chosen to be meaningful to the shader writer; they are not meaningful to the evaluation of the combine node. The order of the inputImage parameters in the shader parameter list will correspond to the multiple evaluations of the node's input (see below).Each time the input is evaluated, there are a number of variations that can be made in the context by way of properties specified in the node definition. To be clear, these properties are specified in the “parameters” section of the node definition, but they are “evaluation parameters” not shader parameters. These are:
 
-|  |  |
+| | |
 | --- | --- |
 | eye | stereo eye, int, 0 for left, 1 for right |
 | channel | color channel, string, eg "R" or "Z" |
@@ -216,7 +216,7 @@ GLSL source code can contain any set of functions and global static data but may
 
 The name of the function which serves as the entry point must be specified if it's not main().The main() function must always return a vec4 indicating the computed color at the current pixel.For each input to a node there should be a parameter of type inputImage. The parameters are applied in the order they appear. So the first node image input is assigned to the first inputImage parameter and so on.There are four special parameters which are supplied by the renderer:
 
-|  |  |
+| | |
 | --- | --- |
 | float frame | The current frame number (local to the node) |
 | float fps | The current frame rate (local to the node) |
@@ -239,7 +239,7 @@ In this case the node can only take a single input and will have a property call
 
 A new type inputImage has been added to GLSL. This type represents the input images to the node. So a node with one image argument must take a single inputImage argument. Likewise, a two input node should take two such arguments.There are a number of operations that can be done on a inputImage object. For the following examples the parameter name will be called i.
 
-|  |  |
+| | |
 | --- | --- |
 | i() | Returns the current pixel value as a vec4. Functions which only call this operator on inputImage parameters can be of type "color" |
 | i(vec2 *OFF* ) | If *P* is the current pixel location this returns the pixel at *OFF* + *P* |
@@ -259,7 +259,7 @@ return vec4(P.rgb * 0.5, P.a);
 
 The type outputImage has also been added. This type provides information about the output framebuffer.The main() function may have a single outputImage parameter. You cannot pass an outputImage to auxiliary functions nor can you have outputImage parameter to an auxiliary function. You can pass the results of operations on the outputImage object to other functions.outputImage has the following operations:
 
-|  |  |
+| | |
 | --- | --- |
 | w.st | Returns the absolute fragment coordinate with swizzling |
 | w.size() | Returns the size of the output framebuffer as a vec2 |
@@ -270,7 +270,7 @@ Table 3.3:Type outputImage Operations
 
 Samplers can be used as inputs to node functions. The sampler name and type must match an existing parameter property on the node. So for example a 1D sampler would correspond to a 1D property the value of which is a scalar array. A 3D sampler would have a type like float[3,32,32,32] if it were an RGB 32^3 LUT.
 
-|  |  |
+| | |
 | --- | --- |
 | sampler1D | *type* [ *D* , *X* ] |
 | sampler2D | *type* [ *D* , *X* , *Y* ] |

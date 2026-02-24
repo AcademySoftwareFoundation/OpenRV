@@ -166,7 +166,7 @@ uint32 interpretation; // string table index
 
 In (Text) diagram form the file looks something like this:
 
-|  |
+| |
 | --- |
 | File Header |
 | String Table |
@@ -490,7 +490,7 @@ int_num::
 
 The GTO format pre-defines a small number of data types that can be stored as properties. The currently defined types are:
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `double` | 64 bit IEEE floating point. | [Property Type] |
 | `float` | 32 bit IEEE floating point. | [Property Type] |
@@ -540,7 +540,7 @@ It is not an error to define the interpretation for a property as the empty stri
 
 The following strings are not currently part of the format specification but are used by the sample implementation. In a future release we may make these “official”. It’s ok to have multiple space separated strings in the interpretation strings (e.g. “4x4 row-major”).
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `coordinate` | The data can be of any width or type. For width N the data represents a point in N dimensional space. | [Interpretation String] |
 | `normal` | The data can be of any width or type. For width N the data represents a unit vector prependicular to an N dimensional surface or in the case of N == 2, a curve. | [Interpretation String] |
@@ -574,7 +574,7 @@ There are two kinds of protocols: major and minor. Every object must have a majo
 
 The name of the protocol as it appears in the ObjectHeader is “object” version 1. The protocol does not require any other protocols. Here it is:
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `object` | A container for properties which don’t fit into other component catagories well. A catch-all data “per-object” component. | [Required Component] |
 | `float[16][1] object.globalMatrix` | The global world-space transform for the object. | [Optional Property] |
@@ -592,7 +592,7 @@ The main point of this protocol is to define the **object** component. This comp
 
 The name of the protocol as it appears in the ObjectHeader is “transform” version 3 <sup>[1](#footnote-1) </sup> . The protocol requires the object protocol. Objects which obey the transform protocol will have global matrices and possibly a parent.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `object` | From the “object” protocol. | [Required Component] |
 | `float[16][1] object.globalMatrix` | A 4x4 matrix of floating point numbers. This matrix describes the world matrix of the coordinate system. | [Required Property] |
@@ -602,10 +602,10 @@ The name of the protocol as it appears in the ObjectHeader is “transform” ve
 
 The name of the protocol as it appears in the ObjectHeader is “particle” version 1. The protocol may include the object and transform protocols.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `points` | The points component is transposable. That means that all of its properties are required to have the same number of elements. | [Required Component] |
-| `float[3][] points.position` |  | [Optional Property] |
+| `float[3][] points.position` | | [Optional Property] |
 | `float[4][] points.position` | The position property is intended to hold the position of the particle in its owncoordinate system or world space if it has no coordinate system. The element is either a 3D or 4D (homogeneous) point | [Optional Property] |
 | `float[3][] points.velocity` | The velocity property – if it exists – should hold the velocity vector per-point in the same coordinate system that the “position” property is in. | [Optional Property] |
 | `int[1][] points.id` | The “id” property should it exist will always be defined as an integer per particle (or other integral type if it ever changes). This number should be unique for each particle. Ideally, multiple GTO files with a point that has the same “id” property for a given particle animation should be the same particle. | [Optional Property] |
@@ -635,9 +635,9 @@ In this case, each particle is scanned in one chunk allowing for optimizations. 
 
 A **strand** object contains a collection of curves. This is somewhat analogous to an object of protocol **particle** as described above.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
-| `points` |  | [Required Component] |
+| `points` | | [Required Component] |
 | `float[3][] points.position` | The CVs which make up each curve. The number of CVs per curve can vary by curve type and size. | [Required Component] |
 | `strand` | Information that is relevant to the *all* strands in the object. | [Required Component] |
 | `string[1][] strand.type` | String describing curve type. Currently, supported values are linear for degree 1 curves, or cubic for degree 3 curves. | [Required Property] |
@@ -650,17 +650,17 @@ A **strand** object contains a collection of curves. This is somewhat analogous 
 
 The name of the protocol as it appears in the ObjectHeader is “NURBS” version 1. The protocol requires the **particle** protocol and optionally includes the **object** and **transform** protocols.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `points` | see **particle** protocol. The points describe data per NURBS control vertex. | [Required Component] |
-| `float[3][] points.position` |  | [Required Property] |
+| `float[3][] points.position` | | [Required Property] |
 | `float[4][] points.position` | The position property holds the control point positions in its own coordinate system or world space if it has no coordinate system. The element is either a 3D or 4D (homogeneous) point. If the type is float[4] the fourth component of the element will be the rational component of the control point position. The control points are laid out in *v-* **major** order ( *u* iterates more quickly than *v* ). | [Required Property] |
 | `float[1][] points.weight` | If the position property is of type `float[3][]` there may optionally be a “weight” property. This property holds the homogeneous (rational) component of the position. Older GTO writers may export data in this manner. The preferred method is to use a `float[4]` element position. | [Optional Property] |
 | `surface` | Properties related to the definition of a NURBS surface are stored in this component. | [Required Component] |
 | `float[1][2] surface.degree` | The degree of the surface in *u* and *v* . | [Required Property] |
-| `float[1][] surface.uKnots` |  | [Required Property] |
+| `float[1][] surface.uKnots` | | [Required Property] |
 | `float[1][] surface.vKnots` | The NURBS surface knot vectors in *u* and *v* are stored in these properties. The knots are not piled. The usual NURBS restrictions on how numbers may be stored in the knot vectors apply. | [Required Property] |
-| `float[1][2] surface.uRange` |  | [Required Property] |
+| `float[1][2] surface.uRange` | | [Required Property] |
 | `float[1][2] surface.vRange` | The range of the knot parameters in *u* and *v* . | [Required Property] |
 
 The **NURBS** protocol currently does not handle trim curves, points on surface, etc. Ultimately, the intent is to handle the trim curves and other nasties as NURBS curveson-surface which will be stored in additional components. UBS surfaces can be stored as NURBS with non-rational uniform knots.
@@ -671,7 +671,7 @@ The name of the protocol as it appears in the ObjectHeader is “polygon” vers
 
 There are a number of alternative configurations of this protocol depending on the value of the **smoothing.method** property. All of these involve the placement of normals in the file.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `points` | See **particle** protocol. The points describe data per vertex. | [Required Component] |
 | `float[3][] points.position` | The positions for regular polygonal meshes are stored as `float[3]` . | [Required Property] |
@@ -708,7 +708,7 @@ When images are stored in a GTO file, use of Gzip compression is highly recommen
 
 If the image data is encoded, its better not to use compression on the GTO file (especially if the file contains only image data).
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `image` | The image data and other information will be stored in the **image** component. | [Required Component] |
 | `int[1][] image.size` | The size (and dimension) of the image. There will be N sizes in this property corresponding to the N dimensions of the image. | [Required Property] |
@@ -717,18 +717,18 @@ If the image data is encoded, its better not to use compression on the GTO file 
 
 Any one of the following properties are required to hold the actual image data:
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
-| `byte[N][] image.pixels` |  | [Property] |
-| `short[N][] image.pixels` |  | [Property] |
-| `string[1][1] image.type` |  | [Property] |
+| `byte[N][] image.pixels` | | [Property] |
+| `short[N][] image.pixels` | | [Property] |
+| `string[1][1] image.type` | | [Property] |
 | `half[N][] image.pixels` | The element width determines the number of channels in the image. For example the type `byte[3][]` indicate a 3 channel 8-bit per channel image. The number of elements in this property should be equal to `image.size[0] &#42; image.size[1] &#42; ... image.size[N]` where **image.size** is the property defined above. | [Property] |
 
 #### Additional Image Properties Used by GTV Files
 
 The base GTO library does not deal with encoded image data or tiling of images. GTV is a specialization of the GTO format for storing movie frames. Some of the GTV properties are documented here. (See documentation for the GTV library for more info).
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `string[1] image.encoding` | If the pixel data is encoded this property will indicate a method to decode it. Typical values are “jpeg”, “jp2000”, “piz”, “rle”, or “zip”. The pixels will be stored in the **image.pixels** as `byte[1][]` . | [OptionalProperty] |
 
@@ -740,7 +740,7 @@ The material definition is renderer and pipeline dependant. Material assignment 
 
 The **material** protocol is intended for use with software renderers. Interactive material definitions may be more easily defined on the assigned object.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `material` | Properties unrelated to parameters appear in the **material** component. | [Required Component] |
 | `string[1][1] type` | The value of the **material.type** property is renderer dependant. For a RIB renderer, the value of type might be “Surface”, “Displacement”, “Atmosphere” or a similar shader type name. | [Required Property] |
@@ -762,7 +762,7 @@ Connection components are transposable. The number of elements in properties com
 
 Connection components have the following properties. Note that where **connection_type** occurs in the property name, you would substitute in the actual name of the connection type. (“parent of” for example).
 
-|  |  |
+| | |
 | --- | --- |
 | `string[1][] connection_type.lhs` | [Required Property] |
 | `string[1][] connection_type.rhs` | [Required Property] |
@@ -805,7 +805,7 @@ If the **object.protocol** property contains the string “sorted” and the obj
 
 This protocol guarantees that the vertices and elements of shells—isolated sections of polygonal geometry—will be continguous in the **points** and **elements** components of the object.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `shells` | The **shells** component is transposable. Each property in the component should have the same number of elements. | [Required Component] |
 | `int[1][] shells.vertices` | The number of contiguous vertices that make up the Nth element’s shell. | [Required Property] |
@@ -821,7 +821,7 @@ The first element of the property should indicate the name of the mapping to use
 
 The second and subsequent elements should contain the name of data to map. This could be a texture map file on disk, an image object in the GTO file, or a special cookie string. The lack of second element can be used as a special cookie.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `channels` | The component holds the names of all the channels on the geometry. | [Required Component] |
 
@@ -981,7 +981,7 @@ In addition, you can compile the GTO library with zlib support. This enables the
 
 As the file is read, the Reader class will call its virtual functions to declare objects in the file to the derived class. The derived class is expected to return a non-null pointer if it wishes to later receive data for that object.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `Reader::Reader` *(unsigned int `mode` )* | The constructor argument mode indicates how the reader will be used. This value is a bit vector of the following or’ed flags:  
 **`Reader::None`**  
@@ -1012,14 +1012,14 @@ Only text GTO files will be accepte by reader. | [Constructor] |
 
 The following functions are called by the base class.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `void Reader::header` *(const `Header& header` )* | This function is called by the Reader base class right after the file header has been read (or created). | [Virtual] |
 | `void Reader::descriptionComplete ()` | This function is called after all file, object, component, and property structures have been read. For binary files, this is just before the data is read. For text files, this is after the entire file has been read. | [Virtual] |
 
 The following functions return a `Reader::Request` object. This object takes two parameters: a boolean indicating whether the data in question should be read by the reader and a second optional data `void*` argument of user data to associate with the file data.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `Reader::Request::Request` *(bool `want` , void\* `data` )* | *want* value of true indicates a request for the data in question. *data* can be any void\*. *data* is meaningless if the *want* is false. | [Constructor] |
 | `Reader::Request Reader::object` *(const std::string& `name` , const std::string& `protocol` , unsigned int `protocolVersion` , const ObjectInfo& `header` )* | This function is called whenever the Reader base class encounters an ObjectHeader. The derived class should override this function and return a Request object to indicate whether data should be read for the object in question. If it requests not to have data read, the Reader will not call the corresponding component() and property() functions. | [Virtual] |
@@ -1030,7 +1030,7 @@ The following functions return a `Reader::Request` object. This object takes two
 
 If you are using the Reader class in `Reader::RandomAccess` mode, you may call these functions after the read function has returned:
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `Reader::Objects& Reader::objects ()` | Returns a reference to an std::vector of Reader::ObjectInfo structures. These are only valid after `Reader::open()` has returned. You can use these structures when calling `Reader::accessObject()` . | [Method] |
 | `const Reader::Components& Reader::components ()` | Returns a reference to an std::vector of Reader::ComponentInfo structures. These are only valid after `Reader::open()` has returned. This method is most useful when deciding how to call the `accessObject` function. | [Method] |
@@ -1092,7 +1092,7 @@ writer.endObject();
      writer.endData(); 
 ```
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `Writer::Writer ()` | Creates a new Writer class object. Typically you’ll make one of these on the stack. This constructor requires you call the open function to actually start writing the file. | [Constructor] |
 | `Writer::Writer` *(std::ostream&)* | Creates a new Writer class object which will output to the passed C++ output stream. | [Constructor] |
@@ -1132,7 +1132,7 @@ As the file is read, the Reader class will call specific functions in itself to 
 
 The biggest difference from the C++ Reader class is that the `data()` method of the C++ class, which returns allocated memory for the library to read data into, cannot be overloaded in Python. Instead, the `dataRead()` method of the Python gto.Reader class is handed pre-allocated Python objects containing the data.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | *status* `gto.Reader` *(mode)* | Create a new gto.Reader instance. Possible values for *mode* :  
 **gto.Reader.NONE**  
@@ -1160,7 +1160,7 @@ The reader will only accept text GTO files. | [Constructor] |
 
 ### gto.Writer
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `gto.Writer ( )` | Creates a new writer instance, no arguments needed. | [Constructor] |
 | `gto.Writer.open` *(filename, mode)* | Open the file. The Writer will attempt to open file *filename* . If the file is not writable for whatever reason, the function will raise a Python exception. The *mode* argument can be `BINARYGTO` , `COMPRESSEDGTO` (the default) or `TEXTGTO` . | [Method] |
@@ -1185,7 +1185,7 @@ Tuples and lists are flattened out before they are written. As long as the numbe
 
 These classes will contain the actual strings rather than string table IDs.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `gto.ObjectInfo` | This class emulates the Gto::ObjectInfo struct from the C++ Gto library. It is passed by the Python gto.Reader class to your derived `object()` method. The only methods implemented are `___getattr__` and `__repr__` . Available attributes are:  
 • `name` : String  
@@ -1217,7 +1217,7 @@ Usage: `gtoinfo [OPTIONS] infile.gto`
 
 Options:
 
-|  |  |
+| | |
 | --- | --- |
 | `-a/-all` | Output property data and header. |
 | `-d/--dump` | Output property data (no header data is emitted). |
@@ -1238,7 +1238,7 @@ Usage: ‘ `gtofilter [OPTIONS] -o` *out.gto in.gto* ’
 
 Options:
 
-|  |  |
+| | |
 | --- | --- |
 | `-v` | Set verbose output. Whenever a pattern matches gtofilter will inform you. |
 | `-ee/--exclude` | Regular expression which will be used to exclude properties. |
@@ -1287,7 +1287,7 @@ Usage: ‘ `gtomerge` *-o outfile.gto infile1.gto infile2.gto …* ’
 
 Options:
 
-|  |  |
+| | |
 | --- | --- |
 | `-o outfile.gto` | The resulting merged file to output. |
 | `-t` | Ouput text GTO file. |
@@ -1305,7 +1305,7 @@ Usage: ‘ `gto2obj [OPTIONS]` *infile outfile* ’
 
 Options:
 
-|  |  |
+| | |
 | --- | --- |
 | `-o NAME` | When outputing GTO files, the name of an object in the GTO file to output. If not specified, the translator will output the first polygon, or subdivision surface it finds. |
 | `-c` | When outputing GTO files, this option will force the protocol to be “catmullclark”. |
@@ -1325,7 +1325,7 @@ gto2obj -c in.obj out.gto ## output obj as subdivision surface
 
 Usage: ‘ `gtoimage` infile outfile’
 
-|  |  |
+| | |
 | --- | --- |
 | `-t` | Ouput text GTO file. |
 | `-nc` | Ouput uncompressed binary GTO file. |
@@ -1439,7 +1439,7 @@ There is also an environment variable, `TWK_RI_GTO_NO_CACHE` , which if defined 
 
 #### Environment Variables
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `TWK_RI_GTO_NO_SUBDS` | If this environment variable is defined and set to anything except “0”, “FALSE”, “False”, or “false”, RiGtoPlugin will treat all catmull-clark subdivision surfaces read from a GTO file as polygons instead. | [Environment Variable] |
 | `TWK_RI_GTO_NO_CACHE` | If this environment variable is defined and set to anything except “0”, “FALSE”, “False”, or “false”, RiGtoPlugin will turn off all caching of geometry data to save memory. | [Environment Variable] |
@@ -1479,7 +1479,7 @@ Procedural "DynamicLoad" [ "RiGtoPlugin.so" "thing.ref.gtothing.0013.open.gto th
 
 RiGtoPlugin stores some useful data in attributes that can be used by shaders if desired.
 
-|  |  |  |
+| | | |
 | --- | --- | --- |
 | `Pref` | On ALL geometry RiGtoPlugin creates “varying point Pref” as part of its geometry declaration. This data can be accessed by simply putting “varying point Pref” in your shader parameters. The position of the model in the reference GTO file is always used for this parameter value. | [Shader parameter] |
 | `Name` | RiGtoPlugin always places the name of the geometry, as retrieved from the GTO file, in an attribute that may be queried. It is exactly as if the following line of RIB were declared before the geometry were instantiated:  

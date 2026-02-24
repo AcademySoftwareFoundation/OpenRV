@@ -84,13 +84,13 @@ By selecting a profile and activating the Apply button, you can set the profile 
 
 There are five arguments which control how presentation mode starts up from the command line:
 
-| | |
+|                               |                                                                                                                                                                                                                                                                                         |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -present                     | Causes the program to start up in presentation mode                                                                                                                                                                                                                                     |
-| -presentAudio [0 or 1]     | Enables audio output to the presentation device if 1 or turns off if 0                                                                                                                                                                                                                   |
-| -presentDevice MODULE/DEVICE | Forces the use of DEVICE from MODULE. Note that the forward slash character must separate the device and module names.                                                                                                                                                                  |
-| -presentVideoFormat format   | Forces the use of format for the video format. The format is a string or substring of full description of the video format as the appear in the video module in the preferences. For example: “1080p” would match “1080p 24Hz”. The first match is used.                                |
-| -presentDataFormat format    | Forces the use of format for the data format. Like the video format above, the data format string is matched against the full description of the data formats as they appear in the video module in the preferences. For example: “Stereo” would match “Dual Stereo YCrCb 4:2:2”.|
+| -present                      | Causes the program to start up in presentation mode                                                                                                                                                                                                                                     |
+| -presentAudio [0 or 1]        | Enables audio output to the presentation device if 1 or turns off if 0                                                                                                                                                                                                                  |
+| -presentDevice MODULE/DEVICE  | Forces the use of DEVICE from MODULE. Note that the forward slash character must separate the device and module names.                                                                                                                                                                  |
+| -presentVideoFormat format    | Forces the use of format for the video format. The format is a string or substring of full description of the video format as the appear in the video module in the preferences. For example: “1080p” would match “1080p 24Hz”. The first match is used.                                |
+| -presentDataFormat format     | Forces the use of format for the data format. Like the video format above, the data format string is matched against the full description of the data formats as they appear in the video module in the preferences. For example: “Stereo” would match “Dual Stereo YCrCb 4:2:2”.       |
 
 Table 6.1:
 
@@ -136,7 +136,7 @@ On Windows, like macOS, the vertical sync is somewhat of an unknown. However, it
 
 Stereoscopic media can be displayed in Frame Packed (or “Frame Packing”) mode on any HDMI 1.4a-compliant device (AKA 3DTV). But in order for RV to make use of this display resolution (which is roughly a double-height HD frame), the monitor or other display device must have the appropriate resolution defined in advance. The timings from the HDMI 1.4a specification are shown in the following table:
 
-| | | | |
+|                   |                |                |              |
 | ----------------- | -------------- | -------------- | ------------ |
 |                   |                | **Horizontal** | **Vertical** |
 | **Active pixels** | **1080p 24Hz** | 1920           | 2205         |

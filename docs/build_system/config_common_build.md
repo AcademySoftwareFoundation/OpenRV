@@ -147,7 +147,7 @@ pre-commit install
 
 ### 5. Clang-tidy
 
-Although not strictly enforced, it is highly suggested to enable clang-tidy locally to lint the C++ code you plan to contribute to the project. A `.clang-tidy` configuration file is present at the root of the project to help standardize linting rules. While it is recommended to use clangd (which integrates clang-tidy), you can refer to the list of other well-known clang-tidy integrations [here](https://clang.llvm.org/extra/clang-tidy/Integrations.html). For more details on how to install everything you need for your IDE, please follow the steps outlined [here](https://clangd.llvm.org/installation).
+Although not strictly enforced, it is highly suggested to enable clang-tidy locally to lint the C++ code you plan to contribute to the project. A `.clang-tidy` configuration file is present at the root of the project to help standardize linting rules. While it is recommended to use clangd (which integrates clang-tidy), you can refer to the list of other well-known [clang-tidy IDE integrations](https://clang.llvm.org/extra/clang-tidy/Integrations.html). For more details on how to install everything you need for your IDE, please follow the [clangd installation guide](https://clangd.llvm.org/installation).
 
 1. Install clangd with your package manager
 
