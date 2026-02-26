@@ -205,11 +205,18 @@ namespace Rv
                            opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
 
+        // Pre-size the QOpenGLWindow before wrapping it in a container.
+        // createWindowContainer() uses QWindow::size() (not sizeHint()) as the
+        // container's sizeHint. Without this, QWindow::size() is QSize(0,0) and
+        // the container starts at zero, ignoring GLView::sizeHint()'s 1024x576.
+        m_glView->resize(m_glView->sizeHint());
+
         // Wrap QOpenGLWindow in a widget container for layout
         m_glViewContainer = QWidget::createWindowContainer(m_glView, this);
         m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
         m_glViewContainer->setMouseTracking(true);
         m_glViewContainer->setAcceptDrops(true);
+        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
         // Set the container as the event widget for QTTranslator
         m_glView->setEventWidget(m_glViewContainer);
@@ -798,7 +805,16 @@ namespace Rv
         Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
         oldGLView->stopProcessingEvents();
 
-        GLView* newGLView = new GLView(this, view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
+        GLView* newGLView = new GLView(view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
+        newGLView->resize(oldGLView->width(), oldGLView->height());
+        m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
+        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+        m_glViewContainer->setMouseTracking(true);
+        m_glViewContainer->setAcceptDrops(true);
+        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+        // Set the container as the event widget for QTTranslator
+        newGLView->setEventWidget(m_glViewContainer);
 
         newGLView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
 
@@ -812,7 +828,13 @@ namespace Rv
         if (!newGLView->isValid())
         {
             delete newGLView;
-            newGLView = new GLView(this, view()->context(), this);
+            newGLView = new GLView(view()->context(), this);
+            m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
+            m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+            m_glViewContainer->setMouseTracking(true);
+            m_glViewContainer->setAcceptDrops(true);
+            m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            newGLView->setEventWidget(m_glViewContainer);
             resetGLPrefs = true;
         }
 
