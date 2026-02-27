@@ -65,8 +65,8 @@ namespace Rv
         void processTextBuffer();
 
     private:
-        void closeEvent(QCloseEvent*);
-        void done(int result);
+        void closeEvent(QCloseEvent*) override;
+        void done(int result) override;
         void saveSettings();
 
     private:
