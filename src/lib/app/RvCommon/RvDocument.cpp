@@ -197,32 +197,29 @@ namespace Rv
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         // --- Metal path ---
-        // MetalView is a QWindow (not QWidget) so that Qt's backing-store
-        // compositor does NOT composite it as a 1× bitmap — which on Retina
-        // displays caused the content to appear as a 2×2 tile of quarter-size
-        // copies.  Wrap it in a container widget with createWindowContainer(),
-        // exactly the same pattern used for GLView (QOpenGLWindow).
-        m_metalView = new MetalView(this, opts.vsync != 0 && !m_vsyncDisabled, 10 /*bitsPerChannel*/);
+        // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
+        // to its native NSView.  It can be used directly in layouts without any
+        // createWindowContainer() wrapping.
+        m_metalView = new MetalView(this, m_centralWidget, opts.vsync != 0 && !m_vsyncDisabled, 10 /*bitsPerChannel*/);
 
-        // Pre-size before createWindowContainer (same as GL path).
+        m_metalView->setFocusPolicy(Qt::StrongFocus);
+        m_metalView->setMouseTracking(true);
+        m_metalView->setAcceptDrops(true);
+        m_metalView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         m_metalView->resize(m_metalView->sizeHint());
 
-        // Wrap QWindow in a widget container for layout integration.
-        m_glViewContainer = QWidget::createWindowContainer(m_metalView, m_centralWidget);
-        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
-        m_glViewContainer->setMouseTracking(true);
-        m_glViewContainer->setAcceptDrops(true);
-        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        // MetalView IS the container widget — no createWindowContainer() needed.
+        m_glViewContainer = m_metalView;
 
-        m_metalView->setEventWidget(m_glViewContainer);
+        m_metalView->setEventWidget(m_metalView);
 
         // Initialize the session eagerly so that doc->session() is non-null
         // immediately after construction.  On the Metal path, MetalView::initialize()
-        // (which normally calls initializeSession) is triggered by exposeEvent() —
+        // (which normally calls initializeSession) is triggered by showEvent() —
         // an async Qt event — so doc->session() would be null when newSessionFromFiles()
         // accesses it synchronously right after doc->show().  Calling it here is safe
         // because QTMetalVideoDevice is constructed in MetalView's constructor and is
-        // already available; actual Metal device/layer setup happens later in
+        // already available; actual CALayer setup happens later in
         // MetalView::initialize() (which re-calls initializeSession but hits the
         // if (!m_session) guard and exits immediately).
         initializeSession();

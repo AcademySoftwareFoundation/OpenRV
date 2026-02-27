@@ -25,9 +25,8 @@
 #include <boost/thread/condition_variable.hpp>
 
 #include <QtCore/QCoreApplication>
-#include <QtGui/QExposeEvent>
 #include <QtGui/QResizeEvent>
-#include <QtGui/QMoveEvent>
+#include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QWheelEvent>
@@ -134,10 +133,8 @@ namespace Rv
     // MetalView implementation
     //--------------------------------------------------------------------------
 
-    MetalView::MetalView(RvDocument* doc, bool vsync, int bitsPerChannel)
-        : QWindow()          // QWindow, not QWidget — bypasses Qt's backing-store
-                             // compositor so the IOSurface layer renders at full
-                             // resolution without being composited as a 1× bitmap.
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool vsync, int bitsPerChannel)
+        : QWidget(parent)
         , m_doc(doc)
         , m_videoDevice(nullptr)
         , m_syncThreadData(nullptr)
@@ -158,14 +155,12 @@ namespace Rv
         , m_ioSurfaceWidth(0)
         , m_ioSurfaceHeight(0)
         , m_ioSurface10bit(false)
-        , m_overlayWindow(nullptr)
     {
-        // Use RasterSurface so Qt creates a plain NSView for this QWindow.
-        // We do not use Qt's rendering pipeline here at all — rendering goes
-        // through an overlay NSWindow (see initialize()) that hosts the
-        // CALayer/IOSurface as its contentView root layer, completely bypassing
-        // the NSViewBackingLayer compositing that causes tiling artifacts.
-        setSurfaceType(QSurface::RasterSurface);
+        // Ensure a native NSView is created immediately so winId() is valid
+        // when initialize() is called from showEvent().
+        setAttribute(Qt::WA_NativeWindow);
+        setAttribute(Qt::WA_NoSystemBackground);
+        setAutoFillBackground(false);
 
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window (Metal)" << "/" << m_doc;
@@ -197,22 +192,12 @@ namespace Rv
             m_ioSurface = nullptr;
         }
 
-        // Release CALayer
+        // Release CALayer (balance the __bridge_retained in initialize())
         if (m_caLayer)
         {
             CALayer* layer = (__bridge_transfer CALayer*)m_caLayer;
             (void)layer;
             m_caLayer = nullptr;
-        }
-
-        // Close and release the overlay NSWindow.
-        if (m_overlayWindow)
-        {
-            NSWindow* overlay = (__bridge NSWindow*)m_overlayWindow;
-            [overlay close];
-            NSWindow* rel = (__bridge_transfer NSWindow*)m_overlayWindow;
-            (void)rel;
-            m_overlayWindow = nullptr;
         }
     }
 
@@ -229,8 +214,6 @@ namespace Rv
 
     void MetalView::absolutePosition(int& x, int& y) const
     {
-        x = 0;
-        y = 0;
         QPoint gp = mapToGlobal(QPoint(0, 0));
         x = gp.x();
         y = gp.y();
@@ -238,7 +221,7 @@ namespace Rv
 
     float MetalView::devicePixelRatio() const
     {
-        return static_cast<float>(QWindow::devicePixelRatio());
+        return static_cast<float>(devicePixelRatioF());
     }
 
     //--------------------------------------------------------------------------
@@ -251,79 +234,28 @@ namespace Rv
             return;
         m_initialized = true;
 
-        // Create a plain CALayer — the root layer of the overlay's contentView.
-        // We use IOSurface (not CAMetalLayer) for pixel delivery because
-        // CAMetalLayer with BGR10A2Unorm is mishandled by the CA compositor
-        // on macOS: it treats 4-byte packed pixels as 1-byte, producing 4×
-        // tiling.  IOSurface + kCVPixelFormatType_ARGB2101010LEPacked is
-        // composited natively and correctly for both 10-bit and 8-bit formats.
+        // Create a plain CALayer — IOSurface content is uploaded to it each frame
+        // by presentPixelData().  We use IOSurface (not CAMetalLayer) for pixel
+        // delivery because CAMetalLayer with BGR10A2Unorm is mishandled by the CA
+        // compositor on macOS: it treats 4-byte packed pixels as 1 byte, producing
+        // 4× horizontal tiling.  IOSurface + kCVPixelFormatType_ARGB2101010LEPacked
+        // is composited natively and correctly for both 10-bit and 8-bit formats.
         CALayer* caLayer = [CALayer layer];
-        caLayer.opaque           = YES;
-        caLayer.contentsGravity  = kCAGravityResize;  // IOSurface fills layer exactly
+        caLayer.opaque          = YES;
+        caLayer.contentsGravity = kCAGravityResize;  // IOSurface fills layer exactly
 
-        // ---------------------------------------------------------------
-        // Overlay NSWindow approach (same as before)
-        // ---------------------------------------------------------------
+        // Attach directly to the widget's NSView.  Since we use IOSurface (not a
+        // Metal drawable), _NSOpenGLViewBackingLayer does not intercept or tile the
+        // content — the CA render server composites IOSurface data independently.
+        NSView* nsView = (__bridge NSView*)reinterpret_cast<void*>(winId());
+        [nsView setLayer:caLayer];
+        [nsView setWantsLayer:YES];
 
-        NSView*   nsView       = (__bridge NSView*)reinterpret_cast<void*>(winId());
-        NSWindow* parentWindow = nsView.window;
+        CGFloat scale = static_cast<CGFloat>(devicePixelRatioF());
+        if (scale < 1.0) scale = 1.0;
+        caLayer.contentsScale = scale;
 
-        if (!parentWindow)
-        {
-            // Fallback: no window yet — attach layer directly to nsView.
-            std::cerr << "[MetalView::initialize] nsView.window is nil — "
-                         "using inline layer (fallback)\n";
-            [nsView setLayer:caLayer];
-            [nsView setWantsLayer:YES];
-            CGFloat scale = static_cast<CGFloat>(QWindow::devicePixelRatio());
-            if (scale < 1.0) scale = 1.0;
-            caLayer.contentsScale = scale;
-            m_caLayer       = (__bridge_retained void*)caLayer;
-            m_overlayWindow = nullptr;
-        }
-        else
-        {
-            CGFloat scale       = static_cast<CGFloat>(QWindow::devicePixelRatio());
-            if (scale < 1.0) scale = 1.0;
-            NSRect viewInWindow = [nsView convertRect:nsView.bounds toView:nil];
-            NSRect viewOnScreen = [parentWindow convertRectToScreen:viewInWindow];
-
-            // Create a transparent, borderless overlay window
-            NSWindow* overlay = [[NSWindow alloc]
-                initWithContentRect:viewOnScreen
-                          styleMask:NSWindowStyleMaskBorderless
-                            backing:NSBackingStoreBuffered
-                              defer:NO];
-            [overlay setBackgroundColor:[NSColor clearColor]];
-            overlay.opaque             = NO;
-            overlay.hasShadow          = NO;
-            overlay.ignoresMouseEvents = YES;
-
-            // Attach our CALayer as the ROOT layer of the overlay's contentView.
-            // Set layer BEFORE wantsLayer to prevent AppKit creating its own first.
-            NSView* ov = overlay.contentView;
-            [ov setLayer:caLayer];
-            [ov setWantsLayer:YES];
-
-            caLayer.contentsScale = scale;
-
-            // Standalone overlay: NOT a child of the parent window, so the
-            // window server composites it directly without going through the
-            // parent's _NSOpenGLViewBackingLayer.
-            overlay.level = parentWindow.level + 1;
-            [overlay orderFront:nil];
-
-            m_caLayer       = (__bridge_retained void*)caLayer;
-            m_overlayWindow = (__bridge_retained void*)overlay;
-
-            std::cerr << "[MetalView::initialize]"
-                      << " overlay=(" << viewOnScreen.origin.x << ","
-                      << viewOnScreen.origin.y << " "
-                      << viewOnScreen.size.width << "x" << viewOnScreen.size.height << ")"
-                      << " QWindow_dpr=" << scale
-                      << " overlay.backingScaleFactor=" << overlay.backingScaleFactor
-                      << "\n";
-        }
+        m_caLayer = (__bridge_retained void*)caLayer;
 
         // Kick off session initialization (equivalent to GLView::initializeGL)
         if (m_doc)
@@ -380,7 +312,7 @@ namespace Rv
                 return;
             }
 
-            m_ioSurface      = surf;
+            m_ioSurface       = surf;
             m_ioSurfaceWidth  = w;
             m_ioSurfaceHeight = h;
             m_ioSurface10bit  = is10bit;
@@ -391,9 +323,9 @@ namespace Rv
         // Lock the IOSurface for CPU write
         IOSurfaceLock(surf, 0, nullptr);
 
-        void*  base    = IOSurfaceGetBaseAddress(surf);
-        size_t bpr     = IOSurfaceGetBytesPerRow(surf);
-        size_t srcBpr  = (size_t)w * 4;
+        void*  base   = IOSurfaceGetBaseAddress(surf);
+        size_t bpr    = IOSurfaceGetBytesPerRow(surf);
+        size_t srcBpr = (size_t)w * 4;
 
         if (bpr == srcBpr)
         {
@@ -483,50 +415,28 @@ namespace Rv
     }
 
     //--------------------------------------------------------------------------
-    // QWindow overrides
+    // QWidget overrides
     //--------------------------------------------------------------------------
 
-    void MetalView::exposeEvent(QExposeEvent* event)
+    void MetalView::showEvent(QShowEvent* event)
     {
-        if (!m_initialized && isExposed())
+        if (!m_initialized)
             initialize();
         // Post an UpdateRequest so the first render fires from the event loop
-        // after the window is fully laid out (same pattern as QOpenGLWindow).
-        if (isExposed())
-            QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
-        QWindow::exposeEvent(event);
-    }
-
-    //  Shared helper: reposition and resize the standalone overlay to match the
-    //  QWindow's current screen rect.  Called from resizeEvent and moveEvent.
-    static void repositionOverlay(NSWindow* overlay, CALayer* layer,
-                                  NSView* nsView)
-    {
-        if (!overlay || !layer || !nsView || !nsView.window)
-            return;
-        NSRect viewInWindow = [nsView convertRect:nsView.bounds toView:nil];
-        NSRect viewOnScreen = [nsView.window convertRectToScreen:viewInWindow];
-        [overlay setFrame:viewOnScreen display:YES];
-
-        CGFloat scale = overlay.backingScaleFactor;
-        if (scale < 1.0) scale = 1.0;
-        layer.contentsScale = scale;
+        // after the widget is fully laid out (same pattern as QOpenGLWindow).
+        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+        QWidget::showEvent(event);
     }
 
     void MetalView::resizeEvent(QResizeEvent* event)
     {
-        NSWindow* overlay = (__bridge NSWindow*)m_overlayWindow;
-        CALayer*  layer   = (__bridge CALayer*)m_caLayer;
-        NSView*   nsView  = (__bridge NSView*)reinterpret_cast<void*>(winId());
-
-        if (overlay && layer)
+        // Update the layer's contentsScale to match the current DPR.
+        // The NSView layer frame is managed automatically by AppKit as the
+        // widget is resized — no manual frame update required.
+        CALayer* layer = (__bridge CALayer*)m_caLayer;
+        if (layer)
         {
-            repositionOverlay(overlay, layer, nsView);
-        }
-        else if (layer)
-        {
-            // Fallback (no overlay): update contentsScale directly
-            CGFloat scale = static_cast<CGFloat>(QWindow::devicePixelRatio());
+            CGFloat scale = static_cast<CGFloat>(devicePixelRatioF());
             if (scale < 1.0) scale = 1.0;
             layer.contentsScale = scale;
         }
@@ -534,48 +444,37 @@ namespace Rv
         if (m_doc)
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
 
-        QWindow::resizeEvent(event);
-    }
-
-    void MetalView::moveEvent(QMoveEvent* event)
-    {
-        // The overlay is a standalone floating window, so it doesn't auto-follow
-        // parent moves.  Reposition it here whenever the QWindow moves.
-        NSWindow* overlay = (__bridge NSWindow*)m_overlayWindow;
-        CALayer*  layer   = (__bridge CALayer*)m_caLayer;
-        NSView*   nsView  = (__bridge NSView*)reinterpret_cast<void*>(winId());
-        repositionOverlay(overlay, layer, nsView);
-        QWindow::moveEvent(event);
+        QWidget::resizeEvent(event);
     }
 
     void MetalView::keyPressEvent(QKeyEvent* event)
     {
-        QWindow::keyPressEvent(event);
+        QWidget::keyPressEvent(event);
     }
 
     void MetalView::keyReleaseEvent(QKeyEvent* event)
     {
-        QWindow::keyReleaseEvent(event);
+        QWidget::keyReleaseEvent(event);
     }
 
     void MetalView::mousePressEvent(QMouseEvent* event)
     {
-        QWindow::mousePressEvent(event);
+        QWidget::mousePressEvent(event);
     }
 
     void MetalView::mouseReleaseEvent(QMouseEvent* event)
     {
-        QWindow::mouseReleaseEvent(event);
+        QWidget::mouseReleaseEvent(event);
     }
 
     void MetalView::mouseMoveEvent(QMouseEvent* event)
     {
-        QWindow::mouseMoveEvent(event);
+        QWidget::mouseMoveEvent(event);
     }
 
     void MetalView::wheelEvent(QWheelEvent* event)
     {
-        QWindow::wheelEvent(event);
+        QWidget::wheelEvent(event);
     }
 
     //--------------------------------------------------------------------------
@@ -589,7 +488,7 @@ namespace Rv
     }
 
     //--------------------------------------------------------------------------
-    // event() — mirrors GLView::event() exactly, replacing QOpenGLWindow base
+    // event() — mirrors GLView::event() exactly
     //--------------------------------------------------------------------------
 
     bool MetalView::event(QEvent* event)
@@ -664,7 +563,7 @@ namespace Rv
         if (event->type() == QEvent::Resize)
         {
             QResizeEvent* e = static_cast<QResizeEvent*>(event);
-            if (!isExposed())
+            if (!isVisible())
                 return true;
             if (e->oldSize().width() != -1 && e->oldSize().height() != -1)
             {
@@ -674,7 +573,7 @@ namespace Rv
                 if (m_doc && session)
                     session->userGenericEvent("view-resized", contents.str());
             }
-            return QWindow::event(event);
+            return QWidget::event(event);
         }
 
         if (event->type() == QEvent::UpdateRequest)
@@ -686,7 +585,7 @@ namespace Rv
         // Guard: translator may not be initialized yet (e.g. events fired
         // during construction before setEventWidget() is called).
         if (!m_videoDevice || !m_videoDevice->hasTranslator())
-            return QWindow::event(event);
+            return QWidget::event(event);
 
         if (session && session->outputVideoDevice()
             && session->outputVideoDevice()->displayMode()
@@ -753,7 +652,7 @@ namespace Rv
         }
         else
         {
-            return QWindow::event(event);
+            return QWidget::event(event);
         }
     }
 
