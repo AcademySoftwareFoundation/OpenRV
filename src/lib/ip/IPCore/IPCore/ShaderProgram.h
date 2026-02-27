@@ -9,6 +9,9 @@
 #define __IPCore__ShaderProgram__h__
 #include <IPCore/ShaderExpression.h>
 #include <TwkGLF/GLProgram.h>
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <IPCore/MetalContext.h>
+#endif
 
 namespace IPCore
 {
@@ -157,6 +160,10 @@ namespace IPCore
 
             virtual bool compile();
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            bool compileMetal() const;
+#endif
+
             //
             //  ShaderProgram API
             //
@@ -198,6 +205,9 @@ namespace IPCore
             bool m_needOutputSize{false};
             bool m_needOutputST{false};
             bool m_needFragmentPosition{false};
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            mutable void* m_metalPipeline{nullptr}; // id<MTLRenderPipelineState>
+#endif
         };
 
         class ProgramCache

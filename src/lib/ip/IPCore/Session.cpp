@@ -3100,6 +3100,10 @@ namespace IPCore
 
     void Session::queryAndStoreGLInfo()
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        // Metal path: no OpenGL context is active — skip GL-specific queries.
+        return;
+#endif
         ImageRenderer::queryGL();
         ImageRenderer::queryGLIntoContainer(graph().sessionNode());
     }

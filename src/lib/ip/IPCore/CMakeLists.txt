@@ -273,6 +273,20 @@ ELSEIF(RV_TARGET_DARWIN)
     ${_target}
     PUBLIC OpenCL::OpenCL
   )
+  IF(USE_METAL)
+    TARGET_SOURCES(
+      ${_target}
+      PRIVATE MetalContext.cpp ShaderFunctionMetal.mm ShaderProgramMetal.mm
+    )
+    TARGET_COMPILE_DEFINITIONS(
+      ${_target}
+      PRIVATE USE_METAL
+    )
+    TARGET_LINK_LIBRARIES(
+      ${_target}
+      PUBLIC "-framework Metal"
+    )
+  ENDIF()
 ELSE()
   TARGET_LINK_LIBRARIES(${_target})
 ENDIF()

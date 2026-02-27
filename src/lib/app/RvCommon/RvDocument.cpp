@@ -61,6 +61,10 @@
 #ifdef PLATFORM_DARWIN
 #include <RvCommon/DisplayLink.h>
 #include <RvCommon/CGDesktopVideoDevice.h>
+#if defined(USE_METAL)
+#include <RvCommon/MetalView.h>
+#include <RvCommon/QTMetalVideoDevice.h>
+#endif
 #endif
 
 #include <QDockWidget>
@@ -146,7 +150,11 @@ namespace Rv
         , m_oldGLView(0)
         , m_glView(0)
         , m_glViewContainer(nullptr)
-        , m_diagnosticsView(0)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        , m_metalView(nullptr)
+#endif
+        , m_diagnosticsView(nullptr)
+        , m_diagnosticsDock(nullptr)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -187,6 +195,47 @@ namespace Rv
         //
         //
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        // --- Metal path ---
+        // MetalView is a QWindow (not QWidget) so that Qt's backing-store
+        // compositor does NOT composite it as a 1× bitmap — which on Retina
+        // displays caused the content to appear as a 2×2 tile of quarter-size
+        // copies.  Wrap it in a container widget with createWindowContainer(),
+        // exactly the same pattern used for GLView (QOpenGLWindow).
+        m_metalView = new MetalView(this, opts.vsync != 0 && !m_vsyncDisabled, 10 /*bitsPerChannel*/);
+
+        // Pre-size before createWindowContainer (same as GL path).
+        m_metalView->resize(m_metalView->sizeHint());
+
+        // Wrap QWindow in a widget container for layout integration.
+        m_glViewContainer = QWidget::createWindowContainer(m_metalView, m_centralWidget);
+        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
+        m_glViewContainer->setMouseTracking(true);
+        m_glViewContainer->setAcceptDrops(true);
+        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+        m_metalView->setEventWidget(m_glViewContainer);
+
+        // Initialize the session eagerly so that doc->session() is non-null
+        // immediately after construction.  On the Metal path, MetalView::initialize()
+        // (which normally calls initializeSession) is triggered by exposeEvent() —
+        // an async Qt event — so doc->session() would be null when newSessionFromFiles()
+        // accesses it synchronously right after doc->show().  Calling it here is safe
+        // because QTMetalVideoDevice is constructed in MetalView's constructor and is
+        // already available; actual Metal device/layer setup happens later in
+        // MetalView::initialize() (which re-calls initializeSession but hits the
+        // if (!m_session) guard and exits immediately).
+        initializeSession();
+
+        // On the Metal path we do NOT create DiagnosticsView.
+        // DiagnosticsView inherits from QOpenGLWidget, and any QOpenGLWidget anywhere in
+        // the top-level window hierarchy forces Qt's macOS backend to use
+        // _NSOpenGLViewBackingLayer for the entire window — even when the widget is hidden
+        // inside a dock.  That compositor intercepts the CAMetalLayer content and composites
+        // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
+        // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
+#else
+        // --- OpenGL path ---
         if (docs.empty())
         {
             m_glView =
@@ -223,15 +272,19 @@ namespace Rv
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
+#endif // PLATFORM_DARWIN && USE_METAL
 
         // Dockable to QMainWindow, not centralwidget.
-        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-        m_diagnosticsDock->setObjectName("Diagnostics");
-        m_diagnosticsDock->setWidget(m_diagnosticsView);
-        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-        m_diagnosticsDock->hide();                    // Hide by default
-        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        // On the Metal path m_diagnosticsView is nullptr (see comment above), so skip.
+        if (m_diagnosticsView)
+        {
+            m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+            m_diagnosticsDock->setWidget(m_diagnosticsView);
+            m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+            addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+            m_diagnosticsDock->hide();                    // Hide by default
+            m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        }
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -332,7 +385,11 @@ namespace Rv
 #endif
 
             // RvApp()->addVideoDevice(m_glView->videoDevice());
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            m_session->setControlVideoDevice(m_metalView->videoDevice());
+#else
             m_session->setControlVideoDevice(m_glView->videoDevice());
+#endif
 
             m_session->setRendererType("Composite");
             m_session->setOpaquePointer(this);
@@ -571,15 +628,27 @@ namespace Rv
         }
         else if (m == IPCore::Session::updateMessage())
         {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            m_metalView->videoDevice()->redraw();
+#else
             view()->videoDevice()->redraw();
+#endif
         }
         else if (m == IPCore::Session::eventDeviceChangedMessage())
         {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            if (m_session->eventVideoDevice() && m_metalView->videoDevice())
+            {
+                m_metalView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                           m_session->eventVideoDevice()->height());
+            }
+#else
             if (m_session->eventVideoDevice() && m_glView->videoDevice())
             {
                 m_glView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
                                                                         m_session->eventVideoDevice()->height());
             }
+#endif
         }
         else if (m == TwkApp::Document::filenameChangedMessage())
         {
@@ -761,9 +830,14 @@ namespace Rv
 
     void RvDocument::resetSizePolicy()
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        m_metalView->setMinimumContentSize(64, 64);
+        m_metalView->setMinimumSize(QSize(64, 64));
+#else
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));
-        m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+#endif
+        m_glViewContainer->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     }
 
     void RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
@@ -784,6 +858,10 @@ namespace Rv
 
     void RvDocument::rebuildGLView(bool stereo, bool vsync, bool doubleBuffer, int red, int green, int blue, int alpha)
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+            return; // Metal path has no GL view to rebuild
+#endif
         //
         //  On the mac, we need to carefully replace the content GL widget so
         //  that Qt doesn't resize the dock widgets and everything
@@ -877,10 +955,18 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics() { m_diagnosticsDock->show(); }
+    void RvDocument::showDiagnostics()
+    {
+        if (m_diagnosticsDock)
+            m_diagnosticsDock->show();
+    }
 
     void RvDocument::setStereo(bool b)
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+            return;
+#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -898,6 +984,10 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+            return;
+#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -913,6 +1003,10 @@ namespace Rv
 
     void RvDocument::setDoubleBuffer(bool b)
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+            return;
+#endif
         bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         const int red = m_glView->format().redBufferSize();
@@ -928,6 +1022,10 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+            return;
+#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -971,6 +1069,12 @@ namespace Rv
     }
 
     GLView* RvDocument::view() const { return m_glView; }
+
+    QWidget* RvDocument::viewContainer() const { return m_glViewContainer; }
+
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    MetalView* RvDocument::metalView() const { return m_metalView; }
+#endif
 
     void RvDocument::center()
     {
@@ -1089,19 +1193,46 @@ namespace Rv
         h += int(mh);
         w += int(mw);
 
-        m_glView->setContentSize(w, h);
-        m_glView->setMinimumContentSize(w, h);
-        m_glView->updateGeometry();
-
-        const int dh = m_glView->height() - h;
-        const int dw = m_glView->width() - w;
-
-        if (dh || dw)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
         {
-            resize(width() - dw, height() - dh);
+            m_metalView->setContentSize(w, h);
+            m_metalView->setMinimumContentSize(w, h);
+            // Only call resize() on the container when the view is NOT already
+            // at the requested size.  resizeView() is frequently called back from
+            // viewSizeChanged() after the view has already resized itself; calling
+            // resize() in that case overrides the stacked layout and permanently
+            // locks the container at the current (possibly small) size.
+            const int dh = m_metalView->height() - h;
+            const int dw = m_metalView->width() - w;
+            if (dh || dw)
+            {
+                m_glViewContainer->resize(w, h);
+                m_glViewContainer->updateGeometry();
+                resize(width() - dw, height() - dh);
+                m_metalView->setContentSize(w, h);
+                m_metalView->setMinimumContentSize(w, h);
+                m_glViewContainer->resize(w, h);
+                m_glViewContainer->updateGeometry();
+            }
+        }
+        else
+#endif
+        {
             m_glView->setContentSize(w, h);
             m_glView->setMinimumContentSize(w, h);
-            m_glView->updateGeometry();
+            m_glViewContainer->updateGeometry();
+
+            const int dh = m_glView->height() - h;
+            const int dw = m_glView->width() - w;
+
+            if (dh || dw)
+            {
+                resize(width() - dw, height() - dh);
+                m_glView->setContentSize(w, h);
+                m_glView->setMinimumContentSize(w, h);
+                m_glViewContainer->updateGeometry();
+            }
         }
 
         m_resetPolicyTimer->start();
@@ -1228,7 +1359,11 @@ namespace Rv
         }
 
         m_session->userRenderEvent("layout");
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        Session::Margins margins = m_metalView ? m_metalView->videoDevice()->margins() : m_glView->videoDevice()->margins();
+#else
         Session::Margins margins = m_glView->videoDevice()->margins();
+#endif
         float mw = int(margins.left + margins.right);
         float mh = int(margins.top + margins.bottom);
 
@@ -1297,29 +1432,57 @@ namespace Rv
 
         DB("resizeToFit final target w " << w << " h " << h);
 
-        m_glView->setContentSize(int(w), int(h));
-        m_glView->setMinimumContentSize(int(w), int(h));
-        m_glView->updateGeometry();
-
-        DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
-
-        const int dh = m_glView->height() - int(h);
-        const int dw = m_glView->width() - int(w);
-
-        //
-        //  WHY? Dunno
-        //
-
-        DB("resizeToFit dw " << dw << " dh " << dh);
-        if (!firstTime && (dh || dw))
-        // if ((dh || dw))
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
         {
-            resize(width() - dw, height() - dh);
+            // Mirror the GL path: set content size hints and invalidate the layout,
+            // then let the delta between current and desired size drive the window resize.
+            // Do NOT call m_glViewContainer->resize() before computing the delta — that
+            // would make m_metalView->width()/height() report the target size and give
+            // dw=dh=0, skipping the window resize entirely.
+            m_metalView->setContentSize(int(w), int(h));
+            m_metalView->setMinimumContentSize(int(w), int(h));
+            m_glViewContainer->updateGeometry();
+            DB("resizeToFit resulting size w " << m_metalView->width() << " h " << m_metalView->height());
+            const int dh = m_metalView->height() - int(h);
+            const int dw = m_metalView->width() - int(w);
+            DB("resizeToFit dw " << dw << " dh " << dh);
+            if (!firstTime && (dh || dw))
+            {
+                resize(width() - dw, height() - dh);
+                m_metalView->setContentSize(int(w), int(h));
+                m_metalView->setMinimumContentSize(int(w), int(h));
+                m_glViewContainer->updateGeometry();
+            }
+            DB("resizeToFit final resulting size w " << m_metalView->width() << " h " << m_metalView->height());
+        }
+        else
+#endif
+        {
             m_glView->setContentSize(int(w), int(h));
             m_glView->setMinimumContentSize(int(w), int(h));
-            m_glView->updateGeometry();
+            m_glViewContainer->updateGeometry();
+
+            DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
+
+            const int dh = m_glView->height() - int(h);
+            const int dw = m_glView->width() - int(w);
+
+            //
+            //  WHY? Dunno
+            //
+
+            DB("resizeToFit dw " << dw << " dh " << dh);
+            if (!firstTime && (dh || dw))
+            // if ((dh || dw))
+            {
+                resize(width() - dw, height() - dh);
+                m_glView->setContentSize(int(w), int(h));
+                m_glView->setMinimumContentSize(int(w), int(h));
+                m_glViewContainer->updateGeometry();
+            }
+            DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
         }
-        DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
 
         m_resetPolicyTimer->start();
 
@@ -1414,7 +1577,9 @@ namespace Rv
     QRect RvDocument::childrenRect()
     {
         QRect mr = mb()->geometry();
-        QRect vr = m_glView->geometry();
+        // Use the container widget geometry — valid on both GL and Metal paths
+        // (m_glViewContainer wraps either GLView or MetalView).
+        QRect vr = m_glViewContainer ? m_glViewContainer->geometry() : QRect();
 
         DB("RvDocument::childrenRect mb" << " shown " << menuBarShown() << " vis " << mb()->isVisible() << " w" << mr.width() << " h "
                                          << mr.height()
@@ -1923,7 +2088,13 @@ namespace Rv
         if (m_session)
         {
             m_session->userRenderEvent("view-size-changed", "");
-            m_session->deviceSizeChanged(m_glView->videoDevice());
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            if (m_metalView)
+                m_session->deviceSizeChanged(m_metalView->videoDevice());
+            else
+#endif
+                if (m_glView)
+                m_session->deviceSizeChanged(m_glView->videoDevice());
         }
     }
 
@@ -2072,13 +2243,16 @@ namespace Rv
 
     void RvDocument::watchedFileChanged(const QString& path)
     {
-        TwkApp::GenericStringEvent event("file-changed", m_glView->videoDevice(), path.toUtf8().data());
-
-        // cout << m_watcher->files().size() << endl;
-        // cout << m_watcher->directories().size() << endl;
-
-        // m_glView->frameBuffer()->sendEvent(event);
-        m_glView->videoDevice()->sendEvent(event);
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        TwkApp::VideoDevice* vdev = m_metalView ? static_cast<TwkApp::VideoDevice*>(m_metalView->videoDevice())
+                                                : static_cast<TwkApp::VideoDevice*>(m_glView->videoDevice());
+#else
+        TwkApp::VideoDevice* vdev = m_glView->videoDevice();
+#endif
+        if (!vdev)
+            return;
+        TwkApp::GenericStringEvent event("file-changed", vdev, path.toUtf8().data());
+        vdev->sendEvent(event);
     }
 
     bool RvDocument::queryDriverVSync() const { return false; }

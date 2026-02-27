@@ -10,6 +10,13 @@ OPTION(RV_VERBOSE_INVOCATION "Show the compiler/link command invocation." OFF)
 OPTION(RV_SHOW_ALL_VARIABLES "Displays all build variables." ON)
 
 #
+# Metal rendering backend (macOS only) When ON, OpenRV uses Apple Metal instead of OpenGL on macOS. This enables true 10-bit output, HDR/EDR, ProMotion, and
+# better GPU tooling. Pass -DUSE_METAL=OFF to fall back to the legacy OpenGL path for debugging.
+IF(APPLE)
+  OPTION(USE_METAL "Use Metal rendering backend on macOS (replaces OpenGL)" ON)
+ENDIF()
+
+#
 # General build options
 SET(RV_DEPS_BASE_DIR
     "${CMAKE_BINARY_DIR}"

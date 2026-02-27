@@ -18,6 +18,8 @@
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/functional/hash.hpp>
 
+// Metal implementation is in ShaderFunctionMetal.mm (Objective-C++ only)
+
 namespace IPCore
 {
     namespace Shader
@@ -29,8 +31,7 @@ namespace IPCore
 
         namespace
         {
-            const char* global_glsl = "#version 150\n"
-                                      "#extension GL_ARB_texture_rectangle : require\n";
+            const char* global_glsl = "#version 150\n";
             const char* global_glsl_gl2 = "#extension GL_ARB_texture_rectangle : require\n";
             const char* global_glsl_lt_150 = "#version 120\n";
         } // namespace
@@ -74,6 +75,18 @@ namespace IPCore
             {
                 if (glslMajor == 0)
                 {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+                    // On the Metal hybrid path, GL rendering uses a GL 2.1
+                    // Compatibility context (required for legacy IPCore APIs).
+                    // Hardcode GLSL 1.20 so replaceTextureCalls() sets
+                    // useDeprecated=true and rewrites texture() → texture2DRect(),
+                    // which is available with GL_ARB_texture_rectangle.
+                    // This avoids calling glGetString before any context exists
+                    // (which would return NULL and trigger abort()).
+                    glslMajor = 1;
+                    glslMinor = 20;
+                    return;
+#endif
                     //
                     //  NOTE: its much better to have assigned
                     if (const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION))
@@ -155,6 +168,9 @@ namespace IPCore
             , m_parameters(params)
             , m_globals(globals)
             , m_state(nullptr)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            , m_metalFunction(nullptr)
+#endif
             , m_doc(doc)
             , m_hash(0)
             , m_inline(type == Filter || type == MorphologicalFilter)
@@ -176,6 +192,9 @@ namespace IPCore
             : m_name(name)
             , m_type(type)
             , m_state(nullptr)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            , m_metalFunction(nullptr)
+#endif
             , m_doc(doc)
             , m_hash(0)
             , m_inline(type == Filter || type == MorphologicalFilter)
@@ -1027,6 +1046,9 @@ namespace IPCore
 
             return status == GL_TRUE;
         }
+
+        // Function::compileMetal() is implemented in ShaderFunctionMetal.mm
+        // (Objective-C++ required for Metal API calls).
 
         Function::ValidationResult Function::validate() const
         {

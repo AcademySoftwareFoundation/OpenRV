@@ -857,11 +857,18 @@ namespace Rv
 
         if (videoModules().empty())
         {
-            doc->view()->makeCurrent();
+            // On the Metal path view() returns null — no GL context to make
+            // current. makeCurrent() is handled per-frame by MetalView.
+            if (doc->view())
+                doc->view()->makeCurrent();
 
             try
             {
-                addVideoModule(m_desktopModule = new DesktopVideoModule(0, doc->view()->videoDevice()));
+                // On the Metal path view() is null — pass nullptr as the GL
+                // share device.  DesktopVideoDevice can still be created;
+                // it only needs the share device when open() is called later.
+                QTGLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
+                addVideoModule(m_desktopModule = new DesktopVideoModule(0, shareDevice));
             }
             catch (...)
             {
@@ -887,7 +894,8 @@ namespace Rv
         //  we're on (video device) so make sure the primary display group is
         //  correct.
         //
-        doc->session()->graph().setPrimaryDisplayGroup(doc->view()->videoDevice());
+        // Use the session's control device — valid on both GL and Metal paths.
+        doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
 
         if (RvApp()->documents().size() == 1 && opts.present)
         {
@@ -918,7 +926,9 @@ namespace Rv
         if (!m->isOpen())
         {
             RvDocument* doc = reinterpret_cast<RvDocument*>(documents().front()->opaquePointer());
-            doc->view()->makeCurrent();
+            // On the Metal path view() is null — no GL context to make current.
+            if (doc->view())
+                doc->view()->makeCurrent();
             m->open();
             //
             //  The open() may have added video devices, so make sure each
@@ -1663,7 +1673,9 @@ namespace Rv
 #endif
 
                 string optionArgs = setVideoDeviceStateFromSettings(d);
-                rvDoc->view()->videoDevice()->makeCurrent();
+                // On the Metal path view() is null — skip GL makeCurrent.
+                if (rvDoc->view())
+                    rvDoc->view()->videoDevice()->makeCurrent();
 
                 try
                 {

@@ -611,8 +611,9 @@ namespace IPCore
     {
         clearRenderedImages();
 
-        // clear state will unbind the FBO currently bound
-        m_glState->clearState();
+        // clear state will unbind the FBO currently bound (GL path only)
+        if (m_controlDevice.glDevice)
+            m_glState->clearState();
         m_imageFBOManager.flushImageFBOs();
         flushProgramCache();
     }
@@ -626,8 +627,11 @@ namespace IPCore
     {
         m_setGLContext = true;
         delete m_uploadThreadDevice;
-        m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
-        controlDevice().glDevice->makeCurrent();
+        if (controlDevice().glDevice)
+        {
+            m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
+            controlDevice().glDevice->makeCurrent();
+        }
     }
 
     void ImageRenderer::queryGLIntoContainer(IPNode* node)
@@ -1227,7 +1231,7 @@ namespace IPCore
 
         if (m_controlDevice.device == device)
         {
-            context.targetFBO = m_controlDevice.glDevice->defaultFBO();
+            context.targetFBO = m_controlDevice.glDevice ? m_controlDevice.glDevice->defaultFBO() : nullptr;
         }
         else if (m_outputDevice.device == device)
         {
@@ -1267,7 +1271,10 @@ namespace IPCore
         if (d)
         {
             Device device(d, dynamic_cast<const GLVideoDevice*>(d), 0, ringBufferSize, nviews);
-            device.glDevice->makeCurrent();
+            if (device.glDevice)
+                device.glDevice->makeCurrent();
+            // On the Metal path glDevice is null — context management is
+            // handled per-frame by MetalView::beginFrame() instead.
             m_controlDevice.clearFBOs();
             m_controlDevice = device;
             setOutputDevice(m_outputDevice.device ? m_outputDevice.device : d);
@@ -1351,7 +1358,8 @@ namespace IPCore
                 if (m_outputDevice.glBindableDevice)
                     m_outputDevice.glBindableDevice->unbind();
 
-                m_controlDevice.glDevice->defaultFBO()->unbind();
+                if (m_controlDevice.glDevice)
+                    m_controlDevice.glDevice->defaultFBO()->unbind();
             }
 
             m_outputDevice.clearFBOs();
@@ -1387,7 +1395,8 @@ namespace IPCore
             const size_t w = d->internalWidth();
             const size_t h = d->internalHeight();
 
-            m_controlDevice.glDevice->makeCurrent();
+            if (m_controlDevice.glDevice)
+                m_controlDevice.glDevice->makeCurrent();
             TWK_GLDEBUG;
 
             //
@@ -1436,7 +1445,8 @@ namespace IPCore
                     fbo->unbind();
                 }
 
-                m_controlDevice.glDevice->makeCurrent();
+                if (m_controlDevice.glDevice)
+                    m_controlDevice.glDevice->makeCurrent();
 
                 if (dualOut)
                 {
@@ -1453,13 +1463,15 @@ namespace IPCore
                     }
                 }
 
-                m_controlDevice.glDevice->makeCurrent();
+                if (m_controlDevice.glDevice)
+                    m_controlDevice.glDevice->makeCurrent();
                 TWK_GLDEBUG;
             }
         }
         else
         {
-            m_controlDevice.glDevice->makeCurrent();
+            if (m_controlDevice.glDevice)
+                m_controlDevice.glDevice->makeCurrent();
             m_controlDevice.clearFBOs();
 
             if (m_outputDevice.glDevice)
@@ -1570,7 +1582,8 @@ namespace IPCore
     void ImageRenderer::renderEnd(const InternalRenderContext& context)
     {
         m_imageFBOManager.gcImageFBOs(context.fullSerialNum);
-        m_glState->clearState();
+        if (m_controlDevice.glDevice)
+            m_glState->clearState();
         clearImagePassStates();
     }
 
@@ -1646,10 +1659,11 @@ namespace IPCore
             HOP_CALL(glFinish();)
             HOP_PROF("ImageRenderer::render - clear BG");
 
-            const GLFBO* controlFBO = m_controlDevice.glDevice->defaultFBO();
+            const GLFBO* controlFBO = m_controlDevice.glDevice ? m_controlDevice.glDevice->defaultFBO() : nullptr;
             if (!root)
             {
-                clearBackground(controlFBO);
+                if (controlFBO)
+                    clearBackground(controlFBO);
                 return;
             }
 
@@ -1716,7 +1730,8 @@ namespace IPCore
             HOP_CALL(glFinish();)
             HOP_PROF("ImageRenderer::renderOutputs - makeCurrent");
 
-            m_controlDevice.glDevice->makeCurrent();
+            if (m_controlDevice.glDevice)
+                m_controlDevice.glDevice->makeCurrent();
 
             HOP_CALL(glFinish();)
         }
@@ -1725,7 +1740,7 @@ namespace IPCore
         const size_t ri = m_deviceFBORingBufferIndex;
         const bool multipleOutputs = hasMultipleOutputs();
         const bool internalBuffer = m_controlDevice.fboRingBuffer[0].views[0] != 0;
-        const GLFBO* controlFBO = m_controlDevice.glDevice->defaultFBO();
+        const GLFBO* controlFBO = m_controlDevice.glDevice ? m_controlDevice.glDevice->defaultFBO() : nullptr;
         const GLFBO* outputFBO = m_outputDevice.glDevice ? m_outputDevice.glDevice->defaultFBO() : 0;
         const bool dualStereo = m_outputDevice.glBindableDevice && m_outputDevice.glBindableDevice->isStereo();
         const bool willBlock = multipleOutputs && m_outputDevice.device->willBlockOnTransfer();
@@ -1735,7 +1750,8 @@ namespace IPCore
             HOP_CALL(glFinish();)
             HOP_PROF("ImageRenderer::renderOutputs - bind FBO");
 
-            controlFBO->bind();
+            if (controlFBO)
+                controlFBO->bind();
 
             HOP_CALL(glFinish();)
         }
@@ -1744,7 +1760,8 @@ namespace IPCore
             HOP_CALL(glFinish();)
             HOP_PROF("ImageRenderer::renderOutputs - renderMain");
 
-            renderMain(controlFBO, 0, 0, auxRenderer, frame, root);
+            if (controlFBO)
+                renderMain(controlFBO, 0, 0, auxRenderer, frame, root);
 
             HOP_CALL(glFinish();)
         }
@@ -1783,9 +1800,13 @@ namespace IPCore
                 m_outputDevice.glDevice->makeCurrent();
                 m_outputDevice.fboRingBuffer[ri].views[0]->copyTo(outputFBO); // uses blit
 
-                m_controlDevice.glDevice->makeCurrent();
-                m_controlDevice.glDevice->redraw();
-                controlFBO->bind();
+                if (m_controlDevice.glDevice)
+                {
+                    m_controlDevice.glDevice->makeCurrent();
+                    m_controlDevice.glDevice->redraw();
+                }
+                if (controlFBO)
+                    controlFBO->bind();
             }
             else if (m_outputDevice.glBindableDevice)
             {
@@ -1841,8 +1862,10 @@ namespace IPCore
                         m_outputDevice.glBindableDevice->transfer(fbo0);
                     }
 
-                    m_controlDevice.glDevice->makeCurrent();
-                    controlFBO->bind();
+                    if (m_controlDevice.glDevice)
+                        m_controlDevice.glDevice->makeCurrent();
+                    if (controlFBO)
+                        controlFBO->bind();
                 }
             }
 
@@ -1853,7 +1876,8 @@ namespace IPCore
             HOP_CALL(glFinish();)
         }
 
-        m_controlDevice.glDevice->makeCurrent();
+        if (m_controlDevice.glDevice)
+            m_controlDevice.glDevice->makeCurrent();
     }
 
     void ImageRenderer::renderMain(const GLFBO* target, const GLFBO* targetL, const GLFBO* targetR, const AuxRender* auxRenderer, int frame,
@@ -2392,7 +2416,8 @@ namespace IPCore
 
         const VideoDevice* device = context.device;
         const bool controller = device == m_controlDevice.device;
-        const GLFBO* fbo = context.targetFBO ? context.targetFBO : m_controlDevice.glDevice->defaultFBO();
+        const GLFBO* fbo =
+            context.targetFBO ? context.targetFBO : (m_controlDevice.glDevice ? m_controlDevice.glDevice->defaultFBO() : nullptr);
         const AuxRender* auxRender = context.auxRenderer;
         IPImage::RenderDestination dest = context.image->destination;
         const bool left = dest == IPImage::MainBuffer || dest == IPImage::LeftBuffer;

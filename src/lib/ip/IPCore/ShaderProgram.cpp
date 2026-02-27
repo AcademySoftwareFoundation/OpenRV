@@ -17,6 +17,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/functional/hash.hpp>
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <IPCore/MetalContext.h>
+#include <CoreFoundation/CFBase.h> // CFRelease — safe from C++
+#endif
+// Metal compileMetal() implementation is in ShaderProgramMetal.mm
 
 namespace IPCore::Shader
 {
@@ -351,6 +356,10 @@ namespace IPCore::Shader
 
     bool Program::compile()
     {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (IPCore::MetalContext::isActive())
+            return compileMetal();
+#endif
         m_programId = glCreateProgram();
 
         if (!m_programId)
@@ -718,7 +727,19 @@ namespace IPCore::Shader
     {
         if (m_programId)
             glDeleteProgram(m_programId);
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalPipeline)
+        {
+            // Release the retained MTLRenderPipelineState.
+            // CFRelease works for any ObjC object and is callable from C++.
+            CFRelease(m_metalPipeline);
+            m_metalPipeline = nullptr;
+        }
+#endif
     }
+
+    // glslToMSL() and Program::compileMetal() are implemented in ShaderProgramMetal.mm
+    // (Objective-C++ required for Metal API calls).
 
     bool Program::validate() const
     {
