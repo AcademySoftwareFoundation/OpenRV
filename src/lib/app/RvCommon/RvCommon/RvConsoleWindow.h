@@ -64,9 +64,11 @@ namespace Rv
     public slots:
         void processTextBuffer();
 
+    public:
+        void done(int result) override;
+
     private:
         void closeEvent(QCloseEvent*) override;
-        void done(int result) override;
         void saveSettings();
 
     private:
