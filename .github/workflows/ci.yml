@@ -26,15 +26,18 @@ jobs:
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}
 
   macos:
     uses: ./.github/workflows/ci-macos.yml
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}
 
   windows:
     uses: ./.github/workflows/ci-windows.yml
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}

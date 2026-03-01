@@ -8,6 +8,9 @@ on:
         default: 'false'
       qt5_modules:
         type: string
+      full_matrix:
+        type: string
+        default: 'true'
 
 env:
   SKIP_DEPS_CACHE: ${{ inputs.skip_deps_cache }}
@@ -18,7 +21,9 @@ env:
 
 jobs:
   windows:
-    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if: >-
+      inputs.full_matrix == 'true'
+      || (matrix.build-type == 'Release' && matrix.vfx-platform == 'CY2024')
     name: 'Windows ${{ matrix.vfx-platform }}
       <${{ matrix.os }}
        msvc=${{ matrix.msvc-component }},
