@@ -32,11 +32,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Check out repository code
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
-      with:
-        submodules: recursive
-
     - name: Install MSVC components ${{ inputs.msvc-component }}
       run: |
         Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"

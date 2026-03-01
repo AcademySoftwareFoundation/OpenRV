@@ -66,6 +66,10 @@ jobs:
             vfx-platform: "CY2024"
             extra_repo: "crb"
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
       - uses: ./.github/actions/build-linux
         with:
           rocky-version: ${{ matrix.rocky-version }}
@@ -172,6 +176,10 @@ jobs:
             vfx-platform: "CY2024"
             extra_repo: "crb"
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
       - uses: ./.github/actions/build-linux
         with:
           rocky-version: ${{ matrix.rocky-version }}

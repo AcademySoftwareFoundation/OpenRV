@@ -48,6 +48,10 @@ jobs:
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
       - uses: ./.github/actions/build-macos
         with:
           arch-type: ${{ matrix.arch-type }}
@@ -94,6 +98,10 @@ jobs:
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        with:
+          submodules: recursive
       - uses: ./.github/actions/build-macos
         with:
           arch-type: ${{ matrix.arch-type }}

@@ -58,11 +58,6 @@ runs:
       run: df -h /
       shell: bash
 
-    - name: Check out repository code
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
-      with:
-        submodules: recursive
-
     - name: Add repository as safe directory
       run: git config --global --add safe.directory /__w/OpenRV/OpenRV
       shell: bash
