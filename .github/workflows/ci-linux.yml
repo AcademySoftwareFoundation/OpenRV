@@ -66,6 +66,9 @@ jobs:
             vfx-platform: "CY2024"
             extra_repo: "crb"
     steps:
+      - name: Install git
+        run: dnf install -y git
+        shell: bash
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
         with:
@@ -176,6 +179,9 @@ jobs:
             vfx-platform: "CY2024"
             extra_repo: "crb"
     steps:
+      - name: Install git
+        run: dnf install -y git
+        shell: bash
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
         with:
