@@ -19,11 +19,14 @@ inputs:
   qt5_modules:
     required: true
   rocky_qt5_archives:
-    required: true
+    required: false
+    default: 'icu qt3d qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwayland qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
   rocky_qt6_modules:
-    required: true
+    required: false
+    default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
   rocky_qt6_archives:
-    required: true
+    required: false
+    default: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
 
 runs:
   using: "composite"

@@ -12,11 +12,6 @@ on:
         type: string
         default: 'true'
 
-env:
-  WINDOWS_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
-  WINDOWS_QT6_MODULES: 'debug_info qt3d qt5compat qtactiveqt qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
-  WINDOWS_QT6_ARCHIVES: 'd3dcompiler_47 opengl32sw qtbase qtdeclarative qtsvg qttools qttranslations'
-
 jobs:
   # Always runs — CY2024 Release only (PR scope)
   windows-pr:
@@ -61,9 +56,6 @@ jobs:
           msvc-component: ${{ matrix.msvc-component }}
           msvc-compiler: ${{ matrix.msvc-compiler }}
           qt5_modules: ${{ inputs.qt5_modules }}
-          windows_qt5_archives: ${{ env.WINDOWS_QT5_ARCHIVES }}
-          windows_qt6_modules: ${{ env.WINDOWS_QT6_MODULES }}
-          windows_qt6_archives: ${{ env.WINDOWS_QT6_ARCHIVES }}
 
   # Full matrix only — CY2023 + Debug builds (daily/push/dispatch)
   windows-full:
@@ -130,6 +122,3 @@ jobs:
           msvc-component: ${{ matrix.msvc-component }}
           msvc-compiler: ${{ matrix.msvc-compiler }}
           qt5_modules: ${{ inputs.qt5_modules }}
-          windows_qt5_archives: ${{ env.WINDOWS_QT5_ARCHIVES }}
-          windows_qt6_modules: ${{ env.WINDOWS_QT6_MODULES }}
-          windows_qt6_archives: ${{ env.WINDOWS_QT6_ARCHIVES }}

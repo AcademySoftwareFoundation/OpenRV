@@ -24,13 +24,13 @@ inputs:
     default: ''
   macos_qt5_archives:
     required: false
-    default: ''
+    default: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
   macos_qt6_modules:
     required: false
-    default: ''
+    default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
   macos_qt6_archives:
     required: false
-    default: ''
+    default: 'qtbase qtdeclarative qtsvg qttools qttranslations'
 
 runs:
   using: "composite"

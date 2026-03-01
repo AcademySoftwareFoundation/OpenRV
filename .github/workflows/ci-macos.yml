@@ -12,11 +12,6 @@ on:
         type: string
         default: 'true'
 
-env:
-  MACOX_X86_64_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
-  MACOX_X86_64_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
-  MACOX_X86_64_QT6_ARCHIVES: 'qtbase qtdeclarative qtsvg qttools qttranslations'
-
 jobs:
   # Always runs — CY2024 Release only (PR scope)
   macos-pr:
@@ -63,9 +58,6 @@ jobs:
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
           qt5_modules: ${{ inputs.qt5_modules }}
-          macos_qt5_archives: ${{ env.MACOX_X86_64_QT5_ARCHIVES }}
-          macos_qt6_modules: ${{ env.MACOX_X86_64_QT6_MODULES }}
-          macos_qt6_archives: ${{ env.MACOX_X86_64_QT6_ARCHIVES }}
 
   # Full matrix only — Debug builds (daily/push/dispatch)
   macos-full:
@@ -113,6 +105,3 @@ jobs:
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
           qt5_modules: ${{ inputs.qt5_modules }}
-          macos_qt5_archives: ${{ env.MACOX_X86_64_QT5_ARCHIVES }}
-          macos_qt6_modules: ${{ env.MACOX_X86_64_QT6_MODULES }}
-          macos_qt6_archives: ${{ env.MACOX_X86_64_QT6_ARCHIVES }}
