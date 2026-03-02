@@ -299,8 +299,9 @@ struct LexinumericCompare
                 {
                     noSequencePatternRe = make_unique<RegEx>(envVar);
                 }
-                catch (...)
+                catch (const RegEx::Exception& e)
                 {
+                    cerr << "Warning: Invalid regex for RV_NO_SEQUENCE_PATTERN: " << e.what() << '\n';
                     noSequencePatternRe.reset();
                 }
             }
