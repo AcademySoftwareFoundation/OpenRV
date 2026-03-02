@@ -14,7 +14,7 @@
 
 if [[ "$(uname)" != "Darwin" ]]; then
     echo "Error: This script is only intended for macOS (Darwin)."
-    exit 0
+    exit 1
 fi
 
 if [ -z "$QT_HOME" ]; then
@@ -41,11 +41,23 @@ for version in "${QT_VERSIONS[@]}"; do
     QT_DIR="$QT_HOME/$version/macos"
     if [ -d "$QT_DIR" ]; then
         echo "Checking Qt version $version in $QT_DIR..."
-        
-        # Check if patch is already applied (by checking if AGL is still in FindWrapOpenGL.cmake)
-        if ! grep -q "AGL" "$QT_DIR/lib/cmake/Qt6/FindWrapOpenGL.cmake"; then
-             echo "Patch is already applied for version $version. Skipping."
-             continue
+
+        FIND_MODULE="$QT_DIR/lib/cmake/Qt6/FindWrapOpenGL.cmake"
+        MAC_CONF="$QT_DIR/mkspecs/common/mac.conf"
+
+        # Ensure expected Qt files exist before proceeding
+        if [ ! -f "$FIND_MODULE" ] || [ ! -f "$MAC_CONF" ]; then
+            echo "Warning: Required Qt files not found for version $version. Skipping."
+            continue
+        fi
+
+        # Check if patch is already applied:
+        #  - WrapOpenGL_AGL removed from FindWrapOpenGL.cmake
+        #  - -framework AGL removed from mkspecs/common/mac.conf
+        if ! grep -q "WrapOpenGL_AGL" "$FIND_MODULE" && \
+           ! grep -q -- "-framework AGL" "$MAC_CONF"; then
+            echo "Patch is already applied for version $version. Skipping."
+            continue
         fi
 
         # Check if patch applies cleanly
@@ -54,10 +66,10 @@ for version in "${QT_VERSIONS[@]}"; do
             patch -p1 -d "$QT_DIR" --batch < "$PATCH_FILE"
             echo "Successfully patched $version."
         else
-             echo "Error: Could not apply patch for version $version. It might be incompatible or already modified."
-             echo "Please check the files in $QT_DIR manually."
-             # Show dry run output for debugging
-             patch -p1 -d "$QT_DIR" --dry-run --batch < "$PATCH_FILE"
+            echo "Error: Could not apply patch for version $version. It might be incompatible or already modified."
+            echo "Please check the files in $QT_DIR manually."
+            # Show dry run output for debugging
+            patch -p1 -d "$QT_DIR" --dry-run --batch < "$PATCH_FILE"
         fi
     else
         echo "Warning: Qt version $version not found at $QT_DIR. Skipping."
