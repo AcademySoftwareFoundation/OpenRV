@@ -9,6 +9,7 @@
 #include <TwkUtil/TwkRegEx.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/PathConform.h>
+#include <filesystem>
 #include <stl_ext/string_algo.h>
 #include <limits.h>
 #include <stdio.h>
@@ -338,11 +339,18 @@ struct LexinumericCompare
                 continue;
             }
 
-            if (noSequencePatternRe && noSequencePatternRe->matches(f))
+            // Apply pattern to basename only,
+            // so names like ^thumbnail or ^\. match the file name, not the path.
+            if (noSequencePatternRe)
             {
-                frameSequences.push_back(f);
-                allfiles.pop_front();
-                continue;
+                const string nameForPattern = filesystem::path(f).filename().string();
+
+                if (noSequencePatternRe->matches(nameForPattern))
+                {
+                    frameSequences.push_back(f);
+                    allfiles.pop_front();
+                    continue;
+                }
             }
 
             //
