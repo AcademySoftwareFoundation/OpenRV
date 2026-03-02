@@ -173,7 +173,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   # Determine output tracking
   IF(_ARG_USE_FLAG_FILE)
     SET(_flag_file
-        ${_ARG_STAGE_LIB_DIR}/${_ARG_TARGET}-stage-flag
+        ${CMAKE_CURRENT_BINARY_DIR}/${_ARG_TARGET}-stage-flag
     )
     LIST(
       APPEND

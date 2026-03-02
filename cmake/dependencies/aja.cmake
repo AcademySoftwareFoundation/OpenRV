@@ -68,7 +68,8 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-LIST(APPEND _configure_options "-DAJANTV2_DISABLE_DEMOS=ON" "-DAJANTV2_DISABLE_TOOLS=ON" "-DAJANTV2_DISABLE_TESTS=ON" "-DAJANTV2_BUILD_SHARED=ON")
+LIST(APPEND _configure_options "-DAJANTV2_DISABLE_DEMOS=ON" "-DAJANTV2_DISABLE_TOOLS=ON" "-DAJANTV2_DISABLE_TESTS=ON" "-DAJANTV2_BUILD_SHARED=ON"
+                               "-DNTV2_VERSION_BUILD=0")
 
 # In Debug, the MSVC runtime library needs to be set to MultiThreadedDebug. Otherwise, it will be set to MultiThreaded.
 IF(RV_TARGET_WINDOWS
