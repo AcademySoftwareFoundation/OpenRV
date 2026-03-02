@@ -57,17 +57,6 @@ jobs:
       full_matrix: ${{ github.event_name != 'pull_request' }}
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
 
-      - name: Save dependencies cache
-        # Only save on push/schedule/workflow_dispatch so PRs use cache from main branch.
-        if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release' && github.event_name != 'pull_request'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ./_build/RV_DEPS_*
-            ./_build/cmake/dependencies
-            ./_build/_deps
-          key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
-
   windows:
     if: github.repository_owner == 'AcademySoftwareFoundation'
     needs: detect-changes
