@@ -912,13 +912,14 @@ namespace Rv
         }
 #endif
 
+#if defined(RV_VFX_CY2023)
+            Qt::KeyboardModifiers dropEventModifiers = devent->keyboardModifiers();
+#else
+            Qt::KeyboardModifiers dropEventModifiers = devent->modifiers();
+#endif
+
             if (devent->mimeData()->hasUrls())
             {
-#if defined(RV_VFX_CY2023)
-                Qt::KeyboardModifiers dropEventModifiers = devent->keyboardModifiers();
-#else
-                Qt::KeyboardModifiers dropEventModifiers = devent->modifiers();
-#endif
                 QList<QUrl> urls = devent->mimeData()->urls();
 
                 FileNameList files;
@@ -999,10 +1000,10 @@ namespace Rv
             {
 #if defined(RV_VFX_CY2023)
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
-                                modifiers(devent->keyboardModifiers()), devent->pos().x(), h - devent->pos().y() - 1, w, h);
+                                modifiers(dropEventModifiers), devent->pos().x(), h - devent->pos().y() - 1, w, h);
 #else
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
-                                modifiers(devent->modifiers()), devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1,
+                                modifiers(dropEventModifiers), devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1,
                                 w, h);
 #endif
 
