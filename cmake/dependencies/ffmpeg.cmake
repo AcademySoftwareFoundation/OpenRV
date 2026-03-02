@@ -179,7 +179,7 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--toolchain=msvc")
 ENDIF()
 
-# Disable x11 on macos to prevent distribution binary errors related to missing X11 headers
+# Disable x11 on macOS to avoid linking against Homebrew's X11 libraries, ensuring binary portability
 IF(RV_TARGET_DARWIN
    OR RV_TARGET_APPLE_ARM64
 )
