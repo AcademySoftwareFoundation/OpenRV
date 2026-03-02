@@ -1,0 +1,110 @@
+name: OpenRV macOS
+
+on:
+  workflow_call:
+    inputs:
+      skip_deps_cache:
+        type: string
+        default: 'false'
+      qt5_modules:
+        type: string
+      full_matrix:
+        type: string
+        default: 'true'
+      run_debug:
+        type: string
+        default: 'true'
+
+jobs:
+  # Always runs — CY2024 Release only (PR scope)
+  macos-pr:
+    name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "macos-15"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-macos
+        with:
+          arch-type: ${{ matrix.arch-type }}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          qt-version-short: ${{ matrix.qt-version-short }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          qt5_modules: ${{ inputs.qt5_modules }}
+
+  # CY2024 Debug — runs when cmake files change or on full matrix
+  macos-debug:
+    if: ${{ inputs.run_debug == 'true' }}
+    name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "macos-15"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            qt-version-short: "6.5"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-macos
+        with:
+          arch-type: ${{ matrix.arch-type }}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          qt-version-short: ${{ matrix.qt-version-short }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          qt5_modules: ${{ inputs.qt5_modules }}

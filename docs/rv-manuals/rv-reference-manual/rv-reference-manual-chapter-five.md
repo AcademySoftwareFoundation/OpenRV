@@ -171,77 +171,77 @@ Some events will originate from RV itself. These include things like new-source 
 
 | Event | Event.(data/contents) | Ancillary Data (contentsArray) | Description |
 | --- | --- | --- | --- |
-| render |  |  | Main view render |
-| pre-render |  |  | Before rendering |
-| post-render |  |  | After rendering |
-| per-render-event-processing |  |  | Qt Event processing between renders (a “safe” time to edit the graph) |
-| layout |  |  | Main view layout used to handle view margin changes |
-| new-source | nodename;;RVSource;;filename |  | **DEPRECATED** A new source node was added (or media was reset) |
-| source-group-complete | group nodename;;action_type |  | A new or modified source group is complete |
-| source-modified | nodename;;RVSource;;filename |  | An existing source was changed |
-| media-relocated | nodename;;oldmedia;;newmedia |  | A movie, image sequence, audio file was swapped out |
-| source-media-set | nodename;;tag |  |  |
-| before-session-read | filename |  | Session file is about to be read |
-| after-session-read | filename |  | Session file was read |
-| before-session-write | filename |  | Session file is about to be written |
-| after-session-write | filename |  | Session file was just written |
-| before-session-write-copy | filename |  | A copy of the session is about to be written |
-| after-session-write-copy | filename |  | A copy of a session was just written |
-| before-session-deletion |  |  | The session is about to be deleted |
-| before-graph-view-change | nodename |  | The current view node is about to change. |
-| after-graph-view-change | nodename |  | The current view node changed. |
-| new-node | nodename |  | A new view node was created. |
+| render | | | Main view render |
+| pre-render | | | Before rendering |
+| post-render | | | After rendering |
+| per-render-event-processing | | | Qt Event processing between renders (a “safe” time to edit the graph) |
+| layout | | | Main view layout used to handle view margin changes |
+| new-source | nodename;;RVSource;;filename | | **DEPRECATED** A new source node was added (or media was reset) |
+| source-group-complete | group nodename;;action_type | | A new or modified source group is complete |
+| source-modified | nodename;;RVSource;;filename | | An existing source was changed |
+| media-relocated | nodename;;oldmedia;;newmedia | | A movie, image sequence, audio file was swapped out |
+| source-media-set | nodename;;tag | | |
+| before-session-read | filename | | Session file is about to be read |
+| after-session-read | filename | | Session file was read |
+| before-session-write | filename | | Session file is about to be written |
+| after-session-write | filename | | Session file was just written |
+| before-session-write-copy | filename | | A copy of the session is about to be written |
+| after-session-write-copy | filename | | A copy of a session was just written |
+| before-session-deletion | | | The session is about to be deleted |
+| before-graph-view-change | nodename | | The current view node is about to change. |
+| after-graph-view-change | nodename | | The current view node changed. |
+| new-node | nodename | | A new view node was created. |
 | graph-new-node | nodename | nodename protocol version groupname | A new node of any kind was created. |
-| set-current-annotate-mode-node | nodename |  | Set the Paint node to use for the _currentNode in the annotate mode package. Calling this event with an empty string will reset its behaviour. |
+| set-current-annotate-mode-node | nodename | | Set the Paint node to use for the _currentNode in the annotate mode package. Calling this event with an empty string will reset its behaviour. |
 | annotate-mode-activated | | | The annotate mode package is activated |
-| before-progressive-loading |  |  | Loading will start |
-| after-progressive-loading |  |  | Loading is complete (sent immediately if no files will be loaded) |
-| graph-layer-change |  |  | **DEPRECATED** use after-graph-view-change |
-| frame-changed |  |  | The current frame changed |
-| fps-changed |  |  | Playback FPS changed |
-| play-start |  |  | Playback started |
-| play-stop |  |  | Playback stopped |
-| incoming-source-path | infilename;;tag |  | A file was selected by the user for loading. |
-| missing-image |  |  | An image could not be loaded for rendering |
-| cache-mode-changed | buffer or region or off |  | Caching mode changed |
-| view-size-changed |  |  | The viewing area size changed |
-| new-in-point | frame |  | The in point changed |
-| new-out-point | frame |  | The out point changed |
-| before-source-delete | nodename |  | Source node will be deleted |
-| after-source-delete | nodename |  | Source node was deleted |
-| before-node-delete | nodename |  | View node will be deleted |
-| after-node-delete | nodename |  | View node was deleted |
-| after-clear-session |  |  | The session was just cleared |
-| after-preferences-write |  |  | Preferences file was written by the Preferences GUI |
-| state-initialized |  |  | Mu/Python init files read |
-| session-initialized |  |  | All modes toggled, command-line processed, etc. |
-| realtime-play-mode |  |  | Playback mode changed to realtime |
-| play-all-frames-mode |  |  | Playback mode changed to play-all-frames |
-| before-play-start |  |  | Play mode will start |
-| mark-frame | frame |  | Frame was marked |
-| unmark-frame | frame |  | Frame was unmarked |
-| update-hold-button |  |  | Update the checked state of the hold button |
-| update-ghost-button |  |  | Update the checked state of the ghost button |
-| pixel-block | Event.data() |  | A block of pixels was received from a remote connection |
-| graph-state-change |  |  | A property in the image processing graph changed |
-| graph-node-inputs-changed | nodename |  | Inputs of a top-level node added/removed/re-ordered |
-| range-changed |  |  | The time range changed |
-| narrowed-range-changed |  |  | The narrowed time range changed |
-| margins-changed | left right top bottom |  | View margins changed |
-| output-video-device-changed | outputVideoModuleName/outputVideoDeviceName |  | The output video device changed |
-| view-resized | old-w new-w | old-h new-h |  | Main view changed size |
-| preferences-show |  |  | Pref dialog will be shown |
-| preferences-hide |  |  | Pref dialog was hidden |
-| read-cdl-complete | cdl_filename;;cdl_nodename |  | CDL file has been loaded |
-| read-lut-complete | lut_filename;;lut_nodename |  | LUT file has been loaded |
-| remote-eval | code |  | Request to evaluate external Mu code |
-| remote-pyeval | code |  | Request to evaluate external Python code |
-| remote-pyexec | code |  | Request to execute external Python code |
-| remote-network-start |  |  | Remote networking started |
-| remote-network-stop |  |  | Remote networking stopped |
-| remote-connection-start | contact-name |  | A new remote connection has been made |
-| remote-connection-stop | contact-name |  | A remote connection has died |
-| remote-contact-error | contact-name |  | A remote connection error occurred while being established |
+| before-progressive-loading | | | Loading will start |
+| after-progressive-loading | | | Loading is complete (sent immediately if no files will be loaded) |
+| graph-layer-change | | | **DEPRECATED** use after-graph-view-change |
+| frame-changed | | | The current frame changed |
+| fps-changed | | | Playback FPS changed |
+| play-start | | | Playback started |
+| play-stop | | | Playback stopped |
+| incoming-source-path | infilename;;tag | | A file was selected by the user for loading. |
+| missing-image | | | An image could not be loaded for rendering |
+| cache-mode-changed | buffer or region or off | | Caching mode changed |
+| view-size-changed | | | The viewing area size changed |
+| new-in-point | frame | | The in point changed |
+| new-out-point | frame | | The out point changed |
+| before-source-delete | nodename | | Source node will be deleted |
+| after-source-delete | nodename | | Source node was deleted |
+| before-node-delete | nodename | | View node will be deleted |
+| after-node-delete | nodename | | View node was deleted |
+| after-clear-session | | | The session was just cleared |
+| after-preferences-write | | | Preferences file was written by the Preferences GUI |
+| state-initialized | | | Mu/Python init files read |
+| session-initialized | | | All modes toggled, command-line processed, etc. |
+| realtime-play-mode | | | Playback mode changed to realtime |
+| play-all-frames-mode | | | Playback mode changed to play-all-frames |
+| before-play-start | | | Play mode will start |
+| mark-frame | frame | | Frame was marked |
+| unmark-frame | frame | | Frame was unmarked |
+| update-hold-button | | | Update the checked state of the hold button |
+| update-ghost-button | | | Update the checked state of the ghost button |
+| pixel-block | Event.data() | | A block of pixels was received from a remote connection |
+| graph-state-change | | | A property in the image processing graph changed |
+| graph-node-inputs-changed | nodename | | Inputs of a top-level node added/removed/re-ordered |
+| range-changed | | | The time range changed |
+| narrowed-range-changed | | | The narrowed time range changed |
+| margins-changed | left right top bottom | | View margins changed |
+| output-video-device-changed | outputVideoModuleName/outputVideoDeviceName | | The output video device changed |
+| view-resized | old-w new-w | old-h new-h | |
+| preferences-show | | | Pref dialog will be shown |
+| preferences-hide | | | Pref dialog was hidden |
+| read-cdl-complete | cdl_filename;;cdl_nodename | | CDL file has been loaded |
+| read-lut-complete | lut_filename;;lut_nodename | | LUT file has been loaded |
+| remote-eval | code | | Request to evaluate external Mu code |
+| remote-pyeval | code | | Request to evaluate external Python code |
+| remote-pyexec | code | | Request to execute external Python code |
+| remote-network-start | | | Remote networking started |
+| remote-network-stop | | | Remote networking stopped |
+| remote-connection-start | contact-name | | A new remote connection has been made |
+| remote-connection-stop | contact-name | | A remote connection has died |
+| remote-contact-error | contact-name | | A remote connection error occurred while being established |
 
 Table 5.3:Internal Events <a id="internal-events"></a>
 

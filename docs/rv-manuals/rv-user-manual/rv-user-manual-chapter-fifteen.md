@@ -184,7 +184,7 @@ The two OpenEXR preferences, found under Preferences-Format-OpenEXR, that define
 
 Table 15.3: OpenEXR format settings that emulate data/display window handling of various tools\*
 
-| Read Window                   | Read Window Is Display Window | Tool                     |
+| Read Window                       | Read Window Is Display Window     | Tool                         |
 | --------------------------------- | --------------------------------- | ---------------------------- |
 | Data Window                       | Checked                           | OSX Preview, Adobe Photoshop |
 | Display Window                    | Not applicable                    | Nuke, exrdisplay             |
@@ -201,11 +201,13 @@ In order to merge these possibly multiple and simultaneous uses of “parts” i
 
 Table 15.4: Components of a fully-qualified channel name.
 
-|  |  |
+<!-- markdownlint-disable MD060 -->
+|             |     |
 | ----------- | --- |
 | **view**    | The name of the stereo view. This may be missing or “default” for “the default view”. The view name cannot contain a “.” Example: “left”, “right”, “center”, etc.
 | **layer**   | This component may include part names as well as traditional EXR layer names. The rule is that if there are no channel-name conflicts within a single view, the part names will be ignored (since they are not necessary to distinguish the channels), if there **is** a channel-name conflict, the part names maybe incorporated into the layer names. Sub-layers are also included. To be concrete, a channel called “Diffuse.R” stored in a part called “keyLight” is considered to be a member of a layer called “keyLight.Diffuse” if the channel “Diffuse.R” also appears in another part within the same view. |
 | **channel** | The last component of a traditional EXR channel name, containing no “.” Example: “R”, “G”, “B”, “A”, “Z”, etc.|
+<!-- markdownlint-enable MD060 -->
 
 If an EXR has multiple parts and no channels are selected, RV will make a best effort to determine the most viable default channels. If multiple layers are similarly viable, RV will prefer a layer with RGB or RGBA channels from the first part (part 0). Unless explicitly directed, the channels chosen will not cross part boundaries unless Guess Channel Inheritance is enabled.
 
@@ -247,7 +249,7 @@ Table 15.7:
 
 Supported RAW formats
 
-| File Extension | File Format         |
+| File Extension     | File Format             |
 | ------------------ | ----------------------- |
 | .arw               | Sony/Minolta RAW        |
 | .cr2               | Canon RAW 2             |

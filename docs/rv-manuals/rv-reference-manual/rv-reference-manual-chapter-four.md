@@ -176,18 +176,18 @@ print("result: %s\n" % result); // Prints "result: darwin"
 
 ### 4.3 Python Mu Type Conversions
 
-| Python Type | Converts to Mu Type | Converts To Python Type |  |
+| Python Type | Converts to Mu Type | Converts To Python Type | |
 | --- | --- | --- | --- |
 | Str or Unicode | string | Unicode string | Normal byte strings and unicode strings are both converted to Mu's unicode string. Mu strings always convert to unicode Python strings. |
-| Int | int, short, or byte | Int |  |
-| Long | int64 | Long |  |
+| Int | int, short, or byte | Int | |
+| Long | int64 | Long | |
 | Float | float or half or double | Float | Mu double values may lose precision. Python float values may lose precision if passed to a Mu function that takes a half. |
-| Bool | bool | Bool |  |
+| Bool | bool | Bool | |
 | (Float, Float) | vector float[2] | (Float, Float) | Vectors are represented as tuples in Python |
-| (Float, Float, Float) | vector float[3] | (Float, Float, Float) |  |
-| (Float, Float, Float, Float) | vector float[4] | (Float, Float, Float, Float) |  |
-| Event | Event | Event |  |
-| MuSymbol | runtime.symbol | MuSymbol |  |
+| (Float, Float, Float) | vector float[3] | (Float, Float, Float) | |
+| (Float, Float, Float, Float) | vector float[4] | (Float, Float, Float, Float) | |
+| Event | Event | Event | |
+| MuSymbol | runtime.symbol | MuSymbol | |
 | Tuple | tuple | Tuple | Tuple elements each convert independently. NOTE: two to four element Float tuples will convert to vector float[N] in Mu. Currently there is no way to force conversion of these Float-only tuples to Mu float tuples. |
 | List | type[] or type[N] | List | Arrays (Lists) convert back and forth |
 | Dictionary | Class | Dictionary | Class labels become dictionary keys |

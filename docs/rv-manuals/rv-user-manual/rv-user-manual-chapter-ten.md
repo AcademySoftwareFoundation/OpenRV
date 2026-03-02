@@ -14,9 +14,9 @@ When a package is added, a list of permissible directories in the support path i
 
 By default, RV will include the application directory's plug-ins directory (which is probably not writable by the user) and one of the following which is usually writable by the user:
 
-| | |
+|                                  |          |
 | -------------------------------- | -------- |
-| ~/Library/Application Support/RV | macOS |
+| ~/Library/Application Support/RV | macOS    |
 | ~/.rv                            | Linux    |
 | $APPDATA/RV                      | Windows  |
 
@@ -24,7 +24,7 @@ You can override the default support path locations by setting the environment v
 
 The file system of each directory in the support path contains these directories:
 
-| | |
+|                  |                                                                         |
 | ---------------- | ----------------------------------------------------------------------- |
 | Packages/        | Package zip files                                                       |
 | ConfigFiles/     | Area used by packages to store non-preference configuration information |

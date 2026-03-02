@@ -50,7 +50,7 @@ From the user's point of view, the following situations will occur:
 
 In addition, the default color management implements two varieties of user-level control, as examples of what you can do from the scripting level.First, environment variables with a standard format can be used to control the linearization process for a given file type. An environment variable of the form “RV_OVERRIDE_TRANSFER_<type>” will set the linearization transform for the specified file type (and this will override the default rules described above). For example, if the environment variable “RV_OVERRIDE_TRANSFER_TIF” is set to “sRGB” then all files with extension “tif” or “TIF” will be linearized with the sRGB transform. If you want, you can also specify the bit depth. So you could set RV_OVERRIDE_TRANSFER_TIF_8 to sRGB and RV_OVERRIDE_TRANSFER_TIF_32 to Linear. The transform function name must be one of the following standard transforms. (The number following “Gamma” is arbitrary.)
 
-|  |
+| |
 | --- |
 | Linear |
 | sRGB |

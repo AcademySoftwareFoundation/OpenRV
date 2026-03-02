@@ -147,7 +147,7 @@ To edit the parameter value using the mouse you can either scrub (like a virtual
 
 To change the parameter value using the keyboard, hit the Enter (or Return) key; RV will prompt you for the value. For interactive changes from the keyboard, use the \`\`+'' and \`\`-'' keys (with or without shift held down). The parameter is incremented and decremented. To end the keyboard interactive edit, hit the Escape or Spacebar keys.
 
-| Key/Mouse Sequence | Action                             |
+| Key/Mouse Sequence     | Action                                 |
 | ---------------------- | -------------------------------------- |
 | Mouse Button #1 Drag   | Scrub parameter                        |
 | Mouse Button #1 Up     | Finish parameter edit                  |
@@ -156,7 +156,7 @@ To change the parameter value using the keyboard, hit the Enter (or Return) key;
 | 0 through 9            | Enter parameter numerically            |
 | ESC                    | Cancel parameter edit mode             |
 | \+ or =                | Increment parameter value              |
-| - or _               | Decrement parameter value              |
+| - or _                 | Decrement parameter value              |
 | BACKSPACE or DEL       | Reset parameter value to default       |
 | r or g or b            | Edit single channel of color parameter |
 | c                      | Edit all channels of color parameter   |
@@ -249,7 +249,7 @@ The in/out range can also be manipulated with the mouse. You can grab and drag e
 
 There are two FPS indicators on the timeline. The first indicates the target FPS, the second the actual measured playback FPS.
 
-| | |
+|                            |                                                                                    |
 | -------------------------- | ---------------------------------------------------------------------------------- |
 | [                          | Set in point                                                                       |
 | ]                          | Set out point                                                                      |
@@ -281,15 +281,15 @@ Figure 4.12: Timeline Configuration Popup Menu <a id="timeline-configuration-pop
 
 The Configuration menu has a number of options:
 
-|  |  |
+| | |
 | --- | --- |
-| Show Play Controls            | Hide or Show the playback control buttons on the right side of the timeline                                                                     |
-| Draw Timeline Over Imagery    | This was the default behavior in previous versions of RV. The timeline is now drawn in the margin by default                                    |
-| Position Timeline At Top      | Draw the timeline at the top of the view. The default is to draw it at the bottom of the view.                                                  |
-| Show In/Out Frame Numbers     | When selected, the in and out points will be labeled using the current method for display the frame (global, source, or time code).             |
-| Step Wraps At In/Out          | This controls how the arrow keys behave at the in and out point. When selected, the frame will wrap from in to out or vice versa.               |
-| Show Source/Input at Frame    | When selected, the main media file name for the frame under the pointer (not the current frame) will be shown just above or below the timeline. |
-| Show Play Direction Indicator | When selected, a small triangle next to the current frame indicates the direction playback will occur, when started.                            |
+| Show Play Controls | Hide or Show the playback control buttons on the right side of the timeline |
+| Draw Timeline Over Imagery | This was the default behavior in previous versions of RV. The timeline is now drawn in the margin by default |
+| Position Timeline At Top | Draw the timeline at the top of the view. The default is to draw it at the bottom of the view. |
+| Show In/Out Frame Numbers | When selected, the in and out points will be labeled using the current method for display the frame (global, source, or time code). |
+| Step Wraps At In/Out | This controls how the arrow keys behave at the in and out point. When selected, the frame will wrap from in to out or vice versa. |
+| Show Source/Input at Frame | When selected, the main media file name for the frame under the pointer (not the current frame) will be shown just above or below the timeline. |
+| Show Play Direction Indicator | When selected, a small triangle next to the current frame indicates the direction playback will occur, when started. |
 
 #### 4.5.3 Realtime versus Play All Frames
 
@@ -569,27 +569,27 @@ RV has a supplementary "stereo hotkeys" mode in which an additional set of stero
 
 | Hotkey | Action |
 | --- | --- |
-| a | Anaglyph Mode  |
-| d | Checked Mode  |
-| k | Scanline Mode  |
-| s | Side-by-Side Mode  |
-| p | Side-by-Side Stereo Mode  |
-| m | Mirrored Side-by-Side Stereo Mode  |
-| x | Stereo Mode Off (DEPRECATED -- use alt-s (or option-s on the mac))  |
-| h | Hardware Stereo Mode  |
-| , | Left Eye Only Stereo Mode  |
-| . | Right Eye Only Stereo Mode  |
-| < | Left Eye Only Stereo Mode  |
-| > | Right Eye Only Stereo Mode  |
-| S | Swap Eyes  |
-| o | Edit Global Relative Stereo Offset|
-| z | Horizontal Squeezed Stereo Mode  |
-| v | Vertical Squeezed Stereo Mode  |
-| r | Edit Global Right-Eye Stereo Offset |
-| O | Turn OFF Stereo Display Mode (in Controller Window)  |
-| / | Reset Stereo Offsets |
-| c | Edit Source/Clip Stereo Offset  |
-| R | Edit Source/Clip Right-Eye-Only Stereo Offset |
+| a | Anaglyph Mode |
+| d | Checked Mode |
+| k | Scanline Mode |
+| s | Side-by-Side Mode |
+| p | Side-by-Side Stereo Mode |
+| m | Mirrored Side-by-Side Stereo Mode |
+| x | Stereo Mode Off (DEPRECATED -- use alt-s (or option-s on the mac)) |
+| h | Hardware Stereo Mode |
+| , | Left Eye Only Stereo Mode |
+| . | Right Eye Only Stereo Mode |
+| < | Left Eye Only Stereo Mode |
+| > | Right Eye Only Stereo Mode |
+| S | Swap Eyes |
+| o | Edit Global Relative Stereo Offset |
+| z | Horizontal Squeezed Stereo Mode |
+| v | Vertical Squeezed Stereo Mode |
+| r | Edit Global Right-Eye Stereo Offset |
+| O | Turn OFF Stereo Display Mode (in Controller Window) |
+| / | Reset Stereo Offsets |
+| c | Edit Source/Clip Stereo Offset |
+| R | Edit Source/Clip Right-Eye-Only Stereo Offset |
 
 #### Mouse Bindings
 
@@ -627,7 +627,7 @@ RV stores configuration information in a preferences file in the user home direc
 
 | OS       | File Location                              | File Format     |
 | -------- | ------------------------------------------ | --------------- |
-| macOS | ~/Library/Preferences/com.tweaksoftware.RV | Property List   |
+| macOS    | ~/Library/Preferences/com.tweaksoftware.RV | Property List   |
 | Linux    | ~/.config/TweakSoftware/RV.conf            | Config File     |
 | Windows  | %APPDATA%/TweakSoftware/RV.ini             | INI File        |
 

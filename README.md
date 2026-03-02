@@ -44,7 +44,7 @@ If you're comfortable and familiar with the above, we are looking forward to you
 
 Open RV is currently supported on macOS Ventura 13.x and later, Windows 10 and later, and Rocky Linux 8.x/9.x.
 
-You should start by setting up the platform-specifc packages and dependencies for your operating system:
+You should start by setting up the platform-specific packages and dependencies for your operating system:
 
 - [macOS Ventura and later](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_macos.html)
 - [Windows 10 and later](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_windows.html)

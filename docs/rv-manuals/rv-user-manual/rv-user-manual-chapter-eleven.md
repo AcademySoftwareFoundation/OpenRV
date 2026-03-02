@@ -71,7 +71,7 @@ The generic OCIONode can used as a top level (user) node. As with the RVColor no
 
 Table 1. OCIO Node Properties
 
-|  |  |
+| | |
 | --- | --- |
 | string ocio.function | One of "color", "look", or "display" |
 | float ocio.lut | Used internally to store the OCIO generated 3D LUT |

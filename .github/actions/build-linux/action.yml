@@ -1,0 +1,310 @@
+name: Build OpenRV on Linux
+description: Build and test OpenRV on Rocky Linux
+
+inputs:
+  rocky-version:
+    required: true
+  build-type:
+    required: true
+  qt-version:
+    required: true
+  cmake-version:
+    required: true
+  python-version:
+    required: true
+  vfx-platform:
+    required: true
+  extra_repo:
+    required: true
+  qt5_modules:
+    required: true
+  rocky_qt5_archives:
+    required: false
+    default: 'icu qt3d qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwayland qtwebchannel qtwebsockets qtwebview qtx11extras qtxmlpatterns'
+  rocky_qt6_modules:
+    required: false
+    default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
+  rocky_qt6_archives:
+    required: false
+    default: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Display disk space
+      run: df -h /
+      shell: bash
+
+    - name: Clear up some spaces on disk
+      run: |
+        # Delete files from host through the volumes
+        # It will have some "cannot remove" message, but but atleast 10GB will be cleared.
+        rm -rf /github/home/android || true
+        rm -rf /github/home/dotnet || true
+        rm -rf /github/home/ghc || true
+        rm -rf /github/home/.ghcup || true
+        rm -rf /github/home/graalvm || true
+        rm -rf /github/home/powershell || true
+        rm -rf /github/home/chromium || true
+        rm -rf /github/home/node_modules || true
+        rm -rf /github/home/CodeQL || true
+        rm -rf /github/home/boost || true
+      shell: bash
+
+    - name: Display disk space
+      run: df -h /
+      shell: bash
+
+    - name: Install system dependencies
+      run: |
+        retry_count=0
+        max_retries=5
+
+        until [ $retry_count -ge $max_retries ]; do
+          echo "Attempt $((retry_count + 1)) of $max_retries"
+
+          if dnf install -y epel-release && \
+             dnf config-manager --set-enabled ${{ inputs.extra_repo }} devel && \
+             dnf groupinstall "Development Tools" -y && \
+             dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd && \
+             dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel && \
+             dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel && \
+             dnf clean all; then
+            echo "Dependencies installed successfully"
+            break
+          else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+              echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+              sleep 5
+            fi
+          fi
+        done
+
+        if [ $retry_count -ge $max_retries ]; then
+          echo "Failed to install dependencies after $max_retries attempts"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Install other system dependencies
+      if: ${{ inputs.rocky-version == '9' }}
+      run: |
+        retry_count=0
+        max_retries=5
+
+        until [ $retry_count -ge $max_retries ]; do
+          echo "Attempt $((retry_count + 1)) of $max_retries"
+
+          if dnf install -y perl-CPAN && \
+            cpan FindBin; then
+            echo "Dependencies installed successfully"
+            break
+          else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+              echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+              sleep 5
+            fi
+          fi
+        done
+
+        if [ $retry_count -ge $max_retries ]; then
+          echo "Failed to install dependencies after $max_retries attempts"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Install GCC 11 toolchain for Rocky Linux 8
+      if: ${{ inputs.rocky-version == '8' }}
+      run: |
+        retry_count=0
+        max_retries=5
+
+        until [ $retry_count -ge $max_retries ]; do
+          echo "Attempt $((retry_count + 1)) of $max_retries"
+
+          if dnf install -y gcc-toolset-11-toolchain; then
+            echo "GCC 11 toolchain installed successfully"
+            break
+          else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+              echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+              sleep 5
+            fi
+          fi
+        done
+
+        if [ $retry_count -ge $max_retries ]; then
+          echo "Failed to install GCC 11 toolchain after $max_retries attempts"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Enable GCC 11 toolchain for Rocky Linux 8
+      if: ${{ inputs.rocky-version == '8' }}
+      run: |
+        source /opt/rh/gcc-toolset-11/enable
+        echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+        echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
+        echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        gcc --version
+        g++ --version
+      shell: bash
+
+    - name: Add repository as safe directory
+      run: git config --global --add safe.directory /__w/OpenRV/OpenRV
+      shell: bash
+
+    - name: Install pyenv
+      run: |
+        curl https://pyenv.run | bash
+
+        export PYENV_ROOT="$HOME/.pyenv"
+        echo "$PYENV_ROOT/shims" >> $GITHUB_PATH
+        echo "$PYENV_ROOT/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Setup pyenv
+      run: |
+        echo $PATH
+        pyenv install ${{ inputs.python-version }}
+        pyenv global ${{ inputs.python-version }}
+      shell: bash
+
+    - name: Display Python installation location
+      run: python -c "import sys; print(sys.executable)"
+      shell: bash
+
+    - name: Install Ninja
+      run: |
+        wget https://github.com/ninja-build/ninja/releases/download/v1.12.1/ninja-linux.zip
+        unzip ninja-linux.zip -d ./ninja
+        echo "$(pwd)/ninja" >> $GITHUB_PATH
+        ninja --version
+      shell: bash
+
+    - name: Install CMake
+      run: |
+        curl -SL -o cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v${{ inputs.cmake-version }}/cmake-${{ inputs.cmake-version }}-Linux-x86_64.tar.gz
+        tar -xzf cmake.tar.gz
+        ls
+        mv cmake-${{ inputs.cmake-version }}-linux-x86_64 ./cmake-${{ inputs.cmake-version }}
+        echo "$(pwd)/cmake-${{ inputs.cmake-version }}/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Prepare Qt folder
+      run: mkdir -p "${{ github.workspace }}/deps"
+      shell: bash
+
+    - name: Install Qt ${{ inputs.qt-version }}
+      if: ${{ inputs.vfx-platform == 'CY2023' }}
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '${{ inputs.qt-version }}'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        dir: "${{ github.workspace }}/deps"
+        install-deps: 'false'
+        modules: ${{ inputs.qt5_modules }}
+        archives: ${{ inputs.rocky_qt5_archives }}
+        cache: false
+        setup-python: 'false'
+        tools: 'tools_qtcreator'
+        set-env: 'true'
+        tools-only: 'false'
+        aqtversion: '==3.2.*'
+
+    - name: Install Qt ${{ inputs.qt-version }}
+      if: ${{ inputs.vfx-platform == 'CY2024' }}
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '${{ inputs.qt-version }}'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        dir: "${{ github.workspace }}/deps"
+        install-deps: 'false'
+        modules: ${{ inputs.rocky_qt6_modules }}
+        archives: ${{ inputs.rocky_qt6_archives }}
+        cache: false
+        setup-python: 'false'
+        tools: 'tools_qtcreator'
+        set-env: 'true'
+        tools-only: 'false'
+        aqtversion: '==3.2.*'
+
+    - name: Install Python dependencies
+      run: python3 -m pip install --user --upgrade -r requirements.txt
+      shell: bash
+
+    - name: Install Rust toolchain
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Verify Rust installation
+      run: |
+        source $HOME/.cargo/env
+        rustc --version
+        cargo --version
+      shell: bash
+
+    # For Rocky Linux, we can't cache the dependencies of Open RV
+    # because there is not enough room in the cache (10GB limit) for all platforms.
+    # ccache is used for this run only (not stored in Actions cache) to speed up the build.
+    # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
+    # or by moving some dependencies from the cache to Conan or another dependency manager.
+    - name: Install ccache
+      run: dnf install -y ccache
+      shell: bash
+
+    # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
+    # - name: Setup ccache
+    #   uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639
+    #   with:
+    #     key: rocky-${{ inputs.rocky-version }}-${{ inputs.vfx-platform }}-${{ inputs.build-type }}
+    #     max-size: 2G
+    #     verbose: 2
+
+    - name: Configure OpenRV
+      if: ${{ inputs.vfx-platform == 'CY2023' }}
+      run: |
+        cmake --version
+        export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ inputs.qt-version}}/gcc_64
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+      shell: bash
+
+    - name: Configure OpenRV
+      if: ${{ inputs.vfx-platform == 'CY2024' }}
+      run: |
+        cmake --version
+        export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ inputs.qt-version}}/gcc_64
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+      shell: bash
+
+    - name: Build OpenRV dependencies
+      run: cmake --build _build --config ${{ inputs.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+      shell: bash
+
+    - name: Build OpenRV main executable
+      run: cmake --build _build --config ${{ inputs.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+      shell: bash
+
+    - name: Tests
+      run: ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
+      shell: bash
+
+    - name: Free some spaces for the install steps
+      run: |
+        rm -rf _build/RV_DEPS_*
+        rm -rf _build/_deps
+      shell: bash
+
+    - name: Install OpenRV
+      run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
+      shell: bash

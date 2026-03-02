@@ -37,7 +37,7 @@ document here
 
 The TwkQtChat library is composed of three classes: Client, Connection, and Server.
 
-|  |  |
+| | |
 | --- | --- |
 | sendMessage | Generic method to send a standard UTF-8 text message to a specific contact |
 | sendData | Generic method to send a data message to a specific contact |
@@ -54,7 +54,7 @@ The TwkQtChat library is composed of three classes: Client, Connection, and Serv
 
 Table 13.1:Important Client Member Functions <a id="important-client-member-functions"></a>
 
-|  |  |
+| | |
 | --- | --- |
 | newMessage | A new message has been received on an existing connection |
 | newData | A new data message has been received on an existing connection |
@@ -76,7 +76,7 @@ There are two types of messages that RV can receive and send over its network so
 
 RV recognizes these types of standard messages:
 
-|  |  |
+| | |
 | --- | --- |
 | MESSAGE | The string payload is subdivided into multiple parts the first of which indicates the sub-type of the message. The rest of the message is interpreted according to its sub-type. |
 | GREETING | Sent by RV to a synced RV when negotiating the initial contact. |
@@ -87,7 +87,7 @@ RV recognizes these types of standard messages:
 
 Table 13.3:Message TypesWhen an application first connects to RV over its TCP port, a greeting message is exchanged. This consists of an UTF-8 byte string composed of:
 
-|  |  |
+| | |
 | --- | --- |
 | The string “NEWGREETING” | 1st word |
 | The UTF-8 value 32 (space) | - |
@@ -99,7 +99,7 @@ Table 13.3:Message TypesWhen an application first connects to RV over its TCP po
 
 Table 13.4:Greeting MessageIn response, the application should receive a NEWGREETING message back. At this point the application will be connected to RV.A standard message is a single UTF-8 string which has the form:
 
-|  |  |
+| | |
 | --- | --- |
 | The string “MESSAGE” | 1st word |
 | The UTF-8 value 32 (space) | - |
@@ -109,7 +109,7 @@ Table 13.4:Greeting MessageIn response, the application should receive a NEWGREE
 
 Table 13.5:Standard MessageWhen RV receives a standard message (MESSAGE type) it will assume the payload is a UTF-8 string and try to interpret it. The first word of the string is considered the sub-message type and is used to decide how to respond:
 
-|  |  |
+| | |
 | --- | --- |
 | EVENT | Send the rest of the payload as a UI event (see below) |
 | RETURNEVENT | Same as EVENT but will result in a response RETURN message |
@@ -118,7 +118,7 @@ Table 13.5:Standard MessageWhen RV receives a standard message (MESSAGE type) it
 
 Table 13.6:Sub-Message TypesThe EVENT and RETURNEVENT messages are the most common. When RV receives an EVENT or RETURNEVENT message it will translate it into a user interface event. The additional part of the string (after EVENT or RETURNEVENT) is composed of:
 
-|  |  |
+| | |
 | --- | --- |
 | EVENT or RETURNEVENT | UTF-8 string identifying the message as an EVENT or RETURNEVENT message. |
 | space character | - |
@@ -136,7 +136,7 @@ Table 13.7:EVENT MessagesFor example the full contents of an EVENT message might
 
 The first word indicates a standard message. The next word (34) indicates the length of the rest of the data. EVENT is the message sub-type which further specifies that the next word (my-event-name) is the event to send to the UI with the rest of the string (red green blue) as the event contents.If a UI function that receives the event sets the return value and the message was a RETURNEVENT, then a RETURN will be sent back. A RETURN will have a single string that is the return value. An EVENT message will not result in a RETURN message.
 
-|  |  |
+| | |
 | --- | --- |
 | RETURN | UTF-8 string identifying the message as an RETURN message. |
 | space character | - |
@@ -160,7 +160,7 @@ Table 13.9:PING and PONG Messages
 
 The data messages come it two types: PIXELTILE and DATAEVENT. These take the form:
 
-|  |  |
+| | |
 | --- | --- |
 | PIXELTILE(parameters) -or- DATAEVENT(parameters) | 1st word |
 | space character | - |
@@ -170,7 +170,7 @@ The data messages come it two types: PIXELTILE and DATAEVENT. These take the for
 
 Table 13.10:PIXELTILE and DATAEVENTThe PIXELTILE message is used to send a block of pixels to or from RV. When received by RV the PIXELTILE message is translated into a pixel-block event (unless another event name is specified) which is sent to the user interface. This message takes a number of parameters which should have no whitespace characters and separated by commas (“,”):
 
-|  |  |
+| | |
 | --- | --- |
 | w | Width of data in pixels. |
 | h | Height of the data in pixels. (If the height of the block of pixels is 1 and the width is the width of the image, the block is equivalent to a scanline.) |
@@ -190,7 +190,7 @@ Table 13.11:PIXELTILE MessageFor example, the PIXELTILE header to the data messa
 
 Which would be parsed and used to fill fields in the Event type. This data becomes available to Mu and Python functions binding to the event. By default the Event object is sent to the insertCreatePixelBlock() function which fins the image source associated with the meda and inserts the data into the correct layer and view of the image. Each of the keywords in the PIXELTILE header is optional.The DATAEVENT message is similar to the PIXELTILE but is intended to be implemented by the user. The message header takes at least three parameters which are ordered (no keywords like PIXELTILE). RV will use only the first three parameters:
 
-|  |  |
+| | |
 | --- | --- |
 | event-name | RV will send a raw data event with this name |
 | target | Required but not currently used |

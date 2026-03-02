@@ -6,7 +6,7 @@ Use the package system described below to expand RV.
 
 The rvpkg command line tool makes it possible to manage packages from the shell. If you use rvpkg you do not need to use RV's preferences UI to install/uninstall add/remove packages from the file system. We recommend using this tool instead of manually editing files to prevent the necessity of keeping abreast of how all the state is stored in new versions.The rvpkg tool can perform a superset of the functions available in RV's packages preference user interface.
 
-|  |  |
+| | |
 | --- | --- |
 | -include directory | include directory as if part of RV_SUPPORT_PATH |
 | -env | show RV_SUPPORT_PATH include app areas |
@@ -164,22 +164,22 @@ The PACKAGE file is a [YAML](http://www.yaml.org/) file providing information ab
 | Field | Value Type | Required | Description |
 | --- | --- | --- | --- |
 | package | string | • | The name of the package in human readable form |
-| author | string |  | The name of the author/creator of the package |
-| organization | string |  | The name of the organization (company) the author created the package for |
-| contact | email address |  | The email contact of the author/support person |
+| author | string | | The name of the author/creator of the package |
+| organization | string | | The name of the organization (company) the author created the package for |
+| contact | email address | | The email contact of the author/support person |
 | version | version number | • | The package version |
-| url | URL |  | Web location for the package where updates, additional documentation resides |
+| url | URL | | Web location for the package where updates, additional documentation resides |
 | rv | version number | • | The minimum version of commercial RV which this package is compatible with |
 | openrv | version number | • | The minimum version of Open RV which this package is compatible with |
-| requires | zip file name list |  | Any other packages (as zip file names) which are required in order to install/load this package |
-| icon | PNG file name |  | The name of an file with an icon for this package |
-| imageio | file list |  | List of files in package which implement Image I/O |
-| movieio | file list |  | List of files in package which implement Movie I/O |
-| hidden | boolean |  | Either “true” or “false” indicating whether package should be visible by default in the package manager |
-| system | boolean |  | Either “true” or “false” indicating whether the package was pre-installed with RV and cannot be removed/uninstalled |
-| optional | boolean |  | Either “true” or “false” indicating whether the package should appear loaded by default. If true the package is not loaded by default after it is installed. Typically this is used only for packages that are pre-installed. (Added in 3.10.9) |
-| modes | YAML list |  | List of modes implemented in the package |
-| files | YAML list |  | List non-mode file handling information |
+| requires | zip file name list | | Any other packages (as zip file names) which are required in order to install/load this package |
+| icon | PNG file name | | The name of an file with an icon for this package |
+| imageio | file list | | List of files in package which implement Image I/O |
+| movieio | file list | | List of files in package which implement Movie I/O |
+| hidden | boolean | | Either “true” or “false” indicating whether package should be visible by default in the package manager |
+| system | boolean | | Either “true” or “false” indicating whether the package was pre-installed with RV and cannot be removed/uninstalled |
+| optional | boolean | | Either “true” or “false” indicating whether the package should appear loaded by default. If true the package is not loaded by default after it is installed. Typically this is used only for packages that are pre-installed. (Added in 3.10.9) |
+| modes | YAML list | | List of modes implemented in the package |
+| files | YAML list | | List non-mode file handling information |
 | description | HTML 1.0 string | • | HTML documentation of the package for user viewing in the package manager |
 
 Table 9.2:Top level fields of PACKAGE file.Each element of the modes list describes one Mu module which is implemented as either a .mu file or a .so file. Files implementing modes are assumed to be Mu module files and will be placed in the Mu subdirectory of the support path location. The other fields are used to optionally create a menu item and/or a short cut key either of which will toggle the mode on/off. The load field indicates when the mode should be loaded: if the value is “delay” the mode will be loaded the first time it is activated, if the value is “immediate” the mode will be loaded on start up.
@@ -187,12 +187,12 @@ Table 9.2:Top level fields of PACKAGE file.Each element of the modes list descri
 | Field | Value Type | Required | Description |
 | --- | --- | --- | --- |
 | file | string | • | The name of the file which implements the mode |
-| menu | string |  | If defined, the string which will appear in a menu item to indicate the status (on/off) of the mode |
-| shortcut | string |  | If defined and menu is defined the shortcut for the menu item |
-| event | string |  | Optional event name used to toggle mode on/off |
+| menu | string | | If defined, the string which will appear in a menu item to indicate the status (on/off) of the mode |
+| shortcut | string | | If defined and menu is defined the shortcut for the menu item |
+| event | string | | Optional event name used to toggle mode on/off |
 | load | string | • | Either immediate or delay indicating when the mode should be loaded |
-| icon | PNG image file |  | Icon representing the mode |
-| requires | mode file name list |  | Names of other mode files required to be active for this mode to be active |
+| icon | PNG image file | | Icon representing the mode |
+| requires | mode file name list | | Names of other mode files required to be active for this mode to be active |
 
 Table 9.3:Mode Fields
 
@@ -227,7 +227,7 @@ description: |
 
 When the package zip file contains additional support files (which are not specified as modes) the package manager will try to install them in locations according to the file type. However, you can also directly specify where the additional files go relative to the support path root directory.
 
-|  |  |  |  |
+| | | | |
 | --- | --- | --- | --- |
 | Field | Value Type | Required | Description |
 | file | string | • | The name of the file in the package zip file |
