@@ -85,7 +85,6 @@ RV_ADD_IMPORTED_LIBRARY(
   NAME dav1d::dav1d
   TYPE STATIC
   LOCATION ${_dav1d_lib}
-  SONAME ${_david_lib_name}
   INCLUDE_DIRS ${_include_dir}
   DEPENDS ${_target}
   ADD_TO_DEPS_LIST

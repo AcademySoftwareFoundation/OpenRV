@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -81,9 +81,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   ENDIF()
 
   # Build the command list
-  SET(_commands
-      ""
-  )
+  SET(_commands)
 
   # Pre-commands (e.g., install_name_tool)
   IF(_ARG_PRE_COMMANDS)

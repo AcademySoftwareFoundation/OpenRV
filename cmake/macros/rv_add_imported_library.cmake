@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2024  Autodesk, Inc. All Rights Reserved.
+# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -10,20 +10,24 @@
 # Consolidates the repeated ADD_LIBRARY(IMPORTED) + SET_PROPERTY + TARGET_INCLUDE_DIRECTORIES
 # pattern used across dependency files.
 #
+# NOTE: This is a MACRO (not a function) so that ADD_TO_DEPS_LIST correctly
+# accumulates into the caller's RV_DEPS_LIST when called multiple times
+# (e.g., gc.cmake creates both BDWGC::Gc and BDWGC::Cord).
+#
 # cmake-format: off
 # Usage:
 #   RV_ADD_IMPORTED_LIBRARY(
 #     NAME <target-name>           # REQUIRED: e.g., ZLIB::ZLIB
 #     TYPE <SHARED|STATIC>         # REQUIRED: library type
 #     LOCATION <path>              # REQUIRED: IMPORTED_LOCATION
-#     [SONAME <name>]              # IMPORTED_SONAME (optional)
+#     [SONAME <name>]              # IMPORTED_SONAME (optional, shared libs only)
 #     [IMPLIB <path>]              # IMPORTED_IMPLIB (optional, typically Windows only)
 #     [INCLUDE_DIRS <dir1>...]     # INTERFACE_INCLUDE_DIRECTORIES (also creates dirs)
 #     [DEPENDS <target>]           # ADD_DEPENDENCIES (optional)
 #     [ADD_TO_DEPS_LIST]           # Append to RV_DEPS_LIST
 #   )
 # cmake-format: on
-FUNCTION(RV_ADD_IMPORTED_LIBRARY)
+MACRO(RV_ADD_IMPORTED_LIBRARY)
   CMAKE_PARSE_ARGUMENTS(_ARG "ADD_TO_DEPS_LIST" "NAME;TYPE;LOCATION;SONAME;IMPLIB;DEPENDS" "INCLUDE_DIRS" ${ARGN})
 
   IF(NOT _ARG_NAME)
@@ -72,7 +76,6 @@ FUNCTION(RV_ADD_IMPORTED_LIBRARY)
   IF(_ARG_ADD_TO_DEPS_LIST)
     SET(RV_DEPS_LIST
         ${RV_DEPS_LIST} ${_ARG_NAME}
-        PARENT_SCOPE
     )
   ENDIF()
-ENDFUNCTION()
+ENDMACRO()
