@@ -8,17 +8,106 @@ on:
         default: 'false'
       qt5_modules:
         type: string
-
-env:
-  SKIP_DEPS_CACHE: ${{ inputs.skip_deps_cache }}
-  QT5_MODULES: ${{ inputs.qt5_modules }}
-  WINDOWS_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
-  WINDOWS_QT6_MODULES: 'debug_info qt3d qt5compat qtactiveqt qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
-  WINDOWS_QT6_ARCHIVES: 'd3dcompiler_47 opengl32sw qtbase qtdeclarative qtsvg qttools qttranslations'
+      full_matrix:
+        type: string
+        default: 'true'
+      run_debug:
+        type: string
+        default: 'true'
 
 jobs:
-  windows:
-    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+  # Always runs — CY2024 Release only (PR scope)
+  windows-pr:
+    name: 'Windows ${{ matrix.vfx-platform }}
+      <${{ matrix.os }}
+       msvc=${{ matrix.msvc-component }},
+       qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       cmake=${{ matrix.cmake-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+
+    runs-on: ${{ matrix.os }}
+    env:
+      SCCACHE_GHA_ENABLED: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-windows
+        with:
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          msvc-component: ${{ matrix.msvc-component }}
+          msvc-compiler: ${{ matrix.msvc-compiler }}
+          qt5_modules: ${{ inputs.qt5_modules }}
+
+  # CY2024 Debug — runs when cmake files change or on full matrix
+  windows-debug:
+    if: ${{ inputs.run_debug == 'true' }}
+    name: 'Windows ${{ matrix.vfx-platform }}
+      <${{ matrix.os }}
+       msvc=${{ matrix.msvc-component }},
+       qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       cmake=${{ matrix.cmake-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+
+    runs-on: ${{ matrix.os }}
+    env:
+      SCCACHE_GHA_ENABLED: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-windows
+        with:
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          msvc-component: ${{ matrix.msvc-component }}
+          msvc-compiler: ${{ matrix.msvc-compiler }}
+          qt5_modules: ${{ inputs.qt5_modules }}
+
+  # CY2023 — full matrix only (daily/push/dispatch)
+  windows-cy2023:
+    if: ${{ inputs.full_matrix == 'true' }}
     name: 'Windows ${{ matrix.vfx-platform }}
       <${{ matrix.os }}
        msvc=${{ matrix.msvc-component }},
@@ -51,239 +140,21 @@ jobs:
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
 
-          # VFX2024
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Release"
-            qt-version: "6.5.3"
-            python-version: "3.11"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Debug"
-            qt-version: "6.5.3"
-            python-version: "3.11"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-
     runs-on: ${{ matrix.os }}
     env:
-      # sccache used for this run only; do not store in Actions cache (saves repo cache limit).
-      # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
-      # or by moving some dependencies from the cache to Conan or another dependency manager.
       SCCACHE_GHA_ENABLED: false
     steps:
       - name: Check out repository code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
         with:
           submodules: recursive
-
-      - name: Install MSVC components ${{ matrix.msvc-component }}
-        run: |
-          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
-          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-          $componentsToRemove= @(
-            "Microsoft.VisualStudio.Component.VC.${{ matrix.msvc-component }}"
-            "Microsoft.VisualStudio.Component.VC.${{ matrix.msvc-component }}.Spectre"
-          )
-          [string]$workloadArgs = $componentsToRemove | ForEach-Object {" --add " +  $_}
-          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
-          # should be run twice
-          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
-          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
-
-      - name: Set up MSVC ${{ matrix.msvc-compiler }}
-        uses: ilammy/msvc-dev-cmd@v1
+      - uses: ./.github/actions/build-windows
         with:
-          toolset: ${{ matrix.msvc-compiler }}
-          arch: '${{ matrix.arch-type }}'
-
-      - name: Setup msys2 and install dependencies
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          # False because it keep creating new cache entry.
-          cache: false
-          install: >-
-            mingw-w64-x86_64-autotools
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-cmake-cmcldeps
-            mingw-w64-x86_64-glew
-            mingw-w64-x86_64-libarchive
-            mingw-w64-x86_64-make
-            mingw-w64-x86_64-meson
-            mingw-w64-x86_64-toolchain
-            autoconf
-            automake
-            bison
-            flex
-            git
-            libtool
-            nasm
-            p7zip
-            patch
-            unzip
-            zip
-
-      - name: Activate Python ${{ matrix.python-version }}
-        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
-        with:
-          python-version: '${{ matrix.python-version }}'
-
-      - name: Display Python installation location
-        run: |
-          python -c "import sys; print(sys.executable)"
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@0b1efabc08b657293548b77fb76cc02d26091c7e
-        with:
-          toolchain: stable
-
-      - name: Cache CMake for Windows
-        uses: actions/cache@v4
-        id: windows-cmake-cache
-        with:
-          path: "C:/Program Files/CMake"
-          key: ${{ runner.os }}-cmake-${{ matrix.cmake-version }}
-
-      - name: Install CMake ${{ matrix.cmake-version }} with chocolatey
-        if: steps.windows-cmake-cache.outputs.cache-hit != 'true'
-        run: |
-          choco install cmake --version=${{ matrix.cmake-version }} --allow-downgrade
-
-      - name: Set PATH environment variable
-        run: |
-          echo "export PATH=\"/c/Program Files/CMake/bin:/c/hostedtoolcache/windows/Python/3.10.11/x64:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin\"" >> ~/.bash_profile
-        shell: msys2 {0}
-
-      - name: Set ACLOCAL_PATH environment variable
-        run: |
-          echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
-        shell: msys2 {0}
-
-      - name: Add Rust to PATH for msys2
-        run: |
-          echo "export PATH=\"/c/Users/runneradmin/.cargo/bin:\$PATH\"" >> ~/.bash_profile
-        shell: msys2 {0}
-
-      - name: Display environment variables
-        run: |
-          echo $PATH
-          echo $ACLOCAL_PATH
-          which python
-          which python3
-          which cmake
-          rustc --version || echo "WARNING: Rust not found in msys2 PATH"
-          cargo --version || echo "WARNING: Cargo not found in msys2 PATH"
-        shell: msys2 {0}
-
-      - name: Prepare Qt folder
-        run: |
-          mkdir -p /c/qt
-        shell: msys2 {0}
-
-      - name: Install Qt ${{ matrix.qt-version }}
-        if: ${{ matrix.vfx-platform == 'CY2023' }}
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '${{ matrix.qt-version }}'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          dir: "c:/"
-          install-deps: 'false'
-          modules: ${{ env.qt5_modules }}
-          archives: ${{ env.WINDOWS_QT5_ARCHIVES }}
-          # Caching only save 2 minutes. Keep the cache for longer operations.
-          cache: false
-          setup-python: 'false'
-          tools: 'tools_qtcreator'
-          set-env: 'true'
-          tools-only: 'false'
-          aqtversion: '==3.2.*'
-
-      - name: Install Qt ${{ matrix.qt-version }}
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '${{ matrix.qt-version }}'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          dir: "c:/"
-          install-deps: 'false'
-          modules: ${{ env.WINDOWS_QT6_MODULES }}
-          archives: ${{ env.WINDOWS_QT6_ARCHIVES }}
-          # Caching only save 2 minutes. Keep the cache for longer operations.
-          cache: false
-          setup-python: 'false'
-          tools: 'tools_qtcreator'
-          set-env: 'true'
-          tools-only: 'false'
-          aqtversion: '==3.2.*'
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user --upgrade -r ./requirements.txt
-        shell: msys2 {0}
-
-      - name: Setup sccache
-        # Used for this run only (SCCACHE_GHA_ENABLED=false); not stored in Actions cache.
-        # For sccache to actually cache the Windows/MSVC build, CMake must use it as the compiler
-        # launcher, e.g. -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
-        # in the Configure OpenRV step (and sccache must be on PATH when the build runs).
-        uses: mozilla-actions/sccache-action@v0.0.6
-        with:
-          version: "v0.8.1"
-
-      - name: Configure sccache for msys2
-        run: |
-          echo "export PATH=\"/c/Users/runneradmin/.cargo/bin:\$PATH\"" >> ~/.bash_profile
-          sccache --version || echo "WARNING: sccache not found in PATH"
-        shell: msys2 {0}
-
-      - name: Configure OpenRV
-        if: ${{ matrix.vfx-platform == 'CY2023' }}
-        run: |
-          cmake --version
-          export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
-          cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
-        shell: msys2 {0}
-
-      - name: Configure OpenRV
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
-        run: |
-          cmake --version
-          export QT_HOME=c:/Qt/${{ matrix.qt-version }}/msvc2019_64
-          cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
-        shell: msys2 {0}
-
-      - name: Build OpenRV dependencies
-        if: steps.cmake-dependencies.outputs.cache-hit != 'true'
-        run: |
-          cmake --build _build --config ${{ matrix.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-        shell: msys2 {0}
-        id: build_deps
-
-      - name: Build OpenRV main executable
-        run: |
-          cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-        shell: msys2 {0}
-
-      - name: Tests
-        continue-on-error: true
-        run: |
-          ls -al _build/stage/app/bin
-          ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
-        shell: msys2 {0}
-
-      - name: Install OpenRV
-        run: |
-          cmake --install _build --prefix $(pwd)/_install --config ${{ matrix.build-type }}
-        shell: msys2 {0}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          msvc-component: ${{ matrix.msvc-component }}
+          msvc-compiler: ${{ matrix.msvc-compiler }}
+          qt5_modules: ${{ inputs.qt5_modules }}
