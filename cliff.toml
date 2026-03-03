@@ -1,0 +1,55 @@
+[changelog]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.\n
+"""
+body = """
+{%- macro remote_url() -%}
+  https://github.com/AcademySoftwareFoundation/OpenRV
+{%- endmacro -%}
+
+{% if version -%}
+    ## [{{ version | trim_start_matches(pat="v") }}]({{ self::remote_url() }}/compare/{{ previous.version }}...{{ version }}) - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else -%}
+    ## [Unreleased]
+{% endif -%}
+
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim }}
+    {% for commit in commits %}
+        - {{ commit.message | split(pat="\n") | first | split(pat=" (#") | first | trim }}\
+            {%- if commit.github.pr_number %} \
+                ([#{{ commit.github.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.github.pr_number }}))\
+            {%- endif %} \
+                ([{{ commit.id | truncate(length=7, end="") }}]({{ self::remote_url() }}/commit/{{ commit.id }}))\
+    {%- endfor %}
+{% endfor %}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = false
+filter_commits = false
+tag_pattern = "v[0-9].*"
+sort_commits = "newest"
+commit_parsers = [
+    { message = "^feat", group = "<!-- 0 -->Features" },
+    { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
+    { message = "^perf", group = "<!-- 2 -->Performance Improvements" },
+    { message = "^build", group = "<!-- 3 -->Build System" },
+    { message = "^ci", group = "<!-- 4 -->GitHub Actions" },
+    { message = "^docs", group = "<!-- 5 -->Documentation" },
+    { message = "^test", skip = true },
+    { message = "^chore", skip = true },
+    # Skip anything that doesn't match the known types above
+    { message = ".*", skip = true },
+]
+
+[remote.github]
+owner = "AcademySoftwareFoundation"
+repo = "OpenRV"

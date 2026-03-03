@@ -105,17 +105,15 @@ Depending on the context in which the hook is called, the `argument_map` paramet
 - `pre_item`: The OTIO item before a transition
 - `post_item`: The OTIO item after a transition
 
-
 ### Export Hook file return values
 
 If an effect returned, the plugin will add it to the effect list of the OTIO Clip or Gap. The OTIO Clip or Gap is created from the RVSourceGroup to which the effect is attached.
 
 For pre- and post- hooks, no return value is expected.  However, the pre-hook nodes can optionally return `False`, which will quit processing the current node and all of its inputs.
 
-
 ## Media Multi-Reference Support
 
-If you're using OTIO version 0.15 or later, you have access to the Media Multi-Reference (MMR) feature. 
+If you're using OTIO version 0.15 or later, you have access to the Media Multi-Reference (MMR) feature.
 
 With MMR, known and supported in RV as [Multiple Media Representations](../rv-manuals/rv-media-multi-representation.md), a clip can reference high-resolution media and proxies. In RV, this allows the user to easily switch between the different representations of the same media.
 

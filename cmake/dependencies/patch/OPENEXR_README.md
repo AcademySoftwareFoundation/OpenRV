@@ -14,7 +14,7 @@ Exception (ImfInputFile.cpp): This file is slightly different. It defers throwin
 
 When you're resolving conflicts, you'll be looking for the readTileData calls and the copyIntoFrameBuffer calls and inserting this logic around them, using the new version's code as the HEAD.
 
-a/cmake/OpenEXRConfig.h.in 
+a/cmake/OpenEXRConfig.h.in
 a/src/lib/OpenEXR/ImfDeepScanLineInputFile.cpp
 a/src/lib/OpenEXR/ImfDeepTiledInputFile.cpp
 a/src/lib/OpenEXR/ImfInputFile.cpp

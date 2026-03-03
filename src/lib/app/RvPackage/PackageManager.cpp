@@ -184,6 +184,7 @@ namespace Rv
 
     PackageManager::PackageManager()
         : m_force(false)
+        , m_skipDependencyCheck(false)
     {
     }
 
@@ -836,39 +837,43 @@ namespace Rv
             supportdir.mkdir(pname);
         supportdir.cd(pname);
 
-        QList<int> others;
-
-        for (size_t i = 0; i < package.usedBy.size(); i++)
+        // Skip dependency check if requested
+        if (!m_skipDependencyCheck)
         {
-            int index = package.usedBy[i];
-            const Package& other = m_packages[index];
-            if (other.installed)
-                others.push_back(index);
-        }
+            QList<int> others;
 
-        if (others.size())
-        {
-            //
-            //  Packages that depend on this one are installed
-            //
-
-            QString s("Package is used by these installed packages:\n");
-
-            for (size_t q = 0; q < others.size(); q++)
+            for (size_t i = 0; i < package.usedBy.size(); i++)
             {
-                s += m_packages[others[q]].file;
-                s += "(";
-                s += m_packages[others[q]].name;
-                s += ")\n";
+                int index = package.usedBy[i];
+                const Package& other = m_packages[index];
+                if (other.installed)
+                    others.push_back(index);
             }
 
-            if (!uninstallDependantPackages(s))
-                return false;
-        }
+            if (others.size())
+            {
+                //
+                //  Packages that depend on this one are installed
+                //
 
-        for (size_t i = 0; i < others.size(); i++)
-        {
-            uninstallPackage(m_packages[others[i]]);
+                QString s("Package is used by these installed packages:\n");
+
+                for (size_t q = 0; q < others.size(); q++)
+                {
+                    s += m_packages[others[q]].file;
+                    s += "(";
+                    s += m_packages[others[q]].name;
+                    s += ")\n";
+                }
+
+                if (!uninstallDependantPackages(s))
+                    return false;
+
+                for (size_t i = 0; i < others.size(); i++)
+                {
+                    uninstallPackage(m_packages[others[i]]);
+                }
+            }
         }
 
         //

@@ -8,7 +8,6 @@ Figure 8.1:Event Propagation. Red and Green modes process the event. On the left
 
 ### 8.1 Outline of a Mode
 
-
 In order to create a new mode you need to create a module for it and derive your mode class from the MinorMode class in the rvtypes module. The basic outline which we'll put in a file called new_mode.mu looks like this:
 
 ```
@@ -34,6 +33,7 @@ class: NewMode : MinorMode
 
 } // end of new_mode module 
 ```
+
 The function createMode() is used by the mode manager to create your mode without knowing anything about it. It should be declared in the scope of the module (not your class) and simply create your mode object and initialize it if that's necessary.When creating a mode it's necessary to call the init() function from within your constructor method. This function takes at least three arguments and as many as six. Chapter [10](rv-reference-manual-chapter-ten.md#chapter-10-a-simple-package) goes into detail about the structure in more detail. It's declared like this in rvtypes.mu:
 
 ```
@@ -45,10 +45,10 @@ The function createMode() is used by the mode manager to create your mode withou
               string sortKey = nil,
               int ordering = 0) 
 ```
+
 The name of the mode is meant to be human readable.The “bindings” arguments supply event bindings for this mode. The bindings are only active when the mode is active and take precedence over any “global” bindings (bindings not associated with any mode). In your event function you can call the “reject” method on an event which will cause rv to pass it on to bindings “underneath” yours. This technique allows you to augment an existing binding instead of replacing it. The separation of the bindings into overrideBindings and globalBindings is due to backwards compatibility requirements, and is no longer meaningful.The menu argument allows you to pass in a menu structure which is merged into the main menu bar. This makes it possible to add new menus and menu items to the existing menus.Finally the sortKey and ordering arguments allow fine control over the order in which event bindings are applied when multiple modes are active. First the ordering value is checked (default is 0 for all modes), then the sortKey (default is the mode name).Again, see chapter [10](rv-reference-manual-chapter-ten.md#chapter-10-a-simple-package) for more detailed information.
 
 ### 8.2 Outline of a Widget
-
 
 A Widget looks just like a MinorMode declaration except you will derive from Widget instead of MinorMode and the base class init() function is simpler. In addition, you'll need to have a render() method (which is optional for regular modes).
 
@@ -80,4 +80,5 @@ class: NewWidget : Widget
 
 } // end of new_widget module 
 ```
+
 In the outline above, the function updateBounds() is called in the render() method. updateBounds() informs the UI about the bounding box of your widget. This function must be called by the widget at some point. If your widget can be interactively or procedurally moved, you will probably want to may want to call it in your render() function as shown (it does not hurt to call it often). The min_point and max_point arguments are Vec2 types.

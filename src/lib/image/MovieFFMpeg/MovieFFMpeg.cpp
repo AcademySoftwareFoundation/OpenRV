@@ -2833,7 +2833,7 @@ namespace TwkMovie
         }
         if (frames == 0)
         {
-            frames = timeDuration * m_io->defaultFPS();
+            frames = std::round(timeDuration * m_io->defaultFPS());
             rate.num = m_io->defaultFPS();
             rate.den = 1.0f;
         }

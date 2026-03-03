@@ -65,17 +65,17 @@ unnamed_5_channel.exr:
 
 Additional command line options can be see in table [17.1](#rvls-options)
 
-|  |  |
+|             |                                                           |
 | ----------- | --------------------------------------------------------- |
-| -a         | Show hidden files                                         |
-| -s         | Show sequences only (no non-sequence member files)        |
-| -l         | Show long listing                                         |
-| -x         | Show extended attributes and image structure              |
-| -b         | Use brute force if no reader found                        |
-| -nr        | Do not show frame ranges                                  |
-| -ns        | Do not infer sequences (list each file separately)        |
-| -min _int_ | Minimum number of files considered a sequence (default=3) |
-| -formats   | List image/movie formats                                  |
-| -version   | Show rvls version number                                  |
+| -a          | Show hidden files                                         |
+| -s          | Show sequences only (no non-sequence member files)        |
+| -l          | Show long listing                                         |
+| -x          | Show extended attributes and image structure              |
+| -b          | Use brute force if no reader found                        |
+| -nr         | Do not show frame ranges                                  |
+| -ns         | Do not infer sequences (list each file separately)        |
+| -min _int_  | Minimum number of files considered a sequence (default=3) |
+| -formats    | List image/movie formats                                  |
+| -version    | Show rvls version number                                  |
 
 Table 17.1: RVLS Options <a id="rvls-options"></a>

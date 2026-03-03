@@ -1,0 +1,254 @@
+name: Build OpenRV on macOS
+description: Build and test OpenRV on macOS
+
+inputs:
+  arch-type:
+    required: true
+  build-type:
+    required: true
+  qt-version:
+    required: true
+  qt-version-short:
+    required: true
+  python-version:
+    required: true
+  cmake-version:
+    required: true
+  vfx-platform:
+    required: true
+  skip_deps_cache:
+    required: false
+    default: 'false'
+  qt5_modules:
+    required: false
+    default: ''
+  macos_qt5_archives:
+    required: false
+    default: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
+  macos_qt6_modules:
+    required: false
+    default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+  macos_qt6_archives:
+    required: false
+    default: 'qtbase qtdeclarative qtsvg qttools qttranslations'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check if it is a schedule job
+      if: github.event_name == 'schedule'
+      run: echo "SKIP_DEPS_CACHE='true'" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Display disk space
+      run: df -h /
+      shell: bash
+
+    - name: Clear up some spaces on disk
+      run: |
+        # Remove some unused XCode (Default is XCode 15.4).
+        sudo rm -rf /Applications/Xcode_15.3.app
+        sudo rm -rf /Applications/Xcode_15.2.app
+        sudo rm -rf /Applications/Xcode_15.1.app
+        sudo rm -rf /Applications/Xcode_15.0.1.app
+        sudo rm -rf /Users/runner/Library/Android
+      shell: bash
+
+    - name: Display disk space
+      run: df -h /
+      shell: bash
+
+    - name: Add repository as safe directory
+      run: git config --global --add safe.directory /__w/OpenRV/OpenRV
+      shell: bash
+
+    - name: Install cmake
+      uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2
+      with:
+        cmake-version: "${{ inputs.cmake-version }}"
+
+    - name: Prepare Qt folder
+      run: mkdir -p "${{ github.workspace }}/deps"
+      shell: bash
+
+    - name: Install Qt ${{ inputs.qt-version }}
+      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '${{ inputs.qt-version }}'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        dir: "${{ github.workspace }}/deps"
+        install-deps: 'false'
+        modules: ${{ inputs.qt5_modules }}
+        archives: ${{ inputs.macos_qt5_archives }}
+        cache: false
+        setup-python: 'false'
+        tools: 'tools_qtcreator'
+        set-env: 'true'
+        tools-only: 'false'
+        aqtversion: '==3.2.*'
+
+    - name: Install Qt ${{ inputs.qt-version }}
+      if: inputs.vfx-platform == 'CY2024'
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '${{ inputs.qt-version }}'
+        host: 'mac'
+        target: 'desktop'
+        # clang_64 contains both x86_64 and arm64 for Qt 6.
+        arch: 'clang_64'
+        dir: "${{ github.workspace }}/deps"
+        install-deps: 'false'
+        modules: ${{ inputs.macos_qt6_modules }}
+        archives: ${{ inputs.macos_qt6_archives }}
+        cache: false
+        setup-python: true
+        tools: 'tools_qtcreator'
+        set-env: 'true'
+        tools-only: 'false'
+        aqtversion: '==3.2.*'
+
+    - name: Patch Qt ${{ inputs.qt-version }}
+      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
+      # There is an issue with Clang15 and Qt < 5.15.15.
+      run: |
+        curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
+        unzip file.zip
+        cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/clang_64/mkspecs/features/toolchain.prf
+      shell: bash
+
+    - name: Activate Python ${{ inputs.python-version }}
+      uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
+      with:
+        python-version: '${{ inputs.python-version }}'
+
+    - name: Install Python dependencies
+      run: python3 -m pip install --user --upgrade -r requirements.txt
+      shell: bash
+
+    - name: Install Homebrew dependencies
+      # icu4c is needed for Qt UIC executable / AUTOUIC.
+      # Might be to find another way to install icu4c if the icu4c recipe disappear.
+      run: |
+        retry_count=0
+        max_retries=5
+
+        until [ $retry_count -ge $max_retries ]; do
+          echo "Attempt $((retry_count + 1)) of $max_retries"
+
+          if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew ccache && \
+             brew install --formula icu4c; then
+            echo "Homebrew dependencies installed successfully"
+            break
+          else
+            retry_count=$((retry_count + 1))
+            if [ $retry_count -lt $max_retries ]; then
+              echo "Attempt $retry_count failed. Retrying in 5 seconds..."
+              sleep 5
+            fi
+          fi
+        done
+
+        if [ $retry_count -ge $max_retries ]; then
+          echo "Failed to install Homebrew dependencies after $max_retries attempts"
+          exit 1
+        fi
+      shell: bash
+
+    - name: Set QT_HOME
+      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
+      # With aqt, the universal binaries are under clang_64 and not macos folder.
+      run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/clang_64" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Set QT_HOME
+      if: inputs.arch-type == 'arm64' && inputs.vfx-platform == 'CY2023'
+      # The path for QT_HOME is diferent for arm64 CY2023 because we have to build it in the CI.
+      run: echo "QT_HOME=${{ github.workspace }}/deps" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Set QT_HOME
+      if: inputs.vfx-platform == 'CY2024'
+      run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/macos" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Check if the dependencies changed
+      if: inputs.build-type == 'Release'
+      uses: dorny/paths-filter@v3
+      id: changes-in-deps
+      with:
+        filters: |
+          dependencies:
+            - 'cmake/**'
+
+    - name: Restore some dependencies
+      # Restore only if there are no changes under cmake folder and Release build.
+      if: inputs.skip_deps_cache == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && inputs.build-type == 'Release'
+      id: cmake-dependencies
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ./_build/RV_DEPS_*
+          ./_build/cmake/dependencies
+          ./_build/_deps
+        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-dependencies
+
+    # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
+    # - name: Setup ccache
+    #   uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639
+    #   with:
+    #     key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-${{ inputs.build-type }}
+    #     max-size: 2G
+    #     verbose: 2
+
+    # ccache from Homebrew is used for this run only (not stored in Actions cache).
+    # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
+    # or by moving some dependencies from the cache to Conan or another dependency manager.
+
+    - name: Configure OpenRV
+      if: ${{ inputs.vfx-platform == 'CY2023' }}
+      run: |
+        which cmake
+        cmake --version
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+      shell: bash
+
+    - name: Configure OpenRV
+      if: ${{ inputs.vfx-platform == 'CY2024' }}
+      run: |
+        which cmake
+        cmake --version
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+      shell: bash
+
+    - name: Build OpenRV dependencies
+      if: steps.cmake-dependencies.outputs.cache-hit != 'true'
+      run: |
+        cmake --build _build --config ${{ inputs.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+        ls -al _build
+      shell: bash
+
+    - name: Build OpenRV main executable
+      run: cmake --build _build --config ${{ inputs.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
+      shell: bash
+
+    - name: Tests
+      run: ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
+      shell: bash
+
+    - name: Install OpenRV
+      run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
+      shell: bash
+
+    - name: Save dependencies cache
+      # Only save on push/schedule/workflow_dispatch so PRs use cache from main branch.
+      if: inputs.skip_deps_cache == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && inputs.build-type == 'Release' && github.event_name != 'pull_request'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ./_build/RV_DEPS_*
+          ./_build/cmake/dependencies
+          ./_build/_deps
+        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-dependencies

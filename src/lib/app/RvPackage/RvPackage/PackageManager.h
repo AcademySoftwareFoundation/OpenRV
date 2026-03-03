@@ -220,6 +220,8 @@ namespace Rv
 
         void setNoConfirmation(bool force = true) { m_force = force; }
 
+        void setSkipDependencyCheck(bool skip = true) { m_skipDependencyCheck = skip; }
+
         static void setIgnorePrefs(bool b) { m_ignorePrefs = b; }
 
         static bool ignoringPrefs() { return m_ignorePrefs; }
@@ -237,7 +239,8 @@ namespace Rv
         PackageMap m_packageMap;
         QStringList m_doNotLoadPackages;
         QStringList m_optLoadPackages;
-        bool m_force;
+        bool m_force{false};
+        bool m_skipDependencyCheck{false};
 
         static bool m_ignorePrefs;
     };
