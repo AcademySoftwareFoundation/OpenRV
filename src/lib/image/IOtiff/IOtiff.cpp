@@ -268,8 +268,8 @@ namespace TwkFB
 
             set_profile = true;
 
-            //free(Buffer); // this is a bad idea apparently (causes a
-            // crash)
+            // free(Buffer); // this is a bad idea apparently (causes a
+            //  crash)
         }
 
         //
@@ -336,16 +336,18 @@ namespace TwkFB
         {
             uint32_t tag = TIFFGetTagListEntry(tif, fi);
             const TIFFField* fip = TIFFFieldWithTag(tif, tag);
-            if (!fip) continue;
+            if (!fip)
+                continue;
 
             if (TIFFFieldTag(fip) != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
                 TIFFFieldTag(fip) != EXIFTAG_COLORSPACE &&
 
                 TIFFFieldTag(fip) != TIFFTAG_COMPRESSION && // prevent the overwriting of the compression type with numerical value
 
-                TIFFFieldTag(fip) != TIFFTAG_XRESOLUTION && TIFFFieldTag(fip) != TIFFTAG_YRESOLUTION && TIFFFieldTag(fip) != TIFFTAG_SOFTWARE
-                && TIFFFieldTag(fip) != EXIFTAG_PIXELXDIMENSION && TIFFFieldTag(fip) != EXIFTAG_PIXELYDIMENSION
-                && TIFFFieldTag(fip) != TIFFTAG_RESOLUTIONUNIT && TIFFFieldTag(fip) != TIFFTAG_PLANARCONFIG &&
+                TIFFFieldTag(fip) != TIFFTAG_XRESOLUTION && TIFFFieldTag(fip) != TIFFTAG_YRESOLUTION
+                && TIFFFieldTag(fip) != TIFFTAG_SOFTWARE && TIFFFieldTag(fip) != EXIFTAG_PIXELXDIMENSION
+                && TIFFFieldTag(fip) != EXIFTAG_PIXELYDIMENSION && TIFFFieldTag(fip) != TIFFTAG_RESOLUTIONUNIT
+                && TIFFFieldTag(fip) != TIFFTAG_PLANARCONFIG &&
 
                 TIFFFieldTag(fip) != TIFFTAG_SUBIFD &&
 
@@ -366,8 +368,9 @@ namespace TwkFB
                 TIFFFieldTag(fip) != TIFFTAG_YCBCRSUBSAMPLING &&
                 // TIFFFieldTag(fip) != TIFFTAG_TRANSFERFUNCTION &&
 
-                TIFFFieldTag(fip) != TIFFTAG_PHOTOMETRIC && TIFFFieldTag(fip) != TIFFTAG_IMAGEWIDTH && TIFFFieldTag(fip) != TIFFTAG_IMAGELENGTH
-                && TIFFFieldTag(fip) != TIFFTAG_BITSPERSAMPLE && TIFFFieldTag(fip) != TIFFTAG_SAMPLESPERPIXEL)
+                TIFFFieldTag(fip) != TIFFTAG_PHOTOMETRIC && TIFFFieldTag(fip) != TIFFTAG_IMAGEWIDTH
+                && TIFFFieldTag(fip) != TIFFTAG_IMAGELENGTH && TIFFFieldTag(fip) != TIFFTAG_BITSPERSAMPLE
+                && TIFFFieldTag(fip) != TIFFTAG_SAMPLESPERPIXEL)
             {
                 unsigned char ch;
                 char* text;
@@ -1489,7 +1492,8 @@ namespace TwkFB
                 for (; p < e; p++)
                 {
                     const uint32_t i = *p;
-                    *p = (uint32_t(TIFFGetR(i)) << 24) | (uint32_t(TIFFGetG(i)) << 16) | (uint32_t(TIFFGetB(i)) << 8) | uint32_t(TIFFGetA(i));
+                    *p = (uint32_t(TIFFGetR(i)) << 24) | (uint32_t(TIFFGetG(i)) << 16) | (uint32_t(TIFFGetB(i)) << 8)
+                         | uint32_t(TIFFGetA(i));
                 }
 #endif
             }
