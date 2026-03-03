@@ -1696,9 +1696,6 @@ namespace IPCore
 
     void Session::clear()
     {
-        m_beingCleared = true;
-        BOOST_SCOPE_EXIT_ALL(&) { m_beingCleared = false; };
-
         if (!m_beingDeleted)
         {
             userGenericEvent("before-clear-session", "");
@@ -1736,7 +1733,11 @@ namespace IPCore
         graph().setAudioCachingMode(IPGraph::BufferCache);
         graph().flushAudioCache();
         if (!m_beingDeleted)
+        {
+            m_beingCleared = true;
+            BOOST_SCOPE_EXIT_ALL(&) { m_beingCleared = false; };
             graph().reset(App()->videoModules());
+        }
         setFileName("Untitled");
         setInPoint(1);
         setOutPoint(2);
@@ -4574,6 +4575,9 @@ namespace IPCore
     {
         if (m_beingDeleted)
             return EventIgnored;
+
+        if (m_beingCleared)
+            return EventAccept;
 
         //
         //  All events are handled by the init script except for
