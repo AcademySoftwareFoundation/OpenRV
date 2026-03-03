@@ -21,14 +21,20 @@
 #     [EXTRA_LIB_DIRS <dir1>...]    # Additional lib dirs to copy to
 #     [FILES <file1> [file2...]]    # Individual files to copy_if_different to STAGE_LIB_DIR (alternative to LIB_DIR)
 #     [DEPENDS <dep1> [dep2...]]    # Dependencies (default: ${TARGET})
-#     [PRE_COMMANDS <cmd1>...]      # Commands to run before copy (e.g., install_name_tool)
+#     [PRE_COMMANDS COMMAND <cmd1> [COMMAND <cmd2>...]]  # Commands to run before copy; each must be prefixed with COMMAND keyword
 #     [LIBNAME <filename>]          # Platform-aware shorthand: on Windows uses BIN_DIR+STAGE_BIN_DIR, otherwise STAGE_LIB_DIR
-#     [USE_FLAG_FILE]               # Use touch-based flag instead of OUTPUTS for tracking
+#     [USE_FLAG_FILE]               # Use touch-based flag instead of OUTPUTS for tracking.
+#                                    # Caveat: won't re-stage if staged files are deleted, since the flag survives.
+#                                    # Prefer OUTPUTS when possible; use this only when outputs are hard to enumerate.
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   CMAKE_PARSE_ARGUMENTS(
     _ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN}
   )
+
+  IF(_ARG_UNPARSED_ARGUMENTS)
+    MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Unknown arguments: ${_ARG_UNPARSED_ARGUMENTS}")
+  ENDIF()
 
   # Validate required args
   IF(NOT _ARG_TARGET)
@@ -36,11 +42,20 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   ENDIF()
 
   # Handle LIBNAME shorthand for platform-aware staging
+  IF(_ARG_LIBNAME AND _ARG_OUTPUTS)
+    MESSAGE(WARNING "RV_STAGE_DEPENDENCY_LIBS: LIBNAME overrides OUTPUTS")
+  ENDIF()
   IF(_ARG_LIBNAME)
     IF(RV_TARGET_WINDOWS)
-      SET(_ARG_BIN_DIR
-          "${_bin_dir}"
-      )
+      IF(NOT _ARG_BIN_DIR)
+        IF(DEFINED _bin_dir)
+          SET(_ARG_BIN_DIR
+              "${_bin_dir}"
+          )
+        ELSE()
+          MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: LIBNAME on Windows requires BIN_DIR or _bin_dir in caller scope")
+        ENDIF()
+      ENDIF()
       SET(_ARG_OUTPUTS
           "${RV_STAGE_BIN_DIR}/${_ARG_LIBNAME}"
       )
@@ -195,7 +210,9 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Either OUTPUTS or USE_FLAG_FILE is required")
   ENDIF()
 
-  # Create the custom command (always OUTPUT-based for proper incremental builds)
+  # Create the custom command (always OUTPUT-based for proper incremental builds).
+  # Note: ${_commands} contains COMMAND keywords which CMake's keyword parser uses as section boundaries,
+  # so they are correctly parsed as commands, not as additional OUTPUT entries.
   ADD_CUSTOM_COMMAND(
     COMMENT "Staging ${_ARG_TARGET} libs into ${_ARG_STAGE_LIB_DIR}"
     OUTPUT ${_tracking_outputs} ${_commands}
