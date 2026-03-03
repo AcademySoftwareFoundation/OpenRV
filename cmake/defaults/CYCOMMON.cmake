@@ -132,13 +132,13 @@ SET(RV_DEPS_GC_DOWNLOAD_HASH
 
 # glew https://github.com/nigels-com/glew
 SET(RV_DEPS_GLEW_VERSION
-    "e1a80a9f12d7def202d394f46e44cfced1104bfb"
+    "2.3.1"
 )
 SET(RV_DEPS_GLEW_DOWNLOAD_HASH
-    "9bfc689dabeb4e305ce80b5b6f28bcf9"
+    "e795affc12dda3226e9ae3afcc80ceb9"
 )
 SET(RV_DEPS_GLEW_VERSION_LIB
-    "2.2.0"
+    "2.3.1"
 )
 
 # imgui https://github.com/pthom/imgui
