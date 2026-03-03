@@ -10,7 +10,9 @@
 #include <IPCore/Exception.h>
 #include <IPBaseNodes/RetimeIPNode.h>
 #include <IPCore/AudioRenderer.h>
+#include <IPCore/ImageRenderer.h>
 #include <IPCore/IPGraph.h>
+#include <IPCore/Session.h>
 #include <IPCore/ShaderUtil.h>
 #include <IPCore/GroupIPNode.h>
 #include <IPCore/ShaderCommon.h>
@@ -859,6 +861,25 @@ namespace IPCore
                 }
 
                 const_cast<SequenceIPNode*>(this)->propagateImageStructureChange();
+                if (group())
+                    group()->propertyChanged(p);
+            }
+            else if (p == m_inputsOpacities || p == m_inputsBlendingModes || p == m_inputsAngularMaskPivotX
+                     || p == m_inputsAngularMaskPivotY || p == m_inputsAngularMaskAngleInRadians || p == m_inputsAngularMaskActive
+                     || p == m_inputsReverseAngularMask)
+            {
+                // IMPORTANT: Flush ImageFBO cache (including paint FBOs) when composite properties change
+                // This ensures that paint caches are invalidated when opacity/blending changes
+                // Without this, paint on sibling nodes in a stack would use stale cached FBOs
+                if (graph())
+                {
+                    Session* session = Session::currentSession();
+                    if (session && session->renderer())
+                    {
+                        session->renderer()->flushImageFBOs();
+                    }
+                }
+
                 if (group())
                     group()->propertyChanged(p);
             }

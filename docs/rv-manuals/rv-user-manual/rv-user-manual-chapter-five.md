@@ -2,7 +2,6 @@
 
 ### 5.1 Open RV Session
 
-
 Each viewer window represents an RV session. A session is composed of one or more source movies, frame markers, image transforms, color corrections, and interactive states (like caching and playback speed). The source movies are combined according to the session type. The default RV session type is \`\`sequence,'' which plays back the source movies one after another.
 
 An RV session can be saved as an .rv file. The .rv file contains the entire state of its image processing tree—all of the variables that determine how it will work—as well as information about frame ranges, in/out points, etc. The .rv file stores references to movie files and images; it does not make copies of them. If you change source material on disk and load an .rv file that references those materials, the changes will be evident in RV.
@@ -19,7 +18,6 @@ The DAG nodes that are visible in the user interface are called Views. RV provid
 
 ### 5.2 Session Manager
 
-
 ![30_session_manager.png](../../images/rv-user-manual-30-rv-cx-session-manager-29.png)   ![31_session_manager2.png](../../images/rv-user-manual-31-rv-cx-session-manager2-30.png)
 
 Figure 5.1: Session Manager on the Mac showing Inputs and Sequence Edit Panel. The DefaultSequence is being viewed.
@@ -29,7 +27,6 @@ The session manager is used to examine and edit the contents of an RV session. T
 The session manager interface is in two parts: the top panel shows an outline of the session contents, and the bottom shows either the inputs of the currently viewed object or user interface to edit the current view. By double clicking on an icon in the top portion of the session manager you can switch to another view. By default RV will create a default sequence, stack, and layout which includes all of the sources in the session. When a new source is added, these will be automatically updated to include the new source.
 
 ### 5.3 Creating, Adding to, and Removing from a View
-
 
 ![32_ease_sm_add_menu.png](../../images/rv-user-manual-32-rv-cx-ease-sm-add-menu-31.png)   ![33_e_sm_folder_menu.png](../../images/rv-user-manual-33-rv-cx-e-sm-folder-menu-32.png)
 
@@ -51,21 +48,19 @@ To remove an item from a view select the item(s) in the inputs list and hit the 
 
 ### 5.4 Navigating Between Views
 
-
 For each RV session, there is always a single \`\`current view'', whose name is displayed at the top of the Session Manager. As in a web browser, RV remembers the history of views you have \`\`visited'' and you can go backwards and forwards in that history.
 
 To change to a different View you can:
 
-*   Double-click on any of the views listed in the top panel of the Session Manager
-*   Double-click on any input view of the current view (listed in the Inputs tab of the bottom panel of the Session Manager)
-*   Double-click on any visible image in the main RV window
-*   Click the left (backwards) and right (forwards) buttons at the top of the Session Manager
-*   For backwards compatibility, the items at the top of the Tools menu navigate to the usual default views
+* Double-click on any of the views listed in the top panel of the Session Manager
+* Double-click on any input view of the current view (listed in the Inputs tab of the bottom panel of the Session Manager)
+* Double-click on any visible image in the main RV window
+* Click the left (backwards) and right (forwards) buttons at the top of the Session Manager
+* For backwards compatibility, the items at the top of the Tools menu navigate to the usual default views
 
 Once you have changed views, you can go backwards and forwards in the view history with the arrow buttons at the top of the Session Manager, or with the navigation hot keys \`\`Shift-left-arrow'' (backwards) and \`\`Shift-right-arrow'' (forwards). Note that you can easily navigate between views with out the Session Manager by double-clicking on the image to \`\`drill-down'' and then using \`\`Shift-left-arrow'' to go back.
 
 ### 5.5 Source Views
-
 
 Source Views are the \`\`leaves'' of the graph in that they are views with no inputs (since they get their pixels from some external source, usually files on disk somewhere). The Edit interface for source views is currently used only to adjust editorial information (in the future it may provide access to other per-source information like color corrections, LUTs, etc). In RV, each source has an Cut In/Out information which provide editorial information to views that use that source (like a Sequence view). These In/Out frame numbers can be set from the command line, or changed with the Edit panel of the Source View interface.
 
@@ -90,7 +85,6 @@ In addition to restricting the media to one of its subcomponents, the session ma
 It's also possible to drag and drop subcomponents into existing view inputs.
 
 ### 5.6 Group Views
-
 
 Folders, Sequence Views, Stack Views, Switch Views, and Layout Views are all \`\`Group Views'' in that they take multiple inputs and combine them in some way for viewing. A Sequence plays it's inputs in order, a Stack layers it's aligned inputs on top of each other, and a Layout arranges it's inputs in a grid, row, column or arbitrary user-determined format.
 
@@ -139,7 +133,6 @@ To determine the arrangement of your layout, choose one of five modes. There are
 A Switch is a conceptually simpler than the other group views: it merely switches between its inputs. Only one input is active at a time and both the imagery and audio pass through the switch view. Otherwise, the switch shares the same output characteristics as the other group nodes (resolution, etc).
 
 ### 5.7 Retime View
-
 
 The Retime View takes a single input and alters it's timing, making it faster or slower or offsetting the native frame numbers. For example, to double the length of an input (IE make every frame play twice, which will have the effect of slowing the action without changing the frame rate), set the Length Multiplier to 2. Or to have frame 1 of the input present itself on the output as frame 101, set the Offset to 100.
 

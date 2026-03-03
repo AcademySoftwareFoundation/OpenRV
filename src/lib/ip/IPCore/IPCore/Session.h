@@ -63,6 +63,7 @@ namespace IPCore
         inline constexpr std::string_view markCategory = "mark_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playControlClickCategory = "playcontrol_click_category";
         inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
         inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
         inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
@@ -73,16 +74,18 @@ namespace IPCore
         inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
         inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
         inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view viewNavigationCategory = "view_navigation_category";
         inline constexpr std::string_view fullscreenModeCategory = "fullscreenMode_category";
         inline constexpr std::string_view backgroundStyleCategory = "backgroundStyle_category";
         inline constexpr std::string_view wipesCategory = "wipes_category";
+        inline constexpr std::string_view panzoomCategory = "panzoom_category";
 
         constexpr auto all_categories()
         {
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 32>{annotateCategory,
+            return std::array<std::string_view, 35>{annotateCategory,
                                                     annotateAirbrushCategory,
                                                     annotateBurnCategory,
                                                     annotateCloneCategory,
@@ -102,7 +105,9 @@ namespace IPCore
                                                     infoCategory,
                                                     markCategory,
                                                     mediaCategory,
+                                                    panzoomCategory,
                                                     playcontrolCategory,
+                                                    playControlClickCategory,
                                                     playmodeLoopCategory,
                                                     playmodeOnceCategory,
                                                     playmodePingPongCategory,
@@ -113,6 +118,7 @@ namespace IPCore
                                                     screeningroomCategory,
                                                     unclassifiedCategory,
                                                     viewmodeCategory,
+                                                    viewNavigationCategory,
                                                     wipesCategory};
         }
     } // namespace EventCategories
@@ -816,7 +822,7 @@ namespace IPCore
         void disableEventCategory(std::string_view category);
         bool isEventCategoryDisabled(std::string_view category) const;
         bool isEventCategoryEnabled(std::string_view category) const;
-        const std::vector<std::string_view>& disabledEventCategories() const;
+        const std::vector<std::string>& disabledEventCategories() const;
 
         //
         //  Marks
@@ -1084,6 +1090,8 @@ namespace IPCore
 
         bool beingDeleted() { return m_beingDeleted; }
 
+        bool beingCleared() { return m_beingCleared; }
+
         void physicalDeviceChanged(const VideoDevice*);
 
     protected:
@@ -1250,6 +1258,7 @@ namespace IPCore
         bool m_audioUnavailble;
         static float m_audioDrift;
         bool m_beingDeleted;
+        bool m_beingCleared{false};
         CacheStats m_cacheStats;
         Time m_syncOffset;
         SyncTimes m_syncTimes;
@@ -1264,7 +1273,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
-        std::vector<std::string_view> m_disabledEventCategories; // List of blocked event categories
+        std::vector<std::string> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;
         struct FBStatusCheck;

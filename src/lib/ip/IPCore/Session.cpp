@@ -52,6 +52,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/scope_exit.hpp>
 #include <iterator>
 
 #ifndef PLATFORM_WINDOWS
@@ -707,7 +708,7 @@ namespace IPCore
         // Don't add duplicates
         if (std::find(m_disabledEventCategories.begin(), m_disabledEventCategories.end(), category) == m_disabledEventCategories.end())
         {
-            m_disabledEventCategories.push_back(category);
+            m_disabledEventCategories.push_back(std::string(category));
         }
     }
 
@@ -722,7 +723,7 @@ namespace IPCore
 
     bool Session::isEventCategoryEnabled(std::string_view category) const { return !isEventCategoryDisabled(category); }
 
-    const std::vector<std::string_view>& Session::disabledEventCategories() const { return m_disabledEventCategories; }
+    const std::vector<std::string>& Session::disabledEventCategories() const { return m_disabledEventCategories; }
 
     void Session::setName(const string& n) { m_name = n; }
 
@@ -1695,6 +1696,9 @@ namespace IPCore
 
     void Session::clear()
     {
+        m_beingCleared = true;
+        BOOST_SCOPE_EXIT_ALL(&) { m_beingCleared = false; };
+
         if (!m_beingDeleted)
         {
             userGenericEvent("before-clear-session", "");

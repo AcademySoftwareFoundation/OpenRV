@@ -12,7 +12,6 @@ If you don't see a codec or container format in the list, then RV doesn't suppor
 
 ### 15.1 Movie File Formats
 
-
 Movie files are single files which contain many images and often audio. These are often called *container file formats* because they usually specify how to store data, but not how it should be used. In most cases, that includes compression methods, play back algorithms, or even what the meaning of the data in the container is.
 
 Container file formats have additional sub-formats called *codecs* which determine things like compression and methods of play back. So even though a program like RV might be able to open a container file and look inside it, it might not understand one or more of the codecs which are being used in the container. In some cases the codec might be proprietary or meant to be used with a specific piece of software or hardware.
@@ -61,7 +60,7 @@ RV and RVIO handle stereo audio. RV does not currently handle more than two chan
 
 The MPEG-4 container file (.mp4) is almost identical to the QuickTime container file (.mov). The same codecs may be used to store data in either format. However, typically you find files encoded with H.264 or one of its predecessors.
 
-RV supports the MPEG-4 container on all platforms. 
+RV supports the MPEG-4 container on all platforms.
 
 #### 15.1.5 Windows AVI Files (.avi)
 
@@ -159,14 +158,13 @@ RV initially will load the default layer (the one that has no name) or the first
 
 You can view alternate layers by selecting them in the Session Manager, or by selecting a layer on the command line.
 
-##### Y RY BY Images and Subsampling.
+##### Y RY BY Images and Subsampling
 
 By default, RV will read EXR files as planar images. Normally this distinction does not have any real effect at the user level, but in the case of Y RY BY images — which can be sub-sampled — it can have a big impact on playback performance. EXR has two special lossy compression schemes, B44 and B44A, which allow fast decode of high dynamic range imagery. B44 maintains a fixed size file regardless of the contents while B44A can potentially make smaller file sizes. As of OpenEXR v2.2.0, two further lossy DCT compression schemes were added i.e. DWAA (based on 32 scanlines) and DWAB (based on 256 scanlines). The level compression for DWAA and DWAB can be set through the '-quality <compression level value>' option in rvio when writing out EXR files. This value is stored in the exr header (single/multipart) as a float attribute called 'dwaCompressionLevel' and defaults to 45 for DWAA and DWAB.
 
 When used with Y RY BY images with sub-sampled chroma (the BY and RY channels) RV will use the GPU to resample the chroma on the card resulting in faster throughput. When coupled with one or more multi-core CPUs, RV can get good direct from disk performance for these types of images while keeping the HDR information intact. At some resolutions, RV can even play back stereo HDR imagery in real-time from disk when used with the correct hardware.
 
 The OpenEXR file will only use B44 or B44A with half float images currently. 32 bit float images will not typically get as good performance.
-
 
 ##### Chromaticities
 
@@ -186,7 +184,7 @@ The two OpenEXR preferences, found under Preferences-Format-OpenEXR, that define
 
 Table 15.3: OpenEXR format settings that emulate data/display window handling of various tools\*
 
-| Read Window                   | Read Window Is Display Window | Tool                     |
+| Read Window                       | Read Window Is Display Window     | Tool                         |
 | --------------------------------- | --------------------------------- | ---------------------------- |
 | Data Window                       | Checked                           | OSX Preview, Adobe Photoshop |
 | Display Window                    | Not applicable                    | Nuke, exrdisplay             |
@@ -203,11 +201,13 @@ In order to merge these possibly multiple and simultaneous uses of “parts” i
 
 Table 15.4: Components of a fully-qualified channel name.
 
-|  |  |
+<!-- markdownlint-disable MD060 -->
+|             |     |
 | ----------- | --- |
 | **view**    | The name of the stereo view. This may be missing or “default” for “the default view”. The view name cannot contain a “.” Example: “left”, “right”, “center”, etc.
 | **layer**   | This component may include part names as well as traditional EXR layer names. The rule is that if there are no channel-name conflicts within a single view, the part names will be ignored (since they are not necessary to distinguish the channels), if there **is** a channel-name conflict, the part names maybe incorporated into the layer names. Sub-layers are also included. To be concrete, a channel called “Diffuse.R” stored in a part called “keyLight” is considered to be a member of a layer called “keyLight.Diffuse” if the channel “Diffuse.R” also appears in another part within the same view. |
 | **channel** | The last component of a traditional EXR channel name, containing no “.” Example: “R”, “G”, “B”, “A”, “Z”, etc.|
+<!-- markdownlint-enable MD060 -->
 
 If an EXR has multiple parts and no channels are selected, RV will make a best effort to determine the most viable default channels. If multiple layers are similarly viable, RV will prefer a layer with RGB or RGBA channels from the first part (part 0). Unless explicitly directed, the channels chosen will not cross part boundaries unless Guess Channel Inheritance is enabled.
 
@@ -241,7 +241,6 @@ The IFF image format commonly created by Maya or Shake is supported by RV includ
 
 RV can read JPEG natively as Y U V or R G B formats. The reader can collect any EXIF tags and pass them along as image attributes. The reader is limited to 8 bits per channel files. Like OpenEXR, DPX, and Cineon, JPEG there is a choice of I/O method with JPEG images.
 
-
 #### 15.2.7 RAW DSLR Camera Formats
 
 There are a number of camera vendor specific formats which RV can read through RV's cross platform image plugin io_raw. This plugin uses the open src package LibRAW. The table below list some of the common raw formats that are read with this plugin.
@@ -250,7 +249,7 @@ Table 15.7:
 
 Supported RAW formats
 
-| File Extension | File Format         |
+| File Extension     | File Format             |
 | ------------------ | ----------------------- |
 | .arw               | Sony/Minolta RAW        |
 | .cr2               | Canon RAW 2             |
@@ -267,11 +266,9 @@ Supported RAW formats
 
 ### 15.3 Audio File Formats
 
-
 RV supports a number of basic uncompressed audio file formats across platforms. On Windows and macOS a number of compressed formats may be supported. Currently use of Microsoft wave files and Apple's AIFF formats are the best bet for cross platform use. RV does support multichannel audio files for playback to multichannel audio devices. (see Appendix [J](rv-user-manual-chapter-j.md#j-supported-multichannel-audio-layouts) ).
 
 ### 15.4 Simple ASCII EDL Format
-
 
 Each line of the ASCII file is either blank, a comment, or an edit event. A comment starts with a '#' character and continues until the end of a line. A comment can appear on the same line as an edit event.
 

@@ -37,7 +37,7 @@ def _get_transform_properties():
                 global_translate_vec = otio.schema.V2d(global_translate[0], global_translate[1])
                 global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
             else:
-                logging.warning(
+                logging.debug(
                     "OTIO global scale and translate properties not found, using aspect ratio from the source"
                 )
                 try:

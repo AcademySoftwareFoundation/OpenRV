@@ -8,7 +8,6 @@ Figure 7.1:  RV Pixel Pipeline <a id="rv-pixel-pipeline"></a>
 
 ### 7.1 Image Layers
 
-
 Each image source may be composed of one or more layers. Layers may come from multiple files, or a single file if the file format supports it or a combination of the two. For example a stereo source can be constructed from a left and right movie file; in that case each file is a layer. Alternately, layers may come from a single file as would be the case with a stereo QuickTime file or EXR images with left and right layers.
 
 An image source may have any number of layers. By default, only the first layer is visible in RV unless an operation exposes the additional layers.
@@ -19,14 +18,13 @@ RV has a number of stereo viewing options which render image layers to a left an
 
 ### 7.2 Image Attributes
 
-
 RV tries to read as many image attributes as possible from the file. RV may also add attributes to the image to indicate things like pixel aspect ratio, alpha type, uncrop regions (data and display windows) and to indicate the color space the pixels are in. The image info window in the user interface shows all of the relevant image attributes.
 
 Some of the attributes are treated as special cases and can have an effect on rendering. Internally, RV will recognize and use the **ColorSpace/Primary** attributes automatically. Other **ColorSpace** attributes are used by the default source setup package (See Reference Manual) to set file to linear properties correctly. For example, if the **ColorSpace/Transfer** attribute has the value “Kodak Log”, the default source setup function will automatically turn on the Kodak log to linear function for that source.
 
 Image attributes can be saved as a text file directly from the UI (File → Export → Image Attributes), viewed interactively with the Tools → Image Info widget, or using the rvls program from the command line.
 
-| Attribute                 | How It's Used                                                                                                                                                                                |
+| Attribute                     | How It's Used                                                                                                                                                                                    |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ColorSpace/Primaries          | Documents the name of the primary space if it has one                                                                                                                                            |
 | ColorSpace/Transfer           | Contains the name of the transfer function used to convert non-linear R G B values to linear R G B values. This is used by the source setup script as a default non-linear to linear conversion. |
@@ -42,7 +40,7 @@ Image attributes can be saved as a text file directly from the UI (File → Expo
 | ColorSpace/White Primary      |                                                                                                                                                                                                  |
 | ColorSpace/AdoptedNeutral     | Indicates adopted color temperature (white point).                                                                                                                                               |
 | ColorSpace/RGBtoXYZMatrix     | Explicit color space conversion matrix. This may be used instead of the primary attributes to determine a conversion to the RGB working space.                                                   |
-| ColorSpace/LogCBlackSignal    | LogC black signal. Black will be mapped to this value. The default is 0.                                                                                                                    |
+| ColorSpace/LogCBlackSignal    | LogC black signal. Black will be mapped to this value. The default is 0.                                                                                                                         |
 | ColorSpace/LogCEncodingOffset | Derived from camera parameters.                                                                                                                                                                  |
 | ColorSpace/LogCEncodingGain   | Derived from camera parameters.                                                                                                                                                                  |
 | ColorSpace/LogCGraySignal     | The value mapped to 18% grey. The default is 0.18.                                                                                                                                               |
@@ -65,14 +63,13 @@ Basic Special Image Attributes
 
 ### 7.3 Image Channels
 
-
 RV potentially does a great deal of data conversion between reading a file and rendering an image on your display device. In some cases, you will want to have control over this process so it's important to understand what's occurring internally. For example, when RV reads a typical RGB TIFF file, you can assume the internal representation is a direct mapping from the data in the file. If, on the other hand, RV is reading an EXR file with A, B, G, T, and Z channels, and you are interested in the contents of the Z channel, you will need to tell RV specifically how to map the image data to an RGBA pixel.
 
 To see what channels an image has in it and what channels RV has decided to use for display you can select Tools **→** Image Info in the menu bar. The first two items displayed tell you the internal image format. In some cases you will see an additional item called ChannelNamesInFile which may show not only R, G, B channels, but additional channels in the file that are not being shown.
 
 RV stores images using between one and four channels. The channels are always the same data type and precision for a given image. If an image file on disk contains channels with differing precision or data type, the reader will choose the best four channels to map to RGBA (or fewer channels) and a data type and precision that best conserves the information present in the file. If there is no particular set of channels in the image that make sense to map to an internal RGBA image, RV will arbitrarily map up to the first four channels in order. By default, RV will interpret channel data as shown in Table [7.2](#mapping-of-file-channels-to-display-channels)
 
-| # of Channels | Names  | RGBA Mapping |
+| # of Channels      | Names      | RGBA Mapping     |
 | ------------------ | ---------- | ---------------- |
 | 1                  | Y          | YYY1             |
 | 2                  | Y, A       | YYYA             |
@@ -89,12 +86,12 @@ When reading an image type that contains pixel data that is not directly mappabl
 
 RV natively handles both integer and floating point images. When one of RV's image readers decides a precision and data type for an image, all of its channels are converted to that type internally.
 
-| Channel Data Type | Display Range | Relative Memory Consumption |
+| Channel Data Type     | Display Range     | Relative Memory Consumption     |
 | --------------------- | ----------------- | ------------------------------- |
-| 8 bit int             | [0.0 , 1.0]     | 1                               |
-| 16 bit int            | [0.0 , 1.0]     | 2                               |
-| 16 bit float          | [ - inf , inf ] | 2                               |
-| 32 bit float          | [ - inf , inf ] | 4                               |
+| 8 bit int             | [0.0 , 1.0]       | 1                               |
+| 16 bit int            | [0.0 , 1.0]       | 2                               |
+| 16 bit float          | [ - inf , inf ]   | 2                               |
+| 32 bit float          | [ - inf , inf ]   | 4                               |
 
 Table 7.3: Characteristics of Channel Data Types <a id="characteristics-of-channel-data-types"></a>
 
@@ -118,14 +115,11 @@ It is also possible to add channels to incoming images using Channel Remapping. 
 
 New channels currently inherit the channel data from the first channel in the image. If the data needs to be 1.0 or 0.0 in the new channel, use Channel Reorder to insert constant data.
 
-
-
 Channel Remapping is controlled by the ChannelMap node. The names of the channels and their order is stored in the **format.channels** property. Channel Remapping occurs when the image data in the file is converted into one of the internal image formats.
 
 Note that there is overlapping functionality between Channel Remapping and Channel Reordering (See [7.8.1](#781-channel-reorder) ) and Channel Isolation (See [7.8.2](#782-isolating-channels) ) which are described below. However, Channel Remapping occurs just after pixels are read from a file. Channel Reordering and Isolation occur just before the pixel is displayed and typically happen in hardware. Channel Remapping always occurs in software.
 
 ### 7.4 Crop and Uncrop
-
 
 Cropping an image discards pixels outside of the crop region. The image size is reduced in the process. This can be beneficial when loading a large number of cached images where only a small portion of the frame is interesting or useful (e.g. a rendered element). For some formats, RV may be able to reduce I/O bandwidth by reading and decoding pixels only within the crop region.
 
@@ -167,7 +161,6 @@ RV considers the uncropped image geometry as the principle image geometry. Value
 
 ### 7.5 Conversion to Linear Color Space
 
-
 If an image format stores pixel values in a color space which is non-linear, the values should be converted to linear before any color correction or display correction is applied. In the ICC and EXR documentation, linear space is also called *Scene Referred Space.* The most important characteristic of scene referred space is that doubling a value results in twice the luminance.
 
 Although any image format can potentially hold pixel data in a non-linear color space, there are few formats which are designed to do so. Kodak Cineon files, for example, store values in a logarithmic color space.
@@ -200,21 +193,22 @@ This is advantageous when one or more of the original image planes are subsample
 
 Some formats may produce YUV or YUVA images to be displayed. RV can decode these in hardware for better performance. RV uses the following matrix to transform YUV to RGB:
 
-|   |             |             |             |   |
-| - | ----------- | ----------- | ----------- | - |
-|   | 1           | 0           | 1.402       |   |
-|   | 1           | - 0.344136 | - 0.714136 |   |
-|   | 1           | 1.772       | 0           |   |
-|   |             | *Y*         |             |   |
-|   |             | *U*         |             |   |
-|   |             | *V*         |             |   |
+|     |             |             |             |     |
+| --- | ----------- | ----------- | ----------- | --- |
+|     | 1           | 0           | 1.402       |     |
+|     | 1           | - 0.344136  | - 0.714136  |     |
+|     | 1           | 1.772       | 0           |     |
+|     |             | *Y*         |             |     |
+|     |             | *U*         |             |     |
+|     |             | *V*         |             |     |
 
 where
-| |
+
+|                    |
 | ------------------ |
-| 0 ≤ _Y_ ≤ 1        |
-| - 0.5 ≤ _U_ ≤ 0.5 |
-| - 0.5 ≤ _V_ ≤ 0.5 |
+| 0 ≤ *Y* ≤ 1        |
+| - 0.5 ≤ *U* ≤ 0.5  |
+| - 0.5 ≤ *V* ≤ 0.5  |
 
 In the case of Photo-JPEG, the YUV data coming from a movie file is assumed to use the full gamut for the given number of bits. For example, an eight bit per channel image would have luminance values of [0, 255]. For Motion-JPEG a reduced color gamut is assumed.
 
@@ -252,9 +246,9 @@ RV uses the following equation to go from sRGB space to linear:
 
 *c*<sub>*linear*</sub> =
 
-| | |
-| --------------------------------- | --------------------- |
-| *c*<sub>*sRGB*</sub>12.92      | *c*<sub>*sRGB*</sub> ≤ *p* |
+|                                                   |                            |
+| ------------------------------------------------- | -------------------------- |
+| *c*<sub>*sRGB*</sub>12.92                         | *c*<sub>*sRGB*</sub> ≤ *p* |
 | (*c*<sub>*sRGB*</sub> + *a*1 + *a*)<sup>2.4</sup> | *c*<sub>*sRGB*</sub> > *p* |
 
 where
@@ -271,9 +265,9 @@ RV uses the following equation to go from Rec. 709 space to linear:
 
 *c*<sub>*linear*</sub> =
 
-| | |
-| --------------------------------- | --------------------- |
-| *c*<sub>*709*</sub>4.5      | *c*<sub>*709*</sub> ≤ *p* |
+|                                                     |                           |
+| --------------------------------------------------- | ------------------------- |
+| *c*<sub>*709*</sub>4.5                              | *c*<sub>*709*</sub> ≤ *p* |
 | (*c*<sub>*709*</sub> +  0.0991.099)<sup>10.45</sup> | *c*<sub>*709*</sub> > *p* |
 
 where
@@ -295,7 +289,6 @@ In much the same way you can assign a File LUT to help linearize a file source i
 See Chapter [9](rv-user-manual-chapter-nine.md#9-using-cdls-in-rv) for more information about how LUTs work in RV.
 
 ### 7.6 Color Correction
-
 
 None of the color corrections affects the Alpha channel. For a good discussion on linear color corrections, check out Paul Haeberli's Graphica Obscura website [Graphica Obscura](http://www.graficaobscura.com/) .
 
@@ -323,11 +316,11 @@ The unit of hue rotation is radians. RV's hue rotation is luminance preserving. 
 
 The algorithm is as follows:
 
-*   Apply a rotation that maps the grey vector to the blue axis.
-*   Compute the vector L that is perpendicular to the plane of constant luminance.
-*   Apply a skew transform to map the vector L onto the blue axis.
-*   Apply a rotation about the blue axis N radians where N is the amount of hue change.
-*   Apply a rotation that maps the blue axis back to the grey vector.
+* Apply a rotation that maps the grey vector to the blue axis.
+* Compute the vector L that is perpendicular to the plane of constant luminance.
+* Apply a skew transform to map the vector L onto the blue axis.
+* Apply a rotation about the blue axis N radians where N is the amount of hue change.
+* Apply a rotation that maps the blue axis back to the grey vector.
 
 RV computes luminance using this formula
 
@@ -337,17 +330,17 @@ This is also the formula used for luminance display.
 
 :
 
-|  |  |  |  |   |  |
-| ------ | ------ | ------ | --------- | - | -|
-| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
-| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
-| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
-|  |  |  |  |   |  |
-|  | *R*    |  |  |  |
-|  | *G*    |  |  |  |
-|  | *B*    |  |  |  |
-|  | *1*    |  |  |  |
+|                   |                   |                   |           |     |     |
+| ----------------- | ----------------- | ----------------- | --------- | --- | --- |
+| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*       |     |     |
+| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*       |     |     |
+| *R*<sub>*w*</sub> | *G*<sub>*w*</sub> | *B*<sub>*w*</sub> | *0*       |     |     |
+| *0*               | *0*               | *0*               | *1*       |     |     |
+|                   |                   |                   |           |     |     |
+|                   | *R*               |                   |           |     |     |
+|                   | *G*               |                   |           |     |     |
+|                   | *B*               |                   |           |     |     |
+|                   | *1*               |                   |           |     |     |
 
 where
 
@@ -355,7 +348,7 @@ where
 
 Weight values for R, G, and B are applicable in linear color space. Values used for determining luminance for NTSC video are not applicable in linear color space.
 
-*R*<sub>*w*</sub> = 0.3086 
+*R*<sub>*w*</sub> = 0.3086
 *G*<sub>*w*</sub> = 0.6094
 *B*<sub>*w*</sub> = 0.0820
 
@@ -363,17 +356,17 @@ Weight values for R, G, and B are applicable in linear color space. Values used 
 
 RV applies the formula:
 
-|  |  |  |  |   |  |
-| ------ | ------ | ------ | --------- | - | -|
-| *R*<sub>*w*</sub>*(1 - s) + s* | *G*<sub>*w*</sub>*(1 - s)* | *B*<sub>*w*</sub>*(1 - s)* | *0*         |   |  |
-| *R*<sub>*w*</sub>*(1 - s)* | *G*<sub>*w*</sub>*(1 - s) + s* | *B*<sub>*w*</sub>*(1 - s)* | *0*         |   |  |
-| *R*<sub>*w*</sub>*(1 - s)* | *G*<sub>*w*</sub>*(1 - s)* | *B*<sub>*w*</sub>*(1 - s) + s* | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
-|  |  |  |  |   |  |
-|  | *R*    |  |  |  |
-|  | *G*    |  |  |  |
-|  | *B*    |  |  |  |
-|  | *1*    |  |  |  |
+|                                |                                |                                |           |     |     |
+| ------------------------------ | ------------------------------ | ------------------------------ | --------- | --- | --- |
+| *R*<sub>*w*</sub>*(1 - s) + s* | *G*<sub>*w*</sub>*(1 - s)*     | *B*<sub>*w*</sub>*(1 - s)*     | *0*       |     |     |
+| *R*<sub>*w*</sub>*(1 - s)*     | *G*<sub>*w*</sub>*(1 - s) + s* | *B*<sub>*w*</sub>*(1 - s)*     | *0*       |     |     |
+| *R*<sub>*w*</sub>*(1 - s)*     | *G*<sub>*w*</sub>*(1 - s)*     | *B*<sub>*w*</sub>*(1 - s) + s* | *0*       |     |     |
+| *0*                            | *0*                            | *0*                            | *1*       |     |     |
+|                                |                                |                                |           |     |     |
+|                                | *R*                            |                                |           |     |     |
+|                                | *G*                            |                                |           |     |     |
+|                                | *B*                            |                                |           |     |     |
+|                                | *1*                            |                                |           |     |     |
 
 where
 
@@ -387,17 +380,17 @@ and *s* is the saturation value.
 
 RV applies the formula:
 
-|  |  |  |  |   |  |
-| ------ | ------ | ------ | --------- | - | -|
-| *1 + k* | *0* | *0* | *- k2*         |   |  |
-| *0* | *1 + k* | *0* | *- k2*         |   |  |
-| *0* | *0* | *1 + k* | *- k2*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
-|  |  |  |  |   |  |
-|  | *R*    |  |  |  |
-|  | *G*    |  |  |  |
-|  | *B*    |  |  |  |
-|  | *1*    |  |  |  |
+|         |         |         |           |     |     |
+| ------- | ------- | ------- | --------- | --- | --- |
+| *1 + k* | *0*     | *0*     | *- k2*    |     |     |
+| *0*     | *1 + k* | *0*     | *- k2*    |     |     |
+| *0*     | *0*     | *1 + k* | *- k2*    |     |     |
+| *0*     | *0*     | *0*     | *1*       |     |     |
+|         |         |         |           |     |     |
+|         | *R*     |         |           |     |     |
+|         | *G*     |         |           |     |     |
+|         | *B*     |         |           |     |     |
+|         | *1*     |         |           |     |     |
 
 where *k* is the contrast value.
 
@@ -405,25 +398,25 @@ where *k* is the contrast value.
 
 RV applies the formula:
 
-|  |  |  |  |   |  |
-| ------ | ------ | ------ | --------- | - | -|
-| *-1* | *0* | *0* | *0*         |   |  |
-| *0* | *-1* | *0* | *0*         |   |  |
-| *0* | *0* | *-1* | *0*         |   |  |
-| *1*      | *1*      | *1*      | *1*         |   |  |   
-|  |  |  |  |   |  |
-|  | *R*    |  |  |  |
-|  | *G*    |  |  |  |
-|  | *B*    |  |  |  |
-|  | *1*    |  |  |  |
+|        |        |        |           |     |     |
+| ------ | ------ | ------ | --------- | --- | --- |
+| *-1*   | *0*    | *0*    | *0*       |     |     |
+| *0*    | *-1*   | *0*    | *0*       |     |     |
+| *0*    | *0*    | *-1*   | *0*       |     |     |
+| *1*    | *1*    | *1*    | *1*       |     |     |
+|        |        |        |           |     |     |
+|        | *R*    |        |           |     |     |
+|        | *G*    |        |           |     |     |
+|        | *B*    |        |           |     |     |
+|        | *1*    |        |           |     |     |
 
 #### 7.6.7 ASC Color Decision List (CDL) Controls
 
 ASC-CDL controls are as follows:
 
-|  |  |  |
-| ------ | ------ | ------ |
-| *SOP* | = | *Clamp* ( *C*<sub>*in*</sub> * *slope* + *offset* )<sup>*power*</sup> | 
+|        |        |                                                                       |
+| ------ | ------ | --------------------------------------------------------------------- |
+| *SOP*  | =      | *Clamp* ( *C*<sub>*in*</sub> * *slope* + *offset* )<sup>*power*</sup> |
 
 where *slope* , *offset* , and *power* are per-channel parameters
 
@@ -431,17 +424,17 @@ The CDL saturation is then applied to the result like so:
 
 *Clamp(*
 
-|  |  |  |  |   |  |
-| ------ | ------ | ------ | --------- | - | -|
-| *R<sub>w</sub>(1 - s) + s* | *G<sub>w</sub>(1 - s)* | *B<sub>w</sub>(1 - s)* | *0*         |   |  |
-| *R<sub>w</sub>(1 - s)* | *G<sub>w</sub>(1 - s) + s* | *B<sub>w</sub>(1 - s)* | *0*         |   |  |
-| *R<sub>w</sub>(1 - s)* | *G<sub>w</sub>(1 - s)* | *B<sub>w</sub>(1 - s) + s* | *0*         |   |  |
-| *0*      | *0*      | *0*      | *1*         |   |  |   
-|  |  |  |  |   |  |
-|  | *SOP<sub>R</sub>*    |  |  |  |
-|  | *SOP<sub>G</sub>*    |  |  |  |
-|  | *SOP<sub>B</sub>*    |  |  |  |
-|  | *1*    |  |  |  |
+|                            |                            |                            |           |     |     |
+| -------------------------- | -------------------------- | -------------------------- | --------- | --- | --- |
+| *R<sub>w</sub>(1 - s) + s* | *G<sub>w</sub>(1 - s)*     | *B<sub>w</sub>(1 - s)*     | *0*       |     |     |
+| *R<sub>w</sub>(1 - s)*     | *G<sub>w</sub>(1 - s) + s* | *B<sub>w</sub>(1 - s)*     | *0*       |     |     |
+| *R<sub>w</sub>(1 - s)*     | *G<sub>w</sub>(1 - s)*     | *B<sub>w</sub>(1 - s) + s* | *0*       |     |     |
+| *0*                        | *0*                        | *0*                        | *1*       |     |     |
+|                            |                            |                            |           |     |     |
+|                            | *SOP<sub>R</sub>*          |                            |           |     |     |
+|                            | *SOP<sub>G</sub>*          |                            |           |     |     |
+|                            | *SOP<sub>B</sub>*          |                            |           |     |     |
+|                            | *1*                        |                            |           |     |     |
 )
 
 where
@@ -453,7 +446,6 @@ where
 and *s* is the saturation when *s* ≥ 0
 
 ### 7.7 Display Simulation and Correction
-
 
 After color corrections have been applied in linear space and before pixels are sent to the display device, they undergo display transformations. These transforms are intended to simulate the appearance of pixels on alternate display devices (like film) and to correct for any color transform that will be applied by the primary display device. In addition, RV provides a few tools to help visualize image pixel values in various ways.
 
@@ -505,10 +497,10 @@ RV uses the following formula to convert from linear to sRGB:
 
 *c*<sub>*sRGB</sub>* =
 
-| | |
-| ----------------------------------------- | --------------------------- |
-| 12.92*c*<sub>*linear*</sub>                | *c*<sub>*linear*</sub> ≤ *q* |
-| (1 + *a*)*c*1/2.4*linear* - *a* | *c*<sub>*linear*</sub> > *q* |
+|                                           |                              |
+| ----------------------------------------- | ---------------------------- |
+| 12.92*c*<sub>*linear*</sub>               | *c*<sub>*linear*</sub> ≤ *q* |
+| (1 + *a*)*c*1/2.4*linear* - *a*           | *c*<sub>*linear*</sub> > *q* |
 
 where
 
@@ -523,9 +515,10 @@ The sRGB Display Correction can be set from the View menu.
 If the display device is an HD television or reference monitor it may be naturally calibrated to the Rec. 709 color space. Similar to sRGB, Rec. 709 is a gamma-like curve. RV uses the following formula to convert from linear to Rec. 709:
 
 *c*<sub>709</sub> =
-| | |
-| -------------------------------------- | --------------------------- |
-| 4.5*c*<sub>*linear*</sub>               | *c*<sub>*linear*</sub> ≤ *q* |
+
+|                                                    |                              |
+| -------------------------------------------------- | ---------------------------- |
+| 4.5*c*<sub>*linear*</sub>                          | *c*<sub>*linear*</sub> ≤ *q* |
 | 1.099*c*<sub>*linear*</sub><sup>0.45</sup> - 0.099 | *c*<sub>*linear*</sub> > *q* |
 
 where
@@ -541,7 +534,6 @@ This is most useful when a display LUT is being used to simulate an alternate di
 The Display Brightness can be set from the View menu.
 
 ### 7.8 Final Display Filters
-
 
 These operations occur after the display correction has been applied and before the pixel is displayed. Unlike color corrections, there is only a single instance of each of these for an RV session. So if you isolate the red channel for example, it will be isolated for all source material.
 
