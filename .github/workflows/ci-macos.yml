@@ -8,17 +8,16 @@ on:
         default: 'false'
       qt5_modules:
         type: string
-
-env:
-  SKIP_DEPS_CACHE: ${{ inputs.skip_deps_cache }}
-  QT5_MODULES: ${{ inputs.qt5_modules }}
-  MACOX_X86_64_QT5_ARCHIVES: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
-  MACOX_X86_64_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
-  MACOX_X86_64_QT6_ARCHIVES: 'qtbase qtdeclarative qtsvg qttools qttranslations'
+      full_matrix:
+        type: string
+        default: 'true'
+      run_debug:
+        type: string
+        default: 'true'
 
 jobs:
-  macos:
-    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+  # Always runs — CY2024 Release only (PR scope)
+  macos-pr:
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
        python=${{ matrix.python-version }},
@@ -30,7 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # VFX2024
           - os: "macos-15"
             arch-type: "x86_64"
             build-type: "Release"
@@ -47,6 +45,37 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-macos
+        with:
+          arch-type: ${{ matrix.arch-type }}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          qt-version-short: ${{ matrix.qt-version-short }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          qt5_modules: ${{ inputs.qt5_modules }}
+
+  # CY2024 Debug — runs when cmake files change or on full matrix
+  macos-debug:
+    if: ${{ inputs.run_debug == 'true' }}
+    name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
           - os: "macos-15"
             arch-type: "x86_64"
             build-type: "Debug"
@@ -64,221 +93,18 @@ jobs:
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
     steps:
-      - name: Check if it is a schedule job
-        if: github.event_name == 'schedule'
-        run: |
-          echo "SKIP_DEPS_CACHE='true'" >> $GITHUB_ENV
-
-      - name: Display disk space
-        run: |
-          df -h /
-
-      - name: Clear up some spaces on disk
-        run: |
-          # Remove some unused XCode (Default is XCode 15.4).
-          sudo rm -rf /Applications/Xcode_15.3.app
-          sudo rm -rf /Applications/Xcode_15.2.app
-          sudo rm -rf /Applications/Xcode_15.1.app
-          sudo rm -rf /Applications/Xcode_15.0.1.app
-          sudo rm -rf /Users/runner/Library/Android
-
-      - name: Display disk space
-        run: |
-          df -h /
-
       - name: Check out repository code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
         with:
           submodules: recursive
-
-      - name: Add repository as safe directory
-        run: |
-          git config --global --add safe.directory /__w/OpenRV/OpenRV
-
-      - name: Install cmake
-        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2
+      - uses: ./.github/actions/build-macos
         with:
-          cmake-version: "${{ matrix.cmake-version }}"
-
-      - name: Prepare Qt folder
-        run: |
-          mkdir -p "${{ github.workspace }}/deps"
-
-      - name: Install Qt ${{ matrix.qt-version }}
-        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '${{ matrix.qt-version }}'
-          host: 'mac'
-          target: 'desktop'
-          arch: 'clang_64'
-          dir: "${{ github.workspace }}/deps"
-          install-deps: 'false'
-          modules: ${{ env.QT5_MODULES }}
-          archives: ${{ env.MACOX_X86_64_QT5_ARCHIVES }}
-          # Caching only save 2 minutes. Keep the cache for longer operations.
-          cache: false
-          setup-python: 'false'
-          tools: 'tools_qtcreator'
-          set-env: 'true'
-          tools-only: 'false'
-          aqtversion: '==3.2.*'
-
-      - name: Install Qt ${{ matrix.qt-version }}
-        if: matrix.vfx-platform == 'CY2024'
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '${{ matrix.qt-version }}'
-          host: 'mac'
-          target: 'desktop'
-          # clang_64 contains both x86_64 and arm64 for Qt 6.
-          arch: 'clang_64'
-          dir: "${{ github.workspace }}/deps"
-          install-deps: 'false'
-          modules: ${{ env.MACOX_X86_64_QT6_MODULES }}
-          archives: ${{ env.MACOX_X86_64_QT6_ARCHIVES }}
-          # Caching only save 2 minutes. Keep the cache for longer operations.
-          cache: false
-          setup-python: true
-          tools: 'tools_qtcreator'
-          set-env: 'true'
-          tools-only: 'false'
-          aqtversion: '==3.2.*'
-
-      - name: Patch Qt ${{ matrix.qt-version }}
-        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
-        # There is an issue with Clang15 and Qt < 5.15.15.
-        run: |
-          curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
-          unzip file.zip
-          cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64/mkspecs/features/toolchain.prf
-
-      - name: Activate Python ${{ matrix.python-version }}
-        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
-        with:
-          python-version: '${{ matrix.python-version }}'
-
-      - name: Install Python dependencies
-        run: |
-          python3 -m pip install --user --upgrade -r requirements.txt
-
-      - name: Install Homebrew dependencies
-        # icu4c is needed for Qt UIC executable / AUTOUIC.
-        # Might be to find another way to install icu4c if the icu4c recipe disappear.
-        run: |
-          retry_count=0
-          max_retries=5
-
-          until [ $retry_count -ge $max_retries ]; do
-            echo "Attempt $((retry_count + 1)) of $max_retries"
-
-            if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew ccache && \
-               brew install --formula icu4c; then
-              echo "Homebrew dependencies installed successfully"
-              break
-            else
-              retry_count=$((retry_count + 1))
-              if [ $retry_count -lt $max_retries ]; then
-                echo "Attempt $retry_count failed. Retrying in 5 seconds..."
-                sleep 5
-              fi
-            fi
-          done
-
-          if [ $retry_count -ge $max_retries ]; then
-            echo "Failed to install Homebrew dependencies after $max_retries attempts"
-            exit 1
-          fi
-
-      - name: Set QT_HOME
-        if: matrix.arch-type == 'x86_64' && matrix.vfx-platform == 'CY2023'
-        # With aqt, the universal binaries are under clang_64 and not macos folder.
-        run: |
-          echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/clang_64" >> $GITHUB_ENV
-
-      - name: Set QT_HOME
-        if: matrix.arch-type == 'arm64' && matrix.vfx-platform == 'CY2023'
-        # The path for QT_HOME is diferent for arm64 CY2023 because we have to build it in the CI.
-        run: |
-          echo "QT_HOME=${{ github.workspace }}/deps" >> $GITHUB_ENV
-
-      - name: Set QT_HOME
-        if: matrix.vfx-platform == 'CY2024'
-        run: |
-          echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ matrix.qt-version }}/macos" >> $GITHUB_ENV
-
-      - name: Check if the dependencies changed
-        if: matrix.build-type == 'Release'
-        uses: dorny/paths-filter@v3
-        id: changes-in-deps
-        with:
-          filters: |
-            dependencies:
-              - 'cmake/**'
-
-      - name: Restore some dependencies
-        # Restore only if there are no changes under cmake folder and Release build.
-        if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release'
-        id: cmake-dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ./_build/RV_DEPS_*
-            ./_build/cmake/dependencies
-            ./_build/_deps
-          key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
-
-      # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
-      # - name: Setup ccache
-      #   uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639
-      #   with:
-      #     key: macos-${{ matrix.os }}-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-${{ matrix.build-type }}
-      #     max-size: 2G
-      #     verbose: 2
-
-      # ccache from Homebrew is used for this run only (not stored in Actions cache).
-      # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
-      # or by moving some dependencies from the cache to Conan or another dependency manager.
-
-      - name: Configure OpenRV
-        if: ${{ matrix.vfx-platform == 'CY2023' }}
-        run: |
-          which cmake
-          cmake --version
-          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
-
-      - name: Configure OpenRV
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
-        run: |
-          which cmake
-          cmake --version
-          cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ matrix.vfx-platform }}
-
-      - name: Build OpenRV dependencies
-        if: steps.cmake-dependencies.outputs.cache-hit != 'true'
-        run: |
-          cmake --build _build --config ${{ matrix.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-          ls -al _build
-
-      - name: Build OpenRV main executable
-        run: |
-          cmake --build _build --config ${{ matrix.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
-
-      - name: Tests
-        run: |
-          ctest --test-dir _build -C ${{ matrix.build-type }} --extra-verbose
-
-      - name: Install OpenRV
-        run: |
-          cmake --install _build --prefix $(pwd)/_install --config ${{ matrix.build-type }}
-
-      - name: Save dependencies cache
-        # Only save on push/schedule/workflow_dispatch so PRs use cache from main branch.
-        if: env.SKIP_DEPS_CACHE == 'false' && steps.changes-in-deps.outputs.dependencies == 'false' && matrix.build-type == 'Release' && github.event_name != 'pull_request'
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ./_build/RV_DEPS_*
-            ./_build/cmake/dependencies
-            ./_build/_deps
-          key: macos-${{ matrix.arch-type }}-${{ matrix.vfx-platform }}-dependencies
+          arch-type: ${{ matrix.arch-type }}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          qt-version-short: ${{ matrix.qt-version-short }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          qt5_modules: ${{ inputs.qt5_modules }}

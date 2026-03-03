@@ -21,20 +21,48 @@ on:
         default: 'false'
 
 jobs:
+  detect-changes:
+    if: github.repository_owner == 'AcademySoftwareFoundation'
+    runs-on: ubuntu-latest
+    outputs:
+      cmake_changed: ${{ steps.filter.outputs.cmake }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        id: filter
+        with:
+          filters: |
+            cmake:
+              - 'cmake/**'
+              - '**/CMakeLists.txt'
+              - '**/*.cmake'
+
   linux:
+    if: github.repository_owner == 'AcademySoftwareFoundation'
+    needs: detect-changes
     uses: ./.github/workflows/ci-linux.yml
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}
+      run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
 
   macos:
+    if: github.repository_owner == 'AcademySoftwareFoundation'
+    needs: detect-changes
     uses: ./.github/workflows/ci-macos.yml
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}
+      run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
 
   windows:
+    if: github.repository_owner == 'AcademySoftwareFoundation'
+    needs: detect-changes
     uses: ./.github/workflows/ci-windows.yml
     with:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       qt5_modules: 'debug_info qtcharts qtdatavis3d qtlottie qtnetworkauth qtquick3d qtquicktimeline qtscript qtwebengine qtwebglplugin'
+      full_matrix: ${{ github.event_name != 'pull_request' }}
+      run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
