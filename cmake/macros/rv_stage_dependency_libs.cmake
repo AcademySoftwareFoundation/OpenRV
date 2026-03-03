@@ -24,8 +24,8 @@
 #     [PRE_COMMANDS COMMAND <cmd1> [COMMAND <cmd2>...]]  # Commands to run before copy; each must be prefixed with COMMAND keyword
 #     [LIBNAME <filename>]          # Platform-aware shorthand: on Windows uses BIN_DIR+STAGE_BIN_DIR, otherwise STAGE_LIB_DIR
 #     [USE_FLAG_FILE]               # Use touch-based flag instead of OUTPUTS for tracking.
-#                                    # Caveat: won't re-stage if staged files are deleted, since the flag survives.
-#                                    # Prefer OUTPUTS when possible; use this only when outputs are hard to enumerate.
+#                                   # Caveat: won't re-stage if staged files are deleted, since the flag survives.
+#                                   # Prefer OUTPUTS when possible; use this only when outputs are hard to enumerate.
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   CMAKE_PARSE_ARGUMENTS(
