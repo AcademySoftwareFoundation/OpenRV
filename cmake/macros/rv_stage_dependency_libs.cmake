@@ -42,7 +42,9 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   ENDIF()
 
   # Handle LIBNAME shorthand for platform-aware staging
-  IF(_ARG_LIBNAME AND _ARG_OUTPUTS)
+  IF(_ARG_LIBNAME
+     AND _ARG_OUTPUTS
+  )
     MESSAGE(WARNING "RV_STAGE_DEPENDENCY_LIBS: LIBNAME overrides OUTPUTS")
   ENDIF()
   IF(_ARG_LIBNAME)
@@ -210,9 +212,8 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Either OUTPUTS or USE_FLAG_FILE is required")
   ENDIF()
 
-  # Create the custom command (always OUTPUT-based for proper incremental builds).
-  # Note: ${_commands} contains COMMAND keywords which CMake's keyword parser uses as section boundaries,
-  # so they are correctly parsed as commands, not as additional OUTPUT entries.
+  # Create the custom command (always OUTPUT-based for proper incremental builds). Note: ${_commands} contains COMMAND keywords which CMake's keyword parser
+  # uses as section boundaries, so they are correctly parsed as commands, not as additional OUTPUT entries.
   ADD_CUSTOM_COMMAND(
     COMMENT "Staging ${_ARG_TARGET} libs into ${_ARG_STAGE_LIB_DIR}"
     OUTPUT ${_tracking_outputs} ${_commands}
