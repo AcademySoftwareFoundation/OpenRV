@@ -11,7 +11,7 @@ RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PCRE2" "pcre2-${RV_DEPS_PCRE2_VERSION
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_download_url
-    "https://github.com/PCRE2Project/pcre2/archive/refs/tags/${_version}.zip"
+    "https://github.com/PCRE2Project/pcre2/archive/refs/tags/${_version}.tar.gz"
 )
 
 SET(_download_hash
@@ -79,7 +79,7 @@ EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${_source_dir}
