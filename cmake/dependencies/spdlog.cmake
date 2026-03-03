@@ -54,7 +54,7 @@ IF(RV_TARGET_WINDOWS)
   SET(_make_command
       ninja
   )
-  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} /utf-8")
 ELSE()
   SET(_make_command
       make
