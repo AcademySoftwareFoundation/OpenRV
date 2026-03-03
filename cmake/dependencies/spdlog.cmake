@@ -10,7 +10,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
 
 SET(_download_url
-    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
+    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.tar.gz"
 )
 
 SET(_download_hash
@@ -54,6 +54,7 @@ IF(RV_TARGET_WINDOWS)
   SET(_make_command
       ninja
   )
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
 ELSE()
   SET(_make_command
       make
@@ -64,7 +65,7 @@ LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
@@ -98,6 +99,14 @@ TARGET_INCLUDE_DIRECTORIES(
   spdlog::spdlog
   INTERFACE ${_include_dir}
 )
+
+IF(RV_TARGET_WINDOWS)
+  SET_TARGET_PROPERTIES(
+    spdlog::spdlog
+    PROPERTIES INTERFACE_COMPILE_OPTIONS "/utf-8"
+  )
+ENDIF()
+
 LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
 
 IF(RV_TARGET_WINDOWS)
