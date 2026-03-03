@@ -20,9 +20,7 @@ SET(_download_hash
     "${RV_DEPS_AJA_DOWNLOAD_HASH}"
 )
 
-IF(RV_TARGET_WINDOWS
-   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
-)
+IF(RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME(ajantv2_vs143_MT "" "SHARED" "d")
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME(ajantv2 "" "SHARED" "d")
@@ -80,8 +78,6 @@ IF(RV_TARGET_WINDOWS
    AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
 )
   LIST(APPEND _configure_options "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
-  # We must also force mbedtls to use the same, otherwise it defaults to DLL linking.
-  LIST(APPEND _configure_options "-DMBEDTLS_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
 ENDIF()
 
 EXTERNALPROJECT_ADD(
