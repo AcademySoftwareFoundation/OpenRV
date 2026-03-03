@@ -148,6 +148,9 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 # OCIO apps are not needed.
 LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
+# Use MISSING so OCIO vendors its own third-party deps when not already provided by RV_DEPS (vs NONE/default),
+# pinning versions and avoiding ABI/licensing drift with system libs; typical CI pulls in Imath/OpenEXR components,
+# yaml-cpp, pystring, expat, lcms2, zlib, and related OCIO external packages.
 LIST(APPEND _configure_options "-DOCIO_INSTALL_EXT_PACKAGES=MISSING")
 
 IF(NOT RV_TARGET_WINDOWS)
