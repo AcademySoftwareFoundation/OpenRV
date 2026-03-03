@@ -10,7 +10,7 @@ PROCESSORCOUNT(_cpu_count)
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "${RV_DEPS_GLEW_VERSION}" "make" "")
 
 SET(_download_url
-    "https://github.com/nigels-com/glew/archive/${_version}.zip"
+    "https://github.com/nigels-com/glew/archive/refs/tags/glew-${_version}.tar.gz"
 )
 
 SET(_download_hash
@@ -50,14 +50,8 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_NAME glew-glew-${_version}.tar.gz
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  # Patch to fix the build issue with OpenGL-Registry Pinning the OpenGL-Registry version to a specific commit https://github.com/nigels-com/glew/issues/449
-  # Also clone the required glfixes repository
-  PATCH_COMMAND
-    cd auto && git clone https://github.com/KhronosGroup/OpenGL-Registry.git || true && cd OpenGL-Registry && git checkout
-    a77f5b6ffd0b0b74904f755ae977fa278eac4e95 && cd .. && git clone --depth=1 --branch glew https://github.com/nigels-com/glfixes glfixes || true && touch
-    OpenGL-Registry/.dummy && cd ..
   CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
   BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
   INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}
