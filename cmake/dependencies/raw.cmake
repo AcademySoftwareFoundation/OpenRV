@@ -115,6 +115,19 @@ ENDIF()
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME LibRaw::raw TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
-  IMPLIB ${_implibpath} INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+  NAME
+  LibRaw::raw
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )

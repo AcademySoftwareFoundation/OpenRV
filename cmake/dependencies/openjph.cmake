@@ -70,13 +70,34 @@ SET(_openjph_include_dir
 
 IF(NOT RV_TARGET_WINDOWS)
   RV_ADD_IMPORTED_LIBRARY(
-    NAME OpenJph::OpenJph TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
-    INCLUDE_DIRS ${_openjph_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    OpenJph::OpenJph
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    SONAME
+    ${_libname}
+    INCLUDE_DIRS
+    ${_openjph_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ELSE()
   RV_ADD_IMPORTED_LIBRARY(
-    NAME OpenJph::OpenJph TYPE SHARED LOCATION ${_libpath}
-    IMPLIB ${_implibpath}
-    INCLUDE_DIRS ${_openjph_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    OpenJph::OpenJph
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    IMPLIB
+    ${_implibpath}
+    INCLUDE_DIRS
+    ${_openjph_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ENDIF()

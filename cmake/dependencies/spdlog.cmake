@@ -51,14 +51,19 @@ EXTERNALPROJECT_ADD(
 )
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME spdlog::spdlog
-  TYPE STATIC
-  LOCATION ${_spdlog_lib}
-  SONAME ${_spdlog_lib_name}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  spdlog::spdlog
+  TYPE
+  STATIC
+  LOCATION
+  ${_spdlog_lib}
+  SONAME
+  ${_spdlog_lib_name}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name})
-

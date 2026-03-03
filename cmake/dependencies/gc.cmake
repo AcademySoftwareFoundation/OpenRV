@@ -88,26 +88,37 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 RV_ADD_IMPORTED_LIBRARY(
-  NAME BDWGC::Gc
-  TYPE STATIC
-  LOCATION ${_gc_lib}
-  SONAME ${_gc_lib_name}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  BDWGC::Gc
+  TYPE
+  STATIC
+  LOCATION
+  ${_gc_lib}
+  SONAME
+  ${_gc_lib_name}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 
 IF(NOT RV_TARGET_WINDOWS)
   RV_ADD_IMPORTED_LIBRARY(
-    NAME BDWGC::Cord
-    TYPE SHARED
-    LOCATION ${_cord_lib}
-    SONAME ${_cord_lib_name}
-    INCLUDE_DIRS ${_include_dir}
-    DEPENDS ${_target}
+    NAME
+    BDWGC::Cord
+    TYPE
+    SHARED
+    LOCATION
+    ${_cord_lib}
+    SONAME
+    ${_cord_lib_name}
+    INCLUDE_DIRS
+    ${_include_dir}
+    DEPENDS
+    ${_target}
     ADD_TO_DEPS_LIST
   )
 ENDIF()
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_gc_stage_outputs})
-

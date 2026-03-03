@@ -58,11 +58,17 @@ EXTERNALPROJECT_ADD(
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME EXPAT::EXPAT
-  TYPE SHARED
-  LOCATION ${_libpath}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  EXPAT::EXPAT
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )

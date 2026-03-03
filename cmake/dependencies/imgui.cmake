@@ -139,12 +139,19 @@ EXTERNALPROJECT_ADD(
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME imgui::imgui
-  TYPE SHARED
-  LOCATION ${_libpath}
-  SONAME ${_libname}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  imgui::imgui
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )

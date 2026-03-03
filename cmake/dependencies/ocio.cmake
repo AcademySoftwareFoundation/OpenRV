@@ -322,11 +322,17 @@ ENDIF()
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME OpenColorIO::OpenColorIO
-  TYPE SHARED
-  LOCATION ${_libpath}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  OpenColorIO::OpenColorIO
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )

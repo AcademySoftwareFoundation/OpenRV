@@ -51,9 +51,17 @@ EXTERNALPROJECT_ADD(
 )
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME GLEW::GLEW TYPE STATIC LOCATION ${_glew_lib}
-  INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+  NAME
+  GLEW::GLEW
+  TYPE
+  STATIC
+  LOCATION
+  ${_glew_lib}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_glew_lib_name})
-

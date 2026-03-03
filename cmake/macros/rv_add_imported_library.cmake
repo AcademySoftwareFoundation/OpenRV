@@ -7,12 +7,10 @@
 #
 # RV_ADD_IMPORTED_LIBRARY - Create an imported library target with standard properties
 #
-# Consolidates the repeated ADD_LIBRARY(IMPORTED) + SET_PROPERTY + TARGET_INCLUDE_DIRECTORIES
-# pattern used across dependency files.
+# Consolidates the repeated ADD_LIBRARY(IMPORTED) + SET_PROPERTY + TARGET_INCLUDE_DIRECTORIES pattern used across dependency files.
 #
-# NOTE: This is a MACRO (not a function) so that ADD_TO_DEPS_LIST correctly
-# accumulates into the caller's RV_DEPS_LIST when called multiple times
-# (e.g., gc.cmake creates both BDWGC::Gc and BDWGC::Cord).
+# NOTE: This is a MACRO (not a function) so that ADD_TO_DEPS_LIST correctly accumulates into the caller's RV_DEPS_LIST when called multiple times (e.g.,
+# gc.cmake creates both BDWGC::Gc and BDWGC::Cord).
 #
 # cmake-format: off
 # Usage:

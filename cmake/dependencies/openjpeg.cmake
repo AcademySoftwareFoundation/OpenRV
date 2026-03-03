@@ -68,13 +68,36 @@ SET(_openjpeg_include_dir
 
 IF(RV_TARGET_WINDOWS)
   RV_ADD_IMPORTED_LIBRARY(
-    NAME OpenJpeg::OpenJpeg TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
-    IMPLIB ${_bin_dir}/${_implibname}
-    INCLUDE_DIRS ${_openjpeg_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    OpenJpeg::OpenJpeg
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    SONAME
+    ${_libname}
+    IMPLIB
+    ${_bin_dir}/${_implibname}
+    INCLUDE_DIRS
+    ${_openjpeg_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ELSE()
   RV_ADD_IMPORTED_LIBRARY(
-    NAME OpenJpeg::OpenJpeg TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
-    INCLUDE_DIRS ${_openjpeg_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    OpenJpeg::OpenJpeg
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    SONAME
+    ${_libname}
+    INCLUDE_DIRS
+    ${_openjpeg_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ENDIF()

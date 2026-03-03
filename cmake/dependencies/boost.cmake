@@ -245,4 +245,3 @@ IF(RV_TARGET_WINDOWS)
 ELSE()
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_boost_stage_output})
 ENDIF()
-

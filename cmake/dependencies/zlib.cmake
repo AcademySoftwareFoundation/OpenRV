@@ -116,13 +116,20 @@ ELSE()
 ENDIF()
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME ZLIB::ZLIB
-  TYPE SHARED
-  LOCATION ${_libpath}
-  SONAME ${_libname}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  ZLIB::ZLIB
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 

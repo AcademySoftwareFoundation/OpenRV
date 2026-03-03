@@ -98,19 +98,44 @@ RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 IF(RV_TARGET_WINDOWS)
   IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    SET(_tiff_lib_name "tiff.lib")
+    SET(_tiff_lib_name
+        "tiff.lib"
+    )
   ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    SET(_tiff_lib_name "tiffd.lib")
+    SET(_tiff_lib_name
+        "tiffd.lib"
+    )
   ENDIF()
   RV_ADD_IMPORTED_LIBRARY(
-    NAME TIFF::TIFF TYPE SHARED LOCATION ${_libpath}
-    IMPLIB ${_lib_dir}/${_tiff_lib_name}
-    INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    TIFF::TIFF
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    IMPLIB
+    ${_lib_dir}/${_tiff_lib_name}
+    INCLUDE_DIRS
+    ${_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ELSE()
   RV_ADD_IMPORTED_LIBRARY(
-    NAME TIFF::TIFF TYPE SHARED LOCATION ${_libpath} SONAME ${_libname}
-    INCLUDE_DIRS ${_include_dir} DEPENDS ${_target} ADD_TO_DEPS_LIST
+    NAME
+    TIFF::TIFF
+    TYPE
+    SHARED
+    LOCATION
+    ${_libpath}
+    SONAME
+    ${_libname}
+    INCLUDE_DIRS
+    ${_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
 ENDIF()
 

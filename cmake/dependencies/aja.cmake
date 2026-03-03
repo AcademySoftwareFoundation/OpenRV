@@ -68,8 +68,15 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-LIST(APPEND _configure_options "-DAJANTV2_DISABLE_DEMOS=ON" "-DAJANTV2_DISABLE_TOOLS=ON" "-DAJANTV2_DISABLE_TESTS=ON" "-DAJANTV2_BUILD_SHARED=ON"
-                               "-DNTV2_VERSION_BUILD=0")
+LIST(
+  APPEND
+  _configure_options
+  "-DAJANTV2_DISABLE_DEMOS=ON"
+  "-DAJANTV2_DISABLE_TOOLS=ON"
+  "-DAJANTV2_DISABLE_TESTS=ON"
+  "-DAJANTV2_BUILD_SHARED=ON"
+  "-DNTV2_VERSION_BUILD=0"
+)
 
 # In Debug, the MSVC runtime library needs to be set to MultiThreadedDebug. Otherwise, it will be set to MultiThreaded.
 IF(RV_TARGET_WINDOWS
@@ -100,13 +107,22 @@ EXTERNALPROJECT_ADD(
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME aja::ntv2
-  TYPE SHARED
-  LOCATION ${_libpath}
-  SONAME ${_libname}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_aja_include_dir} ${_aja_ntv2_include_dir} ${_aja_ntv2_os_specific_include_dir}
-  DEPENDS ${_target}
+  NAME
+  aja::ntv2
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_aja_include_dir}
+  ${_aja_ntv2_include_dir}
+  ${_aja_ntv2_os_specific_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 
@@ -129,4 +145,3 @@ SET(RV_DEPS_AJA_COMPILE_OPTIONS
     ${_aja_compile_options}
     CACHE INTERNAL "" FORCE
 )
-

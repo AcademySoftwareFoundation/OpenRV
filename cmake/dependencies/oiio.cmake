@@ -219,22 +219,35 @@ ENDIF()
 RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME OpenImageIO::OpenImageIO
-  TYPE SHARED
-  LOCATION ${_libpath}
-  SONAME ${_libname}
-  IMPLIB ${_implibpath}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  OpenImageIO::OpenImageIO
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME OpenImageIO::OpenImageIO_Util
-  TYPE SHARED
-  LOCATION ${_oiio_utils_libpath}
-  SONAME ${_oiio_utils_libname}
-  IMPLIB ${_oiio_utils_implibpath}
-  DEPENDS ${_target}
+  NAME
+  OpenImageIO::OpenImageIO_Util
+  TYPE
+  SHARED
+  LOCATION
+  ${_oiio_utils_libpath}
+  SONAME
+  ${_oiio_utils_libname}
+  IMPLIB
+  ${_oiio_utils_implibpath}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )

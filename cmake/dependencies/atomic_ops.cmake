@@ -81,11 +81,16 @@ SET(_include_dir
 )
 
 RV_ADD_IMPORTED_LIBRARY(
-  NAME atomic_ops::atomic_ops
-  TYPE STATIC
-  LOCATION ${_atomic_ops_lib}
-  INCLUDE_DIRS ${_include_dir}
-  DEPENDS ${_target}
+  NAME
+  atomic_ops::atomic_ops
+  TYPE
+  STATIC
+  LOCATION
+  ${_atomic_ops_lib}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
   ADD_TO_DEPS_LIST
 )
 
