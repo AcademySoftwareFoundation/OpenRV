@@ -403,12 +403,14 @@ namespace TwkFB
                     {
                         if (TIFFGetField(tif, TIFFFieldTag(fip), &Len, &text))
                         {
-                            img.attribute<string>(aname) = text;
+                            if (text)
+                                img.attribute<string>(aname) = text;
                         }
                     }
                     else if (TIFFGetField(tif, TIFFFieldTag(fip), &text))
                     {
-                        img.attribute<string>(aname) = text;
+                        if (text)
+                            img.attribute<string>(aname) = text;
                     }
                     break;
 
@@ -453,7 +455,8 @@ namespace TwkFB
 
                         if (TIFFGetField(tif, TIFFFieldTag(fip), &ui, &array))
                         {
-                            img.attribute<string>(aname) = array;
+                            if (array)
+                                img.attribute<string>(aname) = array;
                         }
                     }
                     break;
@@ -466,7 +469,8 @@ namespace TwkFB
 
                         if (TIFFGetField(tif, TIFFFieldTag(fip), &ui, &array))
                         {
-                            img.attribute<string>(aname) = array;
+                            if (array)
+                                img.attribute<string>(aname) = array;
                         }
                     }
                     // if(TIFFGetField(tif, TIFFFieldTag(fip), &ch))
