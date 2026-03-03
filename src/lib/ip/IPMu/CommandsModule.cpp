@@ -3895,6 +3895,11 @@ namespace IPMu
         if (!node)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node name");
 
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
+        }
+
         if (IPNode* n = s->graph().findNode(node->c_str()))
         {
             type = stype->allocate(n->protocol());
@@ -4120,6 +4125,11 @@ namespace IPMu
         if (!name)
         {
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "no node name specified");
+        }
+
+        if (auto val = returnIfGraphUnsafe(s, Pointer(0)))
+        {
+            NODE_RETURN(*val);
         }
 
         if (IPNode* node = s->graph().findNode(name->c_str()))
