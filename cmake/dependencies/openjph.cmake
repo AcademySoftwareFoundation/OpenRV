@@ -41,7 +41,7 @@ IF(RV_TARGET_WINDOWS)
       "openjph.${_version_major}.${_version_minor}${RV_OPENJPH_DEBUG_POSTFIX}.lib"
   )
   SET(_implibpath
-      ${_lib_dir}/${_libname}
+      ${_lib_dir}/${_implibname}
   )
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("openjph${RV_OPENJPH_DEBUG_POSTFIX}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
