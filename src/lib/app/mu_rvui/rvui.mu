@@ -6326,11 +6326,11 @@ global bool debugGC = false;
             menuSeparator(),
             menuItem("Play All Frames", "key-down--A", "playcontrol_category", ~toggleRealtime, realtimeState),
                 subMenu("FPS", MenuItem[] {
+                    menuItem("23.98", "", "playcontrol_category", ~setFPSFunc(23.98), rangeState),
                     menuItem("24", "", "playcontrol_category", ~setFPSFunc(24.0), rangeState),
                     menuItem("25", "", "playcontrol_category", ~setFPSFunc(25.0), rangeState),
-                    menuItem("23.98", "", "playcontrol_category", ~setFPSFunc(23.98), rangeState),
-                    menuItem("30", "", "playcontrol_category", ~setFPSFunc(30.0), rangeState),
                     menuItem("29.97", "", "playcontrol_category", ~setFPSFunc(29.97), rangeState),
+                    menuItem("30", "", "playcontrol_category", ~setFPSFunc(30.0), rangeState),
                     menuSeparator(),
                     menuItem("Custom...", "key-down--F", "playcontrol_category", enterFPS, rangeState)
                 }),
