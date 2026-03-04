@@ -34,8 +34,8 @@ IF(NOT RV_TARGET_WINDOWS)
     RV_MAKE_STANDARD_LIB_NAME("tiff" "" "SHARED" "")
   ENDIF()
 ELSE()
-  # The current CMake build code via NMake doesn't create a Debug lib named "libtiffd.lib"
-  RV_MAKE_STANDARD_LIB_NAME("libtiff" "${_version}" "SHARED" "")
+  # Windows: TIFF produces tiff.dll/tiffd.dll (not libtiff.dll). Debug uses "d" postfix.
+  RV_MAKE_STANDARD_LIB_NAME("tiff" "${_version}" "SHARED" "d")
 ENDIF()
 # ByProducts note: Windows will only have the DLL in _byproducts, this is fine since both .lib and .dll will be updated together.
 
