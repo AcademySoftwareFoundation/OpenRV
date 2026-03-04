@@ -6331,6 +6331,8 @@ global bool debugGC = false;
                     menuItem("25", "", "playcontrol_category", ~setFPSFunc(25.0), rangeState),
                     menuItem("29.97", "", "playcontrol_category", ~setFPSFunc(29.97), rangeState),
                     menuItem("30", "", "playcontrol_category", ~setFPSFunc(30.0), rangeState),
+                    menuItem("59.94", "", "playcontrol_category", ~setFPSFunc(59.94), rangeState),
+                    menuItem("60", "", "playcontrol_category", ~setFPSFunc(60.0), rangeState),
                     menuSeparator(),
                     menuItem("Custom...", "key-down--F", "playcontrol_category", enterFPS, rangeState)
                 }),
