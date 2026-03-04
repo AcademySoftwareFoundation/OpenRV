@@ -673,7 +673,10 @@ namespace TwkMovie
                                                        "wmv3image"sv,
                                                        "xith"sv,
                                                        "xvid"sv,
-                                                       "libdav1d"sv
+                                                       "libdav1d"sv,
+                                                       "prores_aw"sv,
+                                                       "prores_ks"sv,
+                                                       "prores_raw"sv
 #if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
                                                        ,
                                                        "prores"sv
@@ -1435,6 +1438,7 @@ namespace TwkMovie
 
         // Open the codec
         (*avCodecContext)->thread_count = m_io->codecThreads();
+        (*avCodecContext)->thread_type = FF_THREAD_SLICE;
         if (avcodec_open2(*avCodecContext, avCodec, nullptr) < 0)
         {
             std::cerr << "ERROR: MovieFFMpeg: Failed to open codec '" << avCodec->name << "' for " << m_filename << '\n';
