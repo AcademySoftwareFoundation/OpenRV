@@ -177,6 +177,37 @@ def prepare() -> None:
 
                 cmakelist.write(new_line)
 
+    def patch_cmakelist(path):
+        if not os.path.exists(path):
+            return
+        print(f"Suppressing cast-function-type-mismatch in {path}")
+        with open(path, "r") as f:
+            content = f.read()
+
+        if "-Wno-cast-function-type-mismatch" not in content:
+            suppress_flag = (
+                '\nif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")\n'
+                "    add_compile_options(-Wno-cast-function-type-mismatch)\n"
+                "endif()\n"
+            )
+            # Find project(...) and insert after it
+            project_match = re.search(r"project\s*\(.*?\)", content, re.IGNORECASE | re.DOTALL)
+            if project_match:
+                insert_pos = project_match.end()
+                content = content[:insert_pos] + suppress_flag + content[insert_pos:]
+            else:
+                content += suppress_flag
+
+            with open(path, "w") as f:
+                f.write(content)
+
+    # Patch root CMakeLists.txt
+    patch_cmakelist(os.path.join(SOURCE_DIR, "CMakeLists.txt"))
+    # Patch shiboken6 CMakeLists.txt
+    patch_cmakelist(os.path.join(SOURCE_DIR, "sources", "shiboken6", "CMakeLists.txt"))
+    # Patch pyside6 CMakeLists.txt
+    patch_cmakelist(os.path.join(SOURCE_DIR, "sources", "pyside6", "CMakeLists.txt"))
+
 
 def remove_broken_shortcuts(python_home: str) -> None:
     """

@@ -84,3 +84,10 @@ ELSEIF(RV_VFX_PLATFORM STREQUAL "CY2023")
       "MuQt5"
   )
 ENDIF()
+
+# Suppress noisy warnings globally
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  ADD_COMPILE_OPTIONS(-Wno-cast-function-type-mismatch -Wno-deprecated-declarations)
+ELSEIF(MSVC)
+  ADD_COMPILE_OPTIONS(/wd4996) # Equivalent to -Wno-deprecated-declarations
+ENDIF()
