@@ -3236,9 +3236,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     State state = data();
     state.dragDropOccuring = false;
+    state.ddNoSequence = (event.modifiers() & Event.Alt) != 0;
     recordPixelInfo(event);
 
     let kind = event.contentType(),
+        tag = if state.ddNoSequence then "drop-no-sequence" else "drop",
         F    = if state.ddDropFunc eq nil 
                     then ddNoop(0,)
                     else state.ddDropFunc(state.ddRegion,);
@@ -3248,7 +3250,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         let root = string.split(file, "/").back(),
             ext  = string.split(root, ".").back(),
             f    = frameEnd(),
-            F    = if Fin eq nil then (\: (void; string s) { addSources(string[] {s},"drop"); }) else Fin;
+            F    = if Fin eq nil then (\: (void; string s) { addSources(string[] {s}, tag); }) else Fin;
 
         try
         {
@@ -3280,7 +3282,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
             qt.QTimer dt = state.ddDropTimer;
             dt.start();
         }
-        else loadFile(filepath, F);
+        else loadFile(filepath, if state.ddRegion == 1 then (\: (void; string s) { addSources(string[] {s}, tag); }) else F);
     }
     else if (kind == Event.URLObject ||
              kind == Event.TextObject)  //  Chrome URL drops come accross as "Text"
@@ -6974,7 +6976,8 @@ global bool debugGC = false;
     state.ddDropFiles.clear();
     state.ddProgressiveDrop = false;
 
-    addSources(myFiles, "drop");
+    let tag = if state.ddNoSequence then "drop-no-sequence" else "drop";
+    addSources(myFiles, tag);
 }
 
 
@@ -7085,6 +7088,7 @@ global bool debugGC = false;
 
     s.ddDropFiles = string[]();
     s.ddProgressiveDrop = false;
+    s.ddNoSequence = false;
 
     s.quitConfirmMessages = (string,string)[]();
     s.savedInOut = int[]();

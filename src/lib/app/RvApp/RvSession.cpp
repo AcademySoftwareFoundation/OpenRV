@@ -674,6 +674,8 @@ namespace Rv
 
         int nexisting = sources().size();
 
+        bool noSeq = (tag == "drop-no-sequence") || m_noSequences;
+
         //
         //  NOTE: the exception is created but will not be used unless an
         //  error occurs. Each round of reading results in another line of
@@ -691,7 +693,7 @@ namespace Rv
             {
                 if (m_loadState)
                     cerr << "ERROR: already have load state!\n" << endl;
-                m_loadState = new LoadState(this, insources, m_noSequences,
+                m_loadState = new LoadState(this, insources, noSeq,
                                             doProcessOpts, merge, tag);
 
                 if (m_loadState->loadTotal() > 1)
@@ -719,8 +721,8 @@ namespace Rv
                 Options::SourceArgs& sargs = insources[q];
                 const Options::Files& files = sargs.files;
                 SequenceNameList inputPatterns = sequencesInFileList(
-                    files, m_noSequences ? FalseSequencePredicate
-                                         : GlobalExtensionPredicate);
+                    files,
+                    noSeq ? FalseSequencePredicate : GlobalExtensionPredicate);
 
                 for (int i = 0; i < inputPatterns.size(); i++)
                 {

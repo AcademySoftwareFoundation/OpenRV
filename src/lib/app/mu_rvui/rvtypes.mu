@@ -658,6 +658,7 @@ class: State
     bool            ddProgressiveDrop;
     string[]        ddDropFiles;
     object          ddDropTimer;
+    bool            ddNoSequence;
 
     float           lastPixelBlockTime;
 

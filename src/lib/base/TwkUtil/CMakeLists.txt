@@ -88,6 +88,13 @@ IF(RV_TARGET_LINUX)
   )
 ENDIF()
 
+IF(RV_TARGET_IS_RHEL8)
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE stdc++fs
+  )
+ENDIF()
+
 IF(RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}

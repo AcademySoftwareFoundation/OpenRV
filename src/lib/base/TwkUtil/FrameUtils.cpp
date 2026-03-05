@@ -9,10 +9,12 @@
 #include <TwkUtil/TwkRegEx.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/PathConform.h>
+#include <filesystem>
 #include <stl_ext/string_algo.h>
 #include <limits.h>
 #include <stdio.h>
 #include <list>
+#include <memory>
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -274,6 +276,8 @@ struct LexinumericCompare
     }
 
     static int defaultMinSequenceSize = -2;
+    static string cachedNoSequencePattern;
+    static unique_ptr<RegEx> noSequencePatternRe;
 
     SequenceNameList sequencesInFileList(const FileNameList& infiles,
                                          SequencePredicate P,
@@ -299,6 +303,31 @@ struct LexinumericCompare
         }
         if (minSequenceSize == -1)
             minSequenceSize = defaultMinSequenceSize;
+
+        const char* envVar = getenv("RV_NO_SEQUENCE_PATTERN");
+        if (envVar && *envVar)
+        {
+            if (cachedNoSequencePattern != envVar)
+            {
+                cachedNoSequencePattern = envVar;
+                try
+                {
+                    noSequencePatternRe = make_unique<RegEx>(envVar);
+                }
+                catch (const RegEx::Exception& e)
+                {
+                    cerr
+                        << "Warning: Invalid regex for RV_NO_SEQUENCE_PATTERN: "
+                        << e.what() << '\n';
+                    noSequencePatternRe.reset();
+                }
+            }
+        }
+        else
+        {
+            cachedNoSequencePattern.clear();
+            noSequencePatternRe.reset();
+        }
 
         //
         //  NOTE: this function needs to maintain as much order as
@@ -328,6 +357,22 @@ struct LexinumericCompare
                 frameSequences.push_back(f);
                 allfiles.pop_front();
                 continue;
+            }
+
+            // Apply pattern to basename only,
+            // so names like ^thumbnail or ^\. match the file name, not the
+            // path.
+            if (noSequencePatternRe)
+            {
+                const string nameForPattern =
+                    filesystem::path(f).filename().string();
+
+                if (noSequencePatternRe->matches(nameForPattern))
+                {
+                    frameSequences.push_back(f);
+                    allfiles.pop_front();
+                    continue;
+                }
             }
 
             //
