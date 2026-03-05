@@ -1512,9 +1512,14 @@ namespace TwkMovie
     {
         AVRational tcRate = {tsStream->time_base.den, tsStream->time_base.num};
 
-        if (isMOVformat(formatContext))
+        bool isMxf = formatContext && formatContext->iformat && formatContext->iformat->name
+                     && strstr(formatContext->iformat->name, "mxf") != nullptr;
+        if (isMOVformat(formatContext) || isMxf)
         {
-            tcRate = tsStream->avg_frame_rate;
+            if (tsStream->avg_frame_rate.num > 0 && tsStream->avg_frame_rate.den > 0)
+            {
+                tcRate = tsStream->avg_frame_rate;
+            }
         }
 
         return tcRate;
@@ -1581,7 +1586,11 @@ namespace TwkMovie
                 for (unsigned int s = 0; s < m_avFormatContext->nb_streams; ++s)
                 {
                     AVStream* tsStream = m_avFormatContext->streams[s];
-                    tcRate = getTimecodeRate(tsStream, m_avFormatContext);
+                    if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+                    {
+                        tcRate = getTimecodeRate(tsStream, m_avFormatContext);
+                        break;
+                    }
                 }
                 AVTimecode avTimecode;
                 av_timecode_init_from_string(&avTimecode, tcRate, fmtTcEntry->value, m_avFormatContext);
