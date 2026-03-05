@@ -519,6 +519,11 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         except Exception as inst:
             print((str(inst), node))
 
+    def afterClearSession(self, event):
+        event.reject()
+        self.usingOCIOForDisplay.clear()
+        commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
+
     def maybeUpdateViews(self, event):
         event.reject()
         if event.contents().endswith("ocio_display.display"):
@@ -728,6 +733,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 ("before-session-read", self.beforeSessionRead, ""),
                 ("after-session-read", self.afterSessionRead, ""),
                 ("graph-new-node", self.checkForDisplayGroup, ""),
+                ("after-clear-session", self.afterClearSession, ""),
                 ("graph-node-inputs-changed", self.checkForDisplayGroup, ""),
                 ("graph-state-change", self.maybeUpdateViews, ""),
             ],
