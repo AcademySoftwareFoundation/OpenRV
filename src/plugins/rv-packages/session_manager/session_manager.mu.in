@@ -980,6 +980,7 @@ class: SessionManagerMode : MinorMode
     QIcon              _layerIcon;
     QIcon              _channelIcon;
     QIcon              _videoIcon;
+    QIcon              _fallbackSourceIcon;
     bool               _inputOrderLock;
     bool               _disableUpdates;
     bool               _progressiveLoadingInProgress;
@@ -1691,6 +1692,30 @@ class: SessionManagerMode : MinorMode
         let statusItems = newNodeStatusColumns(node);
         if (node == viewNode()) head(tail(statusItems)).setText("\u2714");
         addRow(parentItem, item : statusItems);
+
+        if (source)
+        {
+            item.setText("");
+            item.setSizeHint(QSize(-1, 55));
+
+            let widget = QWidget(nil, 0),
+                layout = QHBoxLayout(widget);
+            widget.setStyleSheet("background: transparent;");
+            layout.setContentsMargins(8, 0, 8, 0);
+            layout.setSpacing(10);
+
+            let thumbLabel = QLabel(widget);
+            thumbLabel.setPixmap(_fallbackSourceIcon.pixmap(QSize(80, 40),
+                                 QIcon.Normal, QIcon.Off));
+            layout.addWidget(thumbLabel);
+
+            let nameLabel = QLabel(uiName(node), widget);
+            nameLabel.setStyleSheet("color: white; background: transparent;");
+            layout.addWidget(nameLabel);
+            layout.addStretch(1);
+
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), widget);
+        }
 
         //
         //  Tabs in tooltips make win32 Qt crash.
@@ -2929,6 +2954,7 @@ class: SessionManagerMode : MinorMode
         _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
         _viewTreeView.setDefaultDropAction(Qt.MoveAction);
         _viewTreeView.setExpandsOnDoubleClick(false);
+        _viewTreeView.setIndentation(10);
 
         _inputsView.setModel(_inputsModel);
         _inputsView.setDragEnabled(true);
@@ -2986,6 +3012,7 @@ class: SessionManagerMode : MinorMode
         _channelIcon = auxIcon("channel.png", true);
         _layerIcon = auxIcon("layer.png", true);
         _unknownTypeIcon = auxIcon("new_48x48.png", true);
+        _fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
 
         _addButton.setDefaultAction(addAction);
         _deleteButton.setDefaultAction(deleteAction);
