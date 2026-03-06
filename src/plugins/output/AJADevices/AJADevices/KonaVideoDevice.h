@@ -69,9 +69,11 @@ namespace AJADevices
         ThreeG = 1 << 3,
         LegalRangeY = 1 << 4,
         FullRangeY = 1 << 5,
+        TwelveG = 1 << 6,
 
         RGB_3G = RGB444 | P2P | ThreeG,
         RGB_DualLink = RGB444 | P2P | DualLink,
+        YUV_6G = P2P | TwelveG,
     };
 
     struct KonaDataFormat
@@ -418,6 +420,7 @@ namespace AJADevices
         void routeQuadRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeStereoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeMonoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeStereoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeMonoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
@@ -448,7 +451,7 @@ namespace AJADevices
         size_t m_deviceNumVideoOutputs{0};
         size_t m_deviceNumVideoChannels{};
         bool m_deviceHasDualLink{false};
-        bool m_deviceHas3G{false};
+        bool m_deviceHas12G{false};
         ULWord m_deviceHDMIVersion{0};
         bool m_deviceHasHDMIStereo{false};
         bool m_deviceHas4KDownConverter{false};
@@ -467,6 +470,7 @@ namespace AJADevices
         bool m_3G{false};
         bool m_3GB{false};
         bool m_dualLink{false};
+        bool m_12G{false};
         bool m_yuvInternalFormat{false};
         bool m_allowSegmentedTransfer{false};
         bool m_simpleRouting{false};
