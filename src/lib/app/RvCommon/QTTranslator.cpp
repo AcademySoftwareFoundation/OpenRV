@@ -944,6 +944,9 @@ namespace Rv
         }
 #endif
 
+            Qt::KeyboardModifiers dropEventModifiers =
+                devent->keyboardModifiers();
+
             if (devent->mimeData()->hasUrls())
             {
                 QList<QUrl> urls = devent->mimeData()->urls();
@@ -988,12 +991,19 @@ namespace Rv
                     seqs = files;
                 }
                 else
-                    seqs = sequencesInFileList(files, GlobalExtensionPredicate);
+                {
+                    SequencePredicate pred =
+                        (dropEventModifiers & Qt::AltModifier)
+                            ? FalseSequencePredicate
+                            : GlobalExtensionPredicate;
+                    seqs = sequencesInFileList(files, pred);
+                }
 
+                unsigned int dropMods = modifiers(dropEventModifiers);
                 for (int i = 0; i < seqs.size(); i++)
                 {
                     DragDropEvent e(ename, m_node, type, DragDropEvent::File,
-                                    seqs[i], 0, devent->pos().x(),
+                                    seqs[i], dropMods, devent->pos().x(),
                                     h - devent->pos().y() - 1, w, h);
 
                     sendEvent(e);
@@ -1004,7 +1014,7 @@ namespace Rv
                 for (int i = 0; i < nonfiles.size(); i++)
                 {
                     DragDropEvent e(ename, m_node, type, DragDropEvent::URL,
-                                    nonfiles[i], 0, devent->pos().x(),
+                                    nonfiles[i], dropMods, devent->pos().x(),
                                     h - devent->pos().y() - 1, w, h);
 
                     sendEvent(e);
@@ -1016,8 +1026,9 @@ namespace Rv
             {
                 DragDropEvent e(ename, m_node, type, DragDropEvent::Text,
                                 devent->mimeData()->text().toUtf8().constData(),
-                                0, devent->pos().x(), h - devent->pos().y() - 1,
-                                w, h);
+                                modifiers(dropEventModifiers),
+                                devent->pos().x(), h - devent->pos().y() - 1, w,
+                                h);
 
                 sendEvent(e);
                 if (e.handled)
