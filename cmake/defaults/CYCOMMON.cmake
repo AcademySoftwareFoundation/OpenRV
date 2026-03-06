@@ -213,10 +213,10 @@ SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
 
 # png https://github.com/glennrp/libpng
 SET(RV_DEPS_PNG_VERSION
-    "1.6.48"
+    "1.6.55"
 )
 SET(RV_DEPS_PNG_DOWNLOAD_HASH
-    "be6cc9e411c26115db3b9eab1159a1d9"
+    "933118ac208387d0727e3d5e36558022"
 )
 
 # raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
