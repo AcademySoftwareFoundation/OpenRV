@@ -214,9 +214,22 @@ For example:
 rvcfg -DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="aac;hevc" -DRV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE="aac"
 ```
 
-### 11. Apple ProRes on Apple Silicon
+### 11. Apple ProRes
 
-On Apple Silicon machines, Open RV supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default but can be controlled using the `-DRV_FFMPEG_USE_VIDEOTOOLBOX` option. Set this option to `ON` to enable or `OFF` to disable VideoToolbox hardware decoding.
+If you have Apple's ProRes SDK for Windows or Linux (you can obtain freely by contacting [ProRes@apple.com](mailto:ProRes@apple.com)),
+then set ```RV_DEPS_APPLE_PRORES_SDK_ZIP_PATH``` to the path of the downloaded zip file on the rvcfg line.<br>
+Example:
+
+```bash
+-DRV_DEPS_APPLE_PRORES_SDK_ZIP_PATH='<downloads_path>/ProResDecoder_Linux_x86_64-15B54.zip'
+```
+
+By default, the ProRes decode via the SDK will use all available system threads.  To use a fixed maximum number of threads, set the
+environment variable `ORV_PREF_GLOBAL_PRORES_DECODER_THREADS` to a positive value.
+
+On Apple Silicon machines, OpenRV supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default
+but can be controlled using the `-DRV_FFMPEG_USE_VIDEOTOOLBOX` option. Set this option to `ON` to enable or `OFF` to disable VideoToolbox
+hardware decoding.
 
 To enable decoding of ProRes media files, you must also specify the following option during the configuration step:
 
@@ -224,9 +237,11 @@ To enable decoding of ProRes media files, you must also specify the following op
 -DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE="prores"
 ```
 
-Note that you should always have `-DRV_FFMPEG_USE_VIDEOTOOLBOX` enabled when decoding Apple ProRes videos on Apple Silicon machines. Failure to do so will result in performance issues and is not compliant with Apple's licensing requirements.
+Note that you should always have `-DRV_FFMPEG_USE_VIDEOTOOLBOX` enabled when decoding Apple ProRes videos on Apple Silicon machines.
+Failure to do so will result in performance issues and is not compliant with Apple's licensing requirements.
 
-**Important:** Before enabling ProRes decoding, you are required to obtain a proper license agreement from Apple by contacting [ProRes@apple.com](mailto:ProRes@apple.com).
+**Important:** Before enabling ProRes decoding on Linux/Windows, you are required to obtain a proper license agreement and the SDK from
+Apple by contacting [ProRes@apple.com](mailto:ProRes@apple.com).
 
 ### 12. Running the automated tests
 
