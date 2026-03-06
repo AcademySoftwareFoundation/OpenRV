@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 SET(_target
     "RV_DEPS_ATOMIC_OPS"
 )
@@ -79,36 +76,25 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(atomic_ops::atomic_ops STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(atomic_ops::atomic_ops ${_target})
-SET_PROPERTY(
-  TARGET atomic_ops::atomic_ops
-  PROPERTY IMPORTED_LOCATION ${_atomic_ops_lib}
-)
-
 SET(_include_dir
     ${_install_dir}/include
 )
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
+
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   atomic_ops::atomic_ops
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST atomic_ops::atomic_ops)
-
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-  OUTPUT ${RV_STAGE_LIB_DIR}/${_atomic_ops_lib_name}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  DEPENDS ${_target}
-)
-
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/${_atomic_ops_lib_name}
+  TYPE
+  STATIC
+  LOCATION
+  ${_atomic_ops_lib}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_atomic_ops_lib_name})
 
 SET(RV_DEPS_ATOMIC_OPS_VERSION
     ${_version}

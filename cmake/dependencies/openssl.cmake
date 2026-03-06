@@ -273,8 +273,9 @@ ELSE()
       COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib ${_lib_dir}/ssl.lib
       COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib ${_lib_dir}/crypto.lib
     )
+    # Copy import libs to stage lib dir and specific DLLs to stage bin dir
     ADD_CUSTOM_COMMAND(
-      COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+      COMMENT "Staging ${_target} libs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
       OUTPUT ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
       COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}
@@ -283,8 +284,9 @@ ELSE()
     )
     ADD_CUSTOM_TARGET(
       ${_target}-stage-target ALL
-      DEPENDS ${RV_STAGE_LIB_DIR}/${_crypto_lib_name} ${RV_STAGE_LIB_DIR}/${_ssl_lib_name}
+      DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
     )
+    ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
   ELSE()
 
     # Because RHEL8 has the same version of openssl library as we use but is not compatible with our library, we will copy openssl into its own seperate lib
@@ -297,19 +299,16 @@ ELSE()
       )
     ENDIF()
 
-    ADD_CUSTOM_COMMAND(
-      COMMENT "Installing ${_target}'s libs into ${_openssl_stage_lib_dir}"
-      OUTPUT ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${_openssl_stage_lib_dir}
-      DEPENDS ${_target}
-    )
-    ADD_CUSTOM_TARGET(
-      ${_target}-stage-target ALL
-      DEPENDS ${_openssl_stage_lib_dir}/${_crypto_lib_name} ${_openssl_stage_lib_dir}/${_ssl_lib_name}
+    RV_STAGE_DEPENDENCY_LIBS(
+      TARGET
+      ${_target}
+      STAGE_LIB_DIR
+      ${_openssl_stage_lib_dir}
+      OUTPUTS
+      ${_openssl_stage_lib_dir}/${_crypto_lib_name}
+      ${_openssl_stage_lib_dir}/${_ssl_lib_name}
     )
   ENDIF()
-
-  ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
 
   SET(RV_DEPS_OPENSSL_VERSION
       ${_version}

@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "${RV_DEPS_GLEW_VERSION}" "make" "")
 
 SET(_download_url
@@ -16,20 +13,6 @@ SET(_download_url
 SET(_download_hash
     ${RV_DEPS_GLEW_DOWNLOAD_HASH}
 )
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
 
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
@@ -67,35 +50,18 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(GLEW::GLEW STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(GLEW::GLEW ${_target})
-SET_PROPERTY(
-  TARGET GLEW::GLEW
-  PROPERTY IMPORTED_LOCATION ${_glew_lib}
-)
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   GLEW::GLEW
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST GLEW::GLEW)
-
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-  OUTPUT ${RV_STAGE_LIB_DIR}/${_glew_lib_name}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  DEPENDS ${_target}
-)
-
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/${_glew_lib_name}
+  TYPE
+  STATIC
+  LOCATION
+  ${_glew_lib}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-SET(RV_DEPS_GLEW_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_glew_lib_name})

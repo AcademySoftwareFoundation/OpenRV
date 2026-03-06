@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkFB
-  PRIVATE TwkUtil Tiff::Tiff stl_ext
+  PRIVATE TwkUtil TIFF::TIFF stl_ext
 )
 
 ADD_LINK_OPTIONS("-Wl,-E")

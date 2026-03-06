@@ -8,9 +8,6 @@
 # Official source repository https://github.com/libexpat/libexpat
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "${RV_DEPS_EXPAT_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -58,29 +55,20 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(EXPAT::EXPAT SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(EXPAT::EXPAT ${_target})
-
-# An import library (.lib) file is often used to resolve references to functions and variables in a DLL, enabling the linker to generate code for loading the
-# DLL and calling its functions at runtime.
-SET_PROPERTY(
-  TARGET EXPAT::EXPAT
-  PROPERTY IMPORTED_LOCATION "${_libpath}"
-)
-SET_PROPERTY(
-  TARGET EXPAT::EXPAT
-  PROPERTY IMPORTED_IMPLIB "${_implibpath}"
-)
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   EXPAT::EXPAT
-  INTERFACE ${_include_dir}
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-LIST(APPEND RV_DEPS_LIST EXPAT::EXPAT)
