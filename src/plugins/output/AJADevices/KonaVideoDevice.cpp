@@ -270,8 +270,8 @@ namespace AJADevices
             {"10 Bit Dual Link RGB", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, RGB_DualLink},
             {"12 Bit Dual Link RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_DualLink},
 
-            // 6G Single-link YCbCr formats (12G-capable port on SDI Out 3)
-            {"10 Bit 6G Single-Link YCrCb 4:2:2 (SDI Out 3)", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, YUV_6G},
+            // 6G/12G Single-link YCbCr formats
+            {"10 Bit 12G Single-Link YCrCb 4:2:2 (SDI Out 3)", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, YUV_12G},
 
             // Stereo
             // {"Stereo Dual 10 Bit YCrCb 4:2:2 (8 bit internal)",
@@ -1952,17 +1952,21 @@ namespace AJADevices
 
     void KonaVideoDevice::route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
-        if (m_infoFeedback)
-            cout << "INFO: KONA 6G single-link YCbCr format (port 3)" << endl;
-
         //
-        //  6G single-link YCbCr output on Kona 5 port 3 (NTV2_CHANNEL3) with the retail firmware.
+        //  Single-link YCbCr output on Kona 5 port 3 (NTV2_CHANNEL3) with the retail firmware.
         //
         //  Two framestores feed a TSI mux which interleaves their samples into
-        //  a single 4K YCbCr stream output over the 12G-capable SDIOut3 port at 6G:
+        //  a single 4K YCbCr stream on the 12G-capable SDIOut3 port:
         //
-        //      FB3(YUV) + FB4(YUV) -> TSI Mux 3+4 -> SDIOut3 (6G, DS1+DS2)
+        //  6G (non-HFR, <=30fps):
+        //      FB3(YUV) + FB4(YUV) -> TSI Mux 3+4 -> SDIOut3 DS1+DS2 / SDIOut4 DS1+DS2 (6G)
         //
+        //  12G (HFR, >=47.95fps):
+        //      FB3(YUV) + FB4(YUV) -> TSI Mux 3+4 -> SDIOut1+2+3+4 (12G link group)
+        //
+
+        if (m_infoFeedback)
+            cout << "INFO: KONA 6G/12G single-link YCbCr format" << endl;
 
         ULWord vpidA;
         CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_3);
@@ -1971,35 +1975,45 @@ namespace AJADevices
         m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, false);
         m_card->SetSDIOut12GEnable(NTV2_CHANNEL3, false);
 
-        m_card->SetSDITransmitEnable(NTV2_CHANNEL1, false);
-        m_card->SetSDITransmitEnable(NTV2_CHANNEL2, false);
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
-        m_card->SetSDITransmitEnable(NTV2_CHANNEL4, false);
 
         m_card->SetSDIOutputStandard(NTV2_CHANNEL3, standard);
         m_card->SetMode(NTV2_CHANNEL3, NTV2_MODE_DISPLAY);
         m_card->SetMode(NTV2_CHANNEL4, NTV2_MODE_DISPLAY);
 
-        m_card->SetTsiFrameEnable(true, NTV2_CHANNEL3);
-
         m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL3);
 
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL3);
 
-        // FS3 + FS4 -> TSI Mux 3 + TSI Mux 4
+        // FS3 + FS4 -> TSI Mux 3 + TSI Mux 4 (same for both 6G and 12G)
         m_card->Connect(NTV2_Xpt425Mux3AInput, NTV2_XptFrameBuffer3YUV);
         m_card->Connect(NTV2_Xpt425Mux3BInput, NTV2_XptFrameBuffer3_DS2YUV);
         m_card->Connect(NTV2_Xpt425Mux4AInput, NTV2_XptFrameBuffer4YUV);
         m_card->Connect(NTV2_Xpt425Mux4BInput, NTV2_XptFrameBuffer4_DS2YUV);
 
-        // TSI Mux 3 + TSI Mux 4 -> SDIOut3
-        m_card->Connect(NTV2_XptSDIOut3Input, NTV2_Xpt425Mux3AYUV);
-        m_card->Connect(NTV2_XptSDIOut3InputDS2, NTV2_Xpt425Mux3BYUV);
-        m_card->Connect(NTV2_XptSDIOut4Input, NTV2_Xpt425Mux4AYUV);
-        m_card->Connect(NTV2_XptSDIOut4InputDS2, NTV2_Xpt425Mux4BYUV);
+        if (NTV2_IS_4K_HFR_VIDEO_FORMAT(f.value))
+        {
+            // 12G: TSI Mux 3 + TSI Mux 4 -> SDIOut1/SDIOut2/SDIOut3/SDIOut4
+            // Only CH3 needs to be explicitly transmit-enabled (SetSDIOut12GEnable handles CH4 internally as the sub-link)
+            m_card->Connect(NTV2_XptSDIOut1Input, NTV2_Xpt425Mux3AYUV);
+            m_card->Connect(NTV2_XptSDIOut2Input, NTV2_Xpt425Mux3BYUV);
+            m_card->Connect(NTV2_XptSDIOut3Input, NTV2_Xpt425Mux4AYUV);
+            m_card->Connect(NTV2_XptSDIOut4Input, NTV2_Xpt425Mux4BYUV);
 
-        // Re-enable 6G after routing is configured
-        m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, true);
+            m_card->SetSDIOut12GEnable(NTV2_CHANNEL3, true);
+        }
+        else
+        {
+            // 6G: TSI Mux 3 + TSI Mux 4 -> SDIOut3/SDIOut4
+            m_card->Connect(NTV2_XptSDIOut3Input, NTV2_Xpt425Mux3AYUV);
+            m_card->Connect(NTV2_XptSDIOut3InputDS2, NTV2_Xpt425Mux3BYUV);
+            m_card->Connect(NTV2_XptSDIOut4Input, NTV2_Xpt425Mux4AYUV);
+            m_card->Connect(NTV2_XptSDIOut4InputDS2, NTV2_Xpt425Mux4BYUV);
+
+            m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, true);
+        }
+
+        m_card->SetTsiFrameEnable(true, NTV2_CHANNEL3);
     }
 
     void KonaVideoDevice::routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)

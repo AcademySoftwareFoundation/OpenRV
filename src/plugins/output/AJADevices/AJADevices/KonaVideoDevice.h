@@ -73,7 +73,7 @@ namespace AJADevices
 
         RGB_3G = RGB444 | P2P | ThreeG,
         RGB_DualLink = RGB444 | P2P | DualLink,
-        YUV_6G = P2P | TwelveG,
+        YUV_12G = P2P | TwelveG,
     };
 
     struct KonaDataFormat
