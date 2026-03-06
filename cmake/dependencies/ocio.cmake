@@ -7,9 +7,6 @@
 # Build instructions: https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -291,14 +288,6 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   )
 ENDIF()
 
-# All platform
-ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Copying OpenColorIO lib into '${RV_STAGE_LIB_DIR}'."
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-)
-
 IF(RV_TARGET_WINDOWS)
   SET(_rv_stage_lib_site_package_dir
       "${RV_STAGE_LIB_DIR}/site-packages"
@@ -323,32 +312,27 @@ IF(RV_TARGET_WINDOWS)
       TARGET ${_target}
       POST_BUILD
       COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}' and '${_ocio_stage_plugins_python_dir}."
-      COMMAND ${CMAKE_COMMAND} -E copy ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${_rv_stage_lib_site_package_dir}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
       COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
     )
   ENDIF()
 ENDIF()
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
-ADD_LIBRARY(ocio::ocio SHARED IMPORTED GLOBAL)
-LIST(APPEND RV_DEPS_LIST ocio::ocio)
-ADD_DEPENDENCIES(ocio::ocio ${_target})
-SET_PROPERTY(
-  TARGET ocio::ocio
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET ocio::ocio
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  ocio::ocio
-  INTERFACE ${_include_dir}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
+  OpenColorIO::OpenColorIO
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
