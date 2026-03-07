@@ -663,7 +663,15 @@ namespace Rv
 
         n += "wheel";
         // use pixelDelta() or angleDelta() instead of delta() (deprecated)
-        if (event->angleDelta().y() < 0)
+        // Alt key means horizontal scroll on Linux and Windows, whereas it is the Shift key on macOS
+        Qt::KeyboardModifier horizontalModifier =
+#ifdef PLATFORM_DARWIN
+            Qt::ShiftModifier;
+#else
+            Qt::AltModifier;
+#endif
+        int delta = (event->modifiers() & horizontalModifier) ? event->angleDelta().x() : event->angleDelta().y();
+        if (delta < 0)
             n += "down";
         else
             n += "up";
