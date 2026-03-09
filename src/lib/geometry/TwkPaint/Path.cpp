@@ -160,7 +160,7 @@ namespace TwkPaint
     //                   |
     //                  f1
     //                   \
-//                    \f2
+    //                    \f2
     //                     |
     //                     f3
     // f0 will have 'location' 0, and f3 will have 'location' 1, f1 will have
@@ -484,8 +484,8 @@ namespace TwkPaint
                     //
                     //     o + o     <-- direction of stroke
                     //    / \ / \
-                //   /   o   \
-                //  o   / \   o     POSITIVE CASE
+                    //   /   o   \
+                    //  o   / \   o     POSITIVE CASE
                     //  |  /   \  |     + == stroke point
                     //  + /     \ +     o == vertex
                     //  |/       \|     x == other intersection
