@@ -74,6 +74,7 @@ namespace AJADevices
         RGB_3G = RGB444 | P2P | ThreeG,
         RGB_DualLink = RGB444 | P2P | DualLink,
         YUV_12G = P2P | TwelveG,
+        RGB_12G = RGB444 | P2P | TwelveG,
     };
 
     struct KonaDataFormat
@@ -421,6 +422,7 @@ namespace AJADevices
         void routeStereoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeMonoRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
+        void route12GSingleLinkRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeStereoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
         void routeMonoYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d);
