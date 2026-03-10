@@ -601,6 +601,73 @@ documentation: """
 QStandardItemModel with modified drag and drop mime types.
 """;
 
+class: FilmstripWidget : QLabel
+{
+    QImage _strip;
+    int    _frameWidth;   // width of each frame in the filmstrip (240 px)
+    bool   _loaded;
+    QTimer _leaveTimer;
+
+    method: FilmstripWidget (FilmstripWidget; QWidget parent)
+    {
+        QLabel.QLabel(this, parent);
+        _frameWidth = 240;
+        _loaded     = false;
+        setScaledContents(true);
+        setMouseTracking(true);
+        _leaveTimer = QTimer(this);
+        _leaveTimer.setInterval(100);
+        connect(_leaveTimer, QTimer.timeout, checkMouseLeft);
+    }
+
+    method: checkMouseLeft (void;)
+    {
+        if (!underMouse())
+        {
+            showFrame(0);
+            _leaveTimer.stop();
+        }
+    }
+
+    method: showFrame (void; int fx)
+    {
+        let frame = _strip.copy(QRect(fx, 0, _frameWidth, _strip.height()));
+        setPixmap(QPixmap.fromImage(frame, Qt.AutoColor));
+    }
+
+    method: loadStrip (void; string path, QPixmap fallback)
+    {
+        let img = QImage(path, nil);
+        if (!img.isNull())
+        {
+            _strip  = img;
+            _loaded = true;
+            showFrame(0);
+        }
+        else
+        {
+            setPixmap(fallback);
+        }
+    }
+
+    method: mouseMoveEvent (void; QMouseEvent event)
+    {
+        if (_loaded)
+        {
+            let mx     = event.position().toPoint().x(),
+                nat_w  = _strip.width(),
+                prop_x = float(mx) / float(width()),
+                fx     = int(prop_x * float(nat_w) / float(_frameWidth) + 0.5) * _frameWidth,
+                clamped = if fx > nat_w - _frameWidth then nat_w - _frameWidth
+                          else if fx < 0 then 0
+                          else fx;
+            showFrame(clamped);
+            if (!_leaveTimer.isActive()) _leaveTimer.start();
+        }
+        QWidget.mouseMoveEvent(this, event);
+    }
+}
+
 class: NodeModel : QStandardItemModel
 {
     method: NodeModel (NodeModel; QObject parent)
@@ -1366,15 +1433,25 @@ class: SessionManagerMode : MinorMode
 
         for_index (i; connections)
         {
-            let innode = connections[i],
-                item   = QStandardItem(iconForNode(innode), uiName(innode)),
-                vindex = indexOfItem(vnodes, innode);
+            let innode   = connections[i],
+                isSource = nodeType(innode) == "RVSourceGroup",
+                item     = QStandardItem(iconForNode(innode), uiName(innode)),
+                vindex   = indexOfItem(vnodes, innode);
 
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsEnabled);
             item.setData(QVariant(innode), Qt.UserRole + 2);
             item.setEditable(false);
-            
+
+            if (isSource)
+            {
+                item.setText("");
+                item.setSizeHint(QSize(-1, 55));
+            }
+
             _inputsModel.appendRow(item);
+
+            if (isSource)
+                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
         }
 
         _inputOrderLock = false;
@@ -1663,6 +1740,59 @@ class: SessionManagerMode : MinorMode
         item;
     }
 
+    method: makeSourceRowWidget (QWidget; string node)
+    {
+        let widget = QWidget(nil, 0),
+            layout = QHBoxLayout(widget);
+        widget.setStyleSheet("background: transparent;");
+        layout.setContentsMargins(8, 0, 8, 0);
+        layout.setSpacing(5);
+
+        // Filmstrip thumbnail
+        let thumb = FilmstripWidget(widget);
+        thumb.setFixedSize(QSize(80, 45));
+        thumb.loadStrip(auxFilePath("filmstrip.jpg"),
+                        _fallbackSourceIcon.pixmap(QSize(80, 45)));
+        layout.addWidget(thumb);
+
+        // Text column
+        let textWidget = QWidget(widget),
+            textLayout = QVBoxLayout(textWidget);
+        textWidget.setStyleSheet("background: transparent;");
+        textLayout.setSpacing(3);
+
+        let nameLabel = QLabel(uiName(node), textWidget);
+        nameLabel.setStyleSheet("color: #d0d0d0; background: transparent;");
+        textLayout.addWidget(nameLabel);
+
+        string meta = "";
+        try
+        {
+            let sn    = sourceNodeOfGroup(node),
+                mprop = getStringProperty(sn + ".media.movie");
+            if (!mprop.empty())
+            {
+                let parts = io.path.basename(mprop.front()).split(".");
+                if (parts.size() > 1) meta = parts.back();
+            }
+        }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get media type info for %s - %s\n" % (uiName(node), exc));
+        }
+
+        let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
+        metaLabel.setStyleSheet("color: #888888; background: transparent; font-size: 9px;");
+        metaLabel.setSizePolicy(5, 5);  // QSizePolicy::Preferred
+        metaLabel.setMinimumWidth(1);   // absolute minimum overrides minimumSizeHint, allows shrinking
+        textLayout.addWidget(metaLabel);
+        textLayout.addStretch(1);
+
+        layout.addWidget(textWidget, 1);
+
+        widget;
+    }
+
     method: newNodeRow (void; 
                         QStandardItem parentItem,
                         string node,
@@ -1697,24 +1827,7 @@ class: SessionManagerMode : MinorMode
         {
             item.setText("");
             item.setSizeHint(QSize(-1, 55));
-
-            let widget = QWidget(nil, 0),
-                layout = QHBoxLayout(widget);
-            widget.setStyleSheet("background: transparent;");
-            layout.setContentsMargins(8, 0, 8, 0);
-            layout.setSpacing(10);
-
-            let thumbLabel = QLabel(widget);
-            thumbLabel.setPixmap(_fallbackSourceIcon.pixmap(QSize(80, 40),
-                                 QIcon.Normal, QIcon.Off));
-            layout.addWidget(thumbLabel);
-
-            let nameLabel = QLabel(uiName(node), widget);
-            nameLabel.setStyleSheet("color: white; background: transparent;");
-            layout.addWidget(nameLabel);
-            layout.addStretch(1);
-
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), widget);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
         }
 
         //
