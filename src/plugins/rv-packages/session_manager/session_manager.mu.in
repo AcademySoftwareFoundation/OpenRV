@@ -1428,15 +1428,13 @@ class: SessionManagerMode : MinorMode
         _inputOrderLock = true;
 
         _inputsModel.clear();
-        let connections = nodeInputs(node),
-            vnodes = viewNodes();
+        let connections = nodeInputs(node);
 
         for_index (i; connections)
         {
             let innode   = connections[i],
                 isSource = nodeType(innode) == "RVSourceGroup",
-                item     = QStandardItem(iconForNode(innode), uiName(innode)),
-                vindex   = indexOfItem(vnodes, innode);
+                item     = QStandardItem(iconForNode(innode), uiName(innode));
 
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsEnabled);
             item.setData(QVariant(innode), Qt.UserRole + 2);
