@@ -1781,8 +1781,6 @@ class: SessionManagerMode : MinorMode
 
         let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
         metaLabel.setStyleSheet("color: #888888; background: transparent; font-size: 9px;");
-        metaLabel.setSizePolicy(5, 5);  // QSizePolicy::Preferred
-        metaLabel.setMinimumWidth(1);   // absolute minimum overrides minimumSizeHint, allows shrinking
         textLayout.addWidget(metaLabel);
         textLayout.addStretch(1);
 
