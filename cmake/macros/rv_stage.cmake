@@ -418,7 +418,9 @@ FUNCTION(rv_stage)
 
       FILE(READ "${CMAKE_CURRENT_SOURCE_DIR}/${_package_file}" _package_file_content)
       STRING(REGEX MATCH "version:[ \t]*([0-9.]+)" _version_match "${_package_file_content}")
-      SET(_pkg_version "${CMAKE_MATCH_1}")
+      SET(_pkg_version
+          "${CMAKE_MATCH_1}"
+      )
       IF(NOT _pkg_version)
         MESSAGE(FATAL_ERROR "Error retrieving version field from '${_package_file}'")
       ELSE()

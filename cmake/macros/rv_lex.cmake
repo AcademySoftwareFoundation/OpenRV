@@ -24,18 +24,26 @@ EXECUTE_PROCESS(
 )
 # Extract minor version: output is like "flex 2.6.4" or "win_flex 2.6.4"
 STRING(REGEX MATCH "[0-9]+\\.([0-9]+)" _flex_version_match "${_flex_version_output}")
-SET(_flex_minor_version "${CMAKE_MATCH_1}")
+SET(_flex_minor_version
+    "${CMAKE_MATCH_1}"
+)
 
 # Detect Apple flex (only relevant on macOS)
 IF(APPLE)
   STRING(FIND "${_flex_version_output}" "Apple" _apple_pos)
   IF(_apple_pos GREATER -1)
-    SET(_flex_apple 1)
+    SET(_flex_apple
+        1
+    )
   ELSE()
-    SET(_flex_apple 0)
+    SET(_flex_apple
+        0
+    )
   ENDIF()
 ELSE()
-  SET(_flex_apple 0)
+  SET(_flex_apple
+      0
+  )
 ENDIF()
 
 SET(RV_FLEX_MINOR_VERSION

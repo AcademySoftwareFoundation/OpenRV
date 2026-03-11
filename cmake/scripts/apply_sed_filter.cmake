@@ -5,16 +5,12 @@
 #
 
 #
-# CMake script-mode file for applying sed-style substitutions.
-# Replaces bash+sed and Python-based approaches with pure CMake.
+# CMake script-mode file for applying sed-style substitutions. Replaces bash+sed and Python-based approaches with pure CMake.
 #
-# Usage:
-#   cmake -DINPUT_FILE=<path> -DOUTPUT_FILE=<path> -DSED_FILE=<path> -P apply_sed_filter.cmake
+# Usage: cmake -DINPUT_FILE=<path> -DOUTPUT_FILE=<path> -DSED_FILE=<path> -P apply_sed_filter.cmake
 #
-# Supports:
-#   - Literal s/PATTERN/REPLACEMENT/ substitutions
-#   - PCRE negative lookbehind patterns (?<!PREFIX)MATCH via three-pass workaround
-#   - Any single-character delimiter after 's'
+# Supports: - Literal s/PATTERN/REPLACEMENT/ substitutions - PCRE negative lookbehind patterns (?<!PREFIX)MATCH via three-pass workaround - Any single-character
+# delimiter after 's'
 #
 
 IF(NOT INPUT_FILE)
@@ -34,14 +30,21 @@ FILE(READ "${SED_FILE}" _sed_content)
 STRING(REPLACE ";" "@@SEMICOLON@@" _sed_content "${_sed_content}")
 STRING(REPLACE "\n" ";" _sed_lines "${_sed_content}")
 
-SET(_placeholder_counter 0)
+SET(_placeholder_counter
+    0
+)
 
-FOREACH(_line IN LISTS _sed_lines)
+FOREACH(
+  _line IN
+  LISTS _sed_lines
+)
   # Restore semicolons within each line
   STRING(REPLACE "@@SEMICOLON@@" ";" _line "${_line}")
   STRING(STRIP "${_line}" _line)
 
-  IF("${_line}" STREQUAL "" OR "${_line}" MATCHES "^#")
+  IF("${_line}" STREQUAL ""
+     OR "${_line}" MATCHES "^#"
+  )
     CONTINUE()
   ENDIF()
 
@@ -69,7 +72,9 @@ FOREACH(_line IN LISTS _sed_lines)
   IF(_end_pos GREATER -1)
     STRING(SUBSTRING "${_repl_rest}" 0 ${_end_pos} _replacement)
   ELSE()
-    SET(_replacement "${_repl_rest}")
+    SET(_replacement
+        "${_repl_rest}"
+    )
   ENDIF()
 
   # Check for PCRE negative lookbehind: (?<!PREFIX)MATCH
@@ -96,10 +101,14 @@ FOREACH(_line IN LISTS _sed_lines)
     STRING(REPLACE "\\/" "/" _replacement "${_replacement}")
 
     # The already-qualified form is prefix + bare_pattern
-    SET(_qualified "${_lb_prefix}${_bare_pattern}")
+    SET(_qualified
+        "${_lb_prefix}${_bare_pattern}"
+    )
 
     # Three-pass workaround:
-    SET(_placeholder "@@RV_SED_PLACEHOLDER_${_placeholder_counter}@@")
+    SET(_placeholder
+        "@@RV_SED_PLACEHOLDER_${_placeholder_counter}@@"
+    )
     MATH(EXPR _placeholder_counter "${_placeholder_counter} + 1")
 
     # Pass 1: Protect already-qualified occurrences
@@ -118,4 +127,7 @@ FOREACH(_line IN LISTS _sed_lines)
   ENDIF()
 ENDFOREACH()
 
-FILE(WRITE "${OUTPUT_FILE}" "${_content}")
+FILE(
+  WRITE "${OUTPUT_FILE}"
+  "${_content}"
+)

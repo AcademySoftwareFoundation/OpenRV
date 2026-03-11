@@ -4,7 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-SET(_apply_sed_script "${PROJECT_SOURCE_DIR}/cmake/scripts/apply_sed_filter.cmake")
+SET(_apply_sed_script
+    "${PROJECT_SOURCE_DIR}/cmake/scripts/apply_sed_filter.cmake"
+)
 
 #
 # 01234567890123456789012345678901234567890123456789012345678901234567890123456789 ! sed_it2 : wraps a call to the 'sed' utility.
@@ -88,12 +90,7 @@ FUNCTION(sed_it)
   # Actual SED operation via CMake script mode
   EXECUTE_PROCESS(
     WORKING_DIRECTORY ${arg_OUTPUT_DIR}
-    COMMAND ${CMAKE_COMMAND}
-      -DINPUT_FILE=${arg_INPUT_FILE}
-      -DOUTPUT_FILE=${_temp}
-      -DSED_FILE=${arg_INPUT_SED_FILE}
-      -P ${_apply_sed_script}
-    COMMAND_ECHO STDOUT
+    COMMAND ${CMAKE_COMMAND} -DINPUT_FILE=${arg_INPUT_FILE} -DOUTPUT_FILE=${_temp} -DSED_FILE=${arg_INPUT_SED_FILE} -P ${_apply_sed_script} COMMAND_ECHO STDOUT
     RESULT_VARIABLE _result_code COMMAND_ERROR_IS_FATAL ANY
   )
 
