@@ -7,6 +7,22 @@
 
 #include <IPCore/ImageFBO.h>
 
+namespace
+{
+    // Number of render cycles an unused regular FBO is kept before being freed.
+    // A small grace window (roughly 200ms at 24fps) prevents thrashing when a
+    // frame is temporarily skipped during cache warm-up or off-screen evaluation.
+    constexpr size_t FBO_AGE_LIMIT = 5;
+
+    // Number of render cycles an idle paint cache FBO is kept before being freed.
+    // Paint cache FBOs are pinned (never returned to the general pool) so they
+    // survive scrubbing. This longer threshold only fires when the annotation has
+    // been genuinely abandoned — cleared, source removed, or the user has been on
+    // a completely different part of the timeline — preventing unbounded memory
+    // accumulation from orphaned cache entries.
+    constexpr size_t PAINT_FBO_AGE_LIMIT = 300;
+} // namespace
+
 namespace IPCore
 {
     using namespace std;
@@ -225,6 +241,14 @@ namespace IPCore
         return 0;
     }
 
+    void ImageFBOManager::destroyImageFBO(ImageFBO* imageFBO)
+    {
+        m_totalSizeInBytes -= imageFBO->fbo()->totalSizeInBytes();
+        deleteFBOFence(imageFBO->fbo());
+        delete imageFBO->fbo();
+        delete imageFBO;
+    }
+
     void ImageFBOManager::gcImageFBOs(size_t fullSerialNum)
     {
         //
@@ -238,11 +262,43 @@ namespace IPCore
         {
             ImageFBO* i = m_imageFBOs[q];
             const size_t age = fullSerialNum - i->fullSerialNum;
+            const bool isPaintCache = i->identifier.find("paintCmdNo") != string::npos;
+
+            if (isPaintCache)
+            {
+                // Paint cache FBOs must NOT be returned to the general pool.
+                // Setting available=true would allow newImageFBO() to grab them
+                // by dimension match before findExistingPaintFBO() reclaims them,
+                // destroying the annotation cache and forcing a cold O(N) re-render
+                // on every scrub. Leave them pinned (available=false) so only
+                // findExistingPaintFBO() can ever reclaim them.
+                //
+                // Evict only after a long idle period — this handles the case where
+                // annotations were cleared or the source was removed, preventing
+                // unbounded memory accumulation.
+                if (age > PAINT_FBO_AGE_LIMIT)
+                {
+                    if (m_imageFBOLog)
+                    {
+                        string s = i->identifier;
+                        if (s.size() > 50)
+                            s = s.substr(0, 50);
+
+                        cout << "INFO: gc paint FBO evict (" << fullSerialNum << ") " << i->fbo()->width() << "x"
+                             << i->fbo()->height() << "/" << i->fullSerialNum << ", " << s << endl;
+                    }
+
+                    destroyImageFBO(i);
+                    m_imageFBOs[q] = m_imageFBOs.back();
+                    m_imageFBOs.pop_back();
+                    q--;
+                }
+                continue;
+            }
 
             i->available = true;
 
-            size_t loc = i->identifier.find("paintCmdNo");
-            if (age > 5 && loc == string::npos) // do not release the paint FBOs
+            if (age > FBO_AGE_LIMIT)
             {
                 if (m_imageFBOLog)
                 {
@@ -254,11 +310,7 @@ namespace IPCore
                          << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << s << endl;
                 }
 
-                m_totalSizeInBytes -= i->fbo()->totalSizeInBytes();
-
-                deleteFBOFence(i->fbo());
-                delete i->fbo();
-                delete i;
+                destroyImageFBO(i);
                 m_imageFBOs[q] = m_imageFBOs.back();
                 m_imageFBOs.pop_back();
                 q--;
@@ -421,28 +473,10 @@ namespace IPCore
     void ImageFBOManager::flushImageFBOs()
     {
         for (size_t i = 0; i < m_outputImageFBOs.size(); i++)
-        {
-            ImageFBO* t = m_outputImageFBOs[i];
-            deleteFBOFence(t->fbo());
-            if (t)
-            {
-                m_totalSizeInBytes -= t->fbo()->totalSizeInBytes();
-                delete t->fbo();
-            }
-            delete t;
-        }
+            destroyImageFBO(m_outputImageFBOs[i]);
 
         for (size_t i = 0; i < m_imageFBOs.size(); i++)
-        {
-            ImageFBO* t = m_imageFBOs[i];
-            deleteFBOFence(t->fbo());
-            if (t)
-            {
-                m_totalSizeInBytes -= t->fbo()->totalSizeInBytes();
-                delete t->fbo();
-            }
-            delete t;
-        }
+            destroyImageFBO(m_imageFBOs[i]);
 
         if (m_imageFBOLog)
         {
