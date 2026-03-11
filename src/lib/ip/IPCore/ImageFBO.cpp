@@ -6,6 +6,7 @@
 //******************************************************************************
 
 #include <IPCore/ImageFBO.h>
+#include <algorithm>
 
 namespace
 {
@@ -21,6 +22,13 @@ namespace
     // a completely different part of the timeline — preventing unbounded memory
     // accumulation from orphaned cache entries.
     constexpr size_t PAINT_FBO_AGE_LIMIT = 300;
+
+    // Maximum number of paint cache FBOs retained simultaneously. Each pinned
+    // paint FBO holds a full-resolution composited image (e.g. ~33MB at 4K 8-bit),
+    // so without a cap a long annotated timeline could exhaust GPU memory. When
+    // the limit is exceeded the least-recently-used entries (lowest fullSerialNum)
+    // are evicted first, keeping the most recently visited frames hot.
+    constexpr size_t MAX_PAINT_FBO_COUNT = 32;
 } // namespace
 
 namespace IPCore
@@ -258,6 +266,8 @@ namespace IPCore
         //  but seems to be adequate in practice.
         //
 
+        size_t paintFBOCount = 0;
+
         for (size_t q = 0; q < m_imageFBOs.size(); q++)
         {
             ImageFBO* i = m_imageFBOs[q];
@@ -293,6 +303,10 @@ namespace IPCore
                     m_imageFBOs.pop_back();
                     q--;
                 }
+                else
+                {
+                    paintFBOCount++;
+                }
                 continue;
             }
 
@@ -314,6 +328,58 @@ namespace IPCore
                 m_imageFBOs[q] = m_imageFBOs.back();
                 m_imageFBOs.pop_back();
                 q--;
+            }
+        }
+
+        //
+        //  Cap the total number of pinned paint cache FBOs to prevent unbounded
+        //  GPU memory growth on long annotated timelines. When the limit is
+        //  exceeded, evict the least-recently-used entries (lowest fullSerialNum)
+        //  first, keeping the most recently visited frames hot in cache.
+        //
+
+        // Collect pointers to surviving paint FBOs only when the cap is exceeded,
+        // avoiding a heap allocation and second scan in the common case.
+        if (paintFBOCount <= MAX_PAINT_FBO_COUNT)
+            return;
+
+        vector<ImageFBO*> paintFBOs;
+        paintFBOs.reserve(paintFBOCount);
+        for (ImageFBO* fbo : m_imageFBOs)
+        {
+            if (fbo->identifier.find("paintCmdNo") != string::npos)
+                paintFBOs.push_back(fbo);
+        }
+
+        if (paintFBOs.size() > MAX_PAINT_FBO_COUNT)
+        {
+            // Sort ascending by fullSerialNum so the oldest (LRU) come first.
+            sort(paintFBOs.begin(), paintFBOs.end(),
+                 [](const ImageFBO* a, const ImageFBO* b) { return a->fullSerialNum < b->fullSerialNum; });
+
+            const size_t evictCount = paintFBOs.size() - MAX_PAINT_FBO_COUNT;
+            for (size_t e = 0; e < evictCount; e++)
+            {
+                ImageFBO* victim = paintFBOs[e];
+
+                if (m_imageFBOLog)
+                {
+                    string s = victim->identifier;
+                    if (s.size() > 50)
+                        s = s.substr(0, 50);
+
+                    cout << "INFO: gc paint FBO cap evict (" << fullSerialNum << ") " << victim->fbo()->width() << "x"
+                         << victim->fbo()->height() << "/" << victim->fullSerialNum << ", " << s << endl;
+                }
+
+                // Remove from m_imageFBOs using swap-and-pop, then destroy.
+                auto it = find(m_imageFBOs.begin(), m_imageFBOs.end(), victim);
+                if (it != m_imageFBOs.end())
+                {
+                    *it = m_imageFBOs.back();
+                    m_imageFBOs.pop_back();
+                }
+                destroyImageFBO(victim);
             }
         }
     }
