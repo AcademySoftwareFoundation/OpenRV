@@ -5,19 +5,38 @@
 #
 
 INCLUDE(rv_sed)
-FIND_PROGRAM(_lex flex NO_CACHE REQUIRED)
 
+# Find the lexer tool: prefer win_flex on Windows, fall back to flex
+IF(RV_TARGET_WINDOWS)
+  FIND_PROGRAM(_lex win_flex NO_CACHE)
+  IF(NOT _lex)
+    FIND_PROGRAM(_lex flex NO_CACHE REQUIRED)
+  ENDIF()
+ELSE()
+  FIND_PROGRAM(_lex flex NO_CACHE REQUIRED)
+ENDIF()
+
+# Get flex version using CMake string operations (no bash needed)
 EXECUTE_PROCESS(
-  COMMAND bash "-c" "${_lex} --version | cut -d '.' -f 2"
-  OUTPUT_VARIABLE _flex_minor_version
+  COMMAND ${_lex} --version
+  OUTPUT_VARIABLE _flex_version_output
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+# Extract minor version: output is like "flex 2.6.4" or "win_flex 2.6.4"
+STRING(REGEX MATCH "[0-9]+\\.([0-9]+)" _flex_version_match "${_flex_version_output}")
+SET(_flex_minor_version "${CMAKE_MATCH_1}")
 
-EXECUTE_PROCESS(
-  COMMAND bash "-c" "${_lex} --version | grep Apple | wc -l | ${_sed} 's/ //g'"
-  OUTPUT_VARIABLE _flex_apple
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+# Detect Apple flex (only relevant on macOS)
+IF(APPLE)
+  STRING(FIND "${_flex_version_output}" "Apple" _apple_pos)
+  IF(_apple_pos GREATER -1)
+    SET(_flex_apple 1)
+  ELSE()
+    SET(_flex_apple 0)
+  ENDIF()
+ELSE()
+  SET(_flex_apple 0)
+ENDIF()
 
 SET(RV_FLEX_MINOR_VERSION
     ${_flex_minor_version}

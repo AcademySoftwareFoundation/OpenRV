@@ -416,16 +416,10 @@ FUNCTION(rv_stage)
 
       SET_DIRECTORY_PROPERTIES(PROPERTIES CMAKE_CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_package_file})
 
-      EXECUTE_PROCESS(
-        COMMAND bash -c "cat ${_package_file} | grep version: | grep --only-matching -e '[0-9.]*'"
-        RESULT_VARIABLE _result
-        OUTPUT_VARIABLE _pkg_version
-        OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      )
-      IF(_result
-         AND NOT _result EQUAL 0
-      )
+      FILE(READ "${CMAKE_CURRENT_SOURCE_DIR}/${_package_file}" _package_file_content)
+      STRING(REGEX MATCH "version:[ \t]*([0-9.]+)" _version_match "${_package_file_content}")
+      SET(_pkg_version "${CMAKE_MATCH_1}")
+      IF(NOT _pkg_version)
         MESSAGE(FATAL_ERROR "Error retrieving version field from '${_package_file}'")
       ELSE()
         MESSAGE(DEBUG "Found version for '${arg_TARGET}.rvpkg' package version ${_pkg_version} ...")
