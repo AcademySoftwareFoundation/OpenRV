@@ -294,8 +294,8 @@ namespace IPCore
                         if (s.size() > 50)
                             s = s.substr(0, 50);
 
-                        cout << "INFO: gc paint FBO evict (" << fullSerialNum << ") " << i->fbo()->width() << "x"
-                             << i->fbo()->height() << "/" << i->fullSerialNum << ", " << s << endl;
+                        cout << "INFO: gc paint FBO evict (" << fullSerialNum << ") " << i->fbo()->width() << "x" << i->fbo()->height()
+                             << "/" << i->fullSerialNum << ", " << s << endl;
                     }
 
                     destroyImageFBO(i);
