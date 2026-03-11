@@ -29,35 +29,17 @@ SET(_lib_dir
     ${_install_dir}/lib
 )
 
-IF(RV_TARGET_WINDOWS)
-  SET(_atomic_ops_lib_name
-      libatomic_ops.a
-  )
-ELSE()
-  SET(_atomic_ops_lib_name
-      ${CMAKE_STATIC_LIBRARY_PREFIX}atomic_ops${CMAKE_STATIC_LIBRARY_SUFFIX}
-  )
-ENDIF()
+SET(_atomic_ops_lib_name
+    ${CMAKE_STATIC_LIBRARY_PREFIX}atomic_ops${CMAKE_STATIC_LIBRARY_SUFFIX}
+)
 
 SET(_atomic_ops_lib
     ${_lib_dir}/${_atomic_ops_lib_name}
 )
 
-SET(_make_command
-    make
+SET(_build_dir
+    ${RV_DEPS_BASE_DIR}/${_target}/build
 )
-SET(_configure_command
-    sh ./configure
-)
-SET(_autogen_command
-    sh ./autogen.sh
-)
-
-# Make sure NOT to enable GPL
-SET(_configure_args
-    "--disable-gpl"
-)
-LIST(APPEND _configure_args "--prefix=${_install_dir}")
 
 EXTERNALPROJECT_ADD(
   ${_target}
@@ -67,10 +49,11 @@ EXTERNALPROJECT_ADD(
   URL_MD5 ${_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  CONFIGURE_COMMAND ${_autogen_command} && ${_configure_command} ${_configure_args}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count}
-  INSTALL_COMMAND ${_make_command} install
-  BUILD_IN_SOURCE TRUE
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} -S ${RV_DEPS_BASE_DIR}/${_target}/src -B ${_build_dir} -DCMAKE_INSTALL_PREFIX=${_install_dir}
+                    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -Denable_gpl=OFF
+  BUILD_COMMAND ${CMAKE_COMMAND} --build ${_build_dir} --config ${CMAKE_BUILD_TYPE} -j${_cpu_count}
+  INSTALL_COMMAND ${CMAKE_COMMAND} --install ${_build_dir} --prefix ${_install_dir} --config ${CMAKE_BUILD_TYPE}
+  BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_atomic_ops_lib}
   USES_TERMINAL_BUILD TRUE

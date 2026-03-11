@@ -17,18 +17,30 @@ SET(_download_hash
 
 # PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
 IF(RV_TARGET_WINDOWS)
+  # PCRE2's CMakeLists.txt sets CMAKE_DEBUG_POSTFIX to "d" internally, which cannot be overridden via cache variable. Account for it here.
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    SET(_pcre2_debug_postfix
+        "d"
+    )
+  ELSE()
+    SET(_pcre2_debug_postfix
+        ""
+    )
+  ENDIF()
+
+  # MSVC library naming (CMake build)
   SET(_pcre2_libname
-      libpcre2-8-0${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}pcre2-8${_pcre2_debug_postfix}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
   SET(_pcre2_libname_posix
-      libpcre2-posix-3${CMAKE_SHARED_LIBRARY_SUFFIX}
+      ${CMAKE_SHARED_LIBRARY_PREFIX}pcre2-posix${_pcre2_debug_postfix}${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
 
   SET(_pcre2_implibname
-      libpcre2-8.dll.a
+      ${CMAKE_IMPORT_LIBRARY_PREFIX}pcre2-8${_pcre2_debug_postfix}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
   SET(_pcre2_implibname_posix
-      libpcre2-posix.dll.a
+      ${CMAKE_IMPORT_LIBRARY_PREFIX}pcre2-posix${_pcre2_debug_postfix}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
 
   SET(_pcre2_libpath
@@ -50,22 +62,17 @@ SET(_pcre2_include_dir
     ${_install_dir}/include
 )
 
-SET(_pcre2_configure_command
-    sh ./configure
-)
-
-SET(_pcre2_autogen_command
-    sh ./autogen.sh
-)
-
-LIST(APPEND _pcre2_configure_args "--prefix=${_install_dir}")
-# Build as shared library
-LIST(APPEND _pcre2_configure_args "--disable-static")
-LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libbz2")
-LIST(APPEND _pcre2_configure_args "--disable-pcre2grep-libz")
+# PCRE2-specific CMake options (replaces autotools configure args)
+LIST(APPEND _configure_options "-DBUILD_SHARED_LIBS=ON")
+LIST(APPEND _configure_options "-DBUILD_STATIC_LIBS=OFF")
+LIST(APPEND _configure_options "-DPCRE2_BUILD_PCRE2GREP=OFF")
+LIST(APPEND _configure_options "-DPCRE2_BUILD_TESTS=OFF")
+LIST(APPEND _configure_options "-DPCRE2_SUPPORT_LIBBZ2=OFF")
+LIST(APPEND _configure_options "-DPCRE2_SUPPORT_LIBZ=OFF")
+LIST(APPEND _configure_options "-DINSTALL_MSVC_PDB=OFF")
 
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  LIST(APPEND _pcre2_configure_args "--enable-debug")
+  LIST(APPEND _configure_options "-DPCRE2_DEBUG=ON")
 ENDIF()
 
 EXTERNALPROJECT_ADD(
@@ -78,66 +85,61 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${_source_dir}
   INSTALL_DIR ${_install_dir}
   DEPENDS ZLIB::ZLIB
-  CONFIGURE_COMMAND ${_pcre2_autogen_command} && ${_pcre2_configure_command} ${_pcre2_configure_args}
-  BUILD_COMMAND make -j${_cpu_count}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command}
   BUILD_IN_SOURCE TRUE
   BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_pcre2_libname} ${_pcre2_libname_posix} ${_pcre2_implibname} ${_pcre2_implibname_posix}
+  BUILD_BYPRODUCTS ${_pcre2_libpath} ${_pcre2_libpath_posix} ${_pcre2_implibpath} ${_pcre2_implibpath_posix}
   USES_TERMINAL_BUILD TRUE
 )
 
-# PCRE is not used for Linux and MacOS (Boost regex is used) in the current code. Copy library files manually since there are tools that are not needed in the
-# bin folder.
-ADD_CUSTOM_COMMAND(
-  COMMENT "Staging ${_target}'s shared library into ${RV_STAGE_BIN_DIR}"
-  OUTPUT ${RV_STAGE_BIN_DIR}/${_pcre2_libname} ${RV_STAGE_BIN_DIR}/${_pcre2_libname_posix}
-  COMMAND ${CMAKE_COMMAND} -E copy ${_pcre2_libpath} ${_pcre2_libpath_posix} -t ${RV_STAGE_BIN_DIR}
-  DEPENDS ${_target}
+RV_STAGE_DEPENDENCY_LIBS(
+  TARGET
+  ${_target}
+  BIN_DIR
+  ${_bin_dir}
+  OUTPUTS
+  ${RV_STAGE_BIN_DIR}/${_pcre2_libname}
+  ${RV_STAGE_BIN_DIR}/${_pcre2_libname_posix}
 )
 
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_BIN_DIR}/${_pcre2_libname} ${RV_STAGE_BIN_DIR}/${_pcre2_libname_posix}
-)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(pcre2-8 SHARED IMPORTED GLOBAL)
-ADD_LIBRARY(pcre2-posix SHARED IMPORTED GLOBAL)
-
-ADD_DEPENDENCIES(pcre2-8 ${_target})
-ADD_DEPENDENCIES(pcre2-posix ${_target})
-
-# Setup includes
-SET(_pcre2_include_dir
-    ${_install_dir}/include
-)
-FILE(MAKE_DIRECTORY ${_pcre2_include_dir})
-
-# Setup pcre2 8-bits target
-SET_TARGET_PROPERTIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   pcre2-8
-  PROPERTIES IMPORTED_LOCATION ${_pcre2_libpath}
-             IMPORTED_IMPLIB ${_pcre2_implibpath}
-)
-TARGET_INCLUDE_DIRECTORIES(
-  pcre2-8
-  INTERFACE ${_pcre2_include_dir}
+  TYPE
+  SHARED
+  LOCATION
+  ${_pcre2_libpath}
+  SONAME
+  ${_pcre2_libname}
+  IMPLIB
+  ${_pcre2_implibpath}
+  INCLUDE_DIRS
+  ${_pcre2_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 TARGET_COMPILE_DEFINITIONS(
   pcre2-8
   INTERFACE PCRE2_CODE_UNIT_WIDTH=8
 )
 
-# Setup pcre2-posix target
-SET_TARGET_PROPERTIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   pcre2-posix
-  PROPERTIES IMPORTED_LOCATION ${_pcre2_libpath_posix}
-             IMPORTED_IMPLIB ${_pcre2_implibpath_posix}
+  TYPE
+  SHARED
+  LOCATION
+  ${_pcre2_libpath_posix}
+  SONAME
+  ${_pcre2_libname_posix}
+  IMPLIB
+  ${_pcre2_implibpath_posix}
+  INCLUDE_DIRS
+  ${_pcre2_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-TARGET_INCLUDE_DIRECTORIES(
-  pcre2-posix
-  INTERFACE ${_pcre2_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST pcre2-8 pcre2-posix)
