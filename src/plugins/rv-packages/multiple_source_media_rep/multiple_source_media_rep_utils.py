@@ -25,7 +25,10 @@ def get_source_at_current_frame():
     """
     Returns first source at current frame.
     """
-    sources = rvc.sourcesAtFrame(rvc.frame())
+    try:
+        sources = rvc.sourcesAtFrame(rvc.frame())
+    except Exception:
+        sources = []
     return "" if not sources else sources[0]
 
 
@@ -34,7 +37,10 @@ def get_switch_node(source):
     Retrieves the first RVSwitch node at current frame.
     """
     if source:
-        switch_nodes = rve.nodesInEvalPath(rvc.frame(), "RVSwitch", source)
+        try:
+            switch_nodes = rve.nodesInEvalPath(rvc.frame(), "RVSwitch", source)
+        except Exception:
+            switch_nodes = []
         if switch_nodes:
             return switch_nodes[0]
 
@@ -47,9 +53,16 @@ def get_switch_nodes_at_current_frame():
     """
     switch_nodes = []
 
-    sources = rvc.sourcesAtFrame(rvc.frame())
+    try:
+        sources = rvc.sourcesAtFrame(rvc.frame())
+    except Exception:
+        sources = []
+
     for source in sources:
-        src_switch_nodes = rve.nodesInEvalPath(rvc.frame(), "RVSwitch", source)
+        try:
+            src_switch_nodes = rve.nodesInEvalPath(rvc.frame(), "RVSwitch", source)
+        except Exception:
+            src_switch_nodes = []
         if src_switch_nodes:
             switch_nodes.append(src_switch_nodes[0])
 
