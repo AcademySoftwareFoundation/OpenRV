@@ -271,11 +271,11 @@ namespace AJADevices
             {"12 Bit Dual Link RGB", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_DualLink},
 
             // 6G/12G Single-link YCbCr formats
-            {"10 Bit 12G Single-Link YCrCb 4:2:2 (SDI Out 3)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, YUV_12G},
+            {"10 Bit 12G Single-link YCrCb 4:2:2 (SDI Out 3)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, YUV_12G},
 
             // 12G Single-link RGB formats
-            {"10 Bit 12G Single-Link RGB (SDI Out 3)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, RGB_12G},
-            {"12 Bit 12G Single-Link RGB (SDI Out 3)", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_12G},
+            {"10 Bit 12G Single-link RGB (SDI Out 3)", NTV2_FBF_10BIT_RGB, VideoDevice::RGB10X2, RGB_12G},
+            {"12 Bit 12G Single-link RGB (SDI Out 3)", NTV2_FBF_48BIT_RGB, VideoDevice::RGB16, RGB_12G},
 
             // Stereo
             // {"Stereo Dual 10 Bit YCrCb 4:2:2 (8 bit internal)",
@@ -1201,19 +1201,7 @@ namespace AJADevices
                 if (numFrameStores >= 2)
                     m_card->EnableChannel(NTV2_CHANNEL2);
 
-                if (m_12G)
-                {
-                    // 12G single-link always uses TSI regardless of the 4K transport setting.
-                    // YUV needs CH3+CH4 and RGB needs CH1+CH2 (already enabled above).
-                    if (!rgb)
-                    {
-                        m_card->DisableChannel(NTV2_CHANNEL1);
-                        m_card->DisableChannel(NTV2_CHANNEL2);
-                        m_card->EnableChannel(NTV2_CHANNEL3);
-                        m_card->EnableChannel(NTV2_CHANNEL4);
-                    }
-                }
-                else if (tsiEnabled())
+                if (tsiEnabled() || m_12G)
                 {
                     if (numFrameStores >= 3)
                         m_card->DisableChannel(NTV2_CHANNEL3);
@@ -1237,18 +1225,8 @@ namespace AJADevices
 
                 if (m_12G)
                 {
-                    // YUV 6G: framestores 3+4 (feeds TSI Mux 3+4 → SDIOut3 via 6G link grouping)
-                    // RGB 12G: framestores 1+2 (feeds TSI Mux 1+2 → DLOut → SDIOut3 via 12G link grouping)
-                    if (rgb)
-                    {
-                        AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL1, d.value));
-                        AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL2, d.value));
-                    }
-                    else
-                    {
-                        AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL3, d.value));
-                        AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL4, d.value));
-                    }
+                    AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL1, d.value));
+                    AJA_CHECK(m_card->SetFrameBufferFormat(NTV2_CHANNEL2, d.value));
                 }
                 else
                 {
@@ -1271,16 +1249,9 @@ namespace AJADevices
                 else
                     m_channelVector.resize(1);
 
-                if (m_12G)
+                for (unsigned int i = 0; i < m_channelVector.size(); i++)
                 {
-                    m_channelVector[0] = rgb ? NTV2_CHANNEL1 : NTV2_CHANNEL3;
-                }
-                else
-                {
-                    for (unsigned int i = 0; i < m_channelVector.size(); i++)
-                    {
-                        m_channelVector[i] = (NTV2Channel)(i + NTV2_CHANNEL1);
-                    }
+                    m_channelVector[i] = (NTV2Channel)(i + NTV2_CHANNEL1);
                 }
 
                 AJA_CHECK(m_card->SetReference(NTV2_REFERENCE_FREERUN));
@@ -1506,11 +1477,6 @@ namespace AJADevices
             if (m_textureType == GL_UNSIGNED_INT_10_10_10_2)
                 m_textureType = GL_UNSIGNED_INT_2_10_10_10_REV;
 
-            for (VideoChannel* vc : m_videoChannels)
-            {
-                m_card->DisableChannel(vc->channel);
-            }
-
             m_videoChannels.clear();
 
             m_videoChannels.push_back(
@@ -1623,25 +1589,11 @@ namespace AJADevices
             }
             if (ok)
             {
-                if (m_12G)
-                {
-                    AJA_CHECK(m_card->AutoCirculateFlush(m_videoChannels[0]->channel));
-                }
-                else
-                {
-                    AJA_CHECK(m_card->AutoCirculateFlush(NTV2_CHANNEL1));
-                }
+                AJA_CHECK(m_card->AutoCirculateFlush(NTV2_CHANNEL1));
 
                 if (m_stereo)
                 {
-                    if (m_12G)
-                    {
-                        AJA_CHECK(m_card->AutoCirculateFlush(m_videoChannels[1]->channel));
-                    }
-                    else
-                    {
-                        AJA_CHECK(m_card->AutoCirculateFlush(NTV2_CHANNEL2));
-                    }
+                    AJA_CHECK(m_card->AutoCirculateFlush(NTV2_CHANNEL2));
                 }
             }
         }
@@ -1969,48 +1921,41 @@ namespace AJADevices
     void KonaVideoDevice::route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         //
-        //  Single-link YCbCr output on Kona 5 port 3 (NTV2_CHANNEL3) with the retail firmware.
+        //  Single-link YCbCr output on Kona 5 port 3 with the retail firmware.
         //
         //
-        //  6G:
-        //      FB3 + FB4 -> TSI Mux 3 + TSI Mux 4 -> CSC3 + CSC4 -> SDIOut3 + SDIOut4
-        //
-        //  12G:
-        //      FB3 + FB4 -> TSI Mux 3 + TSI Mux 4 -> CSC31 + CSC2 + CSC3 + CSC4 -> SDIOut1 + SDIOut2 + SDIOut3 + SDIOut4
+        //  FB 1 + FB 2 -> TSI Mux 1 + TSI Mux 2 -> CSC 1 + CSC 2 + CSC 3 + CSC 4 -> SDI Out 1 + SDI Out 2 + SDI Out 3 + SDI Out 4
         //
 
         if (m_infoFeedback)
-            cout << "INFO: KONA 6G/12G single-link YCbCr format" << endl;
+            std::cout << "INFO: KONA 6G/12G single-link YCbCr format\n";
 
         ULWord vpidA;
         CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_3);
 
-        // Disable 6G/12G on SDIOut3 before configuring
-        m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, false);
-        m_card->SetSDIOut12GEnable(NTV2_CHANNEL3, false);
-
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
 
         m_card->SetSDIOutputStandard(NTV2_CHANNEL3, standard);
-        m_card->SetMode(NTV2_CHANNEL3, NTV2_MODE_DISPLAY);
-        m_card->SetMode(NTV2_CHANNEL4, NTV2_MODE_DISPLAY);
+        m_card->SetMode(NTV2_CHANNEL1, NTV2_MODE_DISPLAY);
+        m_card->SetMode(NTV2_CHANNEL2, NTV2_MODE_DISPLAY);
 
-        m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL3);
+        m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL1);
 
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL3);
 
-        // FS3 + FS4 -> TSI Mux 3 + TSI Mux 4
-        m_card->Connect(NTV2_Xpt425Mux3AInput, NTV2_XptFrameBuffer3RGB);
-        m_card->Connect(NTV2_Xpt425Mux3BInput, NTV2_XptFrameBuffer3_DS2RGB);
-        m_card->Connect(NTV2_Xpt425Mux4AInput, NTV2_XptFrameBuffer4RGB);
-        m_card->Connect(NTV2_Xpt425Mux4BInput, NTV2_XptFrameBuffer4_DS2RGB);
+        // FB 1 + FB 2 -> TSI Mux 1 + TSI Mux 2
+        m_card->Connect(NTV2_Xpt425Mux1AInput, NTV2_XptFrameBuffer1RGB);
+        m_card->Connect(NTV2_Xpt425Mux1BInput, NTV2_XptFrameBuffer1_DS2RGB);
+        m_card->Connect(NTV2_Xpt425Mux2AInput, NTV2_XptFrameBuffer2RGB);
+        m_card->Connect(NTV2_Xpt425Mux2BInput, NTV2_XptFrameBuffer2_DS2RGB);
 
-        // TSI Mux 3 + TSI Mux 4 -> CSC1 + CSC2 + CSC3 + CSC4
-        m_card->Connect(NTV2_XptCSC1VidInput, NTV2_Xpt425Mux3ARGB);
-        m_card->Connect(NTV2_XptCSC2VidInput, NTV2_Xpt425Mux3BRGB);
-        m_card->Connect(NTV2_XptCSC3VidInput, NTV2_Xpt425Mux4ARGB);
-        m_card->Connect(NTV2_XptCSC4VidInput, NTV2_Xpt425Mux4BRGB);
+        // TSI Mux 1 + TSI Mux 2 -> CSC 1 + CSC 2 + CSC 3 + CSC 4
+        m_card->Connect(NTV2_XptCSC1VidInput, NTV2_Xpt425Mux1ARGB);
+        m_card->Connect(NTV2_XptCSC2VidInput, NTV2_Xpt425Mux1BRGB);
+        m_card->Connect(NTV2_XptCSC3VidInput, NTV2_Xpt425Mux2ARGB);
+        m_card->Connect(NTV2_XptCSC4VidInput, NTV2_Xpt425Mux2BRGB);
 
+        // CSC 1 + CSC 2 + CSC 3 + CSC 4 -> SDI Out 1 + SDI Out 2 + SDI Out 3 + SDI Out 4
         if (NTV2_IS_4K_HFR_VIDEO_FORMAT(f.value))
         {
             m_card->Connect(NTV2_XptSDIOut1Input, NTV2_XptCSC1VidYUV);
@@ -2030,27 +1975,24 @@ namespace AJADevices
             m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, true);
         }
 
-        m_card->SetTsiFrameEnable(true, NTV2_CHANNEL3);
+        m_card->SetTsiFrameEnable(true, NTV2_CHANNEL1);
     }
 
     void KonaVideoDevice::route12GSingleLinkRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
     {
         //
-        //  Single-link RGB output on Kona 5 port 3 (NTV2_CHANNEL3) with the retail firmware.
+        //  Single-link RGB output on Kona 5 port 3 with the retail firmware.
         //
         //
-        //  FB1(RGB) + FB2(RGB) -> TSI Mux 1 + TSI Mux 2 -> DLOut1 + DLOut2 + DLOut3 + DLOut4 -> SDIOut1 + SDIOut2 + SDIOut3 + SDIOut4
+        //  FB 1 + FB 2 -> TSI Mux 1 + TSI Mux 2 -> DL Out 1 + DL Out 2 + DL Out 3 + DL Out 4 -> SDI Out 1 + SDI Out 2 + SDI Out 3 +
+        //  SDI Out 4
         //
 
         if (m_infoFeedback)
-            cout << "INFO: KONA 12G single-link RGB format" << endl;
+            std::cout << "INFO: KONA 12G single-link RGB format\n";
 
         ULWord vpidA;
         CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_3);
-
-        // Disable 6G/12G on SDIOut3 before configuring
-        m_card->SetSDIOut6GEnable(NTV2_CHANNEL3, false);
-        m_card->SetSDIOut12GEnable(NTV2_CHANNEL3, false);
 
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
 
@@ -2062,18 +2004,19 @@ namespace AJADevices
 
         m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL3);
 
-        // FS1 + FS2 -> TSI Mux 1 + TSI Mux 2 -> DLOut1 + DLOut2 + DLOut3 + DLOut4
+        // FB 1 + FB 2 -> TSI Mux 1 + TSI Mux 2
         m_card->Connect(NTV2_Xpt425Mux1AInput, NTV2_XptFrameBuffer1RGB);
         m_card->Connect(NTV2_Xpt425Mux1BInput, NTV2_XptFrameBuffer1_DS2RGB);
         m_card->Connect(NTV2_Xpt425Mux2AInput, NTV2_XptFrameBuffer2RGB);
         m_card->Connect(NTV2_Xpt425Mux2BInput, NTV2_XptFrameBuffer2_DS2RGB);
 
+        // TSI Mux 1 + TSI Mux 2 -> DL Out 1 + DL Out 2 + DL Out 3 + DL Out 4
         m_card->Connect(NTV2_XptDualLinkOut1Input, NTV2_Xpt425Mux1ARGB);
         m_card->Connect(NTV2_XptDualLinkOut2Input, NTV2_Xpt425Mux1BRGB);
         m_card->Connect(NTV2_XptDualLinkOut3Input, NTV2_Xpt425Mux2ARGB);
         m_card->Connect(NTV2_XptDualLinkOut4Input, NTV2_Xpt425Mux2BRGB);
 
-        // DLOut1 + DLOut2 + DLOut3 + DLOut4 -> SDIOut1 + SDIOut2 + SDIOut3 + SDIOut4
+        // DL Out 1 + DL Out 2 + DL Out 3 + DL Out 4 -> SDI Out 1 + SDI Out 2 + SDI Out 3 + SDI Out
         m_card->Connect(NTV2_XptSDIOut1Input, NTV2_XptDuallinkOut1);
         m_card->Connect(NTV2_XptSDIOut1InputDS2, NTV2_XptDuallinkOut1DS2);
         m_card->Connect(NTV2_XptSDIOut2Input, NTV2_XptDuallinkOut2);
@@ -2815,7 +2758,7 @@ namespace AJADevices
 
                     if (rcount >= m_highwater && !m_autocirculateRunning)
                     {
-                        AJA_CHECK(m_card->AutoCirculateStart(m_12G ? m_channelVector[0] : NTV2_CHANNEL1));
+                        AJA_CHECK(m_card->AutoCirculateStart(NTV2_CHANNEL1));
 
                         if (doingStereo)
                         {
@@ -3044,7 +2987,7 @@ namespace AJADevices
 
             if (!wrote)
             {
-                AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(m_12G ? m_channelVector[0] : NTV2_CHANNEL1));
+                AJA_CHECK(m_card->WaitForOutputVerticalInterrupt(NTV2_CHANNEL1)); // XXX best guess
                 vi--;
             }
         }
