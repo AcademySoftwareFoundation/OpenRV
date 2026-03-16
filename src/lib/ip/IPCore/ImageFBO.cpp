@@ -10,25 +10,9 @@
 
 namespace
 {
-    // Number of render cycles an unused regular FBO is kept before being freed.
-    // A small grace window (roughly 200ms at 24fps) prevents thrashing when a
-    // frame is temporarily skipped during cache warm-up or off-screen evaluation.
-    constexpr size_t FBO_AGE_LIMIT = 5;
-
-    // Number of render cycles an idle paint cache FBO is kept before being freed.
-    // Paint cache FBOs are pinned (never returned to the general pool) so they
-    // survive scrubbing. This longer threshold only fires when the annotation has
-    // been genuinely abandoned — cleared, source removed, or the user has been on
-    // a completely different part of the timeline — preventing unbounded memory
-    // accumulation from orphaned cache entries.
-    constexpr size_t PAINT_FBO_AGE_LIMIT = 300;
-
-    // Maximum number of paint cache FBOs retained simultaneously. Each pinned
-    // paint FBO holds a full-resolution composited image (e.g. ~33MB at 4K 8-bit),
-    // so without a cap a long annotated timeline could exhaust GPU memory. When
-    // the limit is exceeded the least-recently-used entries (lowest fullSerialNum)
-    // are evicted first, keeping the most recently visited frames hot.
-    constexpr size_t MAX_PAINT_FBO_COUNT = 32;
+    // max length of FBO ids output to debug logs
+    //
+    constexpr size_t FBO_ID_DEBUG_LOG_LIMIT = 50;
 } // namespace
 
 namespace IPCore
@@ -73,12 +57,12 @@ namespace IPCore
                         for (size_t i = 0; i < m_imageFBOs.size(); i++)
                         {
                             ImageFBO* f = m_imageFBOs[i];
-                            string s = f->identifier;
-                            if (s.size() > 50)
-                                s = s.substr(0, 50);
+                            string fboId = f->identifier;
+                            if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                                fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
 
                             cout << "INFO:     " << i << ": " << f->fbo()->width() << "x" << f->fbo()->height() << ", "
-                                 << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << s << endl;
+                                 << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << fboId << endl;
                         }
                     }
 
@@ -110,12 +94,12 @@ namespace IPCore
             for (size_t i = 0; i < m_imageFBOs.size(); i++)
             {
                 ImageFBO* f = m_imageFBOs[i];
-                string s = f->identifier;
-                if (s.size() > 50)
-                    s = s.substr(0, 50);
+                string fboId = f->identifier;
+                if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                    fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
 
                 cout << "INFO:     " << i << ": " << f->fbo()->width() << "x" << f->fbo()->height() << ", "
-                     << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << s << endl;
+                     << (f->available ? "available" : "used") << "/" << f->fullSerialNum << ", " << fboId << endl;
             }
         }
 
@@ -221,8 +205,8 @@ namespace IPCore
                 if (m_imageFBOLog)
                 {
                     ImageFBO* i = imageFBO;
-                    // string s = i->identifier;
-                    // if (s.size() > 50) s = s.substr(0, 50);
+                    // string fboId = i->identifier;
+                    // if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT) fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
                     cout << "INFO: (" << fullSerialNum << ") found imageFBO " << i->fbo()->width() << "x" << i->fbo()->height() << ", "
                          << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << i->identifier << endl;
                 }
@@ -259,13 +243,33 @@ namespace IPCore
 
     void ImageFBOManager::gcImageFBOs(size_t fullSerialNum)
     {
+
+        // Number of render cycles an unused regular FBO is kept before being freed.
+        // A small grace window (roughly 200ms at 24fps) prevents thrashing when a
+        // frame is temporarily skipped during cache warm-up or off-screen evaluation.
+        constexpr size_t FBO_AGE_LIMIT = 5;
+
+        // Number of render cycles an idle paint cache FBO is kept before being freed.
+        // Paint cache FBOs are pinned (never returned to the general pool) so they
+        // survive scrubbing. This longer threshold only fires when the annotation has
+        // been genuinely abandoned — cleared, source removed, or the user has been on
+        // a completely different part of the timeline — preventing unbounded memory
+        // accumulation from orphaned cache entries.
+        constexpr size_t PAINT_FBO_AGE_LIMIT = 300;
+
+        // Maximum number of paint cache FBOs retained simultaneously. Each pinned
+        // paint FBO holds a full-resolution composited image (e.g. ~33MB at 4K 8-bit),
+        // so without a cap a long annotated timeline could exhaust GPU memory. When
+        // the limit is exceeded the least-recently-used entries (lowest fullSerialNum)
+        // are evicted first, keeping the most recently visited frames hot.
+        constexpr size_t MAX_PAINT_FBO_COUNT = 32;
+
         //
         //  This is run after each main render -- FBOs all become
         //  available and those that were untouched from last time are
         //  freed (age > 1). This is a naively simple caching strategy,
         //  but seems to be adequate in practice.
         //
-
         size_t paintFBOCount = 0;
 
         for (size_t q = 0; q < m_imageFBOs.size(); q++)
@@ -290,12 +294,12 @@ namespace IPCore
                 {
                     if (m_imageFBOLog)
                     {
-                        string s = i->identifier;
-                        if (s.size() > 50)
-                            s = s.substr(0, 50);
+                        string fboId = i->identifier;
+                        if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                            fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
 
                         cout << "INFO: gc paint FBO evict (" << fullSerialNum << ") " << i->fbo()->width() << "x" << i->fbo()->height()
-                             << "/" << i->fullSerialNum << ", " << s << endl;
+                             << "/" << i->fullSerialNum << ", " << fboId << endl;
                     }
 
                     destroyImageFBO(i);
@@ -316,12 +320,12 @@ namespace IPCore
             {
                 if (m_imageFBOLog)
                 {
-                    string s = i->identifier;
-                    if (s.size() > 50)
-                        s = s.substr(0, 50);
+                    string fboId = i->identifier;
+                    if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                        fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
 
                     cout << "INFO: gc (" << fullSerialNum << ") " << i->fbo()->width() << "x" << i->fbo()->height() << ", "
-                         << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << s << endl;
+                         << (i->available ? "available" : "used") << "/" << i->fullSerialNum << ", " << fboId << endl;
                 }
 
                 destroyImageFBO(i);
@@ -364,12 +368,12 @@ namespace IPCore
 
                 if (m_imageFBOLog)
                 {
-                    string s = victim->identifier;
-                    if (s.size() > 50)
-                        s = s.substr(0, 50);
+                    string fboId = victim->identifier;
+                    if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                        fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
 
                     cout << "INFO: gc paint FBO cap evict (" << fullSerialNum << ") " << victim->fbo()->width() << "x"
-                         << victim->fbo()->height() << "/" << victim->fullSerialNum << ", " << s << endl;
+                         << victim->fbo()->height() << "/" << victim->fullSerialNum << ", " << fboId << endl;
                 }
 
                 // Remove from m_imageFBOs using swap-and-pop, then destroy.
@@ -525,11 +529,11 @@ namespace IPCore
         if (m_imageFBOLog)
         {
             ImageFBO* i = target;
-            string s = i->identifier;
-            if (s.size() > 50)
-                s = s.substr(0, 50);
+            string fboId = i->identifier;
+            if (fboId.size() > FBO_ID_DEBUG_LOG_LIMIT)
+                fboId = fboId.substr(0, FBO_ID_DEBUG_LOG_LIMIT);
             cout << "INFO: release " << i->fbo()->width() << "x" << i->fbo()->height() << ", " << (i->available ? "available" : "used")
-                 << "/" << i->fullSerialNum << ", " << s << endl;
+                 << "/" << i->fullSerialNum << ", " << fboId << endl;
         }
 
         deleteFBOFence(fbo);
