@@ -601,12 +601,31 @@ documentation: """
 QStandardItemModel with modified drag and drop mime types.
 """;
 
+// Displays a static thumbnail image. Falls back to a placeholder pixmap if none loaded.
+class: ThumbnailWidget : QLabel
+{
+    method: ThumbnailWidget (ThumbnailWidget; QWidget parent)
+    {
+        QLabel.QLabel(this, parent);
+        setScaledContents(true);
+    }
+
+    method: setFallback (void; QPixmap px) { setPixmap(px); }
+
+    method: load (void; string path)
+    {
+        let px = QPixmap.fromImage(QImage(path, ""), Qt.AutoColor);
+        if (!px.isNull()) setPixmap(px);
+    }
+}
+
+// Displays a scrubable filmstrip that will show the corresponding frame
+// based on mouse position
 class: FilmstripWidget : QLabel
 {
     QImage _strip;
     int    _frameWidth;   // width of each frame in the filmstrip (240 px)
     bool   _loaded;
-    QTimer _leaveTimer;
 
     method: FilmstripWidget (FilmstripWidget; QWidget parent)
     {
@@ -615,56 +634,84 @@ class: FilmstripWidget : QLabel
         _loaded     = false;
         setScaledContents(true);
         setMouseTracking(true);
-        _leaveTimer = QTimer(this);
-        _leaveTimer.setInterval(100);
-        connect(_leaveTimer, QTimer.timeout, checkMouseLeft);
     }
 
-    method: checkMouseLeft (void;)
+    method: showFrameAtX (void; int mouseX)
     {
-        if (!underMouse())
-        {
-            showFrame(0);
-            _leaveTimer.stop();
-        }
-    }
-
-    method: showFrame (void; int fx)
-    {
-        let frame = _strip.copy(QRect(fx, 0, _frameWidth, _strip.height()));
+        if (!_loaded) return;
+        let nat_w   = _strip.width(),
+            prop_x  = float(mouseX) / float(width()),
+            fx      = int(prop_x * float(nat_w) / float(_frameWidth) + 0.5) * _frameWidth,
+            clamped = if fx > nat_w - _frameWidth then nat_w - _frameWidth
+                      else if fx < 0 then 0
+                      else fx;
+        let frame = _strip.copy(QRect(clamped, 0, _frameWidth, _strip.height()));
         setPixmap(QPixmap.fromImage(frame, Qt.AutoColor));
     }
 
-    method: loadStrip (void; string path, QPixmap fallback)
+    method: isLoaded (bool;) { _loaded; }
+
+    method: load (void; string path)
     {
-        let img = QImage(path, nil);
+        let img = QImage(path, "");
         if (!img.isNull())
         {
             _strip  = img;
             _loaded = true;
-            showFrame(0);
-        }
-        else
-        {
-            setPixmap(fallback);
         }
     }
 
     method: mouseMoveEvent (void; QMouseEvent event)
     {
-        if (_loaded)
-        {
-            let mx     = event.position().toPoint().x(),
-                nat_w  = _strip.width(),
-                prop_x = float(mx) / float(width()),
-                fx     = int(prop_x * float(nat_w) / float(_frameWidth) + 0.5) * _frameWidth,
-                clamped = if fx > nat_w - _frameWidth then nat_w - _frameWidth
-                          else if fx < 0 then 0
-                          else fx;
-            showFrame(clamped);
-            if (!_leaveTimer.isActive()) _leaveTimer.start();
-        }
+        showFrameAtX(event.position().toPoint().x());
         QWidget.mouseMoveEvent(this, event);
+    }
+}
+
+// Stacks a FilmstripWidget and ThumbnailWidget. Shows thumbnail by default;
+// on hover enter shows the filmstrip scrubbed to the cursor position.
+class: SourcePreviewWidget : QWidget
+{
+    FilmstripWidget _filmstrip;
+    ThumbnailWidget _thumbnail;
+
+    method: SourcePreviewWidget (SourcePreviewWidget; QWidget parent)
+    {
+        QWidget.QWidget(this, parent);
+        setAttribute(Qt.WA_Hover, true);
+
+        _thumbnail = ThumbnailWidget(this);
+        _thumbnail.setGeometry(QRect(0, 0, 80, 45));
+        _thumbnail.show();
+
+        _filmstrip = FilmstripWidget(this);
+        _filmstrip.setGeometry(QRect(0, 0, 80, 45));
+        _filmstrip.hide();
+    }
+
+    method: setFallback (void; QPixmap px) { _thumbnail.setFallback(px); }
+    method: loadStrip   (void; string path) { _filmstrip.load(path); }
+    method: loadThumbnail (void; string path) { _thumbnail.load(path); }
+
+    method: event (bool; QEvent e)
+    {
+        if (e.type() == QEvent.HoverEnter)
+        {
+            if (_filmstrip.isLoaded())
+            {
+                _filmstrip.showFrameAtX(mapFromGlobal(QCursor.pos()).x());
+                _filmstrip.show();
+                _thumbnail.hide();
+            }
+            return true;
+        }
+        else if (e.type() == QEvent.HoverLeave)
+        {
+            _filmstrip.hide();
+            _thumbnail.show();
+            return true;
+        }
+        return QWidget.event(this, e);
     }
 }
 
@@ -1094,8 +1141,8 @@ class: SessionManagerMode : MinorMode
     method: colorAdjustedIcon (QIcon; string rpath, bool invertSense)
     {
         let bg = QApplication.palette().color(QPalette.Active, @MU_QT_QPALETTE_COLORROLE@),
-            icon0 = QImage(regex.replace("48x48", rpath, "out"), nil),
-            icon1 = QImage(rpath, nil),
+            icon0 = QImage(regex.replace("48x48", rpath, "out"), ""),
+            icon1 = QImage(rpath, ""),
             swap = invertSense != _darkUI,
             qimage = if swap then icon0 else icon1;
 
@@ -1746,12 +1793,37 @@ class: SessionManagerMode : MinorMode
         layout.setContentsMargins(8, 0, 8, 0);
         layout.setSpacing(5);
 
-        // Filmstrip thumbnail
-        let thumb = FilmstripWidget(widget);
-        thumb.setFixedSize(QSize(80, 45));
-        thumb.loadStrip(auxFilePath("filmstrip.jpg"),
-                        _fallbackSourceIcon.pixmap(QSize(80, 45)));
-        layout.addWidget(thumb);
+        // Source preview: stacks thumbnail (default) and filmstrip (on hover)
+        let preview = SourcePreviewWidget(widget);
+        preview.setFixedSize(QSize(80, 45));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(80, 45)));
+
+        try
+        {
+            let sn = sourceNodeOfGroup(node);
+
+            // Fire events that can get picked up by Python plugins used to
+            // download filmstrips and thumbnails
+            sendInternalEvent("fetch-version-filmstrip", sn);
+            sendInternalEvent("fetch-version-thumbnail", sn);
+
+            // Load synchronously from disk if files are already cached
+            // (sendInternalEvent is synchronous so files may already be there)
+            let trackingInfo = getStringProperty(sn + ".tracking.info");
+            for_index (i; trackingInfo)
+            {
+                if (trackingInfo[i] == "id" && i + 1 < trackingInfo.size())
+                {
+                    let base = QDir.tempPath() + "/rv_thumbnails/" + trackingInfo[i+1];
+                    if (io.path.exists(base + "_filmstrip.jpg")) preview.loadStrip(base + "_filmstrip.jpg");
+                    if (io.path.exists(base + "_thumbnail.jpg")) preview.loadThumbnail(base + "_thumbnail.jpg");
+                    break;
+                }
+            }
+        }
+        catch (...) { ; }
+
+        layout.addWidget(preview);
 
         // Text column
         let textWidget = QWidget(widget),
