@@ -1141,8 +1141,8 @@ class: SessionManagerMode : MinorMode
     method: colorAdjustedIcon (QIcon; string rpath, bool invertSense)
     {
         let bg = QApplication.palette().color(QPalette.Active, @MU_QT_QPALETTE_COLORROLE@),
-            icon0 = QImage(regex.replace("48x48", rpath, "out"), ""),
-            icon1 = QImage(rpath, ""),
+            icon0 = QImage(regex.replace("48x48", rpath, "out"), nil),
+            icon1 = QImage(rpath, nil),
             swap = invertSense != _darkUI,
             qimage = if swap then icon0 else icon1;
 
