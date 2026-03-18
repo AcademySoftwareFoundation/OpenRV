@@ -6,14 +6,11 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "${RV_DEPS_GLEW_VERSION}" "make" "")
 
-SET(_download_url
-    "https://github.com/nigels-com/glew/archive/refs/tags/glew-${_version}.tar.gz"
-)
+# --- Try to find installed package ---
+# GLEW's CMake config does not ship a version file, so omit VERSION to avoid find_package failure.
+RV_FIND_DEPENDENCY(TARGET ${_target} PACKAGE GLEW DEPS_LIST_TARGETS GLEW::GLEW)
 
-SET(_download_hash
-    ${RV_DEPS_GLEW_DOWNLOAD_HASH}
-)
-
+# --- Library naming (shared between find and build paths) ---
 IF(RV_TARGET_DARWIN)
   SET(_glew_lib_name
       ${CMAKE_SHARED_LIBRARY_PREFIX}GLEW.${RV_DEPS_GLEW_VERSION_LIB}${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -27,35 +24,29 @@ SET(_glew_lib
     ${_lib_dir}/${_glew_lib_name}
 )
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  INSTALL_DIR ${_install_dir}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME glew-glew-${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  CONFIGURE_COMMAND cd auto && ${_make_command} && cd .. && ${_make_command}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count} GLEW_DEST=${_install_dir}
-  INSTALL_COMMAND ${_make_command} install LIBDIR=${_lib_dir} GLEW_DEST=${_install_dir}
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_glew_lib}
-  USES_TERMINAL_BUILD TRUE
-)
+# --- Build from source if not found ---
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/glew.cmake)
 
-RV_ADD_IMPORTED_LIBRARY(
-  NAME
-  GLEW::GLEW
-  TYPE
-  STATIC
-  LOCATION
-  ${_glew_lib}
-  INCLUDE_DIRS
-  ${_include_dir}
-  DEPENDS
-  ${_target}
-  ADD_TO_DEPS_LIST
-)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_glew_lib_name})
+ELSE()
+  # CONFIG found — GLEW::GLEW target already exists (created by glew-config.cmake from GLEW::glew).
+  IF(NOT TARGET GLEW::GLEW)
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      GLEW::GLEW
+      TYPE
+      SHARED
+      LOCATION
+      ${_glew_lib}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+  ENDIF()
 
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_glew_lib_name})
+  # Found path: use TARGET_LIBS to resolve actual library path at build time
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS GLEW::GLEW USE_FLAG_FILE)
+ENDIF()
