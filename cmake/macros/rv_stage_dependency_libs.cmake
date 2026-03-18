@@ -20,6 +20,9 @@
 #     [STAGE_LIB_DIR <override>]    # Override RV_STAGE_LIB_DIR (e.g., for OpenSSL/Linux)
 #     [EXTRA_LIB_DIRS <dir1>...]    # Additional lib dirs to copy to
 #     [FILES <file1> [file2...]]    # Individual files to copy_if_different to STAGE_LIB_DIR (alternative to LIB_DIR)
+#     [TARGET_LIBS <t1> [t2...]]    # Imported targets to stage via $<TARGET_FILE:...> generatos (requires USE_FLAG_FILE).
+#                                   # Resolves actual library paths at build time — handles any naming convention.
+#                                   # On Windows: DLL→STAGE_BIN_DIR, import lib→STAGE_LIB_DIR.
 #     [DEPENDS <dep1> [dep2...]]    # Dependencies (default: ${TARGET})
 #     [PRE_COMMANDS COMMAND <cmd1> [COMMAND <cmd2>...]]  # Commands to run before copy; each must be prefixed with COMMAND keyword
 #     [LIBNAME <filename>]          # Platform-aware shorthand: on Windows uses BIN_DIR+STAGE_BIN_DIR, otherwise STAGE_LIB_DIR
@@ -29,7 +32,7 @@
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   CMAKE_PARSE_ARGUMENTS(
-    _ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN}
+    _ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES;TARGET_LIBS" ${ARGN}
   )
 
   IF(_ARG_UNPARSED_ARGUMENTS)
@@ -68,9 +71,17 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     ENDIF()
   ENDIF()
 
+  # Validate TARGET_LIBS requires USE_FLAG_FILE (generators can't be used in OUTPUTS)
+  IF(_ARG_TARGET_LIBS
+     AND NOT _ARG_USE_FLAG_FILE
+  )
+    MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: TARGET_LIBS requires USE_FLAG_FILE (generator expressions cannot be used in OUTPUTS)")
+  ENDIF()
+
   # Default LIB_DIR to caller's _lib_dir if not explicitly passed
   IF(NOT _ARG_LIB_DIR
      AND NOT _ARG_FILES
+     AND NOT _ARG_TARGET_LIBS
   )
     IF(DEFINED _lib_dir)
       SET(_ARG_LIB_DIR
@@ -81,8 +92,9 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
 
   IF(NOT _ARG_LIB_DIR
      AND NOT _ARG_FILES
+     AND NOT _ARG_TARGET_LIBS
   )
-    MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Either LIB_DIR or FILES is required")
+    MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Either LIB_DIR, FILES, or TARGET_LIBS is required")
   ENDIF()
 
   # Default depends to TARGET
@@ -123,6 +135,131 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
         ${_file}
         ${_ARG_STAGE_LIB_DIR}/
       )
+    ENDFOREACH()
+  ENDIF()
+
+  # Copy imported target libraries via generator expressions (resolved at build time). Ensure destination dirs exist first — copy_if_different doesn't create
+  # them, and for found packages (no ExternalProject) the stage dirs may not yet exist at this point in the build.
+  IF(_ARG_TARGET_LIBS)
+    LIST(
+      APPEND
+      _commands
+      COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      make_directory
+      ${_ARG_STAGE_LIB_DIR}
+    )
+    IF(RV_TARGET_WINDOWS)
+      LIST(
+        APPEND
+        _commands
+        COMMAND
+        ${CMAKE_COMMAND}
+        -E
+        make_directory
+        ${RV_STAGE_BIN_DIR}
+      )
+    ENDIF()
+
+    FOREACH(
+      _tgt
+      ${_ARG_TARGET_LIBS}
+    )
+      IF(RV_TARGET_WINDOWS)
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          echo
+          "  Staging $<TARGET_FILE:${_tgt}> -> ${RV_STAGE_BIN_DIR}/"
+        )
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          copy_if_different
+          $<TARGET_FILE:${_tgt}>
+          ${RV_STAGE_BIN_DIR}/
+        )
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          echo
+          "  Staging $<TARGET_LINKER_FILE:${_tgt}> -> ${_ARG_STAGE_LIB_DIR}/"
+        )
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          copy_if_different
+          $<TARGET_LINKER_FILE:${_tgt}>
+          ${_ARG_STAGE_LIB_DIR}/
+        )
+      ELSE()
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          echo
+          "  Staging $<TARGET_FILE:${_tgt}> -> ${_ARG_STAGE_LIB_DIR}/"
+        )
+        LIST(
+          APPEND
+          _commands
+          COMMAND
+          ${CMAKE_COMMAND}
+          -E
+          copy_if_different
+          $<TARGET_FILE:${_tgt}>
+          ${_ARG_STAGE_LIB_DIR}/
+        )
+      ENDIF()
+
+      # On macOS, fix the staged copy's install name to @rpath so it can be resolved via rpath at runtime. For found packages (e.g. Homebrew) the install name
+      # is an absolute path; for built-from-source it's typically already @rpath but -id is idempotent.
+      IF(RV_TARGET_DARWIN)
+        GET_PROPERTY(
+          _rsdl_install_name
+          TARGET ${_tgt}
+          PROPERTY RV_DARWIN_INSTALL_NAME
+        )
+        IF(_rsdl_install_name)
+          GET_FILENAME_COMPONENT(_rsdl_install_fname "${_rsdl_install_name}" NAME)
+          LIST(
+            APPEND
+            _commands
+            COMMAND
+            ${CMAKE_INSTALL_NAME_TOOL}
+            -id
+            "@rpath/${_rsdl_install_fname}"
+            "${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>"
+          )
+          # Re-sign with ad-hoc after modifying the install name. Homebrew libraries carry a Homebrew signature that install_name_tool invalidates; on arm64
+          # macOS loading a library with an invalid signature causes SIGKILL.
+          LIST(
+            APPEND
+            _commands
+            COMMAND
+            codesign
+            --force
+            --sign
+            -
+            "${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>"
+          )
+        ENDIF()
+      ENDIF()
     ENDFOREACH()
   ENDIF()
 
@@ -213,11 +350,13 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   ENDIF()
 
   # Create the custom command (always OUTPUT-based for proper incremental builds). Note: ${_commands} contains COMMAND keywords which CMake's keyword parser
-  # uses as section boundaries, so they are correctly parsed as commands, not as additional OUTPUT entries.
+  # uses as section boundaries, so they are correctly parsed as commands, not as additional OUTPUT entries. VERBATIM ensures arguments with shell metacharacters
+  # (e.g., ">" in echo messages) are properly escaped.
   ADD_CUSTOM_COMMAND(
     COMMENT "Staging ${_ARG_TARGET} libs into ${_ARG_STAGE_LIB_DIR}"
     OUTPUT ${_tracking_outputs} ${_commands}
     DEPENDS ${_ARG_DEPENDS}
+    VERBATIM
   )
 
   # Create the stage target

@@ -24,11 +24,12 @@
 #     PACKAGE <find-package-name>    # REQUIRED: e.g., Imath
 #     [VERSION <version>]            # Optional version (EXACT or MINIMUM per RV_DEPS_VERSION_MATCH)
 #     [PKG_CONFIG_NAME <name>]       # Optional pkg-config module name for fallback
+#     [COMPONENTS <c1>...]           # Optional find_package COMPONENTS (e.g., Boost components)
 #     [DEPS_LIST_TARGETS <t1>...]    # Targets to append to RV_DEPS_LIST
 #   )
 # cmake-format: on
 MACRO(RV_FIND_DEPENDENCY)
-  CMAKE_PARSE_ARGUMENTS(_RFD "" "TARGET;PACKAGE;VERSION;PKG_CONFIG_NAME" "DEPS_LIST_TARGETS" ${ARGN})
+  CMAKE_PARSE_ARGUMENTS(_RFD "" "TARGET;PACKAGE;VERSION;PKG_CONFIG_NAME" "DEPS_LIST_TARGETS;COMPONENTS" ${ARGN})
 
   SET(${_RFD_TARGET}_FOUND
       FALSE
@@ -52,15 +53,25 @@ MACRO(RV_FIND_DEPENDENCY)
       )
     ENDIF()
 
+    # Build optional COMPONENTS argument list
+    SET(_rfd_components_args
+        ""
+    )
+    IF(_RFD_COMPONENTS)
+      SET(_rfd_components_args
+          COMPONENTS ${_RFD_COMPONENTS}
+      )
+    ENDIF()
+
     # Strategy 1: CMake CONFIG mode
     IF(_RFD_VERSION)
       IF(_rfd_match_mode STREQUAL "EXACT")
-        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} EXACT CONFIG)
+        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} EXACT CONFIG ${_rfd_components_args})
       ELSE()
-        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} CONFIG)
+        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} CONFIG ${_rfd_components_args})
       ENDIF()
     ELSE()
-      FIND_PACKAGE(${_RFD_PACKAGE} CONFIG)
+      FIND_PACKAGE(${_RFD_PACKAGE} CONFIG ${_rfd_components_args})
     ENDIF()
 
     IF(${_RFD_PACKAGE}_FOUND)
@@ -108,6 +119,29 @@ MACRO(RV_FIND_DEPENDENCY)
       IF(_RFD_FOUND_VIA STREQUAL "config")
         MESSAGE(STATUS "Found ${_RFD_PACKAGE} ${${_RFD_PACKAGE}_VERSION} via CMake config. Using installed package.")
         RV_SET_FOUND_PACKAGE_DIRS(${_RFD_TARGET} ${_RFD_PACKAGE})
+
+        # Package config files may suffer the same symlink resolution bug as our walk-up logic (CMake normalizes "../" before resolving symlinks). If the
+        # resolved and unresolved include dirs differ, fix imported targets that inherited the stale prefix-level path.
+        IF(NOT "${_sfpd_unresolved_include_dir}" STREQUAL "${_include_dir}")
+          FOREACH(
+            _rfd_dep
+            ${_RFD_DEPS_LIST_TARGETS}
+          )
+            IF(TARGET ${_rfd_dep})
+              GET_TARGET_PROPERTY(_rfd_inc_dirs ${_rfd_dep} INTERFACE_INCLUDE_DIRECTORIES)
+              IF(_rfd_inc_dirs)
+                STRING(REPLACE "${_sfpd_unresolved_include_dir}" "${_include_dir}" _rfd_fixed_inc_dirs "${_rfd_inc_dirs}")
+                IF(NOT "${_rfd_fixed_inc_dirs}" STREQUAL "${_rfd_inc_dirs}")
+                  SET_TARGET_PROPERTIES(
+                    ${_rfd_dep}
+                    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_rfd_fixed_inc_dirs}"
+                  )
+                  MESSAGE(STATUS "  Fixed ${_rfd_dep} include: ${_rfd_inc_dirs} -> ${_rfd_fixed_inc_dirs}")
+                ENDIF()
+              ENDIF()
+            ENDIF()
+          ENDFOREACH()
+        ENDIF()
       ELSEIF(_RFD_FOUND_VIA STREQUAL "pkgconfig")
         MESSAGE(STATUS "Found ${_RFD_PACKAGE} ${${_RFD_PACKAGE}_VERSION} via pkg-config. Using installed package.")
         RV_SET_FOUND_PKGCONFIG_DIRS(${_RFD_TARGET} ${_RFD_TARGET}_PC)

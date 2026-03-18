@@ -8,6 +8,10 @@
 # Create the standard variables common to most RV_DEPS_xyz modules
 MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configure_command)
 
+  # Parse optional keyword arguments after the 4 positional params. FORCE_LIB: always use lib/ instead of lib64/ even when RHEL_VERBOSE is set. Use for
+  # dependencies whose CMake install does not honor GNUInstallDirs lib64 (e.g. zlib).
+  CMAKE_PARSE_ARGUMENTS(_RCSDV "FORCE_LIB" "" "" ${ARGN})
+
   SET(_target
       ${target_name}
   )
@@ -33,7 +37,11 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   SET(_source_dir
       ${_base_dir}/src
   )
-  IF(RHEL_VERBOSE)
+  IF(_RCSDV_FORCE_LIB)
+    SET(_lib_dir
+        ${_install_dir}/lib
+    )
+  ELSEIF(RHEL_VERBOSE)
     SET(_lib_dir
         ${_install_dir}/lib64
     )
@@ -248,9 +256,8 @@ ENDMACRO()
 # Set directory variables from a found package
 #
 # When a dependency is found via find_package() instead of built from source, the _lib_dir, _bin_dir, _include_dir, and _install_dir variables set by
-# RV_CREATE_STANDARD_DEPS_VARIABLES point at the (non-existent) ExternalProject install dir. 
-# This macro overrides them to point at the found package's actuallocation, 
-# so downstream code (including RV_STAGE_DEPENDENCY_LIBS) works identically for both paths.
+# RV_CREATE_STANDARD_DEPS_VARIABLES point at the (non-existent) ExternalProject install dir. This macro overrides them to point at the found package's
+# actuallocation, so downstream code (including RV_STAGE_DEPENDENCY_LIBS) works identically for both paths.
 #
 # Also creates a dummy custom target for the dependency so that DEPENDS ${_target} works in the find path where there's no ExternalProject target.
 #
@@ -259,11 +266,17 @@ ENDMACRO()
 MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
   # ${find_package_name}_DIR is set by find_package(CONFIG) to the directory containing the CMake config files, typically: <root>/lib/cmake/<Package>/   (3
   # levels up) <root>/share/cmake/<Package>/ (3 levels up)
-  SET(_sfpd_config_dir
-      "${${find_package_name}_DIR}"
-  )
+  #
+  # Resolve through symlinks FIRST, then walk up. This is critical for package managers like Homebrew that symlink cmake config dirs into a shared prefix (e.g.,
+  # /opt/homebrew/lib/cmake/Boost-1.85.0 → Cellar/boost@1.85/.../lib/cmake/Boost-1.85.0). Without REALPATH, walking up lands on the shared prefix
+  # (/opt/homebrew) instead of the package-specific root, causing include path contamination.
+  GET_FILENAME_COMPONENT(_sfpd_config_dir "${${find_package_name}_DIR}" REALPATH)
 
-  # Walk up 3 levels from the config dir to find the package root
+  # Also compute the unresolved root so callers can detect and fix imported targets whose config files have the same symlink issue.
+  GET_FILENAME_COMPONENT(_sfpd_config_dir_unresolved "${${find_package_name}_DIR}" ABSOLUTE)
+  GET_FILENAME_COMPONENT(_sfpd_unresolved_root_3 "${_sfpd_config_dir_unresolved}/../../.." ABSOLUTE)
+
+  # Walk up 3 levels from the resolved config dir to find the package root
   GET_FILENAME_COMPONENT(_sfpd_root_3 "${_sfpd_config_dir}/../../.." ABSOLUTE)
   GET_FILENAME_COMPONENT(_sfpd_root_2 "${_sfpd_config_dir}/../.." ABSOLUTE)
 
@@ -285,6 +298,10 @@ MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
         "${_sfpd_root_3}"
     )
   ENDIF()
+
+  SET(_sfpd_unresolved_include_dir
+      "${_sfpd_unresolved_root_3}/include"
+  )
 
   SET(${rv_deps_target}_ROOT_DIR
       "${_install_dir}"
@@ -318,9 +335,9 @@ ENDMACRO()
 
 # Set directory variables from a pkg-config found package
 #
-# Parallel to RV_SET_FOUND_PACKAGE_DIRS but uses variables set by pkg_check_modules() instead of find_package(CONFIG). 
-# Sets _lib_dir, _include_dir, _install_dir, _bin_dir in the caller's scope and creates a dummy custom target.
-# _install_dir, _bin_dir in the caller's scope and creates a dummy custom target.
+# Parallel to RV_SET_FOUND_PACKAGE_DIRS but uses variables set by pkg_check_modules() instead of find_package(CONFIG). Sets _lib_dir, _include_dir,
+# _install_dir, _bin_dir in the caller's scope and creates a dummy custom target. _install_dir, _bin_dir in the caller's scope and creates a dummy custom
+# target.
 #
 # Must be a MACRO so the variable overrides propagate to the caller's scope.
 #

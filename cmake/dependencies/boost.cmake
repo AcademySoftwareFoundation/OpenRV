@@ -15,17 +15,9 @@ SET(_ext_boost_version
 SET(_major_minor_version
     ${RV_DEPS_BOOST_MAJOR_MINOR_VERSION}
 )
-SET(_download_hash
-    ${RV_DEPS_BOOST_DOWNLOAD_HASH}
-)
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_BOOST" "${_ext_boost_version}" "" "")
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_BOOST" "${_ext_boost_version}" "" "" FORCE_LIB)
 RV_SHOW_STANDARD_DEPS_VARIABLES()
-
-STRING(REPLACE "." "_" _version_with_underscore ${_version})
-SET(_download_url
-    "https://archives.boost.io/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
-)
 
 SET(_boost_libs
     atomic
@@ -44,10 +36,32 @@ SET(_boost_libs
     timer
 )
 
-SET(_lib_dir
-    ${_install_dir}/lib
+# Build DEPS_LIST_TARGETS from _boost_libs
+SET(_boost_deps_list_targets
+    ""
+)
+FOREACH(
+  _boost_lib
+  ${_boost_libs}
+)
+  LIST(APPEND _boost_deps_list_targets Boost::${_boost_lib})
+ENDFOREACH()
+
+# --- Try to find installed package ---
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  Boost
+  VERSION
+  ${_ext_boost_version}
+  COMPONENTS
+  ${_boost_libs}
+  DEPS_LIST_TARGETS
+  ${_boost_deps_list_targets}
 )
 
+# --- Library naming (shared between find and build paths) ---
 # Note: Boost has a custom lib naming scheme on windows
 IF(RV_TARGET_WINDOWS)
   SET(BOOST_SHARED_LIBRARY_PREFIX
@@ -80,6 +94,7 @@ ELSE()
   )
 ENDIF()
 
+# Compute per-lib paths AFTER RV_FIND_DEPENDENCY (which may override _lib_dir)
 FOREACH(
   _boost_lib
   ${_boost_libs}
@@ -99,149 +114,77 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-LIST(APPEND _boost_b2_options "-s")
-LIST(APPEND _boost_b2_options "NO_LZMA=1")
+# --- Build from source if not found ---
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/boost.cmake)
 
-IF(RV_VERBOSE_INVOCATION)
-  LIST(APPEND _boost_b2_options "-d+2")
-ELSE()
-  LIST(APPEND _boost_b2_options "-d+0")
-ENDIF()
-
-IF(RV_TARGET_DARWIN)
-  SET(_toolset
-      "clang"
+  # Build path: we control the filenames, use OUTPUTS for precise tracking
+  FOREACH(
+    _boost_lib
+    ${_boost_libs}
   )
-
-ELSEIF(RV_TARGET_LINUX)
-  SET(_toolset
-      "gcc"
-  )
-ELSEIF(RV_TARGET_WINDOWS)
-  SET(_toolset
-      "msvc-14.3"
-  )
-ELSE()
-  MESSAGE(FATAL_ERROR "Unsupported (yet) target for Boost")
-ENDIF()
-
-SET(_b2_command
-    ./b2
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET(_bootstrap_command
-      ./bootstrap.bat
-  )
-ELSE()
-  SET(_bootstrap_command
-      ./bootstrap.sh
-  )
-ENDIF()
-
-IF(RV_TARGET_WINDOWS)
-  SET(_boost_python_bin
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/python.exe
-  )
-ELSE()
-  SET(_boost_python_bin
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python
-  )
-ENDIF()
-
-STRING(TOLOWER ${CMAKE_BUILD_TYPE} _boost_variant)
-
-LIST(
-  TRANSFORM _boost_libs
-  PREPEND "--with-"
-          OUTPUT_VARIABLE _boost_with_list
-)
-
-SET(__boost_arch__
-    x86
-)
-IF(APPLE)
-  IF(RV_TARGET_APPLE_ARM64)
-    SET(__boost_arch__
-        arm
-    )
-  ENDIF()
-ENDIF()
-
-EXTERNALPROJECT_ADD(
-  ${_target}
-  DEPENDS Python::Python
-  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  INSTALL_DIR ${_install_dir}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_bootstrap_command} --with-toolset=${_toolset} --with-python=${_boost_python_bin}
-  BUILD_COMMAND
-    # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
-    # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
-    ./b2 -a -q toolset=${_toolset} cxxstd=${RV_CPP_STANDARD} variant=${_boost_variant} link=shared threading=multi architecture=${__boost_arch__}
-    address-model=64 ${_boost_with_list} ${_boost_b2_options} -j${_cpu_count} install --prefix=${_install_dir}
-  INSTALL_COMMAND echo "Boost was both built and installed in the build stage"
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_boost_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET(_include_dir
-      ${_install_dir}/include/boost-${_major_minor_version}
-  )
-ELSE()
-  SET(_include_dir
-      ${_install_dir}/include
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-
-FOREACH(
-  _boost_lib
-  ${_boost_libs}
-)
-  ADD_LIBRARY(Boost::${_boost_lib} SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(Boost::${_boost_lib} ${_target})
-  SET_PROPERTY(
-    TARGET Boost::${_boost_lib}
-    PROPERTY IMPORTED_LOCATION ${_boost_${_boost_lib}_lib}
-  )
-  SET_PROPERTY(
-    TARGET Boost::${_boost_lib}
-    PROPERTY IMPORTED_SONAME ${_boost_${_boost_lib}_lib_name}
-  )
-
+    LIST(APPEND _boost_stage_output ${RV_STAGE_LIB_DIR}/${_boost_${_boost_lib}_lib_name})
+  ENDFOREACH()
+  # Note: On Windows, Boost's b2 puts both .lib and .dll in lib/, so we copy _lib_dir to both RV_STAGE_LIB_DIR and RV_STAGE_BIN_DIR.
   IF(RV_TARGET_WINDOWS)
-    SET_PROPERTY(
-      TARGET Boost::${_boost_lib}
-      PROPERTY IMPORTED_IMPLIB ${_boost_${_boost_lib}_implib}
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} OUTPUTS ${_boost_stage_output})
+  ELSE()
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_boost_stage_output})
+  ENDIF()
+ELSE()
+  # CONFIG found — Boost::xxx targets already exist with proper LOCATION. Create any missing targets as a safety net.
+  IF(RV_TARGET_WINDOWS)
+    SET(_include_dir
+        ${_install_dir}/include/boost-${_major_minor_version}
     )
   ENDIF()
-  TARGET_INCLUDE_DIRECTORIES(
-    Boost::${_boost_lib}
-    INTERFACE ${_include_dir}
+
+  # Boost::headers is not in DEPS_LIST_TARGETS so the general symlink fixup in RV_FIND_DEPENDENCY doesn't reach it. Fix it here: Boost's config has a symlink
+  # resolution bug where get_filename_component(REALPATH) on "../" normalizes before resolving, landing on the shared prefix include dir (e.g.
+  # /opt/homebrew/include) instead of the package-specific one.
+  IF(TARGET Boost::headers)
+    GET_TARGET_PROPERTY(_boost_headers_inc Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
+    IF(_boost_headers_inc
+       AND NOT "${_boost_headers_inc}" STREQUAL "${_include_dir}"
+    )
+      SET_TARGET_PROPERTIES(
+        Boost::headers
+        PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
+      )
+      MESSAGE(STATUS "  Fixed Boost::headers include: ${_boost_headers_inc} -> ${_include_dir}")
+    ENDIF()
+  ELSE()
+    ADD_LIBRARY(Boost::headers INTERFACE IMPORTED GLOBAL)
+    SET_TARGET_PROPERTIES(
+      Boost::headers
+      PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
+    )
+  ENDIF()
+
+  FOREACH(
+    _boost_lib
+    ${_boost_libs}
   )
+    IF(NOT TARGET Boost::${_boost_lib})
+      RV_ADD_IMPORTED_LIBRARY(
+        NAME
+        Boost::${_boost_lib}
+        TYPE
+        SHARED
+        LOCATION
+        ${_boost_${_boost_lib}_lib}
+        SONAME
+        ${_boost_${_boost_lib}_lib_name}
+        IMPLIB
+        ${_boost_${_boost_lib}_implib}
+        INCLUDE_DIRS
+        ${_include_dir}
+        DEPENDS
+        ${_target}
+      )
+    ENDIF()
+  ENDFOREACH()
 
-  LIST(APPEND RV_DEPS_LIST Boost::${_boost_lib})
-  LIST(APPEND _boost_stage_output ${RV_STAGE_LIB_DIR}/${_boost_${_boost_lib}_lib_name})
-ENDFOREACH()
-
-ADD_LIBRARY(Boost::headers INTERFACE IMPORTED GLOBAL)
-SET_TARGET_PROPERTIES(
-  Boost::headers
-  PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
-)
-
-# Note: On Windows, Boost's b2 puts both .lib and .dll in lib/, so we copy _lib_dir to both RV_STAGE_LIB_DIR and RV_STAGE_BIN_DIR.
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} OUTPUTS ${_boost_stage_output})
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_boost_stage_output})
+  # Found path: actual filenames may differ (e.g. -mt suffix), use TARGET_LIBS to resolve at build time
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_boost_deps_list_targets} USE_FLAG_FILE)
 ENDIF()
