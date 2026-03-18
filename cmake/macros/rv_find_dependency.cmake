@@ -39,13 +39,13 @@ MACRO(RV_FIND_DEPENDENCY)
   )
 
   IF(RV_DEPS_PREFER_INSTALLED
-     AND NOT RV_DEPS_${_RFD_TARGET}_FORCE_BUILD
+     AND NOT ${_RFD_TARGET}_FORCE_BUILD
   )
 
     # Determine version match mode: per-dep override > global default
-    IF(DEFINED RV_DEPS_${_RFD_TARGET}_VERSION_MATCH)
+    IF(DEFINED ${_RFD_TARGET}_VERSION_MATCH)
       SET(_rfd_match_mode
-          "${RV_DEPS_${_RFD_TARGET}_VERSION_MATCH}"
+          "${${_RFD_TARGET}_VERSION_MATCH}"
       )
     ELSE()
       SET(_rfd_match_mode
@@ -121,13 +121,23 @@ MACRO(RV_FIND_DEPENDENCY)
         RV_SET_FOUND_PACKAGE_DIRS(${_RFD_TARGET} ${_RFD_PACKAGE})
 
         # Package config files may suffer the same symlink resolution bug as our walk-up logic (CMake normalizes "../" before resolving symlinks). If the
-        # resolved and unresolved include dirs differ, fix imported targets that inherited the stale prefix-level path.
+        # resolved and unresolved include dirs differ, fix ALL imported targets from this package (not just DEPS_LIST_TARGETS). Config files often create
+        # auxiliary interface targets (e.g. Imath::ImathConfig, OpenEXR::OpenEXRConfig) that carry include dirs and are linked transitively by the library
+        # targets.
         IF(NOT "${_sfpd_unresolved_include_dir}" STREQUAL "${_include_dir}")
+          GET_PROPERTY(
+            _rfd_all_imported_targets
+            DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            PROPERTY IMPORTED_TARGETS
+          )
+          IF(NOT _rfd_all_imported_targets)
+            MESSAGE(WARNING "RV_FIND_DEPENDENCY: IMPORTED_TARGETS is empty for ${_RFD_PACKAGE} — symlink include fixup skipped")
+          ENDIF()
           FOREACH(
             _rfd_dep
-            ${_RFD_DEPS_LIST_TARGETS}
+            ${_rfd_all_imported_targets}
           )
-            IF(TARGET ${_rfd_dep})
+            IF("${_rfd_dep}" MATCHES "^${_RFD_PACKAGE}::")
               GET_TARGET_PROPERTY(_rfd_inc_dirs ${_rfd_dep} INTERFACE_INCLUDE_DIRECTORIES)
               IF(_rfd_inc_dirs)
                 STRING(REPLACE "${_sfpd_unresolved_include_dir}" "${_include_dir}" _rfd_fixed_inc_dirs "${_rfd_inc_dirs}")
