@@ -22,7 +22,7 @@
 #   RV_FIND_DEPENDENCY(
 #     TARGET <rv-deps-target>        # REQUIRED: e.g., RV_DEPS_IMATH
 #     PACKAGE <find-package-name>    # REQUIRED: e.g., Imath
-#     [VERSION <version>]            # Optional minimum version
+#     [VERSION <version>]            # Optional version (EXACT or MINIMUM per RV_DEPS_VERSION_MATCH)
 #     [PKG_CONFIG_NAME <name>]       # Optional pkg-config module name for fallback
 #     [DEPS_LIST_TARGETS <t1>...]    # Targets to append to RV_DEPS_LIST
 #   )
@@ -41,9 +41,24 @@ MACRO(RV_FIND_DEPENDENCY)
      AND NOT RV_DEPS_${_RFD_TARGET}_FORCE_BUILD
   )
 
+    # Determine version match mode: per-dep override > global default
+    IF(DEFINED RV_DEPS_${_RFD_TARGET}_VERSION_MATCH)
+      SET(_rfd_match_mode
+          "${RV_DEPS_${_RFD_TARGET}_VERSION_MATCH}"
+      )
+    ELSE()
+      SET(_rfd_match_mode
+          "${RV_DEPS_VERSION_MATCH}"
+      )
+    ENDIF()
+
     # Strategy 1: CMake CONFIG mode
     IF(_RFD_VERSION)
-      FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} CONFIG)
+      IF(_rfd_match_mode STREQUAL "EXACT")
+        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} EXACT CONFIG)
+      ELSE()
+        FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} CONFIG)
+      ENDIF()
     ELSE()
       FIND_PACKAGE(${_RFD_PACKAGE} CONFIG)
     ENDIF()
@@ -61,7 +76,11 @@ MACRO(RV_FIND_DEPENDENCY)
       FIND_PACKAGE(PkgConfig QUIET)
       IF(PKG_CONFIG_FOUND)
         IF(_RFD_VERSION)
-          PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET "${_RFD_PKG_CONFIG_NAME}>=${_RFD_VERSION}")
+          IF(_rfd_match_mode STREQUAL "EXACT")
+            PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET "${_RFD_PKG_CONFIG_NAME}=${_RFD_VERSION}")
+          ELSE()
+            PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET "${_RFD_PKG_CONFIG_NAME}>=${_RFD_VERSION}")
+          ENDIF()
         ELSE()
           PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET ${_RFD_PKG_CONFIG_NAME})
         ENDIF()
@@ -110,7 +129,7 @@ MACRO(RV_FIND_DEPENDENCY)
 
       RV_PRINT_PACKAGE_INFO(${_RFD_PACKAGE})
     ELSE()
-      MESSAGE(STATUS "${_RFD_PACKAGE} not found — will build from source")
+      MESSAGE(STATUS "${_RFD_PACKAGE} ${_RFD_VERSION} not found. It will be build from source")
     ENDIF()
   ENDIF()
 ENDMACRO()
