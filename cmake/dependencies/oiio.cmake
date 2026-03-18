@@ -48,7 +48,8 @@ LIST(APPEND _byproducts ${_byprojects_copy})
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
-LIST(APPEND _configure_options "-DUSE_OCIO=0")
+LIST(APPEND _configure_options "-DUSE_OCIO=ON")
+LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
@@ -87,6 +88,7 @@ LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
 LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
 
 LIST(APPEND _configure_options "-DOpenJPEG_ROOT=${RV_DEPS_OPENJPEG_ROOT_DIR}")
+LIST(APPEND _configure_options "-DOPENJPEG_VERSION=${RV_DEPS_OPENJPEG_VERSION}")
 GET_TARGET_PROPERTY(_openjpeg_library OpenJpeg::OpenJpeg IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
@@ -126,6 +128,7 @@ LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF"
 
 IF(RV_TARGET_WINDOWS)
   LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
 ENDIF()
 
 IF(NOT RV_TARGET_WINDOWS)
@@ -153,6 +156,7 @@ IF(NOT RV_TARGET_WINDOWS)
             WebP::webp
             LibRaw::raw
             ZLIB::ZLIB
+            OpenColorIO::OpenColorIO
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
     INSTALL_COMMAND ${_cmake_install_command}
@@ -207,6 +211,7 @@ ELSE()
             WebP::webp
             LibRaw::raw
             ZLIB::ZLIB
+            OpenColorIO::OpenColorIO
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
     INSTALL_COMMAND ${CMAKE_COMMAND} ${_oiio_install_options}
