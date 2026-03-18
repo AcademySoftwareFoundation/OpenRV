@@ -116,3 +116,14 @@ SET_PROPERTY(
   CACHE RV_FFMPEG
   PROPERTY STRINGS ${_RV_FFMPEG}
 )
+
+#
+# Dependency resolution option
+#
+# When ON, try find_package() for each dependency before building from source.
+# When OFF (default), always build dependencies from source (current behavior).
+#
+# Per-dependency override: set RV_DEPS_<NAME>_FORCE_BUILD=ON to force building
+# a specific dependency from source even when RV_DEPS_PREFER_INSTALLED=ON.
+#
+OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before building from source" OFF)

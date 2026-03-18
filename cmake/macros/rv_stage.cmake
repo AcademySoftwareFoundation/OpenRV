@@ -92,6 +92,9 @@ FUNCTION(rv_stage)
       IF(_native_target_type STREQUAL "EXECUTABLE"
          OR _native_target_type STREQUAL "SHARED_LIBRARY"
       )
+        # Batch all -change arguments into a single install_name_tool invocation per target. Multiple separate invocations each re-sign the binary, which can
+        # trigger macOS code signing lockouts ("Operation not permitted") on arm64.
+        SET(_change_args)
         FOREACH(
           dep
           ${RV_DEPS_LIST}
@@ -102,13 +105,34 @@ FUNCTION(rv_stage)
               TARGET ${dep}
               PROPERTY LOCATION
             )
-            GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
-            ADD_CUSTOM_COMMAND(
-              COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-              COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
+            # For found packages (e.g. Homebrew), the install name recorded by the linker may differ from the target's LOCATION (different symlink paths). Use
+            # the cached install name from RV_RESOLVE_DARWIN_INSTALL_NAME if available; this is a no-op for built-from-source deps where the library doesn't
+            # exist at configure time.
+            GET_PROPERTY(
+              _dep_install_name
+              TARGET ${dep}
+              PROPERTY RV_DARWIN_INSTALL_NAME
             )
+            IF(_dep_install_name)
+              SET(dep_change_path
+                  "${_dep_install_name}"
+              )
+              GET_FILENAME_COMPONENT(dep_file_name "${_dep_install_name}" NAME)
+            ELSE()
+              SET(dep_change_path
+                  "${dep_file_path}"
+              )
+              GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
+            ENDIF()
+            LIST(APPEND _change_args -change "${dep_change_path}" "@rpath/${dep_file_name}")
           ENDIF()
         ENDFOREACH()
+        IF(_change_args)
+          ADD_CUSTOM_COMMAND(
+            COMMENT "Fixing dependency rpaths in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
+            COMMAND ${CMAKE_INSTALL_NAME_TOOL} ${_change_args} "$<TARGET_FILE:${arg_TARGET}>"
+          )
+        ENDIF()
       ENDIF()
     ENDIF()
   ENDIF()

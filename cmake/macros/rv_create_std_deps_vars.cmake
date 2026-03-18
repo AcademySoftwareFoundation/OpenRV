@@ -161,3 +161,201 @@ MACRO(RV_SHOW_STANDARD_DEPS_VARIABLES)
   MESSAGE(DEBUG "  ${_target}_VERSION='${${_target}_VERSION}'")
   MESSAGE(DEBUG "  ${_target}_ROOT_DIR='${${_target}_ROOT_DIR}'")
 ENDMACRO()
+
+#
+# RV_RESOLVE_IMPORTED_LOCATION — Resolve an imported target's library path across config variants
+#
+# MODULE-found targets (e.g. FindZLIB) often only set config-specific variants (IMPORTED_LOCATION_RELEASE, IMPORTED_LOCATION_NOCONFIG) not plain
+# IMPORTED_LOCATION. This macro tries each variant and stores the first hit.
+#
+# Must be a MACRO so the output variable propagates to the caller's scope.
+#
+# Usage: RV_RESOLVE_IMPORTED_LOCATION(<target> <output_variable>)
+#
+MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
+  SET(${_rril_out_var}
+      ""
+  )
+  IF(TARGET ${_rril_target})
+    STRING(TOUPPER "${CMAKE_BUILD_TYPE}" _rril_config_upper)
+    FOREACH(
+      _rril_prop
+      IMPORTED_LOCATION IMPORTED_LOCATION_${_rril_config_upper} IMPORTED_LOCATION_RELEASE IMPORTED_LOCATION_NOCONFIG
+    )
+      IF(NOT ${_rril_out_var})
+        GET_TARGET_PROPERTY(${_rril_out_var} ${_rril_target} ${_rril_prop})
+      ENDIF()
+    ENDFOREACH()
+  ENDIF()
+ENDMACRO()
+
+#
+# RV_RESOLVE_DARWIN_INSTALL_NAME — Get a macOS dylib's actual install name (LC_ID_DYLIB)
+#
+# On macOS, the install name recorded in a binary by the linker comes from the library's LC_ID_DYLIB, which may differ from the file path (e.g. Homebrew symlink
+# paths). This macro resolves the real install name via otool -D and caches the result as a target property (RV_DARWIN_INSTALL_NAME) for later use in rpath
+# fixup.
+#
+# For built-from-source deps where the library doesn't exist at configure time, this is a no-op.
+#
+MACRO(RV_RESOLVE_DARWIN_INSTALL_NAME _rdain_target)
+  IF(RV_TARGET_DARWIN
+     AND TARGET ${_rdain_target}
+  )
+    RV_RESOLVE_IMPORTED_LOCATION(${_rdain_target} _rdain_loc)
+    IF(_rdain_loc
+       AND EXISTS "${_rdain_loc}"
+    )
+      EXECUTE_PROCESS(
+        COMMAND otool -D "${_rdain_loc}"
+        OUTPUT_VARIABLE _rdain_otool_out
+        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+      )
+      # otool -D output: first line is file path, second line is the install name
+      STRING(REGEX MATCH "[^\n]+$" _rdain_install_name "${_rdain_otool_out}")
+      IF(_rdain_install_name)
+        SET_PROPERTY(
+          TARGET ${_rdain_target}
+          PROPERTY RV_DARWIN_INSTALL_NAME "${_rdain_install_name}"
+        )
+      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDMACRO()
+
+#
+# RV_MAKE_TARGETS_GLOBAL — Promote imported targets to GLOBAL visibility
+#
+# Imported targets created by find_package(CONFIG) are scoped to the calling directory. This promotes them to GLOBAL so all subdirectories can reference them.
+#
+MACRO(RV_MAKE_TARGETS_GLOBAL)
+  FOREACH(
+    _rmtg_target
+    ${ARGN}
+  )
+    IF(TARGET ${_rmtg_target})
+      SET_PROPERTY(
+        TARGET ${_rmtg_target}
+        PROPERTY IMPORTED_GLOBAL TRUE
+      )
+    ENDIF()
+  ENDFOREACH()
+ENDMACRO()
+
+#
+# RV_SET_FOUND_PACKAGE_DIRS
+
+# Set directory variables from a found package
+#
+# When a dependency is found via find_package() instead of built from source, the _lib_dir, _bin_dir, _include_dir, and _install_dir variables set by
+# RV_CREATE_STANDARD_DEPS_VARIABLES point at the (non-existent) ExternalProject install dir. 
+# This macro overrides them to point at the found package's actuallocation, 
+# so downstream code (including RV_STAGE_DEPENDENCY_LIBS) works identically for both paths.
+#
+# Also creates a dummy custom target for the dependency so that DEPENDS ${_target} works in the find path where there's no ExternalProject target.
+#
+# Must be a MACRO so the variable overrides propagate to the caller's scope.
+#
+MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
+  # ${find_package_name}_DIR is set by find_package(CONFIG) to the directory containing the CMake config files, typically: <root>/lib/cmake/<Package>/   (3
+  # levels up) <root>/share/cmake/<Package>/ (3 levels up)
+  SET(_sfpd_config_dir
+      "${${find_package_name}_DIR}"
+  )
+
+  # Walk up 3 levels from the config dir to find the package root
+  GET_FILENAME_COMPONENT(_sfpd_root_3 "${_sfpd_config_dir}/../../.." ABSOLUTE)
+  GET_FILENAME_COMPONENT(_sfpd_root_2 "${_sfpd_config_dir}/../.." ABSOLUTE)
+
+  IF(EXISTS "${_sfpd_root_3}/include"
+     OR EXISTS "${_sfpd_root_3}/lib"
+  )
+    SET(_install_dir
+        "${_sfpd_root_3}"
+    )
+  ELSEIF(
+    EXISTS "${_sfpd_root_2}/include"
+    OR EXISTS "${_sfpd_root_2}/lib"
+  )
+    SET(_install_dir
+        "${_sfpd_root_2}"
+    )
+  ELSE()
+    SET(_install_dir
+        "${_sfpd_root_3}"
+    )
+  ENDIF()
+
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+      CACHE INTERNAL "" FORCE
+  )
+  SET(_include_dir
+      "${_install_dir}/include"
+  )
+  SET(_bin_dir
+      "${_install_dir}/bin"
+  )
+  IF(RHEL_VERBOSE
+     AND EXISTS "${_install_dir}/lib64"
+  )
+    SET(_lib_dir
+        "${_install_dir}/lib64"
+    )
+  ELSE()
+    SET(_lib_dir
+        "${_install_dir}/lib"
+    )
+  ENDIF()
+
+  IF(NOT TARGET ${rv_deps_target})
+    ADD_CUSTOM_TARGET(${rv_deps_target})
+  ENDIF()
+ENDMACRO()
+
+#
+# RV_SET_FOUND_PKGCONFIG_DIRS
+
+# Set directory variables from a pkg-config found package
+#
+# Parallel to RV_SET_FOUND_PACKAGE_DIRS but uses variables set by pkg_check_modules() instead of find_package(CONFIG). 
+# Sets _lib_dir, _include_dir, _install_dir, _bin_dir in the caller's scope and creates a dummy custom target.
+# _install_dir, _bin_dir in the caller's scope and creates a dummy custom target.
+#
+# Must be a MACRO so the variable overrides propagate to the caller's scope.
+#
+MACRO(RV_SET_FOUND_PKGCONFIG_DIRS rv_deps_target pc_prefix)
+  LIST(GET ${pc_prefix}_LIBRARY_DIRS 0 _lib_dir)
+  LIST(GET ${pc_prefix}_INCLUDE_DIRS 0 _include_dir)
+
+  GET_FILENAME_COMPONENT(_install_dir "${_lib_dir}/.." ABSOLUTE)
+  SET(_bin_dir
+      "${_install_dir}/bin"
+  )
+
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+      CACHE INTERNAL "" FORCE
+  )
+
+  IF(NOT TARGET ${rv_deps_target})
+    ADD_CUSTOM_TARGET(${rv_deps_target})
+  ENDIF()
+ENDMACRO()
+
+#
+# RV_PRINT_PACKAGE_INFO — Print diagnostic info for a found package
+#
+MACRO(RV_PRINT_PACKAGE_INFO package_name)
+  MESSAGE(STATUS "  ${package_name} package info:")
+  IF(DEFINED ${package_name}_VERSION)
+    MESSAGE(STATUS "    Version:    ${${package_name}_VERSION}")
+  ENDIF()
+  IF(DEFINED ${package_name}_DIR)
+    MESSAGE(STATUS "    Config dir: ${${package_name}_DIR}")
+  ENDIF()
+  MESSAGE(STATUS "    Root:       ${_install_dir}")
+  MESSAGE(STATUS "    Include:    ${_include_dir}")
+  MESSAGE(STATUS "    Lib:        ${_lib_dir}")
+  MESSAGE(STATUS "    Bin:        ${_bin_dir}")
+ENDMACRO()
