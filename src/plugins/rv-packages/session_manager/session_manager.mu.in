@@ -20,6 +20,10 @@ ViewSubComponent    := 2;
 LayerSubComponent   := 3;
 ChannelSubComponent := 4;
 
+FILMSTRIP_FRAME_WIDTH := 240;
+PREVIEW_WIDTH         := 80;
+PREVIEW_HEIGHT        := 45;
+
 \: itemNode (string; QStandardItem item) 
 { 
     let d = item.data(Qt.UserRole + 2);
@@ -624,13 +628,13 @@ class: ThumbnailWidget : QLabel
 class: FilmstripWidget : QLabel
 {
     QImage _strip;
-    int    _frameWidth;   // width of each frame in the filmstrip (240 px)
+    int    _frameWidth;
     bool   _loaded;
 
     method: FilmstripWidget (FilmstripWidget; QWidget parent)
     {
         QLabel.QLabel(this, parent);
-        _frameWidth = 240;
+        _frameWidth = FILMSTRIP_FRAME_WIDTH;
         _loaded     = false;
         setScaledContents(true);
         setMouseTracking(true);
@@ -681,11 +685,11 @@ class: SourcePreviewWidget : QWidget
         setAttribute(Qt.WA_Hover, true);
 
         _thumbnail = ThumbnailWidget(this);
-        _thumbnail.setGeometry(QRect(0, 0, 80, 45));
+        _thumbnail.setGeometry(QRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT));
         _thumbnail.show();
 
         _filmstrip = FilmstripWidget(this);
-        _filmstrip.setGeometry(QRect(0, 0, 80, 45));
+        _filmstrip.setGeometry(QRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT));
         _filmstrip.hide();
     }
 
@@ -1795,31 +1799,21 @@ class: SessionManagerMode : MinorMode
 
         // Source preview: stacks thumbnail (default) and filmstrip (on hover)
         let preview = SourcePreviewWidget(widget);
-        preview.setFixedSize(QSize(80, 45));
-        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(80, 45)));
+        preview.setFixedSize(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)));
 
         try
         {
             let sn = sourceNodeOfGroup(node);
 
-            // Fire events that can get picked up by Python plugins used to
-            // download filmstrips and thumbnails
-            sendInternalEvent("fetch-version-filmstrip", sn);
-            sendInternalEvent("fetch-version-thumbnail", sn);
+            // Fire events that fetch filmstrip/thumbnail and return file paths
+            let filmstripPath = sendInternalEvent("session_manager-get-filmstrip-path", sn);
+            let thumbnailPath = sendInternalEvent("session_manager-get-thumbnail-path", sn);
 
-            // Load synchronously from disk if files are already cached
-            // (sendInternalEvent is synchronous so files may already be there)
-            let trackingInfo = getStringProperty(sn + ".tracking.info");
-            for_index (i; trackingInfo)
-            {
-                if (trackingInfo[i] == "id" && i + 1 < trackingInfo.size())
-                {
-                    let base = QDir.tempPath() + "/rv_thumbnails/" + trackingInfo[i+1];
-                    if (io.path.exists(base + "_filmstrip.jpg")) preview.loadStrip(base + "_filmstrip.jpg");
-                    if (io.path.exists(base + "_thumbnail.jpg")) preview.loadThumbnail(base + "_thumbnail.jpg");
-                    break;
-                }
-            }
+            if (filmstripPath != "" && io.path.exists(filmstripPath))
+                preview.loadStrip(filmstripPath);
+            if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+                preview.loadThumbnail(thumbnailPath);
         }
         catch (...) { ; }
 
