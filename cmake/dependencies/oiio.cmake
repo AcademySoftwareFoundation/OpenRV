@@ -52,20 +52,10 @@ LIST(APPEND _configure_options "-DUSE_OCIO=0")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
-LIST(APPEND _configure_options "-DBoost_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
+# Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution.
+LIST(APPEND _configure_options "-DBoost_DIR=${RV_DEPS_BOOST_ROOT_DIR}/lib/cmake/Boost-${RV_DEPS_BOOST_VERSION}")
 LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
-
-IF(NOT RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
-  LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
-  LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
-  GET_FILENAME_COMPONENT(_imath_library_path ${_imath_library} DIRECTORY)
-  LIST(APPEND _configure_options "-DImath_DIR=${_imath_library_path}/cmake/Imath")
-ELSE()
-  # Must point to the IMath-config.cmake file which is a 'FindIMath.cmake' type of file.
-  LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
-ENDIF()
+LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
 
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
@@ -94,7 +84,14 @@ LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}"
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
-LIST(APPEND _configure_options "-USE_FFMPEG=0")
+LIST(APPEND _configure_options "-DUSE_FFMPEG=0")
+
+# When Boost is built from source but other deps come from a shared prefix (e.g. Homebrew), their transitive -isystem includes can pull in a newer system
+# Boost's headers, causing ABI mismatches at link time. Adding Boost's include as a non-system -I flag ensures it takes precedence over any -isystem paths,
+# since compilers (GCC/Clang) always search -I before -isystem.
+IF(RV_DEPS_IGNORE_PREFIXES)
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=-I${RV_DEPS_BOOST_ROOT_DIR}/include")
+ENDIF()
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
