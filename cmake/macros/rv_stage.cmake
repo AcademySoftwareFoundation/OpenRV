@@ -375,6 +375,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(mu_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -409,6 +410,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(python_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -525,6 +527,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(image_formats ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -554,6 +557,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(movie_formats ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -584,6 +588,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(oiio_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -613,6 +618,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(output_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
