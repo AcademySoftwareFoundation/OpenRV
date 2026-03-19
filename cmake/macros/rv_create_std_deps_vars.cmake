@@ -303,6 +303,11 @@ MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
       "${_sfpd_unresolved_root_3}/include"
   )
 
+  # Set both the regular variable (to override the one from RV_CREATE_STANDARD_DEPS_VARIABLES that would otherwise shadow the cache) and the cache variable (for
+  # persistence across reconfigures).
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+  )
   SET(${rv_deps_target}_ROOT_DIR
       "${_install_dir}"
       CACHE INTERNAL "" FORCE
@@ -350,6 +355,85 @@ MACRO(RV_SET_FOUND_PKGCONFIG_DIRS rv_deps_target pc_prefix)
       "${_install_dir}/bin"
   )
 
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+  )
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+      CACHE INTERNAL "" FORCE
+  )
+
+  IF(NOT TARGET ${rv_deps_target})
+    ADD_CUSTOM_TARGET(${rv_deps_target})
+  ENDIF()
+ENDMACRO()
+
+#
+# RV_SET_FOUND_MODULE_DIRS
+#
+# Set directory variables from a package found via CMake MODULE mode (built-in Find modules like FindZLIB, FindJPEG, etc.).
+#
+# Unlike CONFIG mode packages that provide ${Package}_DIR, MODULE mode results derive locations from the imported target's properties and standard
+# <Package>_INCLUDE_DIRS / <Package>_LIBRARIES variables.
+#
+# Must be a MACRO so the variable overrides propagate to the caller's scope.
+#
+MACRO(RV_SET_FOUND_MODULE_DIRS rv_deps_target find_package_name deps_list_targets)
+  SET(_sfmd_inc_dir
+      ""
+  )
+  SET(_sfmd_lib_dir
+      ""
+  )
+
+  # Derive include dir: prefer <Package>_INCLUDE_DIRS, fall back to first target's INTERFACE_INCLUDE_DIRECTORIES
+  IF(${find_package_name}_INCLUDE_DIRS)
+    LIST(GET ${find_package_name}_INCLUDE_DIRS 0 _sfmd_inc_dir)
+  ELSE()
+    SET(_sfmd_dep_targets
+        ${deps_list_targets}
+    )
+    LIST(LENGTH _sfmd_dep_targets _sfmd_dep_count)
+    IF(_sfmd_dep_count GREATER 0)
+      LIST(GET _sfmd_dep_targets 0 _sfmd_primary_tgt)
+      IF(TARGET ${_sfmd_primary_tgt})
+        GET_TARGET_PROPERTY(_sfmd_inc_dir ${_sfmd_primary_tgt} INTERFACE_INCLUDE_DIRECTORIES)
+      ENDIF()
+    ENDIF()
+  ENDIF()
+
+  # Derive lib dir from the first imported target's IMPORTED_LOCATION
+  SET(_sfmd_dep_targets
+      ${deps_list_targets}
+  )
+  LIST(LENGTH _sfmd_dep_targets _sfmd_dep_count)
+  IF(_sfmd_dep_count GREATER 0)
+    LIST(GET _sfmd_dep_targets 0 _sfmd_primary_tgt)
+    RV_RESOLVE_IMPORTED_LOCATION(${_sfmd_primary_tgt} _sfmd_loc)
+    IF(_sfmd_loc)
+      GET_FILENAME_COMPONENT(_sfmd_lib_dir "${_sfmd_loc}" DIRECTORY)
+    ENDIF()
+  ENDIF()
+
+  IF(_sfmd_inc_dir)
+    SET(_include_dir
+        "${_sfmd_inc_dir}"
+    )
+  ENDIF()
+  IF(_sfmd_lib_dir)
+    SET(_lib_dir
+        "${_sfmd_lib_dir}"
+    )
+  ENDIF()
+
+  GET_FILENAME_COMPONENT(_install_dir "${_lib_dir}/.." ABSOLUTE)
+  SET(_bin_dir
+      "${_install_dir}/bin"
+  )
+
+  SET(${rv_deps_target}_ROOT_DIR
+      "${_install_dir}"
+  )
   SET(${rv_deps_target}_ROOT_DIR
       "${_install_dir}"
       CACHE INTERNAL "" FORCE

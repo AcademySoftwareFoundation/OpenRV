@@ -24,12 +24,13 @@
 #     PACKAGE <find-package-name>    # REQUIRED: e.g., Imath
 #     [VERSION <version>]            # Optional version (EXACT or MINIMUM per RV_DEPS_VERSION_MATCH)
 #     [PKG_CONFIG_NAME <name>]       # Optional pkg-config module name for fallback
+#     [ALLOW_MODULE]                 # Also try find_package(MODULE) for packages with built-in Find modules
 #     [COMPONENTS <c1>...]           # Optional find_package COMPONENTS (e.g., Boost components)
 #     [DEPS_LIST_TARGETS <t1>...]    # Targets to append to RV_DEPS_LIST
 #   )
 # cmake-format: on
 MACRO(RV_FIND_DEPENDENCY)
-  CMAKE_PARSE_ARGUMENTS(_RFD "" "TARGET;PACKAGE;VERSION;PKG_CONFIG_NAME" "DEPS_LIST_TARGETS;COMPONENTS" ${ARGN})
+  CMAKE_PARSE_ARGUMENTS(_RFD "ALLOW_MODULE" "TARGET;PACKAGE;VERSION;PKG_CONFIG_NAME" "DEPS_LIST_TARGETS;COMPONENTS" ${ARGN})
 
   SET(${_RFD_TARGET}_FOUND
       FALSE
@@ -80,12 +81,44 @@ MACRO(RV_FIND_DEPENDENCY)
       )
     ENDIF()
 
+    # Strategy 1.5: CMake MODULE mode (built-in Find modules) Some packages (e.g., zlib) don't ship CMake config files but have built-in Find modules
+    # (FindZLIB.cmake) that create proper imported targets.  Opt-in via ALLOW_MODULE to avoid unexpected matches.
+    IF(NOT ${_RFD_PACKAGE}_FOUND
+       AND _RFD_ALLOW_MODULE
+    )
+      IF(_RFD_VERSION)
+        IF(_rfd_match_mode STREQUAL "EXACT")
+          FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} EXACT MODULE ${_rfd_components_args})
+        ELSE()
+          FIND_PACKAGE(${_RFD_PACKAGE} ${_RFD_VERSION} MODULE ${_rfd_components_args})
+        ENDIF()
+      ELSE()
+        FIND_PACKAGE(${_RFD_PACKAGE} MODULE ${_rfd_components_args})
+      ENDIF()
+
+      IF(${_RFD_PACKAGE}_FOUND)
+        SET(_RFD_FOUND_VIA
+            "module"
+        )
+      ENDIF()
+    ENDIF()
+
     # Strategy 2: pkg-config fallback
     IF(NOT ${_RFD_PACKAGE}_FOUND
        AND _RFD_PKG_CONFIG_NAME
     )
       FIND_PACKAGE(PkgConfig QUIET)
       IF(PKG_CONFIG_FOUND)
+        # pkg_check_modules only searches PKG_CONFIG_PATH by default. Temporarily enable CMAKE_PREFIX_PATH integration so that
+        # -DCMAKE_PREFIX_PATH=/opt/homebrew/opt/zlib also exposes <prefix>/lib/pkgconfig/*.pc to pkg-config.  Restored afterwards to avoid side-effects on
+        # unrelated pkg_check_modules calls.
+        SET(_rfd_saved_pc_prefix_path
+            "${PKG_CONFIG_USE_CMAKE_PREFIX_PATH}"
+        )
+        SET(PKG_CONFIG_USE_CMAKE_PREFIX_PATH
+            ON
+        )
+
         IF(_RFD_VERSION)
           IF(_rfd_match_mode STREQUAL "EXACT")
             PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET "${_RFD_PKG_CONFIG_NAME}=${_RFD_VERSION}")
@@ -95,6 +128,10 @@ MACRO(RV_FIND_DEPENDENCY)
         ELSE()
           PKG_CHECK_MODULES(${_RFD_TARGET}_PC QUIET IMPORTED_TARGET ${_RFD_PKG_CONFIG_NAME})
         ENDIF()
+
+        SET(PKG_CONFIG_USE_CMAKE_PREFIX_PATH
+            "${_rfd_saved_pc_prefix_path}"
+        )
 
         IF(${_RFD_TARGET}_PC_FOUND)
           SET(${_RFD_PACKAGE}_FOUND
@@ -125,6 +162,16 @@ MACRO(RV_FIND_DEPENDENCY)
         # auxiliary interface targets (e.g. Imath::ImathConfig, OpenEXR::OpenEXRConfig) that carry include dirs and are linked transitively by the library
         # targets.
         IF(NOT "${_sfpd_unresolved_include_dir}" STREQUAL "${_include_dir}")
+          # Record the contaminating prefix so ExternalProject sub-builds can exclude it via CMAKE_IGNORE_PREFIX_PATH. This is how we propagate the symlink fix
+          # to sub-builds that run their own CMake and would otherwise rediscover packages at the unresolved (shared) prefix.
+          LIST(APPEND RV_DEPS_IGNORE_PREFIXES "${_sfpd_unresolved_root_3}")
+          LIST(REMOVE_DUPLICATES RV_DEPS_IGNORE_PREFIXES)
+          SET(RV_DEPS_IGNORE_PREFIXES
+              "${RV_DEPS_IGNORE_PREFIXES}"
+              CACHE INTERNAL "Contaminating prefixes detected during symlink resolution (for ExternalProject sub-builds)" FORCE
+          )
+          MESSAGE(STATUS "  Added ${_sfpd_unresolved_root_3} to RV_DEPS_IGNORE_PREFIXES (symlink resolved to ${_install_dir})")
+
           GET_PROPERTY(
             _rfd_all_imported_targets
             DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -152,6 +199,9 @@ MACRO(RV_FIND_DEPENDENCY)
             ENDIF()
           ENDFOREACH()
         ENDIF()
+      ELSEIF(_RFD_FOUND_VIA STREQUAL "module")
+        MESSAGE(STATUS "Found ${_RFD_PACKAGE} ${${_RFD_PACKAGE}_VERSION} via CMake Find module. Using installed package.")
+        RV_SET_FOUND_MODULE_DIRS(${_RFD_TARGET} ${_RFD_PACKAGE} "${_RFD_DEPS_LIST_TARGETS}")
       ELSEIF(_RFD_FOUND_VIA STREQUAL "pkgconfig")
         MESSAGE(STATUS "Found ${_RFD_PACKAGE} ${${_RFD_PACKAGE}_VERSION} via pkg-config. Using installed package.")
         RV_SET_FOUND_PKGCONFIG_DIRS(${_RFD_TARGET} ${_RFD_TARGET}_PC)
