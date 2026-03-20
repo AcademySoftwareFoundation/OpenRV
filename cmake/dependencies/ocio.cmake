@@ -52,6 +52,12 @@ IF(RV_TARGET_WINDOWS)
       ${_bin_dir}/${_ocio_win_sharedlibname}
   )
   LIST(APPEND _byproducts ${_ocio_win_sharedlib_path})
+
+  # Fix _libpath to match the actual version-suffixed DLL name that OCIO produces. RV_MAKE_STANDARD_LIB_NAME generates "OpenColorIO.dll" but OCIO builds
+  # "OpenColorIO_2.3.dll".
+  SET(_libpath
+      ${_ocio_win_sharedlib_path}
+  )
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
@@ -138,8 +144,9 @@ IF(NOT RV_TARGET_WINDOWS)
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
-# Use explicit Imath_DIR for precise config resolution. Works for both built-from-source and found (e.g. Homebrew) packages.
-LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
+# Use explicit Imath_DIR for precise config resolution. Works for both built-from-source and found (e.g. Homebrew) packages. Use RV_DEPS_IMATH_CMAKE_DIR which
+# accounts for lib vs lib64 (RHEL) rather than hardcoding lib/.
+LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
@@ -202,7 +209,7 @@ ELSE() # Windows
     "-DZLIB_LIBRARY=${_zlib_library}"
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
-    "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
+    "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}"
     "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     # Mandatory param: OCIO CMake code finds Python.
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param

@@ -52,10 +52,11 @@ LIST(APPEND _configure_options "-DUSE_OCIO=0")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
-# Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution.
+# Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution. Use RV_DEPS_*_CMAKE_DIR which accounts for lib
+# vs lib64 (RHEL) rather than hardcoding lib/.
 LIST(APPEND _configure_options "-DBoost_DIR=${RV_DEPS_BOOST_ROOT_DIR}/lib/cmake/Boost-${RV_DEPS_BOOST_VERSION}")
 LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
-LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
+LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
 
 GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
