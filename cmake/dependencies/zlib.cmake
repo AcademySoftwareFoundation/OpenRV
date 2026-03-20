@@ -6,6 +6,45 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_ZLIB" "${RV_DEPS_ZLIB_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(ZLIB)
+  IF(ZLIB_FOUND)
+    MESSAGE(STATUS "Using Homebrew ZLIB: ${ZLIB_VERSION_STRING}")
+
+    IF(TARGET ZLIB::ZLIB)
+      GET_TARGET_PROPERTY(_is_imported ZLIB::ZLIB IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          ZLIB::ZLIB
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ELSE()
+      ADD_LIBRARY(ZLIB::ZLIB UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET ZLIB::ZLIB
+        PROPERTY IMPORTED_LOCATION "${ZLIB_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        ZLIB::ZLIB
+        INTERFACE "${ZLIB_INCLUDE_DIRS}"
+      )
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST ZLIB::ZLIB)
+    SET(RV_DEPS_ZLIB_VERSION
+        "${ZLIB_VERSION_STRING}"
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_ZLIB_INCLUDE_DIR
+        "${ZLIB_INCLUDE_DIRS}"
+        CACHE STRING "Path to installed includes" FORCE
+    )
+
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/madler/zlib/archive/refs/tags/v${_version}.zip"
 )

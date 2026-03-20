@@ -16,6 +16,66 @@
 # cmake-format: on
 # ------------------------------------------------------------------------------
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  SET(_ffmpeg_found_all
+      TRUE
+  )
+  FOREACH(
+    _comp
+    avutil swresample swscale avcodec avformat
+  )
+    PKG_CHECK_MODULES(PC_${_comp} lib${_comp})
+    IF(PC_${_comp}_FOUND)
+      IF(NOT TARGET ffmpeg::${_comp})
+        ADD_LIBRARY(ffmpeg::${_comp} UNKNOWN IMPORTED GLOBAL)
+        FIND_LIBRARY(
+          LIB_${_comp}
+          NAMES ${_comp}
+          HINTS ${PC_${_comp}_LIBDIR}
+        )
+        SET_PROPERTY(
+          TARGET ffmpeg::${_comp}
+          PROPERTY IMPORTED_LOCATION "${LIB_${_comp}}"
+        )
+        TARGET_INCLUDE_DIRECTORIES(
+          ffmpeg::${_comp}
+          INTERFACE "${PC_${_comp}_INCLUDE_DIRS}"
+        )
+        LIST(APPEND RV_DEPS_LIST ffmpeg::${_comp})
+
+        # Need to link dependencies
+        IF("${_comp}" STREQUAL "swresample"
+           OR "${_comp}" STREQUAL "swscale"
+        )
+          TARGET_LINK_LIBRARIES(
+            ffmpeg::${_comp}
+            INTERFACE ffmpeg::avutil
+          )
+        ELSEIF("${_comp}" STREQUAL "avcodec")
+          TARGET_LINK_LIBRARIES(
+            ffmpeg::${_comp}
+            INTERFACE ffmpeg::swresample
+          )
+        ELSEIF("${_comp}" STREQUAL "avformat")
+          TARGET_LINK_LIBRARIES(
+            ffmpeg::${_comp}
+            INTERFACE ffmpeg::avcodec
+          )
+        ENDIF()
+      ENDIF()
+    ELSE()
+      MESSAGE(WARNING "Homebrew FFmpeg component lib${_comp} not found")
+      SET(_ffmpeg_found_all
+          FALSE
+      )
+    ENDIF()
+  ENDFOREACH()
+
+  IF(_ffmpeg_found_all)
+    RETURN()
+  ENDIF()
+ENDIF()
 SET(_target
     "RV_DEPS_FFMPEG"
 )

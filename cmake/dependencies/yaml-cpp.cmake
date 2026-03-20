@@ -9,6 +9,24 @@
 # Expose OCIO's own 'yaml_cpp' target replacing the legacy 'src/pub/yaml_cpp' folder.
 #
 # ##############################################################################################################################################################
+
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(yaml-cpp CONFIG)
+  IF(yaml-cpp_FOUND)
+    MESSAGE(STATUS "Using Homebrew yaml-cpp: ${yaml-cpp_VERSION}")
+    ADD_LIBRARY(yaml_cpp INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(
+      yaml_cpp
+      INTERFACE yaml-cpp
+    )
+    SET(RV_DEPS_YAML_CPP_VERSION
+        "${yaml-cpp_VERSION}"
+        CACHE INTERNAL "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
+
 ADD_LIBRARY(yaml_cpp STATIC IMPORTED GLOBAL)
 ADD_DEPENDENCIES(yaml_cpp RV_DEPS_OCIO)
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")

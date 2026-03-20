@@ -11,6 +11,75 @@ SET(_version
     ${RV_DEPS_OPENSSL_VERSION}
 )
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(OpenSSL)
+  IF(OpenSSL_FOUND)
+    MESSAGE(STATUS "Using Homebrew OpenSSL: ${OPENSSL_VERSION}")
+
+    IF(TARGET OpenSSL::Crypto)
+      GET_TARGET_PROPERTY(_is_imported OpenSSL::Crypto IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          OpenSSL::Crypto
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(TARGET OpenSSL::SSL)
+      GET_TARGET_PROPERTY(_is_imported OpenSSL::SSL IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          OpenSSL::SSL
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST OpenSSL::Crypto OpenSSL::SSL)
+
+    GET_FILENAME_COMPONENT(_openssl_include_dir "${OPENSSL_INCLUDE_DIR}" ABSOLUTE)
+    GET_FILENAME_COMPONENT(_openssl_root_dir "${_openssl_include_dir}/.." ABSOLUTE)
+
+    SET(RV_DEPS_OPENSSL_INSTALL_DIR
+        "${_openssl_root_dir}"
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_OPENSSL_VERSION
+        "${OPENSSL_VERSION}"
+        CACHE INTERNAL "" FORCE
+    )
+
+    SET_PROPERTY(
+      GLOBAL APPEND
+      PROPERTY "RV_FFMPEG_DEPENDS" OpenSSL::Crypto
+    )
+    SET_PROPERTY(
+      GLOBAL APPEND
+      PROPERTY "RV_FFMPEG_EXTRA_C_OPTIONS" "--extra-cflags=-I${OPENSSL_INCLUDE_DIR}"
+    )
+
+    GET_FILENAME_COMPONENT(_openssl_lib_dir "${OPENSSL_CRYPTO_LIBRARY}" DIRECTORY)
+    IF(RV_TARGET_WINDOWS)
+      SET_PROPERTY(
+        GLOBAL APPEND
+        PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-LIBPATH:${_openssl_lib_dir}"
+      )
+    ELSE()
+      SET_PROPERTY(
+        GLOBAL APPEND
+        PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-L${_openssl_lib_dir}"
+      )
+    ENDIF()
+    SET_PROPERTY(
+      GLOBAL APPEND
+      PROPERTY "RV_FFMPEG_EXTERNAL_LIBS" "--enable-openssl"
+    )
+
+    RETURN()
+  ENDIF()
+ENDIF()
+
 IF(RV_TARGET_IS_RHEL8
    AND RV_VFX_PLATFORM STREQUAL CY2023
 )

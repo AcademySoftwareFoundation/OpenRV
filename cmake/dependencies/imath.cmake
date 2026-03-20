@@ -6,6 +6,61 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "${RV_DEPS_IMATH_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(Imath CONFIG)
+  IF(Imath_FOUND)
+    MESSAGE(STATUS "Using Homebrew Imath: ${Imath_VERSION}")
+
+    # Helper macro to promote target to global
+    MACRO(PROMOTE_TO_GLOBAL target)
+      IF(TARGET ${target})
+        GET_TARGET_PROPERTY(_is_imported ${target} IMPORTED)
+        IF(_is_imported)
+          SET_TARGET_PROPERTIES(
+            ${target}
+            PROPERTIES IMPORTED_GLOBAL TRUE
+          )
+        ENDIF()
+      ENDIF()
+    ENDMACRO()
+
+    IF(TARGET Imath::Imath)
+      PROMOTE_TO_GLOBAL(Imath::Imath)
+      LIST(APPEND RV_DEPS_LIST Imath::Imath)
+    ELSEIF(TARGET Imath::imath)
+      PROMOTE_TO_GLOBAL(Imath::imath)
+      ADD_LIBRARY(Imath::Imath ALIAS Imath::imath)
+      LIST(APPEND RV_DEPS_LIST Imath::Imath)
+    ELSE()
+      # Fallback using variables
+      ADD_LIBRARY(Imath::Imath UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET Imath::Imath
+        PROPERTY IMPORTED_LOCATION "${Imath_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        Imath::Imath
+        INTERFACE "${Imath_INCLUDE_DIR}"
+      )
+      LIST(APPEND RV_DEPS_LIST Imath::Imath)
+    ENDIF()
+
+    SET(RV_DEPS_IMATH_VERSION
+        "${Imath_VERSION}"
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_IMATH_ROOT_DIR
+        "${Imath_DIR}/../.."
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_IMATH_CMAKE_DIR
+        "${Imath_DIR}"
+        CACHE STRING "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v${_version}.zip"
 )

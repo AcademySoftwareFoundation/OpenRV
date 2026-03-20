@@ -18,6 +18,32 @@ IF(RV_TARGET_LINUX)
 ENDIF()
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(PC_RAW libraw)
+  IF(PC_RAW_FOUND)
+    MESSAGE(STATUS "Using Homebrew LibRaw")
+    IF(NOT TARGET LibRaw::raw)
+      ADD_LIBRARY(LibRaw::raw UNKNOWN IMPORTED GLOBAL)
+      FIND_LIBRARY(
+        RAW_LIBRARY
+        NAMES raw
+        HINTS ${PC_RAW_LIBDIR}
+      )
+      SET_PROPERTY(
+        TARGET LibRaw::raw
+        PROPERTY IMPORTED_LOCATION "${RAW_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        LibRaw::raw
+        INTERFACE "${PC_RAW_INCLUDE_DIRS}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST LibRaw::raw)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/LibRaw/LibRaw/archive/refs/tags/${_version}.tar.gz"
 )

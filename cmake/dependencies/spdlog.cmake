@@ -6,6 +6,34 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(spdlog CONFIG)
+  IF(spdlog_FOUND)
+    MESSAGE(STATUS "Using Homebrew spdlog: ${spdlog_VERSION}")
+
+    IF(TARGET spdlog::spdlog)
+      GET_TARGET_PROPERTY(_is_imported spdlog::spdlog IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          spdlog::spdlog
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(NOT TARGET spdlog::spdlog)
+      ADD_LIBRARY(spdlog::spdlog INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        spdlog::spdlog
+        INTERFACE spdlog::spdlog_header_only
+      )
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
 )

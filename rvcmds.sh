@@ -464,3 +464,77 @@ else
     rvrelease
   fi
 fi
+
+rvbuild-withbrew() {
+  # Define brew dependencies
+  # Format: "cmake_file_prefix:brew_package"
+  local deps=(
+      "dav1d:dav1d"
+      "expat:expat"
+      "ffmpeg:ffmpeg"
+      "gc:bdw-gc"
+      "glew:glew"
+      "imath:imath"
+      "jpegturbo:jpeg-turbo"
+      "mbedtls:mbedtls"
+      "ocio:opencolorio"
+      "oiio:openimageio"
+      "openexr:openexr"
+      "openjpeg:openjpeg"
+      "openjph:openjph"
+      "openssl:openssl@3"
+      "pcre2:pcre2"
+      "png:libpng"
+      "raw:libraw"
+      "spdlog:spdlog"
+      "tiff:libtiff"
+      "webp:webp"
+      "zlib:zlib"
+  )
+
+  local missing_pkgs=()
+  local prefix_paths=""
+  local brew_prefix=$(brew --prefix)
+
+  echo "Checking Homebrew dependencies..."
+  for dep in "${deps[@]}"; do
+      local pkg="${dep#*:}"
+      if ! brew list --versions "$pkg" >/dev/null 2>&1; then
+          missing_pkgs+=("$pkg")
+      else
+          # Get prefix for CMAKE_PREFIX_PATH
+          # Some packages are keg-only (like openssl, curl), so we need their direct path
+          local p="${brew_prefix}/opt/${pkg}"
+          if [ -d "$p" ]; then
+             if [ -z "$prefix_paths" ]; then
+                 prefix_paths="$p"
+             else
+                 prefix_paths="$prefix_paths;$p"
+             fi
+          fi
+      fi
+  done
+
+  if [ ${#missing_pkgs[@]} -gt 0 ]; then
+      echo "Missing Homebrew packages:"
+      printf "  %s\n" "${missing_pkgs[@]}"
+      echo ""
+      echo "Run the following command to install them:"
+      echo "brew install ${missing_pkgs[*]}"
+      return 1
+  fi
+
+  echo "All dependencies found."
+  
+  echo "Configuring with Homebrew dependencies..."
+  # Pass RV_USE_BREW_DEPS=ON and CMAKE_PREFIX_PATH
+  rvcfg -DRV_USE_BREW_DEPS=ON -DCMAKE_PREFIX_PATH="$prefix_paths"
+  
+  if [ $? -eq 0 ]; then
+      echo "Configuration successful. Starting build..."
+      rvbuild
+  else
+      echo "Configuration failed."
+      return 1
+  fi
+}

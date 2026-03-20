@@ -7,6 +7,35 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PCRE2" "pcre2-${RV_DEPS_PCRE2_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PCRE2 CONFIG)
+  IF(PCRE2_FOUND)
+    MESSAGE(STATUS "Using Homebrew PCRE2")
+    IF(TARGET PCRE2::8bit)
+      IF(NOT TARGET pcre2-8)
+        ADD_LIBRARY(pcre2-8 INTERFACE IMPORTED GLOBAL)
+        TARGET_LINK_LIBRARIES(
+          pcre2-8
+          INTERFACE PCRE2::8bit
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(TARGET PCRE2::posix)
+      IF(NOT TARGET pcre2-posix)
+        ADD_LIBRARY(pcre2-posix INTERFACE IMPORTED GLOBAL)
+        TARGET_LINK_LIBRARIES(
+          pcre2-posix
+          INTERFACE PCRE2::posix
+        )
+      ENDIF()
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST pcre2-8 pcre2-posix)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/PCRE2Project/pcre2/archive/refs/tags/${_version}.zip"
 )

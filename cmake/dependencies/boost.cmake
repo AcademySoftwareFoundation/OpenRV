@@ -207,37 +207,41 @@ FOREACH(
   _boost_lib
   ${_boost_libs}
 )
-  ADD_LIBRARY(Boost::${_boost_lib} SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(Boost::${_boost_lib} ${_target})
-  SET_PROPERTY(
-    TARGET Boost::${_boost_lib}
-    PROPERTY IMPORTED_LOCATION ${_boost_${_boost_lib}_lib}
-  )
-  SET_PROPERTY(
-    TARGET Boost::${_boost_lib}
-    PROPERTY IMPORTED_SONAME ${_boost_${_boost_lib}_lib_name}
-  )
-
-  IF(RV_TARGET_WINDOWS)
+  IF(NOT TARGET Boost::${_boost_lib})
+    ADD_LIBRARY(Boost::${_boost_lib} SHARED IMPORTED GLOBAL)
+    ADD_DEPENDENCIES(Boost::${_boost_lib} ${_target})
     SET_PROPERTY(
       TARGET Boost::${_boost_lib}
-      PROPERTY IMPORTED_IMPLIB ${_boost_${_boost_lib}_implib}
+      PROPERTY IMPORTED_LOCATION ${_boost_${_boost_lib}_lib}
     )
-  ENDIF()
-  TARGET_INCLUDE_DIRECTORIES(
-    Boost::${_boost_lib}
-    INTERFACE ${_include_dir}
-  )
+    SET_PROPERTY(
+      TARGET Boost::${_boost_lib}
+      PROPERTY IMPORTED_SONAME ${_boost_${_boost_lib}_lib_name}
+    )
 
-  LIST(APPEND RV_DEPS_LIST Boost::${_boost_lib})
-  LIST(APPEND _boost_stage_output ${RV_STAGE_LIB_DIR}/${_boost_${_boost_lib}_lib_name})
+    IF(RV_TARGET_WINDOWS)
+      SET_PROPERTY(
+        TARGET Boost::${_boost_lib}
+        PROPERTY IMPORTED_IMPLIB ${_boost_${_boost_lib}_implib}
+      )
+    ENDIF()
+    TARGET_INCLUDE_DIRECTORIES(
+      Boost::${_boost_lib}
+      INTERFACE ${_include_dir}
+    )
+
+    LIST(APPEND RV_DEPS_LIST Boost::${_boost_lib})
+    LIST(APPEND _boost_stage_output ${RV_STAGE_LIB_DIR}/${_boost_${_boost_lib}_lib_name})
+  ENDIF()
 ENDFOREACH()
 
-ADD_LIBRARY(Boost::headers INTERFACE IMPORTED GLOBAL)
-SET_TARGET_PROPERTIES(
-  Boost::headers
-  PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
-)
+IF(NOT TARGET Boost::headers)
+  ADD_LIBRARY(Boost::headers INTERFACE IMPORTED GLOBAL)
+  SET_TARGET_PROPERTIES(
+    Boost::headers
+    PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
+  )
+ENDIF()
 
 # Note: On Windows, Boost's b2 puts both .lib and .dll in lib/, so we copy _lib_dir to both RV_STAGE_LIB_DIR and RV_STAGE_BIN_DIR.
 IF(RV_TARGET_WINDOWS)

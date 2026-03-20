@@ -6,6 +6,53 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "${RV_DEPS_JPEGTURBO_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(JPEG)
+  FIND_LIBRARY(
+    TURBOJPEG_LIBRARY
+    NAMES turbojpeg
+  )
+  FIND_PATH(
+    TURBOJPEG_INCLUDE_DIR
+    NAMES turbojpeg.h
+  )
+
+  IF(JPEG_FOUND
+     AND TURBOJPEG_LIBRARY
+     AND TURBOJPEG_INCLUDE_DIR
+  )
+    MESSAGE(STATUS "Using Homebrew JPEGTURBO")
+
+    IF(NOT TARGET libjpeg-turbo::jpeg)
+      ADD_LIBRARY(libjpeg-turbo::jpeg UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET libjpeg-turbo::jpeg
+        PROPERTY IMPORTED_LOCATION "${JPEG_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        libjpeg-turbo::jpeg
+        INTERFACE "${JPEG_INCLUDE_DIR}"
+      )
+    ENDIF()
+
+    IF(NOT TARGET libjpeg-turbo::turbojpeg)
+      ADD_LIBRARY(libjpeg-turbo::turbojpeg UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET libjpeg-turbo::turbojpeg
+        PROPERTY IMPORTED_LOCATION "${TURBOJPEG_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        libjpeg-turbo::turbojpeg
+        INTERFACE "${TURBOJPEG_INCLUDE_DIR}"
+      )
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST libjpeg-turbo::jpeg)
+    LIST(APPEND RV_DEPS_LIST libjpeg-turbo::turbojpeg)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${_version}.tar.gz"
 )

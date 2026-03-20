@@ -11,6 +11,33 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_EXPAT" "${RV_DEPS_EXPAT_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(EXPAT)
+  IF(EXPAT_FOUND)
+    MESSAGE(STATUS "Using Homebrew EXPAT: ${EXPAT_VERSION_STRING}")
+    IF(NOT TARGET EXPAT::EXPAT)
+      ADD_LIBRARY(EXPAT::EXPAT UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET EXPAT::EXPAT
+        PROPERTY IMPORTED_LOCATION "${EXPAT_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        EXPAT::EXPAT
+        INTERFACE "${EXPAT_INCLUDE_DIRS}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST EXPAT::EXPAT)
+    # Some other deps might need EXPAT root dir
+    GET_FILENAME_COMPONENT(_expat_include_dir "${EXPAT_INCLUDE_DIRS}" ABSOLUTE)
+    GET_FILENAME_COMPONENT(_expat_root_dir "${_expat_include_dir}/.." ABSOLUTE)
+    SET(RV_DEPS_EXPAT_ROOT_DIR
+        "${_expat_root_dir}"
+        CACHE INTERNAL "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
+
 STRING(REPLACE "." "_" _version_underscored ${_version})
 SET(_download_url
     "https://github.com/libexpat/libexpat/archive/refs/tags/R_${_version_underscored}.tar.gz"
