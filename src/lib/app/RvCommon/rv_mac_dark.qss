@@ -1100,7 +1100,38 @@ QWidget::sessionManager QScrollBar::handle:horizontal {
 QWidget::sessionManager QScrollBar::handle:vertical {
     min-height: 20px;
 }
-    
+
+QWidget#sessionManager QWidget#sourceRowWidget {
+    background: transparent;
+}
+
+QWidget#sessionManager QWidget#sourceTextWidget {
+    background: transparent;
+}
+
+QWidget#sessionManager QLabel#sourceNameLabel {
+    color: rgb(208, 208, 208);
+    background: transparent;
+}
+
+QWidget#sessionManager QLabel#sourceMetaLabel {
+    color: rgb(136, 136, 136);
+    background: transparent;
+    font-size: %2pt;
+}
+
+QWidget#sessionManager QListView#inputsViewList::item:hover {
+    background-color: rgb(7, 75, 120);
+}
+
+QWidget#sessionManager QListView#inputsViewList::item:selected {
+    background-color: rgb(7, 75, 120);
+}
+
+QWidget#sessionManager QListView#inputsViewList::item:selected:hover {
+    background-color: rgb(7, 75, 120);
+}
+
 QAbstractItemView#uiTreeWidget QWidget {
 }
     
