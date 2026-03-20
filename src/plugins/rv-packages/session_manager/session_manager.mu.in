@@ -23,6 +23,11 @@ ChannelSubComponent := 4;
 FILMSTRIP_FRAME_WIDTH := 240;
 PREVIEW_WIDTH         := 80;
 PREVIEW_HEIGHT        := 45;
+SOURCE_ROW_HEIGHT     := 55;
+SOURCE_ROW_MARGIN     := 8;
+SOURCE_ROW_SPACING    := 5;
+SOURCE_TEXT_SPACING   := 3;
+TREE_VIEW_INDENTATION := 10;
 
 \: itemNode (string; QStandardItem item) 
 { 
@@ -614,12 +619,12 @@ class: ThumbnailWidget : QLabel
         setScaledContents(true);
     }
 
-    method: setFallback (void; QPixmap px) { setPixmap(px); }
+    method: setFallback (void; QPixmap pixmap) { setPixmap(pixmap); }
 
     method: load (void; string path)
     {
-        let px = QPixmap.fromImage(QImage(path, ""), Qt.AutoColor);
-        if (!px.isNull()) setPixmap(px);
+        let pixmap = QPixmap.fromImage(QImage(path, ""), Qt.AutoColor);
+        if (!pixmap.isNull()) setPixmap(pixmap);
     }
 }
 
@@ -642,14 +647,14 @@ class: FilmstripWidget : QLabel
 
     method: showFrameAtX (void; int mouseX)
     {
-        if (!_loaded) return;
-        let nat_w   = _strip.width(),
-            prop_x  = float(mouseX) / float(width()),
-            fx      = int(prop_x * float(nat_w) / float(_frameWidth) + 0.5) * _frameWidth,
-            clamped = if fx > nat_w - _frameWidth then nat_w - _frameWidth
-                      else if fx < 0 then 0
-                      else fx;
-        let frame = _strip.copy(QRect(clamped, 0, _frameWidth, _strip.height()));
+        if (!_loaded || width() <= 0) return;
+        let nativeWidth  = _strip.width(),
+            proportionX  = float(mouseX) / float(width()),
+            frameX       = int(proportionX * float(nativeWidth) / float(_frameWidth) + 0.5) * _frameWidth,
+            clampedX     = if frameX > nativeWidth - _frameWidth then nativeWidth - _frameWidth
+                           else if frameX < 0 then 0
+                           else frameX;
+        let frame = _strip.copy(QRect(clampedX, 0, _frameWidth, _strip.height()));
         setPixmap(QPixmap.fromImage(frame, Qt.AutoColor));
     }
 
@@ -657,10 +662,10 @@ class: FilmstripWidget : QLabel
 
     method: load (void; string path)
     {
-        let img = QImage(path, "");
-        if (!img.isNull())
+        let filmstripImage = QImage(path, "");
+        if (!filmstripImage.isNull())
         {
-            _strip  = img;
+            _strip  = filmstripImage;
             _loaded = true;
         }
     }
@@ -693,13 +698,13 @@ class: SourcePreviewWidget : QWidget
         _filmstrip.hide();
     }
 
-    method: setFallback (void; QPixmap px) { _thumbnail.setFallback(px); }
+    method: setFallback (void; QPixmap pixmap) { _thumbnail.setFallback(pixmap); }
     method: loadStrip   (void; string path) { _filmstrip.load(path); }
     method: loadThumbnail (void; string path) { _thumbnail.load(path); }
 
-    method: event (bool; QEvent e)
+    method: event (bool; QEvent event)
     {
-        if (e.type() == QEvent.HoverEnter)
+        if (event.type() == QEvent.HoverEnter)
         {
             if (_filmstrip.isLoaded())
             {
@@ -709,13 +714,13 @@ class: SourcePreviewWidget : QWidget
             }
             return true;
         }
-        else if (e.type() == QEvent.HoverLeave)
+        else if (event.type() == QEvent.HoverLeave)
         {
             _filmstrip.hide();
             _thumbnail.show();
             return true;
         }
-        return QWidget.event(this, e);
+        return QWidget.event(this, event);
     }
 }
 
@@ -1494,7 +1499,7 @@ class: SessionManagerMode : MinorMode
             if (isSource)
             {
                 item.setText("");
-                item.setSizeHint(QSize(-1, 55));
+                item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
             }
 
             _inputsModel.appendRow(item);
@@ -1793,60 +1798,60 @@ class: SessionManagerMode : MinorMode
     {
         let widget = QWidget(nil, 0),
             layout = QHBoxLayout(widget);
-        widget.setStyleSheet("background: transparent;");
-        layout.setContentsMargins(8, 0, 8, 0);
-        layout.setSpacing(5);
+        widget.setObjectName("sourceRowWidget");
+        layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
+        layout.setSpacing(SOURCE_ROW_SPACING);
 
         // Source preview: stacks thumbnail (default) and filmstrip (on hover)
         let preview = SourcePreviewWidget(widget);
         preview.setFixedSize(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT));
         preview.setFallback(_fallbackSourceIcon.pixmap(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)));
 
-        try
+        string meta = "";
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception error)
         {
-            let sn = sourceNodeOfGroup(node);
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), error));
+        }
 
+        if (sourceNode neq nil)
+        {
             // Fire events that fetch filmstrip/thumbnail and return file paths
-            let filmstripPath = sendInternalEvent("session_manager-get-filmstrip-path", sn);
-            let thumbnailPath = sendInternalEvent("session_manager-get-thumbnail-path", sn);
+            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+            let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
 
             if (filmstripPath != "" && io.path.exists(filmstripPath))
                 preview.loadStrip(filmstripPath);
             if (thumbnailPath != "" && io.path.exists(thumbnailPath))
                 preview.loadThumbnail(thumbnailPath);
+
+            let mediaPropertyPath = sourceNode + ".media.movie";
+            if (propertyExists(mediaPropertyPath))
+            {
+                let movieProperty = getStringProperty(mediaPropertyPath);
+                if (!movieProperty.empty())
+                {
+                    let parts = io.path.basename(movieProperty.front()).split(".");
+                    if (parts.size() > 1) meta = parts.back();
+                }
+            }
         }
-        catch (...) { ; }
 
         layout.addWidget(preview);
 
         // Text column
         let textWidget = QWidget(widget),
             textLayout = QVBoxLayout(textWidget);
-        textWidget.setStyleSheet("background: transparent;");
-        textLayout.setSpacing(3);
+        textWidget.setObjectName("sourceTextWidget");
+        textLayout.setSpacing(SOURCE_TEXT_SPACING);
 
         let nameLabel = QLabel(uiName(node), textWidget);
-        nameLabel.setStyleSheet("color: #d0d0d0; background: transparent;");
+        nameLabel.setObjectName("sourceNameLabel");
         textLayout.addWidget(nameLabel);
 
-        string meta = "";
-        try
-        {
-            let sn    = sourceNodeOfGroup(node),
-                mprop = getStringProperty(sn + ".media.movie");
-            if (!mprop.empty())
-            {
-                let parts = io.path.basename(mprop.front()).split(".");
-                if (parts.size() > 1) meta = parts.back();
-            }
-        }
-        catch (exception exc)
-        {
-            print("WARNING: Could not get media type info for %s - %s\n" % (uiName(node), exc));
-        }
-
         let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
-        metaLabel.setStyleSheet("color: #888888; background: transparent; font-size: 9px;");
+        metaLabel.setObjectName("sourceMetaLabel");
         textLayout.addWidget(metaLabel);
         textLayout.addStretch(1);
 
@@ -1888,7 +1893,7 @@ class: SessionManagerMode : MinorMode
         if (source)
         {
             item.setText("");
-            item.setSizeHint(QSize(-1, 55));
+            item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
             _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
         }
 
@@ -3129,7 +3134,7 @@ class: SessionManagerMode : MinorMode
         _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
         _viewTreeView.setDefaultDropAction(Qt.MoveAction);
         _viewTreeView.setExpandsOnDoubleClick(false);
-        _viewTreeView.setIndentation(10);
+        _viewTreeView.setIndentation(TREE_VIEW_INDENTATION);
 
         _inputsView.setModel(_inputsModel);
         _inputsView.setDragEnabled(true);
