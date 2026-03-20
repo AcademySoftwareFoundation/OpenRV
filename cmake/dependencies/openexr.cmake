@@ -169,5 +169,5 @@ ELSE()
     LIST(APPEND _openexr_stage_targets OpenEXR::OpenEXRCore)
   ENDIF()
 
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_openexr_stage_targets} USE_FLAG_FILE)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_openexr_stage_targets})
 ENDIF()

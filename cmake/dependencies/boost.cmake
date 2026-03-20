@@ -186,5 +186,5 @@ ELSE()
   ENDFOREACH()
 
   # Found path: actual filenames may differ (e.g. -mt suffix), use TARGET_LIBS to resolve at build time
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_boost_deps_list_targets} USE_FLAG_FILE)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_boost_deps_list_targets})
 ENDIF()

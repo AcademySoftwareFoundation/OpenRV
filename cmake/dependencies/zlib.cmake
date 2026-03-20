@@ -160,7 +160,7 @@ ELSE()
     )
     ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
   ELSE()
-    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ZLIB::ZLIB USE_FLAG_FILE)
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ZLIB::ZLIB)
   ENDIF()
 ENDIF()
 

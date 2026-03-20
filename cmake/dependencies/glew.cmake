@@ -48,5 +48,5 @@ ELSE()
   ENDIF()
 
   # Found path: use TARGET_LIBS to resolve actual library path at build time
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS GLEW::GLEW USE_FLAG_FILE)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS GLEW::GLEW)
 ENDIF()

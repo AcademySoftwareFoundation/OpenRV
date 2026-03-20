@@ -20,8 +20,10 @@
 #     [STAGE_LIB_DIR <override>]    # Override RV_STAGE_LIB_DIR (e.g., for OpenSSL/Linux)
 #     [EXTRA_LIB_DIRS <dir1>...]    # Additional lib dirs to copy to
 #     [FILES <file1> [file2...]]    # Individual files to copy_if_different to STAGE_LIB_DIR (alternative to LIB_DIR)
-#     [TARGET_LIBS <t1> [t2...]]    # Imported targets to stage via $<TARGET_FILE:...> generatos (requires USE_FLAG_FILE).
-#                                   # Resolves actual library paths at build time — handles any naming convention.
+#     [TARGET_LIBS <t1> [t2...]]    # Imported targets to stage via $<TARGET_FILE:...> generators.
+#                                   # At configure time, resolves IMPORTED_LOCATION to derive output filenames
+#                                   # for proper incremental tracking (re-stages if files are deleted).
+#                                   # Falls back to USE_FLAG_FILE if location cannot be resolved.
 #                                   # On Windows: DLL→STAGE_BIN_DIR, import lib→STAGE_LIB_DIR.
 #     [DEPENDS <dep1> [dep2...]]    # Dependencies (default: ${TARGET})
 #     [PRE_COMMANDS COMMAND <cmd1> [COMMAND <cmd2>...]]  # Commands to run before copy; each must be prefixed with COMMAND keyword
@@ -71,13 +73,6 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     ENDIF()
   ENDIF()
 
-  # Validate TARGET_LIBS requires USE_FLAG_FILE (generators can't be used in OUTPUTS)
-  IF(_ARG_TARGET_LIBS
-     AND NOT _ARG_USE_FLAG_FILE
-  )
-    MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: TARGET_LIBS requires USE_FLAG_FILE (generator expressions cannot be used in OUTPUTS)")
-  ENDIF()
-
   # Default LIB_DIR to caller's _lib_dir if not explicitly passed
   IF(NOT _ARG_LIB_DIR
      AND NOT _ARG_FILES
@@ -109,6 +104,68 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     SET(_ARG_STAGE_LIB_DIR
         ${RV_STAGE_LIB_DIR}
     )
+  ENDIF()
+
+  # When TARGET_LIBS is used without explicit USE_FLAG_FILE or OUTPUTS, resolve IMPORTED_LOCATION at configure time to derive output filenames for proper
+  # incremental tracking. This way Ninja detects deleted staged files and re-runs the staging command automatically.
+  IF(_ARG_TARGET_LIBS
+     AND NOT _ARG_USE_FLAG_FILE
+     AND NOT _ARG_OUTPUTS
+  )
+    SET(_rsdl_resolved_outputs)
+    SET(_rsdl_failed
+        FALSE
+    )
+    STRING(TOUPPER "${CMAKE_BUILD_TYPE}" _rsdl_config_upper)
+
+    FOREACH(
+      _rsdl_tgt
+      ${_ARG_TARGET_LIBS}
+    )
+      RV_RESOLVE_IMPORTED_LOCATION(${_rsdl_tgt} _rsdl_loc)
+
+      IF(_rsdl_loc)
+        GET_FILENAME_COMPONENT(_rsdl_fname "${_rsdl_loc}" NAME)
+        IF(RV_TARGET_WINDOWS)
+          LIST(APPEND _rsdl_resolved_outputs "${RV_STAGE_BIN_DIR}/${_rsdl_fname}")
+          SET(_rsdl_implib
+              ""
+          )
+          FOREACH(
+            _rsdl_prop
+            IMPORTED_IMPLIB IMPORTED_IMPLIB_${_rsdl_config_upper} IMPORTED_IMPLIB_RELEASE IMPORTED_IMPLIB_NOCONFIG
+          )
+            IF(NOT _rsdl_implib)
+              GET_TARGET_PROPERTY(_rsdl_implib ${_rsdl_tgt} ${_rsdl_prop})
+            ENDIF()
+          ENDFOREACH()
+          IF(_rsdl_implib)
+            GET_FILENAME_COMPONENT(_rsdl_impfname "${_rsdl_implib}" NAME)
+            LIST(APPEND _rsdl_resolved_outputs "${_ARG_STAGE_LIB_DIR}/${_rsdl_impfname}")
+          ENDIF()
+        ELSE()
+          LIST(APPEND _rsdl_resolved_outputs "${_ARG_STAGE_LIB_DIR}/${_rsdl_fname}")
+        ENDIF()
+      ELSE()
+        SET(_rsdl_failed
+            TRUE
+        )
+        MESSAGE(AUTHOR_WARNING "RV_STAGE_DEPENDENCY_LIBS: Cannot resolve IMPORTED_LOCATION for ${_rsdl_tgt}; falling back to flag file")
+        BREAK()
+      ENDIF()
+    ENDFOREACH()
+
+    IF(NOT _rsdl_failed
+       AND _rsdl_resolved_outputs
+    )
+      SET(_ARG_OUTPUTS
+          ${_rsdl_resolved_outputs}
+      )
+    ELSE()
+      SET(_ARG_USE_FLAG_FILE
+          TRUE
+      )
+    ENDIF()
   ENDIF()
 
   # Build the command list

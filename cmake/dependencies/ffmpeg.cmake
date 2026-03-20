@@ -410,13 +410,15 @@ ADD_CUSTOM_TARGET(
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
-# Note: On Windows, FFmpeg stores both import libs and DLLs in the install bin directory, so we copy _lib_dir (which is install/bin on Windows) to both stage
-# dirs.
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} USE_FLAG_FILE)
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} USE_FLAG_FILE)
-ENDIF()
+SET(_ffmpeg_targets)
+FOREACH(
+  _ffmpeg_lib
+  ${_ffmpeg_libs}
+)
+  LIST(APPEND _ffmpeg_targets ffmpeg::${_ffmpeg_lib})
+ENDFOREACH()
+
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_ffmpeg_targets})
 
 SET(RV_DEPS_FFMPEG_VERSION
     ${_version}

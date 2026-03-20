@@ -94,11 +94,7 @@ ELSE()
 ENDIF()
 
 # --- Staging ---
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} USE_FLAG_FILE)
-ENDIF()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS dav1d::dav1d)
 
 # --- FFmpeg customization adding dav1d codec support ---
 SET_PROPERTY(

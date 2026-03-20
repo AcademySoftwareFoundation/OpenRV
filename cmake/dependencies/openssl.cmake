@@ -180,7 +180,6 @@ ELSE()
       TARGET_LIBS
       OpenSSL::Crypto
       OpenSSL::SSL
-      USE_FLAG_FILE
     )
   ENDIF()
 
