@@ -21,8 +21,8 @@ LayerSubComponent   := 3;
 ChannelSubComponent := 4;
 
 FILMSTRIP_FRAME_WIDTH := 240;
-PREVIEW_WIDTH         := 80;
-PREVIEW_HEIGHT        := 45;
+SOURCE_PREVIEW_WIDTH  := 80;
+SOURCE_PREVIEW_HEIGHT := 45;
 SOURCE_ROW_HEIGHT     := 55;
 SOURCE_ROW_MARGIN     := 8;
 SOURCE_ROW_SPACING    := 5;
@@ -690,11 +690,11 @@ class: SourcePreviewWidget : QWidget
         setAttribute(Qt.WA_Hover, true);
 
         _thumbnail = ThumbnailWidget(this);
-        _thumbnail.setGeometry(QRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+        _thumbnail.setGeometry(QRect(0, 0, SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
         _thumbnail.show();
 
         _filmstrip = FilmstripWidget(this);
-        _filmstrip.setGeometry(QRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT));
+        _filmstrip.setGeometry(QRect(0, 0, SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
         _filmstrip.hide();
     }
 
@@ -1804,8 +1804,8 @@ class: SessionManagerMode : MinorMode
 
         // Source preview: stacks thumbnail (default) and filmstrip (on hover)
         let preview = SourcePreviewWidget(widget);
-        preview.setFixedSize(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT));
-        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(PREVIEW_WIDTH, PREVIEW_HEIGHT)));
+        preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
 
         string meta = "";
         string sourceNode = nil;
