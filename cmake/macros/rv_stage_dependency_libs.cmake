@@ -283,15 +283,17 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
           ${_ARG_STAGE_LIB_DIR}/
         )
 
-        # On macOS, create a SONAME symlink if the library's install name differs from its filename (e.g. libFoo.2.3.dylib -> libFoo.2.3.2.dylib). The linker
-        # records the install name in binaries that link against this library, so dyld needs a file matching that name at runtime.
-        IF(RV_TARGET_DARWIN)
+        # Create a SONAME symlink if the library's recorded name differs from its filename (e.g. libFoo.2.3.dylib -> libFoo.2.3.2.dylib on macOS,
+        # libFoo.so.2.3 -> libFoo.so.2.3.2 on Linux). The linker records this name in dependent binaries, so the runtime loader needs a file matching it.
+        IF(RV_TARGET_DARWIN OR RV_TARGET_LINUX)
           LIST(
             APPEND
             _commands
             COMMAND
             ${CMAKE_COMMAND}
             -DLIB_FILE=${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>
+            -DRV_TARGET_DARWIN=${RV_TARGET_DARWIN}
+            -DRV_TARGET_LINUX=${RV_TARGET_LINUX}
             -P
             ${PROJECT_SOURCE_DIR}/cmake/scripts/create_soname_symlink.cmake
           )
