@@ -82,57 +82,11 @@ FUNCTION(rv_stage)
     IF(TARGET ${arg_TARGET})
       GET_TARGET_PROPERTY(_native_target_type ${arg_TARGET} TYPE)
       IF(_native_target_type STREQUAL "EXECUTABLE")
-        ADD_CUSTOM_COMMAND(
-          COMMENT "Fixing ${arg_TARGET}'s RPATHs" TARGET ${arg_TARGET} POST_BUILD
-          COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../Frameworks" "$<TARGET_FILE:${arg_TARGET}>"
-          COMMAND ${CMAKE_INSTALL_NAME_TOOL} -add_rpath "@executable_path/../lib" "$<TARGET_FILE:${arg_TARGET}>"
-        )
-      ENDIF()
-
-      IF(_native_target_type STREQUAL "EXECUTABLE"
-         OR _native_target_type STREQUAL "SHARED_LIBRARY"
-      )
-        # Batch all -change arguments into a single install_name_tool invocation per target. Multiple separate invocations each re-sign the binary, which can
-        # trigger macOS code signing lockouts ("Operation not permitted") on arm64.
-        SET(_change_args)
-        FOREACH(
-          dep
-          ${RV_DEPS_LIST}
-        )
-          IF(TARGET ${dep})
-            GET_PROPERTY(
-              dep_file_path
-              TARGET ${dep}
-              PROPERTY LOCATION
-            )
-            # For found packages (e.g. Homebrew), the install name recorded by the linker may differ from the target's LOCATION (different symlink paths). Use
-            # the cached install name from RV_RESOLVE_DARWIN_INSTALL_NAME if available; this is a no-op for built-from-source deps where the library doesn't
-            # exist at configure time.
-            GET_PROPERTY(
-              _dep_install_name
-              TARGET ${dep}
-              PROPERTY RV_DARWIN_INSTALL_NAME
-            )
-            IF(_dep_install_name)
-              SET(dep_change_path
-                  "${_dep_install_name}"
-              )
-              GET_FILENAME_COMPONENT(dep_file_name "${_dep_install_name}" NAME)
-            ELSE()
-              SET(dep_change_path
-                  "${dep_file_path}"
-              )
-              GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
-            ENDIF()
-            LIST(APPEND _change_args -change "${dep_change_path}" "@rpath/${dep_file_name}")
-          ENDIF()
-        ENDFOREACH()
-        IF(_change_args)
-          ADD_CUSTOM_COMMAND(
-            COMMENT "Fixing dependency rpaths in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-            COMMAND ${CMAKE_INSTALL_NAME_TOOL} ${_change_args} "$<TARGET_FILE:${arg_TARGET}>"
-          )
-        ENDIF()
+        # Add rpaths via linker flags instead of POST_BUILD install_name_tool.
+        # CMAKE_SKIP_RPATH is ON so CMake's rpath machinery is disabled;
+        # direct linker flags bypass it. This avoids modifying the auto-signed
+        # binary after linking (which fails on arm64 macOS 26+).
+        TARGET_LINK_OPTIONS(${arg_TARGET} PRIVATE "LINKER:-rpath,@executable_path/../Frameworks" "LINKER:-rpath,@executable_path/../lib")
       ENDIF()
     ENDIF()
   ENDIF()

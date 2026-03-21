@@ -198,40 +198,6 @@ MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
 ENDMACRO()
 
 #
-# RV_RESOLVE_DARWIN_INSTALL_NAME — Get a macOS dylib's actual install name (LC_ID_DYLIB)
-#
-# On macOS, the install name recorded in a binary by the linker comes from the library's LC_ID_DYLIB, which may differ from the file path (e.g. Homebrew symlink
-# paths). This macro resolves the real install name via otool -D and caches the result as a target property (RV_DARWIN_INSTALL_NAME) for later use in rpath
-# fixup.
-#
-# For built-from-source deps where the library doesn't exist at configure time, this is a no-op.
-#
-MACRO(RV_RESOLVE_DARWIN_INSTALL_NAME _rdain_target)
-  IF(RV_TARGET_DARWIN
-     AND TARGET ${_rdain_target}
-  )
-    RV_RESOLVE_IMPORTED_LOCATION(${_rdain_target} _rdain_loc)
-    IF(_rdain_loc
-       AND EXISTS "${_rdain_loc}"
-    )
-      EXECUTE_PROCESS(
-        COMMAND otool -D "${_rdain_loc}"
-        OUTPUT_VARIABLE _rdain_otool_out
-        OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
-      )
-      # otool -D output: first line is file path, second line is the install name
-      STRING(REGEX MATCH "[^\n]+$" _rdain_install_name "${_rdain_otool_out}")
-      IF(_rdain_install_name)
-        SET_PROPERTY(
-          TARGET ${_rdain_target}
-          PROPERTY RV_DARWIN_INSTALL_NAME "${_rdain_install_name}"
-        )
-      ENDIF()
-    ENDIF()
-  ENDIF()
-ENDMACRO()
-
-#
 # RV_MAKE_TARGETS_GLOBAL — Promote imported targets to GLOBAL visibility
 #
 # Imported targets created by find_package(CONFIG) are scoped to the calling directory. This promotes them to GLOBAL so all subdirectories can reference them.

@@ -282,41 +282,22 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
           $<TARGET_FILE:${_tgt}>
           ${_ARG_STAGE_LIB_DIR}/
         )
-      ENDIF()
 
-      # On macOS, fix the staged copy's install name to @rpath so it can be resolved via rpath at runtime. For found packages (e.g. Homebrew) the install name
-      # is an absolute path; for built-from-source it's typically already @rpath but -id is idempotent.
-      IF(RV_TARGET_DARWIN)
-        GET_PROPERTY(
-          _rsdl_install_name
-          TARGET ${_tgt}
-          PROPERTY RV_DARWIN_INSTALL_NAME
-        )
-        IF(_rsdl_install_name)
-          GET_FILENAME_COMPONENT(_rsdl_install_fname "${_rsdl_install_name}" NAME)
+        # On macOS, create a SONAME symlink if the library's install name differs from its filename (e.g. libFoo.2.3.dylib -> libFoo.2.3.2.dylib). The linker
+        # records the install name in binaries that link against this library, so dyld needs a file matching that name at runtime.
+        IF(RV_TARGET_DARWIN)
           LIST(
             APPEND
             _commands
             COMMAND
-            ${CMAKE_INSTALL_NAME_TOOL}
-            -id
-            "@rpath/${_rsdl_install_fname}"
-            "${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>"
-          )
-          # Re-sign with ad-hoc after modifying the install name. Homebrew libraries carry a Homebrew signature that install_name_tool invalidates; on arm64
-          # macOS loading a library with an invalid signature causes SIGKILL.
-          LIST(
-            APPEND
-            _commands
-            COMMAND
-            codesign
-            --force
-            --sign
-            -
-            "${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>"
+            ${CMAKE_COMMAND}
+            -DLIB_FILE=${_ARG_STAGE_LIB_DIR}/$<TARGET_FILE_NAME:${_tgt}>
+            -P
+            ${PROJECT_SOURCE_DIR}/cmake/scripts/create_soname_symlink.cmake
           )
         ENDIF()
       ENDIF()
+
     ENDFOREACH()
   ENDIF()
 

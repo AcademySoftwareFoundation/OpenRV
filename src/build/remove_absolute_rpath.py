@@ -103,6 +103,42 @@ def change_shared_library_path(object_file_path, old_library_path):
     return new_library_path
 
 
+def get_install_name(object_file_path):
+    """Get a dylib's own install name (LC_ID_DYLIB) via otool -D.
+    Returns None for executables or if no install name is found."""
+    try:
+        otool_output = subprocess.check_output(
+            ["otool", "-D", object_file_path], stderr=subprocess.DEVNULL
+        ).decode().splitlines()
+    except subprocess.CalledProcessError:
+        return None
+    # otool -D output: first line is the file path, second line is the install name
+    if len(otool_output) >= 2:
+        return otool_output[1].strip()
+    return None
+
+
+def change_install_name_id(object_file_path, old_id):
+    new_id = f"@rpath/{os.path.basename(old_id)}"
+    command = [
+        "install_name_tool",
+        "-id",
+        new_id,
+        object_file_path,
+    ]
+    subprocess.run(command).check_returncode()
+    return new_id
+
+
+# System library prefixes that must keep their absolute paths.
+# These are Apple-provided frameworks/dylibs that are always present at these paths.
+SYSTEM_LIBRARY_PREFIXES = ("/usr/lib/", "/System/")
+
+
+def is_system_library(library_path):
+    return any(library_path.startswith(p) for p in SYSTEM_LIBRARY_PREFIXES)
+
+
 def fix_rpath(target, root):
     for file in get_object_files(target):
         logging.info(f"Fixing rpaths for {file}")
@@ -111,7 +147,7 @@ def fix_rpath(target, root):
         # become invalid due to our rpath fixing logic.
         # IMPORTANT:
         #    Numpy was the only issue found, but it could happend again if new dependencies are added.
-        is_numpy = file._str.find("numpy")
+        is_numpy = file.find("numpy")
         if is_numpy > -1:
             logging.info(f"Skipping {file} because numpy")
             return
@@ -128,13 +164,19 @@ def fix_rpath(target, root):
 
             logging.info(output)
 
+        # Fix library self-ID: for dylibs with absolute install names, rewrite to @rpath/<name>
+        install_name = get_install_name(file)
+        if install_name and not install_name.startswith("@") and not is_system_library(install_name):
+            new_id = change_install_name_id(file, install_name)
+            logging.info(f"\tinstall name: {install_name} (Changed ID to {new_id})")
+
         logging.info(f"Fixing shared library paths for {file}")
 
         for library_path in get_shared_library_paths(file):
             output = f"\tlibrary path: {library_path}"
 
             shared_library_name = os.path.basename(library_path)
-            if library_path.startswith(root) or library_path == shared_library_name:
+            if (library_path.startswith("/") and not is_system_library(library_path)) or library_path == shared_library_name:
                 new_library_path = change_shared_library_path(file, library_path)
                 output += f" (Changed to {new_library_path})"
 

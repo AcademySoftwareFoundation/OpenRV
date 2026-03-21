@@ -77,18 +77,7 @@ IF(NOT ${_target}_FOUND)
   IF(RV_TARGET_WINDOWS)
     RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} OUTPUTS ${RV_STAGE_BIN_DIR}/${_libname})
   ELSEIF(RV_TARGET_DARWIN)
-    RV_STAGE_DEPENDENCY_LIBS(
-      TARGET
-      ${_target}
-      OUTPUTS
-      ${RV_STAGE_LIB_DIR}/${_libname}
-      PRE_COMMANDS
-      COMMAND
-      ${CMAKE_INSTALL_NAME_TOOL}
-      -id
-      "@rpath/${_libname}"
-      "${_lib_dir}/${_libname}"
-    )
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
   ELSE()
     RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
   ENDIF()
@@ -111,8 +100,8 @@ ELSE()
   ENDIF()
 
   IF(RV_TARGET_DARWIN)
-    # Found zlib may carry a versioned install name (e.g. libz.1.dylib from Homebrew, libz.1.3.1.dylib from MacPorts). Stage with the actual SONAME, rewrite the
-    # install name to @rpath, and create an unversioned symlink when needed.
+    # Found zlib may carry a versioned install name (e.g. libz.1.dylib from Homebrew, libz.1.3.1.dylib from MacPorts). Stage with the actual SONAME and create an
+    # unversioned symlink when needed. The install name rewrite to @rpath is deferred to install time (remove_absolute_rpath.py).
     #
     # Resolve the actual library path, then fall back to ZLIB_LIBRARIES (always set by FindZLIB.cmake).
     RV_RESOLVE_IMPORTED_LOCATION(ZLIB::ZLIB _zlib_realpath)
@@ -150,8 +139,7 @@ ELSE()
       COMMENT "Staging ${_target}: ${_zlib_soname} -> ${RV_STAGE_LIB_DIR}"
       OUTPUT ${RV_STAGE_LIB_DIR}/${_zlib_soname}
       COMMAND ${CMAKE_COMMAND} -E make_directory ${RV_STAGE_LIB_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_zlib_realpath}" "${RV_STAGE_LIB_DIR}/${_zlib_soname}"
-      COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@rpath/${_zlib_soname}" "${RV_STAGE_LIB_DIR}/${_zlib_soname}" ${_zlib_symlink_cmd}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different "${_zlib_realpath}" "${RV_STAGE_LIB_DIR}/${_zlib_soname}" ${_zlib_symlink_cmd}
       DEPENDS ${_target}
     )
     ADD_CUSTOM_TARGET(
