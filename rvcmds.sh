@@ -61,7 +61,15 @@ if [[ "$OSTYPE" == "linux"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
   RV_TOOLCHAIN=""
-  export PATH="/opt/homebrew/opt/python@3.11/libexec/bin:$PATH" 
+  if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
+    export PATH="/opt/homebrew/opt/python@3.13/libexec/bin:$PATH"
+  elif [[ "$RV_VFX_PLATFORM" == "CY2024" ]] || [[ "$RV_VFX_PLATFORM" == "CY2025" ]]; then
+    export PATH="/opt/homebrew/opt/python@3.11/libexec/bin:$PATH"
+  elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
+    export PATH="/opt/homebrew/opt/python@3.10/libexec/bin:$PATH"
+  else
+    export PATH="/opt/homebrew/opt/python3/libexec/bin:$PATH"
+  fi
 
 # Windows
 elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
