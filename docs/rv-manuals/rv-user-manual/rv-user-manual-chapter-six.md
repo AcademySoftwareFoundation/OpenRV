@@ -8,7 +8,6 @@ Typically a video device is set up once in the preferences and used repeatedly. 
 
 ### 6.1 Video Device Configuration
 
-
 Video devices are configured from the preferences Video tab. The interface is in two parts: the module/device selection and the video configuration parameters. For each module/device combination there is a unique set of configuration parameters.
 
 Different devices will have different configuration parameters and some devices may not use all of the available ones.
@@ -53,10 +52,9 @@ If checked, audio will be routed to the device if it has audio capabilities.
 
 Incorporate Video Latency into Audio Offset
 
-If checked, the total latency as indicated in the Configure Latency dialog box will be applied to the audio offset – but only if audio is being played by the controller instead of the output device (i.e. Output Audio to this Device is not checked). This is primarily useful if the video device has a large buffer causing a significant delay between the controller's audio output and the video output. 
+If checked, the total latency as indicated in the Configure Latency dialog box will be applied to the audio offset – but only if audio is being played by the controller instead of the output device (i.e. Output Audio to this Device is not checked). This is primarily useful if the video device has a large buffer causing a significant delay between the controller's audio output and the video output.
 
 ### 6.2 Display Profiles
-
 
 Each video device configuration can have a unique display profile associated with it or can be made to use a default device or module profile. Profiles can be created and managed via View → Create/Edit Display Profiles.... Profiles are searched for in the RV_SUPPORT_PATH in the Profiles subdirectory (folder).
 
@@ -84,16 +82,15 @@ By selecting a profile and activating the Apply button, you can set the profile 
 
 ### 6.3 Video Device Command Line Arguments
 
-
 There are five arguments which control how presentation mode starts up from the command line:
 
-| | |
+|                               |                                                                                                                                                                                                                                                                                         |
 | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -present                     | Causes the program to start up in presentation mode                                                                                                                                                                                                                                     |
-| -presentAudio [0 or 1]     | Enables audio output to the presentation device if 1 or turns off if 0                                                                                                                                                                                                                   |
-| -presentDevice MODULE/DEVICE | Forces the use of DEVICE from MODULE. Note that the forward slash character must separate the device and module names.                                                                                                                                                                  |
-| -presentVideoFormat format   | Forces the use of format for the video format. The format is a string or substring of full description of the video format as the appear in the video module in the preferences. For example: “1080p” would match “1080p 24Hz”. The first match is used.                                |
-| -presentDataFormat format    | Forces the use of format for the data format. Like the video format above, the data format string is matched against the full description of the data formats as they appear in the video module in the preferences. For example: “Stereo” would match “Dual Stereo YCrCb 4:2:2”.|
+| -present                      | Causes the program to start up in presentation mode                                                                                                                                                                                                                                     |
+| -presentAudio [0 or 1]        | Enables audio output to the presentation device if 1 or turns off if 0                                                                                                                                                                                                                  |
+| -presentDevice MODULE/DEVICE  | Forces the use of DEVICE from MODULE. Note that the forward slash character must separate the device and module names.                                                                                                                                                                  |
+| -presentVideoFormat format    | Forces the use of format for the video format. The format is a string or substring of full description of the video format as the appear in the video module in the preferences. For example: “1080p” would match “1080p 24Hz”. The first match is used.                                |
+| -presentDataFormat format     | Forces the use of format for the data format. Like the video format above, the data format string is matched against the full description of the data formats as they appear in the video module in the preferences. For example: “Stereo” would match “Dual Stereo YCrCb 4:2:2”.       |
 
 Table 6.1:
 
@@ -103,13 +100,11 @@ The command line arguments will override any existing preferences.
 
 ### 6.4 Presentation Mode Settings
 
-
 When the controller display mode is set to Separate Output and Control Rendering you can choose which elements of the user interface are visible on the presentation device. These can be turned on/off via the View → Presentation Settings menu. This includes not only things like the timeline and image info widget, but also whether or not the pointer location should be visible or not. In addition, you can show the actual video settings as an overlay on the display itself in order to verify the format is as expected. You can also control the display of feedback messages and remote sync pointers with items on this menu. The settings are retained in the preferences.
 
 If you want your custom-build widget to be rendered on the Presentation Device, your widget just needs to set the Widget class data member _drawOnPresentation to true.
 
 ### 6.5 Platform Specific Considerations
-
 
 #### 6.5.1 Linux Desktop Video Module Issues
 
@@ -139,10 +134,9 @@ On Windows, like macOS, the vertical sync is somewhat of an unknown. However, it
 
 ### 6.6 HDMI Frame Packed Mode
 
-
 Stereoscopic media can be displayed in Frame Packed (or “Frame Packing”) mode on any HDMI 1.4a-compliant device (AKA 3DTV). But in order for RV to make use of this display resolution (which is roughly a double-height HD frame), the monitor or other display device must have the appropriate resolution defined in advance. The timings from the HDMI 1.4a specification are shown in the following table:
 
-| | | | |
+|                   |                |                |              |
 | ----------------- | -------------- | -------------- | ------------ |
 |                   |                | **Horizontal** | **Vertical** |
 | **Active pixels** | **1080p 24Hz** | 1920           | 2205         |

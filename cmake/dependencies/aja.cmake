@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_AJA" "${RV_DEPS_AJA_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -71,7 +68,15 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-LIST(APPEND _configure_options "-DAJANTV2_DISABLE_DEMOS=ON" "-DAJANTV2_DISABLE_TOOLS=ON" "-DAJANTV2_DISABLE_TESTS=ON" "-DAJANTV2_BUILD_SHARED=ON")
+LIST(
+  APPEND
+  _configure_options
+  "-DAJANTV2_DISABLE_DEMOS=ON"
+  "-DAJANTV2_DISABLE_TOOLS=ON"
+  "-DAJANTV2_DISABLE_TESTS=ON"
+  "-DAJANTV2_BUILD_SHARED=ON"
+  "-DNTV2_VERSION_BUILD=0"
+)
 
 # In Debug, the MSVC runtime library needs to be set to MultiThreadedDebug. Otherwise, it will be set to MultiThreaded.
 IF(RV_TARGET_WINDOWS
@@ -99,29 +104,26 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(aja::ntv2 SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(aja::ntv2 ${_target})
-SET_PROPERTY(
-  TARGET aja::ntv2
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET aja::ntv2
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET aja::ntv2
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY ${_aja_include_dir} ${_aja_ntv2_include_dir} ${_aja_ntv2_os_specific_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   aja::ntv2
-  INTERFACE ${_aja_include_dir} ${_aja_ntv2_include_dir} ${_aja_ntv2_os_specific_include_dir}
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_aja_include_dir}
+  ${_aja_ntv2_include_dir}
+  ${_aja_ntv2_os_specific_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 
 TARGET_LINK_LIBRARIES(
@@ -141,14 +143,5 @@ ELSEIF(RV_TARGET_WINDOWS)
 ENDIF()
 SET(RV_DEPS_AJA_COMPILE_OPTIONS
     ${_aja_compile_options}
-    CACHE INTERNAL "" FORCE
-)
-
-LIST(APPEND RV_DEPS_LIST aja::ntv2)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-SET(RV_DEPS_AJA_VERSION
-    ${_version}
     CACHE INTERNAL "" FORCE
 )

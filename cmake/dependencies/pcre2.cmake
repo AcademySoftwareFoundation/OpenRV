@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PCRE2" "pcre2-${RV_DEPS_PCRE2_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -16,10 +13,6 @@ SET(_download_url
 
 SET(_download_hash
     ${RV_DEPS_PCRE2_DOWNLOAD_HASH}
-)
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
 )
 
 # PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
@@ -93,13 +86,13 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-# PCRE is not used for Linux and MacOS (Boost regex is used) in the current code.
+# PCRE is not used for Linux and MacOS (Boost regex is used) in the current code. Copy library files manually since there are tools that are not needed in the
+# bin folder.
 ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Installing ${_target}'s shared library into ${RV_STAGE_BIN_DIR}"
-  # Copy library files manually since there are tools that are not needed in the bin folder.
+  COMMENT "Staging ${_target}'s shared library into ${RV_STAGE_BIN_DIR}"
+  OUTPUT ${RV_STAGE_BIN_DIR}/${_pcre2_libname} ${RV_STAGE_BIN_DIR}/${_pcre2_libname_posix}
   COMMAND ${CMAKE_COMMAND} -E copy ${_pcre2_libpath} ${_pcre2_libpath_posix} -t ${RV_STAGE_BIN_DIR}
+  DEPENDS ${_target}
 )
 
 ADD_CUSTOM_TARGET(
@@ -148,8 +141,3 @@ TARGET_INCLUDE_DIRECTORIES(
 )
 
 LIST(APPEND RV_DEPS_LIST pcre2-8 pcre2-posix)
-
-SET(RV_DEPS_PCRE2_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)

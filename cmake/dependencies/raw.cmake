@@ -9,9 +9,6 @@
 # https://www.libraw.org/docs/Install-LibRaw-eng.html
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "${RV_DEPS_RAW_VERSION}" "make" "../src/configure")
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
@@ -115,33 +112,22 @@ ELSE()
   )
 ENDIF()
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(Raw::Raw SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Raw::Raw ${_target})
-SET_PROPERTY(
-  TARGET Raw::Raw
-  PROPERTY IMPORTED_LOCATION ${_libpath}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
+  LibRaw::raw
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-SET_PROPERTY(
-  TARGET Raw::Raw
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Raw::Raw
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  Raw::Raw
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST Raw::Raw)

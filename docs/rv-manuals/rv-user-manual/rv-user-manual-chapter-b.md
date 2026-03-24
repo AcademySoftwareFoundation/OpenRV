@@ -2,7 +2,6 @@
 
 ### B.1 Linux
 
-
 This is taken from an NVIDIA README file. The portions pertaining to stereo modes are reproduced here:
 
 The following driver options are supported by the NVIDIA X driver. They may be specified either in the Screen or Device sections of the X config file.
@@ -11,7 +10,7 @@ The following driver options are supported by the NVIDIA X driver. They may be s
 
 Enable offering of quad-buffered stereo visuals on Quadro. Integer indicates the type of stereo glasses being used
 
-| Value | Equipment                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Value     | Equipment                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1         | DDC glasses. The sync signal is sent to the glasses via the DDC signal to the monitor. These usually involve a passthrough cable between the monitor and video card                                                                                                                                                                                                                                                                                                                           |
 | 2         | "Blueline" glasses. These usually involve a passthrough cable between the monitor and video card. The glasses know which eye to display based on the length of a blue line visible at the bottom of the screen. When in this mode, the root window dimensions are one pixel shorter in the Y dimension than requested. This mode does not work with virtual root window sizes larger than the visible root window size (desktop panning).                                                     |
@@ -27,8 +26,6 @@ Stereo options 1, 2, and 3 (aka "active" stereo) are not supported on digital fl
 #### Option "AllowDFPStereo" "boolean"
 
 By default, the NVIDIA X driver performs a check which turns off active stereo (stereo options 1, 2, and 3) if the X screen is driving a DFP. The "AllowDFPStereo" option bypasses this check.
-
-
 
 ENSURING IDENTICAL MODE TIMINGS
 
@@ -61,7 +58,6 @@ Only the intersection of capabilities across all GPUs will be advertised.
 X configuration options that affect GLX operation (e.g.: stereo, overlays) should be set consistently across all X screens in the X server.
 
 ### B.2 macOS and Windows
-
 
 There are no special requirements (other than having a proper GPU that can produce stereo output). If the macOS or Windows graphical environment can provide RV with a stereo GL context, it will play back in stereo. If not, the console widget will pop up and you will see GL errors.
 

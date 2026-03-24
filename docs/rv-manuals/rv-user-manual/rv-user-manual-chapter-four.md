@@ -65,7 +65,6 @@ For detailed information about these settings, see Chapter [7](rv-user-manual-ch
 
 ### 4.3 Loading Images, Sequences, Movies and Audio
 
-
 #### 4.3.1 Using the File Browser
 
 There are two options for loading images, sequences, and movies via the file browser: you can add to the existing session by choosing File → Open (or File → Open into Layer) or you can open images in a new window by choosing File → Open In New Session.
@@ -95,7 +94,6 @@ If multiple icons are dropped onto RV at the same time, the order in which the s
 To associate an audio file with an image sequence or movie, drop the audio file as a layer, rather than as a source.
 
 ### 4.4 Examining an Image
-
 
 RV normalizes image geometry to fit into its viewing window. If you load two files containing the same image but at different resolutions, RV will show you the images with the same apparent \`\`size''. So, for example, if these images are viewed as a sequence — one after another — the smaller of the two images will be scaled to fit the larger. Of course, if you zoom in on a high-resolution image, you will see detail compared to a lower-resolution image. When necessary you can view the image scaled so that one image pixel is mapped to each display pixel.
 
@@ -149,7 +147,7 @@ To edit the parameter value using the mouse you can either scrub (like a virtual
 
 To change the parameter value using the keyboard, hit the Enter (or Return) key; RV will prompt you for the value. For interactive changes from the keyboard, use the \`\`+'' and \`\`-'' keys (with or without shift held down). The parameter is incremented and decremented. To end the keyboard interactive edit, hit the Escape or Spacebar keys.
 
-| Key/Mouse Sequence | Action                             |
+| Key/Mouse Sequence     | Action                                 |
 | ---------------------- | -------------------------------------- |
 | Mouse Button #1 Drag   | Scrub parameter                        |
 | Mouse Button #1 Up     | Finish parameter edit                  |
@@ -158,7 +156,7 @@ To change the parameter value using the keyboard, hit the Enter (or Return) key;
 | 0 through 9            | Enter parameter numerically            |
 | ESC                    | Cancel parameter edit mode             |
 | \+ or =                | Increment parameter value              |
-| - or _               | Decrement parameter value              |
+| - or _                 | Decrement parameter value              |
 | BACKSPACE or DEL       | Reset parameter value to default       |
 | r or g or b            | Edit single channel of color parameter |
 | c                      | Edit all channels of color parameter   |
@@ -231,7 +229,6 @@ To remove the image information widget from the view either move the mouse to th
 
 ### 4.5 Playing Image Sequences, Movie Files, and Audio Files
 
-
 RV can play multiple images, image sequences and movie files as well as associated audio files. Play controls are available via the menus, keyboard, and mouse. Timing information and navigation is provided by the timeline widget which can be toggled via the Tools → Timeline menu item or by hitting the TAB key.
 
 #### 4.5.1 Timeline
@@ -252,7 +249,7 @@ The in/out range can also be manipulated with the mouse. You can grab and drag e
 
 There are two FPS indicators on the timeline. The first indicates the target FPS, the second the actual measured playback FPS.
 
-| | |
+|                            |                                                                                    |
 | -------------------------- | ---------------------------------------------------------------------------------- |
 | [                          | Set in point                                                                       |
 | ]                          | Set out point                                                                      |
@@ -284,15 +281,15 @@ Figure 4.12: Timeline Configuration Popup Menu <a id="timeline-configuration-pop
 
 The Configuration menu has a number of options:
 
-|  |  |
+| | |
 | --- | --- |
-| Show Play Controls            | Hide or Show the playback control buttons on the right side of the timeline                                                                     |
-| Draw Timeline Over Imagery    | This was the default behavior in previous versions of RV. The timeline is now drawn in the margin by default                                    |
-| Position Timeline At Top      | Draw the timeline at the top of the view. The default is to draw it at the bottom of the view.                                                  |
-| Show In/Out Frame Numbers     | When selected, the in and out points will be labeled using the current method for display the frame (global, source, or time code).             |
-| Step Wraps At In/Out          | This controls how the arrow keys behave at the in and out point. When selected, the frame will wrap from in to out or vice versa.               |
-| Show Source/Input at Frame    | When selected, the main media file name for the frame under the pointer (not the current frame) will be shown just above or below the timeline. |
-| Show Play Direction Indicator | When selected, a small triangle next to the current frame indicates the direction playback will occur, when started.                            |
+| Show Play Controls | Hide or Show the playback control buttons on the right side of the timeline |
+| Draw Timeline Over Imagery | This was the default behavior in previous versions of RV. The timeline is now drawn in the margin by default |
+| Position Timeline At Top | Draw the timeline at the top of the view. The default is to draw it at the bottom of the view. |
+| Show In/Out Frame Numbers | When selected, the in and out points will be labeled using the current method for display the frame (global, source, or time code). |
+| Step Wraps At In/Out | This controls how the arrow keys behave at the in and out point. When selected, the frame will wrap from in to out or vice versa. |
+| Show Source/Input at Frame | When selected, the main media file name for the frame under the pointer (not the current frame) will be shown just above or below the timeline. |
+| Show Play Direction Indicator | When selected, a small triangle next to the current frame indicates the direction playback will occur, when started. |
 
 #### 4.5.3 Realtime versus Play All Frames
 
@@ -341,7 +338,6 @@ Figure 4.14:
 Timeline Magnifier Configuration Popup Menu
 
 ### 4.6 Audio
-
 
 When playing back audio with an image sequence or movie file, RV can be in one of two modes: video locked to audio or audio locked to video.
 
@@ -407,7 +403,6 @@ rv syncflash,start=1,end=500,interval=1,fps=24.movieproc
 
 ### 4.7 Caching
 
-
 RV has a three state cache: it's either off, caching the current in/out range, or being used as a look-ahead (also known as a ring) buffer.
 
 ![26_e_timeline_cache.png](../../images/rv-user-manual-26-rv-cx-e-timeline-cache-25.png)  
@@ -437,7 +432,6 @@ If the timeline widget is visible, cached regions will appear as a dark green st
 **Note** that there is usually no advantage to setting the lookahead cache size to something large (if playback does not overtake the caching, a small lookahead cache is sufficient, and if it does, you probably want to use region caching anyway).
 
 ### 4.8 Color, LUTs, and CDLs
-
 
 RV provides users with fine grained color management and can support various color management scenarios. See [7.1](rv-user-manual-chapter-seven.md#rv-pixel-pipeline) for detailed technical information about RV's color pipeline. Without adding any nodes the default graph in RV supports three LUTs and two CDLs per file, an overall display LUT, and has a number of useful color transforms built-in. You can load LUTs and CDLs using the File → Import menu (Display, Look, File, and Pre-Cache items), or you can drag and drop the files onto the RV window. Smart drop targets will allow you determine how the LUT or CDL will be applied. Note that there is no CDL slot for the display by default. See chapter [8](rv-user-manual-chapter-eight.md#8-using-luts-in-rv) for more information about using LUTs and [9](rv-user-manual-chapter-nine.md#9-using-cdls-in-rv) for using CDLs in RV.
 
@@ -575,27 +569,27 @@ RV has a supplementary "stereo hotkeys" mode in which an additional set of stero
 
 | Hotkey | Action |
 | --- | --- |
-| a | Anaglyph Mode  |
-| d | Checked Mode  |
-| k | Scanline Mode  |
-| s | Side-by-Side Mode  |
-| p | Side-by-Side Stereo Mode  |
-| m | Mirrored Side-by-Side Stereo Mode  |
-| x | Stereo Mode Off (DEPRECATED -- use alt-s (or option-s on the mac))  |
-| h | Hardware Stereo Mode  |
-| , | Left Eye Only Stereo Mode  |
-| . | Right Eye Only Stereo Mode  |
-| < | Left Eye Only Stereo Mode  |
-| > | Right Eye Only Stereo Mode  |
-| S | Swap Eyes  |
-| o | Edit Global Relative Stereo Offset|
-| z | Horizontal Squeezed Stereo Mode  |
-| v | Vertical Squeezed Stereo Mode  |
-| r | Edit Global Right-Eye Stereo Offset |
-| O | Turn OFF Stereo Display Mode (in Controller Window)  |
-| / | Reset Stereo Offsets |
-| c | Edit Source/Clip Stereo Offset  |
-| R | Edit Source/Clip Right-Eye-Only Stereo Offset |
+| a | Anaglyph Mode |
+| d | Checked Mode |
+| k | Scanline Mode |
+| s | Side-by-Side Mode |
+| p | Side-by-Side Stereo Mode |
+| m | Mirrored Side-by-Side Stereo Mode |
+| x | Stereo Mode Off (DEPRECATED -- use alt-s (or option-s on the mac)) |
+| h | Hardware Stereo Mode |
+| , | Left Eye Only Stereo Mode |
+| . | Right Eye Only Stereo Mode |
+| < | Left Eye Only Stereo Mode |
+| > | Right Eye Only Stereo Mode |
+| S | Swap Eyes |
+| o | Edit Global Relative Stereo Offset |
+| z | Horizontal Squeezed Stereo Mode |
+| v | Vertical Squeezed Stereo Mode |
+| r | Edit Global Right-Eye Stereo Offset |
+| O | Turn OFF Stereo Display Mode (in Controller Window) |
+| / | Reset Stereo Offsets |
+| c | Edit Source/Clip Stereo Offset |
+| R | Edit Source/Clip Right-Eye-Only Stereo Offset |
 
 #### Mouse Bindings
 
@@ -629,12 +623,11 @@ Mouse button 1 is normally the left mouse button and button 3 is normally the ri
 
 ### 4.11 Preferences File
 
-
 RV stores configuration information in a preferences file in the user home directory. Each platform has a different location and possibly a different format for the file.
 
 | OS       | File Location                              | File Format     |
 | -------- | ------------------------------------------ | --------------- |
-| macOS | ~/Library/Preferences/com.tweaksoftware.RV | Property List   |
+| macOS    | ~/Library/Preferences/com.tweaksoftware.RV | Property List   |
 | Linux    | ~/.config/TweakSoftware/RV.conf            | Config File     |
 | Windows  | %APPDATA%/TweakSoftware/RV.ini             | INI File        |
 
