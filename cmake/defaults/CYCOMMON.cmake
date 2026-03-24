@@ -16,10 +16,13 @@ SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
 
 # dav1d https://github.com/videolan/dav1d
 SET(RV_DEPS_DAV1D_VERSION
-    "1.4.3"
+    "1.5.3"
 )
 SET(RV_DEPS_DAV1D_DOWNLOAD_HASH
-    "2c62106fda87a69122dc8709243a34e8"
+    "6a195752588586acf13349a1cceedab8"
+)
+SET(RV_DEPS_DAV1D_VERSION_LIB
+    "7"
 )
 
 # doctest https://github.com/doctest/doctest
@@ -205,10 +208,10 @@ SET(RV_DEPS_OTIO_VERSION
 
 # pcre2 https://github.com/PCRE2Project/pcre2
 SET(RV_DEPS_PCRE2_VERSION
-    "10.47"
+    "10.43"
 )
 SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
-    "9a77e2cdc4410addf9a77363a89fe858"
+    "e4c3f2a24eb5c15bec8360e50b3f0137"
 )
 
 # png https://github.com/glennrp/libpng

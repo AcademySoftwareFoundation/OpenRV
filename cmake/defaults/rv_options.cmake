@@ -116,3 +116,29 @@ SET_PROPERTY(
   CACHE RV_FFMPEG
   PROPERTY STRINGS ${_RV_FFMPEG}
 )
+
+#
+# Dependency resolution option
+#
+# When ON, try find_package() for each dependency before building from source. When OFF (default), always build dependencies from source (current behavior).
+#
+# Per-dependency override: set RV_DEPS_<NAME>_FORCE_BUILD=ON to force building a specific dependency from source even when RV_DEPS_PREFER_INSTALLED=ON.
+#
+OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before building from source" OFF)
+
+#
+# Version matching mode for dependency resolution.
+#
+# Controls how RV_FIND_DEPENDENCY matches versions when RV_DEPS_PREFER_INSTALLED=ON. EXACT   — require the exact version specified in CY*.cmake (default,
+# recommended) MINIMUM — accept the specified version or newer (standard find_package behavior)
+#
+# Per-dependency override: set RV_DEPS_<NAME>_VERSION_MATCH=EXACT or MINIMUM to override the global setting for a specific dependency.
+#
+SET(RV_DEPS_VERSION_MATCH
+    "EXACT"
+    CACHE STRING "Version matching mode for find_package: EXACT or MINIMUM"
+)
+SET_PROPERTY(
+  CACHE RV_DEPS_VERSION_MATCH
+  PROPERTY STRINGS EXACT MINIMUM
+)
