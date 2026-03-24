@@ -208,10 +208,10 @@ SET(RV_DEPS_OTIO_VERSION
 
 # pcre2 https://github.com/PCRE2Project/pcre2
 SET(RV_DEPS_PCRE2_VERSION
-    "10.43"
+    "10.47"
 )
 SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
-    "e4c3f2a24eb5c15bec8360e50b3f0137"
+    "9a77e2cdc4410addf9a77363a89fe858"
 )
 
 # png https://github.com/glennrp/libpng

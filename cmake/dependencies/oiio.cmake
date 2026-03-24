@@ -53,50 +53,66 @@ LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
-LIST(APPEND _configure_options "-DBoost_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
-LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
-
-IF(NOT RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_imath_library Imath::Imath IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_imath_include_dir Imath::Imath INTERFACE_INCLUDE_DIRECTORIES)
-  LIST(APPEND _configure_options "-DImath_LIBRARY=${_imath_library}")
-  LIST(APPEND _configure_options "-DImath_INCLUDE_DIR=${_imath_include_dir}/..")
-  GET_FILENAME_COMPONENT(_imath_library_path ${_imath_library} DIRECTORY)
-  LIST(APPEND _configure_options "-DImath_DIR=${_imath_library_path}/cmake/Imath")
-ELSE()
-  # Must point to the IMath-config.cmake file which is a 'FindIMath.cmake' type of file.
-  LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath")
+# Propagate CMAKE_PREFIX_PATH and CMAKE_IGNORE_PREFIX_PATH so the sub-build can find transitive dependencies (e.g. libdeflate for OpenEXR) and avoids
+# contaminating prefixes (e.g. msys64/mingw64).
+IF(CMAKE_PREFIX_PATH)
+  LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+ENDIF()
+IF(RV_DEPS_IGNORE_PREFIXES)
+  LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
 ENDIF()
 
-GET_TARGET_PROPERTY(_png_library PNG::PNG IMPORTED_LOCATION)
+# Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution. Use RV_DEPS_*_CMAKE_DIR which accounts for lib
+# vs lib64 (RHEL) rather than hardcoding lib/.
+LIST(APPEND _configure_options "-DBoost_DIR=${RV_DEPS_BOOST_ROOT_DIR}/lib/cmake/Boost-${RV_DEPS_BOOST_VERSION}")
+LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
+LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
+
+# Use RV_RESOLVE_IMPORTED_LINKER_FILE to get the file the linker needs: IMPORTED_IMPLIB (.lib) on Windows, IMPORTED_LOCATION elsewhere. This avoids passing DLLs
+# to -D<Pkg>_LIBRARY= which causes LNK1107 on MSVC. Also handles config-specific variants (e.g. IMPORTED_LOCATION_RELEASE).
+RV_RESOLVE_IMPORTED_LINKER_FILE(PNG::PNG _png_library)
 GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
+# INTERFACE_INCLUDE_DIRECTORIES may be a list; take only the first element for the cmake -D flag.
+LIST(GET _png_include_dir 0 _png_include_dir_first)
+LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir_first}")
 
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_IMPLIB)
-ELSE()
-  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_LOCATION)
-ENDIF()
+RV_RESOLVE_IMPORTED_LINKER_FILE(libjpeg-turbo::jpeg _jpeg_library)
 GET_TARGET_PROPERTY(_jpeg_include_dir libjpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
 LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
 
-GET_TARGET_PROPERTY(_jpegturbo_library libjpeg-turbo::turbojpeg IMPORTED_LOCATION)
+RV_RESOLVE_IMPORTED_LINKER_FILE(libjpeg-turbo::turbojpeg _jpegturbo_library)
 GET_TARGET_PROPERTY(_jpegturbo_include_dir libjpeg-turbo::turbojpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
 LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
 
 LIST(APPEND _configure_options "-DOpenJPEG_ROOT=${RV_DEPS_OPENJPEG_ROOT_DIR}")
 LIST(APPEND _configure_options "-DOPENJPEG_VERSION=${RV_DEPS_OPENJPEG_VERSION}")
-GET_TARGET_PROPERTY(_openjpeg_library OpenJpeg::OpenJpeg IMPORTED_LOCATION)
-GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
+# Use openjp2 target (the actual IMPORTED library). OpenJpeg::OpenJpeg is an INTERFACE wrapper when found via CONFIG.
+RV_RESOLVE_IMPORTED_LINKER_FILE(openjp2 _openjpeg_library)
+IF(NOT _openjpeg_library)
+  # Build-from-source path: openjp2 target doesn't exist, use OpenJpeg::OpenJpeg
+  RV_RESOLVE_IMPORTED_LINKER_FILE(OpenJpeg::OpenJpeg _openjpeg_library)
+ENDIF()
+IF(TARGET openjp2)
+  GET_TARGET_PROPERTY(_openjpeg_include_dir openjp2 INTERFACE_INCLUDE_DIRECTORIES)
+ELSE()
+  GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
+ENDIF()
 LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
 LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-DUSE_FFMPEG=0")
+
+# When Boost is built from source but other deps come from a shared prefix (e.g. Homebrew), their transitive -isystem includes can pull in a newer system
+# Boost's headers, causing ABI mismatches at link time. Adding Boost's include as a non-system -I flag ensures it takes precedence over any -isystem paths,
+# since compilers (GCC/Clang) always search -I before -isystem.
+IF(RV_DEPS_IGNORE_PREFIXES)
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=-I${RV_DEPS_BOOST_ROOT_DIR}/include")
+ENDIF()
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
@@ -126,8 +142,8 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 # OIIO tools are not needed.
 LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
+LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
 IF(RV_TARGET_WINDOWS)
-  LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
   LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
 ENDIF()
 

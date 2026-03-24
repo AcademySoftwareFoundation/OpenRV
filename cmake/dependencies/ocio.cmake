@@ -52,6 +52,12 @@ IF(RV_TARGET_WINDOWS)
       ${_bin_dir}/${_ocio_win_sharedlibname}
   )
   LIST(APPEND _byproducts ${_ocio_win_sharedlib_path})
+
+  # Fix _libpath to match the actual version-suffixed DLL name that OCIO produces. RV_MAKE_STANDARD_LIB_NAME generates "OpenColorIO.dll" but OCIO builds
+  # "OpenColorIO_2.3.dll".
+  SET(_libpath
+      ${_ocio_win_sharedlib_path}
+  )
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)
@@ -138,8 +144,17 @@ IF(NOT RV_TARGET_WINDOWS)
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
-# Using Imath_ROOT because Imath_DIR does not seems to be enough on UNIX-based platform (at least Rocky linux).
-LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
+# Propagate CMAKE_PREFIX_PATH and CMAKE_IGNORE_PREFIX_PATH so the sub-build can find transitive dependencies and avoids contaminating prefixes.
+IF(CMAKE_PREFIX_PATH)
+  LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+ENDIF()
+IF(RV_DEPS_IGNORE_PREFIXES)
+  LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
+ENDIF()
+
+# Use explicit Imath_DIR for precise config resolution. Works for both built-from-source and found (e.g. Homebrew) packages. Use RV_DEPS_IMATH_CMAKE_DIR which
+# accounts for lib vs lib64 (RHEL) rather than hardcoding lib/.
+LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
 
 LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
@@ -191,7 +206,7 @@ ELSE() # Windows
 
   # Windows only. Because of an issue in Debug with minizip-ng finding ZLIB at two locations, ZLIB_LIBRARY and ZLIB_INCLUDE_DIR is used for both Release and
   # Debug. ZLIB_ROOT is not enough to fix the issue.
-  GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
+  RV_RESOLVE_IMPORTED_LINKER_FILE(ZLIB::ZLIB _zlib_library)
   GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
 
   LIST(
@@ -205,7 +220,7 @@ ELSE() # Windows
     "-DZLIB_LIBRARY=${_zlib_library}"
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
-    "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
+    "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}"
     "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     # Mandatory param: OCIO CMake code finds Python.
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
@@ -228,6 +243,12 @@ ELSE() # Windows
     "-S ${_source_dir}"
     "-B ${_build_dir}"
   )
+  IF(CMAKE_PREFIX_PATH)
+    LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+  ENDIF()
+  IF(RV_DEPS_IGNORE_PREFIXES)
+    LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
+  ENDIF()
 
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     # Use debug Python executable.
@@ -240,6 +261,9 @@ ELSE() # Windows
        # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
        # isn't compatible with OCIO: tons of STD C++ missing symbols errors.
   )
+
+  MESSAGE(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+  MESSAGE(STATUS "_configure_options: ${_configure_options}")
 
   EXTERNALPROJECT_ADD(
     ${_target}
@@ -322,8 +346,6 @@ IF(RV_TARGET_WINDOWS)
   ENDIF()
 ENDIF()
 
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
-
 RV_ADD_IMPORTED_LIBRARY(
   NAME
   OpenColorIO::OpenColorIO
@@ -339,3 +361,5 @@ RV_ADD_IMPORTED_LIBRARY(
   ${_target}
   ADD_TO_DEPS_LIST
 )
+
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS OpenColorIO::OpenColorIO)

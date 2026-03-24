@@ -511,6 +511,15 @@ def install_python_vfx2024() -> None:
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
+        # Copy include/ into bin/include/ so Python's sysconfig-reported include path
+        # (sys.prefix = bin/ because the _pth file lives there) is valid.
+        # CMake's FindPython queries python.exe for its include dir and gets bin/include/;
+        # without this copy that path doesn't exist and Python.h is not found (OCIO build).
+        include_src = os.path.join(OUTPUT_DIR, "include")
+        include_bin_dst = os.path.join(dst_dir, "include")
+        if os.path.exists(include_src) and not os.path.exists(include_bin_dst):
+            shutil.copytree(include_src, include_bin_dst)
+
         # Manually move python3.lib because the script provided do not copy it.
         python3_lib = "python3.lib"
         python3xx_lib = f"python{PYTHON_VERSION}.lib"
