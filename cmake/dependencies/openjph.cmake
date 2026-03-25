@@ -8,7 +8,6 @@
 # Build instructions: https://github.com/aous72/OpenJPH/blob/master/docs/compiling.md
 #
 
-# version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPH" "${RV_DEPS_OPENJPH_VERSION}" "make" "")
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
@@ -16,7 +15,20 @@ IF(RV_TARGET_LINUX)
       ${_install_dir}/lib
   )
 ENDIF()
-RV_SHOW_STANDARD_DEPS_VARIABLES()
+
+# OpenJPH ships CMake CONFIG files (openjph-config.cmake). CONFIG creates target `openjph` (not namespaced). Fall back to pkg-config.
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  openjph
+  VERSION
+  ${_version}
+  PKG_CONFIG_NAME
+  openjph
+  DEPS_LIST_TARGETS
+  openjph
+)
 
 SET(_download_url
     "https://github.com/aous72/OpenJPH/archive/refs/tags/${_version}.tar.gz"
@@ -25,6 +37,7 @@ SET(_download_hash
     ${RV_DEPS_OPENJPH_DOWNLOAD_HASH}
 )
 
+# Shared naming logic (used by both build and found paths)
 IF(RV_TARGET_WINDOWS)
   RV_MAKE_STANDARD_LIB_NAME("openjph.${_version_major}.${_version_minor}" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
   SET(_libname
@@ -36,68 +49,103 @@ IF(RV_TARGET_WINDOWS)
 ELSE()
   RV_MAKE_STANDARD_LIB_NAME("openjph" "${RV_DEPS_OPENJPH_VERSION}" "SHARED" "")
 ENDIF()
-# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 
-# Do not build the executables (Openjph calls them "codec executables"). BUILD_THIRDPARTY options is valid only if BUILD_CODEC=ON. PNG, TIFF and ZLIB are not
-# needed anymore because they are used for the executables only.
-LIST(APPEND _configure_options "-DBUILD_CODEC=OFF")
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/openjph.cmake)
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${_source_dir}
-  BINARY_DIR ${_build_dir}
-  INSTALL_DIR ${_install_dir}
-  # DEPENDS ZLIB::ZLIB TIFF::TIFF PNG::PNG
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_IN_SOURCE FALSE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
-
-SET(_openjph_include_dir
-    "${_include_dir}"
-)
-
-IF(NOT RV_TARGET_WINDOWS)
-  RV_ADD_IMPORTED_LIBRARY(
-    NAME
-    OpenJph::OpenJph
-    TYPE
-    SHARED
-    LOCATION
-    ${_libpath}
-    SONAME
-    ${_libname}
-    INCLUDE_DIRS
-    ${_openjph_include_dir}
-    DEPENDS
-    ${_target}
-    ADD_TO_DEPS_LIST
-  )
+  IF(NOT RV_TARGET_WINDOWS)
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      OpenJph::OpenJph
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      SONAME
+      ${_libname}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+  ELSE()
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      OpenJph::OpenJph
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      IMPLIB
+      ${_implibpath}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+  ENDIF()
 ELSE()
-  RV_ADD_IMPORTED_LIBRARY(
-    NAME
-    OpenJph::OpenJph
-    TYPE
-    SHARED
-    LOCATION
-    ${_libpath}
-    IMPLIB
-    ${_implibpath}
-    INCLUDE_DIRS
-    ${_openjph_include_dir}
-    DEPENDS
-    ${_target}
-    ADD_TO_DEPS_LIST
-  )
+  # CONFIG creates `openjph` target; pkg-config does not. Create it if missing (e.g. found via pkg-config).
+  IF(NOT TARGET openjph)
+    # Resolve actual library. On Windows, DLLs are in _bin_dir and import libs in _lib_dir. On Unix, shared libs are in _lib_dir.
+    SET(_openjph_found_lib
+        ""
+    )
+    SET(_openjph_found_implib
+        ""
+    )
+    IF(RV_TARGET_WINDOWS)
+      FILE(GLOB _openjph_found_dlls "${_bin_dir}/openjph*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+      IF(_openjph_found_dlls)
+        LIST(GET _openjph_found_dlls 0 _openjph_found_lib)
+      ENDIF()
+      FILE(GLOB _openjph_found_implibs "${_lib_dir}/openjph*.lib")
+      IF(_openjph_found_implibs)
+        LIST(GET _openjph_found_implibs 0 _openjph_found_implib)
+      ENDIF()
+    ELSE()
+      FILE(GLOB _openjph_found_libs "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
+           "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+      )
+      IF(_openjph_found_libs)
+        LIST(GET _openjph_found_libs 0 _openjph_found_lib)
+      ENDIF()
+    ENDIF()
+    IF(NOT _openjph_found_lib)
+      SET(_openjph_found_lib
+          "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      )
+    ENDIF()
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      openjph
+      TYPE
+      SHARED
+      LOCATION
+      ${_openjph_found_lib}
+      IMPLIB
+      ${_openjph_found_implib}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+    )
+    LIST(APPEND RV_DEPS_LIST openjph)
+    RV_RESOLVE_DARWIN_INSTALL_NAME(openjph)
+  ENDIF()
+
+  # Create `OpenJph::OpenJph` as an INTERFACE wrapper for backward compatibility.
+  IF(NOT TARGET OpenJph::OpenJph)
+    ADD_LIBRARY(OpenJph::OpenJph INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(
+      OpenJph::OpenJph
+      INTERFACE openjph
+    )
+  ENDIF()
+
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS openjph)
 ENDIF()
