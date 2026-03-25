@@ -297,7 +297,8 @@ SET(RV_PYTHON_WHEEL_SAFE
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
-    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo); avoids setuptools_scm 10.x source build failure
+    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo)
+    "setuptools-scm" # Version detection tool (pure Python, calls git); 10.x source build broken in isolated envs
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
