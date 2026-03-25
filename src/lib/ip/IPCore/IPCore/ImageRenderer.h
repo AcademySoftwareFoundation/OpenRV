@@ -175,7 +175,9 @@ namespace IPCore
             };
 
             TextureDescription()
-                : uploaded(false)
+                : id(0)
+                , bufferId(0)
+                , uploaded(false)
                 , age(-1)
             {
             }
