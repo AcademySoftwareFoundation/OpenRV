@@ -292,6 +292,7 @@ SET(RV_PYTHON_BUILD_DEPS
 # that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
     ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
+    "cmake" # Build tool (self-contained binary wheel, no ABI dependency on Python)
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
