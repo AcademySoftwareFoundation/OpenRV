@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "${RV_DEPS_IMATH_VERSION}" "" "")
 
 SET(_download_url
@@ -17,14 +14,8 @@ SET(_download_hash
     "${RV_DEPS_IMATH_DOWNLOAD_HASH}"
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
 SET(_include_dir
     ${_install_dir}/include/Imath
-)
-SET(RV_DEPS_IMATH_ROOT_DIR
-    ${_install_dir}
 )
 
 IF(RV_TARGET_DARWIN)
@@ -38,16 +29,6 @@ ELSEIF(RV_TARGET_LINUX)
 ELSEIF(RV_TARGET_WINDOWS)
   SET(_libname
       ${CMAKE_SHARED_LIBRARY_PREFIX}Imath-${RV_DEPS_IMATH_LIB_MAJOR}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
   )
 ENDIF()
 
@@ -91,58 +72,22 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-FILE(MAKE_DIRECTORY "${_include_dir}")
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
-  )
-ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
-  )
-ENDIF()
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(Imath::Imath SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Imath::Imath ${_target})
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Imath::Imath
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   Imath::Imath
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST Imath::Imath)
-
-SET(RV_DEPS_IMATH_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )

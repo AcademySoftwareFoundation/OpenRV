@@ -24,6 +24,13 @@
 #define TWEAK_AUDIO_MIN_SAMPLE_RATE 8000
 #define TWEAK_AUDIO_DEFAULT_SAMPLE_RATE 48000
 #define TWEAK_AUDIO_MAX_SAMPLE_RATE 352800
+// The audio packet size is the number of audio samples processed per packet
+// (i.e. per call to the audio fill buffer function). It controls the trade-off
+// between latency and CPU overhead: smaller values reduce latency but increase
+// the number of fill-buffer calls per second, while larger values reduce CPU
+// overhead at the cost of higher latency. 2048 samples at 48 kHz yields ~43 ms
+// of audio per packet, which is a standard default for buffered video playback.
+#define TWEAK_AUDIO_DEFAULT_PACKET_SIZE 2048
 
 // #define ENABLE_AUDIOBUFFER_CHECK
 

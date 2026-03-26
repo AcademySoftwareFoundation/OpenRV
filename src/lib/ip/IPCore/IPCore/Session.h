@@ -63,6 +63,7 @@ namespace IPCore
         inline constexpr std::string_view markCategory = "mark_category";
         inline constexpr std::string_view mediaCategory = "media_category";
         inline constexpr std::string_view playcontrolCategory = "playcontrol_category";
+        inline constexpr std::string_view playControlClickCategory = "playcontrol_click_category";
         inline constexpr std::string_view playmodeLoopCategory = "playmode_loop_category";
         inline constexpr std::string_view playmodeOnceCategory = "playmode_once_category";
         inline constexpr std::string_view playmodePingPongCategory = "playmode_pingpong_category";
@@ -73,6 +74,7 @@ namespace IPCore
         inline constexpr std::string_view screeningroomCategory = "screeningroom_category";
         inline constexpr std::string_view unclassifiedCategory = "unclassified_category";
         inline constexpr std::string_view viewmodeCategory = "viewmode_category";
+        inline constexpr std::string_view viewNavigationCategory = "view_navigation_category";
         inline constexpr std::string_view fullscreenModeCategory = "fullscreenMode_category";
         inline constexpr std::string_view backgroundStyleCategory = "backgroundStyle_category";
         inline constexpr std::string_view wipesCategory = "wipes_category";
@@ -83,7 +85,7 @@ namespace IPCore
             // Explicitly specify template parameters for MSVC compatibility.
             // CTAD (Class Template Argument Deduction) works on GCC/Clang but
             // fails on Windows MSVC, so we specify the number of categories explicitly.
-            return std::array<std::string_view, 33>{annotateCategory,
+            return std::array<std::string_view, 35>{annotateCategory,
                                                     annotateAirbrushCategory,
                                                     annotateBurnCategory,
                                                     annotateCloneCategory,
@@ -103,7 +105,9 @@ namespace IPCore
                                                     infoCategory,
                                                     markCategory,
                                                     mediaCategory,
+                                                    panzoomCategory,
                                                     playcontrolCategory,
+                                                    playControlClickCategory,
                                                     playmodeLoopCategory,
                                                     playmodeOnceCategory,
                                                     playmodePingPongCategory,
@@ -114,8 +118,8 @@ namespace IPCore
                                                     screeningroomCategory,
                                                     unclassifiedCategory,
                                                     viewmodeCategory,
-                                                    wipesCategory,
-                                                    panzoomCategory};
+                                                    viewNavigationCategory,
+                                                    wipesCategory};
         }
     } // namespace EventCategories
 

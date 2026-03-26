@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_ZLIB" "${RV_DEPS_ZLIB_VERSION}" "" "")
 
 SET(_download_url
@@ -17,25 +14,8 @@ SET(_download_hash
     ${RV_DEPS_ZLIB_DOWNLOAD_HASH}
 )
 
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-# This file is pretty close to being ready to use the Standrd macros: (create_lib_bin especially but maybe rv_make_std_lib). One problem is debug names for Libs
-# which is different but there's ways to fix this.
-SET(RV_DEPS_ZLIB_ROOT_DIR
-    ${_install_dir}
-)
-
-SET(_include_dir
-    ${_install_dir}/include
-)
-
 SET(_lib_dir
     ${_install_dir}/lib
-)
-SET(_bin_dir
-    ${_install_dir}/bin
 )
 
 IF(RV_TARGET_WINDOWS)
@@ -106,8 +86,6 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-FILE(MAKE_DIRECTORY "${_include_dir}")
-
 IF(RV_TARGET_WINDOWS)
   # FFmpeg expect "zlib" in Release and Debug.
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
@@ -119,74 +97,45 @@ IF(RV_TARGET_WINDOWS)
     )
   ENDIF()
 
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_bin_dir} ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} OUTPUTS ${RV_STAGE_BIN_DIR}/${_libname})
 ELSEIF(RV_TARGET_DARWIN)
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-    COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@rpath/${_libname}" "${_lib_dir}/${_libname}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET
+    ${_target}
+    OUTPUTS
+    ${RV_STAGE_LIB_DIR}/${_libname}
+    PRE_COMMANDS
+    COMMAND
+    ${CMAKE_INSTALL_NAME_TOOL}
+    -id
+    "@rpath/${_libname}"
+    "${_lib_dir}/${_libname}"
   )
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
 ENDIF()
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(ZLIB::ZLIB SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(ZLIB::ZLIB ${_target})
-SET_PROPERTY(
-  TARGET ZLIB::ZLIB
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET ZLIB::ZLIB
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET ZLIB::ZLIB
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   ZLIB::ZLIB
-  INTERFACE ${_include_dir}
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-LIST(APPEND RV_DEPS_LIST ZLIB::ZLIB)
 
 SET(RV_DEPS_ZLIB_INCLUDE_DIR
     ${_include_dir}
     CACHE STRING "Path to installed includes for ${_target}"
-)
-
-SET(RV_DEPS_ZLIB_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
 )
 
 # FFmpeg customization

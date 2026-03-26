@@ -9,9 +9,6 @@
 #
 # Starting from CMake 3.30, FindBoost.cmake has been removed in favor of BoostConfig.cmake (Boost 1.70+). This behavior is covered by CMake policy CMP0167.
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 SET(_ext_boost_version
     ${RV_DEPS_BOOST_VERSION}
 )
@@ -28,19 +25,6 @@ RV_SHOW_STANDARD_DEPS_VARIABLES()
 STRING(REPLACE "." "_" _version_with_underscore ${_version})
 SET(_download_url
     "https://archives.boost.io/release/${_version}/source/boost_${_version_with_underscore}.tar.gz"
-)
-
-# Set _base_dir for Clean-<target>
-SET(_base_dir
-    ${RV_DEPS_BASE_DIR}/${_target}
-)
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(${_target}_ROOT_DIR
-    ${_install_dir}
 )
 
 SET(_boost_libs
@@ -255,31 +239,9 @@ SET_TARGET_PROPERTIES(
   PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${_include_dir}"
 )
 
+# Note: On Windows, Boost's b2 puts both .lib and .dll in lib/, so we copy _lib_dir to both RV_STAGE_LIB_DIR and RV_STAGE_BIN_DIR.
 IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_BIN_DIR}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} OUTPUTS ${_boost_stage_output})
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${_boost_stage_output}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_boost_stage_output})
 ENDIF()
-
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${_boost_stage_output}
-)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-SET(RV_DEPS_BOOST_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)

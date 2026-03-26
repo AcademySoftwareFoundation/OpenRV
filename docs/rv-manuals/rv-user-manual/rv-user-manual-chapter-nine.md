@@ -8,5 +8,4 @@ As discussed previously there are two default places to set ASC CDL properties i
 
 ### 9.1 CDL File Formats
 
-
 The types of files RV supports right now are Color Decision List (.cdl), Color Correction (.cc) and Color Correction Collection (.ccc) files. Color Correction Collection files can include multiple Color Corrections tagged by ids. We do not support reading the properties by id. Therefore the first Color Collection found in the file will be read and used.

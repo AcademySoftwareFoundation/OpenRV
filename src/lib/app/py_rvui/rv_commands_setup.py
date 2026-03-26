@@ -167,6 +167,7 @@ all_mu_commands = [
     "theTime",
     "getIntProperty",
     "insertStringProperty",
+    "flushImageFBOs",
     "releaseAllCachedImages",
     "getFloatProperty",
     "sources",
@@ -315,6 +316,7 @@ all_mu_commands = [
     "sourceMediaRepSourceNode",
     "sourceMediaRepsAndNodes",
     "devicePixelRatio",
+    "waitForProgressiveLoading",
 ]
 
 

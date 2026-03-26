@@ -11,10 +11,10 @@ Mac:
 <RV install dir>/Contents/PlugIns/Nodes/AdditionalNodes.gto
 <RV install dir>/Contents/PlugIns/Support/additional_nodes/AdditionalNodes.zip  
 ```
+
 The file "AdditionalNodes.gto" is a GTO formatted text file that contains the definition of all the nodes described in this chapter. All of the node definitions found in this file are signed for use by all RV4 versions. The GLSL source code that implements the node's functionality is embedded within the node definition's function block as an inlined string. In addition, the default values of the node's parameters can be found within the node definition's parameter block. The accompanying support file "AdditionalNodes.zip" is a zipped up collection of individually named node ".gto" and ".glsl" files. Users can unzip this package and refer to each node's .gto/.glsl file as examples of custom written RV GLSL nodes. Note the file "AdditionalNodes.zip" is not used by RV. Instead RV only uses "AdditionalNodes.gto" which was produced from all the files found in "AdditionalNodes.zip".These nodes can be applied through the session manager to sources, sequences, stacks, layouts or other nodes. First you select a source (for example) and from the session manager "+" pull menu select "New Node by Type" and type in the name of the node in the entry box field of the "New Node by Type" window.
 
 ### 17.1 Color Nodes
-
 
 This section describes all the GLSL nodes of evaluationType "color" found in "AdditionalNodes.gto".
 
@@ -183,7 +183,6 @@ This node implements the saturation operation on the RGB channels of the inputIm
 | node.parameters.maxClamp | float | [ 1 ] |
 
 ### 17.2 Transition Nodes
-
 
 This section describes all the GLSL nodes of evaluationType "transition" found in "AdditionalNodes.gto".
 

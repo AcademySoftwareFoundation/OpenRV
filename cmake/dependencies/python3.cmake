@@ -284,11 +284,20 @@ SET(RV_PYTHON_BUILD_DEPS
 # that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
     ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
+    "cmake" # Build tool (self-contained binary wheel, no ABI dependency on Python)
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
+    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo)
+    "setuptools-scm" # Version detection tool (pure Python, calls git)
+    "hatchling" # Build backend (pure Python, like setuptools)
+    "hatch-vcs" # Hatchling VCS version plugin (pure Python)
+    "pluggy" # Plugin framework (pure Python)
+    "pathspec" # Gitignore pattern matching (pure Python)
+    "trove-classifiers" # PyPI classifiers data (pure Python)
+    "vcs-versioning" # VCS version detection for setuptools-scm 10.x (pure Python)
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
@@ -549,6 +558,10 @@ ELSE()
 ENDIF()
 
 ADD_LIBRARY(Python::Python SHARED IMPORTED GLOBAL)
+SET_TARGET_PROPERTIES(
+  Python::Python
+  PROPERTIES SYSTEM FALSE
+)
 ADD_DEPENDENCIES(Python::Python ${_python3_target})
 SET_PROPERTY(
   TARGET Python::Python

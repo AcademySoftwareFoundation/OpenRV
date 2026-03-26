@@ -12,7 +12,7 @@ If your network uses a proxy server, you can configure Open RV to use it by sett
 | ------------------------- | ------- | --------- | ----------------------------- |
 | RV_NETWORK_PROXY_HOST     | string  | required  | Proxy host name or IP address |
 | RV_NETWORK_PROXY_PORT     | int     | required  | Proxy port number             |
-| RV_NETWORK_PROXY_USER     | string  | optional  | Username for proxy service   |
+| RV_NETWORK_PROXY_USER     | string  | optional  | Username for proxy service    |
 | RV_NETWORK_PROXY_PASSWORD | string  | optional  | Password for proxy service    |
 
 > Note: If you do not set a proxy, Open RV always uses the operating system's proxy. To have Open RV to ignore all proxies (including the system's own), set the environment variable `RV_NETWORK_PROXY_DISABLE`.
