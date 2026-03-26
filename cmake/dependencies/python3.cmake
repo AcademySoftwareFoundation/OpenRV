@@ -298,6 +298,14 @@ SET(RV_PYTHON_WHEEL_SAFE
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
+    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo)
+    "setuptools-scm" # Version detection tool (pure Python, calls git)
+    "hatchling" # Build backend (pure Python, like setuptools)
+    "hatch-vcs" # Hatchling VCS version plugin (pure Python)
+    "pluggy" # Plugin framework (pure Python)
+    "pathspec" # Gitignore pattern matching (pure Python)
+    "trove-classifiers" # PyPI classifiers data (pure Python)
+    "vcs-versioning" # VCS version detection for setuptools-scm 10.x (pure Python)
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
