@@ -10,6 +10,33 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(OpenColorIO CONFIG)
+  IF(OpenColorIO_FOUND)
+    MESSAGE(STATUS "Using Homebrew OpenColorIO: ${OpenColorIO_VERSION}")
+
+    IF(TARGET OpenColorIO::OpenColorIO)
+      GET_TARGET_PROPERTY(_is_imported OpenColorIO::OpenColorIO IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          OpenColorIO::OpenColorIO
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(NOT TARGET ocio::ocio)
+      ADD_LIBRARY(ocio::ocio INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        ocio::ocio
+        INTERFACE OpenColorIO::OpenColorIO
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST OpenColorIO::OpenColorIO)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 # The folder OCIO is building its own dependencies
 SET(RV_DEPS_OCIO_DIST_DIR
     ${_build_dir}/ext/dist

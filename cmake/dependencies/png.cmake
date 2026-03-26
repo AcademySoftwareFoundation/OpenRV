@@ -13,6 +13,43 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PNG" "${RV_DEPS_PNG_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PNG)
+  IF(PNG_FOUND)
+    MESSAGE(STATUS "Using Homebrew PNG: ${PNG_VERSION_STRING}")
+
+    IF(TARGET PNG::PNG)
+      GET_TARGET_PROPERTY(_is_imported PNG::PNG IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          PNG::PNG
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ELSE()
+      ADD_LIBRARY(PNG::PNG UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET PNG::PNG
+        PROPERTY IMPORTED_LOCATION "${PNG_LIBRARY}"
+      )
+      IF(PNG_PNG_INCLUDE_DIR)
+        TARGET_INCLUDE_DIRECTORIES(
+          PNG::PNG
+          INTERFACE "${PNG_PNG_INCLUDE_DIR}"
+        )
+      ELSE()
+        TARGET_INCLUDE_DIRECTORIES(
+          PNG::PNG
+          INTERFACE "${PNG_INCLUDE_DIR}"
+        )
+      ENDIF()
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST PNG::PNG)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/glennrp/libpng/archive/refs/tags/v${_version}.tar.gz"
 )

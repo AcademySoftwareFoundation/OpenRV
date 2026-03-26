@@ -15,6 +15,60 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "${RV_DEPS_OIIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(OpenImageIO CONFIG)
+  IF(OpenImageIO_FOUND)
+    MESSAGE(STATUS "Using Homebrew OpenImageIO: ${OpenImageIO_VERSION}")
+
+    IF(TARGET OpenImageIO::OpenImageIO)
+      GET_TARGET_PROPERTY(_is_imported OpenImageIO::OpenImageIO IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          OpenImageIO::OpenImageIO
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(TARGET OpenImageIO::OpenImageIO_Util)
+      GET_TARGET_PROPERTY(_is_imported OpenImageIO::OpenImageIO_Util IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          OpenImageIO::OpenImageIO_Util
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ENDIF()
+
+    IF(NOT TARGET oiio::oiio)
+      ADD_LIBRARY(oiio::oiio INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        oiio::oiio
+        INTERFACE OpenImageIO::OpenImageIO
+      )
+    ENDIF()
+
+    IF(NOT TARGET oiio::utils)
+      IF(TARGET OpenImageIO::OpenImageIO_Util)
+        ADD_LIBRARY(oiio::utils INTERFACE IMPORTED GLOBAL)
+        TARGET_LINK_LIBRARIES(
+          oiio::utils
+          INTERFACE OpenImageIO::OpenImageIO_Util
+        )
+      ELSE()
+        ADD_LIBRARY(oiio::utils INTERFACE IMPORTED GLOBAL)
+        TARGET_LINK_LIBRARIES(
+          oiio::utils
+          INTERFACE OpenImageIO::OpenImageIO
+        )
+      ENDIF()
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST OpenImageIO::OpenImageIO)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/AcademySoftwareFoundation/OpenImageIO/archive/refs/tags/v${_version}.tar.gz"
 )

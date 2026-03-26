@@ -4,6 +4,109 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+SET(Python3_FIND_VIRTUALENV
+    FIRST
+)
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(
+    Python3
+    COMPONENTS Interpreter Development
+  )
+  IF(Python3_FOUND)
+    MESSAGE(STATUS "Using Homebrew/System Python3: ${Python3_VERSION}")
+
+    # Satisfy variables used in requirements.txt template etc
+    SET(RV_DEPS_PYTHON_VERSION
+        "${Python3_VERSION}"
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_PYTHON_VERSION_SHORT
+        "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+        CACHE INTERNAL "" FORCE
+    )
+    SET(RV_DEPS_PYTHON3_EXECUTABLE
+        "${Python3_EXECUTABLE}"
+        CACHE INTERNAL "" FORCE
+    )
+
+    # Satisfy targets that depend on Python::Python
+    IF(NOT TARGET Python::Python)
+      ADD_LIBRARY(Python::Python INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        Python::Python
+        INTERFACE Python3::Python
+      )
+    ENDIF()
+
+    # Check for PySide if possible
+    IF(RV_VFX_PLATFORM STREQUAL "CY2023")
+      SET(_pyside_pkg
+          "PySide2"
+      )
+    ELSE()
+      SET(_pyside_pkg
+          "PySide6"
+      )
+    ENDIF()
+
+    EXECUTE_PROCESS(
+      COMMAND "${Python3_EXECUTABLE}" -c "import ${_pyside_pkg}; print(${_pyside_pkg}.__version__)"
+      RESULT_VARIABLE _pyside_check_res
+      OUTPUT_VARIABLE _pyside_ver
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    IF(_pyside_check_res EQUAL 0)
+      MESSAGE(STATUS "Using Homebrew/System ${_pyside_pkg}: ${_pyside_ver}")
+      SET(RV_DEPS_PYSIDE_VERSION
+          "${_pyside_ver}"
+          CACHE INTERNAL "" FORCE
+      )
+    ELSE()
+      MESSAGE(WARNING "Homebrew/System ${_pyside_pkg} not found in ${Python3_EXECUTABLE}")
+    ENDIF()
+
+    # Skip everything else in this file
+    LIST(APPEND RV_DEPS_LIST Python::Python)
+
+    # Define flags so later custom commands don't fail on missing dependencies
+    SET(${_python3_target}-requirements-flag
+        "${CMAKE_BINARY_DIR}/python3-brew-requirements-flag"
+        CACHE INTERNAL ""
+    )
+    ADD_CUSTOM_COMMAND(
+      OUTPUT "${${_python3_target}-requirements-flag}"
+      COMMAND ${CMAKE_COMMAND} -E touch "${${_python3_target}-requirements-flag}"
+    )
+
+    SET(${_pyside_target}-build-flag
+        "${CMAKE_BINARY_DIR}/pyside-brew-build-flag"
+        CACHE INTERNAL ""
+    )
+    ADD_CUSTOM_COMMAND(
+      OUTPUT "${${_pyside_target}-build-flag}"
+      COMMAND ${CMAKE_COMMAND} -E touch "${${_pyside_target}-build-flag}"
+    )
+
+    # Create dummy targets for staged dependencies if they don't exist
+    IF(NOT TARGET ${_python3_target}-stage-target)
+      ADD_CUSTOM_TARGET(
+        ${_python3_target}-stage-target
+        DEPENDS "${${_python3_target}-requirements-flag}" "${${_pyside_target}-build-flag}"
+      )
+      ADD_DEPENDENCIES(dependencies ${_python3_target}-stage-target)
+    ENDIF()
+
+    RETURN()
+  ENDIF()
+ENDIF()
+
+FIND_PACKAGE(
+  Python3
+  COMPONENTS Interpreter
+  REQUIRED
+)
+
 SET(_python3_target
     "RV_DEPS_PYTHON3"
 )
@@ -89,7 +192,7 @@ SET(_python3_make_command_script
     "${PROJECT_SOURCE_DIR}/src/build/make_python.py"
 )
 SET(_python3_make_command
-    python3 "${_python3_make_command_script}"
+    ${Python3_EXECUTABLE} "${_python3_make_command_script}"
 )
 LIST(APPEND _python3_make_command "--variant")
 LIST(APPEND _python3_make_command ${CMAKE_BUILD_TYPE})
@@ -117,7 +220,7 @@ IF(RV_VFX_PLATFORM STREQUAL CY2023)
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside.py"
   )
   SET(_pyside_make_command
-      python3 "${_pyside_make_command_script}"
+      ${Python3_EXECUTABLE} "${_pyside_make_command_script}"
   )
 
   LIST(APPEND _pyside_make_command "--variant")
@@ -145,7 +248,7 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
       "${PROJECT_SOURCE_DIR}/src/build/make_pyside6.py"
   )
   SET(_pyside_make_command
-      python3 "${_pyside_make_command_script}"
+      ${Python3_EXECUTABLE} "${_pyside_make_command_script}"
   )
 
   LIST(APPEND _pyside_make_command "--variant")
@@ -357,6 +460,7 @@ LIST(
   :all:
   --only-binary
   ${_wheel_safe_packages}
+  ${RV_PYTHON_WHEEL_SAFE}
   -r
   "${_requirements_output_file}"
 )
@@ -445,7 +549,7 @@ SET(_test_python_script
 ADD_CUSTOM_COMMAND(
   COMMENT "Testing Python distribution"
   OUTPUT ${${_python3_target}-test-flag}
-  COMMAND python3 "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
+  COMMAND ${Python3_EXECUTABLE} "${_test_python_script}" --python-home "${_install_dir}" --variant "${CMAKE_BUILD_TYPE}"
   COMMAND cmake -E touch ${${_python3_target}-test-flag}
   DEPENDS ${${_python3_target}-requirements-flag} ${_test_python_script}
 )

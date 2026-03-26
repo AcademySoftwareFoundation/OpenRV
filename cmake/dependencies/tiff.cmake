@@ -17,6 +17,45 @@
 # OpenImageIO required >= 3.9, using latest 4.0
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(TIFF)
+  IF(TIFF_FOUND)
+    MESSAGE(STATUS "Using Homebrew TIFF: ${TIFF_VERSION}")
+
+    # RV build system expects TIFF::TIFF
+    IF(TARGET TIFF::TIFF)
+      GET_TARGET_PROPERTY(_is_imported TIFF::TIFF IMPORTED)
+      IF(_is_imported)
+        SET_TARGET_PROPERTIES(
+          TIFF::TIFF
+          PROPERTIES IMPORTED_GLOBAL TRUE
+        )
+      ENDIF()
+    ELSE()
+      ADD_LIBRARY(TIFF::TIFF UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET TIFF::TIFF
+        PROPERTY IMPORTED_LOCATION "${TIFF_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        TIFF::TIFF
+        INTERFACE "${TIFF_INCLUDE_DIR}"
+      )
+    ENDIF()
+
+    IF(NOT TARGET Tiff::Tiff)
+      ADD_LIBRARY(Tiff::Tiff INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        Tiff::Tiff
+        INTERFACE TIFF::TIFF
+      )
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST TIFF::TIFF)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://gitlab.com/libtiff/libtiff/-/archive/v${_version}/libtiff-v${_version}.tar.gz"
 )

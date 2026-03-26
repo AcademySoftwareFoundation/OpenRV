@@ -50,6 +50,48 @@ SET(_mbedcrypto_lib
     ${_mbedtls_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}mbedcrypto${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(PC_mbedtls mbedtls mbedx509 mbedcrypto)
+  IF(PC_mbedtls_FOUND)
+    MESSAGE(STATUS "Using Homebrew mbedtls")
+    # Use direct paths from pkg-config
+    FIND_LIBRARY(
+      BREW_MBEDTLS_LIB
+      NAMES mbedtls
+      HINTS ${PC_mbedtls_LIBDIR}
+    )
+    FIND_LIBRARY(
+      BREW_MBEDX509_LIB
+      NAMES mbedx509
+      HINTS ${PC_mbedtls_LIBDIR}
+    )
+    FIND_LIBRARY(
+      BREW_MBEDCRYPTO_LIB
+      NAMES mbedcrypto
+      HINTS ${PC_mbedtls_LIBDIR}
+    )
+
+    IF(BREW_MBEDTLS_LIB
+       AND BREW_MBEDX509_LIB
+       AND BREW_MBEDCRYPTO_LIB
+    )
+      SET(_mbedtls_lib
+          "${BREW_MBEDTLS_LIB}"
+      )
+      SET(_mbedx509_lib
+          "${BREW_MBEDX509_LIB}"
+      )
+      SET(_mbedcrypto_lib
+          "${BREW_MBEDCRYPTO_LIB}"
+      )
+      SET(_use_brew_mbedtls
+          TRUE
+      )
+    ENDIF()
+  ENDIF()
+ENDIF()
+
 LIST(APPEND _byproducts ${_mbedtls_lib} ${_mbedx509_lib} ${_mbedcrypto_lib})
 
 # There is an issue with the recent AJA SDK : the OS specific header files are no longer copied to _aja_ntv2_include_dir Adding custom paths here to work around
@@ -85,6 +127,19 @@ IF(RV_TARGET_WINDOWS
   LIST(APPEND _configure_options "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug")
 ENDIF()
 
+IF(_use_brew_mbedtls)
+  LIST(APPEND _configure_options "-DAJANTV2_DISABLE_MBEDTLS=ON")
+  # In AJA SDK, AJANTV2_DISABLE_PLUGIN_LOAD=ON also disables internal mbedtls
+  LIST(APPEND _configure_options "-DAJANTV2_DISABLE_PLUGIN_LOAD=ON")
+  SET(_aja_install_command
+      ${_cmake_install_command}
+  )
+ELSE()
+  SET(_aja_install_command
+      ${_cmake_install_command} && ${CMAKE_COMMAND} -E copy_directory ${_mbedtls_lib_dir} ${_lib_dir}
+  )
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_download_url}
@@ -97,7 +152,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command} && ${CMAKE_COMMAND} -E copy_directory ${_mbedtls_lib_dir} ${_lib_dir}
+  INSTALL_COMMAND ${_aja_install_command}
   BUILD_IN_SOURCE FALSE
   BUILD_ALWAYS FALSE
   BUILD_BYPRODUCTS ${_byproducts}

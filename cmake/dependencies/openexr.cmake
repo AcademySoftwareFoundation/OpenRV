@@ -6,6 +6,61 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(OpenEXR CONFIG)
+  IF(OpenEXR_FOUND)
+    MESSAGE(STATUS "Using Homebrew OpenEXR: ${OpenEXR_VERSION}")
+
+    # Helper macro to promote target to global
+    MACRO(PROMOTE_TO_GLOBAL target)
+      IF(TARGET ${target})
+        GET_TARGET_PROPERTY(_is_imported ${target} IMPORTED)
+        IF(_is_imported)
+          SET_TARGET_PROPERTIES(
+            ${target}
+            PROPERTIES IMPORTED_GLOBAL TRUE
+          )
+        ENDIF()
+      ENDIF()
+    ENDMACRO()
+
+    # Handle OpenEXR main library
+    IF(TARGET OpenEXR::OpenEXR)
+      PROMOTE_TO_GLOBAL(OpenEXR::OpenEXR)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)
+    ELSEIF(TARGET OpenEXR::openexr)
+      PROMOTE_TO_GLOBAL(OpenEXR::openexr)
+      ADD_LIBRARY(OpenEXR::OpenEXR ALIAS OpenEXR::openexr)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)
+    ENDIF()
+
+    # Handle Iex
+    IF(TARGET OpenEXR::Iex)
+      PROMOTE_TO_GLOBAL(OpenEXR::Iex)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::Iex)
+    ELSEIF(TARGET OpenEXR::iex)
+      PROMOTE_TO_GLOBAL(OpenEXR::iex)
+      ADD_LIBRARY(OpenEXR::Iex ALIAS OpenEXR::iex)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::Iex)
+    ENDIF()
+
+    # Handle IlmThread
+    IF(TARGET OpenEXR::IlmThread)
+      PROMOTE_TO_GLOBAL(OpenEXR::IlmThread)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::IlmThread)
+    ELSEIF(TARGET OpenEXR::ilmthread)
+      PROMOTE_TO_GLOBAL(OpenEXR::ilmthread)
+      ADD_LIBRARY(OpenEXR::IlmThread ALIAS OpenEXR::ilmthread)
+      LIST(APPEND RV_DEPS_LIST OpenEXR::IlmThread)
+    ENDIF()
+
+    SET(RV_DEPS_OPENEXR_VERSION
+        "${OpenEXR_VERSION}"
+        CACHE INTERNAL "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
 SET(_make_command
     make
 )

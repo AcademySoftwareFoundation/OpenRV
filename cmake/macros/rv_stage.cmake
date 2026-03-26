@@ -97,16 +97,30 @@ FUNCTION(rv_stage)
           ${RV_DEPS_LIST}
         )
           IF(TARGET ${dep})
-            GET_PROPERTY(
-              dep_file_path
-              TARGET ${dep}
-              PROPERTY LOCATION
-            )
-            GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
-            ADD_CUSTOM_COMMAND(
-              COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-              COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
-            )
+            GET_TARGET_PROPERTY(dep_type ${dep} TYPE)
+            IF(NOT dep_type STREQUAL "INTERFACE_LIBRARY")
+              GET_PROPERTY(
+                dep_file_path
+                TARGET ${dep}
+                PROPERTY LOCATION
+              )
+              IF(dep_file_path)
+                STRING(REGEX MATCH "^/opt/homebrew" _is_homebrew "${dep_file_path}")
+                STRING(REGEX MATCH "^/usr/local" _is_usr_local "${dep_file_path}")
+                STRING(REGEX MATCH "^/usr/lib" _is_usr_lib "${dep_file_path}")
+
+                IF(NOT _is_homebrew
+                   AND NOT _is_usr_local
+                   AND NOT _is_usr_lib
+                )
+                  GET_FILENAME_COMPONENT(dep_file_name "${dep_file_path}" NAME)
+                  ADD_CUSTOM_COMMAND(
+                    COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
+                    COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
+                  )
+                ENDIF()
+              ENDIF()
+            ENDIF()
           ENDIF()
         ENDFOREACH()
       ENDIF()

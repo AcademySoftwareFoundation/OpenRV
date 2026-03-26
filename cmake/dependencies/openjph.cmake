@@ -10,6 +10,33 @@
 
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPH" "${RV_DEPS_OPENJPH_VERSION}" "make" "")
+
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(PC_OPENJPH openjph)
+  IF(PC_OPENJPH_FOUND)
+    MESSAGE(STATUS "Using Homebrew OpenJPH")
+    IF(NOT TARGET OpenJph::OpenJph)
+      ADD_LIBRARY(OpenJph::OpenJph UNKNOWN IMPORTED GLOBAL)
+      FIND_LIBRARY(
+        OPENJPH_LIBRARY
+        NAMES openjph
+        HINTS ${PC_OPENJPH_LIBDIR}
+      )
+      SET_PROPERTY(
+        TARGET OpenJph::OpenJph
+        PROPERTY IMPORTED_LOCATION "${OPENJPH_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        OpenJph::OpenJph
+        INTERFACE "${PC_OPENJPH_INCLUDE_DIRS}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST OpenJph::OpenJph)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64
   SET(_lib_dir

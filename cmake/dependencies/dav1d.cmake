@@ -4,6 +4,62 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(PC_dav1d dav1d)
+  IF(PC_dav1d_FOUND)
+    MESSAGE(STATUS "Using Homebrew dav1d: ${PC_dav1d_VERSION}")
+
+    IF(NOT TARGET dav1d::dav1d)
+      ADD_LIBRARY(dav1d::dav1d UNKNOWN IMPORTED GLOBAL)
+      FIND_LIBRARY(
+        dav1d_LIBRARY
+        NAMES dav1d
+        HINTS ${PC_dav1d_LIBDIR}
+      )
+      SET_PROPERTY(
+        TARGET dav1d::dav1d
+        PROPERTY IMPORTED_LOCATION "${dav1d_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        dav1d::dav1d
+        INTERFACE "${PC_dav1d_INCLUDE_DIRS}"
+      )
+    ENDIF()
+
+    LIST(APPEND RV_DEPS_LIST dav1d::dav1d)
+    GET_TARGET_PROPERTY(_dav1d_loc dav1d::dav1d LOCATION)
+    GET_FILENAME_COMPONENT(_dav1d_lib_dir "${_dav1d_loc}" DIRECTORY)
+    SET(RV_DEPS_DAVID_LIB_DIR
+        "${_dav1d_lib_dir}"
+        CACHE INTERNAL ""
+    )
+
+    # FFmpeg customization adding dav1d codec support to FFmpeg
+    SET_PROPERTY(
+      GLOBAL APPEND
+      PROPERTY "RV_FFMPEG_EXTRA_C_OPTIONS" "--extra-cflags=-I${PC_dav1d_INCLUDE_DIRS}"
+    )
+    IF(RV_TARGET_WINDOWS)
+      SET_PROPERTY(
+        GLOBAL APPEND
+        PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-LIBPATH:${_dav1d_lib_dir}"
+      )
+    ELSE()
+      SET_PROPERTY(
+        GLOBAL APPEND
+        PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-L${_dav1d_lib_dir}"
+      )
+    ENDIF()
+    SET_PROPERTY(
+      GLOBAL APPEND
+      PROPERTY "RV_FFMPEG_EXTERNAL_LIBS" "--enable-libdav1d"
+    )
+
+    RETURN()
+  ENDIF()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_DAV1D" "${RV_DEPS_DAV1D_VERSION}" "ninja" "meson")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

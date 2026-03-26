@@ -6,6 +6,32 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "${RV_DEPS_GC_VERSION}" "" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(PkgConfig)
+  PKG_CHECK_MODULES(PC_GC bdw-gc)
+  IF(PC_GC_FOUND)
+    MESSAGE(STATUS "Using Homebrew GC")
+    IF(NOT TARGET BDWGC::Gc)
+      ADD_LIBRARY(BDWGC::Gc UNKNOWN IMPORTED GLOBAL)
+      FIND_LIBRARY(
+        GC_LIBRARY
+        NAMES gc
+        HINTS ${PC_GC_LIBDIR}
+      )
+      SET_PROPERTY(
+        TARGET BDWGC::Gc
+        PROPERTY IMPORTED_LOCATION "${GC_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        BDWGC::Gc
+        INTERFACE "${PC_GC_INCLUDE_DIRS}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST BDWGC::Gc)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.zip"
 )

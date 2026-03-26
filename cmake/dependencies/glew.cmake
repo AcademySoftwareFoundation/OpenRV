@@ -6,6 +6,33 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GLEW" "${RV_DEPS_GLEW_VERSION}" "make" "")
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(GLEW)
+  IF(GLEW_FOUND)
+    MESSAGE(STATUS "Using Homebrew GLEW: ${GLEW_VERSION}")
+    IF(NOT TARGET GLEW::GLEW)
+      ADD_LIBRARY(GLEW::GLEW UNKNOWN IMPORTED GLOBAL)
+      IF(GLEW_SHARED_LIBRARY)
+        SET_PROPERTY(
+          TARGET GLEW::GLEW
+          PROPERTY IMPORTED_LOCATION "${GLEW_SHARED_LIBRARY}"
+        )
+      ELSE()
+        SET_PROPERTY(
+          TARGET GLEW::GLEW
+          PROPERTY IMPORTED_LOCATION "${GLEW_LIBRARIES}"
+        )
+      ENDIF()
+      TARGET_INCLUDE_DIRECTORIES(
+        GLEW::GLEW
+        INTERFACE "${GLEW_INCLUDE_DIRS}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST GLEW::GLEW)
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/nigels-com/glew/archive/refs/tags/glew-${_version}.tar.gz"
 )

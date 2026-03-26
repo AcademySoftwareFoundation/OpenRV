@@ -16,6 +16,45 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "${RV_DEPS_WEBP_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PACKAGE(WebP CONFIG)
+  IF(WebP_FOUND)
+    MESSAGE(STATUS "Using Homebrew WebP")
+    IF(TARGET WebP::webp)
+      IF(NOT TARGET Webp::Webp)
+        ADD_LIBRARY(Webp::Webp INTERFACE IMPORTED GLOBAL)
+        TARGET_LINK_LIBRARIES(
+          Webp::Webp
+          INTERFACE WebP::webp
+        )
+      ENDIF()
+    ELSE()
+      FIND_LIBRARY(
+        WEBP_LIBRARY
+        NAMES webp
+      )
+      IF(WEBP_LIBRARY)
+        ADD_LIBRARY(Webp::Webp UNKNOWN IMPORTED GLOBAL)
+        SET_PROPERTY(
+          TARGET Webp::Webp
+          PROPERTY IMPORTED_LOCATION "${WEBP_LIBRARY}"
+        )
+        TARGET_INCLUDE_DIRECTORIES(
+          Webp::Webp
+          INTERFACE "${WebP_INCLUDE_DIRS}"
+        )
+      ENDIF()
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST Webp::Webp)
+    GET_FILENAME_COMPONENT(_webp_root "${WebP_DIR}/../../.." ABSOLUTE)
+    SET(RV_DEPS_WEBP_ROOT_DIR
+        "${_webp_root}"
+        CACHE INTERNAL "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/webmproject/libwebp/archive/refs/tags/v${_version}.tar.gz"
 )

@@ -21,6 +21,42 @@ IF(RV_TARGET_LINUX)
 ENDIF()
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
+IF(RV_USE_BREW_DEPS)
+  FIND_PATH(
+    OPENJPEG_INCLUDE_DIR
+    NAMES openjpeg.h
+    PATH_SUFFIXES openjpeg-2.5 openjpeg-2.4 openjpeg-2.3
+  )
+  FIND_LIBRARY(
+    OPENJPEG_LIBRARY
+    NAMES openjp2
+  )
+
+  IF(OPENJPEG_INCLUDE_DIR
+     AND OPENJPEG_LIBRARY
+  )
+    MESSAGE(STATUS "Using Homebrew OpenJPEG")
+    IF(NOT TARGET OpenJpeg::OpenJpeg)
+      ADD_LIBRARY(OpenJpeg::OpenJpeg UNKNOWN IMPORTED GLOBAL)
+      SET_PROPERTY(
+        TARGET OpenJpeg::OpenJpeg
+        PROPERTY IMPORTED_LOCATION "${OPENJPEG_LIBRARY}"
+      )
+      TARGET_INCLUDE_DIRECTORIES(
+        OpenJpeg::OpenJpeg
+        INTERFACE "${OPENJPEG_INCLUDE_DIR}"
+      )
+    ENDIF()
+    LIST(APPEND RV_DEPS_LIST OpenJpeg::OpenJpeg)
+    GET_FILENAME_COMPONENT(_openjpeg_root "${OPENJPEG_INCLUDE_DIR}/.." ABSOLUTE)
+    SET(RV_DEPS_OPENJPEG_ROOT_DIR
+        "${_openjpeg_root}"
+        CACHE INTERNAL "" FORCE
+    )
+    RETURN()
+  ENDIF()
+ENDIF()
+
 SET(_download_url
     "https://github.com/uclouvain/openjpeg/archive/refs/tags/v${_version}.tar.gz"
 )
