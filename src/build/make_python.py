@@ -350,7 +350,16 @@ def build() -> None:
 
         python_env = sys.executable
 
-        subprocess_env = {**os.environ, "PYTHON": python_env, "PATH": path_env}
+        subprocess_env = {
+            **os.environ,
+            "PYTHON": python_env,
+            "PATH": path_env,
+            # Prevent global vcpkg MSBuild integration (vcpkg integrate install)
+            # from injecting vcpkg include/lib paths into Python's PCBuild.
+            # Without this, _ctypes.pyd may link against vcpkg's libffi instead
+            # of Python's own, causing ABI mismatches at install time.
+            "VcpkgEnabled": "false",
+        }
         if OPENSSL_OUTPUT_DIR:
             subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
 
