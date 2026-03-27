@@ -157,10 +157,12 @@ IF(RV_DEPS_CMAKE_PREFIX_PATH)
   STRING(REPLACE "\\" "/" _ocio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
   STRING(APPEND _ocio_cache_content "set(CMAKE_PREFIX_PATH \"${_ocio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
-IF(RV_DEPS_IGNORE_PREFIXES)
-  STRING(REPLACE "\\" "/" _ocio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
-  STRING(APPEND _ocio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_ocio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
-ENDIF()
+# TODO: Re-evaluate if needed. Disabled because CMAKE_IGNORE_PREFIX_PATH blocks transitive deps (e.g. libdeflate for OpenEXR).
+# Explicit -D flags should be sufficient to route OCIO to the correct deps.
+# IF(RV_DEPS_IGNORE_PREFIXES)
+#   STRING(REPLACE "\\" "/" _ocio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
+#   STRING(APPEND _ocio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_ocio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
+# ENDIF()
 FILE(MAKE_DIRECTORY "${_build_dir}")
 FILE(
   WRITE "${_ocio_initial_cache}"

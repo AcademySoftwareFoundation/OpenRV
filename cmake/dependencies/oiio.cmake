@@ -66,10 +66,12 @@ IF(RV_DEPS_CMAKE_PREFIX_PATH)
   STRING(REPLACE "\\" "/" _oiio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
   STRING(APPEND _oiio_cache_content "set(CMAKE_PREFIX_PATH \"${_oiio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
-IF(RV_DEPS_IGNORE_PREFIXES)
-  STRING(REPLACE "\\" "/" _oiio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
-  STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
-ENDIF()
+# TODO: Re-evaluate if needed. Disabled because CMAKE_IGNORE_PREFIX_PATH blocks transitive deps (e.g. libdeflate for OpenEXR).
+# Explicit -D flags and -DUSE_*=0 should be sufficient to route OIIO to the correct deps.
+# IF(RV_DEPS_IGNORE_PREFIXES)
+#   STRING(REPLACE "\\" "/" _oiio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
+#   STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
+# ENDIF()
 FILE(MAKE_DIRECTORY "${_build_dir}")
 FILE(
   WRITE "${_oiio_initial_cache}"
@@ -79,7 +81,7 @@ LIST(APPEND _configure_options "-C" "${_oiio_initial_cache}")
 
 # Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution. Use RV_DEPS_*_CMAKE_DIR which accounts for lib
 # vs lib64 (RHEL) rather than hardcoding lib/.
-LIST(APPEND _configure_options "-DBoost_DIR=${RV_DEPS_BOOST_ROOT_DIR}/lib/cmake/Boost-${RV_DEPS_BOOST_VERSION}")
+LIST(APPEND _configure_options "-DBoost_ROOT=${RV_DEPS_BOOST_ROOT_DIR}")
 LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
 
