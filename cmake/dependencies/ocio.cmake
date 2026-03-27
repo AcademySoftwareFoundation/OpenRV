@@ -144,13 +144,29 @@ IF(NOT RV_TARGET_WINDOWS)
 ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
-# Propagate CMAKE_PREFIX_PATH and CMAKE_IGNORE_PREFIX_PATH so the sub-build can find transitive dependencies and avoids contaminating prefixes.
-IF(CMAKE_PREFIX_PATH)
-  LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+# Write an initial-cache script so CMAKE_PREFIX_PATH (a semicolon-separated list) survives ExternalProject's double expansion of CONFIGURE_COMMAND args. Uses
+# RV_DEPS_CMAKE_PREFIX_PATH (snapshot before Qt6 additions). Backslashes converted to forward slashes to prevent escape issues in the generated CMake script.
+# Written once here and referenced by both platform branches (the Windows block resets _configure_options but reuses the same cache file).
+SET(_ocio_initial_cache
+    "${_build_dir}/_rv_initial_cache.cmake"
+)
+SET(_ocio_cache_content
+    ""
+)
+IF(RV_DEPS_CMAKE_PREFIX_PATH)
+  STRING(REPLACE "\\" "/" _ocio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
+  STRING(APPEND _ocio_cache_content "set(CMAKE_PREFIX_PATH \"${_ocio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
 IF(RV_DEPS_IGNORE_PREFIXES)
-  LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
+  STRING(REPLACE "\\" "/" _ocio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
+  STRING(APPEND _ocio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_ocio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
+FILE(MAKE_DIRECTORY "${_build_dir}")
+FILE(
+  WRITE "${_ocio_initial_cache}"
+  "${_ocio_cache_content}"
+)
+LIST(APPEND _configure_options "-C" "${_ocio_initial_cache}")
 
 # Use explicit Imath_DIR for precise config resolution. Works for both built-from-source and found (e.g. Homebrew) packages. Use RV_DEPS_IMATH_CMAKE_DIR which
 # accounts for lib vs lib64 (RHEL) rather than hardcoding lib/.
@@ -243,13 +259,7 @@ ELSE() # Windows
     "-S ${_source_dir}"
     "-B ${_build_dir}"
   )
-  IF(CMAKE_PREFIX_PATH)
-    LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
-  ENDIF()
-  IF(RV_DEPS_IGNORE_PREFIXES)
-    LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
-  ENDIF()
-
+  LIST(APPEND _configure_options "-C" "${_ocio_initial_cache}")
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     # Use debug Python executable.
     LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe")
@@ -261,9 +271,6 @@ ELSE() # Windows
        # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
        # isn't compatible with OCIO: tons of STD C++ missing symbols errors.
   )
-
-  MESSAGE(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
-  MESSAGE(STATUS "_configure_options: ${_configure_options}")
 
   EXTERNALPROJECT_ADD(
     ${_target}

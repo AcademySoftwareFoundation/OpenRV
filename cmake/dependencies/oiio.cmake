@@ -53,14 +53,29 @@ LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
-# Propagate CMAKE_PREFIX_PATH and CMAKE_IGNORE_PREFIX_PATH so the sub-build can find transitive dependencies (e.g. libdeflate for OpenEXR) and avoids
-# contaminating prefixes (e.g. msys64/mingw64).
-IF(CMAKE_PREFIX_PATH)
-  LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+# Write an initial-cache script so CMAKE_PREFIX_PATH (a semicolon-separated list) survives ExternalProject's double expansion of CONFIGURE_COMMAND args. Uses
+# RV_DEPS_CMAKE_PREFIX_PATH (snapshot before Qt6 additions) to avoid passing ~150 Qt component dirs. Backslashes are converted to forward slashes to prevent
+# escape issues in the generated CMake script.
+SET(_oiio_initial_cache
+    "${_build_dir}/_rv_initial_cache.cmake"
+)
+SET(_oiio_cache_content
+    ""
+)
+IF(RV_DEPS_CMAKE_PREFIX_PATH)
+  STRING(REPLACE "\\" "/" _oiio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
+  STRING(APPEND _oiio_cache_content "set(CMAKE_PREFIX_PATH \"${_oiio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
 IF(RV_DEPS_IGNORE_PREFIXES)
-  LIST(APPEND _configure_options "-DCMAKE_IGNORE_PREFIX_PATH=${RV_DEPS_IGNORE_PREFIXES}")
+  STRING(REPLACE "\\" "/" _oiio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
+  STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
+FILE(MAKE_DIRECTORY "${_build_dir}")
+FILE(
+  WRITE "${_oiio_initial_cache}"
+  "${_oiio_cache_content}"
+)
+LIST(APPEND _configure_options "-C" "${_oiio_initial_cache}")
 
 # Use explicit *_DIR variables pointing directly to config file directories for more precise package resolution. Use RV_DEPS_*_CMAKE_DIR which accounts for lib
 # vs lib64 (RHEL) rather than hardcoding lib/.
@@ -69,23 +84,37 @@ LIST(APPEND _configure_options "-DOpenEXR_ROOT=${RV_DEPS_OPENEXR_ROOT_DIR}")
 LIST(APPEND _configure_options "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}")
 
 # Use RV_RESOLVE_IMPORTED_LINKER_FILE to get the file the linker needs: IMPORTED_IMPLIB (.lib) on Windows, IMPORTED_LOCATION elsewhere. This avoids passing DLLs
-# to -D<Pkg>_LIBRARY= which causes LNK1107 on MSVC. Also handles config-specific variants (e.g. IMPORTED_LOCATION_RELEASE).
+# to -D<Pkg>_LIBRARY= which causes LNK1107 on MSVC. Also handles config-specific variants (e.g. IMPORTED_LOCATION_RELEASE). PNG::PNG may be an INTERFACE wrapper
+# (vcpkg) where INTERFACE_INCLUDE_DIRECTORIES is on the underlying target (PNG::png_shared). Resolve through the chain for both library and include dirs. Guard
+# all -D flags: passing -NOTFOUND values poisons OIIO's own FindPNG search. CMAKE_PREFIX_PATH (initial-cache) provides fallback discovery.
 RV_RESOLVE_IMPORTED_LINKER_FILE(PNG::PNG _png_library)
-GET_TARGET_PROPERTY(_png_include_dir PNG::PNG INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
-# INTERFACE_INCLUDE_DIRECTORIES may be a list; take only the first element for the cmake -D flag.
-LIST(GET _png_include_dir 0 _png_include_dir_first)
-LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir_first}")
+RV_RESOLVE_IMPORTED_INCLUDE_DIR(PNG::PNG _png_include_dir)
+IF(_png_library)
+  LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
+ENDIF()
+IF(_png_include_dir)
+  # INTERFACE_INCLUDE_DIRECTORIES may be a list; take only the first element for the cmake -D flag.
+  LIST(GET _png_include_dir 0 _png_include_dir_first)
+  LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir_first}")
+ENDIF()
 
 RV_RESOLVE_IMPORTED_LINKER_FILE(libjpeg-turbo::jpeg _jpeg_library)
-GET_TARGET_PROPERTY(_jpeg_include_dir libjpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
-LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
+RV_RESOLVE_IMPORTED_INCLUDE_DIR(libjpeg-turbo::jpeg _jpeg_include_dir)
+IF(_jpeg_library)
+  LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
+ENDIF()
+IF(_jpeg_include_dir)
+  LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
+ENDIF()
 
 RV_RESOLVE_IMPORTED_LINKER_FILE(libjpeg-turbo::turbojpeg _jpegturbo_library)
-GET_TARGET_PROPERTY(_jpegturbo_include_dir libjpeg-turbo::turbojpeg INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
-LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
+RV_RESOLVE_IMPORTED_INCLUDE_DIR(libjpeg-turbo::turbojpeg _jpegturbo_include_dir)
+IF(_jpegturbo_library)
+  LIST(APPEND _configure_options "-DJPEGTURBO_LIBRARY=${_jpegturbo_library}")
+ENDIF()
+IF(_jpegturbo_include_dir)
+  LIST(APPEND _configure_options "-DJPEGTURBO_INCLUDE_DIR=${_jpegturbo_include_dir}")
+ENDIF()
 
 LIST(APPEND _configure_options "-DOpenJPEG_ROOT=${RV_DEPS_OPENJPEG_ROOT_DIR}")
 LIST(APPEND _configure_options "-DOPENJPEG_VERSION=${RV_DEPS_OPENJPEG_VERSION}")
@@ -96,12 +125,16 @@ IF(NOT _openjpeg_library)
   RV_RESOLVE_IMPORTED_LINKER_FILE(OpenJpeg::OpenJpeg _openjpeg_library)
 ENDIF()
 IF(TARGET openjp2)
-  GET_TARGET_PROPERTY(_openjpeg_include_dir openjp2 INTERFACE_INCLUDE_DIRECTORIES)
+  RV_RESOLVE_IMPORTED_INCLUDE_DIR(openjp2 _openjpeg_include_dir)
 ELSE()
-  GET_TARGET_PROPERTY(_openjpeg_include_dir OpenJpeg::OpenJpeg INTERFACE_INCLUDE_DIRECTORIES)
+  RV_RESOLVE_IMPORTED_INCLUDE_DIR(OpenJpeg::OpenJpeg _openjpeg_include_dir)
 ENDIF()
-LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
-LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
+IF(_openjpeg_library)
+  LIST(APPEND _configure_options "-DOPENJPEG_OPENJP2_LIBRARY=${_openjpeg_library}")
+ENDIF()
+IF(_openjpeg_include_dir)
+  LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}")
+ENDIF()
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
@@ -123,15 +156,35 @@ ELSE()
   SET(_depends_freetype
       freetype
   )
-  GET_TARGET_PROPERTY(_freetype_library freetype IMPORTED_LOCATION)
-  GET_TARGET_PROPERTY(_freetype_include_dir freetype INTERFACE_INCLUDE_DIRECTORIES)
-  LIST(APPEND _configure_options "-DFREETYPE_LIBRARY=${_freetype_library}")
-  LIST(APPEND _configure_options "-DFREETYPE_INCLUDE_DIR=${_freetype_include_dir}")
+  RV_RESOLVE_IMPORTED_LINKER_FILE(freetype _freetype_library)
+  RV_RESOLVE_IMPORTED_INCLUDE_DIR(freetype _freetype_include_dir)
+  IF(_freetype_library)
+    LIST(APPEND _configure_options "-DFREETYPE_LIBRARY=${_freetype_library}")
+  ENDIF()
+  IF(_freetype_include_dir)
+    LIST(APPEND _configure_options "-DFREETYPE_INCLUDE_DIR=${_freetype_include_dir}")
+  ENDIF()
   MESSAGE(DEBUG "OIIO: _freetype_library='${_freetype_library}'")
   MESSAGE(DEBUG "OIIO: _freetype_include_dir='${_freetype_include_dir}'")
 ENDIF()
 
+# LibRaw_ROOT alone is insufficient when vcpkg puts the import library in lib/manual-link/. OIIO's FindLibRaw.cmake uses LIBRAW_LIBDIR_HINT and
+# LIBRAW_INCLUDEDIR_HINT as find_library/find_path HINTS. Pass the directory containing the library file and the include parent directory.
 LIST(APPEND _configure_options "-DLibRaw_ROOT=${RV_DEPS_RAW_ROOT_DIR}")
+RV_RESOLVE_IMPORTED_LINKER_FILE(libraw::raw _raw_library)
+RV_RESOLVE_IMPORTED_INCLUDE_DIR(libraw::raw _raw_include_dir)
+IF(_raw_library)
+  GET_FILENAME_COMPONENT(_raw_lib_dir "${_raw_library}" DIRECTORY)
+  LIST(APPEND _configure_options "-DLIBRAW_LIBDIR_HINT=${_raw_lib_dir}")
+ENDIF()
+IF(_raw_include_dir)
+  # OIIO's find_path uses PATH_SUFFIXES libraw, so pass the parent of the libraw/ include dir.
+  STRING(
+    REGEX
+    REPLACE "/libraw$" "" _raw_include_dir_parent "${_raw_include_dir}"
+  )
+  LIST(APPEND _configure_options "-DLIBRAW_INCLUDEDIR_HINT=${_raw_include_dir_parent}")
+ENDIF()
 
 IF(NOT RV_TARGET_LINUX)
   LIST(APPEND _configure_options "-DWebP_ROOT=${RV_DEPS_WEBP_ROOT_DIR}")
