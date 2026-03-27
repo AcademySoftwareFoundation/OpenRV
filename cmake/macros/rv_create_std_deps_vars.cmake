@@ -253,6 +253,46 @@ MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
 ENDMACRO()
 
 #
+# RV_RESOLVE_IMPORTED_INCLUDE_DIR — Resolve INTERFACE_INCLUDE_DIRECTORIES, following INTERFACE wrapper chains
+#
+# Some package managers (vcpkg) create INTERFACE wrapper targets (e.g. PNG::PNG) that only have INTERFACE_LINK_LIBRARIES pointing to the real imported target
+# (e.g. PNG::png_shared). INTERFACE_INCLUDE_DIRECTORIES lives on the real target, not the wrapper. This macro follows one level of INTERFACE_LINK_LIBRARIES to
+# resolve include dirs when the direct property is empty.
+#
+# Must be a MACRO so the output variable propagates to the caller's scope.
+#
+# Usage: RV_RESOLVE_IMPORTED_INCLUDE_DIR(<target> <output_variable>)
+#
+MACRO(RV_RESOLVE_IMPORTED_INCLUDE_DIR _rriid_target _rriid_out_var)
+  SET(${_rriid_out_var}
+      ""
+  )
+  IF(TARGET ${_rriid_target})
+    GET_TARGET_PROPERTY(${_rriid_out_var} ${_rriid_target} INTERFACE_INCLUDE_DIRECTORIES)
+    IF(NOT ${_rriid_out_var})
+      # Follow INTERFACE_LINK_LIBRARIES to find the real target's include dirs.
+      GET_TARGET_PROPERTY(_rriid_type ${_rriid_target} TYPE)
+      IF(_rriid_type STREQUAL "INTERFACE_LIBRARY")
+        GET_TARGET_PROPERTY(_rriid_link_libs ${_rriid_target} INTERFACE_LINK_LIBRARIES)
+        IF(_rriid_link_libs)
+          FOREACH(
+            _rriid_ll
+            ${_rriid_link_libs}
+          )
+            IF(TARGET ${_rriid_ll})
+              GET_TARGET_PROPERTY(${_rriid_out_var} ${_rriid_ll} INTERFACE_INCLUDE_DIRECTORIES)
+              IF(${_rriid_out_var})
+                BREAK()
+              ENDIF()
+            ENDIF()
+          ENDFOREACH()
+        ENDIF()
+      ENDIF()
+    ENDIF()
+  ENDIF()
+ENDMACRO()
+
+#
 # RV_RESOLVE_IMPORTED_LINKER_FILE — Resolve the file a linker needs for an imported target
 #
 # On Windows: returns IMPORTED_IMPLIB (.lib import library), falling back to IMPORTED_LOCATION. On other platforms: returns IMPORTED_LOCATION (same as

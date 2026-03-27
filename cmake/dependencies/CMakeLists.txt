@@ -15,6 +15,13 @@ SET(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL
     TRUE
 )
 
+# Snapshot the user's CMAKE_PREFIX_PATH before Qt adds ~150 component cmake dirs. ExternalProject sub-builds (OIIO, OCIO, OpenEXR) use this clean list to find
+# transitive dependencies without Qt noise.
+SET(RV_DEPS_CMAKE_PREFIX_PATH
+    "${CMAKE_PREFIX_PATH}"
+    CACHE INTERNAL "User's CMAKE_PREFIX_PATH before Qt additions"
+)
+
 INCLUDE(ProcessorCount)
 PROCESSORCOUNT(_cpu_count)
 
