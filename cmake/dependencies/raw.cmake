@@ -75,39 +75,48 @@ ELSE()
   # <libraw/libraw.h> which needs the parent. Override _include_dir to the install root's include dir.
   GET_FILENAME_COMPONENT(_include_dir "${_install_dir}/include" ABSOLUTE)
 
-  # pkg-config found path: create the imported target. pkg-config creates PkgConfig::libraw, not libraw::raw. Resolve the actual library file from pkg-config
-  # (don't use _libname which has the hardcoded build-from-source version).
-  SET(_raw_found_lib
-      ""
-  )
-  IF(${_target}_PC_LINK_LIBRARIES)
-    LIST(GET ${_target}_PC_LINK_LIBRARIES 0 _raw_found_lib)
-  ENDIF()
-  IF(NOT _raw_found_lib
-     OR NOT EXISTS "${_raw_found_lib}"
-  )
-    # Fallback: find the library in _lib_dir
-    FILE(GLOB _raw_found_libs "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}raw${CMAKE_SHARED_LIBRARY_SUFFIX}"
-         "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}raw.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
-    )
-    IF(_raw_found_libs)
-      LIST(GET _raw_found_libs 0 _raw_found_lib)
-    ENDIF()
-  ENDIF()
-
   IF(NOT TARGET libraw::raw)
-    RV_ADD_IMPORTED_LIBRARY(
-      NAME
-      libraw::raw
-      TYPE
-      SHARED
-      LOCATION
-      ${_raw_found_lib}
-      INCLUDE_DIRS
-      ${_include_dir}
-      DEPENDS
-      ${_target}
-    )
+    IF(TARGET libraw::libraw)
+      # Conan CMakeDeps creates libraw::libraw (namespaced). Create an alias so downstream code using the upstream/pkg-config name works.
+      ADD_LIBRARY(libraw::raw INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        libraw::raw
+        INTERFACE libraw::libraw
+      )
+    ELSE()
+      # pkg-config found path: create the imported target. pkg-config creates PkgConfig::libraw, not libraw::raw. Resolve the actual library file from
+      # pkg-config (don't use _libname which has the hardcoded build-from-source version).
+      SET(_raw_found_lib
+          ""
+      )
+      IF(${_target}_PC_LINK_LIBRARIES)
+        LIST(GET ${_target}_PC_LINK_LIBRARIES 0 _raw_found_lib)
+      ENDIF()
+      IF(NOT _raw_found_lib
+         OR NOT EXISTS "${_raw_found_lib}"
+      )
+        # Fallback: find the library in _lib_dir
+        FILE(GLOB _raw_found_libs "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}raw${CMAKE_SHARED_LIBRARY_SUFFIX}"
+             "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}raw.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+        )
+        IF(_raw_found_libs)
+          LIST(GET _raw_found_libs 0 _raw_found_lib)
+        ENDIF()
+      ENDIF()
+
+      RV_ADD_IMPORTED_LIBRARY(
+        NAME
+        libraw::raw
+        TYPE
+        SHARED
+        LOCATION
+        ${_raw_found_lib}
+        INCLUDE_DIRS
+        ${_include_dir}
+        DEPENDS
+        ${_target}
+      )
+    ENDIF()
   ENDIF()
 
   RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS libraw::raw)
