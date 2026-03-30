@@ -5,21 +5,21 @@ repos:
       - id: cmake-format
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.13.2
+    rev: v0.15.8
     hooks:
       - id: ruff-check
         args: [ --fix ]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: 'v19.1.4'
+    rev: 'v22.1.2'
     hooks:
       - id: clang-format
         types_or: [c++, c]
         exclude: '\.(m|mm)$'
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
         args: [--fix]
