@@ -89,53 +89,62 @@ IF(NOT ${_target}_FOUND)
     )
   ENDIF()
 ELSE()
-  # CONFIG creates `openjph` target; pkg-config does not. Create it if missing (e.g. found via pkg-config).
+  # CONFIG creates `openjph` (upstream) or `openjph::openjph` (Conan). Create the upstream name if missing.
   IF(NOT TARGET openjph)
-    # Resolve actual library. On Windows, DLLs are in _bin_dir and import libs in _lib_dir. On Unix, shared libs are in _lib_dir.
-    SET(_openjph_found_lib
-        ""
-    )
-    SET(_openjph_found_implib
-        ""
-    )
-    IF(RV_TARGET_WINDOWS)
-      FILE(GLOB _openjph_found_dlls "${_bin_dir}/openjph*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-      IF(_openjph_found_dlls)
-        LIST(GET _openjph_found_dlls 0 _openjph_found_lib)
-      ENDIF()
-      FILE(GLOB _openjph_found_implibs "${_lib_dir}/openjph*.lib")
-      IF(_openjph_found_implibs)
-        LIST(GET _openjph_found_implibs 0 _openjph_found_implib)
-      ENDIF()
+    IF(TARGET openjph::openjph)
+      # Conan CMakeDeps created the namespaced target. Create an INTERFACE alias so downstream code can use the upstream name.
+      ADD_LIBRARY(openjph INTERFACE IMPORTED GLOBAL)
+      TARGET_LINK_LIBRARIES(
+        openjph
+        INTERFACE openjph::openjph
+      )
     ELSE()
-      FILE(GLOB _openjph_found_libs "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
-           "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
-      )
-      IF(_openjph_found_libs)
-        LIST(GET _openjph_found_libs 0 _openjph_found_lib)
-      ENDIF()
-    ENDIF()
-    IF(NOT _openjph_found_lib)
+      # pkg-config path: no target from find_package. Create from resolved paths.
       SET(_openjph_found_lib
-          "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
+          ""
       )
+      SET(_openjph_found_implib
+          ""
+      )
+      IF(RV_TARGET_WINDOWS)
+        FILE(GLOB _openjph_found_dlls "${_bin_dir}/openjph*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        IF(_openjph_found_dlls)
+          LIST(GET _openjph_found_dlls 0 _openjph_found_lib)
+        ENDIF()
+        FILE(GLOB _openjph_found_implibs "${_lib_dir}/openjph*.lib")
+        IF(_openjph_found_implibs)
+          LIST(GET _openjph_found_implibs 0 _openjph_found_implib)
+        ENDIF()
+      ELSE()
+        FILE(GLOB _openjph_found_libs "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
+             "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph.*${CMAKE_SHARED_LIBRARY_SUFFIX}*"
+        )
+        IF(_openjph_found_libs)
+          LIST(GET _openjph_found_libs 0 _openjph_found_lib)
+        ENDIF()
+      ENDIF()
+      IF(NOT _openjph_found_lib)
+        SET(_openjph_found_lib
+            "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}openjph${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        )
+      ENDIF()
+      RV_ADD_IMPORTED_LIBRARY(
+        NAME
+        openjph
+        TYPE
+        SHARED
+        LOCATION
+        ${_openjph_found_lib}
+        IMPLIB
+        ${_openjph_found_implib}
+        INCLUDE_DIRS
+        ${_include_dir}
+        DEPENDS
+        ${_target}
+      )
+      LIST(APPEND RV_DEPS_LIST openjph)
+      RV_RESOLVE_DARWIN_INSTALL_NAME(openjph)
     ENDIF()
-    RV_ADD_IMPORTED_LIBRARY(
-      NAME
-      openjph
-      TYPE
-      SHARED
-      LOCATION
-      ${_openjph_found_lib}
-      IMPLIB
-      ${_openjph_found_implib}
-      INCLUDE_DIRS
-      ${_include_dir}
-      DEPENDS
-      ${_target}
-    )
-    LIST(APPEND RV_DEPS_LIST openjph)
-    RV_RESOLVE_DARWIN_INSTALL_NAME(openjph)
   ENDIF()
 
   # Create `OpenJph::OpenJph` as an INTERFACE wrapper for backward compatibility.
