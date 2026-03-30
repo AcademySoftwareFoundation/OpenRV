@@ -217,18 +217,18 @@ MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
         )
       ENDIF()
     ELSE()
-      # For INTERFACE_LIBRARY targets (e.g. vcpkg wrappers), try resolving through INTERFACE_LINK_LIBRARIES to find the real library target.
+      # For INTERFACE_LIBRARY targets (e.g. vcpkg wrappers, Conan CMakeDeps), try resolving through INTERFACE_LINK_LIBRARIES to find the real library target.
+      # INTERFACE_LINK_LIBRARIES may contain plain target names or generator expressions ($<$<CONFIG:...>:target>).
       GET_TARGET_PROPERTY(_rril_type ${_rril_target} TYPE)
       IF(_rril_type STREQUAL "INTERFACE_LIBRARY")
         GET_TARGET_PROPERTY(_rril_link_libs ${_rril_target} INTERFACE_LINK_LIBRARIES)
         IF(_rril_link_libs)
+          RV_EXTRACT_LINK_TARGETS("${_rril_link_libs}" _rril_resolved_libs)
           FOREACH(
             _rril_link_lib
-            ${_rril_link_libs}
+            ${_rril_resolved_libs}
           )
-            IF(NOT ${_rril_out_var}
-               AND TARGET ${_rril_link_lib}
-            )
+            IF(NOT ${_rril_out_var})
               FOREACH(
                 _rril_prop
                 IMPORTED_LOCATION IMPORTED_LOCATION_${_rril_config_upper} IMPORTED_LOCATION_RELEASE IMPORTED_LOCATION_NOCONFIG
@@ -270,20 +270,19 @@ MACRO(RV_RESOLVE_IMPORTED_INCLUDE_DIR _rriid_target _rriid_out_var)
   IF(TARGET ${_rriid_target})
     GET_TARGET_PROPERTY(${_rriid_out_var} ${_rriid_target} INTERFACE_INCLUDE_DIRECTORIES)
     IF(NOT ${_rriid_out_var})
-      # Follow INTERFACE_LINK_LIBRARIES to find the real target's include dirs.
+      # Follow INTERFACE_LINK_LIBRARIES to find the real target's include dirs. Handles generator expressions from Conan CMakeDeps and similar.
       GET_TARGET_PROPERTY(_rriid_type ${_rriid_target} TYPE)
       IF(_rriid_type STREQUAL "INTERFACE_LIBRARY")
         GET_TARGET_PROPERTY(_rriid_link_libs ${_rriid_target} INTERFACE_LINK_LIBRARIES)
         IF(_rriid_link_libs)
+          RV_EXTRACT_LINK_TARGETS("${_rriid_link_libs}" _rriid_resolved_libs)
           FOREACH(
             _rriid_ll
-            ${_rriid_link_libs}
+            ${_rriid_resolved_libs}
           )
-            IF(TARGET ${_rriid_ll})
-              GET_TARGET_PROPERTY(${_rriid_out_var} ${_rriid_ll} INTERFACE_INCLUDE_DIRECTORIES)
-              IF(${_rriid_out_var})
-                BREAK()
-              ENDIF()
+            GET_TARGET_PROPERTY(${_rriid_out_var} ${_rriid_ll} INTERFACE_INCLUDE_DIRECTORIES)
+            IF(${_rriid_out_var})
+              BREAK()
             ENDIF()
           ENDFOREACH()
         ENDIF()
@@ -314,7 +313,8 @@ MACRO(RV_RESOLVE_IMPORTED_LINKER_FILE _rrilf_target _rrilf_out_var)
   IF(RV_TARGET_WINDOWS
      AND TARGET ${_rrilf_target}
   )
-    # Resolve through INTERFACE_LIBRARY wrappers (e.g. vcpkg targets) to find the real library target.
+    # Resolve through INTERFACE_LIBRARY wrappers (e.g. vcpkg, Conan CMakeDeps) to find the real library target. Handles generator expressions in
+    # INTERFACE_LINK_LIBRARIES.
     SET(_rrilf_real_tgt
         ${_rrilf_target}
     )
@@ -322,18 +322,17 @@ MACRO(RV_RESOLVE_IMPORTED_LINKER_FILE _rrilf_target _rrilf_out_var)
     IF(_rrilf_type STREQUAL "INTERFACE_LIBRARY")
       GET_TARGET_PROPERTY(_rrilf_link_libs ${_rrilf_target} INTERFACE_LINK_LIBRARIES)
       IF(_rrilf_link_libs)
+        RV_EXTRACT_LINK_TARGETS("${_rrilf_link_libs}" _rrilf_resolved_libs)
         FOREACH(
           _rrilf_ll
-          ${_rrilf_link_libs}
+          ${_rrilf_resolved_libs}
         )
-          IF(TARGET ${_rrilf_ll})
-            GET_TARGET_PROPERTY(_rrilf_ll_type ${_rrilf_ll} TYPE)
-            IF(NOT _rrilf_ll_type STREQUAL "INTERFACE_LIBRARY")
-              SET(_rrilf_real_tgt
-                  ${_rrilf_ll}
-              )
-              BREAK()
-            ENDIF()
+          GET_TARGET_PROPERTY(_rrilf_ll_type ${_rrilf_ll} TYPE)
+          IF(NOT _rrilf_ll_type STREQUAL "INTERFACE_LIBRARY")
+            SET(_rrilf_real_tgt
+                ${_rrilf_ll}
+            )
+            BREAK()
           ENDIF()
         ENDFOREACH()
       ENDIF()
@@ -409,6 +408,122 @@ MACRO(RV_MAKE_TARGETS_GLOBAL)
 ENDMACRO()
 
 #
+# RV_EXTRACT_LINK_TARGETS — Extract real target names from INTERFACE_LINK_LIBRARIES
+#
+# INTERFACE_LINK_LIBRARIES may contain plain target names ("Foo::Foo") or generator-expression-wrapped names ("$<$<CONFIG:Release>:CONAN_LIB::foo_RELEASE>").
+# This function extracts all items that resolve to existing CMake targets, regardless of wrapping. Non-target items (library paths, flags, unrecognised genexes)
+# are silently skipped.
+#
+# Generic: handles Conan CMakeDeps, vcpkg, and standard CMake export patterns.
+#
+# NOTE: This is a FUNCTION (has its own scope). When called from a MACRO, PARENT_SCOPE sets the output variable in the macro's caller's scope, which is the same
+# scope where the macro's variables live. This is correct but subtle — do not change callers from MACRO to FUNCTION without verifying variable propagation.
+#
+# Usage: RV_EXTRACT_LINK_TARGETS(<input_list> <output_variable>)
+#
+FUNCTION(RV_EXTRACT_LINK_TARGETS _relt_input _relt_out_var)
+  SET(_relt_result)
+  FOREACH(
+    _relt_item
+    ${_relt_input}
+  )
+    IF(TARGET ${_relt_item})
+      LIST(APPEND _relt_result ${_relt_item})
+    ELSE()
+      # Parse $<$<CONFIG:...>:target_name> patterns (Conan CMakeDeps, standard CMake exports)
+      STRING(REGEX MATCHALL "\\$<\\$<CONFIG:[^>]+>:([^>$][^>]*)>" _relt_matches "${_relt_item}")
+      FOREACH(
+        _relt_match
+        ${_relt_matches}
+      )
+        STRING(
+          REGEX
+          REPLACE "\\$<\\$<CONFIG:[^>]+>:([^>]+)>" "\\1" _relt_name "${_relt_match}"
+        )
+        IF(_relt_name
+           AND TARGET ${_relt_name}
+        )
+          LIST(APPEND _relt_result ${_relt_name})
+        ENDIF()
+      ENDFOREACH()
+      # Also handle $<TARGET_NAME:target> pattern
+      STRING(REGEX MATCHALL "\\$<TARGET_NAME:([^>]+)>" _relt_tn_matches "${_relt_item}")
+      FOREACH(
+        _relt_tn_match
+        ${_relt_tn_matches}
+      )
+        STRING(
+          REGEX
+          REPLACE "\\$<TARGET_NAME:([^>]+)>" "\\1" _relt_tn_name "${_relt_tn_match}"
+        )
+        IF(_relt_tn_name
+           AND TARGET ${_relt_tn_name}
+        )
+          LIST(APPEND _relt_result ${_relt_tn_name})
+        ENDIF()
+      ENDFOREACH()
+    ENDIF()
+  ENDFOREACH()
+  IF(_relt_result)
+    LIST(REMOVE_DUPLICATES _relt_result)
+  ENDIF()
+  SET(${_relt_out_var}
+      ${_relt_result}
+      PARENT_SCOPE
+  )
+ENDFUNCTION()
+
+#
+# RV_COLLECT_ALL_LIBRARY_TARGETS — Recursively collect all non-INTERFACE library targets from a dependency chain
+#
+# Traverses INTERFACE_LINK_LIBRARIES of each input target (handling generator expressions via RV_EXTRACT_LINK_TARGETS) and collects every IMPORTED
+# SHARED/STATIC/UNKNOWN/MODULE target. Visits each target at most once (cycle-safe). This captures all transitive library components that a package manager
+# (Conan, vcpkg) creates, even ones not explicitly listed in DEPS_LIST_TARGETS.
+#
+# Usage: RV_COLLECT_ALL_LIBRARY_TARGETS(<input_target_list> <output_variable>)
+#
+FUNCTION(RV_COLLECT_ALL_LIBRARY_TARGETS _rcalt_input _rcalt_out_var)
+  SET(_rcalt_result)
+  SET(_rcalt_visited)
+  SET(_rcalt_queue
+      ${_rcalt_input}
+  )
+
+  WHILE(_rcalt_queue)
+    LIST(POP_FRONT _rcalt_queue _rcalt_current)
+    IF("${_rcalt_current}" IN_LIST _rcalt_visited)
+      CONTINUE()
+    ENDIF()
+    LIST(APPEND _rcalt_visited "${_rcalt_current}")
+
+    IF(NOT TARGET ${_rcalt_current})
+      CONTINUE()
+    ENDIF()
+
+    GET_TARGET_PROPERTY(_rcalt_type ${_rcalt_current} TYPE)
+    IF(_rcalt_type STREQUAL "INTERFACE_LIBRARY")
+      # Traverse INTERFACE_LINK_LIBRARIES to find real targets
+      GET_TARGET_PROPERTY(_rcalt_libs ${_rcalt_current} INTERFACE_LINK_LIBRARIES)
+      IF(_rcalt_libs)
+        RV_EXTRACT_LINK_TARGETS("${_rcalt_libs}" _rcalt_extracted)
+        LIST(APPEND _rcalt_queue ${_rcalt_extracted})
+      ENDIF()
+    ELSEIF(_rcalt_type MATCHES "SHARED_LIBRARY|STATIC_LIBRARY|UNKNOWN_LIBRARY|MODULE_LIBRARY")
+      # Real library target — collect it
+      LIST(APPEND _rcalt_result ${_rcalt_current})
+    ENDIF()
+  ENDWHILE()
+
+  IF(_rcalt_result)
+    LIST(REMOVE_DUPLICATES _rcalt_result)
+  ENDIF()
+  SET(${_rcalt_out_var}
+      ${_rcalt_result}
+      PARENT_SCOPE
+  )
+ENDFUNCTION()
+
+#
 # RV_SET_FOUND_PACKAGE_DIRS
 
 # Set directory variables from a found package
@@ -422,6 +537,10 @@ ENDMACRO()
 # Must be a MACRO so the variable overrides propagate to the caller's scope.
 #
 MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
+  # Optional: DEPS_LIST_TARGETS <t1> <t2> ... — imported targets for root validation. When provided, the walk-up root is validated against actual
+  # IMPORTED_LOCATION paths.
+  CMAKE_PARSE_ARGUMENTS(_SFPD "" "" "DEPS_LIST_TARGETS" ${ARGN})
+
   # ${find_package_name}_DIR is set by find_package(CONFIG) to the directory containing the CMake config files, typically: <root>/lib/cmake/<Package>/   (3
   # levels up) <root>/share/cmake/<Package>/ (3 levels up)
   #
@@ -451,6 +570,47 @@ MACRO(RV_SET_FOUND_PACKAGE_DIRS rv_deps_target find_package_name)
       BREAK()
     ENDIF()
   ENDFOREACH()
+
+  # Validate the resolved root against actual target locations. Conan CMakeDeps puts config files in a flat generators/ folder; the walk-up may land on the
+  # build tree root (which falsely has include/ and lib/) instead of the actual package root.
+  IF(_SFPD_DEPS_LIST_TARGETS)
+    SET(_sfpd_validated
+        FALSE
+    )
+    FOREACH(
+      _sfpd_tgt
+      ${_SFPD_DEPS_LIST_TARGETS}
+    )
+      RV_RESOLVE_IMPORTED_LOCATION(${_sfpd_tgt} _sfpd_tgt_loc)
+      IF(_sfpd_tgt_loc)
+        # On macOS, resolve symlinks in IMPORTED_LOCATION before comparing against the walk-up root (which was already resolved via REALPATH). Homebrew's
+        # IMPORTED_LOCATION uses the symlinked path (/opt/homebrew/lib/libfoo.dylib) but the walk-up root is the Cellar path.
+        IF(APPLE)
+          GET_FILENAME_COMPONENT(_sfpd_tgt_loc "${_sfpd_tgt_loc}" REALPATH)
+        ENDIF()
+        STRING(FIND "${_sfpd_tgt_loc}" "${_sfpd_root}" _sfpd_find_idx)
+        IF(_sfpd_find_idx EQUAL 0)
+          SET(_sfpd_validated
+              TRUE
+          )
+          BREAK()
+        ELSE()
+          # Derive root from the actual library location
+          GET_FILENAME_COMPONENT(_sfpd_loc_dir "${_sfpd_tgt_loc}" DIRECTORY)
+          GET_FILENAME_COMPONENT(_sfpd_root "${_sfpd_loc_dir}/.." ABSOLUTE)
+          SET(_sfpd_validated
+              TRUE
+          )
+          MESSAGE(STATUS "  Walk-up root did not contain ${_sfpd_tgt_loc}; derived root from IMPORTED_LOCATION: ${_sfpd_root}")
+          BREAK()
+        ENDIF()
+      ENDIF()
+    ENDFOREACH()
+    IF(NOT _sfpd_validated)
+      MESSAGE(AUTHOR_WARNING "RV_SET_FOUND_PACKAGE_DIRS: Could not validate walk-up root ${_sfpd_root} against any target IMPORTED_LOCATION")
+    ENDIF()
+  ENDIF()
+
   SET(_install_dir
       "${_sfpd_root}"
   )

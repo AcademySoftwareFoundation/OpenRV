@@ -10,9 +10,9 @@
 # Checks RV_DEPS_PREFER_INSTALLED and per-dep RV_DEPS_<NAME>_FORCE_BUILD. Tries find_package(CONFIG) first, then falls back to pkg-config if PKG_CONFIG_NAME is
 # set. If found: sets up directory vars, adds to RV_DEPS_LIST. If not found or finding disabled: sets ${TARGET}_FOUND=FALSE (caller handles fallback).
 #
-# Imported targets from find_package(CONFIG) are automatically GLOBAL via CMAKE_FIND_PACKAGE_TARGETS_GLOBAL (set in cmake/dependencies/CMakeLists.txt). For
-# pkg-config, the caller is responsible for creating proper imported targets (with LOCATION) after this macro returns — INTERFACE targets won't work because
-# rv_stage.cmake expects LOCATION on all RV_DEPS_LIST entries.
+# Imported targets from find_package(CONFIG) are automatically GLOBAL via CMAKE_FIND_PACKAGE_TARGETS_GLOBAL (set in cmake/dependencies/CMakeLists.txt).
+# INTERFACE_LIBRARY targets (e.g. from Conan CMakeDeps) are automatically resolved to their underlying real targets via RV_EXTRACT_LINK_TARGETS before appending
+# to RV_DEPS_LIST. For pkg-config, the caller is responsible for creating proper imported targets (with LOCATION) after this macro returns.
 #
 # Must be a MACRO because RV_SET_FOUND_PACKAGE_DIRS / RV_SET_FOUND_PKGCONFIG_DIRS set _lib_dir, _bin_dir, _include_dir in the caller's scope via text
 # substitution.
@@ -155,7 +155,20 @@ MACRO(RV_FIND_DEPENDENCY)
 
       IF(_RFD_FOUND_VIA STREQUAL "config")
         MESSAGE(STATUS "Found ${_RFD_PACKAGE} ${${_RFD_PACKAGE}_VERSION} via CMake config. Using installed package.")
-        RV_SET_FOUND_PACKAGE_DIRS(${_RFD_TARGET} ${_RFD_PACKAGE})
+        # Build a resolved target list for root validation — apply the same namespaced fallback so that Conan targets (e.g. openjph::openjph for upstream
+        # openjph) can be used for IMPORTED_LOCATION resolution.
+        SET(_rfd_resolved_targets)
+        FOREACH(
+          _rfd_t
+          ${_RFD_DEPS_LIST_TARGETS}
+        )
+          IF(TARGET ${_rfd_t})
+            LIST(APPEND _rfd_resolved_targets ${_rfd_t})
+          ELSEIF(TARGET ${_RFD_PACKAGE}::${_rfd_t})
+            LIST(APPEND _rfd_resolved_targets ${_RFD_PACKAGE}::${_rfd_t})
+          ENDIF()
+        ENDFOREACH()
+        RV_SET_FOUND_PACKAGE_DIRS(${_RFD_TARGET} ${_RFD_PACKAGE} DEPS_LIST_TARGETS ${_rfd_resolved_targets})
 
         # Package config files may suffer the same symlink resolution bug as our walk-up logic (CMake normalizes "../" before resolving symlinks). If the
         # resolved and unresolved include dirs differ, fix ALL imported targets from this package (not just DEPS_LIST_TARGETS). Config files often create
@@ -211,8 +224,64 @@ MACRO(RV_FIND_DEPENDENCY)
         _rfd_dep
         ${_RFD_DEPS_LIST_TARGETS}
       )
-        LIST(APPEND RV_DEPS_LIST ${_rfd_dep})
-        RV_RESOLVE_DARWIN_INSTALL_NAME(${_rfd_dep})
+        # Resolve the target to append to RV_DEPS_LIST. rv_stage.cmake's RPATH fixup loop expects all entries to have IMPORTED_LOCATION.
+        SET(_rfd_actual_dep
+            ${_rfd_dep}
+        )
+
+        # If the upstream target name doesn't exist, try the namespaced variant. Conan CMakeDeps creates <Package>::<target> instead of the upstream
+        # non-namespaced name (e.g. openjph::openjph instead of openjph).
+        IF(NOT TARGET ${_rfd_dep})
+          SET(_rfd_namespaced
+              "${_RFD_PACKAGE}::${_rfd_dep}"
+          )
+          IF(TARGET ${_rfd_namespaced})
+            SET(_rfd_actual_dep
+                ${_rfd_namespaced}
+            )
+          ELSE()
+            MESSAGE(WARNING "RV_FIND_DEPENDENCY: target ${_rfd_dep} (and ${_rfd_namespaced}) not found — skipping RV_DEPS_LIST append")
+            CONTINUE()
+          ENDIF()
+        ENDIF()
+
+        # Resolve INTERFACE_LIBRARY targets (e.g. Conan CMakeDeps wrappers) to their underlying real target.
+        IF(TARGET ${_rfd_actual_dep})
+          GET_TARGET_PROPERTY(_rfd_dep_type ${_rfd_actual_dep} TYPE)
+          IF(_rfd_dep_type STREQUAL "INTERFACE_LIBRARY")
+            GET_TARGET_PROPERTY(_rfd_iface_libs ${_rfd_actual_dep} INTERFACE_LINK_LIBRARIES)
+            IF(_rfd_iface_libs)
+              RV_EXTRACT_LINK_TARGETS("${_rfd_iface_libs}" _rfd_resolved_deps)
+              SET(_rfd_found_real
+                  FALSE
+              )
+              FOREACH(
+                _rfd_resolved_dep
+                ${_rfd_resolved_deps}
+              )
+                GET_TARGET_PROPERTY(_rfd_resolved_type ${_rfd_resolved_dep} TYPE)
+                IF(NOT _rfd_resolved_type STREQUAL "INTERFACE_LIBRARY")
+                  SET(_rfd_actual_dep
+                      ${_rfd_resolved_dep}
+                  )
+                  SET(_rfd_found_real
+                      TRUE
+                  )
+                  BREAK()
+                ENDIF()
+              ENDFOREACH()
+              IF(NOT _rfd_found_real)
+                MESSAGE(WARNING "RV_FIND_DEPENDENCY: ${_rfd_dep} is INTERFACE but no underlying library target found — skipping RV_DEPS_LIST append")
+                CONTINUE()
+              ENDIF()
+            ELSE()
+              MESSAGE(WARNING "RV_FIND_DEPENDENCY: ${_rfd_dep} is INTERFACE with no INTERFACE_LINK_LIBRARIES — skipping RV_DEPS_LIST append")
+              CONTINUE()
+            ENDIF()
+          ENDIF()
+        ENDIF()
+        LIST(APPEND RV_DEPS_LIST ${_rfd_actual_dep})
+        RV_RESOLVE_DARWIN_INSTALL_NAME(${_rfd_actual_dep})
       ENDFOREACH()
 
       STRING(TOUPPER ${_RFD_PACKAGE} _RFD_PKG_UPPER)

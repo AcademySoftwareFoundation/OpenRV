@@ -100,17 +100,46 @@ FUNCTION(rv_stage)
           ${RV_DEPS_LIST}
         )
           IF(TARGET ${dep})
-            GET_PROPERTY(
-              dep_file_path
-              TARGET ${dep}
-              PROPERTY LOCATION
+            # Resolve INTERFACE_LIBRARY targets to their underlying library target. Defensive: rv_find_dependency.cmake should already resolve these at
+            # insertion time, but handle any that slip through.
+            SET(_rvs_real_dep
+                ${dep}
             )
+            GET_TARGET_PROPERTY(_rvs_dep_type ${dep} TYPE)
+            IF(_rvs_dep_type STREQUAL "INTERFACE_LIBRARY")
+              GET_TARGET_PROPERTY(_rvs_iface_libs ${dep} INTERFACE_LINK_LIBRARIES)
+              IF(_rvs_iface_libs)
+                RV_EXTRACT_LINK_TARGETS("${_rvs_iface_libs}" _rvs_resolved_deps)
+                FOREACH(
+                  _rvs_rdep
+                  ${_rvs_resolved_deps}
+                )
+                  GET_TARGET_PROPERTY(_rvs_rdep_type ${_rvs_rdep} TYPE)
+                  IF(NOT _rvs_rdep_type STREQUAL "INTERFACE_LIBRARY")
+                    SET(_rvs_real_dep
+                        ${_rvs_rdep}
+                    )
+                    BREAK()
+                  ENDIF()
+                ENDFOREACH()
+              ENDIF()
+              IF("${_rvs_real_dep}" STREQUAL "${dep}")
+                CONTINUE()
+              ENDIF()
+            ENDIF()
+
+            # Use RV_RESOLVE_IMPORTED_LOCATION instead of raw PROPERTY LOCATION to handle config-specific variants correctly.
+            RV_RESOLVE_IMPORTED_LOCATION(${_rvs_real_dep} dep_file_path)
+            IF(NOT dep_file_path)
+              CONTINUE()
+            ENDIF()
+
             # For found packages (e.g. Homebrew), the install name recorded by the linker may differ from the target's LOCATION (different symlink paths). Use
             # the cached install name from RV_RESOLVE_DARWIN_INSTALL_NAME if available; this is a no-op for built-from-source deps where the library doesn't
             # exist at configure time.
             GET_PROPERTY(
               _dep_install_name
-              TARGET ${dep}
+              TARGET ${_rvs_real_dep}
               PROPERTY RV_DARWIN_INSTALL_NAME
             )
             IF(_dep_install_name)
@@ -122,7 +151,7 @@ FUNCTION(rv_stage)
               SET(dep_change_path
                   "${dep_file_path}"
               )
-              GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
+              GET_FILENAME_COMPONENT(dep_file_name "${dep_file_path}" NAME)
             ENDIF()
             LIST(APPEND _change_args -change "${dep_change_path}" "@rpath/${dep_file_name}")
           ENDIF()

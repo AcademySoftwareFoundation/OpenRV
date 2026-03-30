@@ -111,6 +111,18 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     )
   ENDIF()
 
+  # Collect all real library targets from the input list, recursively traversing INTERFACE chains. This captures transitive components (e.g.
+  # OpenEXR::OpenEXRUtil, Boost::container) that a package manager provides but aren't explicitly listed.
+  IF(_ARG_TARGET_LIBS)
+    RV_COLLECT_ALL_LIBRARY_TARGETS("${_ARG_TARGET_LIBS}" _rsdl_all_file_targets)
+    IF(NOT _rsdl_all_file_targets)
+      # Fallback: if traversal found nothing (e.g., all targets are non-INTERFACE real targets already), use the original list
+      SET(_rsdl_all_file_targets
+          ${_ARG_TARGET_LIBS}
+      )
+    ENDIF()
+  ENDIF()
+
   # When TARGET_LIBS is used without explicit USE_FLAG_FILE or OUTPUTS, resolve IMPORTED_LOCATION at configure time to derive output filenames for proper
   # incremental tracking. This way Ninja detects deleted staged files and re-runs the staging command automatically.
   IF(_ARG_TARGET_LIBS
@@ -125,7 +137,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
 
     FOREACH(
       _rsdl_tgt
-      ${_ARG_TARGET_LIBS}
+      ${_rsdl_all_file_targets}
     )
       RV_RESOLVE_IMPORTED_LOCATION(${_rsdl_tgt} _rsdl_loc _rsdl_resolved_tgt)
 
@@ -224,45 +236,12 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
       )
     ENDIF()
 
+    # Use the pre-collected real library targets (resolved via RV_COLLECT_ALL_LIBRARY_TARGETS above). All targets in this list are guaranteed non-INTERFACE with
+    # IMPORTED_LOCATION, so no per-target INTERFACE unwrapping is needed.
     FOREACH(
-      _tgt
-      ${_ARG_TARGET_LIBS}
+      _rsdl_file_tgt
+      ${_rsdl_all_file_targets}
     )
-      # Resolve INTERFACE_LIBRARY targets (e.g. vcpkg wrappers) to their underlying library target for $<TARGET_FILE:...> generator expressions and property
-      # lookups. INTERFACE targets have no file on disk so TARGET_FILE/TARGET_LINKER_FILE fail on them.
-      SET(_rsdl_file_tgt
-          ${_tgt}
-      )
-      IF(TARGET ${_tgt})
-        GET_TARGET_PROPERTY(_rsdl_tgt_type ${_tgt} TYPE)
-        IF(_rsdl_tgt_type STREQUAL "INTERFACE_LIBRARY")
-          GET_TARGET_PROPERTY(_rsdl_iface_libs ${_tgt} INTERFACE_LINK_LIBRARIES)
-          IF(_rsdl_iface_libs)
-            FOREACH(
-              _rsdl_iface_lib
-              ${_rsdl_iface_libs}
-            )
-              IF(TARGET ${_rsdl_iface_lib})
-                GET_TARGET_PROPERTY(_rsdl_iface_type ${_rsdl_iface_lib} TYPE)
-                IF(NOT _rsdl_iface_type STREQUAL "INTERFACE_LIBRARY")
-                  SET(_rsdl_file_tgt
-                      ${_rsdl_iface_lib}
-                  )
-                  BREAK()
-                ENDIF()
-              ENDIF()
-            ENDFOREACH()
-          ENDIF()
-          IF(_rsdl_file_tgt STREQUAL _tgt)
-            MESSAGE(
-              AUTHOR_WARNING
-                "RV_STAGE_DEPENDENCY_LIBS: ${_tgt} is an INTERFACE_LIBRARY but no underlying library target found in INTERFACE_LINK_LIBRARIES — skipping"
-            )
-            CONTINUE()
-          ENDIF()
-        ENDIF()
-      ENDIF()
-
       IF(RV_TARGET_WINDOWS)
         LIST(
           APPEND
