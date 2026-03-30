@@ -94,7 +94,7 @@ LIST(APPEND _configure_options "-DOPENJPEG_INCLUDE_DIR=${_openjpeg_include_dir}"
 
 LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
-LIST(APPEND _configure_options "-USE_FFMPEG=0")
+LIST(APPEND _configure_options "-DUSE_FFMPEG=0")
 
 IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Building OpenImageIO using system's freetype library.")
