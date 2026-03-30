@@ -1802,7 +1802,6 @@ class: SessionManagerMode : MinorMode
         layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
         layout.setSpacing(SOURCE_ROW_SPACING);
 
-        // Source preview: stacks thumbnail (default) and filmstrip (on hover)
         let preview = SourcePreviewWidget(widget);
         preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
         preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
@@ -1817,12 +1816,16 @@ class: SessionManagerMode : MinorMode
 
         if (sourceNode neq nil)
         {
-            // Fire events that fetch filmstrip/thumbnail and return file paths
+            // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of 
+            // 10 for ordering. This means any custom plugin of higher priority will be used first.
+            // This allows users to override the local plugin with a custom plugin by making sure 
+            // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
             let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
             let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
 
             if (filmstripPath != "" && io.path.exists(filmstripPath))
                 preview.loadStrip(filmstripPath);
+
             if (thumbnailPath != "" && io.path.exists(thumbnailPath))
                 preview.loadThumbnail(thumbnailPath);
 
@@ -2153,6 +2156,12 @@ class: SessionManagerMode : MinorMode
     {
         updateTree();
         event.reject();
+    }
+
+    method: onLocalPreviewGenerationComplete (void; Event event)
+    {
+        event.reject();
+        if (!_lazyUpdateTimer.isActive()) _lazyUpdateTimer.start(0);
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -3041,6 +3050,7 @@ class: SessionManagerMode : MinorMode
         _editors        = QTreeWidgetItem[]();
         _quitting       = false;
         _disableUpdates = false;
+
         _progressiveLoadingInProgress = (loadTotal() != 0);
 
         init(name,
@@ -3058,7 +3068,8 @@ class: SessionManagerMode : MinorMode
                ("key-down--@", showRows, "show'em"),
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
-               ("event-category-state-changed", onCategoryStateChanged, "Category state changed")
+               ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
+               ("local-preview-generation-complete", onLocalPreviewGenerationComplete, "Refresh UI after local preview generation")
                ],
              nil,
              nil);
