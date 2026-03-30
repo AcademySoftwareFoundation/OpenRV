@@ -1,0 +1,19 @@
+include(common)
+
+[settings]
+arch=x86_64
+build_type=Debug
+compiler=msvc
+compiler.cppstd=17
+compiler.runtime=dynamic
+compiler.version=194
+os=Windows
+
+[buildenv]
+# Pre-append Python location to MSYS2's PATH environment variable.
+# Using Python from MSYS2 could lead to unnecessary builds of Python packages and the needs of more
+# MSYS2 packages.
+PATH=+(path)/c/Python311
+# Set ACLOCAL_PATH using the msys2 from Conan (MSYS_ROOT is set by msys2 tool_requires)
+# Using $$ to escape so variable is expanded at runtime, not generation time
+ACLOCAL_PATH=$$MSYS_ROOT/usr/share/aclocal
