@@ -2158,12 +2158,6 @@ class: SessionManagerMode : MinorMode
         event.reject();
     }
 
-    method: onLocalPreviewGenerationComplete (void; Event event)
-    {
-        event.reject();
-        if (!_lazyUpdateTimer.isActive()) _lazyUpdateTimer.start(0);
-    }
-
     method: beforeProgressiveLoading (void; Event event)
     {
         event.reject();
@@ -3069,7 +3063,7 @@ class: SessionManagerMode : MinorMode
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
                ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
-               ("local-preview-generation-complete", onLocalPreviewGenerationComplete, "Refresh UI after local preview generation")
+               ("session-manager-preview-available", updateTreeEvent, "Refresh UI after preview is available")
                ],
              nil,
              nil);

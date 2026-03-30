@@ -383,7 +383,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _trigger_ui_refresh(self) -> None:
         """Called by the coalescing timer. Tells the session manager to rebuild."""
-        commands.sendInternalEvent("local-preview-generation-complete", "")
+        commands.sendInternalEvent("session-manager-preview-available", "")
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
