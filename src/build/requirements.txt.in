@@ -10,7 +10,8 @@ pip==24.0               # License: MIT License (MIT)
 setuptools==69.5.1      # License: MIT License
 wheel==0.43.0           # License: MIT License (MIT)
 numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
-opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
+# This commit fixes issue with OTIO and the Windows debug build.
+opentimelineio @ git+https://github.com/AcademySoftwareFoundation/OpenTimelineIO.git@d793d6f99729ffc5d3ed4943ea17e8fd6065f5ae # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL==3.1.7         # License: BSD License (BSD)
 PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
 
