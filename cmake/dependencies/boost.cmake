@@ -185,6 +185,18 @@ ELSE()
     ENDIF()
   ENDFOREACH()
 
-  # Found path: actual filenames may differ (e.g. -mt suffix), use TARGET_LIBS to resolve at build time
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_boost_deps_list_targets})
+  # Found path: actual filenames may differ (e.g. -mt suffix), use TARGET_LIBS to resolve at build time. Also stage transitive Boost components that a package
+  # manager (Conan) provides but aren't in _boost_libs (the source build doesn't build these).
+  SET(_boost_stage_targets
+      ${_boost_deps_list_targets}
+  )
+  FOREACH(
+    _boost_extra
+    container system wserialization
+  )
+    IF(TARGET Boost::${_boost_extra})
+      LIST(APPEND _boost_stage_targets Boost::${_boost_extra})
+    ENDIF()
+  ENDFOREACH()
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_boost_stage_targets})
 ENDIF()
