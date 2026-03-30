@@ -66,12 +66,27 @@ IF(RV_DEPS_CMAKE_PREFIX_PATH)
   STRING(REPLACE "\\" "/" _oiio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
   STRING(APPEND _oiio_cache_content "set(CMAKE_PREFIX_PATH \"${_oiio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
-# TODO: Re-evaluate if needed. Disabled because CMAKE_IGNORE_PREFIX_PATH blocks transitive deps (e.g. libdeflate for OpenEXR).
-# Explicit -D flags and -DUSE_*=0 should be sufficient to route OIIO to the correct deps.
-# IF(RV_DEPS_IGNORE_PREFIXES)
-#   STRING(REPLACE "\\" "/" _oiio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
-#   STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
-# ENDIF()
+# When deps come from a package manager (Conan), block find_package from searching the Homebrew shared prefix. OIIO's find_package(Boost) would otherwise find
+# Homebrew's Boost headers (newer version), causing ABI mismatches with Conan's Boost library. CMAKE_IGNORE_PREFIX_PATH only affects find_package, not
+# find_program (so Ninja and compilers still resolve). With Homebrew-only builds, all Boost is from the same source so no contamination occurs.
+IF(RV_CONAN_CMAKE_PREFIX_PATH
+   AND APPLE
+)
+  EXECUTE_PROCESS(
+    COMMAND brew --prefix
+    OUTPUT_VARIABLE _oiio_brew_prefix
+    OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+    RESULT_VARIABLE _oiio_brew_rc
+  )
+  IF(_oiio_brew_rc EQUAL 0
+     AND _oiio_brew_prefix
+  )
+    STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_brew_prefix}\" CACHE STRING \"\" FORCE)\n")
+  ENDIF()
+ENDIF()
+# NOTE: CMAKE_IGNORE_PREFIX_PATH is NOT set for Homebrew-only builds (no Conan). Although RV_DEPS_IGNORE_PREFIXES contains /opt/homebrew, blocking it would
+# prevent OIIO from finding transitive deps (libdeflate, etc.) that only exist at the Homebrew prefix. The CMAKE_CXX_FLAGS -I workaround below handles Boost
+# header contamination for the Homebrew path.
 FILE(MAKE_DIRECTORY "${_build_dir}")
 FILE(
   WRITE "${_oiio_initial_cache}"

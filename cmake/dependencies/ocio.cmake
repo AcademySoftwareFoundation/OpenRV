@@ -157,12 +157,22 @@ IF(RV_DEPS_CMAKE_PREFIX_PATH)
   STRING(REPLACE "\\" "/" _ocio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
   STRING(APPEND _ocio_cache_content "set(CMAKE_PREFIX_PATH \"${_ocio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
-# TODO: Re-evaluate if needed. Disabled because CMAKE_IGNORE_PREFIX_PATH blocks transitive deps (e.g. libdeflate for OpenEXR).
-# Explicit -D flags should be sufficient to route OCIO to the correct deps.
-# IF(RV_DEPS_IGNORE_PREFIXES)
-#   STRING(REPLACE "\\" "/" _ocio_clean_ignore "${RV_DEPS_IGNORE_PREFIXES}")
-#   STRING(APPEND _ocio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_ocio_clean_ignore}\" CACHE STRING \"\" FORCE)\n")
-# ENDIF()
+# When deps come from a package manager (Conan), block find_package from searching the Homebrew shared prefix to prevent header contamination.
+IF(RV_CONAN_CMAKE_PREFIX_PATH
+   AND APPLE
+)
+  EXECUTE_PROCESS(
+    COMMAND brew --prefix
+    OUTPUT_VARIABLE _ocio_brew_prefix
+    OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
+    RESULT_VARIABLE _ocio_brew_rc
+  )
+  IF(_ocio_brew_rc EQUAL 0
+     AND _ocio_brew_prefix
+  )
+    STRING(APPEND _ocio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_ocio_brew_prefix}\" CACHE STRING \"\" FORCE)\n")
+  ENDIF()
+ENDIF()
 FILE(MAKE_DIRECTORY "${_build_dir}")
 FILE(
   WRITE "${_ocio_initial_cache}"
