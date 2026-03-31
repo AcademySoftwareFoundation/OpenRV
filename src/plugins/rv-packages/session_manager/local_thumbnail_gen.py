@@ -30,7 +30,7 @@ UI_REFRESH_DELAY_MS = 100
 class _SignalBridge(QtCore.QObject):
     """Bridges background threads to the main thread via Qt signals."""
 
-    finished = QtCore.Signal(str, str, str)  # cache_key, thumbnail_path ("" if failed), filmstrip_path ("" if failed)
+    finished = QtCore.Signal(str, str, str)  # cache_key, path_key, output_path ("" if failed)
 
 
 class LocalThumbnailGen(rvtypes.MinorMode):
@@ -123,7 +123,15 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         start_frame, end_frame, width, height = source_info
 
         self._pool.submit(
-            self._generate_source,
+            self._generate_thumbnail,
+            cache_key,
+            rvio_bin,
+            media_path,
+            (start_frame + end_frame) // 2,
+        )
+
+        self._pool.submit(
+            self._generate_filmstrip,
             cache_key,
             rvio_bin,
             media_path,
@@ -311,7 +319,25 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         return output_width, output_height
 
-    def _generate_source(
+    def _generate_thumbnail(self, cache_key: str, rvio_bin: str, media_path: str, mid_frame: int) -> None:
+        """Runs rvio to generate a single-frame thumbnail in a worker thread."""
+        output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
+        try:
+            subprocess.run(
+                [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
+                capture_output=True,
+                timeout=120,
+            )
+        except Exception as e:
+            logger.error(f"Thumbnail generation failed: {e}")
+
+        self._bridge.finished.emit(
+            cache_key,
+            "thumbnail_path",
+            str(output_path) if output_path.exists() else "",
+        )
+
+    def _generate_filmstrip(
         self,
         cache_key: str,
         rvio_bin: str,
@@ -321,19 +347,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         width: int,
         height: int,
     ) -> None:
-        """Runs both rvio commands sequentially in a worker thread."""
-        thumbnail_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
-        filmstrip_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
-
-        try:
-            subprocess.run(
-                [rvio_bin, media_path, "-t", str((start_frame + end_frame) // 2), "-o", str(thumbnail_path)],
-                capture_output=True,
-                timeout=120,
-            )
-        except Exception as e:
-            logger.error(f"Thumbnail generation failed: {e}")
-
+        """Runs rvio to generate a filmstrip image in a worker thread."""
+        output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
             output_width, output_height = self._write_filmstrip_session(
@@ -350,7 +365,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     str(output_width),
                     str(output_height),
                     "-o",
-                    str(filmstrip_path),
+                    str(output_path),
                 ],
                 capture_output=True,
                 timeout=120,
@@ -365,20 +380,19 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         self._bridge.finished.emit(
             cache_key,
-            str(thumbnail_path) if thumbnail_path.exists() else "",
-            str(filmstrip_path) if filmstrip_path.exists() else "",
+            "filmstrip_path",
+            str(output_path) if output_path.exists() else "",
         )
 
-    def _on_generation_done(self, cache_key: str, thumbnail_path: str, filmstrip_path: str) -> None:
-        """Called on the main thread when both rvio jobs complete for a source."""
-        entry: dict[str, Path | None] = {}
-        if thumbnail_path:
-            entry["thumbnail_path"] = Path(thumbnail_path)
-        if filmstrip_path:
-            entry["filmstrip_path"] = Path(filmstrip_path)
+    def _on_generation_done(self, cache_key: str, path_key: str, output_path: str) -> None:
+        """Called on the main thread when a single rvio job completes."""
+        if output_path:
+            self._cache.setdefault(cache_key, {})[path_key] = Path(output_path)
 
-        self._cache[cache_key] = entry
-        self._in_flight.discard(cache_key)
+        cached = self._cache.get(cache_key, {})
+        if "thumbnail_path" in cached and "filmstrip_path" in cached:
+            self._in_flight.discard(cache_key)
+
         self._refresh_timer.start()
 
     def _trigger_ui_refresh(self) -> None:
