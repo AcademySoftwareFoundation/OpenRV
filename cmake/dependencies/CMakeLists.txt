@@ -15,6 +15,24 @@ SET(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL
     TRUE
 )
 
+# When Conan provides single-config (Release-only) targets on a multi-config generator (MSVC), map non-Release configurations to Release so that
+# IMPORTED_LOCATION_RELEASE / IMPORTED_IMPLIB_RELEASE are used for validation. Without this, CMake errors with "IMPORTED_LOCATION not set for imported target
+# ... configuration Debug" because multi-config generators validate ALL configurations in CMAKE_CONFIGURATION_TYPES at generation time, but Conan's CMakeDeps
+# only sets properties for the build_type used during `conan install`.
+IF(RV_CONAN_CMAKE_PREFIX_PATH
+   AND MSVC
+)
+  SET(CMAKE_MAP_IMPORTED_CONFIG_DEBUG
+      Release RelWithDebInfo ""
+  )
+  SET(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL
+      Release RelWithDebInfo ""
+  )
+  SET(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO
+      Release ""
+  )
+ENDIF()
+
 # Snapshot the user's CMAKE_PREFIX_PATH before Qt adds ~150 component cmake dirs. ExternalProject sub-builds (OIIO, OCIO, OpenEXR) use this clean list to find
 # transitive dependencies without Qt noise.
 SET(RV_DEPS_CMAKE_PREFIX_PATH
