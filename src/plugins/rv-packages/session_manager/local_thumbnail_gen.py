@@ -98,8 +98,9 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             event.setReturnContent(str(path))
             return
 
-        if cache_key not in self._in_flight:
-            self._start_generation(source_node, cache_key, media_path)
+        flight_key = f"{cache_key}_{path_key}"
+        if flight_key not in self._in_flight:
+            self._start_generation(source_node, cache_key, media_path, path_key)
 
         event.setReturnContent("")
 
@@ -109,7 +110,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_get_thumbnail_path(self, event: Any) -> None:
         self._get_cached_path(event, "thumbnail_path")
 
-    def _start_generation(self, source_node: str, cache_key: str, media_path: str) -> None:
+    def _start_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
         rvio_bin = self._get_rvio_bin()
         if not rvio_bin:
             return
@@ -118,28 +119,29 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         if not source_info:
             return
 
-        self._in_flight.add(cache_key)
+        self._in_flight.add(f"{cache_key}_{path_key}")
 
         start_frame, end_frame, width, height = source_info
 
-        self._pool.submit(
-            self._generate_thumbnail,
-            cache_key,
-            rvio_bin,
-            media_path,
-            (start_frame + end_frame) // 2,
-        )
-
-        self._pool.submit(
-            self._generate_filmstrip,
-            cache_key,
-            rvio_bin,
-            media_path,
-            start_frame,
-            end_frame,
-            width,
-            height,
-        )
+        if path_key == "thumbnail_path":
+            self._pool.submit(
+                self._generate_thumbnail,
+                cache_key,
+                rvio_bin,
+                media_path,
+                (start_frame + end_frame) // 2,
+            )
+        else:
+            self._pool.submit(
+                self._generate_filmstrip,
+                cache_key,
+                rvio_bin,
+                media_path,
+                start_frame,
+                end_frame,
+                width,
+                height,
+            )
 
     def _cache_key(self, media_path: str) -> str:
         return hashlib.sha256(media_path.encode()).hexdigest()[:16]
@@ -389,10 +391,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         if output_path:
             self._cache.setdefault(cache_key, {})[path_key] = Path(output_path)
 
-        cached = self._cache.get(cache_key, {})
-        if "thumbnail_path" in cached and "filmstrip_path" in cached:
-            self._in_flight.discard(cache_key)
-
+        self._in_flight.discard(f"{cache_key}_{path_key}")
         self._refresh_timer.start()
 
     def _trigger_ui_refresh(self) -> None:
