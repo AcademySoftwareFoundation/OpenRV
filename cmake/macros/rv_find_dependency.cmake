@@ -245,37 +245,72 @@ MACRO(RV_FIND_DEPENDENCY)
           ENDIF()
         ENDIF()
 
-        # Resolve INTERFACE_LIBRARY targets (e.g. Conan CMakeDeps wrappers) to their underlying real target.
+        # Resolve INTERFACE_LIBRARY targets (e.g. Conan CMakeDeps wrappers) to their underlying real target. Conan CMakeDeps may create nested INTERFACE chains
+        # (e.g. libraw::libraw → libraw::libraw_ → CONAN_LIB::...), so traverse up to 3 levels with a visited set to prevent infinite loops.
         IF(TARGET ${_rfd_actual_dep})
           GET_TARGET_PROPERTY(_rfd_dep_type ${_rfd_actual_dep} TYPE)
           IF(_rfd_dep_type STREQUAL "INTERFACE_LIBRARY")
-            GET_TARGET_PROPERTY(_rfd_iface_libs ${_rfd_actual_dep} INTERFACE_LINK_LIBRARIES)
-            IF(_rfd_iface_libs)
-              RV_EXTRACT_LINK_TARGETS("${_rfd_iface_libs}" _rfd_resolved_deps)
-              SET(_rfd_found_real
-                  FALSE
+            SET(_rfd_found_real
+                FALSE
+            )
+            SET(_rfd_iface_queue
+                ${_rfd_actual_dep}
+            )
+            SET(_rfd_iface_visited
+                ""
+            )
+            SET(_rfd_iface_depth
+                0
+            )
+            WHILE(
+              _rfd_iface_queue
+              AND NOT _rfd_found_real
+              AND _rfd_iface_depth LESS 3
+            )
+              SET(_rfd_iface_next_queue
+                  ""
               )
               FOREACH(
-                _rfd_resolved_dep
-                ${_rfd_resolved_deps}
+                _rfd_iface_tgt
+                ${_rfd_iface_queue}
               )
-                GET_TARGET_PROPERTY(_rfd_resolved_type ${_rfd_resolved_dep} TYPE)
-                IF(NOT _rfd_resolved_type STREQUAL "INTERFACE_LIBRARY")
-                  SET(_rfd_actual_dep
-                      ${_rfd_resolved_dep}
-                  )
-                  SET(_rfd_found_real
-                      TRUE
-                  )
+                IF(_rfd_found_real)
                   BREAK()
                 ENDIF()
+                IF("${_rfd_iface_tgt}" IN_LIST _rfd_iface_visited)
+                  CONTINUE()
+                ENDIF()
+                LIST(APPEND _rfd_iface_visited "${_rfd_iface_tgt}")
+                GET_TARGET_PROPERTY(_rfd_iface_libs ${_rfd_iface_tgt} INTERFACE_LINK_LIBRARIES)
+                IF(NOT _rfd_iface_libs)
+                  CONTINUE()
+                ENDIF()
+                RV_EXTRACT_LINK_TARGETS("${_rfd_iface_libs}" _rfd_resolved_deps)
+                FOREACH(
+                  _rfd_resolved_dep
+                  ${_rfd_resolved_deps}
+                )
+                  GET_TARGET_PROPERTY(_rfd_resolved_type ${_rfd_resolved_dep} TYPE)
+                  IF(NOT _rfd_resolved_type STREQUAL "INTERFACE_LIBRARY")
+                    SET(_rfd_actual_dep
+                        ${_rfd_resolved_dep}
+                    )
+                    SET(_rfd_found_real
+                        TRUE
+                    )
+                    BREAK()
+                  ELSE()
+                    LIST(APPEND _rfd_iface_next_queue ${_rfd_resolved_dep})
+                  ENDIF()
+                ENDFOREACH()
               ENDFOREACH()
-              IF(NOT _rfd_found_real)
-                MESSAGE(WARNING "RV_FIND_DEPENDENCY: ${_rfd_dep} is INTERFACE but no underlying library target found — skipping RV_DEPS_LIST append")
-                CONTINUE()
-              ENDIF()
-            ELSE()
-              MESSAGE(WARNING "RV_FIND_DEPENDENCY: ${_rfd_dep} is INTERFACE with no INTERFACE_LINK_LIBRARIES — skipping RV_DEPS_LIST append")
+              SET(_rfd_iface_queue
+                  ${_rfd_iface_next_queue}
+              )
+              MATH(EXPR _rfd_iface_depth "${_rfd_iface_depth} + 1")
+            ENDWHILE()
+            IF(NOT _rfd_found_real)
+              MESSAGE(WARNING "RV_FIND_DEPENDENCY: ${_rfd_dep} is INTERFACE but no underlying library target found — skipping RV_DEPS_LIST append")
               CONTINUE()
             ENDIF()
           ENDIF()

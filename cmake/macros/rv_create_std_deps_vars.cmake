@@ -218,17 +218,55 @@ MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
       ENDIF()
     ELSE()
       # For INTERFACE_LIBRARY targets (e.g. vcpkg wrappers, Conan CMakeDeps), try resolving through INTERFACE_LINK_LIBRARIES to find the real library target.
-      # INTERFACE_LINK_LIBRARIES may contain plain target names or generator expressions ($<$<CONFIG:...>:target>).
+      # INTERFACE_LINK_LIBRARIES may contain plain target names or generator expressions ($<$<CONFIG:...>:target>). Conan CMakeDeps may create nested INTERFACE
+      # chains (e.g. libraw::libraw → libraw::libraw_ → CONAN_LIB::...), so traverse up to 3 levels deep with a visited set to prevent infinite loops (Imath's
+      # aggregated target links to itself).
       GET_TARGET_PROPERTY(_rril_type ${_rril_target} TYPE)
       IF(_rril_type STREQUAL "INTERFACE_LIBRARY")
-        GET_TARGET_PROPERTY(_rril_link_libs ${_rril_target} INTERFACE_LINK_LIBRARIES)
-        IF(_rril_link_libs)
-          RV_EXTRACT_LINK_TARGETS("${_rril_link_libs}" _rril_resolved_libs)
-          FOREACH(
-            _rril_link_lib
-            ${_rril_resolved_libs}
+        SET(_rril_queue
+            ${_rril_target}
+        )
+        SET(_rril_visited
+            ""
+        )
+        SET(_rril_depth
+            0
+        )
+        WHILE(
+          _rril_queue
+          AND NOT ${_rril_out_var}
+          AND _rril_depth LESS 3
+        )
+          SET(_rril_next_queue
+              ""
           )
-            IF(NOT ${_rril_out_var})
+          FOREACH(
+            _rril_iface_tgt
+            ${_rril_queue}
+          )
+            IF(${_rril_out_var})
+              BREAK()
+            ENDIF()
+            IF("${_rril_iface_tgt}" IN_LIST _rril_visited)
+              CONTINUE()
+            ENDIF()
+            LIST(APPEND _rril_visited "${_rril_iface_tgt}")
+            IF(NOT TARGET ${_rril_iface_tgt})
+              CONTINUE()
+            ENDIF()
+            GET_TARGET_PROPERTY(_rril_link_libs ${_rril_iface_tgt} INTERFACE_LINK_LIBRARIES)
+            IF(NOT _rril_link_libs)
+              CONTINUE()
+            ENDIF()
+            RV_EXTRACT_LINK_TARGETS("${_rril_link_libs}" _rril_resolved_libs)
+            FOREACH(
+              _rril_link_lib
+              ${_rril_resolved_libs}
+            )
+              IF(${_rril_out_var})
+                BREAK()
+              ENDIF()
+              # Try IMPORTED_LOCATION variants on this target
               FOREACH(
                 _rril_prop
                 IMPORTED_LOCATION IMPORTED_LOCATION_${_rril_config_upper} IMPORTED_LOCATION_RELEASE IMPORTED_LOCATION_NOCONFIG
@@ -237,16 +275,26 @@ MACRO(RV_RESOLVE_IMPORTED_LOCATION _rril_target _rril_out_var)
                   GET_TARGET_PROPERTY(${_rril_out_var} ${_rril_link_lib} ${_rril_prop})
                 ENDIF()
               ENDFOREACH()
-              IF(${_rril_out_var}
-                 AND _rril_resolved_target_var
-              )
-                SET(${_rril_resolved_target_var}
-                    "${_rril_link_lib}"
-                )
+              IF(${_rril_out_var})
+                IF(_rril_resolved_target_var)
+                  SET(${_rril_resolved_target_var}
+                      "${_rril_link_lib}"
+                  )
+                ENDIF()
+              ELSE()
+                # If this target is also INTERFACE, queue it for the next depth level
+                GET_TARGET_PROPERTY(_rril_link_lib_type ${_rril_link_lib} TYPE)
+                IF(_rril_link_lib_type STREQUAL "INTERFACE_LIBRARY")
+                  LIST(APPEND _rril_next_queue ${_rril_link_lib})
+                ENDIF()
               ENDIF()
-            ENDIF()
+            ENDFOREACH()
           ENDFOREACH()
-        ENDIF()
+          SET(_rril_queue
+              ${_rril_next_queue}
+          )
+          MATH(EXPR _rril_depth "${_rril_depth} + 1")
+        ENDWHILE()
       ENDIF()
     ENDIF()
   ENDIF()
