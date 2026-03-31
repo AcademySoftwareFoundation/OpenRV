@@ -17,7 +17,8 @@ IF(RV_TARGET_LINUX)
   )
 ENDIF()
 
-# LibRaw uses autotools (not CMake), so no CONFIG files. Fall back to pkg-config.
+# LibRaw uses autotools (not CMake), so no CONFIG files. Fall back to pkg-config. vcpkg creates libraw::raw, Conan creates libraw::libraw — list both so
+# DEPS_LIST_TARGETS works regardless of which package manager provides it.
 RV_FIND_DEPENDENCY(
   TARGET
   ${_target}
@@ -29,6 +30,7 @@ RV_FIND_DEPENDENCY(
   libraw
   DEPS_LIST_TARGETS
   libraw::raw
+  libraw::libraw
 )
 
 SET(_download_url

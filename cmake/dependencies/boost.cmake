@@ -134,9 +134,16 @@ IF(NOT ${_target}_FOUND)
 ELSE()
   # CONFIG found — Boost::xxx targets already exist with proper LOCATION. Create any missing targets as a safety net.
   IF(RV_TARGET_WINDOWS)
-    SET(_include_dir
+    # Build-from-source Boost on Windows installs headers under include/boost-<ver>/. Conan's Boost uses include/ directly. Only apply the versioned
+    # subdirectory when it actually exists.
+    SET(_boost_versioned_include
         ${_install_dir}/include/boost-${_major_minor_version}
     )
+    IF(EXISTS "${_boost_versioned_include}")
+      SET(_include_dir
+          ${_boost_versioned_include}
+      )
+    ENDIF()
   ENDIF()
 
   # Boost::headers is not in DEPS_LIST_TARGETS so the general symlink fixup in RV_FIND_DEPENDENCY doesn't reach it. Fix it here: Boost's config has a symlink
