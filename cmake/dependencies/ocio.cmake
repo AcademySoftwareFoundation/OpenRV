@@ -249,13 +249,18 @@ ELSE() # Windows
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
     "-DImath_DIR=${RV_DEPS_IMATH_CMAKE_DIR}"
-    "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
     # Mandatory param: OCIO CMake code finds Python.
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
     # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
     # want and doesn't build.
     "-DRV_Python_LIBRARIES=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"
     "-DPython_INCLUDE_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/include"
+    # Python3_ mirrors: pybind11 2.12 (bundled by OCIO) calls find_package(Python3) independently and does not inherit the Python_ prefix variables above.
+    # Without these, FindPython3 searches the system and may find a Python without development headers (no Python.h).
+    "-DPython3_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    "-DPython3_INCLUDE_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/include"
+    "-DPython3_LIBRARY_RELEASE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"
     "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}"
     "-DBUILD_SHARED_LIBS=ON"
     "-DOCIO_BUILD_PYTHON=ON"
@@ -275,8 +280,10 @@ ELSE() # Windows
   IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
     # Use debug Python executable.
     LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe")
+    LIST(APPEND _configure_options "-DPython3_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe")
   ELSE()
     LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
+    LIST(APPEND _configure_options "-DPython3_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
   ENDIF()
 
   LIST(APPEND _ocio_build_options "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}"
