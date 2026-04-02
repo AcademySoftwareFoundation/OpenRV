@@ -68,6 +68,10 @@ IF(RV_TARGET_DARWIN)
   LIST(APPEND _sources DisplayLink.cpp DeepColorSupport.mm)
   IF(USE_METAL)
     LIST(APPEND _sources MetalView.mm QTMetalVideoDevice.mm)
+    SET_SOURCE_FILES_PROPERTIES(
+      MetalView.mm
+      PROPERTIES COMPILE_FLAGS "-fobjc-arc"
+    )
   ENDIF()
 ENDIF()
 
