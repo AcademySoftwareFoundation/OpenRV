@@ -779,6 +779,11 @@ class: ModeManagerMode : MinorMode
         _otherLoads  = commandLineFlag("ModeManagerLoad", "").split(",");
         _rejectLoads = commandLineFlag("ModeManagerReject", "").split(",");
 
+        // "zzzzzz" is the sortKey and 100 is the ordering (ordering takes priority over sortKey)
+        // Their current value is chosen because we want this mode to run last
+        // as it deactivates all other modes. Therefore, when creating a new mode,
+        // make sure that its ordering and/or sortKey is lower than mode_manager so your
+        // before-session-deletion (and similar) handlers run before deactivateAll tears modes down.
         init("ModeManager",
              nil,
              [("state-initialized", load, "Load installed modes"),
