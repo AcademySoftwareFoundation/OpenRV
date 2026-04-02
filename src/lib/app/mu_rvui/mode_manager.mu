@@ -787,7 +787,8 @@ class: ModeManagerMode : MinorMode
               ("before-graph-view-change", viewChange(,false), "Deactivate mode when view changes"),
               ("after-graph-view-change", viewChange(,true), "Activate mode when view changes")],
              nil,
-             "zzzzzz");
+             "zzzzzz",
+             100);
 
         try
         {
