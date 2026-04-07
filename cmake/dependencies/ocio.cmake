@@ -206,7 +206,11 @@ ELSE() # Windows
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
     "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
-    "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    # Force CMake to use our custom Python, not the system/registry Python. Python_FIND_REGISTRY=NEVER prevents Windows registry lookups that find the system
+    # Python from actions/setup-python. Python_FIND_STRATEGY=LOCATION ensures Python_ROOT_DIR is checked before the default search paths.
+    "-DPython_FIND_REGISTRY=NEVER"
+    "-DPython_FIND_STRATEGY=LOCATION"
     # Mandatory param: OCIO CMake code finds Python.
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
     # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
