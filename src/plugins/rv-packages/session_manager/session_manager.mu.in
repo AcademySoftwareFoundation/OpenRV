@@ -1106,6 +1106,7 @@ class: SessionManagerMode : MinorMode
     QIcon              _fallbackSourceIcon;
     bool               _inputOrderLock;
     bool               _disableUpdates;
+    bool               _previewsEnabled;
     bool               _progressiveLoadingInProgress;
     QTimer             _lazySetInputsTimer;
     QTimer             _lazyUpdateTimer;
@@ -1496,7 +1497,7 @@ class: SessionManagerMode : MinorMode
             item.setData(QVariant(innode), Qt.UserRole + 2);
             item.setEditable(false);
 
-            if (isSource)
+            if (isSource && _previewsEnabled)
             {
                 item.setText("");
                 item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
@@ -1504,7 +1505,7 @@ class: SessionManagerMode : MinorMode
 
             _inputsModel.appendRow(item);
 
-            if (isSource)
+            if (isSource && _previewsEnabled)
                 _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
         }
 
@@ -1893,7 +1894,7 @@ class: SessionManagerMode : MinorMode
         if (node == viewNode()) head(tail(statusItems)).setText("\u2714");
         addRow(parentItem, item : statusItems);
 
-        if (source)
+        if (source && _previewsEnabled)
         {
             item.setText("");
             item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
@@ -3037,6 +3038,14 @@ class: SessionManagerMode : MinorMode
         writeSetting("Tools", "show_session_manager", Bool(show));
     }
 
+    method: togglePreviews (void; bool checked)
+    {
+        _previewsEnabled = checked;
+        use SettingsValue;
+        writeSetting("SessionManager", "previewsEnabled", Bool(checked));
+        updateTree();
+    }
+
     method: SessionManagerMode (SessionManagerMode; string name)
     {
         _darkUI         = true;
@@ -3044,6 +3053,18 @@ class: SessionManagerMode : MinorMode
         _editors        = QTreeWidgetItem[]();
         _quitting       = false;
         _disableUpdates = false;
+
+        let previewsEnv = system.getenv("SESSION_MANAGER_PREVIEWS", nil);
+        if (previewsEnv neq nil && previewsEnv == "DISABLE")
+        {
+            _previewsEnabled = false;
+        }
+        else
+        {
+            use SettingsValue;
+            let Bool enabled = readSetting("SessionManager", "previewsEnabled", Bool(true));
+            _previewsEnabled = bool(enabled);
+        }
 
         _progressiveLoadingInProgress = (loadTotal() != 0);
 
@@ -3336,6 +3357,17 @@ class: SessionManagerMode : MinorMode
             configGroup.addAction(a);
         }
 
+        let _              = configMenu.addSeparator(),
+            previewToggle  = configMenu.addAction("Show Source Previews");
+
+        previewToggle.setCheckable(true);
+        previewToggle.setChecked(_previewsEnabled);
+
+        if (previewsEnv neq nil && previewsEnv == "DISABLE")
+        {
+            previewToggle.setEnabled(false);
+        }
+
         _configButton.setMenu(configMenu);
 
         try
@@ -3387,6 +3419,7 @@ class: SessionManagerMode : MinorMode
         connect(configAlwaysOn, QAction.triggered, configSlot(,"yes",true));
         connect(configNeverOn, QAction.triggered, configSlot(,"no",false));
         connect(configLastOn, QAction.triggered, configSlot(,"last",true));
+        connect(previewToggle, QAction.toggled, togglePreviews);
         connect(_viewModel, QStandardItemModel.itemChanged, viewItemChanged);
         connect(_viewTreeView, QTreeView.expanded, setItemExpandedState(,1));
         connect(_viewTreeView, QTreeView.collapsed, setItemExpandedState(,0));
