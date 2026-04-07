@@ -6,19 +6,19 @@
 #       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
 #       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
 
-pip==24.0               # License: MIT License (MIT)
-setuptools==69.5.1      # License: MIT License
-wheel==0.43.0           # License: MIT License (MIT)
-numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
-opentimelineio==@_opentimelineio_version@ # License: Other/Proprietary License (Modified Apache 2.0 License)
-PyOpenGL==3.1.7         # License: BSD License (BSD)
-PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
+numpy==@_numpy_version@                     # License: BSD License (BSD-3-Clause) - Required by PySide6
+opentimelineio==@_opentimelineio_version@   # License: Other/Proprietary License (Modified Apache 2.0 License)
+pip==26.0.1                                 # License: MIT License (MIT)
+PyOpenGL_accelerate~=3.1.10                 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
+PyOpenGL~=3.1.10                            # License: BSD License (BSD)
+setuptools==82.0.1                          # License: MIT License
+wheel==0.46.3                               # License: MIT License (MIT)
 
 # Additional packages required by RV and for testing the Python distribution
 
-certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
-six==1.16.0             # License: MIT License (MIT)
-packaging==24.0         # License: Apache Software License, BSD License
-requests==2.31.0        # License: Apache Software License (Apache 2.0)
-cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
-pydantic==2.7.1         # License: MIT License (MIT)
+certifi==2026.2.25          # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+cryptography==46.0.5        # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+packaging==26.0             # License: Apache Software License, BSD License
+pydantic==2.12.5            # License: MIT License (MIT)
+requests==2.32.5            # License: Apache Software License (Apache 2.0)
+six==1.17.0                 # License: MIT License (MIT)
