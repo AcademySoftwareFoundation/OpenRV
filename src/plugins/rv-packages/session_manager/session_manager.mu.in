@@ -672,7 +672,7 @@ class: FilmstripWidget : QLabel
 
     method: mouseMoveEvent (void; QMouseEvent event)
     {
-        showFrameAtX(event.position().toPoint().x());
+        showFrameAtX(@MU_QT_QDRAGMOVEEVENT_POSITION@.x());
         QWidget.mouseMoveEvent(this, event);
     }
 }
