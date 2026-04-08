@@ -46,7 +46,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def __init__(self) -> None:
         rvtypes.MinorMode.__init__(self)
         self._cache: dict[str, dict[str, Path | None]] = {}
-        self._cache_dir = Path(tempfile.gettempdir()) / "rv_thumbnails"
+        self._cache_dir = Path(tempfile.gettempdir()) / f"rv_thumbnails_{os.getpid()}"
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._in_flight: set[str] = set()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
