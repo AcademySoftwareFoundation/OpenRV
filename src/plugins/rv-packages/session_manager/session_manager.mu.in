@@ -3054,7 +3054,7 @@ class: SessionManagerMode : MinorMode
         _quitting       = false;
         _disableUpdates = false;
 
-        let previewsEnv = system.getenv("SESSION_MANAGER_PREVIEWS", nil);
+        let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
         if (previewsEnv neq nil && previewsEnv == "DISABLE")
         {
             _previewsEnabled = false;
