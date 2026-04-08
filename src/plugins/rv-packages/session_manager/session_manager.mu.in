@@ -3055,7 +3055,7 @@ class: SessionManagerMode : MinorMode
         _disableUpdates = false;
 
         let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
-        if (previewsEnv neq nil && previewsEnv == "DISABLE")
+        if (previewsEnv neq nil && previewsEnv == "0")
         {
             _previewsEnabled = false;
         }
@@ -3363,7 +3363,7 @@ class: SessionManagerMode : MinorMode
         previewToggle.setCheckable(true);
         previewToggle.setChecked(_previewsEnabled);
 
-        if (previewsEnv neq nil && previewsEnv == "DISABLE")
+        if (previewsEnv neq nil && previewsEnv == "0")
         {
             previewToggle.setEnabled(false);
         }
