@@ -240,7 +240,7 @@ IF(NOT RV_TARGET_WINDOWS)
             Boost::filesystem
             Imath::Imath
             WebP::webp
-            LibRaw::raw
+            libraw::raw
             ZLIB::ZLIB
             OpenColorIO::OpenColorIO
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
@@ -295,7 +295,7 @@ ELSE()
             Boost::filesystem
             Imath::Imath
             WebP::webp
-            LibRaw::raw
+            libraw::raw
             ZLIB::ZLIB
             OpenColorIO::OpenColorIO
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
