@@ -646,6 +646,7 @@ namespace IPCore
         //
 
         static void queryGL();
+        static void declareGLProperties(IPNode*);
         static void queryGLIntoContainer(IPNode*);
 
         static bool queryGLFinished() { return !m_queryInit; }
