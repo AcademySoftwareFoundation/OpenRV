@@ -50,6 +50,11 @@ LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
 LIST(APPEND _configure_options "-DUSE_OCIO=ON")
 LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
+IF(RHEL_VERBOSE)
+  LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib64/cmake/OpenColorIO")
+ELSE()
+  LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib/cmake/OpenColorIO")
+ENDIF()
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
 
