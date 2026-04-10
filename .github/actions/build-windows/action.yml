@@ -107,6 +107,10 @@ runs:
       run: choco install cmake --version=${{ inputs.cmake-version }} --allow-downgrade
       shell: powershell
 
+    - name: Install JOM (parallel nmake)
+      run: choco install jom --yes
+      shell: powershell
+
     - name: Set PATH environment variable
       run: |
         echo "export PATH=\"/c/Program Files/CMake/bin:/c/hostedtoolcache/windows/Python/3.10.11/x64:/c/msys64/mingw64/bin:$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin\"" >> ~/.bash_profile

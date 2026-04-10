@@ -188,6 +188,9 @@ def configure() -> None:
     configure_args.append(f"--prefix={OUTPUT_DIR}")
     configure_args.append(f"--openssldir={OUTPUT_DIR}")
 
+    # Skip building the test suite
+    configure_args.append("no-tests")
+
     if platform.system() == "Linux":
         configure_args.append("-Wl,-rpath,'$$ORIGIN/../lib'")
 
@@ -200,8 +203,20 @@ def build() -> None:
     """
     Run the build step of the build. It compile every target of the project.
     """
+    build_env = None
+
     if platform.system() == "Windows":
-        build_args = ["nmake"]
+        # jom is a parallel drop-in replacement for nmake; use it when available
+        # to significantly speed up the Windows build. Falls back to nmake.
+        _has_jom = bool(shutil.which("jom"))
+        if _has_jom:
+            build_args = ["jom", f"/J{os.cpu_count() or 1}"]
+            # /FS forces PDB writes through mspdbsrv.exe, which serializes access and
+            # prevents C1041 errors when multiple cl.exe processes compile in parallel.
+            build_env = os.environ.copy()
+            build_env["CL"] = build_env.get("CL", "") + " /FS"
+        else:
+            build_args = ["nmake"]
     else:
         build_args = ["make", f"-j{os.cpu_count() or 1}"]
 
