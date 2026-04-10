@@ -342,7 +342,8 @@ ENDIF()
 LIST(
   APPEND
   _requirements_install_command
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  # Use old and more recent library name convention to ensure the correct library is used in the build.
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
   "${_python3_executable}"
   -s
   -E
@@ -561,10 +562,32 @@ SET_PROPERTY(
   PROPERTY IMPORTED_SONAME ${_python3_lib_name}
 )
 IF(RV_TARGET_WINDOWS)
+  # Set per-config import libs so multi-config generators (VS) pick the right one. Without this, IMPORTED_IMPLIB would be fixed to whichever CMAKE_BUILD_TYPE
+  # was set at configure time, causing LNK1104 when building a different configuration.
+  SET(_python_debug_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_d${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
+  SET(_python_release_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
   SET_PROPERTY(
     TARGET Python::Python
-    PROPERTY IMPORTED_IMPLIB ${_python3_implib}
+    PROPERTY IMPORTED_IMPLIB_DEBUG ${_python_debug_implib}
   )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELEASE ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELWITHDEBINFO ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_MINSIZEREL ${_python_release_implib}
+  )
+  # Also expose the libs dir so #pragma comment(lib, "python311.lib") in Python headers can be resolved by the linker for non-debug configurations.
+  TARGET_LINK_DIRECTORIES(Python::Python INTERFACE ${_lib_dir})
 ENDIF()
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(
