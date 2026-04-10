@@ -108,3 +108,16 @@ RV_STAGE_DEPENDENCY_LIBS(
   OUTPUTS
   ${_pybindings_location}/${_libname}
 )
+
+# Windows only. Debug Python on Windows searches for modules with *_d suffix, but pyimgui does not create a pyimgui_d.pyd.
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Copying pyimgui.pyd to pyimgui_d.pyd in '${_pybindings_location}' for Python debug compatibility."
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${_pybindings_location}
+    COMMAND ${CMAKE_COMMAND} -E copy ${_libpath} ${_pybindings_location}/pyimgui_d.pyd
+  )
+ENDIF()
