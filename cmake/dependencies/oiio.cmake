@@ -48,6 +48,11 @@ LIST(APPEND _byproducts ${_byprojects_copy})
 # The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
 LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
 LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra pybind11 package
+# OIIO 3.x still calls find_package(Python3) even with USE_PYTHON=0. Point it to our custom Python to prevent finding the system Python (e.g. 3.14 from GitHub
+# runner toolcache).
+LIST(APPEND _configure_options "-DPython3_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
+LIST(APPEND _configure_options "-DPython3_FIND_STRATEGY=LOCATION")
+LIST(APPEND _configure_options "-DPython3_FIND_REGISTRY=NEVER")
 LIST(APPEND _configure_options "-DUSE_OCIO=ON")
 LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
 IF(RHEL_VERBOSE)
