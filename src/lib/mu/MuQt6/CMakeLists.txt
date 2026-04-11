@@ -288,11 +288,6 @@ ADD_LIBRARY(
   ${_sources} ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy_filtered.hpp
 )
 
-SET_TARGET_PROPERTIES(
-  ${_target}
-  PROPERTIES UNITY_BUILD ON
-)
-
 #
 # Note: Defining WIN32_LEAN_AND_MEAN to prevent a clash between winsock.h and winsock2.h: windows.h, which is included indirectly by <QtCore/QtCore>, includes
 # winsock.h by default (if WIN32_LEAN_AND_MEAN is not defined). And then winsock2.h is later included by SignalSpy.h. Any time winsock.h gets included before
