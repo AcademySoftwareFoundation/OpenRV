@@ -82,11 +82,6 @@ ADD_LIBRARY(
   ${_sources}
 )
 
-SET_TARGET_PROPERTIES(
-  ${_target}
-  PROPERTIES UNITY_BUILD ON
-)
-
 # Harcoded special case
 SET(CFILES_PTHREAD
     "pthread_support pthread_stop_world pthread_start"
