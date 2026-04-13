@@ -48,6 +48,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache: dict[str, dict[str, Path | None]] = {}
         self._cache_dir = Path(tempfile.gettempdir()) / f"rv_thumbnails_{os.getpid()}"
         self._cache_dir.mkdir(parents=True, exist_ok=True)
+        self._persistent = bool(os.getenv("RV_PERSISTENT_PREVIEW_CACHE"))
         self._in_flight: set[str] = set()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
@@ -98,6 +99,13 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             event.setReturnContent(str(path))
             return
 
+        if self._persistent:
+            persistent_path = self._persistent_preview_path(media_path, cache_key, path_key)
+            if persistent_path.exists():
+                self._cache.setdefault(cache_key, {})[path_key] = persistent_path
+                event.setReturnContent(str(persistent_path))
+                return
+
         flight_key = f"{cache_key}_{path_key}"
         if flight_key not in self._in_flight:
             self._start_generation(source_node, cache_key, media_path, path_key)
@@ -145,6 +153,22 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _cache_key(self, media_path: str) -> str:
         return hashlib.sha256(media_path.encode()).hexdigest()[:16]
+
+    def _persistent_preview_path(self, media_path: str, cache_key: str, path_key: str) -> Path:
+        type_name = path_key.replace("_path", "")
+        return Path(media_path).parent / "rv_previews" / f"{cache_key}_{type_name}.jpg"
+
+    def _resolve_output_path(self, media_path: str, cache_key: str, path_key: str) -> Path:
+        """Try persistent storage alongside source, fall back to temp dir."""
+        if self._persistent:
+            try:
+                persistent_path = self._persistent_preview_path(media_path, cache_key, path_key)
+                persistent_path.parent.mkdir(parents=True, exist_ok=True)
+                return persistent_path
+            except OSError:
+                logger.warning("Cannot create persistent cache dir, falling back to temp dir")
+        type_name = path_key.replace("_path", "")
+        return self._cache_dir / f"{cache_key}_{type_name}.jpg"
 
     def _get_rvio_bin(self) -> str | None:
         rvio = os.getenv("RV_APP_RVIO")
@@ -323,7 +347,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _generate_thumbnail(self, cache_key: str, rvio_bin: str, media_path: str, mid_frame: int) -> None:
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
-        output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
+        output_path = self._resolve_output_path(media_path, cache_key, "thumbnail_path")
         try:
             subprocess.run(
                 [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
@@ -350,7 +374,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         height: int,
     ) -> None:
         """Runs rvio to generate a filmstrip image in a worker thread."""
-        output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
+        output_path = self._resolve_output_path(media_path, cache_key, "filmstrip_path")
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
             output_width, output_height = self._write_filmstrip_session(
