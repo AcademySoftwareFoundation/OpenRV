@@ -221,7 +221,7 @@ def build() -> None:
         build_args = ["make", f"-j{os.cpu_count() or 1}"]
 
     print(f"Executing {build_args} from {SOURCE_DIR}")
-    subprocess.run(build_args, cwd=SOURCE_DIR).check_returncode()
+    subprocess.run(build_args, cwd=SOURCE_DIR, env=build_env).check_returncode()
 
 
 def install() -> None:
