@@ -48,8 +48,8 @@ def test_python_distribution(python_home: str, variant: str) -> None:
 
     tmp_python_home = os.path.join(tmp_dir, os.path.basename(python_home))
     try:
-        print(f"Moving {python_home} to {tmp_python_home}")
-        shutil.move(python_home, tmp_python_home)
+        print(f"Copying {python_home} to {tmp_python_home}")
+        shutil.copytree(python_home, tmp_python_home)
 
         python_interpreter_args = get_python_interpreter_args(tmp_python_home, variant)
 
@@ -125,8 +125,8 @@ def test_python_distribution(python_home: str, variant: str) -> None:
         print("All Python distribution tests passed successfully!")
 
     finally:
-        print(f"Moving {tmp_python_home} back to {python_home}")
-        shutil.move(tmp_python_home, python_home)
+        print(f"Removing temporary copy {tmp_python_home}")
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
 if __name__ == "__main__":
