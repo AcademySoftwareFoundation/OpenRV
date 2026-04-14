@@ -24,7 +24,6 @@ the_mode = None
 FRAME_WIDTH = 240
 MAX_FILMSTRIP_FRAMES = 25
 MAX_WORKERS = 4
-UI_REFRESH_DELAY_MS = 100
 
 
 class _SignalBridge(QtCore.QObject):
@@ -49,15 +48,11 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache_dir = Path(tempfile.gettempdir()) / f"rv_thumbnails_{os.getpid()}"
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._in_flight: set[str] = set()
+        self._cache_key_to_source: dict[str, str] = {}
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
         self._bridge = _SignalBridge()
         self._bridge.finished.connect(self._on_generation_done, QtCore.Qt.QueuedConnection)
-
-        self._refresh_timer = QtCore.QTimer()
-        self._refresh_timer.setSingleShot(True)
-        self._refresh_timer.setInterval(UI_REFRESH_DELAY_MS)
-        self._refresh_timer.timeout.connect(self._trigger_ui_refresh)
 
         # The last parameter is the priority of the plugin. Having it at 10 means it will be run last
         # letting custom plugins of higher priority run first and consume the event before the local plugin runs.
@@ -120,6 +115,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
 
         self._in_flight.add(f"{cache_key}_{path_key}")
+        self._cache_key_to_source[cache_key] = source_node
 
         start_frame, end_frame, width, height = source_info
 
@@ -392,15 +388,12 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._cache.setdefault(cache_key, {})[path_key] = Path(output_path)
 
         self._in_flight.discard(f"{cache_key}_{path_key}")
-        self._refresh_timer.start()
-
-    def _trigger_ui_refresh(self) -> None:
-        """Called by the coalescing timer. Tells the session manager to rebuild."""
-        commands.sendInternalEvent("session-manager-preview-available", "")
+        source_node = self._cache_key_to_source.get(cache_key)
+        if source_node:
+            commands.sendInternalEvent("session-manager-preview-available", source_node)
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
-        self._refresh_timer.stop()
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._in_flight.clear()
 

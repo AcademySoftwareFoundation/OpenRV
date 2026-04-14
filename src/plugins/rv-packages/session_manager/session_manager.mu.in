@@ -1810,9 +1810,9 @@ class: SessionManagerMode : MinorMode
         string meta = "";
         string sourceNode = nil;
         try { sourceNode = sourceNodeOfGroup(node); }
-        catch (exception error)
+        catch (exception exc)
         {
-            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), error));
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
         }
 
         if (sourceNode neq nil)
@@ -2157,6 +2157,36 @@ class: SessionManagerMode : MinorMode
     {
         updateTree();
         event.reject();
+    }
+
+    method: updateNodePreviewEvent (void; Event event)
+    {
+        event.reject();
+        if (!_previewsEnabled) return;
+        let sourceNode = event.contents();
+
+        for_each (node; viewNodes())
+        {
+            try
+            {
+                if (nodeType(node) == "RVSourceGroup" && sourceNodeOfGroup(node) == sourceNode)
+                {
+                    let item = itemOfNode(_viewModel, node);
+                    if (item neq nil)
+                        _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+
+                    let inputItem = itemOfNode(_inputsModel, node);
+                    if (inputItem neq nil)
+                        _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
+
+                    return;
+                }
+            }
+            catch (exception exc) 
+            { 
+                print("WARNING: Could not update preview for %s - %s\n" % (uiName(node), exc));
+            }
+        }
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -3084,7 +3114,7 @@ class: SessionManagerMode : MinorMode
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
                ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
-               ("session-manager-preview-available", updateTreeEvent, "Refresh UI after preview is available")
+               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail")
                ],
              nil,
              nil);
