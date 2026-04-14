@@ -28,7 +28,7 @@ struct AppleProResContext
     {
         if (prpixbuf.baseAddr)
         {
-            av_freep(prpixbuf.baseAddr);
+            av_free(prpixbuf.baseAddr);
         }
         if (prdecoder)
         {
@@ -43,6 +43,14 @@ struct AppleProResContext
         if (this == &other)
         {
             return *this;
+        }
+        if (prpixbuf.baseAddr)
+        {
+            av_free(prpixbuf.baseAddr);
+        }
+        if (prdecoder)
+        {
+            PRCloseDecoder(prdecoder);
         }
         pixfmt = other.pixfmt;
         avPixelFormat = other.avPixelFormat;
