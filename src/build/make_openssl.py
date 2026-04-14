@@ -211,10 +211,13 @@ def build() -> None:
         _has_jom = bool(shutil.which("jom"))
         if _has_jom:
             build_args = ["jom", f"/J{os.cpu_count() or 1}"]
-            # /FS forces PDB writes through mspdbsrv.exe, which serializes access and
-            # prevents C1041 errors when multiple cl.exe processes compile in parallel.
             build_env = os.environ.copy()
+            # /FS serializes PDB writes through mspdbsrv.exe as a safety net.
             build_env["CL"] = build_env.get("CL", "") + " /FS"
+            # _CL_ is appended after all other flags, so /Z7 overrides the /Zi
+            # in OpenSSL's Makefile. This embeds debug info in each .obj instead
+            # of a shared PDB, eliminating file contention under parallel jom.
+            build_env["_CL_"] = build_env.get("_CL_", "") + " /Z7"
         else:
             build_args = ["nmake"]
     else:

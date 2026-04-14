@@ -132,7 +132,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
   )
   # SET(RV_DEPS_PYTHON_VERSION "3.10.18") SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "e381359208e2bd0485169656b50ff24c")
 
-  # OpenImageIO
+  # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
   SET(RV_DEPS_OIIO_VERSION
       "2.5.19.1"
   )
