@@ -39,12 +39,15 @@ ENDIF()
 IF(RV_TARGET_WINDOWS)
   FIND_PROGRAM(_jom_executable jom)
   IF(_jom_executable)
-    SET(_libraw_build_command ${_jom_executable} /J${_cpu_count} /f Makefile.msvc)
+    SET(_libraw_build_command
+        ${_jom_executable} /J${_cpu_count} /f Makefile.msvc
+    )
   ELSE()
-    SET(_libraw_build_command nmake /f Makefile.msvc)
+    SET(_libraw_build_command
+        nmake /f Makefile.msvc
+    )
   ENDIF()
 
-  MESSAGE(STATUS "libraw build command: ${_libraw_build_command}")
   EXTERNALPROJECT_ADD(
     ${_target}
     URL ${_download_url}

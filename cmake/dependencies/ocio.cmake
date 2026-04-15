@@ -240,9 +240,15 @@ ELSE() # Windows
     LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
   ENDIF()
 
-  LIST(APPEND _ocio_build_options "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}"
-       "--parallel" ${_cpu_count}    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
-       # isn't compatible with OCIO: tons of STD C++ missing symbols errors.
+  LIST(
+    APPEND
+    _ocio_build_options
+    "--build"
+    "${_build_dir}"
+    "--config"
+    "${CMAKE_BUILD_TYPE}"
+    "--parallel"
+    ${_cpu_count}
   )
 
   EXTERNALPROJECT_ADD(
