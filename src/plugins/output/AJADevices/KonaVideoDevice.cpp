@@ -1918,7 +1918,7 @@ namespace AJADevices
         }
     }
 
-    void KonaVideoDevice::route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
+    void KonaVideoDevice::route12GSingleLinkYUV(NTV2Standard standard, const KonaVideoFormat& videoFormat, const KonaDataFormat& dataFormat)
     {
         //
         //  Single-link YCbCr output on Kona 5 port 3 with the retail firmware.
@@ -1931,7 +1931,7 @@ namespace AJADevices
             std::cout << "INFO: KONA 6G/12G single-link YCbCr format\n";
 
         ULWord vpidA;
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_3);
+        CNTV2VPID::SetVPIDData(vpidA, videoFormat.value, dataFormat.value, false, false, VPIDChannel_3);
 
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
 
@@ -1956,7 +1956,7 @@ namespace AJADevices
         m_card->Connect(NTV2_XptCSC4VidInput, NTV2_Xpt425Mux2BRGB);
 
         // CSC 1 + CSC 2 + CSC 3 + CSC 4 -> SDI Out 1 + SDI Out 2 + SDI Out 3 + SDI Out 4
-        if (NTV2_IS_4K_HFR_VIDEO_FORMAT(f.value))
+        if (NTV2_IS_4K_HFR_VIDEO_FORMAT(videoFormat.value))
         {
             m_card->Connect(NTV2_XptSDIOut1Input, NTV2_XptCSC1VidYUV);
             m_card->Connect(NTV2_XptSDIOut2Input, NTV2_XptCSC2VidYUV);
@@ -1976,9 +1976,11 @@ namespace AJADevices
         }
 
         m_card->SetTsiFrameEnable(true, NTV2_CHANNEL1);
+
+        routeHDMI(standard, dataFormat, true, false);
     }
 
-    void KonaVideoDevice::route12GSingleLinkRGB(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
+    void KonaVideoDevice::route12GSingleLinkRGB(NTV2Standard standard, const KonaVideoFormat& videoFormat, const KonaDataFormat& dataFormat)
     {
         //
         //  Single-link RGB output on Kona 5 port 3 with the retail firmware.
@@ -1992,7 +1994,7 @@ namespace AJADevices
             std::cout << "INFO: KONA 12G single-link RGB format\n";
 
         ULWord vpidA;
-        CNTV2VPID::SetVPIDData(vpidA, f.value, d.value, false, false, VPIDChannel_3);
+        CNTV2VPID::SetVPIDData(vpidA, videoFormat.value, dataFormat.value, false, false, VPIDChannel_3);
 
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
 
@@ -2029,6 +2031,8 @@ namespace AJADevices
         m_card->SetSDIOut12GEnable(NTV2_CHANNEL3, true);
 
         m_card->SetTsiFrameEnable(true, NTV2_CHANNEL1);
+
+        routeHDMI(standard, dataFormat, true, true);
     }
 
     void KonaVideoDevice::routeQuadYUV(NTV2Standard standard, const KonaVideoFormat& f, const KonaDataFormat& d)
