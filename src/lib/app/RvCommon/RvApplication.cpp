@@ -779,19 +779,6 @@ namespace Rv
             return totalGeometry != primaryScreen->geometry();
         };
 
-        auto getScreenFromPoint = [&screens](const QPoint& point) -> int
-        {
-            for (int i = 0; i < screens.size(); ++i)
-            {
-                if (screens[i]->geometry().contains(point))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        };
-
         //
         //  Allow command line placement
         //
@@ -818,16 +805,31 @@ namespace Rv
             }
         }
 
+        auto getScreenFromPoint = [&screens](const QPoint& point) -> int
+        {
+            for (int i = 0; i < screens.size(); ++i)
+            {
+                if (screens[i]->geometry().contains(point))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        };
+
         int screen = getScreenFromPoint(QCursor::pos());
         if (opts.screen != -1)
+        {
             screen = opts.screen;
+        }
 
         int oldX = doc->pos().x();
         int oldY = doc->pos().y();
 
         int oldScreen = getScreenFromPoint(QPoint(oldX, oldY));
 
-        if (screen != -1 && isVirtualDesktop() && screen != oldScreen)
+        if (screen != -1 && oldScreen != -1 && isVirtualDesktop() && screen != oldScreen)
         //
         //  The application is going to come up on the wrong screen, so figure
         //  out our our relative position on the current screen, and move to the
