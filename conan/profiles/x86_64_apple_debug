@@ -1,6 +1,6 @@
 include(common)
 
-# Host profile for Intel Mac (x86_64) or Rosetta 2 emulation on Apple Silicon (Debug).
+# This a host profile for an x86_64 on Apple M1 (Debug).
 # Use that profile for -pr options.
 
 [settings]
