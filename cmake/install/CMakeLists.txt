@@ -17,7 +17,15 @@ FOREACH(
   IF(_variableName MATCHES "^RV_")
     IF(${_variableName})
       MESSAGE(STATUS "Adding VARIABLE ${_variableName} to INSTALL")
-      INSTALL(CODE "SET(${_variableName} ${${_variableName}})")
+      SET(_install_safe_value
+          "${${_variableName}}"
+      )
+      IF(RV_TARGET_WINDOWS)
+        # Convert backslashes to forward slashes so Windows paths like "D:\a\OpenRV\..." don't produce invalid escape sequences (\a, \O, etc.) in the generated
+        # cmake_install.cmake.
+        STRING(REPLACE "\\" "/" _install_safe_value "${_install_safe_value}")
+      ENDIF()
+      INSTALL(CODE "SET(${_variableName} ${_install_safe_value})")
     ENDIF()
   ENDIF()
 ENDFOREACH()

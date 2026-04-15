@@ -8,6 +8,38 @@ INCLUDE(rv_create_std_deps_vars)
 INCLUDE(rv_make_std_lib_name)
 INCLUDE(rv_stage_dependency_libs)
 INCLUDE(rv_add_imported_library)
+INCLUDE(rv_find_dependency)
+
+# All imported targets created by find_package() are automatically GLOBAL, so subdirectories can reference them without manual promotion.
+SET(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL
+    TRUE
+)
+
+# Conan's CMakeDeps only sets IMPORTED_LOCATION_<CONFIG> for the single build_type used during `conan install`. On multi-config generators (MSVC), CMake
+# validates ALL configurations in CMAKE_CONFIGURATION_TYPES at generation time. Any config Conan didn't provide would error with "IMPORTED_LOCATION not set for
+# imported target ... configuration <X>". Map every config that Conan didn't provide to the one it did, so imported targets always resolve.
+IF(RV_CONAN_CMAKE_PREFIX_PATH
+   AND MSVC
+)
+  STRING(TOUPPER "${CMAKE_BUILD_TYPE}" _conan_config_upper)
+  FOREACH(
+    _cfg
+    DEBUG RELEASE RELWITHDEBINFO MINSIZEREL
+  )
+    IF(NOT _cfg STREQUAL _conan_config_upper)
+      SET(CMAKE_MAP_IMPORTED_CONFIG_${_cfg}
+          ${CMAKE_BUILD_TYPE} ""
+      )
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
+
+# Snapshot the user's CMAKE_PREFIX_PATH before Qt adds ~150 component cmake dirs. ExternalProject sub-builds (OIIO, OCIO, OpenEXR) use this clean list to find
+# transitive dependencies without Qt noise.
+SET(RV_DEPS_CMAKE_PREFIX_PATH
+    "${CMAKE_PREFIX_PATH}"
+    CACHE INTERNAL "User's CMAKE_PREFIX_PATH before Qt additions"
+)
 
 INCLUDE(ProcessorCount)
 PROCESSORCOUNT(_cpu_count)
@@ -88,6 +120,9 @@ INCLUDE(openjpeg) # depends on zlib, tiff, png
 INCLUDE(openjph)
 INCLUDE(webp)
 INCLUDE(openexr)
+IF(RV_DEPS_OPENEXR_FOUND)
+  INCLUDE(libdeflate)
+ENDIF()
 INCLUDE(ocio)
 # src/pub: freetype: src/pub will be removed eventually, this path will needed to change.
 ADD_SUBDIRECTORY(../../src/pub/freetype src/pub/freetype) # required by oiio
