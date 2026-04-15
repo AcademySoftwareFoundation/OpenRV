@@ -4,18 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-SET(_target
-    "RV_DEPS_OPENSSL"
-)
-SET(_version
-    ${RV_DEPS_OPENSSL_VERSION}
-)
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENSSL" "${RV_DEPS_OPENSSL_VERSION}" "" "")
 
 IF(RV_TARGET_IS_RHEL8
    AND RV_VFX_PLATFORM STREQUAL CY2023
 )
-  # VFX2023: Rocky Linux 8
-
+  # VFX2023 on Rocky Linux 8: use system OpenSSL 1.1.1
   FIND_PACKAGE(OpenSSL 1.1.1 REQUIRED)
 
   SET(RV_DEPS_OPENSSL_VERSION
@@ -28,125 +22,38 @@ IF(RV_TARGET_IS_RHEL8
   )
   GET_FILENAME_COMPONENT(_lib_dir "${OPENSSL_SSL_LIBRARY}" DIRECTORY)
 
-  MESSAGE(STATUS "_include_dir ${_include_dir}")
-  MESSAGE(STATUS "_lib_dir ${_lib_dir}")
-
 ELSE()
-  # VFX2023: Rocky Linux 9, Windows and MacOS VFX2024: Rocky Linux 8/9, Windows and MacOS
-
-  SET(RV_DEPS_WIN_PERL_ROOT
-      ""
-      CACHE STRING "Path to Windows perl root"
+  # All other platforms: find-first dispatcher. Tries CONFIG, then MODULE (FindOpenSSL.cmake), then pkg-config. On systems where OpenSSL is not on the default
+  # search path (e.g., keg-only on macOS, custom install on Linux/Windows), hint with CMAKE_PREFIX_PATH, OPENSSL_ROOT_DIR, or PKG_CONFIG_PATH.
+  RV_FIND_DEPENDENCY(
+    TARGET
+    ${_target}
+    PACKAGE
+    OpenSSL
+    VERSION
+    ${_version}
+    PKG_CONFIG_NAME
+    openssl
+    ALLOW_MODULE
+    DEPS_LIST_TARGETS
+    OpenSSL::Crypto
+    OpenSSL::SSL
   )
 
-  SET(_target
-      "RV_DEPS_OPENSSL"
+  SET(_download_url
+      "https://github.com/openssl/openssl/releases/download/openssl-${_version}/openssl-${_version}.tar.gz"
   )
-
-  STRING(REPLACE "." "_" _version_underscored ${_version})
-
-  IF(RV_TARGET_WINDOWS
-     AND (NOT RV_DEPS_WIN_PERL_ROOT
-          OR RV_DEPS_WIN_PERL_ROOT STREQUAL "")
-  )
-    MESSAGE(
-      FATAL_ERROR
-        "Unable to build without a RV_DEPS_WIN_PERL_ROOT. OpenSSL requires a Windows native perl interpreter to build (it recommends https://strawberryperl.com/). Example -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin"
-    )
-  ENDIF()
-
-  SET(RV_DEPS_OPENSSL_INSTALL_DIR
-      ${RV_DEPS_BASE_DIR}/${_target}/install
-  )
-  SET(_include_dir
-      ${RV_DEPS_OPENSSL_INSTALL_DIR}/include
-  )
-  SET(_source_dir
-      ${RV_DEPS_BASE_DIR}/${_target}/src
-  )
-  SET(_build_dir
-      ${RV_DEPS_BASE_DIR}/${_target}/build
-  )
-
-  IF(RHEL_VERBOSE)
-    IF(RV_VFX_PLATFORM STREQUAL "CY2023")
-      SET(_lib_dir
-          "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib"
-      )
-    ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-      SET(_lib_dir
-          "${RV_DEPS_OPENSSL_INSTALL_DIR}/lib64"
-      )
-    ENDIF()
-  ELSE()
-    SET(_lib_dir
-        ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib
-    )
-  ENDIF()
-
-  SET(_bin_dir
-      ${RV_DEPS_OPENSSL_INSTALL_DIR}/bin
-  )
-
   IF(${_version} STREQUAL "1.1.1u")
+    STRING(REPLACE "." "_" _version_underscored ${_version})
     SET(_download_url
         "https://github.com/openssl/openssl/releases/download/OpenSSL_${_version_underscored}/openssl-${_version}.tar.gz"
     )
-  ELSE()
-    SET(_download_url
-        "https://github.com/openssl/openssl/releases/download/openssl-${_version}/openssl-${_version}.tar.gz"
-    )
   ENDIF()
-
   SET(_download_hash
       ${RV_DEPS_OPENSSL_HASH}
   )
 
-  SET(_make_command_script
-      "${PROJECT_SOURCE_DIR}/src/build/make_openssl.py"
-  )
-  SET(_make_command
-      python3 "${_make_command_script}"
-  )
-
-  LIST(APPEND _make_command "--source-dir")
-  LIST(APPEND _make_command ${_source_dir})
-  LIST(APPEND _make_command "--output-dir")
-  LIST(APPEND _make_command ${RV_DEPS_OPENSSL_INSTALL_DIR})
-
-  LIST(APPEND _make_command "--vfx_platform")
-
-  LIST(APPEND _make_command ${RV_VFX_CY_YEAR})
-
-  IF(RV_TARGET_WINDOWS)
-    LIST(APPEND _make_command "--perlroot")
-    LIST(APPEND _make_command ${RV_DEPS_WIN_PERL_ROOT})
-  ENDIF()
-
-  IF(APPLE)
-    # This is needed because if Rosetta is used to compile for x86_64 from ARM64, openssl build system detects it as "linux-x86_64" and it causes issues.
-
-    IF(RV_TARGET_APPLE_X86_64)
-      SET(__openssl_arch__
-          x86_64
-      )
-    ELSEIF(RV_TARGET_APPLE_ARM64)
-      SET(__openssl_arch__
-          arm64
-      )
-    ENDIF()
-
-    LIST(APPEND _make_command --arch=-${__openssl_arch__})
-  ENDIF()
-
-  # On most POSIX platforms, shared libraries are named `libcrypto.so.1.1` and `libssl.so.1.1`.
-
-  # On Windows build with MSVC or using MingW, shared libraries are named `libcrypto-1_1.dll` and `libssl-1_1.dll` for 32-bit Windows, `libcrypto-1_1-x64.dll`
-  # and `libssl-1_1-x64.dll` for 64-bit x86_64 Windows, and `libcrypto-1_1-ia64.dll` and `libssl-1_1-ia64.dll` for IA64 Windows. With MSVC, the import libraries
-  # are named `libcrypto.lib` and `libssl.lib`, while with MingW, they are named `libcrypto.dll.a` and `libssl.dll.a`.
-
-  # Ref: https://github.com/openssl/openssl/blob/398011848468c7e8e481b295f7904afc30934217/INSTALL.md?plain=1#L1847-L1858
-
+  # Shared naming logic (used by both build and found paths)
   SET(_dot_version
       ${RV_DEPS_OPENSSL_VERSION_DOT}
   )
@@ -158,12 +65,10 @@ ELSE()
     SET(_crypto_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}crypto${CMAKE_SHARED_LIBRARY_SUFFIX}${_dot_version}
     )
-
     SET(_ssl_lib_name
         ${CMAKE_SHARED_LIBRARY_PREFIX}ssl${CMAKE_SHARED_LIBRARY_SUFFIX}${_dot_version}
     )
   ELSEIF(RV_TARGET_WINDOWS)
-    # As stated in the openssl documentation, the names are libcrypto-1_1-x64 and libssl-1_1-x64 when OpenSSL is build with MSVC.
     SET(_crypto_lib_name
         libcrypto-${_underscore_version}-x64${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
@@ -182,7 +87,6 @@ ELSE()
   SET(_crypto_lib
       ${_lib_dir}/${_crypto_lib_name}
   )
-
   SET(_ssl_lib
       ${_lib_dir}/${_ssl_lib_name}
   )
@@ -191,108 +95,77 @@ ELSE()
     SET(_implibpath_crypto
         ${_lib_dir}/${CMAKE_IMPORT_LIBRARY_PREFIX}crypto${CMAKE_IMPORT_LIBRARY_SUFFIX}
     )
-
     SET(_implibpath_ssl
         ${_lib_dir}/${CMAKE_IMPORT_LIBRARY_PREFIX}ssl${CMAKE_IMPORT_LIBRARY_SUFFIX}
     )
   ENDIF()
 
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_source_dir}
-    INSTALL_DIR ${RV_DEPS_OPENSSL_INSTALL_DIR}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    CONFIGURE_COMMAND ${_make_command} --configure
-    BUILD_COMMAND ${_make_command} --build
-    INSTALL_COMMAND ${_make_command} --install
-    BUILD_IN_SOURCE TRUE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_crypto_lib} ${_ssl_lib}
-    USES_TERMINAL_BUILD TRUE
-  )
+  IF(NOT ${_target}_FOUND)
+    INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/openssl.cmake)
 
-  FILE(MAKE_DIRECTORY ${_include_dir})
+    IF(RV_TARGET_WINDOWS)
+      ADD_CUSTOM_COMMAND(
+        COMMENT "Staging ${_target} libs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
+        OUTPUT ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_ssl_lib_name} ${RV_STAGE_BIN_DIR}
+        DEPENDS ${_target}
+      )
+      ADD_CUSTOM_TARGET(
+        ${_target}-stage-target ALL
+        DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
+      )
+      ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+    ELSE()
+      SET(_openssl_stage_lib_dir
+          ${RV_STAGE_LIB_DIR}
+      )
+      IF(RV_TARGET_LINUX)
+        SET(_openssl_stage_lib_dir
+            ${_openssl_stage_lib_dir}/OpenSSL
+        )
+      ENDIF()
 
-  ADD_LIBRARY(OpenSSL::Crypto SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(OpenSSL::Crypto ${_target})
-  SET_PROPERTY(
-    TARGET OpenSSL::Crypto
-    PROPERTY IMPORTED_LOCATION ${_crypto_lib}
-  )
-  SET_PROPERTY(
-    TARGET OpenSSL::Crypto
-    PROPERTY IMPORTED_SONAME ${_crypto_lib_name}
-  )
-  IF(RV_TARGET_WINDOWS)
-    SET_PROPERTY(
-      TARGET OpenSSL::Crypto
-      PROPERTY IMPORTED_IMPLIB ${_implibpath_crypto}
-    )
-  ENDIF()
-  TARGET_INCLUDE_DIRECTORIES(
-    OpenSSL::Crypto
-    INTERFACE ${_include_dir}
-  )
-  LIST(APPEND RV_DEPS_LIST OpenSSL::Crypto)
-
-  ADD_LIBRARY(OpenSSL::SSL SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(OpenSSL::SSL ${_target})
-  SET_PROPERTY(
-    TARGET OpenSSL::SSL
-    PROPERTY IMPORTED_LOCATION ${_ssl_lib}
-  )
-  SET_PROPERTY(
-    TARGET OpenSSL::SSL
-    PROPERTY IMPORTED_SONAME ${_ssl_lib_name}
-  )
-  IF(RV_TARGET_WINDOWS)
-    SET_PROPERTY(
-      TARGET OpenSSL::SSL
-      PROPERTY IMPORTED_IMPLIB ${_implibpath_ssl}
-    )
-  ENDIF()
-  TARGET_INCLUDE_DIRECTORIES(
-    OpenSSL::SSL
-    INTERFACE ${_include_dir}
-  )
-  LIST(APPEND RV_DEPS_LIST OpenSSL::SSL)
-
-  SET(_openssl_stage_lib_dir
-      ${RV_STAGE_LIB_DIR}
-  )
-
-  IF(RV_TARGET_WINDOWS)
-    ADD_CUSTOM_COMMAND(
-      TARGET ${_target}
-      POST_BUILD
-      COMMENT "Renaming the openssl import libs to the name FFmpeg is expecting"
-      COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libssl.lib ${_lib_dir}/ssl.lib
-      COMMAND ${CMAKE_COMMAND} -E copy ${RV_DEPS_OPENSSL_INSTALL_DIR}/lib/libcrypto.lib ${_lib_dir}/crypto.lib
-    )
-    # Copy import libs to stage lib dir and specific DLLs to stage bin dir
-    ADD_CUSTOM_COMMAND(
-      COMMENT "Staging ${_target} libs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-      OUTPUT ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_ssl_lib_name} ${RV_STAGE_BIN_DIR}
-      DEPENDS ${_target}
-    )
-    ADD_CUSTOM_TARGET(
-      ${_target}-stage-target ALL
-      DEPENDS ${RV_STAGE_BIN_DIR}/${_crypto_lib_name} ${RV_STAGE_BIN_DIR}/${_ssl_lib_name}
-    )
-    ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+      RV_STAGE_DEPENDENCY_LIBS(
+        TARGET
+        ${_target}
+        STAGE_LIB_DIR
+        ${_openssl_stage_lib_dir}
+        OUTPUTS
+        ${_openssl_stage_lib_dir}/${_crypto_lib_name}
+        ${_openssl_stage_lib_dir}/${_ssl_lib_name}
+      )
+    ENDIF()
   ELSE()
+    FOREACH(
+      _ssl_target
+      OpenSSL::Crypto OpenSSL::SSL
+    )
+      IF(NOT TARGET ${_ssl_target})
+        STRING(
+          REGEX
+          REPLACE ".*::" "" _ssl_short ${_ssl_target}
+        )
+        STRING(TOLOWER ${_ssl_short} _ssl_lower)
+        RV_ADD_IMPORTED_LIBRARY(
+          NAME
+          ${_ssl_target}
+          TYPE
+          SHARED
+          LOCATION
+          ${_lib_dir}/lib${_ssl_lower}${CMAKE_SHARED_LIBRARY_SUFFIX}
+          INCLUDE_DIRS
+          ${_include_dir}
+          DEPENDS
+          ${_target}
+        )
+      ENDIF()
+    ENDFOREACH()
 
-    # Because RHEL8 has the same version of openssl library as we use but is not compatible with our library, we will copy openssl into its own seperate lib
-    # directory and conditionally add it to the LD_LIBRARY_PATH if the version we build does not match the system version. This will allow RHEL8 to use its own
-    # system version
-    #
+    SET(_openssl_stage_lib_dir
+        ${RV_STAGE_LIB_DIR}
+    )
     IF(RV_TARGET_LINUX)
       SET(_openssl_stage_lib_dir
           ${_openssl_stage_lib_dir}/OpenSSL
@@ -304,11 +177,15 @@ ELSE()
       ${_target}
       STAGE_LIB_DIR
       ${_openssl_stage_lib_dir}
-      OUTPUTS
-      ${_openssl_stage_lib_dir}/${_crypto_lib_name}
-      ${_openssl_stage_lib_dir}/${_ssl_lib_name}
+      TARGET_LIBS
+      OpenSSL::Crypto
+      OpenSSL::SSL
     )
   ENDIF()
+
+  SET(RV_DEPS_OPENSSL_INSTALL_DIR
+      ${_install_dir}
+  )
 
   SET(RV_DEPS_OPENSSL_VERSION
       ${_version}
@@ -341,3 +218,33 @@ SET_PROPERTY(
   GLOBAL APPEND
   PROPERTY "RV_FFMPEG_EXTERNAL_LIBS" "--enable-openssl"
 )
+# FFmpeg's check_lib fallback tries -lssl/-lcrypto, which MSVC converts to ssl.lib/crypto.lib. OpenSSL 3.x ships libssl.lib/libcrypto.lib. When the package was
+# found (Conan/vcpkg) rather than built from source, create compatibility copies so the fallback works. The build-from-source path already does this in
+# build/openssl.cmake. Copies go into a build-local directory to avoid modifying the package cache.
+IF(RV_TARGET_WINDOWS
+   AND ${_target}_FOUND
+   AND EXISTS "${_lib_dir}/libssl.lib"
+   AND NOT EXISTS "${_lib_dir}/ssl.lib"
+)
+  SET(_openssl_compat_dir
+      "${CMAKE_CURRENT_BINARY_DIR}/openssl_compat"
+  )
+  FILE(MAKE_DIRECTORY "${_openssl_compat_dir}")
+  CONFIGURE_FILE("${_lib_dir}/libssl.lib" "${_openssl_compat_dir}/ssl.lib" COPYONLY)
+  CONFIGURE_FILE("${_lib_dir}/libcrypto.lib" "${_openssl_compat_dir}/crypto.lib" COPYONLY)
+  SET_PROPERTY(
+    GLOBAL APPEND
+    PROPERTY "RV_FFMPEG_EXTRA_LIBPATH_OPTIONS" "--extra-ldflags=-LIBPATH:${_openssl_compat_dir}"
+  )
+ENDIF()
+# For found packages, expose the pkgconfig directory so FFmpeg's configure can detect OpenSSL via pkg-config. This is critical on Windows where FFmpeg's
+# fallback `-lssl -lcrypto` translates to `ssl.lib`/`crypto.lib` (MSVC literal name), but vcpkg/OpenSSL 3.x ships `libssl.lib`/`libcrypto.lib`. The .pc files
+# contain the correct `-llibssl -llibcrypto` flags. On Unix this is also useful when the found package is in a non-standard prefix.
+IF(${_target}_FOUND
+   AND EXISTS "${_lib_dir}/pkgconfig"
+)
+  SET_PROPERTY(
+    GLOBAL APPEND
+    PROPERTY "RV_DEPS_PKG_CONFIG_PATH" "${_lib_dir}/pkgconfig"
+  )
+ENDIF()

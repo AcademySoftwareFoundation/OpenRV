@@ -17,17 +17,36 @@
 # OpenImageIO required >= 3.9, using latest 4.0
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "" "")
 
+# Force build from source: OpenRV uses private TIFF headers (tiffiop.h, tif_dir.h, tif_hash_set.h) that are not installed by system packages.
+SET(RV_DEPS_TIFF_FORCE_BUILD
+    ON
+    CACHE BOOL "libtiff must be built from source (private headers required)" FORCE
+)
+
+# libtiff ships CMake CONFIG files when built from source. CMake also provides a FindTIFF module. Fall back to pkg-config.
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  TIFF
+  VERSION
+  ${_version}
+  PKG_CONFIG_NAME
+  libtiff-4
+  ALLOW_MODULE
+  DEPS_LIST_TARGETS
+  TIFF::TIFF
+)
+
 SET(_download_url
     "https://gitlab.com/libtiff/libtiff/-/archive/v${_version}/libtiff-v${_version}.tar.gz"
 )
-
 SET(_download_hash
     ${RV_DEPS_TIFF_DOWNLOAD_HASH}
 )
 
+# Shared naming logic (used by both build and found paths)
 IF(NOT RV_TARGET_WINDOWS)
-  # Mac/Linux: Use the unversionned .dylib.so LINK which points to the proper file (which has a diff version number) Mac/Linux: TIFF doesn't use a Postfix only
-  # 'MSVC'.
   IF(RV_TARGET_DARWIN)
     RV_MAKE_STANDARD_LIB_NAME("tiff" "${RV_DEPS_TIFF_VERSION_LIB}" "SHARED" "")
   ELSE()
@@ -37,109 +56,91 @@ ELSE()
   # Windows: TIFF produces tiff.dll/tiffd.dll (not libtiff.dll). Debug uses "d" postfix.
   RV_MAKE_STANDARD_LIB_NAME("tiff" "${_version}" "SHARED" "d")
 ENDIF()
-# ByProducts note: Windows will only have the DLL in _byproducts, this is fine since both .lib and .dll will be updated together.
 
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
-ELSE()
-  GET_TARGET_PROPERTY(zlib_library ZLIB::ZLIB IMPORTED_LOCATION)
-ENDIF()
-GET_TARGET_PROPERTY(zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${zlib_include_dir}")
-LIST(APPEND _configure_options "-DZLIB_LIBRARY=${zlib_library}")
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/tiff.cmake)
 
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(jpeg_library libjpeg-turbo::jpeg IMPORTED_IMPLIB)
-ELSE()
-  GET_TARGET_PROPERTY(jpeg_library libjpeg-turbo::jpeg IMPORTED_LOCATION)
-ENDIF()
-GET_TARGET_PROPERTY(jpeg_include_dir libjpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
-LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${jpeg_include_dir}")
-LIST(APPEND _configure_options "-DJPEG_LIBRARY=${jpeg_library}")
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-LIST(APPEND _configure_options "-Djpeg=ON")
-LIST(APPEND _configure_options "-Dlzma=OFF")
-LIST(APPEND _configure_options "-Dwebp=OFF")
-LIST(APPEND _configure_options "-Dzlib=ON")
-LIST(APPEND _configure_options "-Dzstd=OFF")
-
-# Do not need TIFF tools.
-LIST(APPEND _configure_options "-Dtiff-tools=OFF")
-
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${_source_dir}
-  BINARY_DIR ${_build_dir}
-  INSTALL_DIR ${_install_dir}
-  DEPENDS ZLIB::ZLIB libjpeg-turbo::jpeg
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_IN_SOURCE FALSE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_libpath}
-  USES_TERMINAL_BUILD TRUE
-)
-
-ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Installing ${_target}'s missing headers"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_base_dir}/build/libtiff/tif_config.h ${_base_dir}/src/libtiff/tiffiop.h ${_base_dir}/src/libtiff/tif_dir.h
-          ${_base_dir}/src/libtiff/tif_hash_set.h ${_include_dir}
-)
-
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
-
-IF(RV_TARGET_WINDOWS)
-  IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    SET(_tiff_lib_name
-        "tiff.lib"
+  IF(RV_TARGET_WINDOWS)
+    IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+      SET(_tiff_lib_name
+          "tiff.lib"
+      )
+    ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+      SET(_tiff_lib_name
+          "tiffd.lib"
+      )
+    ENDIF()
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      TIFF::TIFF
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      IMPLIB
+      ${_lib_dir}/${_tiff_lib_name}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
     )
-  ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    SET(_tiff_lib_name
-        "tiffd.lib"
+  ELSE()
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      TIFF::TIFF
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      SONAME
+      ${_libname}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
     )
   ENDIF()
-  RV_ADD_IMPORTED_LIBRARY(
-    NAME
+
+  TARGET_LINK_LIBRARIES(
     TIFF::TIFF
-    TYPE
-    SHARED
-    LOCATION
-    ${_libpath}
-    IMPLIB
-    ${_lib_dir}/${_tiff_lib_name}
-    INCLUDE_DIRS
-    ${_include_dir}
-    DEPENDS
-    ${_target}
-    ADD_TO_DEPS_LIST
+    INTERFACE ZLIB::ZLIB libjpeg-turbo::jpeg
   )
 ELSE()
-  RV_ADD_IMPORTED_LIBRARY(
-    NAME
-    TIFF::TIFF
-    TYPE
-    SHARED
-    LOCATION
-    ${_libpath}
-    SONAME
-    ${_libname}
-    INCLUDE_DIRS
-    ${_include_dir}
-    DEPENDS
-    ${_target}
-    ADD_TO_DEPS_LIST
-  )
-ENDIF()
+  # FindTIFF.cmake (MODULE) creates TIFF::TIFF as INTERFACE wrapping TIFF::tiff. CONFIG creates TIFF::TIFF directly. For staging, use TIFF::tiff if it exists
+  # (the actual IMPORTED library with LOCATION), otherwise TIFF::TIFF.
+  IF(TARGET TIFF::tiff)
+    SET(_tiff_stage_target
+        TIFF::tiff
+    )
+    # TIFF::tiff needs to be in RV_DEPS_LIST for install_name_tool -change to work (it has LOCATION, TIFF::TIFF is INTERFACE).
+    LIST(APPEND RV_DEPS_LIST TIFF::tiff)
+    RV_RESOLVE_DARWIN_INSTALL_NAME(TIFF::tiff)
+  ELSE()
+    SET(_tiff_stage_target
+        TIFF::TIFF
+    )
+  ENDIF()
 
-TARGET_LINK_LIBRARIES(
-  TIFF::TIFF
-  INTERFACE ZLIB::ZLIB libjpeg-turbo::jpeg
-)
+  IF(NOT TARGET TIFF::TIFF)
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      TIFF::TIFF
+      TYPE
+      SHARED
+      LOCATION
+      ${_lib_dir}/${_libname}
+      SONAME
+      ${_libname}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+    )
+  ENDIF()
+
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_tiff_stage_target})
+ENDIF()
