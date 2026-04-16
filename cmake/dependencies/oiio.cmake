@@ -53,12 +53,14 @@ LIST(APPEND _configure_options "-DUSE_PYTHON=0") # this on would requireextra py
 LIST(APPEND _configure_options "-DPython3_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
 LIST(APPEND _configure_options "-DPython3_FIND_STRATEGY=LOCATION")
 LIST(APPEND _configure_options "-DPython3_FIND_REGISTRY=NEVER")
-LIST(APPEND _configure_options "-DUSE_OCIO=ON")
-LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
-IF(RHEL_VERBOSE)
-  LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib64/cmake/OpenColorIO")
-ELSE()
-  LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib/cmake/OpenColorIO")
+IF(NOT RV_VFX_CY2023)
+  LIST(APPEND _configure_options "-DUSE_OCIO=ON")
+  LIST(APPEND _configure_options "-DOpenColorIO_ROOT=${RV_DEPS_OCIO_ROOT_DIR}")
+  IF(RHEL_VERBOSE)
+    LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib64/cmake/OpenColorIO")
+  ELSE()
+    LIST(APPEND _configure_options "-DOpenColorIO_DIR=${RV_DEPS_OCIO_ROOT_DIR}/lib/cmake/OpenColorIO")
+  ENDIF()
 ENDIF()
 LIST(APPEND _configure_options "-DUSE_FREETYPE=0")
 LIST(APPEND _configure_options "-DUSE_GIF=OFF")
@@ -141,6 +143,16 @@ IF(RV_TARGET_WINDOWS)
   LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
 ENDIF()
 
+IF(NOT RV_VFX_CY2023)
+  SET(_depends_ocio
+      OpenColorIO::OpenColorIO
+  )
+ELSE()
+  SET(_depends_ocio
+      ""
+  )
+ENDIF()
+
 IF(NOT RV_TARGET_WINDOWS)
   EXTERNALPROJECT_ADD(
     ${_target}
@@ -166,7 +178,7 @@ IF(NOT RV_TARGET_WINDOWS)
             WebP::webp
             LibRaw::raw
             ZLIB::ZLIB
-            OpenColorIO::OpenColorIO
+            ${_depends_ocio}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${_cmake_build_command}
     INSTALL_COMMAND ${_cmake_install_command}
@@ -221,7 +233,7 @@ ELSE()
             WebP::webp
             LibRaw::raw
             ZLIB::ZLIB
-            OpenColorIO::OpenColorIO
+            ${_depends_ocio}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
     BUILD_COMMAND ${CMAKE_COMMAND} ${_oiio_build_options}
     INSTALL_COMMAND ${CMAKE_COMMAND} ${_oiio_install_options}
