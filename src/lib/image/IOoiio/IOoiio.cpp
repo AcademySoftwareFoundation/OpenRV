@@ -19,7 +19,11 @@ namespace TwkFB
 {
     using namespace std;
     using namespace TwkUtil;
+#ifdef RV_VFX_CY2023
+    using namespace OpenImageIO_v2_5;
+#else
     using namespace OpenImageIO;
+#endif
 
     IOoiio::IOoiio()
         : FrameBufferIO("IOoiio", "n") // OIIO after any defaults of ours
