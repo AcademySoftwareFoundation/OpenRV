@@ -1108,6 +1108,8 @@ class: SessionManagerMode : MinorMode
     bool               _disableUpdates;
     bool               _previewsEnabled;
     bool               _progressiveLoadingInProgress;
+    string[]           _srcNodeKeys;
+    string[]           _grpNodeValues;
     QTimer             _lazySetInputsTimer;
     QTimer             _lazyUpdateTimer;
     QTimer             _mainWinVisTimer;
@@ -1797,6 +1799,13 @@ class: SessionManagerMode : MinorMode
 
     method: makeSourceRowWidget (QWidget; string node)
     {
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
+        }
+
         let widget = QWidget(nil, 0),
             layout = QHBoxLayout(widget);
         widget.setObjectName("sourceRowWidget");
@@ -1808,12 +1817,6 @@ class: SessionManagerMode : MinorMode
         preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
 
         string meta = "";
-        string sourceNode = nil;
-        try { sourceNode = sourceNodeOfGroup(node); }
-        catch (exception exc)
-        {
-            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
-        }
 
         if (sourceNode neq nil)
         {
@@ -1934,8 +1937,10 @@ class: SessionManagerMode : MinorMode
                 //  node.sm_state.componentHash
                 //
 
-                let sourceNode = sourceNodeOfGroup(node),
-                    pval       = getStringProperty(sourceNode + ".request.imageComponent"),
+                let sourceNode = sourceNodeOfGroup(node);
+                _srcNodeKeys.push_back(sourceNode);
+                _grpNodeValues.push_back(node);
+                let pval       = getStringProperty(sourceNode + ".request.imageComponent"),
                     hasPval    = pval.size() > 1,
                     iname      = if hasPval then pval.back() else string(nil),
                     itype      = if hasPval
@@ -2055,6 +2060,8 @@ class: SessionManagerMode : MinorMode
     method: updateTree (void;)
     {
         if (_disableUpdates) return;
+        _srcNodeKeys = string[]();
+        _grpNodeValues = string[]();
         _viewModel.clear();
         _viewModel.setHorizontalHeaderLabels(string[] {"Name", "*", "*"});
         _viewTreeView.header().setMinimumSectionSize(-1);
@@ -2155,8 +2162,9 @@ class: SessionManagerMode : MinorMode
 
     method: updateTreeEvent (void; Event event)
     {
-        updateTree();
         event.reject();
+        if (_progressiveLoadingInProgress) return;
+        updateTree();
     }
 
     method: updateNodePreviewEvent (void; Event event)
@@ -2165,28 +2173,20 @@ class: SessionManagerMode : MinorMode
         if (!_previewsEnabled) return;
         let sourceNode = event.contents();
 
-        for_each (node; viewNodes())
+        string node = nil;
+        for (int i = 0; i < _srcNodeKeys.size(); i++)
         {
-            try
-            {
-                if (nodeType(node) == "RVSourceGroup" && sourceNodeOfGroup(node) == sourceNode)
-                {
-                    let item = itemOfNode(_viewModel, node);
-                    if (item neq nil)
-                        _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
-
-                    let inputItem = itemOfNode(_inputsModel, node);
-                    if (inputItem neq nil)
-                        _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
-
-                    return;
-                }
-            }
-            catch (exception exc) 
-            { 
-                print("WARNING: Could not update preview for %s - %s\n" % (uiName(node), exc));
-            }
+            if (_srcNodeKeys[i] == sourceNode) { node = _grpNodeValues[i]; break; }
         }
+        if (node eq nil) return;
+
+        let item = itemOfNode(_viewModel, node);
+        if (item neq nil)
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+
+        let inputItem = itemOfNode(_inputsModel, node);
+        if (inputItem neq nil)
+            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
     }
 
     method: beforeProgressiveLoading (void; Event event)
