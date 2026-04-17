@@ -138,6 +138,8 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 # OIIO tools are not needed.
 LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
+LIST(APPEND _configure_options "-DCMAKE_CXX_STANDARD=${RV_CPP_STANDARD}")
+
 IF(RV_TARGET_WINDOWS)
   LIST(PREPEND _configure_options "-G ${CMAKE_GENERATOR}")
   LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=/utf-8")
