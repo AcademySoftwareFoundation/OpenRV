@@ -91,6 +91,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
         self._playback_active = False
+        self._shutting_down = False
         self._active_procs: list[subprocess.Popen] = []
         self._procs_lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
@@ -167,6 +168,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._submit_generation(source_node, cache_key, media_path, path_key)
 
     def _submit_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
+        if self._shutting_down:
+            return
         rvio_bin = self._get_rvio_bin()
         if not rvio_bin:
             return
@@ -522,6 +525,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
+        self._shutting_down = True
         with self._procs_lock:
             for proc in self._active_procs:
                 _resume_proc(proc)
