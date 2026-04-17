@@ -1,11 +1,16 @@
+import ctypes
 import hashlib
 import logging
 import math
 import os
+import signal
 import shutil
 import subprocess
+import sys
 import tempfile
 import textwrap
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
@@ -23,7 +28,41 @@ the_mode = None
 
 FRAME_WIDTH = 240
 MAX_FILMSTRIP_FRAMES = 25
-MAX_WORKERS = 4
+MAX_WORKERS = 2
+
+_IS_WIN32 = sys.platform == "win32"
+
+
+def _suspend_proc(proc: subprocess.Popen) -> None:
+    """Suspend a subprocess. Uses SIGSTOP on Unix, NtSuspendProcess on Windows."""
+    try:
+        if _IS_WIN32:
+            handle = ctypes.windll.kernel32.OpenProcess(0x0800, False, proc.pid)  # PROCESS_SUSPEND_RESUME
+            if handle:
+                try:
+                    ctypes.windll.ntdll.NtSuspendProcess(handle)
+                finally:
+                    ctypes.windll.kernel32.CloseHandle(handle)
+        else:
+            proc.send_signal(signal.SIGSTOP)
+    except Exception:
+        logger.warning(f"Failed to suspend process {proc.pid}")
+
+
+def _resume_proc(proc: subprocess.Popen) -> None:
+    """Resume a suspended subprocess. Uses SIGCONT on Unix, NtResumeProcess on Windows."""
+    try:
+        if _IS_WIN32:
+            handle = ctypes.windll.kernel32.OpenProcess(0x0800, False, proc.pid)  # PROCESS_SUSPEND_RESUME
+            if handle:
+                try:
+                    ctypes.windll.ntdll.NtResumeProcess(handle)
+                finally:
+                    ctypes.windll.kernel32.CloseHandle(handle)
+        else:
+            proc.send_signal(signal.SIGCONT)
+    except Exception:
+        logger.warning(f"Failed to resume process {proc.pid}")
 
 
 class _SignalBridge(QtCore.QObject):
@@ -49,6 +88,11 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._in_flight: set[str] = set()
         self._cache_key_to_source: dict[str, str] = {}
+        self._deferred_sources: set[str] = set()
+        self._deferred_jobs: list[tuple[str, str, str, str]] = []
+        self._playback_active = False
+        self._active_procs: list[subprocess.Popen] = []
+        self._procs_lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
         self._bridge = _SignalBridge()
@@ -74,6 +118,16 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 "before-session-deletion",
                 self._on_session_deletion,
                 "Delete all cached local filmstrips and thumbnails on RV close",
+            ),
+            (
+                "play-start",
+                self._on_play_start,
+                "Pause thumbnail generation during playback",
+            ),
+            (
+                "play-stop",
+                self._on_play_stop,
+                "Resume thumbnail generation after playback",
             ),
         ]
 
@@ -106,6 +160,13 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._get_cached_path(event, "thumbnail_path")
 
     def _start_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
+        if self._playback_active:
+            self._deferred_jobs.append((source_node, cache_key, media_path, path_key))
+            return
+
+        self._submit_generation(source_node, cache_key, media_path, path_key)
+
+    def _submit_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
         rvio_bin = self._get_rvio_bin()
         if not rvio_bin:
             return
@@ -317,14 +378,46 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         return output_width, output_height
 
+    def _run_suspendable(self, cmd: list[str], timeout: int = 120) -> None:
+        """Run a subprocess that can be suspended/resumed during playback.
+
+        The timeout counts only non-suspended wall-clock time: while the
+        process is frozen during playback the deadline is extended so that
+        a long playback session does not kill a healthy rvio job.
+        """
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        with self._procs_lock:
+            self._active_procs.append(proc)
+            if self._playback_active:
+                _suspend_proc(proc)
+        deadline = time.monotonic() + timeout
+        try:
+            while True:
+                remaining = max(deadline - time.monotonic(), 0)
+                try:
+                    proc.wait(timeout=remaining)
+                    break
+                except subprocess.TimeoutExpired:
+                    if self._playback_active:
+                        deadline = time.monotonic() + timeout
+                    else:
+                        raise
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+        finally:
+            with self._procs_lock:
+                try:
+                    self._active_procs.remove(proc)
+                except ValueError:
+                    logger.warning(f"Process {proc.pid} was not in active processes list")
+
     def _generate_thumbnail(self, cache_key: str, rvio_bin: str, media_path: str, mid_frame: int) -> None:
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
         output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
         try:
-            subprocess.run(
+            self._run_suspendable(
                 [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
-                capture_output=True,
-                timeout=120,
             )
         except Exception as e:
             logger.error(f"Thumbnail generation failed: {e}")
@@ -352,7 +445,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             output_width, output_height = self._write_filmstrip_session(
                 session_path, media_path, self._pick_frames(start_frame, end_frame), width, height
             )
-            subprocess.run(
+            self._run_suspendable(
                 [
                     rvio_bin,
                     str(session_path),
@@ -365,8 +458,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     "-o",
                     str(output_path),
                 ],
-                capture_output=True,
-                timeout=120,
             )
         except Exception as e:
             logger.error(f"Filmstrip generation failed: {e}")
@@ -389,11 +480,55 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         self._in_flight.discard(f"{cache_key}_{path_key}")
         source_node = self._cache_key_to_source.get(cache_key)
-        if source_node:
+        if not source_node:
+            return
+
+        if self._playback_active:
+            self._deferred_sources.add(source_node)
+        else:
             commands.sendInternalEvent("session-manager-preview-available", source_node)
+            self._drain_one()
+
+    def _drain_one(self) -> None:
+        """Submit one deferred notification or one deferred job. Stops if playback resumes."""
+        if self._playback_active:
+            return
+
+        if self._deferred_sources:
+            source_node = self._deferred_sources.pop()
+            commands.sendInternalEvent("session-manager-preview-available", source_node)
+            if self._deferred_sources or self._deferred_jobs:
+                QtCore.QTimer.singleShot(0, self._drain_one)
+            return
+
+        if self._deferred_jobs:
+            source_node, cache_key, media_path, path_key = self._deferred_jobs.pop(0)
+            self._submit_generation(source_node, cache_key, media_path, path_key)
+
+    def _on_play_start(self, event: Any) -> None:
+        event.reject()
+        with self._procs_lock:
+            self._playback_active = True
+            for proc in self._active_procs:
+                _suspend_proc(proc)
+
+    def _on_play_stop(self, event: Any) -> None:
+        event.reject()
+        with self._procs_lock:
+            self._playback_active = False
+            for proc in self._active_procs:
+                _resume_proc(proc)
+        self._drain_one()
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
+        with self._procs_lock:
+            for proc in self._active_procs:
+                _resume_proc(proc)
+                try:
+                    proc.terminate()
+                except OSError:
+                    logger.warning(f"Failed to terminate process {proc}")
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._in_flight.clear()
 
