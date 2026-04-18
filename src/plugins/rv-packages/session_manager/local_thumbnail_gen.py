@@ -388,7 +388,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         process is frozen during playback the deadline is extended so that
         a long playback session does not kill a healthy rvio job.
         """
-        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        creationflags = subprocess.CREATE_NO_WINDOW if _IS_WIN32 else 0
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=creationflags)
         with self._procs_lock:
             self._active_procs.append(proc)
             if self._playback_active:
