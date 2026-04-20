@@ -3083,6 +3083,8 @@ class: SessionManagerMode : MinorMode
         _editors        = QTreeWidgetItem[]();
         _quitting       = false;
         _disableUpdates = false;
+        _srcNodeKeys    = string[]();
+        _grpNodeValues  = string[]();
 
         let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
         if (previewsEnv neq nil && previewsEnv == "0")
