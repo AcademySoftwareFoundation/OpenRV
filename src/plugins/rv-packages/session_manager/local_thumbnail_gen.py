@@ -516,6 +516,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_play_stop(self, event: Any) -> None:
         event.reject()
+        # Ignore non-user stops: loop wraps and buffering pauses fire
+        # play-stop/play-start internally while playback continues.
+        if event.contents() != "":
+            return
         with self._procs_lock:
             self._playback_active = False
             for proc in self._active_procs:
