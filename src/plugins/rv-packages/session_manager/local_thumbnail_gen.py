@@ -483,9 +483,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._cache.setdefault(cache_key, {})[path_key] = Path(output_path)
 
         self._in_flight.discard(f"{cache_key}_{path_key}")
-        source_node = self._cache_key_to_source.get(cache_key)
-        if not source_node:
-            return
+        source_node = self._cache_key_to_source[cache_key]
 
         if self._playback_active:
             self._deferred_sources.add(source_node)
