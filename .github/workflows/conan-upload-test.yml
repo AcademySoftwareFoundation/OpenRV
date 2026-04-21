@@ -1,0 +1,181 @@
+name: Conan Upload Test (ASWF Artifactory)
+
+# Manual-only workflow for probing ASWF Artifactory write access and
+# publishing prebuilt OpenRV packages under @openrv/vfxYYYY.
+#
+# Phases:
+#   probe   = Phase A.5 only (upload a tiny dummy recipe to confirm
+#             the @openrv/* path is writable). ~2 min.
+#   openssl = Phase A.5 + B + C (probe, then build openssl/3.5.0
+#             under @openrv/vfx2024 and upload). ~15 min.
+#
+# Target remote defaults to aswftesting (aswf-conan-dev) for safety.
+# Switch to aswf (production) only after aswftesting succeeds and the
+# namespace policy is confirmed.
+
+on:
+  push:
+    branches:
+      # This will run when PR is merged or direct pushes to main.
+      - main
+
+  pull_request: # This handles PR creation and subsequent commits.
+  
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "Which phase to run"
+        required: true
+        default: "probe"
+        type: choice
+        options:
+          - probe
+          - openssl
+      remote:
+        description: "Target Conan remote"
+        required: true
+        default: "aswftesting"
+        type: choice
+        options:
+          - aswftesting
+          - aswf
+
+jobs:
+  upload:
+    name: "Conan ${{ inputs.phase }} -> ${{ inputs.remote }}"
+    runs-on: ubuntu-latest
+    container:
+      image: amd64/rockylinux:8
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      REMOTE_NAME: ${{ inputs.remote }}
+      REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
+      CONAN_PROFILE: x86_64_rocky8
+
+    steps:
+      - name: Verify secrets are set
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set on this repo."
+            exit 1
+          fi
+
+      - name: Install base system packages
+        run: |
+          dnf install -y epel-release
+          dnf config-manager --set-enabled powertools devel
+          dnf groupinstall "Development Tools" -y
+          dnf install -y which findutils git python3 python3-pip perl perl-IPC-Cmd perl-Digest-SHA nasm make
+          dnf clean all
+
+      - name: Install gcc-toolset-11
+        run: |
+          for i in 1 2 3 4 5; do
+            dnf install -y gcc-toolset-11-toolchain && break
+            echo "attempt $i failed, retrying in 5s"; sleep 5
+          done
+
+      - name: Enable gcc-toolset-11
+        run: |
+          source /opt/rh/gcc-toolset-11/enable
+          echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+          echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
+          echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
+          gcc --version
+
+      - name: Install Conan 2.x
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "conan>=2.0,<3.0"
+          conan --version
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Mark repo as safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          # Replace any existing entry so the URL is always the one we expect.
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+
+      - name: Detect default Conan profile
+        # The x86_64_rocky8 profile inherits no fallback, so a baseline
+        # "default" profile must exist for conan create to resolve.
+        run: conan profile detect --force
+
+      - name: Phase A.5 - Create probe recipe
+        run: |
+          mkdir -p /tmp/openrv-probe
+          cat > /tmp/openrv-probe/conanfile.py <<'PY'
+          from conan import ConanFile
+
+          class Probe(ConanFile):
+              name = "openrv-probe"
+              version = "0.0.1"
+              package_type = "application"
+              settings = "os", "arch"
+
+              def package(self):
+                  pass
+          PY
+          conan create /tmp/openrv-probe --user openrv --channel test
+
+      - name: Phase A.5 - Upload probe to ${{ inputs.remote }}
+        id: probe_upload
+        run: |
+          set +e
+          out=$(conan upload "openrv-probe/0.0.1@openrv/test" --remote "$REMOTE_NAME" --confirm 2>&1)
+          status=$?
+          echo "$out"
+          echo "----"
+          if [ $status -eq 0 ]; then
+            echo "::notice::Probe upload succeeded. @openrv/* writes are permitted on $REMOTE_NAME."
+          else
+            if echo "$out" | grep -qiE "403|forbidden|unauthorized"; then
+              echo "::error::Probe upload rejected. Check LF Artifactory permission target for aswf-conan*/openrv/**."
+            fi
+            exit $status
+          fi
+
+      - name: Phase A.5 - Clean up probe from remote
+        if: always() && steps.probe_upload.outcome == 'success'
+        continue-on-error: true
+        run: |
+          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
+          conan remove "openrv-probe/*" -c || true
+
+      - name: Phase B - Clone conan-center-index for openssl recipe
+        if: ${{ inputs.phase == 'openssl' }}
+        run: |
+          git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git /tmp/cci
+          ls /tmp/cci/recipes/openssl/3.x/
+
+      - name: Phase B - Build openssl/3.5.0@openrv/vfx2024
+        if: ${{ inputs.phase == 'openssl' }}
+        run: |
+          conan create /tmp/cci/recipes/openssl/3.x/ \
+            --version 3.5.0 \
+            --user openrv \
+            --channel vfx2024 \
+            --build=missing \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True'
+          conan list "openssl/3.5.0@openrv/vfx2024:*"
+
+      - name: Phase C - Upload openssl/3.5.0@openrv/vfx2024
+        if: ${{ inputs.phase == 'openssl' }}
+        run: |
+          conan upload "openssl/3.5.0@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
+
+      - name: Verify server-side listing
+        if: ${{ inputs.phase == 'openssl' }}
+        run: conan search "openssl/3.5.0@openrv/vfx2024" -r "$REMOTE_NAME"
