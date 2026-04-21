@@ -4,28 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(${_target}_ROOT_DIR
-    ${_install_dir}
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
 
 SET(_make_command
     make
@@ -193,30 +172,21 @@ SET(_include_dir
 
 FILE(MAKE_DIRECTORY ${_include_dir})
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
 IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_openexrcore_name} ${RV_STAGE_BIN_DIR}/${_ilmthread_name} ${RV_STAGE_BIN_DIR}/${_iex_name}
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET
+    ${_target}
+    BIN_DIR
+    ${_bin_dir}
+    OUTPUTS
+    ${RV_STAGE_BIN_DIR}/${_openexr_name}
+    ${RV_STAGE_BIN_DIR}/${_openexrcore_name}
+    ${RV_STAGE_BIN_DIR}/${_ilmthread_name}
+    ${RV_STAGE_BIN_DIR}/${_iex_name}
   )
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
+  RV_STAGE_DEPENDENCY_LIBS(
+    TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
   )
 ENDIF()
 
@@ -281,8 +251,3 @@ TARGET_LINK_LIBRARIES(
 LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)
 
 ADD_DEPENDENCIES(OpenEXR::OpenEXR ${_target})
-
-SET(RV_DEPS_OPENEXR_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)

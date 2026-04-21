@@ -1,6 +1,3 @@
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_PYIMPLOT" "" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -87,7 +84,6 @@ EXTERNALPROJECT_ADD(
   DEPENDS Python::Python imgui::imgui RV_DEPS_NANOBIND
 )
 
-# Not using RV_COPY_LIB_BIN_FOLDERS() because we need to copy the library to a specific location.
 IF(RV_TARGET_WINDOWS)
   SET(_pybindings_location
       "${RV_STAGE_LIB_DIR}/site-packages"
@@ -98,15 +94,26 @@ ELSE()
   )
 ENDIF()
 
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into site-packages"
-  OUTPUT ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_libpath} ${_pybindings_location}/${_libname}
-  DEPENDS ${_target}
-)
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/site-packages/${_libname}
+RV_STAGE_DEPENDENCY_LIBS(
+  TARGET
+  ${_target}
+  FILES
+  ${_libpath}
+  STAGE_LIB_DIR
+  ${_pybindings_location}
+  OUTPUTS
+  ${_pybindings_location}/${_libname}
 )
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+# Windows only. Debug Python on Windows searches for modules with *_d suffix, but pyimplot does not create a pyimplot_d.pyd.
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  ADD_CUSTOM_COMMAND(
+    TARGET ${_target}
+    POST_BUILD
+    COMMENT "Copying pyimplot.pyd to pyimplot_d.pyd in '${_pybindings_location}' for Python debug compatibility."
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${_pybindings_location}
+    COMMAND ${CMAKE_COMMAND} -E copy ${_libpath} ${_pybindings_location}/pyimplot_d.pyd
+  )
+ENDIF()

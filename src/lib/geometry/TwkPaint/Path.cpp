@@ -103,7 +103,6 @@ namespace TwkPaint
 
         IndexTriangle t(n, i2, i0);
         rTris.push_back(t);
-        rDirectionCoords.push_back(dir);
 
         for (size_t q = n + 1; q < na; q++)
         {

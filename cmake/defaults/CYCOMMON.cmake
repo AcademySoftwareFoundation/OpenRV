@@ -1,9 +1,9 @@
 # Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
 SET(RV_DEPS_AJA_VERSION
-    "17.1.0"
+    "17.6.0.hotfix1"
 )
 SET(RV_DEPS_AJA_DOWNLOAD_HASH
-    "b9d189f77e18dbdff7c39a339b1a5dd4"
+    "dba447ddd1b0ee84cee8441c0adba06a"
 )
 
 # atomic_ops https://github.com/ivmai/libatomic_ops
@@ -132,13 +132,13 @@ SET(RV_DEPS_GC_DOWNLOAD_HASH
 
 # glew https://github.com/nigels-com/glew
 SET(RV_DEPS_GLEW_VERSION
-    "e1a80a9f12d7def202d394f46e44cfced1104bfb"
+    "2.3.1"
 )
 SET(RV_DEPS_GLEW_DOWNLOAD_HASH
-    "9bfc689dabeb4e305ce80b5b6f28bcf9"
+    "e795affc12dda3226e9ae3afcc80ceb9"
 )
 SET(RV_DEPS_GLEW_VERSION_LIB
-    "2.2.0"
+    "2.3.1"
 )
 
 # imgui https://github.com/pthom/imgui
@@ -176,10 +176,10 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB
 
 # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION
-    "2.5.19.1"
+    "3.1.12.0"
 )
 SET(RV_DEPS_OIIO_DOWNLOAD_HASH
-    "5af6de5a73c6d234eed8e2874a5aed62"
+    "4f7cb0e132117613d828439d987e187c"
 )
 
 # openjpeg https://github.com/uclouvain/openjpeg
@@ -213,10 +213,10 @@ SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
 
 # png https://github.com/glennrp/libpng
 SET(RV_DEPS_PNG_VERSION
-    "1.6.48"
+    "1.6.55"
 )
 SET(RV_DEPS_PNG_DOWNLOAD_HASH
-    "be6cc9e411c26115db3b9eab1159a1d9"
+    "933118ac208387d0727e3d5e36558022"
 )
 
 # raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value

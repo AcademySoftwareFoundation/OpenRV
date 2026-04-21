@@ -7,9 +7,6 @@
 # Build instructions: https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -148,6 +145,9 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 # OCIO apps are not needed.
 LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
+# Use MISSING so OCIO vendors its own third-party deps when not already provided by RV_DEPS (vs NONE/default), pinning versions and avoiding ABI/licensing drift
+# with system libs; typical CI pulls in Imath/OpenEXR components, yaml-cpp, pystring, expat, lcms2, zlib, and related OCIO external packages.
+LIST(APPEND _configure_options "-DOCIO_INSTALL_EXT_PACKAGES=MISSING")
 
 IF(NOT RV_TARGET_WINDOWS)
   EXTERNALPROJECT_ADD(
@@ -206,7 +206,11 @@ ELSE() # Windows
     "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
     "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
     "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
-    "-DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
+    # Force CMake to use our custom Python, not the system/registry Python. Python_FIND_REGISTRY=NEVER prevents Windows registry lookups that find the system
+    # Python from actions/setup-python. Python_FIND_STRATEGY=LOCATION ensures Python_ROOT_DIR is checked before the default search paths.
+    "-DPython_FIND_REGISTRY=NEVER"
+    "-DPython_FIND_STRATEGY=LOCATION"
     # Mandatory param: OCIO CMake code finds Python.
     "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
     # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
@@ -236,9 +240,15 @@ ELSE() # Windows
     LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
   ENDIF()
 
-  LIST(APPEND _ocio_build_options "--build" "${_build_dir}" "--config" "${CMAKE_BUILD_TYPE}"
-       # "--parallel"    # parallel breaks minizip because Zlib is built before minizip and minizip depends on Zlib. "${_cpu_count}"   # Moreover, our Zlib
-       # isn't compatible with OCIO: tons of STD C++ missing symbols errors.
+  LIST(
+    APPEND
+    _ocio_build_options
+    "--build"
+    "${_build_dir}"
+    "--config"
+    "${CMAKE_BUILD_TYPE}"
+    "--parallel"
+    ${_cpu_count}
   )
 
   EXTERNALPROJECT_ADD(
@@ -291,14 +301,6 @@ ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   )
 ENDIF()
 
-# All platform
-ADD_CUSTOM_COMMAND(
-  TARGET ${_target}
-  POST_BUILD
-  COMMENT "Copying OpenColorIO lib into '${RV_STAGE_LIB_DIR}'."
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-)
-
 IF(RV_TARGET_WINDOWS)
   SET(_rv_stage_lib_site_package_dir
       "${RV_STAGE_LIB_DIR}/site-packages"
@@ -323,32 +325,27 @@ IF(RV_TARGET_WINDOWS)
       TARGET ${_target}
       POST_BUILD
       COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}' and '${_ocio_stage_plugins_python_dir}."
-      COMMAND ${CMAKE_COMMAND} -E copy ${_rv_stage_lib_site_package_dir}/PyOpenColorIO.pyd ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${_rv_stage_lib_site_package_dir}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
       COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
     )
   ENDIF()
 ENDIF()
 
-# The macro is using existing _target, _libname, _lib_dir and _bin_dir variabless
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
 
-ADD_LIBRARY(ocio::ocio SHARED IMPORTED GLOBAL)
-LIST(APPEND RV_DEPS_LIST ocio::ocio)
-ADD_DEPENDENCIES(ocio::ocio ${_target})
-SET_PROPERTY(
-  TARGET ocio::ocio
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET ocio::ocio
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
-  ocio::ocio
-  INTERFACE ${_include_dir}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
+  OpenColorIO::OpenColorIO
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
