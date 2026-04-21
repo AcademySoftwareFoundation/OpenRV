@@ -1,5 +1,8 @@
 # Common settings shared across all OpenRV profiles
 
 [replace_requires]
-openssl/*: openssl/3.5.0
+# openssl resolves to the prebuilt binary hosted under @openrv/vfx2024
+# on the ASWF Conan remote (aswf-conan-dev / aswf-conan). Consumers must
+# have one of those remotes configured to resolve this reference.
+openssl/*: openssl/3.5.6@openrv/vfx2024
 libjpeg/*: libjpeg-turbo/2.1.4
