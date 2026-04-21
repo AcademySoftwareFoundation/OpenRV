@@ -12,9 +12,6 @@
 # WebP build from sources: -- https://github.com/webmproject/libwebp/blob/main/doc/building.md
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 # OpenImageIO was tested up to 1.2.1
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "${RV_DEPS_WEBP_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
@@ -52,21 +49,21 @@ LIST(APPEND _configure_options "-DPNG_LIBRARY=${_png_library}")
 LIST(APPEND _configure_options "-DPNG_PNG_INCLUDE_DIR=${_png_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_IMPLIB)
+  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_IMPLIB)
 ELSE()
-  GET_TARGET_PROPERTY(_jpeg_library jpeg-turbo::jpeg IMPORTED_LOCATION)
+  GET_TARGET_PROPERTY(_jpeg_library libjpeg-turbo::jpeg IMPORTED_LOCATION)
 ENDIF()
-GET_TARGET_PROPERTY(_jpeg_include_dir jpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_jpeg_include_dir libjpeg-turbo::jpeg INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DJPEG_LIBRARY=${_jpeg_library}")
 LIST(APPEND _configure_options "-DJPEG_INCLUDE_DIR=${_jpeg_include_dir}")
 
 IF(RV_TARGET_WINDOWS)
   # WebP is static so we can use the Static lib from Tiff
-  GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_IMPLIB)
+  GET_TARGET_PROPERTY(_tiff_library TIFF::TIFF IMPORTED_IMPLIB)
 ELSE()
-  GET_TARGET_PROPERTY(_tiff_library Tiff::Tiff IMPORTED_LOCATION)
+  GET_TARGET_PROPERTY(_tiff_library TIFF::TIFF IMPORTED_LOCATION)
 ENDIF()
-GET_TARGET_PROPERTY(_tiff_include_dir Tiff::Tiff INTERFACE_INCLUDE_DIRECTORIES)
+GET_TARGET_PROPERTY(_tiff_include_dir TIFF::TIFF INTERFACE_INCLUDE_DIRECTORIES)
 LIST(APPEND _configure_options "-DTIFF_LIBRARY=${_tiff_library}")
 LIST(APPEND _configure_options "-DTIFF_INCLUDE_DIR=${_tiff_include_dir}")
 
@@ -92,7 +89,7 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${_source_dir}
   BINARY_DIR ${_build_dir}
   INSTALL_DIR ${_install_dir}
-  DEPENDS ZLIB::ZLIB jpeg-turbo::jpeg Tiff::Tiff PNG::PNG
+  DEPENDS ZLIB::ZLIB libjpeg-turbo::jpeg TIFF::TIFF PNG::PNG
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
@@ -102,43 +99,22 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-# No bin folder because webp is built as static and we don't build webp tools (executable).
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-  OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  DEPENDS ${_target}
-)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_libname})
 
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
+  WebP::webp
+  TYPE
+  STATIC
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(Webp::Webp STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Webp::Webp ${_target})
-SET_PROPERTY(
-  TARGET Webp::Webp
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET Webp::Webp
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Webp::Webp
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-# It is required to force directory creation at configure time otherwise CMake complains about importing a non-existing path
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
-  Webp::Webp
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST Webp::Webp)

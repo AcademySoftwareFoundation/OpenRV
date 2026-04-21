@@ -28,6 +28,7 @@
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 #include <TwkApp/VideoModule.h>
+#include <TwkAudio/Audio.h>
 #include <TwkAudio/Filters.h>
 #include <TwkAudio/Mix.h>
 #include <TwkMath/Function.h>
@@ -259,15 +260,8 @@ namespace IPCore
         , m_audioThreading(true)
         , m_audioMinCache(3.0)
         , m_audioMaxCache(6.0)
-        ,
-#ifdef WIN32
-        m_audioPacketSize(512)
-        ,
-#else
-        m_audioPacketSize(2048)
-        ,
-#endif
-        m_audioCacheMode(BufferCache)
+        , m_audioPacketSize(TWEAK_AUDIO_DEFAULT_PACKET_SIZE)
+        , m_audioCacheMode(BufferCache)
         , m_audioPendingCacheMode(BufferCache)
         , m_audioConfigured(false)
         , m_audioCacheComplete(false)
@@ -2846,7 +2840,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         if (notify)
             finishAudioThread();
 
-        m_audioPacketSize = Application::optionValue<size_t>("acachesize", 2048);
+        m_audioPacketSize = Application::optionValue<size_t>("acachesize", TWEAK_AUDIO_DEFAULT_PACKET_SIZE);
         m_audioMinCache = Application::optionValue<double>("audioMinCache", m_audioMinCache);
         m_audioMaxCache = Application::optionValue<double>("audioMaxCache", m_audioMaxCache);
 

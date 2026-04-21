@@ -292,11 +292,20 @@ SET(RV_PYTHON_BUILD_DEPS
 # that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
     ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
+    "cmake" # Build tool (self-contained binary wheel, no ABI dependency on Python)
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
+    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo)
+    "setuptools-scm" # Version detection tool (pure Python, calls git)
+    "hatchling" # Build backend (pure Python, like setuptools)
+    "hatch-vcs" # Hatchling VCS version plugin (pure Python)
+    "pluggy" # Plugin framework (pure Python)
+    "pathspec" # Gitignore pattern matching (pure Python)
+    "trove-classifiers" # PyPI classifiers data (pure Python)
+    "vcs-versioning" # VCS version detection for setuptools-scm 10.x (pure Python)
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
@@ -333,7 +342,8 @@ ENDIF()
 LIST(
   APPEND
   _requirements_install_command
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  # Use old and more recent library name convention to ensure the correct library is used in the build.
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
   "${_python3_executable}"
   -s
   -E
@@ -552,10 +562,32 @@ SET_PROPERTY(
   PROPERTY IMPORTED_SONAME ${_python3_lib_name}
 )
 IF(RV_TARGET_WINDOWS)
+  # Set per-config import libs so multi-config generators (VS) pick the right one. Without this, IMPORTED_IMPLIB would be fixed to whichever CMAKE_BUILD_TYPE
+  # was set at configure time, causing LNK1104 when building a different configuration.
+  SET(_python_debug_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_d${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
+  SET(_python_release_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
   SET_PROPERTY(
     TARGET Python::Python
-    PROPERTY IMPORTED_IMPLIB ${_python3_implib}
+    PROPERTY IMPORTED_IMPLIB_DEBUG ${_python_debug_implib}
   )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELEASE ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELWITHDEBINFO ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_MINSIZEREL ${_python_release_implib}
+  )
+  # Also expose the libs dir so #pragma comment(lib, "python311.lib") in Python headers can be resolved by the linker for non-debug configurations.
+  TARGET_LINK_DIRECTORIES(Python::Python INTERFACE ${_lib_dir})
 ENDIF()
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(

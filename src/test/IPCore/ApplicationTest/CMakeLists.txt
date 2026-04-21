@@ -17,7 +17,7 @@ ADD_EXECUTABLE(
   ${_sources}
 )
 
-TARGET_LINK_LIBRARIES(${_target} TwkUtil doctest RvApp)
+TARGET_LINK_LIBRARIES(${_target} TwkUtil doctest::doctest RvApp)
 
 IF(RV_TARGET_LINUX)
   TARGET_LINK_LIBRARIES(${_target} pthread dl)
