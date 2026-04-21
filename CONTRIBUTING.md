@@ -38,6 +38,20 @@ Please follow the coding conventions and style in each file and in each library 
 4. Ensure CI checks pass — in particular the **semantic PR title** check (see below).
 5. Once reviewed and approved, a committer will merge your PR.
 
+### Pull Request Labels
+
+After a pull request is opened, the Technical Steering Committee (TSC) assigns workflow labels to communicate its current status. Here is what each label means:
+
+| Label | Meaning |
+| ----- | ------- |
+| `PR: Triaging` | The PR is being triaged. This will determine the priority for the TSC to review and test it. |
+| `PR: Acknowledged` | The new PR has been acknowledged by the TSC. |
+| `PR: Planned_P1` | The PR will be reviewed and tested soon. Expect a 1–4 week delay. |
+| `PR: Planned_P2` | The PR will be reviewed and tested eventually. Expect a 1–3 month delay. |
+| `PR: In Progress` | The PR is being reviewed by a code reviewer. |
+| `PR: In Testing` | The PR is being built and tested by QA. |
+| `PR: Unplanned` | The PR is not a priority. The TSC will comment on the PR to explain the decision. |
+
 ### Semantic PR Titles (Required)
 
 All pull request titles **must** follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
