@@ -731,6 +731,9 @@ ENDMACRO()
 # Must be a MACRO so the variable overrides propagate to the caller's scope.
 #
 MACRO(RV_SET_FOUND_PKGCONFIG_DIRS rv_deps_target pc_prefix)
+  IF(NOT ${pc_prefix}_LIBRARY_DIRS)
+    MESSAGE(AUTHOR_WARNING "RV_SET_FOUND_PKGCONFIG_DIRS: ${pc_prefix}_LIBRARY_DIRS is empty (.pc file may be missing a libdir field)")
+  ENDIF()
   LIST(GET ${pc_prefix}_LIBRARY_DIRS 0 _lib_dir)
   LIST(GET ${pc_prefix}_INCLUDE_DIRS 0 _include_dir)
 
@@ -891,7 +894,7 @@ FUNCTION(RV_BUILD_PKG_CONFIG_PATH _rbpcp_out_var)
     LIST(APPEND _rbpcp_dirs ${_RBPCP_EXTRA_DIRS})
   ENDIF()
 
-  # 1. Dirs from found dependencies
+  # 2. Dirs from found dependencies
   GET_PROPERTY(
     _rbpcp_dep_dirs GLOBAL
     PROPERTY "RV_DEPS_PKG_CONFIG_PATH"
@@ -900,7 +903,7 @@ FUNCTION(RV_BUILD_PKG_CONFIG_PATH _rbpcp_out_var)
     LIST(APPEND _rbpcp_dirs ${_rbpcp_dep_dirs})
   ENDIF()
 
-  # 1. Environment PKG_CONFIG_PATH, filtered by CMAKE_IGNORE_PREFIX_PATH
+  # 3. Environment PKG_CONFIG_PATH, filtered by CMAKE_IGNORE_PREFIX_PATH
   SET(_rbpcp_env_path
       $ENV{PKG_CONFIG_PATH}
   )

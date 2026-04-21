@@ -20,7 +20,7 @@ RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "" ""
 # Force build from source: OpenRV uses private TIFF headers (tiffiop.h, tif_dir.h, tif_hash_set.h) that are not installed by system packages.
 SET(RV_DEPS_TIFF_FORCE_BUILD
     ON
-    CACHE BOOL "libtiff must be built from source (private headers required)" FORCE
+    CACHE BOOL "libtiff must be built from source (private headers required)"
 )
 
 # libtiff ships CMake CONFIG files when built from source. CMake also provides a FindTIFF module. Fall back to pkg-config.
