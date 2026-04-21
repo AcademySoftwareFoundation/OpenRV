@@ -352,7 +352,7 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << OpenImageIO::geterror());
+            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << geterror());
         }
     }
 
@@ -468,7 +468,7 @@ namespace TwkFB
         }
         else
         {
-            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << OpenImageIO::geterror());
+            TWK_THROW_STREAM(IOException, "OIIO: Unable to open file \"" << filename << "\" for reading. " << geterror());
         }
     }
 
