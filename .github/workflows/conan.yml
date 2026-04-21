@@ -70,7 +70,8 @@ jobs:
             python-version: "3.11.8"
             vfx-platform: "CY2024"
             extra_repo: "powertools"
-            
+            conan-profile: "x86_64_rocky8"
+
           - os: "ubuntu-latest"
             rocky-version: "9"
             image: "amd64/rockylinux:9"
@@ -81,6 +82,7 @@ jobs:
             python-version: "3.11.8"
             vfx-platform: "CY2024"
             extra_repo: "crb"
+            conan-profile: "x86_64_rocky9"
             
     steps:
       - name: Display disk space
@@ -370,7 +372,7 @@ jobs:
 
       - name: Build OpenRV main executable
         run: |
-          $CONAN_EXECUTABLE build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_rocky8
+          $CONAN_EXECUTABLE build conanfile.py --build=missing -pr:a ./conan/profiles/${{ matrix.conan-profile }}
 
       - name: Tests
         run: |
