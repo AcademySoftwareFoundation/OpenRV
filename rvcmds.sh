@@ -125,6 +125,7 @@ if [ -z "$QT_HOME" ]; then
   fi
 
   if [ -n "$QT_HOME" ]; then
+    export QT_HOME
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
   else
     echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."

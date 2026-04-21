@@ -14,6 +14,11 @@ SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
     "cc7fad1e71b3064abe1ea821ae9a9a6e"
 )
 
+# libdeflate https://github.com/ebiggers/libdeflate
+SET(RV_DEPS_LIBDEFLATE_VERSION
+    "1.25"
+)
+
 # dav1d https://github.com/videolan/dav1d
 SET(RV_DEPS_DAV1D_VERSION
     "1.5.3"

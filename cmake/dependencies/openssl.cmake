@@ -143,18 +143,18 @@ ELSE()
       OpenSSL::Crypto OpenSSL::SSL
     )
       IF(NOT TARGET ${_ssl_target})
-        STRING(
-          REGEX
-          REPLACE ".*::" "" _ssl_short ${_ssl_target}
-        )
-        STRING(TOLOWER ${_ssl_short} _ssl_lower)
+        IF(${_ssl_target} STREQUAL "OpenSSL::SSL")
+          SET(_ssl_found_lib ${_ssl_lib})
+        ELSE()
+          SET(_ssl_found_lib ${_crypto_lib})
+        ENDIF()
         RV_ADD_IMPORTED_LIBRARY(
           NAME
           ${_ssl_target}
           TYPE
           SHARED
           LOCATION
-          ${_lib_dir}/lib${_ssl_lower}${CMAKE_SHARED_LIBRARY_SUFFIX}
+          ${_ssl_found_lib}
           INCLUDE_DIRS
           ${_include_dir}
           DEPENDS

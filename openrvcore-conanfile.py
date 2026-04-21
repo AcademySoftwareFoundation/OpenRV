@@ -107,7 +107,7 @@ class OpenRVBase:
         # Override imath version for other dependencies.
         self.requires("imath/3.2.1", force=True, options={"shared": True})
 
-        self.requires("libdeflate/1.19", force=True, options={"shared": True})
+        self.requires("libdeflate/1.25", force=True, options={"shared": True})
 
         self.requires("openexr/3.2.5", force=True, options={"shared": True})
 

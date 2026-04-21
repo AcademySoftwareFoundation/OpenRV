@@ -21,7 +21,7 @@ ENDIF()
 # (lcms.dll). We need to remove lcms from pub-sub and use lcms2 in RV.
 SET(RV_DEPS_RAW_FORCE_BUILD
     ON
-    CACHE BOOL "libraw must be built from source (requires OpenRV's own LCMS build)" FORCE
+    CACHE BOOL "libraw must be built from source (requires OpenRV's own LCMS build)"
 )
 
 # LibRaw uses autotools (not CMake), so no CONFIG files. Fall back to pkg-config. List both targets naming because vcpkg creates libraw::raw and Conan creates

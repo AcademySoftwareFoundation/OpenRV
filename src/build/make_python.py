@@ -428,6 +428,7 @@ def install_python_vfx2023() -> None:
         shutil.copyfile(src_file, dst_file)
 
     else:
+        # -j1: Python's make install has a known upstream race condition under parallel jobs.
         make_args = ["make", "install", "-j1", "-s"]
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
@@ -551,6 +552,7 @@ def install_python_vfx2024() -> None:
             shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
 
     else:
+        # -j1: Python's make install has a known upstream race condition under parallel jobs.
         make_args = ["make", "install", "-j1", "-s"]
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
