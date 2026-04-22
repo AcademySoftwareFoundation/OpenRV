@@ -87,7 +87,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache_dir = Path(tempfile.gettempdir()) / f"rv_thumbnails_{os.getpid()}"
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._in_flight: set[str] = set()
-        self._cache_key_to_source: dict[str, str] = {}
+        self._cache_key_to_sources: dict[str, set[str]] = {}
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
         self._playback_active = False
@@ -148,6 +148,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             event.setReturnContent(str(path))
             return
 
+        self._cache_key_to_sources.setdefault(cache_key, set()).add(source_node)
+
         flight_key = f"{cache_key}_{path_key}"
         if flight_key not in self._in_flight:
             self._start_generation(source_node, cache_key, media_path, path_key)
@@ -161,6 +163,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._get_cached_path(event, "thumbnail_path")
 
     def _start_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
+        self._in_flight.add(f"{cache_key}_{path_key}")
         if self._playback_active:
             self._deferred_jobs.append((source_node, cache_key, media_path, path_key))
             return
@@ -177,9 +180,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         source_info = self._get_source_info(source_node)
         if not source_info:
             return
-
-        self._in_flight.add(f"{cache_key}_{path_key}")
-        self._cache_key_to_source[cache_key] = source_node
 
         start_frame, end_frame, width, height = source_info
 
@@ -487,12 +487,13 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._cache.setdefault(cache_key, {})[path_key] = Path(output_path)
 
         self._in_flight.discard(f"{cache_key}_{path_key}")
-        source_node = self._cache_key_to_source[cache_key]
+        source_nodes = self._cache_key_to_sources.get(cache_key, set())
 
         if self._playback_active:
-            self._deferred_sources.add(source_node)
+            self._deferred_sources.update(source_nodes)
         else:
-            commands.sendInternalEvent("session-manager-preview-available", source_node)
+            for source_node in source_nodes:
+                commands.sendInternalEvent("session-manager-preview-available", source_node)
             self._drain_one()
 
     def _drain_one(self) -> None:
@@ -542,6 +543,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     logger.warning(f"Failed to terminate process {proc}")
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._in_flight.clear()
+        self._cache_key_to_sources.clear()
 
         if self._cache_dir.exists():
             try:

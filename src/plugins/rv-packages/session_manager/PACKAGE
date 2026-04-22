@@ -36,7 +36,7 @@ modes:
     load: delay
   - file: transform_manip
     load: delay
-  - file: local_thumbnail_gen
+  - file: local_thumbnail_gen.py
     load: immediate
 
 description: |

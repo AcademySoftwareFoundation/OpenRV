@@ -628,7 +628,7 @@ class: ThumbnailWidget : QLabel
     }
 }
 
-// Displays a scrubable filmstrip that will show the corresponding frame
+// Displays a scrubbable filmstrip that will show the corresponding frame
 // based on mouse position
 class: FilmstripWidget : QLabel
 {
