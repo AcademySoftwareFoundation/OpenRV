@@ -157,8 +157,37 @@ jobs:
           echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
           echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "LIBRARY_PATH=/opt/rh/gcc-toolset-11/root/usr/lib64:${LIBRARY_PATH:-}" >> $GITHUB_ENV
           gcc --version
           g++ --version
+
+      - name: Verify libstdc++ GLIBCXX versions for Rocky Linux 8
+        if: ${{ matrix.rocky-version == '8' }}
+        run: |
+          echo "=== g++ -print-file-name=libstdc++.so ==="
+          GXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++
+          LIBSTDCXX_SO=$("$GXX" -print-file-name=libstdc++.so)
+          echo "libstdc++.so -> $LIBSTDCXX_SO"
+          ls -l "$LIBSTDCXX_SO" || true
+          file "$LIBSTDCXX_SO" || true
+          echo "--- contents (first 10 lines, in case it's a linker script) ---"
+          head -n 10 "$LIBSTDCXX_SO" || true
+
+          echo "=== g++ -print-file-name=libstdc++.so.6 ==="
+          LIBSTDCXX_SO6=$("$GXX" -print-file-name=libstdc++.so.6)
+          echo "libstdc++.so.6 -> $LIBSTDCXX_SO6"
+          ls -l "$LIBSTDCXX_SO6" || true
+
+          echo "=== System libstdc++.so.6 (/usr/lib64) ==="
+          ls -l /usr/lib64/libstdc++.so.6* || true
+          echo "GLIBCXX versions in /usr/lib64/libstdc++.so.6:"
+          strings /usr/lib64/libstdc++.so.6 | grep -E '^GLIBCXX_3\.4\.[0-9]+$' | sort -V | tail -n 10 || true
+
+          echo "=== libstdc++_nonshared.a (gcc-toolset-11 nonshared symbols) ==="
+          find /opt/rh/gcc-toolset-11 -name 'libstdc++_nonshared.a' -print 2>/dev/null || true
+
+          echo "=== Any newer libstdc++.so.6 under /opt/rh/gcc-toolset-11 ==="
+          find /opt/rh/gcc-toolset-11 -name 'libstdc++.so*' -print 2>/dev/null || true
 
       - name: Check out repository code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # 4.1.7

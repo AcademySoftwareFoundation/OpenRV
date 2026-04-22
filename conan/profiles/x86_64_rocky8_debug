@@ -8,3 +8,8 @@ compiler.cppstd=17
 compiler.libcxx=libstdc++11
 compiler.version=11
 os=Linux
+
+[buildenv]
+# Use the default path for now
+LD_LIBRARY_PATH=+(path)/opt/rh/gcc-toolset-11/root/usr/lib64
+LIBRARY_PATH=+(path)/opt/rh/gcc-toolset-11/root/usr/lib64
