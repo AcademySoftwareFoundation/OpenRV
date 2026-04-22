@@ -221,6 +221,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return None
 
     def _get_source_info(self, source_node: str) -> tuple[int, int, int, int] | None:
+        # Skip inactive media representations
+        if not commands.getIntProperty(f"{source_node}.media.active")[0]:
+            return None
+
         try:
             info = commands.sourceMediaInfo(source_node)
             return (
