@@ -22,7 +22,7 @@ on:
 
 jobs:
   detect-changes:
-    #if: github.repository_owner == 'AcademySoftwareFoundation'
+    if: github.repository_owner == 'AcademySoftwareFoundation'
     runs-on: ubuntu-latest
     outputs:
       cmake_changed: ${{ steps.filter.outputs.cmake }}

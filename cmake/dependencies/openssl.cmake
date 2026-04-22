@@ -144,9 +144,13 @@ ELSE()
     )
       IF(NOT TARGET ${_ssl_target})
         IF(${_ssl_target} STREQUAL "OpenSSL::SSL")
-          SET(_ssl_found_lib ${_ssl_lib})
+          SET(_ssl_found_lib
+              ${_ssl_lib}
+          )
         ELSE()
-          SET(_ssl_found_lib ${_crypto_lib})
+          SET(_ssl_found_lib
+              ${_crypto_lib}
+          )
         ENDIF()
         RV_ADD_IMPORTED_LIBRARY(
           NAME

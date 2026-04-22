@@ -894,7 +894,7 @@ FUNCTION(RV_BUILD_PKG_CONFIG_PATH _rbpcp_out_var)
     LIST(APPEND _rbpcp_dirs ${_RBPCP_EXTRA_DIRS})
   ENDIF()
 
-  # 2. Dirs from found dependencies
+  # 1. Dirs from found dependencies
   GET_PROPERTY(
     _rbpcp_dep_dirs GLOBAL
     PROPERTY "RV_DEPS_PKG_CONFIG_PATH"
@@ -903,7 +903,7 @@ FUNCTION(RV_BUILD_PKG_CONFIG_PATH _rbpcp_out_var)
     LIST(APPEND _rbpcp_dirs ${_rbpcp_dep_dirs})
   ENDIF()
 
-  # 3. Environment PKG_CONFIG_PATH, filtered by CMAKE_IGNORE_PREFIX_PATH
+  # 1. Environment PKG_CONFIG_PATH, filtered by CMAKE_IGNORE_PREFIX_PATH
   SET(_rbpcp_env_path
       $ENV{PKG_CONFIG_PATH}
   )
