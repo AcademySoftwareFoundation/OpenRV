@@ -338,9 +338,12 @@ class: TransformManip : MinorMode
 
     method: findEditingNodes (void; bool setStates=true)
     {
-        let vnode       = viewNode(),
-            infos       = metaEvaluateClosestByType(frame(), "RVTransform2D"),
-            (ins, outs) = nodeConnections(viewNode(), false);
+        let vnode       = viewNode();
+        if (vnode eq nil || vnode == "") return;
+        
+        // Use an explicit type declaration here so that infos is correctly MetaEvalInfo[]
+        let infos       = metaEvaluateClosestByType(frame(), "RVTransform2D"),
+            (ins, outs) = nodeConnections(vnode, false);
 
         _editNodes = EditNodePair[]();
 
