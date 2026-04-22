@@ -2,12 +2,12 @@
 name: Conan-OpenRV
 
 on:
-  # push:
-  #   branches:
-  #     # This will run when PR is merged or direct pushes to main.
-  #     - main
+  push:
+    branches:
+      # This will run when PR is merged or direct pushes to main.
+      - main
 
-  # pull_request: # This handles PR creation and subsequent commits.
+  pull_request: # This handles PR creation and subsequent commits.
 
   # This allows manual triggering of the workflow from the web
   workflow_dispatch:
@@ -351,6 +351,18 @@ jobs:
           echo "Conan home path: $CONAN_HOME_OUTPUT"
           echo "CONAN_HOME=$CONAN_HOME_OUTPUT" >> $GITHUB_ENV
 
+      - name: Add ASWF Conan remote
+        # Required so conan/profiles/common [replace_requires] can resolve
+        # openssl/*@openrv/vfx2024 from the ASWF JFrog Artifactory.
+        # Anonymous read; no credentials needed for install. Uses aswftesting
+        # (aswf-conan-dev) for now; swap to the 'aswf' production remote
+        # once binaries are promoted there.
+        # Rocky 8 currently has a prebuilt binary; other profiles will
+        # build from source via the CCI recipe exported under this user/channel.
+        run: |
+          $CONAN_EXECUTABLE remote remove aswftesting 2>/dev/null || true
+          $CONAN_EXECUTABLE remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
+
       - name: Export OpenRVCore recipe to Conan's cache
         if: ${{ matrix.vfx-platform == 'CY2024' }}
         run: |
@@ -566,6 +578,12 @@ jobs:
 
       - name: Set Conan Home Path
         run: echo "CONAN_HOME=$(/Users/runner/Library/Python/3.11/bin/conan config home)" >> $GITHUB_ENV
+
+      - name: Add ASWF Conan remote
+        # See conan.yml Rocky step of the same name for rationale.
+        run: |
+          /Users/runner/Library/Python/3.11/bin/conan remote remove aswftesting 2>/dev/null || true
+          /Users/runner/Library/Python/3.11/bin/conan remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
 
       - name: Export OpenRVCore recipe
         if: ${{ matrix.vfx-platform == 'CY2024' }}
@@ -838,6 +856,14 @@ jobs:
           mkdir -p /tmp/dev 2>/dev/null || true
           echo "PKG_CONFIG_PATH setup completed"
           cat ~/.bash_profile | tail -5
+        shell: msys2 {0}
+
+      - name: Add ASWF Conan remote
+        # See conan.yml Rocky step of the same name for rationale.
+        run: |
+          source ~/.bash_profile
+          conan remote remove aswftesting 2>/dev/null || true
+          conan remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
         shell: msys2 {0}
 
       - name: Export OpenRVCore recipe
