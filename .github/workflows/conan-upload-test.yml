@@ -54,7 +54,10 @@ env:
   CMAKE_VERSION: "3.31.6"
   # inputs.* is only populated for workflow_dispatch. For push / PR
   # triggers these are empty; each job applies its own fallback.
-  PHASE: ${{ inputs.phase || 'probe' }}
+  # TEMP: phase default is 'openssl' while dispatch is unavailable and
+  # the cross-platform openssl run is being validated. Flip back to
+  # 'probe' once the four-platform run passes.
+  PHASE: ${{ inputs.phase || 'openssl' }}
   REMOTE_NAME: ${{ inputs.remote || 'aswftesting' }}
   REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
   PLATFORMS: ${{ inputs.platforms || 'rocky8,rocky9,macos,windows' }}
@@ -211,12 +214,18 @@ jobs:
             exit $status
           fi
 
-      - name: Phase A.5 - Clean up probe from remote
+      - name: Phase A.5 - Clean up probe (local + best-effort remote)
         if: always() && steps.probe_upload.outcome == 'success'
-        continue-on-error: true
         run: |
-          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
-          conan remove "openrv-probe/*" -c || true
+          # Remote cleanup typically fails 403 on LF Artifactory because
+          # the OpenRV token has upload-only rights on @openrv/*. Treat
+          # as expected; an admin can clean the probe ref periodically.
+          if conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c 2>/dev/null; then
+            echo "::notice::Remote probe cleaned from $REMOTE_NAME."
+          else
+            echo "::notice::Remote probe cleanup returned non-zero (expected for upload-only tokens). Leaving openrv-probe on $REMOTE_NAME."
+          fi
+          conan remove "openrv-probe/*" -c 2>/dev/null || true
 
       - name: Phase B - Clone conan-center-index and verify openssl version
         if: ${{ env.PHASE == 'openssl' }}
@@ -391,12 +400,18 @@ jobs:
             exit $status
           fi
 
-      - name: Phase A.5 - Clean up probe from remote
+      - name: Phase A.5 - Clean up probe (local + best-effort remote)
         if: always() && steps.probe_upload.outcome == 'success'
-        continue-on-error: true
         run: |
-          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
-          conan remove "openrv-probe/*" -c || true
+          # Remote cleanup typically fails 403 on LF Artifactory because
+          # the OpenRV token has upload-only rights on @openrv/*. Treat
+          # as expected; an admin can clean the probe ref periodically.
+          if conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c 2>/dev/null; then
+            echo "::notice::Remote probe cleaned from $REMOTE_NAME."
+          else
+            echo "::notice::Remote probe cleanup returned non-zero (expected for upload-only tokens). Leaving openrv-probe on $REMOTE_NAME."
+          fi
+          conan remove "openrv-probe/*" -c 2>/dev/null || true
 
       - name: Phase B - Clone conan-center-index and verify openssl version
         if: ${{ env.PHASE == 'openssl' }}
@@ -586,12 +601,18 @@ jobs:
             exit $status
           fi
 
-      - name: Phase A.5 - Clean up probe from remote
+      - name: Phase A.5 - Clean up probe (local + best-effort remote)
         if: always() && steps.probe_upload.outcome == 'success'
-        continue-on-error: true
         run: |
-          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
-          conan remove "openrv-probe/*" -c || true
+          # Remote cleanup typically fails 403 on LF Artifactory because
+          # the OpenRV token has upload-only rights on @openrv/*. Treat
+          # as expected; an admin can clean the probe ref periodically.
+          if conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c 2>/dev/null; then
+            echo "::notice::Remote probe cleaned from $REMOTE_NAME."
+          else
+            echo "::notice::Remote probe cleanup returned non-zero (expected for upload-only tokens). Leaving openrv-probe on $REMOTE_NAME."
+          fi
+          conan remove "openrv-probe/*" -c 2>/dev/null || true
 
       - name: Phase B - Clone conan-center-index and verify openssl version
         if: ${{ env.PHASE == 'openssl' }}
