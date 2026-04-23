@@ -5,21 +5,22 @@ name: Conan Upload Test (ASWF Artifactory)
 #
 # Phases:
 #   probe   = Phase A.5 only (upload a tiny dummy recipe to confirm
-#             the @openrv/* path is writable). ~2 min.
-#   openssl = Phase A.5 + B + C (probe, then build openssl/3.5.0
-#             under @openrv/vfx2024 and upload). ~15 min.
+#             the @openrv/* path is writable). ~2 min per platform.
+#   openssl = Phase A.5 + B + C + D + E (probe, then build openssl
+#             under @openrv/vfx2024, upload, round-trip install,
+#             profile graph verify). 10-20 min per platform.
 #
 # Target remote defaults to aswftesting (aswf-conan-dev) for safety.
 # Switch to aswf (production) only after aswftesting succeeds and the
-# namespace policy is confirmed
+# namespace policy is confirmed.
 
 on:
   push:
     branches:
       # This will run when PR is merged or direct pushes to main.
       - main
-      # Temporary: auto-run on the Conan-ASWF test branch while dispatch
-      # access is unavailable. Remove this line once testing is done.
+      # Temporary: auto-run on the Conan-ASWF test branch while manual
+      # workflow dispatch is not available. Remove once testing is done.
       - find-fork-test-aswf
 
   pull_request: # This handles PR creation and subsequent commits.
@@ -42,38 +43,57 @@ on:
         options:
           - aswftesting
           - aswf
+      platforms:
+        description: "Comma-separated subset of rocky8,rocky9,macos,windows (empty = all)"
+        required: false
+        default: "rocky8,rocky9,macos,windows"
+
+env:
+  # Shared across all jobs. Not platform-dependent.
+  OPENSSL_VERSION: "3.5.6"
+  CMAKE_VERSION: "3.31.6"
+  # inputs.* is only populated for workflow_dispatch. For push / PR
+  # triggers these are empty; each job applies its own fallback.
+  PHASE: ${{ inputs.phase || 'probe' }}
+  REMOTE_NAME: ${{ inputs.remote || 'aswftesting' }}
+  REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
+  PLATFORMS: ${{ inputs.platforms || 'rocky8,rocky9,macos,windows' }}
 
 jobs:
-  upload:
-    name: "Conan ${{ inputs.phase || 'openssl' }} -> ${{ inputs.remote || 'aswftesting' }}"
+  # ---------------------------------------------------------------------------
+  # Rocky Linux (8 + 9). Matrix over rocky-version; job runs per row.
+  # ---------------------------------------------------------------------------
+  rocky-linux:
+    name: "Conan ${{ inputs.phase || 'probe' }} -> rocky${{ matrix.rocky-version }} -> ${{ inputs.remote || 'aswftesting' }}"
+    # GitHub Actions does not expose matrix.* in job-level if: expressions,
+    # so we cannot filter rocky8 vs rocky9 independently here. If either
+    # token appears in platforms, both matrix rows run; if neither does,
+    # neither runs. Selecting "rocky8 only" requires editing the matrix.
+    if: contains(format(',{0},', inputs.platforms || 'rocky8,rocky9,macos,windows'), ',rocky8,') || contains(format(',{0},', inputs.platforms || 'rocky8,rocky9,macos,windows'), ',rocky9,')
     runs-on: ubuntu-latest
     container:
-      image: amd64/rockylinux:8
+      image: ${{ matrix.image }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rocky-version: "8"
+            image: "amd64/rockylinux:8"
+            extra_repo: "powertools"
+            conan-profile: "x86_64_rocky8"
+          - rocky-version: "9"
+            image: "amd64/rockylinux:9"
+            extra_repo: "crb"
+            conan-profile: "x86_64_rocky9"
 
     env:
       CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
       CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
-      # inputs.* is only populated for workflow_dispatch. For push / PR
-      # triggers these are empty, so fall back to safe defaults.
-      # TEMP: phase default is 'openssl' while we can't manually dispatch.
-      # Flip back to 'probe' once dispatch access is available again.
-      PHASE: ${{ inputs.phase || 'openssl' }}
-      REMOTE_NAME: ${{ inputs.remote || 'aswftesting' }}
-      REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
-      CONAN_PROFILE: x86_64_rocky8
-      # openssl 3.5.0 has been rotated out of CCI master. Use the latest
-      # 3.5.x patch available. Bump here when CCI drops 3.5.6 too.
-      OPENSSL_VERSION: "3.5.6"
-      # Match cmake-version from the rocky-linux matrix in conan.yml.
-      CMAKE_VERSION: "3.31.6"
+      CONAN_PROFILE: ${{ matrix.conan-profile }}
 
     steps:
       - name: Diagnose secret presence
-        # Prints lengths only (never values). If both are 0, the secrets
-        # aren't reaching this workflow. Likely causes: org-level secret
-        # with repo allow-list that excludes OpenRV, secrets placed under
-        # Environment / Dependabot / Codespaces tabs instead of Actions,
-        # or case/typo in the secret names.
         env:
           U: ${{ secrets.ARTIFACTORY_USER }}
           T: ${{ secrets.ARTIFACTORY_TOKEN }}
@@ -82,6 +102,7 @@ jobs:
           echo "actor: ${GITHUB_ACTOR}"
           echo "repo:  ${GITHUB_REPOSITORY}"
           echo "ref:   ${GITHUB_REF}"
+          echo "platform: rocky${{ matrix.rocky-version }} (${{ matrix.conan-profile }})"
           echo "ARTIFACTORY_USER length:  ${#U}"
           echo "ARTIFACTORY_TOKEN length: ${#T}"
           echo "CONAN_LOGIN_USERNAME (env) length: ${#CONAN_LOGIN_USERNAME}"
@@ -97,19 +118,21 @@ jobs:
       - name: Install base system packages
         run: |
           dnf install -y epel-release
-          dnf config-manager --set-enabled powertools devel
+          dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
           dnf groupinstall "Development Tools" -y
           dnf install -y which findutils git python3 python3-pip perl perl-IPC-Cmd perl-Digest-SHA nasm make
           dnf clean all
 
-      - name: Install gcc-toolset-11
+      - name: Install gcc-toolset-11 (rocky8 only)
+        if: matrix.rocky-version == '8'
         run: |
           for i in 1 2 3 4 5; do
             dnf install -y gcc-toolset-11-toolchain && break
             echo "attempt $i failed, retrying in 5s"; sleep 5
           done
 
-      - name: Enable gcc-toolset-11
+      - name: Enable gcc-toolset-11 (rocky8 only)
+        if: matrix.rocky-version == '8'
         run: |
           source /opt/rh/gcc-toolset-11/enable
           echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
@@ -117,9 +140,13 @@ jobs:
           echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
           gcc --version
 
+      - name: Install Rocky 9 perl CPAN (rocky9 only)
+        if: matrix.rocky-version == '9'
+        run: |
+          dnf install -y perl-CPAN
+          cpan FindBin || true
+
       - name: Install CMake
-        # Same pattern as .github/actions/build-linux/action.yml: download
-        # the Kitware binary tarball instead of relying on dnf.
         run: |
           curl -SL -o cmake.tar.gz "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz"
           tar -xzf cmake.tar.gz
@@ -142,15 +169,12 @@ jobs:
 
       - name: Configure Conan remote and authenticate
         run: |
-          # Replace any existing entry so the URL is always the one we expect.
           conan remote remove "$REMOTE_NAME" 2>/dev/null || true
           conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
           conan remote list
           conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
 
       - name: Detect default Conan profile
-        # The x86_64_rocky8 profile inherits no fallback, so a baseline
-        # "default" profile must exist for conan create to resolve.
         run: conan profile detect --force
 
       - name: Phase A.5 - Create probe recipe
@@ -201,7 +225,6 @@ jobs:
           echo "::group::CCI openssl config.yml"
           cat /tmp/cci/recipes/openssl/config.yml
           echo "::endgroup::"
-          # Fail early if the pinned OPENSSL_VERSION isn't listed in CCI.
           if ! grep -q "\"${OPENSSL_VERSION}\"" /tmp/cci/recipes/openssl/config.yml; then
             echo "::error::openssl ${OPENSSL_VERSION} not found in CCI config.yml. Update OPENSSL_VERSION env."
             exit 1
@@ -210,8 +233,6 @@ jobs:
       - name: Phase B - Build openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
         if: ${{ env.PHASE == 'openssl' }}
         run: |
-          # -tf="" skips the CCI test_package step; we only care about
-          # producing and uploading the binary, not revalidating the recipe.
           conan create /tmp/cci/recipes/openssl/3.x.x/ \
             --version "${OPENSSL_VERSION}" \
             --user openrv \
@@ -225,8 +246,7 @@ jobs:
 
       - name: Phase C - Upload openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
         if: ${{ env.PHASE == 'openssl' }}
-        run: |
-          conan upload "openssl/${OPENSSL_VERSION}@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
+        run: conan upload "openssl/${OPENSSL_VERSION}@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
 
       - name: Verify server-side listing
         if: ${{ env.PHASE == 'openssl' }}
@@ -234,20 +254,11 @@ jobs:
 
       - name: Phase D - Wipe local cache for openssl
         if: ${{ env.PHASE == 'openssl' }}
-        run: |
-          # Remove the just-built package so the install in the next step
-          # has to pull from the remote. Otherwise conan would use the
-          # local cache and we would not be exercising the remote.
-          conan remove "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -c
+        run: conan remove "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -c
 
       - name: Phase D - Round-trip install from ${{ inputs.remote || 'aswftesting' }}
         if: ${{ env.PHASE == 'openssl' }}
         run: |
-          # --build=never makes this step assert "prebuilt binary must
-          # exist on the remote with the same package_id as the profile
-          # and options below produce". If Conan would need to build, it
-          # fails here and we know the upload was incomplete or the
-          # options do not match what was uploaded.
           set -o pipefail
           conan install \
             --requires="openssl/${OPENSSL_VERSION}@openrv/vfx2024" \
@@ -256,7 +267,6 @@ jobs:
             -pr:a "./conan/profiles/${CONAN_PROFILE}" \
             -o 'openssl/*:shared=True' \
             -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_d.log
-
           if grep -qiE "Building from sources|building package" /tmp/phase_d.log; then
             echo "::error::Phase D regressed - Conan is building instead of downloading."
             exit 1
@@ -270,9 +280,6 @@ jobs:
       - name: Phase E - Verify profile rewrites openssl to @openrv/vfx2024
         if: ${{ env.PHASE == 'openssl' }}
         run: |
-          # conan/profiles/common has [replace_requires] that rewrites
-          # openssl/* to openssl/${OPENSSL_VERSION}@openrv/vfx2024. Asking
-          # for plain openssl/3.5.0 should still resolve to the ASWF ref.
           set -o pipefail
           conan graph info \
             --requires="openssl/3.5.0" \
@@ -280,10 +287,384 @@ jobs:
             -pr:a "./conan/profiles/${CONAN_PROFILE}" \
             -o 'openssl/*:shared=True' \
             -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_e.log
-
           expected_ref="openssl/${OPENSSL_VERSION}@openrv/vfx2024"
           if ! grep -qF "$expected_ref" /tmp/phase_e.log; then
-            echo "::error::Phase E failed - graph does not contain $expected_ref. The profile replace_requires rewrite is not taking effect."
+            echo "::error::Phase E failed - graph does not contain $expected_ref."
             exit 1
           fi
           echo "::notice::Phase E success - profile rewrites openssl/* to $expected_ref."
+
+  # ---------------------------------------------------------------------------
+  # macOS arm64. GitHub-hosted macos-14 runner. Profile: arm64_apple_release.
+  # ---------------------------------------------------------------------------
+  macos:
+    name: "Conan ${{ inputs.phase || 'probe' }} -> macos-arm64 -> ${{ inputs.remote || 'aswftesting' }}"
+    if: contains(format(',{0},', inputs.platforms || 'rocky8,rocky9,macos,windows'), ',macos,')
+    runs-on: macos-14
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      CONAN_PROFILE: arm64_apple_release
+
+    steps:
+      - name: Diagnose secret presence
+        env:
+          U: ${{ secrets.ARTIFACTORY_USER }}
+          T: ${{ secrets.ARTIFACTORY_TOKEN }}
+        run: |
+          echo "event: ${GITHUB_EVENT_NAME}"
+          echo "platform: macos-arm64 (${CONAN_PROFILE})"
+          echo "ARTIFACTORY_USER length:  ${#U}"
+          echo "ARTIFACTORY_TOKEN length: ${#T}"
+
+      - name: Verify secrets are set
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set."
+            exit 1
+          fi
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2
+        with:
+          cmake-version: "${{ env.CMAKE_VERSION }}"
+
+      - name: Install nasm
+        run: brew install nasm
+
+      - name: Setup Python
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Conan 2.x
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "conan>=2.0,<3.0"
+          conan --version
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+
+      - name: Detect default Conan profile
+        run: conan profile detect --force
+
+      - name: Phase A.5 - Create probe recipe
+        run: |
+          mkdir -p /tmp/openrv-probe
+          cat > /tmp/openrv-probe/conanfile.py <<'PY'
+          from conan import ConanFile
+
+          class Probe(ConanFile):
+              name = "openrv-probe"
+              version = "0.0.1"
+              package_type = "application"
+              settings = "os", "arch"
+
+              def package(self):
+                  pass
+          PY
+          conan create /tmp/openrv-probe --user openrv --channel test
+
+      - name: Phase A.5 - Upload probe to ${{ inputs.remote || 'aswftesting' }}
+        id: probe_upload
+        run: |
+          set +e
+          out=$(conan upload "openrv-probe/0.0.1@openrv/test" --remote "$REMOTE_NAME" --confirm 2>&1)
+          status=$?
+          echo "$out"
+          if [ $status -eq 0 ]; then
+            echo "::notice::Probe upload succeeded (macos)."
+          else
+            if echo "$out" | grep -qiE "403|forbidden|unauthorized"; then
+              echo "::error::Probe upload rejected on macos. Check permissions."
+            fi
+            exit $status
+          fi
+
+      - name: Phase A.5 - Clean up probe from remote
+        if: always() && steps.probe_upload.outcome == 'success'
+        continue-on-error: true
+        run: |
+          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
+          conan remove "openrv-probe/*" -c || true
+
+      - name: Phase B - Clone conan-center-index and verify openssl version
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git /tmp/cci
+          echo "::group::CCI openssl config.yml"
+          cat /tmp/cci/recipes/openssl/config.yml
+          echo "::endgroup::"
+          if ! grep -q "\"${OPENSSL_VERSION}\"" /tmp/cci/recipes/openssl/config.yml; then
+            echo "::error::openssl ${OPENSSL_VERSION} not found in CCI config.yml."
+            exit 1
+          fi
+
+      - name: Phase B - Build openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          conan create /tmp/cci/recipes/openssl/3.x.x/ \
+            --version "${OPENSSL_VERSION}" \
+            --user openrv \
+            --channel vfx2024 \
+            --build=missing \
+            -tf="" \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True'
+          conan list "openssl/${OPENSSL_VERSION}@openrv/vfx2024:*"
+
+      - name: Phase C - Upload openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan upload "openssl/${OPENSSL_VERSION}@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
+
+      - name: Verify server-side listing
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan search "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -r "$REMOTE_NAME"
+
+      - name: Phase D - Wipe local cache for openssl
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan remove "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -c
+
+      - name: Phase D - Round-trip install from ${{ inputs.remote || 'aswftesting' }}
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          set -o pipefail
+          conan install \
+            --requires="openssl/${OPENSSL_VERSION}@openrv/vfx2024" \
+            -r "$REMOTE_NAME" \
+            --build=never \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_d.log
+          if grep -qiE "Building from sources|building package" /tmp/phase_d.log; then
+            echo "::error::Phase D regressed on macos - Conan is building instead of downloading."
+            exit 1
+          fi
+          if ! grep -qiE "downloaded|Already installed" /tmp/phase_d.log; then
+            echo "::error::Phase D log does not show a download on macos."
+            exit 1
+          fi
+          echo "::notice::Phase D success on macos."
+
+      - name: Phase E - Verify profile rewrites openssl to @openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          set -o pipefail
+          conan graph info \
+            --requires="openssl/3.5.0" \
+            -r "$REMOTE_NAME" \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_e.log
+          expected_ref="openssl/${OPENSSL_VERSION}@openrv/vfx2024"
+          if ! grep -qF "$expected_ref" /tmp/phase_e.log; then
+            echo "::error::Phase E failed on macos - graph missing $expected_ref."
+            exit 1
+          fi
+          echo "::notice::Phase E success on macos."
+
+  # ---------------------------------------------------------------------------
+  # Windows x86_64. windows-2022 + MSVC + MSYS2. Profile: x86_64_windows.
+  # ---------------------------------------------------------------------------
+  windows:
+    name: "Conan ${{ inputs.phase || 'probe' }} -> windows-x86_64 -> ${{ inputs.remote || 'aswftesting' }}"
+    if: contains(format(',{0},', inputs.platforms || 'rocky8,rocky9,macos,windows'), ',windows,')
+    runs-on: windows-2022
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      CONAN_PROFILE: x86_64_windows
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Diagnose secret presence
+        shell: bash
+        env:
+          U: ${{ secrets.ARTIFACTORY_USER }}
+          T: ${{ secrets.ARTIFACTORY_TOKEN }}
+        run: |
+          echo "event: ${GITHUB_EVENT_NAME}"
+          echo "platform: windows-x86_64 (${CONAN_PROFILE})"
+          echo "ARTIFACTORY_USER length:  ${#U}"
+          echo "ARTIFACTORY_TOKEN length: ${#T}"
+
+      - name: Verify secrets are set
+        shell: bash
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set."
+            exit 1
+          fi
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          cache: false
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+            nasm
+            perl
+            make
+            git
+
+      - name: Install Conan 2.x (inside msys2)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "conan>=2.0,<3.0"
+          conan --version
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+
+      - name: Detect default Conan profile
+        run: conan profile detect --force
+
+      - name: Phase A.5 - Create probe recipe
+        run: |
+          mkdir -p /tmp/openrv-probe
+          cat > /tmp/openrv-probe/conanfile.py <<'PY'
+          from conan import ConanFile
+
+          class Probe(ConanFile):
+              name = "openrv-probe"
+              version = "0.0.1"
+              package_type = "application"
+              settings = "os", "arch"
+
+              def package(self):
+                  pass
+          PY
+          conan create /tmp/openrv-probe --user openrv --channel test
+
+      - name: Phase A.5 - Upload probe to ${{ inputs.remote || 'aswftesting' }}
+        id: probe_upload
+        run: |
+          set +e
+          out=$(conan upload "openrv-probe/0.0.1@openrv/test" --remote "$REMOTE_NAME" --confirm 2>&1)
+          status=$?
+          echo "$out"
+          if [ $status -eq 0 ]; then
+            echo "::notice::Probe upload succeeded (windows)."
+          else
+            if echo "$out" | grep -qiE "403|forbidden|unauthorized"; then
+              echo "::error::Probe upload rejected on windows. Check permissions."
+            fi
+            exit $status
+          fi
+
+      - name: Phase A.5 - Clean up probe from remote
+        if: always() && steps.probe_upload.outcome == 'success'
+        continue-on-error: true
+        run: |
+          conan remove "openrv-probe/*" -r "$REMOTE_NAME" -c || true
+          conan remove "openrv-probe/*" -c || true
+
+      - name: Phase B - Clone conan-center-index and verify openssl version
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git /tmp/cci
+          echo "::group::CCI openssl config.yml"
+          cat /tmp/cci/recipes/openssl/config.yml
+          echo "::endgroup::"
+          if ! grep -q "\"${OPENSSL_VERSION}\"" /tmp/cci/recipes/openssl/config.yml; then
+            echo "::error::openssl ${OPENSSL_VERSION} not found in CCI config.yml."
+            exit 1
+          fi
+
+      - name: Phase B - Build openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          conan create /tmp/cci/recipes/openssl/3.x.x/ \
+            --version "${OPENSSL_VERSION}" \
+            --user openrv \
+            --channel vfx2024 \
+            --build=missing \
+            -tf="" \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True'
+          conan list "openssl/${OPENSSL_VERSION}@openrv/vfx2024:*"
+
+      - name: Phase C - Upload openssl/${{ env.OPENSSL_VERSION }}@openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan upload "openssl/${OPENSSL_VERSION}@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
+
+      - name: Verify server-side listing
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan search "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -r "$REMOTE_NAME"
+
+      - name: Phase D - Wipe local cache for openssl
+        if: ${{ env.PHASE == 'openssl' }}
+        run: conan remove "openssl/${OPENSSL_VERSION}@openrv/vfx2024" -c
+
+      - name: Phase D - Round-trip install from ${{ inputs.remote || 'aswftesting' }}
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          set -o pipefail
+          conan install \
+            --requires="openssl/${OPENSSL_VERSION}@openrv/vfx2024" \
+            -r "$REMOTE_NAME" \
+            --build=never \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_d.log
+          if grep -qiE "Building from sources|building package" /tmp/phase_d.log; then
+            echo "::error::Phase D regressed on windows - Conan is building instead of downloading."
+            exit 1
+          fi
+          if ! grep -qiE "downloaded|Already installed" /tmp/phase_d.log; then
+            echo "::error::Phase D log does not show a download on windows."
+            exit 1
+          fi
+          echo "::notice::Phase D success on windows."
+
+      - name: Phase E - Verify profile rewrites openssl to @openrv/vfx2024
+        if: ${{ env.PHASE == 'openssl' }}
+        run: |
+          set -o pipefail
+          conan graph info \
+            --requires="openssl/3.5.0" \
+            -r "$REMOTE_NAME" \
+            -pr:a "./conan/profiles/${CONAN_PROFILE}" \
+            -o 'openssl/*:shared=True' \
+            -o 'openssl/*:no_zlib=True' 2>&1 | tee /tmp/phase_e.log
+          expected_ref="openssl/${OPENSSL_VERSION}@openrv/vfx2024"
+          if ! grep -qF "$expected_ref" /tmp/phase_e.log; then
+            echo "::error::Phase E failed on windows - graph missing $expected_ref."
+            exit 1
+          fi
+          echo "::notice::Phase E success on windows."
