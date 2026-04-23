@@ -20,6 +20,15 @@ ViewSubComponent    := 2;
 LayerSubComponent   := 3;
 ChannelSubComponent := 4;
 
+FILMSTRIP_FRAME_WIDTH := 240;
+SOURCE_PREVIEW_WIDTH  := 80;
+SOURCE_PREVIEW_HEIGHT := 45;
+SOURCE_ROW_HEIGHT     := 55;
+SOURCE_ROW_MARGIN     := 8;
+SOURCE_ROW_SPACING    := 5;
+SOURCE_TEXT_SPACING   := 3;
+TREE_VIEW_INDENTATION := 10;
+
 \: itemNode (string; QStandardItem item) 
 { 
     let d = item.data(Qt.UserRole + 2);
@@ -601,6 +610,120 @@ documentation: """
 QStandardItemModel with modified drag and drop mime types.
 """;
 
+// Displays a static thumbnail image. Falls back to a placeholder pixmap if none loaded.
+class: ThumbnailWidget : QLabel
+{
+    method: ThumbnailWidget (ThumbnailWidget; QWidget parent)
+    {
+        QLabel.QLabel(this, parent);
+        setScaledContents(true);
+    }
+
+    method: setFallback (void; QPixmap pixmap) { setPixmap(pixmap); }
+
+    method: load (void; string path)
+    {
+        let pixmap = QPixmap.fromImage(QImage(path, ""), Qt.AutoColor);
+        if (!pixmap.isNull()) setPixmap(pixmap);
+    }
+}
+
+// Displays a scrubbable filmstrip that will show the corresponding frame
+// based on mouse position
+class: FilmstripWidget : QLabel
+{
+    QImage _strip;
+    int    _frameWidth;
+    bool   _loaded;
+
+    method: FilmstripWidget (FilmstripWidget; QWidget parent)
+    {
+        QLabel.QLabel(this, parent);
+        _frameWidth = FILMSTRIP_FRAME_WIDTH;
+        _loaded     = false;
+        setScaledContents(true);
+        setMouseTracking(true);
+    }
+
+    method: showFrameAtX (void; int mouseX)
+    {
+        if (!_loaded || width() <= 0) return;
+        let nativeWidth  = _strip.width(),
+            proportionX  = float(mouseX) / float(width()),
+            frameX       = int(proportionX * float(nativeWidth) / float(_frameWidth) + 0.5) * _frameWidth,
+            clampedX     = if frameX > nativeWidth - _frameWidth then nativeWidth - _frameWidth
+                           else if frameX < 0 then 0
+                           else frameX;
+        let frame = _strip.copy(QRect(clampedX, 0, _frameWidth, _strip.height()));
+        setPixmap(QPixmap.fromImage(frame, Qt.AutoColor));
+    }
+
+    method: isLoaded (bool;) { _loaded; }
+
+    method: load (void; string path)
+    {
+        let filmstripImage = QImage(path, "");
+        if (!filmstripImage.isNull())
+        {
+            _strip  = filmstripImage;
+            _loaded = true;
+        }
+    }
+
+    method: mouseMoveEvent (void; QMouseEvent event)
+    {
+        showFrameAtX(@MU_QT_QDRAGMOVEEVENT_POSITION@.x());
+        QWidget.mouseMoveEvent(this, event);
+    }
+}
+
+// Stacks a FilmstripWidget and ThumbnailWidget. Shows thumbnail by default;
+// on hover enter shows the filmstrip scrubbed to the cursor position.
+class: SourcePreviewWidget : QWidget
+{
+    FilmstripWidget _filmstrip;
+    ThumbnailWidget _thumbnail;
+
+    method: SourcePreviewWidget (SourcePreviewWidget; QWidget parent)
+    {
+        QWidget.QWidget(this, parent);
+        setAttribute(Qt.WA_Hover, true);
+
+        _thumbnail = ThumbnailWidget(this);
+        _thumbnail.setGeometry(QRect(0, 0, SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        _thumbnail.show();
+
+        _filmstrip = FilmstripWidget(this);
+        _filmstrip.setGeometry(QRect(0, 0, SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        _filmstrip.hide();
+    }
+
+    method: setFallback (void; QPixmap pixmap) { _thumbnail.setFallback(pixmap); }
+    method: loadStrip   (void; string path) { _filmstrip.load(path); }
+    method: loadThumbnail (void; string path) { _thumbnail.load(path); }
+
+    method: event (bool; QEvent event)
+    {
+        if (event.type() == QEvent.HoverEnter)
+        {
+            if (_filmstrip.isLoaded())
+            {
+                _filmstrip.showFrameAtX(mapFromGlobal(QCursor.pos()).x());
+                _filmstrip.show();
+                _thumbnail.hide();
+            }
+            return true;
+        }
+        else if (event.type() == QEvent.HoverLeave)
+        {
+            _filmstrip.hide();
+            _thumbnail.show();
+            return true;
+        }
+        return QWidget.event(this, event);
+    }
+}
+
 class: NodeModel : QStandardItemModel
 {
     method: NodeModel (NodeModel; QObject parent)
@@ -980,9 +1103,13 @@ class: SessionManagerMode : MinorMode
     QIcon              _layerIcon;
     QIcon              _channelIcon;
     QIcon              _videoIcon;
+    QIcon              _fallbackSourceIcon;
     bool               _inputOrderLock;
     bool               _disableUpdates;
+    bool               _previewsEnabled;
     bool               _progressiveLoadingInProgress;
+    string[]           _srcNodeKeys;
+    string[]           _grpNodeValues;
     QTimer             _lazySetInputsTimer;
     QTimer             _lazyUpdateTimer;
     QTimer             _mainWinVisTimer;
@@ -1360,20 +1487,28 @@ class: SessionManagerMode : MinorMode
         _inputOrderLock = true;
 
         _inputsModel.clear();
-        let connections = nodeInputs(node),
-            vnodes = viewNodes();
+        let connections = nodeInputs(node);
 
         for_index (i; connections)
         {
-            let innode = connections[i],
-                item   = QStandardItem(iconForNode(innode), uiName(innode)),
-                vindex = indexOfItem(vnodes, innode);
+            let innode   = connections[i],
+                isSource = nodeType(innode) == "RVSourceGroup",
+                item     = QStandardItem(iconForNode(innode), uiName(innode));
 
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsEnabled);
             item.setData(QVariant(innode), Qt.UserRole + 2);
             item.setEditable(false);
-            
+
+            if (isSource && _previewsEnabled)
+            {
+                item.setText("");
+                item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
+            }
+
             _inputsModel.appendRow(item);
+
+            if (isSource && _previewsEnabled)
+                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
         }
 
         _inputOrderLock = false;
@@ -1662,6 +1797,76 @@ class: SessionManagerMode : MinorMode
         item;
     }
 
+    method: makeSourceRowWidget (QWidget; string node)
+    {
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
+        }
+
+        let widget = QWidget(nil, 0),
+            layout = QHBoxLayout(widget);
+        widget.setObjectName("sourceRowWidget");
+        layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
+        layout.setSpacing(SOURCE_ROW_SPACING);
+
+        let preview = SourcePreviewWidget(widget);
+        preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
+
+        string meta = "";
+
+        if (sourceNode neq nil)
+        {
+            // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of 
+            // 10 for ordering. This means any custom plugin of higher priority will be used first.
+            // This allows users to override the local plugin with a custom plugin by making sure 
+            // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
+            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+            let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
+
+            if (filmstripPath != "" && io.path.exists(filmstripPath))
+                preview.loadStrip(filmstripPath);
+
+            if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+                preview.loadThumbnail(thumbnailPath);
+
+            let mediaPropertyPath = sourceNode + ".media.movie";
+            if (propertyExists(mediaPropertyPath))
+            {
+                let movieProperty = getStringProperty(mediaPropertyPath);
+                if (!movieProperty.empty())
+                {
+                    let parts = io.path.basename(movieProperty.front()).split(".");
+                    if (parts.size() > 1) meta = parts.back();
+                }
+            }
+        }
+
+        layout.addWidget(preview);
+
+        // Text column
+        let textWidget = QWidget(widget),
+            textLayout = QVBoxLayout(textWidget);
+        textWidget.setObjectName("sourceTextWidget");
+        textLayout.setSpacing(SOURCE_TEXT_SPACING);
+
+        let nameLabel = QLabel(uiName(node), textWidget);
+        nameLabel.setObjectName("sourceNameLabel");
+        textLayout.addWidget(nameLabel);
+
+        let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
+        metaLabel.setObjectName("sourceMetaLabel");
+        textLayout.addWidget(metaLabel);
+        textLayout.addStretch(1);
+
+        layout.addWidget(textWidget, 1);
+
+        widget;
+    }
+
     method: newNodeRow (void; 
                         QStandardItem parentItem,
                         string node,
@@ -1691,6 +1896,13 @@ class: SessionManagerMode : MinorMode
         let statusItems = newNodeStatusColumns(node);
         if (node == viewNode()) head(tail(statusItems)).setText("\u2714");
         addRow(parentItem, item : statusItems);
+
+        if (source && _previewsEnabled)
+        {
+            item.setText("");
+            item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+        }
 
         //
         //  Tabs in tooltips make win32 Qt crash.
@@ -1725,8 +1937,10 @@ class: SessionManagerMode : MinorMode
                 //  node.sm_state.componentHash
                 //
 
-                let sourceNode = sourceNodeOfGroup(node),
-                    pval       = getStringProperty(sourceNode + ".request.imageComponent"),
+                let sourceNode = sourceNodeOfGroup(node);
+                _srcNodeKeys.push_back(sourceNode);
+                _grpNodeValues.push_back(node);
+                let pval       = getStringProperty(sourceNode + ".request.imageComponent"),
                     hasPval    = pval.size() > 1,
                     iname      = if hasPval then pval.back() else string(nil),
                     itype      = if hasPval
@@ -1846,6 +2060,8 @@ class: SessionManagerMode : MinorMode
     method: updateTree (void;)
     {
         if (_disableUpdates) return;
+        _srcNodeKeys = string[]();
+        _grpNodeValues = string[]();
         _viewModel.clear();
         _viewModel.setHorizontalHeaderLabels(string[] {"Name", "*", "*"});
         _viewTreeView.header().setMinimumSectionSize(-1);
@@ -1946,8 +2162,31 @@ class: SessionManagerMode : MinorMode
 
     method: updateTreeEvent (void; Event event)
     {
-        updateTree();
         event.reject();
+        if (_progressiveLoadingInProgress) return;
+        updateTree();
+    }
+
+    method: updateNodePreviewEvent (void; Event event)
+    {
+        event.reject();
+        if (!_previewsEnabled) return;
+        let sourceNode = event.contents();
+
+        string node = nil;
+        for (int i = 0; i < _srcNodeKeys.size(); i++)
+        {
+            if (_srcNodeKeys[i] == sourceNode) { node = _grpNodeValues[i]; break; }
+        }
+        if (node eq nil) return;
+
+        let item = itemOfNode(_viewModel, node);
+        if (item neq nil)
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+
+        let inputItem = itemOfNode(_inputsModel, node);
+        if (inputItem neq nil)
+            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -2829,6 +3068,14 @@ class: SessionManagerMode : MinorMode
         writeSetting("Tools", "show_session_manager", Bool(show));
     }
 
+    method: togglePreviews (void; bool checked)
+    {
+        _previewsEnabled = checked;
+        use SettingsValue;
+        writeSetting("SessionManager", "previewsEnabled", Bool(checked));
+        updateTree();
+    }
+
     method: SessionManagerMode (SessionManagerMode; string name)
     {
         _darkUI         = true;
@@ -2836,6 +3083,21 @@ class: SessionManagerMode : MinorMode
         _editors        = QTreeWidgetItem[]();
         _quitting       = false;
         _disableUpdates = false;
+        _srcNodeKeys    = string[]();
+        _grpNodeValues  = string[]();
+
+        let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
+        if (previewsEnv neq nil && previewsEnv == "0")
+        {
+            _previewsEnabled = false;
+        }
+        else
+        {
+            use SettingsValue;
+            let Bool enabled = readSetting("SessionManager", "previewsEnabled", Bool(true));
+            _previewsEnabled = bool(enabled);
+        }
+
         _progressiveLoadingInProgress = (loadTotal() != 0);
 
         init(name,
@@ -2853,7 +3115,8 @@ class: SessionManagerMode : MinorMode
                ("key-down--@", showRows, "show'em"),
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
-               ("event-category-state-changed", onCategoryStateChanged, "Category state changed")
+               ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
+               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail")
                ],
              nil,
              nil);
@@ -2929,6 +3192,7 @@ class: SessionManagerMode : MinorMode
         _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
         _viewTreeView.setDefaultDropAction(Qt.MoveAction);
         _viewTreeView.setExpandsOnDoubleClick(false);
+        _viewTreeView.setIndentation(TREE_VIEW_INDENTATION);
 
         _inputsView.setModel(_inputsModel);
         _inputsView.setDragEnabled(true);
@@ -2986,6 +3250,7 @@ class: SessionManagerMode : MinorMode
         _channelIcon = auxIcon("channel.png", true);
         _layerIcon = auxIcon("layer.png", true);
         _unknownTypeIcon = auxIcon("new_48x48.png", true);
+        _fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
 
         _addButton.setDefaultAction(addAction);
         _deleteButton.setDefaultAction(deleteAction);
@@ -3124,6 +3389,17 @@ class: SessionManagerMode : MinorMode
             configGroup.addAction(a);
         }
 
+        let _              = configMenu.addSeparator(),
+            previewToggle  = configMenu.addAction("Show Source Previews");
+
+        previewToggle.setCheckable(true);
+        previewToggle.setChecked(_previewsEnabled);
+
+        if (previewsEnv neq nil && previewsEnv == "0")
+        {
+            previewToggle.setEnabled(false);
+        }
+
         _configButton.setMenu(configMenu);
 
         try
@@ -3175,6 +3451,7 @@ class: SessionManagerMode : MinorMode
         connect(configAlwaysOn, QAction.triggered, configSlot(,"yes",true));
         connect(configNeverOn, QAction.triggered, configSlot(,"no",false));
         connect(configLastOn, QAction.triggered, configSlot(,"last",true));
+        connect(previewToggle, QAction.toggled, togglePreviews);
         connect(_viewModel, QStandardItemModel.itemChanged, viewItemChanged);
         connect(_viewTreeView, QTreeView.expanded, setItemExpandedState(,1));
         connect(_viewTreeView, QTreeView.collapsed, setItemExpandedState(,0));
