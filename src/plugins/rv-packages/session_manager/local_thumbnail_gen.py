@@ -136,7 +136,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         event.reject()
         source_node = event.contents()
         media_path = self._get_media_path(source_node)
-        if not media_path:
+        if not media_path or not self._get_source_info(source_node):
             event.setReturnContent("")
             return
 
