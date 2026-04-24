@@ -11,6 +11,9 @@ SET(_target
 )
 
 LIST(APPEND _sources MovieFFMpeg.cpp)
+IF(RV_DEPS_APPLE_PRORES_SDK_ZIP_PATH)
+  LIST(APPEND _sources AppleProRes.cpp)
+ENDIF()
 
 ADD_LIBRARY(
   ${_target} STATIC
@@ -35,6 +38,18 @@ TARGET_LINK_LIBRARIES(
           ffmpeg::swscale
           OpenJph::OpenJph
 )
+
+IF(RV_DEPS_APPLE_PRORES_SDK_ZIP_PATH)
+  ADD_DEPENDENCIES(${_target} Apple::ProRes)
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE Apple::ProRes
+  )
+  TARGET_COMPILE_OPTIONS(
+    ${_target}
+    PRIVATE "-DRV_USE_APPLE_PRORES_SDK"
+  )
+ENDIF()
 
 IF(RV_FFMPEG_USE_VIDEOTOOLBOX)
   TARGET_LINK_LIBRARIES(
