@@ -1,0 +1,282 @@
+name: Conan Upload Deps (@openrv/vfx2024)
+
+# Batch-builds the non-openssl deps declared in conan/packages.yml and
+# uploads them under @openrv/vfx2024 to the ASWF Conan remote. Mirrors
+# the phase pattern already proven in .github/workflows/conan-upload-test.yml
+# for openssl, but driven by packages.yml so adding or bumping a dep is
+# a one-file change.
+#
+# Scope (this iteration):
+#   - Rocky 8 profile only (x86_64_rocky8).
+#   - Uploads to aswftesting by default.
+#   - pcre2 is windows_only and skipped here; picked up in the cross-platform
+#     follow-up (Phase 6 of the plan).
+
+on:
+  push:
+    branches:
+      - main
+      # Temporary: auto-run on the Conan-ASWF test branch while manual
+      # workflow dispatch is not available. Remove once testing is done.
+      - find-fork-test-aswf
+
+  pull_request:
+
+  workflow_dispatch:
+    inputs:
+      remote:
+        description: "Target Conan remote"
+        required: true
+        default: "aswftesting"
+        type: choice
+        options:
+          - aswftesting
+          - aswf
+      only:
+        description: "Single package name to run (empty = all)"
+        required: false
+        default: ""
+
+env:
+  REMOTE_NAME: ${{ inputs.remote || 'aswftesting' }}
+  REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
+  CMAKE_VERSION: "3.31.6"
+  CONAN_PROFILE: x86_64_rocky8
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Reads conan/packages.yml, filters out windows_only entries and optionally
+  # narrows to a single package via the `only` input. Emits a JSON array of
+  # matrix rows consumed by build-upload.
+  # ---------------------------------------------------------------------------
+  prepare-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+      count: ${{ steps.gen.outputs.count }}
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup Python
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: python3 -m pip install --user pyyaml
+
+      - name: Generate matrix from conan/packages.yml
+        id: gen
+        env:
+          ONLY: ${{ inputs.only || '' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, sys, yaml
+
+          cfg = yaml.safe_load(open("conan/packages.yml"))
+          only = os.environ.get("ONLY", "").strip()
+          rows = []
+          for dep in cfg["deps"]:
+              if dep.get("windows_only"):
+                  continue
+              if only and dep["name"] != only:
+                  continue
+              opts = dep.get("options") or {}
+              # Emit options as a flat list of tokens: ["-o", "foo=bar", ...].
+              # The consuming job parses this JSON into a bash array to avoid
+              # shell-glob expansion on `*` in option patterns.
+              flags = []
+              for k, v in opts.items():
+                  flags.append("-o")
+                  flags.append(f"{k}={v}")
+              rows.append({
+                  "name":         dep["name"],
+                  "version":      dep["version"],
+                  "cci_folder":   dep["cci_folder"],
+                  "options_json": json.dumps(flags),
+              })
+
+          if only and not rows:
+              print(f"::error::--only={only} matched no entry in conan/packages.yml", file=sys.stderr)
+              sys.exit(1)
+
+          payload = json.dumps(rows)
+          print(f"Matrix rows ({len(rows)}):")
+          for r in rows:
+              print(f"  {r['name']}/{r['version']} ({r['cci_folder']})")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write(f"matrix={payload}\n")
+              f.write(f"count={len(rows)}\n")
+          PY
+
+  # ---------------------------------------------------------------------------
+  # One matrix row per package. Rocky 8 container, same bootstrap pattern as
+  # conan-upload-test.yml (base packages, gcc-toolset-11, Kitware CMake,
+  # Conan 2.x, remote add, login). Each row exports the CCI recipe under
+  # @openrv/vfx2024, builds, uploads, and asserts server-side listing.
+  # ---------------------------------------------------------------------------
+  build-upload:
+    name: "Conan deps: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
+    needs: prepare-matrix
+    if: needs.prepare-matrix.outputs.count != '0'
+    runs-on: ubuntu-latest
+    container:
+      image: amd64/rockylinux:8
+
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix) }}
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+
+    steps:
+      - name: Verify secrets are set
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set on this repo."
+            exit 1
+          fi
+
+      - name: Install base system packages
+        # VFX Reference Platform CY2024 mandates Python 3.11. Rocky 8's
+        # default `python3` is 3.6.8, which is too old for meson (>=3.7
+        # required), so dav1d/libjpeg-turbo/etc. fail when Conan builds
+        # meson from source under the default interpreter. Install
+        # python3.11 from AppStream and expose it as the default
+        # `python3` / `pip3` via /usr/local/bin so every subsequent step
+        # (Conan install, recipe build() calls, meson) runs on 3.11.
+        run: |
+          dnf install -y epel-release
+          dnf config-manager --set-enabled powertools devel
+          dnf groupinstall "Development Tools" -y
+          dnf install -y which findutils git python3.11 python3.11-pip perl perl-IPC-Cmd perl-Digest-SHA nasm make
+          ln -sf /usr/bin/python3.11 /usr/local/bin/python3
+          ln -sf /usr/bin/pip3.11 /usr/local/bin/pip3
+          python3 --version
+          dnf clean all
+
+      - name: Install gcc-toolset-11
+        run: |
+          for i in 1 2 3 4 5; do
+            dnf install -y gcc-toolset-11-toolchain && break
+            echo "attempt $i failed, retrying in 5s"; sleep 5
+          done
+
+      - name: Enable gcc-toolset-11
+        run: |
+          source /opt/rh/gcc-toolset-11/enable
+          echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+          echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
+          echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
+          gcc --version
+
+      - name: Install CMake
+        # Install under /opt so the subsequent actions/checkout step does not
+        # wipe it (checkout cleans the workspace by default). Then symlink
+        # into /usr/local/bin so Conan's self.run(..., env="conanbuild"),
+        # which can isolate PATH via the generated buildenv.sh, still finds
+        # cmake when recipe build() methods invoke it.
+        run: |
+          curl -SL -o /tmp/cmake.tar.gz "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz"
+          mkdir -p /opt
+          tar -xzf /tmp/cmake.tar.gz -C /opt
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/cmake" /usr/local/bin/cmake
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/ctest" /usr/local/bin/ctest
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/cpack" /usr/local/bin/cpack
+          echo "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin" >> $GITHUB_PATH
+          cmake --version
+
+      - name: Install Conan 2.x
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "conan>=2.0,<3.0"
+          conan --version
+
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Mark repo as safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+
+      - name: Detect default Conan profile
+        run: conan profile detect --force
+
+      - name: Clone conan-center-index
+        run: git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git /tmp/cci
+
+      - name: Verify CCI recipe folder exists
+        run: |
+          DIR="/tmp/cci/recipes/${{ matrix.name }}/${{ matrix.cci_folder }}"
+          if [ ! -d "$DIR" ]; then
+            echo "::error::Recipe folder $DIR not found. Siblings:"
+            ls -1 "/tmp/cci/recipes/${{ matrix.name }}/" || true
+            exit 1
+          fi
+          echo "Using recipe: $DIR"
+
+      - name: Verify pinned version is available in CCI
+        run: |
+          CONFIG="/tmp/cci/recipes/${{ matrix.name }}/config.yml"
+          echo "::group::${{ matrix.name }} config.yml"
+          cat "$CONFIG"
+          echo "::endgroup::"
+          if ! grep -q "\"${{ matrix.version }}\"" "$CONFIG"; then
+            echo "::error::${{ matrix.name }}/${{ matrix.version }} not listed in $CONFIG. Version may have been rotated out of CCI; update conan/packages.yml."
+            exit 1
+          fi
+
+      - name: Export recipe with user/channel
+        run: |
+          conan export "/tmp/cci/recipes/${{ matrix.name }}/${{ matrix.cci_folder }}/" \
+            --version "${{ matrix.version }}" \
+            --user openrv \
+            --channel vfx2024
+
+      - name: Build ${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024
+        env:
+          OPTIONS_JSON: ${{ matrix.options_json }}
+        # sh-compatible: emit each option token NUL-terminated from Python,
+        # pipe to xargs -0 which appends them to the conan argv. Avoids shell
+        # glob expansion on `*` in option patterns and handles values that
+        # contain spaces (e.g., boost's extra_b2_flags).
+        #
+        # The extra `--build=<tool>/*` patterns force Conan to rebuild
+        # build-time tool_requires from source on the Rocky 8 runner rather
+        # than pulling prebuilt CCI binaries. Those prebuilts are compiled
+        # on newer hosts (glibc >= 2.32) and fail to launch against Rocky 8's
+        # glibc 2.28 (e.g., boost's b2/4.10.1, dav1d's meson/1.4.0 +
+        # nasm/2.16.01, libjpeg-turbo's nasm). Rebuilding locally also keeps
+        # the toolchain homogeneous per VFX Reference Platform CY2024
+        # ("same compiler for a given OS"). Extend this list if a new
+        # tool surfaces a `GLIBC_2.xx not found` error.
+        run: |
+          python3 -c "import json,sys; sys.stdout.write(''.join(t + '\0' for t in json.loads(sys.argv[1])))" "$OPTIONS_JSON" \
+            | xargs -0 conan install \
+                --requires="${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024" \
+                --build=missing \
+                --build="b2/*" \
+                --build="meson/*" \
+                --build="nasm/*" \
+                -pr:a "./conan/profiles/${CONAN_PROFILE}"
+          conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024:*"
+
+      - name: Upload ${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024
+        run: conan upload "${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024" --remote "$REMOTE_NAME" --confirm
+
+      - name: Verify server-side listing
+        run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/vfx2024" -r "$REMOTE_NAME"
