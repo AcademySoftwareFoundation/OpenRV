@@ -1,0 +1,130 @@
+# OpenRV Conan dependencies published under @openrv/vfx2024.
+#
+# Single source of truth consumed by .github/workflows/conan-upload-deps.yml.
+# Each entry mirrors openrvcore-conanfile.py:63-128 (name, version, options
+# on conan create). The workflow builds each on x86_64_rocky8 and uploads
+# to the ASWF Conan remote (aswftesting by default).
+#
+# Fields:
+#   name         - Conan package name (matches CCI recipe folder).
+#   version      - Pinned version; must be listed in CCI config.yml.
+#   cci_folder   - Subfolder under recipes/<name>/ in conan-center-index.
+#                  Most are "all"; a few like openssl use "3.x.x".
+#   options      - Map of Conan option -> value. Passed as -o flags on
+#                  conan install. Pattern strings like "foo/*:shared" match
+#                  the install --requires ref.
+#   windows_only - Optional. If true, this entry is filtered out when the
+#                  workflow runs on a Linux or macOS platform.
+
+deps:
+  - name: zlib
+    version: "1.3.1"
+    cci_folder: all
+    options:
+      "zlib/*:shared": "True"
+
+  - name: libatomic_ops
+    version: "7.10.0"
+    cci_folder: all
+    options:
+      "libatomic_ops/*:shared": "False"
+
+  - name: libwebp
+    # openrvcore-conanfile.py:69 pins 1.2.1 because libwebp >=1.3.0 adds
+    # sharpyuv and causes issues with OIIO. CCI rotated 1.2.1 out; 1.2.4
+    # is the closest available that remains pre-1.3.0.
+    version: "1.2.4"
+    cci_folder: all
+    options:
+      "libwebp/*:shared": "False"
+
+  - name: dav1d
+    version: "1.5.3"
+    cci_folder: all
+    options:
+      "dav1d/*:shared": "True"
+
+  - name: libjpeg-turbo
+    # 2.1.4 rotated out of CCI; 2.1.5 is the closest 2.1.x available.
+    # Avoiding 3.x to prevent ABI surprises against libraw/openjph.
+    version: "2.1.5"
+    cci_folder: all
+    options:
+      "libjpeg-turbo/*:shared": "True"
+
+  - name: boost
+    # The recipe revision pin #7053477b271b8c39e046f784405b402f from
+    # openrvcore-conanfile.py:87 may be unresolvable on CCI master.
+    # Workflow strips any #rrev suffix before conan create; the produced
+    # @openrv/vfx2024 ref gets its own revision.
+    version: "1.82.0"
+    cci_folder: all
+    options:
+      "boost/*:shared": "True"
+      "boost/*:extra_b2_flags": "-d+0 -s NO_LZMA=1"
+
+  - name: imath
+    # 3.2.1 rotated; 3.2.2 is a patch bump within 3.2.x.
+    version: "3.2.2"
+    cci_folder: all
+    options:
+      "imath/*:shared": "True"
+
+  - name: libdeflate
+    version: "1.25"
+    cci_folder: all
+    options:
+      "libdeflate/*:shared": "True"
+
+  - name: openexr
+    # 3.2.5 rotated; 3.2.8 is a patch bump within 3.2.x.
+    # Avoiding 3.3/3.4 because they would require realigning imath.
+    # openexr splits recipes by major: 2.x and 3.x (no "all").
+    version: "3.2.8"
+    cci_folder: "3.x"
+    options:
+      "openexr/*:shared": "True"
+
+  - name: libpng
+    # 1.6.55 rotated; 1.6.58 is a patch bump within 1.6.x.
+    version: "1.6.58"
+    cci_folder: all
+    options:
+      "libpng/*:shared": "True"
+
+  - name: openjpeg
+    version: "2.5.4"
+    cci_folder: all
+    options:
+      "openjpeg/*:shared": "True"
+
+  - name: libraw
+    # 0.21.1 rotated; 0.21.2 is a patch bump within 0.21.x.
+    # 0.21.5b has a beta suffix, avoided.
+    version: "0.21.2"
+    cci_folder: all
+    options:
+      "libraw/*:shared": "True"
+      "libraw/*:with_jpeg": "libjpeg-turbo"
+      "libraw/*:with_jasper": "False"
+
+  - name: openjph
+    # 0.26.3 rotated; 0.27.0 is the only remaining version in CCI.
+    # Minor bump; validate CMake target name compatibility.
+    version: "0.27.0"
+    cci_folder: all
+    options:
+      "openjph/*:shared": "True"
+      "openjph/*:with_tiff": "False"
+
+  - name: pcre2
+    version: "10.44"
+    cci_folder: all
+    windows_only: true
+    options:
+      "pcre2/*:shared": "True"
+      "pcre2/*:with_zlib": "False"
+      "pcre2/*:with_bzip2": "False"
+      "pcre2/*:support_jit": "False"
+      "pcre2/*:build_pcre2_16": "False"
+      "pcre2/*:build_pcre2_32": "False"

@@ -371,16 +371,13 @@ jobs:
           $CONAN_EXECUTABLE export openrvcore-conanfile.py
 
       - name: Build OpenRV dependencies
+        # openexr (and every other dep covered by [replace_requires] in
+        # conan/profiles/common) now resolves to @openrv/vfx2024 and is
+        # pulled prebuilt from the ASWF remote on Rocky 8, built on the
+        # matching toolchain. The earlier Rocky 8-specific `--build=openexr/*`
+        # workaround is no longer needed.
         run: |
-          # Rocky 8: force local rebuild of openexr so it uses gcc-toolset-11's
-          # libstdc++_nonshared.a (no dynamic VERNEED on GLIBCXX_3.4.26+).
-          # Conan Center's openexr prebuilt is linked against a full newer
-          # libstdc++.so.6 that the Rocky 8 system lib (GCC 8) cannot satisfy.
-          BUILD_FLAGS="--build=missing"
-          if [ "${{ matrix.rocky-version }}" = "8" ]; then
-            BUILD_FLAGS="--build=missing --build=openexr/*"
-          fi
-          $CONAN_EXECUTABLE install conanfile.py $BUILD_FLAGS -pr:a ./conan/profiles/x86_64_rocky8
+          $CONAN_EXECUTABLE install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_rocky8
 
       - name: Build OpenRV main executable
         run: |
