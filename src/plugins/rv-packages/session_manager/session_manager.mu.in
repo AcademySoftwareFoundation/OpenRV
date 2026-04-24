@@ -1824,14 +1824,15 @@ class: SessionManagerMode : MinorMode
             // 10 for ordering. This means any custom plugin of higher priority will be used first.
             // This allows users to override the local plugin with a custom plugin by making sure 
             // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
-            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
             let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
-
-            if (filmstripPath != "" && io.path.exists(filmstripPath))
-                preview.loadStrip(filmstripPath);
-
             if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+            {
                 preview.loadThumbnail(thumbnailPath);
+
+                let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+                if (filmstripPath != "" && io.path.exists(filmstripPath))
+                    preview.loadStrip(filmstripPath);
+            }
 
             let mediaPropertyPath = sourceNode + ".media.movie";
             if (propertyExists(mediaPropertyPath))

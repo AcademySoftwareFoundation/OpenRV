@@ -371,13 +371,16 @@ jobs:
           $CONAN_EXECUTABLE export openrvcore-conanfile.py
 
       - name: Build OpenRV dependencies
-        # openexr (and every other dep covered by [replace_requires] in
-        # conan/profiles/common) now resolves to @openrv/vfx2024 and is
-        # pulled prebuilt from the ASWF remote on Rocky 8, built on the
-        # matching toolchain. The earlier Rocky 8-specific `--build=openexr/*`
-        # workaround is no longer needed.
+        # Every dep covered by [replace_requires] / [replace_tool_requires]
+        # in conan/profiles/common resolves to @openrv/vfx2024 and is
+        # pulled prebuilt from the ASWF remote. The host tools b2, meson,
+        # and nasm are uploaded by conan-upload-deps.yml on a matching
+        # Rocky 8 runner, so the consumer never has to rebuild them
+        # locally to dodge glibc 2.32+ from CCI Linux prebuilts.
         run: |
-          $CONAN_EXECUTABLE install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_rocky8
+          $CONAN_EXECUTABLE install conanfile.py \
+            --build=missing \
+            -pr:a ./conan/profiles/x86_64_rocky8
 
       - name: Build OpenRV main executable
         run: |
@@ -588,8 +591,15 @@ jobs:
           /Users/runner/Library/Python/3.11/bin/conan export openrvcore-conanfile.py
 
       - name: Build OpenRV dependencies
+        # b2, meson, and nasm route through [replace_tool_requires] in
+        # conan/profiles/common to @openrv/vfx2024 and ship as macOS
+        # arm64 binaries from conan-upload-deps.yml, so plain
+        # --build=missing is enough; no consumer-side host-tool rebuild
+        # is needed.
         run: |
-          /Users/runner/Library/Python/3.11/bin/conan install conanfile.py --build=missing -pr:a ./conan/profiles/arm64_apple_release
+          /Users/runner/Library/Python/3.11/bin/conan install conanfile.py \
+            --build=missing \
+            -pr:a ./conan/profiles/arm64_apple_release
           
       - name: Build OpenRV main executable
         run: |
@@ -738,7 +748,13 @@ jobs:
           echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
         shell: msys2 {0}
 
-      - name: Add MSVC compiler to PATH for msys2
+      - name: Add MSVC + Windows SDK to PATH for msys2
+        # cl.exe lives under VCToolsInstallDir/bin/Hostx64/x64; mt.exe
+        # and the other Windows SDK tools live under WindowsSdkVerBinPath/x64.
+        # Both need to be reachable by the MSVC linker or b2 (and anything
+        # else that rebuilds from source) will die with LNK1158: cannot
+        # run 'mt.exe'. Persist both in ~/.bash_profile so subsequent
+        # msys2 steps pick them up.
         run: |
           if [ -n "$VCToolsInstallDir" ]; then
             MSVC_BIN=$(cygpath -u "$VCToolsInstallDir/bin/Hostx64/x64")
@@ -746,6 +762,13 @@ jobs:
             echo "Added MSVC bin to PATH: $MSVC_BIN"
           else
             echo "WARNING: VCToolsInstallDir not set, cl.exe will not be on PATH"
+          fi
+          if [ -n "$WindowsSdkVerBinPath" ]; then
+            WINSDK_BIN=$(cygpath -u "$WindowsSdkVerBinPath")
+            echo "export PATH=\"$WINSDK_BIN/x64:\$PATH\"" >> ~/.bash_profile
+            echo "Added Windows SDK bin to PATH: $WINSDK_BIN/x64"
+          else
+            echo "WARNING: WindowsSdkVerBinPath not set, mt.exe will not be on PATH"
           fi
         shell: msys2 {0}
 
@@ -887,9 +910,16 @@ jobs:
         shell: msys2 {0}
 
       - name: Build and install OpenRV dependencies
+        # b2, meson, and nasm route through [replace_tool_requires] in
+        # conan/profiles/common to @openrv/vfx2024 and ship as native
+        # Windows binaries from conan-upload-deps.yml, so plain
+        # --build=missing is enough; no consumer-side host-tool rebuild
+        # is needed.
         run: |
           source ~/.bash_profile
-          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows
+          conan install conanfile.py \
+            --build=missing \
+            -pr:a ./conan/profiles/x86_64_windows
         shell: msys2 {0}
           
       - name: Build OpenRV main executable

@@ -242,7 +242,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         if n_frames < MAX_FILMSTRIP_FRAMES:
             return list(range(start_frame, end_frame + 1))
         incr = (n_frames - 1) / (MAX_FILMSTRIP_FRAMES - 1.0)
-        return [int(math.floor(start_frame + i * incr)) for i in range(MAX_FILMSTRIP_FRAMES)]
+        return [math.floor(start_frame + i * incr) for i in range(MAX_FILMSTRIP_FRAMES)]
 
     def _write_filmstrip_session(
         self, session_path: Path, media_path: str, frames: list[int], width: int, height: int
@@ -257,8 +257,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         rhs = " ".join('"defaultLayout"' for _ in frames)
         top_nodes = f'"defaultLayout" {lhs}'
 
-        with open(session_path, "w") as f:
-            f.write(
+        with open(session_path, "w") as session_file:
+            session_file.write(
                 textwrap.dedent(f"""\
                 GTOa (3)
 
@@ -344,9 +344,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             """)
             )
 
-            for frame in frames:
-                f.write(
-                    textwrap.dedent(f"""\
+            session_file.writelines(
+                textwrap.dedent(f"""\
                     sourceGroup{frame:06d} : RVSourceGroup (1)
                     {{
                         ui
@@ -381,7 +380,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     }}
 
                 """)
-                )
+                for frame in frames
+            )
 
         return output_width, output_height
 

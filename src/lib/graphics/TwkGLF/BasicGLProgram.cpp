@@ -85,17 +85,32 @@ namespace TwkGLF
         }
     }
 
+    namespace
+    {
+        // Returns "#version 150\n" for GL3+, empty string for GL2.
+        // Must be called after a GL context is current.
+        const char* basicGLVersionHeader()
+        {
+            const char* glVersion = (const char*)glGetString(GL_VERSION);
+            if (glVersion && glVersion[0] >= '3')
+                return "#version 150\n";
+            return "";
+        }
+    } // namespace
+
     bool BasicGLProgram::compile()
     {
         GLuint v, f;
         m_programId = glCreateProgram();
         v = glCreateShader(GL_VERTEX_SHADER);
         f = glCreateShader(GL_FRAGMENT_SHADER);
-        const char* vcode = m_vertexCode.c_str();
-        glShaderSource(v, 1, &vcode, NULL);
+
+        const char* versionHeader = basicGLVersionHeader();
+        const char* vsrc[2] = {versionHeader, m_vertexCode.c_str()};
+        glShaderSource(v, 2, vsrc, NULL);
         glCompileShader(v);
-        const char* fcode = m_fragmentCode.c_str();
-        glShaderSource(f, 1, &fcode, NULL);
+        const char* fsrc[2] = {versionHeader, m_fragmentCode.c_str()};
+        glShaderSource(f, 2, fsrc, NULL);
         glCompileShader(f);
 
         GLint status = GL_TRUE;
