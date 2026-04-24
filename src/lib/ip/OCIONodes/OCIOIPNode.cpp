@@ -231,6 +231,8 @@ namespace IPCore
 
         updateContext();
         updateFunction();
+
+        m_initialized = true;
     }
 
     void OCIOIPNode::updateContext()
@@ -352,7 +354,10 @@ namespace IPCore
         boost::hash<string> string_hash;
         string inName = stringProp("ocio.inColorSpace", m_state->linear);
 
-        if (inName.empty())
+        // synlinearize/syndisplay build their pipeline from file/URL
+        // transforms, so an empty input color space is valid for those modes.
+        const bool needsInColorSpace = ociofunction != "synlinearize" && ociofunction != "syndisplay";
+        if (inName.empty() && needsInColorSpace)
             return;
 
         try
@@ -436,6 +441,8 @@ namespace IPCore
                 string inTransformURL = stringProp("inTransform.url", "");
                 if (inTransformURL.empty() && (!m_inTransformData || m_inTransformData->size() == 0))
                 {
+                    if (!m_initialized)
+                        return;
                     TWK_THROW_EXC_STREAM("Either inTransform.url or inTransform.data property "
                                          "needs to be set for synlinearize function");
                 }
@@ -481,6 +488,8 @@ namespace IPCore
                 const string outTransformURL = stringProp("outTransform.url", "");
                 if (outTransformURL.empty())
                 {
+                    if (!m_initialized)
+                        return;
                     TWK_THROW_EXC_STREAM("outTransform.url property needs to "
                                          "be set for syndisplay function");
                 }
