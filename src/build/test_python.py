@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # *****************************************************************************
@@ -126,6 +125,7 @@ def test_python_distribution(python_home: str, variant: str) -> None:
 
     finally:
         print(f"Removing temporary copy {tmp_python_home}")
+        shutil.rmtree(tmp_python_home, ignore_errors=True)
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 

@@ -6,211 +6,113 @@
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JPEGTURBO" "${RV_DEPS_JPEGTURBO_VERSION}" "" "")
 
+# libjpeg-turbo ships CMake CONFIG files that create libjpeg-turbo::jpeg and libjpeg-turbo::turbojpeg.
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  libjpeg-turbo
+  VERSION
+  ${_version}
+  DEPS_LIST_TARGETS
+  libjpeg-turbo::jpeg
+  libjpeg-turbo::turbojpeg
+)
+
 SET(_download_url
     "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${_version}.tar.gz"
 )
-
 SET(_download_hash
     ${RV_DEPS_JPEGTURBO_DOWNLOAD_HASH}
 )
 
-# CMake is not generating debug postfix for JpegTurbo
-RV_MAKE_STANDARD_LIB_NAME("jpeg" "${RV_DEPS_JPEGTURBO_VERSION_LIB}" "SHARED" "")
-SET(_winlibjpegname
-    jpeg62.dll
-)
-SET(_libjpegname
-    ${_libname}
-)
-SET(_libjpegpath
-    ${_libpath}
-)
-IF(RV_TARGET_WINDOWS)
-  SET(_libjpegimplibpath
-      ${_implibpath}
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/jpegturbo.cmake)
+
+  #
+  # --- libjpeg-turbo::jpeg (build path)
+  #
+  ADD_LIBRARY(libjpeg-turbo::jpeg SHARED IMPORTED GLOBAL)
+  ADD_DEPENDENCIES(libjpeg-turbo::jpeg ${_target})
+
+  IF(NOT RV_TARGET_WINDOWS)
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::jpeg
+      PROPERTY IMPORTED_LOCATION ${_libjpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::jpeg
+      PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_libjpegpath}
+    )
+  ELSE()
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::jpeg
+      PROPERTY IMPORTED_LOCATION ${_winlibjpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::jpeg
+      PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_winlibjpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::jpeg
+      PROPERTY IMPORTED_IMPLIB ${_libjpegimplibpath}
+    )
+  ENDIF()
+
+  FILE(MAKE_DIRECTORY "${_include_dir}")
+  TARGET_INCLUDE_DIRECTORIES(
+    libjpeg-turbo::jpeg
+    INTERFACE ${_include_dir}
   )
-ENDIF()
-SET(_winlibjpegpath
-    ${_bin_dir}/${_winlibjpegname}
-)
 
-# CMake is not generating debug postfix for JpegTurbo Note: This library is added by one of our DEP (TIFF or a JPEG DEP) and thus we're copying it. Ideally, we
-# should use the above and remove this one.
-RV_MAKE_STANDARD_LIB_NAME("jpeg" "62" "SHARED" "")
-SET(_libjpeg62name
-    ${_libname}
-)
-SET(_libjpeg62path
-    ${_libpath}
-)
+  #
+  # --- libjpeg-turbo::turbojpeg (build path)
+  #
+  ADD_LIBRARY(libjpeg-turbo::turbojpeg SHARED IMPORTED GLOBAL)
+  ADD_DEPENDENCIES(libjpeg-turbo::turbojpeg ${_target})
 
-# CMake is not generating debug postfix for JpegTurbo
-RV_MAKE_STANDARD_LIB_NAME("turbojpeg" "0.2.0" "SHARED" "")
-SET(_winlibturbojpegname
-    turbojpeg.dll
-)
-SET(_libturbojpegname
-    ${_libname}
-)
-SET(_libturbojpegpath
-    ${_libpath}
-)
-SET(_libturbojpegimplibpath
-    ${_implibpath}
-)
-SET(_winlibturbojpegpath
-    ${_bin_dir}/${_winlibturbojpegname}
-)
+  IF(NOT RV_TARGET_WINDOWS)
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::turbojpeg
+      PROPERTY IMPORTED_LOCATION ${_libturbojpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::turbojpeg
+      PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_libturbojpegpath}
+    )
+  ELSE()
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::turbojpeg
+      PROPERTY IMPORTED_LOCATION ${_winlibturbojpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::turbojpeg
+      PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_winlibturbojpegpath}
+    )
+    SET_PROPERTY(
+      TARGET libjpeg-turbo::turbojpeg
+      PROPERTY IMPORTED_IMPLIB ${_libturbojpegimplibpath}
+    )
+  ENDIF()
 
-# RV_MAKE_STANDARD_LIB_NAME overwrites _byproducts at each call, so we set it properly here with both libs.
-SET(_byproducts
-    ""
-)
-IF(NOT RV_TARGET_WINDOWS)
-  LIST(APPEND _byproducts ${_libjpegpath})
-  LIST(APPEND _byproducts ${_libjpeg62path})
-ENDIF()
-LIST(APPEND _byproducts ${_libturbojpegpath})
-
-IF(RV_TARGET_WINDOWS)
-  SET(_implibjpegpath
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}jpeg${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  TARGET_INCLUDE_DIRECTORIES(
+    libjpeg-turbo::turbojpeg
+    INTERFACE ${_include_dir}
   )
-  SET(_implibturbojpegpath
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}turbojpeg${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
-  )
-  LIST(APPEND _byproducts ${_implibjpegpath})
-  LIST(APPEND _byproducts ${_implibturbojpegpath})
-ENDIF()
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.tar.gz
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${_source_dir}
-  BINARY_DIR ${_build_dir}
-  INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_IN_SOURCE FALSE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_byproducts}
-)
-
-IF(RV_TARGET_WINDOWS)
-  # Don't use copy_directory for bin/ because RV only needs specific DLLs from jpegturbo.
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Staging ${_target} libs and DLLs into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    OUTPUT ${RV_STAGE_BIN_DIR}/${_winlibjpegname}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_winlibjpegname} ${RV_STAGE_BIN_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${_bin_dir}/${_libturbojpegname} ${RV_STAGE_BIN_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_winlibjpegname}
-  )
-  ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
+  LIST(APPEND RV_DEPS_LIST libjpeg-turbo::jpeg)
+  LIST(APPEND RV_DEPS_LIST libjpeg-turbo::turbojpeg)
 ELSE()
-  # copy_directory doesn't copy symlinks, so the libjpeg62 file needs an explicit copy via PRE_COMMANDS
+  # Some package managers derive the DLL name from the component name ("jpeg") but the actual DLL is "jpeg62.dll". The name mismatch causes IMPORTED_LOCATION to
+  # fall back to jpeg.lib (import library) instead of the DLL. BIN_DIR copies the entire bin/ directory, ensuring jpeg62.dll reaches RV_STAGE_BIN_DIR regardless
+  # of IMPORTED_LOCATION resolution.
   RV_STAGE_DEPENDENCY_LIBS(
     TARGET
     ${_target}
-    OUTPUTS
-    ${RV_STAGE_LIB_DIR}/${_libturbojpegname}
-    PRE_COMMANDS
-    COMMAND
-    ${CMAKE_COMMAND}
-    -E
-    copy
-    ${_libjpeg62path}
-    ${RV_STAGE_LIB_DIR}
+    TARGET_LIBS
+    libjpeg-turbo::jpeg
+    libjpeg-turbo::turbojpeg
+    BIN_DIR
+    ${_bin_dir}
   )
 ENDIF()
-
-#
-# --- JpegTurbo::Jpeg Library
-#
-ADD_LIBRARY(libjpeg-turbo::jpeg SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(libjpeg-turbo::jpeg ${_target})
-
-IF(NOT RV_TARGET_WINDOWS)
-  # _lib*path on Windows creates a path like <deproot>/install/lib/jpeg.dll which is wrong: DLLS go in bin.
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::jpeg
-    PROPERTY IMPORTED_LOCATION ${_libjpegpath}
-  )
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::jpeg
-    PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_libjpegpath}
-  )
-ELSE()
-  # If Lib is a SHARED set IMPORTED_LOCATION to the DLL
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::jpeg
-    PROPERTY IMPORTED_LOCATION ${_winlibjpegpath}
-  )
-
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::jpeg
-    PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_winlibjpegpath}
-  )
-
-  # And the ImpLib to the Static .lib generated by the Dep.
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::jpeg
-    PROPERTY IMPORTED_IMPLIB ${_libjpegimplibpath}
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY "${_include_dir}") # required at configure time for importing include path.
-TARGET_INCLUDE_DIRECTORIES(
-  libjpeg-turbo::jpeg
-  INTERFACE ${_include_dir}
-)
-
-#
-# --- JpegTurbo::JpegTurbo Library
-#
-ADD_LIBRARY(libjpeg-turbo::turbojpeg SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(libjpeg-turbo::turbojpeg ${_target})
-IF(NOT RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::turbojpeg
-    PROPERTY IMPORTED_LOCATION ${_libturbojpegpath}
-  )
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::turbojpeg
-    PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_libturbojpegpath}
-  )
-ELSE()
-  # If Lib is a SHARED set IMPORTED_LOCATION to the DLL
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::turbojpeg
-    PROPERTY IMPORTED_LOCATION ${_winlibturbojpegpath}
-  )
-
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::turbojpeg
-    PROPERTY IMPORTED_LOCATION_${CMAKE_BUILD_TYPE} ${_winlibturbojpegpath}
-  )
-
-  # And the ImpLib to the Static .lib generated by the Dep.
-  SET_PROPERTY(
-    TARGET libjpeg-turbo::turbojpeg
-    PROPERTY IMPORTED_IMPLIB ${_libturbojpegimplibpath}
-  )
-ENDIF()
-
-TARGET_INCLUDE_DIRECTORIES(
-  libjpeg-turbo::turbojpeg
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST libjpeg-turbo::jpeg)
-LIST(APPEND RV_DEPS_LIST libjpeg-turbo::turbojpeg)

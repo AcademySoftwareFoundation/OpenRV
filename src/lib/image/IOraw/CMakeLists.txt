@@ -25,7 +25,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  LibRaw::raw
+  libraw::raw
   TwkExc
   TwkFB
   TwkUtil

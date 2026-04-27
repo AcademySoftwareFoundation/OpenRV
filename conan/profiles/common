@@ -1,0 +1,43 @@
+# Common settings shared across all OpenRV profiles.
+#
+# Redirect every OpenRV-managed dependency to the prebuilt binary published
+# under @openrv/vfx2024 on the ASWF Conan remote (aswf-conan-dev for testing,
+# aswf-conan for production). Consumers must have one of those remotes
+# configured before running `conan install`. The versions below track
+# conan/packages.yml, which is the single source of truth for what the
+# conan-upload-deps.yml workflow builds and uploads.
+#
+# With RV_DEPS_*_VERSION_MATCH=MINIMUM set in openrvcore-conanfile.py, these
+# refs may be newer than what the conanfile pins; CMake's find_package will
+# still accept them. replace_requires runs before force=True, so the bare
+# version pins in the conanfile effectively become cosmetic for anything
+# covered here.
+
+[replace_tool_requires]
+# Route every transitive `tool_requires("<tool>/<any>")` to our prebuilt
+# host tools under @openrv/vfx2024. Each cell of conan-upload-deps.yml
+# rebuilds these on its native toolchain, so consumers always pull a
+# binary that matches their host (Rocky 8's glibc 2.28, MSVC on Windows,
+# Apple clang on macOS) instead of a CCI prebuilt linked against newer
+# glibc/libstdc++ that fails to launch on Rocky 8.
+b2/*: b2/5.4.2@openrv/vfx2024
+meson/*: meson/1.5.1@openrv/vfx2024
+nasm/*: nasm/2.16.01@openrv/vfx2024
+
+[replace_requires]
+zlib/*: zlib/1.3.1@openrv/vfx2024
+libatomic_ops/*: libatomic_ops/7.10.0@openrv/vfx2024
+libwebp/*: libwebp/1.2.4@openrv/vfx2024
+dav1d/*: dav1d/1.5.3@openrv/vfx2024
+libjpeg/*: libjpeg-turbo/2.1.5@openrv/vfx2024
+libjpeg-turbo/*: libjpeg-turbo/2.1.5@openrv/vfx2024
+boost/*: boost/1.82.0@openrv/vfx2024
+imath/*: imath/3.2.2@openrv/vfx2024
+libdeflate/*: libdeflate/1.25@openrv/vfx2024
+openexr/*: openexr/3.2.8@openrv/vfx2024
+libpng/*: libpng/1.6.58@openrv/vfx2024
+openjpeg/*: openjpeg/2.5.4@openrv/vfx2024
+libraw/*: libraw/0.21.2@openrv/vfx2024
+openjph/*: openjph/0.27.0@openrv/vfx2024
+pcre2/*: pcre2/10.44@openrv/vfx2024
+openssl/*: openssl/3.5.6@openrv/vfx2024
