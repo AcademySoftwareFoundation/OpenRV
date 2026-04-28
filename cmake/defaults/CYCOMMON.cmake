@@ -241,13 +241,13 @@ SET(RV_DEPS_SPDLOG_DOWNLOAD_HASH
 
 # tiff https://gitlab.com/libtiff/libtiff
 SET(RV_DEPS_TIFF_VERSION
-    "4.6.0"
+    "4.7.1"
 )
 SET(RV_DEPS_TIFF_DOWNLOAD_HASH
-    "118a2e5fc9ed71653195b332b9715890"
+    "ec48ea6266661f4dceb8b1e923c7b838"
 )
 SET(RV_DEPS_TIFF_VERSION_LIB
-    "6.0.2"
+    "6.2.0"
 )
 
 # webp https://github.com/webmproject/libwebp
