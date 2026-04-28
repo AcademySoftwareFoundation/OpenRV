@@ -124,10 +124,10 @@ ENDIF()
 
 # gc https://github.com/ivmai/bdwgc
 SET(RV_DEPS_GC_VERSION
-    "8.2.2"
+    "8.2.12"
 )
 SET(RV_DEPS_GC_DOWNLOAD_HASH
-    "2ca38d05e1026b3426cf6c24ca3a7787"
+    "5e7c74f8bd57f64d3f86673ff3c17230"
 )
 
 # glew https://github.com/nigels-com/glew
