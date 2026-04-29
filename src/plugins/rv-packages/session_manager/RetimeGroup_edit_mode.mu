@@ -222,8 +222,10 @@ class: RetimeGroupEditMode : MinorMode
                              menuItem("24", "", "viewmode_category", convertToFPS(,24), enabledItem),
                              menuItem("25", "", "viewmode_category", convertToFPS(,25), enabledItem),
                              menuItem("23.98", "", "viewmode_category", convertToFPS(,23.98), enabledItem),
-                             menuItem("30", "", "viewmode_category", convertToFPS(,30), enabledItem),
                              menuItem("29.97", "", "viewmode_category", convertToFPS(,29.97), enabledItem),
+                             menuItem("30", "", "viewmode_category", convertToFPS(,30), enabledItem),
+                             menuItem("59.94", "", "viewmode_category", convertToFPS(,59.94), enabledItem),
+                             menuItem("60", "", "viewmode_category", convertToFPS(,60), enabledItem),
                              menuSeparator(),
                              menuItem("Custom...", "", "viewmode_category", editFPS, enabledItem)
                      }),
