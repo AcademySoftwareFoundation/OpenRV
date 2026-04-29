@@ -1497,9 +1497,10 @@ namespace TwkMovie
         }
 
         // Make sure to only use allowed codecs
-        if (!m_io->codecIsAllowed((*avCodecContext)->codec->name, true))
+        const char* codecName = (*avCodecContext)->codec ? (*avCodecContext)->codec->name : "unknown";
+        if (!m_io->codecIsAllowed(codecName, true))
         {
-            std::cerr << "ERROR: MovieFFMpeg: Unallowed codec '" << (*avCodecContext)->codec->name << "' in " << m_filename << '\n';
+            std::cerr << "ERROR: MovieFFMpeg: Unallowed codec '" << codecName << "' in " << m_filename << '\n';
             avcodec_free_context(avCodecContext);
             return false;
         }
@@ -2054,7 +2055,7 @@ namespace TwkMovie
             //  display correctly.
             //
 
-            string name = string(videoCodecContext->codec->name);
+            string name = string(videoCodecContext->codec ? videoCodecContext->codec->name : "unknown");
             if (name == "dnxhd")
             {
                 //
@@ -2604,7 +2605,8 @@ namespace TwkMovie
             AVCodecContext* videoCodecContext = track->avCodecContext;
 
             // Tell RV to restrict caching to one thread
-            bool slowTrackRandomAccess = (codecHasSlowAccess(videoCodecContext->codec->name) || TwkUtil::pathIsURL(m_filename));
+            bool slowTrackRandomAccess =
+                (videoCodecContext->codec && codecHasSlowAccess(videoCodecContext->codec->name)) || TwkUtil::pathIsURL(m_filename);
             slowRandomAccess = slowTrackRandomAccess || slowRandomAccess;
 
             // Make sure the orientation/rotation matches for each track
@@ -2637,8 +2639,8 @@ namespace TwkMovie
         m_info.numChannels = desc->nb_components;
         m_info.dataType = (bitSize > 8) ? FrameBuffer::USHORT : FrameBuffer::UCHAR;
 
-        // Set the channel specific information
-        string fmtname = string(av_get_pix_fmt_name(nativeFormat));
+        const char* fmtname_raw = av_get_pix_fmt_name(nativeFormat);
+        string fmtname = string(fmtname_raw ? fmtname_raw : "none");
         set<char> visited;
         int c = 0;
         for (string::iterator it = fmtname.begin(); it != fmtname.end() && c < m_info.numChannels; ++it)
@@ -2745,7 +2747,8 @@ namespace TwkMovie
                                              : int64_t(double(m_avFormatContext->duration) / double(AV_TIME_BASE) * audioSampleRate + 0.49);
             audioFormat = audioCodecContext->sample_fmt;
             audioLanguage = streamLang(track->number);
-            audioCodec = string(audioCodecContext->codec->long_name);
+            audioCodec =
+                string((audioCodecContext->codec && audioCodecContext->codec->long_name) ? audioCodecContext->codec->long_name : "unknown");
 
             DBL(DB_AUDIO, "Audio track " << i << " start_time: " << audioStream->start_time << " num frames: " << audioStream->nb_frames
                                          << " frame size: " << audioCodecContext->frame_size << " duration: " << duration
@@ -2812,8 +2815,11 @@ namespace TwkMovie
         snagVideoColorInformation(track);
 
         track->fb.setPixelAspectRatio(m_info.pixelAspect);
-        track->fb.newAttribute("VideoPixelFormat", string(av_get_pix_fmt_name(videoCodecContext->pix_fmt)));
-        track->fb.newAttribute("VideoCodec", string(videoCodecContext->codec->long_name));
+        const char* fmt_name = av_get_pix_fmt_name(videoCodecContext->pix_fmt);
+        track->fb.newAttribute("VideoPixelFormat", string(fmt_name ? fmt_name : "none"));
+
+        const char* codec_name = videoCodecContext->codec ? videoCodecContext->codec->long_name : nullptr;
+        track->fb.newAttribute("VideoCodec", string(codec_name ? codec_name : "unknown"));
 
         ostringstream attr;
         attr << m_videoTracks.size();
@@ -3928,9 +3934,10 @@ namespace TwkMovie
             std::call_once(warnOnce,
                            [this]()
                            {
+                               const char* fallback_fmt = av_get_pix_fmt_name(m_pxlFormatOnOpen);
                                std::cout << "WARNING: FFmpeg detected pixel format "
                                             "AV_PIX_FMT_NONE for frames in "
-                                         << m_filename << ". Using fallback pixel format: " << av_get_pix_fmt_name(m_pxlFormatOnOpen)
+                                         << m_filename << ". Using fallback pixel format: " << (fallback_fmt ? fallback_fmt : "none")
                                          << std::endl;
                            });
             // Use the pixel format detected when the file was opened as a
@@ -4496,7 +4503,8 @@ namespace TwkMovie
                 if (m_request.verbose)
                 {
                     ostringstream message;
-                    message << "No pix_fmt specified. Using: " << string(av_get_pix_fmt_name(avCodecContext->pix_fmt));
+                    const char* fmt_name = av_get_pix_fmt_name(avCodecContext->pix_fmt);
+                    message << "No pix_fmt specified. Using: " << string(fmt_name ? fmt_name : "none");
                     report(message.str());
                 }
             }
