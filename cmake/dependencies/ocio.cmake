@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -13,12 +12,18 @@
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(OpenColorIO REQUIRED)
   IF(TARGET OpenColorIO::OpenColorIO)
-    SET_PROPERTY(TARGET OpenColorIO::OpenColorIO PROPERTY IMPORTED_GLOBAL TRUE)
+    SET_PROPERTY(
+      TARGET OpenColorIO::OpenColorIO
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   # Map to internal target name
   IF(NOT TARGET OpenColorIO::OpenColorIO)
     ADD_LIBRARY(OpenColorIO::OpenColorIO INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(OpenColorIO::OpenColorIO INTERFACE OpenColorIO::OpenColorIO)
+    TARGET_LINK_LIBRARIES(
+      OpenColorIO::OpenColorIO
+      INTERFACE OpenColorIO::OpenColorIO
+    )
   ENDIF()
   RETURN()
 ENDIF()

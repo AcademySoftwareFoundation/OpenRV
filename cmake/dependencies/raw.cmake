@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -16,12 +15,21 @@ IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(PkgConfig REQUIRED)
   PKG_CHECK_MODULES(LIBRAW REQUIRED libraw)
   IF(TARGET PkgConfig::LIBRAW)
-    SET_PROPERTY(TARGET PkgConfig::LIBRAW PROPERTY IMPORTED_GLOBAL TRUE)
+    SET_PROPERTY(
+      TARGET PkgConfig::LIBRAW
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   IF(NOT TARGET LibRaw::raw)
     ADD_LIBRARY(LibRaw::raw INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(LibRaw::raw INTERFACE ${LIBRAW_LIBRARIES})
-    TARGET_INCLUDE_DIRECTORIES(LibRaw::raw INTERFACE ${LIBRAW_INCLUDE_DIRS})
+    TARGET_LINK_LIBRARIES(
+      LibRaw::raw
+      INTERFACE ${LIBRAW_LIBRARIES}
+    )
+    TARGET_INCLUDE_DIRECTORIES(
+      LibRaw::raw
+      INTERFACE ${LIBRAW_INCLUDE_DIRS}
+    )
   ENDIF()
   RETURN()
 ENDIF()

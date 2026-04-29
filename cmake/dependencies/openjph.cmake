@@ -1,6 +1,5 @@
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,12 +14,21 @@ IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(PkgConfig REQUIRED)
   PKG_CHECK_MODULES(OPENJPH REQUIRED openjph)
   IF(TARGET PkgConfig::OPENJPH)
-    SET_PROPERTY(TARGET PkgConfig::OPENJPH PROPERTY IMPORTED_GLOBAL TRUE)
+    SET_PROPERTY(
+      TARGET PkgConfig::OPENJPH
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   IF(NOT TARGET OpenJph::OpenJph)
     ADD_LIBRARY(OpenJph::OpenJph INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(OpenJph::OpenJph INTERFACE ${OPENJPH_LIBRARIES})
-    TARGET_INCLUDE_DIRECTORIES(OpenJph::OpenJph INTERFACE ${OPENJPH_INCLUDE_DIRS})
+    TARGET_LINK_LIBRARIES(
+      OpenJph::OpenJph
+      INTERFACE ${OPENJPH_LIBRARIES}
+    )
+    TARGET_INCLUDE_DIRECTORIES(
+      OpenJph::OpenJph
+      INTERFACE ${OPENJPH_INCLUDE_DIRS}
+    )
   ENDIF()
   RETURN()
 ENDIF()
