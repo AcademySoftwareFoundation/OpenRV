@@ -61,6 +61,7 @@ ADD_CUSTOM_COMMAND(
   DEPENDS ${_target} python_source_modules installed_packages
 )
 
+
 ADD_CUSTOM_TARGET(
   pyc_generation ALL
   DEPENDS ${RV_STAGE_PLUGINS_PYTHON_DIR}/.compiled

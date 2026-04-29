@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2025  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -50,11 +49,11 @@ EXTERNALPROJECT_ADD(
   GIT_REPOSITORY "https://github.com/epezent/implot.git"
   GIT_TAG ${RV_DEPS_IMPLOT_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/implot
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  UPDATE_DISCONNECTED 1
   BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
@@ -66,11 +65,11 @@ EXTERNALPROJECT_ADD(
   GIT_REPOSITORY "https://github.com/dpaulat/imgui-backend-qt.git"
   GIT_TAG ${RV_DEPS_IMGUI_BACKEND_QT_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  UPDATE_DISCONNECTED 1
   BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
@@ -82,11 +81,11 @@ EXTERNALPROJECT_ADD(
   GIT_REPOSITORY "https://github.com/thedmd/imgui-node-editor.git"
   GIT_TAG ${RV_DEPS_IMGUI_NODE_EDITOR_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
+  UPDATE_DISCONNECTED 1
   BUILD_ALWAYS FALSE
   BUILD_IN_SOURCE TRUE
   USES_TERMINAL_DOWNLOAD TRUE
@@ -102,9 +101,9 @@ SET(_find_qt_version
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
-  GIT_TAG "docking"
+  GIT_TAG ${RV_DEPS_IMGUI_VERSION}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  INSTALL_DIR ${_install_dir}
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/src
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
@@ -114,6 +113,7 @@ EXTERNALPROJECT_ADD(
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}
+  UPDATE_DISCONNECTED 1
   BUILD_BYPRODUCTS ${_libpath}
   BUILD_ALWAYS FALSE
   USES_TERMINAL_BUILD TRUE

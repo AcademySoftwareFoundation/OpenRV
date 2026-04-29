@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -150,12 +149,10 @@ SET(RV_DEPS_GLEW_VERSION_LIB
     "2.3.1"
 )
 
-# imgui https://github.com/ocornut/imgui
-# implot https://github.com/epezent/implot
-# backend-qt https://github.com/dpaulat/imgui-backend-qt
+# imgui https://github.com/ocornut/imgui implot https://github.com/epezent/implot backend-qt https://github.com/dpaulat/imgui-backend-qt
 
 SET(RV_DEPS_IMGUI_VERSION
-    "docking"
+    "v1.90.1-docking"
 )
 SET(RV_DEPS_IMPLOT_TAG
     "v0.16"
@@ -164,7 +161,7 @@ SET(RV_DEPS_IMGUI_BACKEND_QT_TAG
     "023345ca8abf731fc50568c0197ceebe76bb4324"
 )
 SET(RV_DEPS_IMGUI_NODE_EDITOR_TAG
-    "master"
+    "v0.9.1"
 )
 
 # jpegturbo https://github.com/libjpeg-turbo/libjpeg-turbo TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake to fully integrate new versioning

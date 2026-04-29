@@ -286,9 +286,7 @@ namespace Rv
         // Create a dockspace inside the Diagnostics View window
         ImGuiID dockspace_id = ImGui::GetID("DiagnosticsDockSpace");
         ImVec2 dockspace_size = ImGui::GetContentRegionAvail();
-#ifdef ImGuiConfigFlags_DockingEnable
         ImGui::DockSpaceOverViewport(dockspace_id);
-#endif
 
         // Check if we have any Python callbacks registered
         size_t numCallbacks = Rv::ImGuiPythonBridge::nbCallbacks();
