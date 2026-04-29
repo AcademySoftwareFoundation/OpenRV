@@ -338,16 +338,16 @@ namespace TwkFB
         {
             uint32_t tag = TIFFGetTagListEntry(tif, fi);
             const TIFFField* const fip = TIFFFieldWithTag(tif, tag);
-            if (!fip) continue;
+            if (!fip)
+                continue;
 
             if (tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
                 tag != EXIFTAG_COLORSPACE &&
 
                 tag != TIFFTAG_COMPRESSION && // prevent the overwriting of the compression type with numerical value
 
-                tag != TIFFTAG_XRESOLUTION && tag != TIFFTAG_YRESOLUTION && tag != TIFFTAG_SOFTWARE
-                && tag != EXIFTAG_PIXELXDIMENSION && tag != EXIFTAG_PIXELYDIMENSION
-                && tag != TIFFTAG_RESOLUTIONUNIT && tag != TIFFTAG_PLANARCONFIG &&
+                tag != TIFFTAG_XRESOLUTION && tag != TIFFTAG_YRESOLUTION && tag != TIFFTAG_SOFTWARE && tag != EXIFTAG_PIXELXDIMENSION
+                && tag != EXIFTAG_PIXELYDIMENSION && tag != TIFFTAG_RESOLUTIONUNIT && tag != TIFFTAG_PLANARCONFIG &&
 
                 tag != TIFFTAG_SUBIFD &&
 
@@ -368,8 +368,8 @@ namespace TwkFB
                 tag != TIFFTAG_YCBCRSUBSAMPLING &&
                 // tag != TIFFTAG_TRANSFERFUNCTION &&
 
-                tag != TIFFTAG_PHOTOMETRIC && tag != TIFFTAG_IMAGEWIDTH && tag != TIFFTAG_IMAGELENGTH
-                && tag != TIFFTAG_BITSPERSAMPLE && tag != TIFFTAG_SAMPLESPERPIXEL)
+                tag != TIFFTAG_PHOTOMETRIC && tag != TIFFTAG_IMAGEWIDTH && tag != TIFFTAG_IMAGELENGTH && tag != TIFFTAG_BITSPERSAMPLE
+                && tag != TIFFTAG_SAMPLESPERPIXEL)
             {
                 unsigned char ch;
                 char* text;
@@ -402,12 +402,12 @@ namespace TwkFB
                     {
                         if (TIFFGetField(tif, tag, &Len, &text))
                         {
-                            img.attribute<string>(aname) = text;
+                            img.attribute<string>(aname) = text ? text : "";
                         }
                     }
                     else if (TIFFGetField(tif, tag, &text))
                     {
-                        img.attribute<string>(aname) = text;
+                        img.attribute<string>(aname) = text ? text : "";
                     }
                     break;
 
@@ -452,7 +452,7 @@ namespace TwkFB
 
                         if (TIFFGetField(tif, tag, &ui, &array))
                         {
-                            img.attribute<string>(aname) = array;
+                            img.attribute<string>(aname) = array ? array : "";
                         }
                     }
                     break;
@@ -465,7 +465,7 @@ namespace TwkFB
 
                         if (TIFFGetField(tif, tag, &ui, &array))
                         {
-                            img.attribute<string>(aname) = array;
+                            img.attribute<string>(aname) = array ? array : "";
                         }
                     }
                     // if(TIFFGetField(tif, tag, &ch))
