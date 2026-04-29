@@ -8,13 +8,7 @@
 # agreement to the ShotGrid Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by ShotGrid Software Inc.
 
-try:
-    from PySide2 import QtCore, QtGui, QtWidgets
-except ImportError:
-    try:
-        from PySide6 import QtCore, QtGui, QtWidgets
-    except ImportError:
-        pass
+from PySide6 import QtCore, QtGui, QtWidgets
 
 from rv import rvtypes, qtutils
 from rv import commands as rvc

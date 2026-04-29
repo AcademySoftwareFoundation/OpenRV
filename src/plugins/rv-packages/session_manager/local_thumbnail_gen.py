@@ -15,10 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
-try:
-    from PySide2 import QtCore
-except ImportError:
-    from PySide6 import QtCore
+from PySide6 import QtCore
 
 from rv import commands, rvtypes
 

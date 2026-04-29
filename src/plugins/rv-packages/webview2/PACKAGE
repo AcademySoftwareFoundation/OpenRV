@@ -14,5 +14,5 @@ modes:
    load: delayed 
 
 description: |
-   <p This package creates one or more docked Qt5 QWebEngineView (Chromium) instances via PySide2 
+   <p This package creates one or more docked Qt6 QWebEngineView (Chromium) instances via PySide6
    

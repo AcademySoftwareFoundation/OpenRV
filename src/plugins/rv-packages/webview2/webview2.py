@@ -11,31 +11,16 @@ import os
 from rv import rvtypes
 from rv import qtutils
 
-try:
-    from PySide2 import QtCore
-    from PySide2 import QtWidgets
-    from PySide2 import QtWebChannel
-    from PySide2 import QtWebEngineWidgets
-    from PySide2 import QtQml
+from PySide6 import QtCore
+from PySide6 import QtWidgets
+from PySide6 import QtWebChannel
+from PySide6 import QtWebEngineWidgets
+from PySide6 import QtQml
 
-    from PySide2.QtWidgets import (
-        qApp,
-    )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
-    from PySide2.QtWidgets import QDockWidget
-except ImportError:
-    try:
-        from PySide6 import QtCore
-        from PySide6 import QtWidgets
-        from PySide6 import QtWebChannel
-        from PySide6 import QtWebEngineWidgets
-        from PySide6 import QtQml
-
-        from PySide6.QtWidgets import (
-            qApp,
-        )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
-        from PySide6.QtWidgets import QDockWidget
-    except ImportError:
-        pass
+from PySide6.QtWidgets import (
+    qApp,
+)  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
+from PySide6.QtWidgets import QDockWidget
 
 print(QtWebEngineWidgets.__file__)
 
