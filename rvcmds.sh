@@ -1,4 +1,8 @@
 # Ensure file is sourced and not executed
+#
+# Modified for the Visto project.
+# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+#
 
 SOURCED=0
 if [ -n "$ZSH_EVAL_CONTEXT" ]; then

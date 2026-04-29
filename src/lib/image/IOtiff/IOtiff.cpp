@@ -1,6 +1,9 @@
 //******************************************************************************
 // Copyright (c) 2001-2004 Tweak Inc. All rights reserved.
 //
+// Modified for the Visto project.
+// Copyright (C) 2026  Makai Systems. All Rights Reserved.
+//
 // SPDX-License-Identifier: Apache-2.0
 //
 //******************************************************************************

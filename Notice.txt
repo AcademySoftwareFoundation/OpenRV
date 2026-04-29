@@ -1,3 +1,15 @@
+Visto
+
+Copyright (C) 2026  Makai Systems. All Rights Reserved.
+
+This project, Visto, is a derivative work of OpenRV.
+
+Original portions of this work are:
+Copyright (C) 2022-2025 Autodesk, Inc. All Rights Reserved.
+SPDX-License-Identifier: Apache-2.0
+
+--------------------------------------------------------------------------------
+
 IMPORTANT: This file contains a non-exhaustive list of required third party components that are not licensed under Apache 2.0.
 
 OpenEXR

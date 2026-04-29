@@ -1,6 +1,9 @@
 name: Build OpenRV on macOS
 description: Build and test OpenRV on macOS
 
+# Modified for the Visto project.
+# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+
 inputs:
   arch-type:
     required: true

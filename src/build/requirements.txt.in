@@ -1,4 +1,8 @@
 # Visto Python Requirements (Build Template)
+#
+# Modified for the Visto project.
+# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+#
 # This file is used to generate the requirements for the packaged environment.
 # We prefer latest stable versions.
 

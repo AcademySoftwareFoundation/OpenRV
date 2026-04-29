@@ -1,3 +1,12 @@
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# Modified for the Visto project.
+# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
 # Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
 SET(RV_DEPS_AJA_VERSION
     "17.6.0.hotfix1"
