@@ -92,23 +92,76 @@ FUNCTION(rv_stage)
       IF(_native_target_type STREQUAL "EXECUTABLE"
          OR _native_target_type STREQUAL "SHARED_LIBRARY"
       )
+        # Batch all -change arguments into a single install_name_tool invocation per target. Multiple separate invocations each re-sign the binary, which can
+        # trigger macOS code signing lockouts ("Operation not permitted") on arm64.
+        SET(_change_args)
         FOREACH(
           dep
           ${RV_DEPS_LIST}
         )
           IF(TARGET ${dep})
+            # Resolve INTERFACE_LIBRARY targets to their underlying library target. Defensive: rv_find_dependency.cmake should already resolve these at
+            # insertion time, but handle any that slip through.
+            SET(_rvs_real_dep
+                ${dep}
+            )
+            GET_TARGET_PROPERTY(_rvs_dep_type ${dep} TYPE)
+            IF(_rvs_dep_type STREQUAL "INTERFACE_LIBRARY")
+              GET_TARGET_PROPERTY(_rvs_iface_libs ${dep} INTERFACE_LINK_LIBRARIES)
+              IF(_rvs_iface_libs)
+                RV_EXTRACT_LINK_TARGETS("${_rvs_iface_libs}" _rvs_resolved_deps)
+                FOREACH(
+                  _rvs_rdep
+                  ${_rvs_resolved_deps}
+                )
+                  GET_TARGET_PROPERTY(_rvs_rdep_type ${_rvs_rdep} TYPE)
+                  IF(NOT _rvs_rdep_type STREQUAL "INTERFACE_LIBRARY")
+                    SET(_rvs_real_dep
+                        ${_rvs_rdep}
+                    )
+                    BREAK()
+                  ENDIF()
+                ENDFOREACH()
+              ENDIF()
+              IF("${_rvs_real_dep}" STREQUAL "${dep}")
+                CONTINUE()
+              ENDIF()
+            ENDIF()
+
+            # Use RV_RESOLVE_IMPORTED_LOCATION instead of raw PROPERTY LOCATION to handle config-specific variants correctly.
+            RV_RESOLVE_IMPORTED_LOCATION(${_rvs_real_dep} dep_file_path)
+            IF(NOT dep_file_path)
+              CONTINUE()
+            ENDIF()
+
+            # For found packages (e.g. Homebrew), the install name recorded by the linker may differ from the target's LOCATION (different symlink paths). Use
+            # the cached install name from RV_RESOLVE_DARWIN_INSTALL_NAME if available; this is a no-op for built-from-source deps where the library doesn't
+            # exist at configure time.
             GET_PROPERTY(
-              dep_file_path
-              TARGET ${dep}
-              PROPERTY LOCATION
+              _dep_install_name
+              TARGET ${_rvs_real_dep}
+              PROPERTY RV_DARWIN_INSTALL_NAME
             )
-            GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
-            ADD_CUSTOM_COMMAND(
-              COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-              COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
-            )
+            IF(_dep_install_name)
+              SET(dep_change_path
+                  "${_dep_install_name}"
+              )
+              GET_FILENAME_COMPONENT(dep_file_name "${_dep_install_name}" NAME)
+            ELSE()
+              SET(dep_change_path
+                  "${dep_file_path}"
+              )
+              GET_FILENAME_COMPONENT(dep_file_name "${dep_file_path}" NAME)
+            ENDIF()
+            LIST(APPEND _change_args -change "${dep_change_path}" "@rpath/${dep_file_name}")
           ENDIF()
         ENDFOREACH()
+        IF(_change_args)
+          ADD_CUSTOM_COMMAND(
+            COMMENT "Fixing dependency rpaths in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
+            COMMAND ${CMAKE_INSTALL_NAME_TOOL} ${_change_args} "$<TARGET_FILE:${arg_TARGET}>"
+          )
+        ENDIF()
       ENDIF()
     ENDIF()
   ENDIF()
@@ -351,6 +404,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(mu_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -385,6 +439,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(python_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -501,6 +556,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(image_formats ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -530,6 +586,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(movie_formats ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -560,6 +617,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(oiio_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 
@@ -589,6 +647,7 @@ FUNCTION(rv_stage)
     ENDIF()
 
     ADD_DEPENDENCIES(output_plugins ${arg_TARGET})
+    ADD_DEPENDENCIES(${arg_TARGET} dependencies)
 
     ADD_SHARED_LIBRARY_LIST(${arg_TARGET})
 

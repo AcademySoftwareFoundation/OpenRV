@@ -1,0 +1,5 @@
+# Common settings shared across all OpenRV profiles
+
+[replace_requires]
+openssl/*: openssl/3.5.0
+libjpeg/*: libjpeg-turbo/2.1.4

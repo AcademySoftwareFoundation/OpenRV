@@ -1,0 +1,149 @@
+#
+# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Build OpenEXR from source via ExternalProject_Add. Included by cmake/dependencies/openexr.cmake when no installed package is found.
+#
+# Expects these variables from the caller (set by RV_CREATE_STANDARD_DEPS_VARIABLES): _target, _version, _install_dir, _lib_dir, _bin_dir, _include_dir,
+# _source_dir And these dep-specific variables from the caller: _openexr_libname_suffix_, LIB_VERSION_SUFFIX, _openexr_byproducts _openexr_lib, _openexr_name,
+# _openexrcore_lib, _openexrcore_name _ilmthread_lib, _ilmthread_name, _iex_lib, _iex_name _openexr_implib, _ilmthread_implib, _iex_implib (Windows)
+
+SET(_make_command
+    make
+)
+IF(${RV_OSX_EMULATION})
+  SET(_darwin_x86_64
+      "arch" "${RV_OSX_EMULATION_ARCH}"
+  )
+  SET(_make_command
+      ${_darwin_x86_64} ${_make_command}
+  )
+ENDIF()
+IF(RV_TARGET_WINDOWS)
+  # MSYS2/CMake defaults to Ninja
+  SET(_make_command
+      ninja
+  )
+ENDIF()
+
+SET(_openexr_patch_file_
+    "${CMAKE_CURRENT_SOURCE_DIR}/patch/${RV_DEPS_OPENEXR_PATCH_NAME}.patch"
+)
+
+IF(EXISTS "${_openexr_patch_file_}")
+  SET(_patch_command
+      patch -p1 < ${_openexr_patch_file_}
+  )
+  MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
+ELSE()
+  # If it does not exist, set the command to an empty string. ExternalProject_Add will skip the patch step if the command is empty.
+  SET(_patch_command
+      ""
+  )
+  MESSAGE(STATUS "ERROR Patch file not found, skipping patch for ${_target}: ${_patch_file}")
+ENDIF()
+
+LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
+LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
+IF(RV_TARGET_WINDOWS)
+  GET_TARGET_PROPERTY(_zlib_implibpath ZLIB::ZLIB IMPORTED_IMPLIB)
+  LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${RV_DEPS_ZLIB_INCLUDE_DIR}")
+  LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_implibpath}")
+ENDIF()
+
+# OpenEXR tools are not needed.
+LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
+
+# Disable OpenEXR's automatic rpath setup to avoid conflicts with RV's rpath management OpenEXR 3.3+ automatically adds @loader_path/../lib which conflicts with
+# our install scripts
+LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
+
+EXTERNALPROJECT_ADD(
+  ${_target}
+  URL "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
+  URL_MD5 ${RV_DEPS_OPENEXR_DOWNLOAD_HASH}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  DEPENDS Imath::Imath ZLIB::ZLIB
+  INSTALL_DIR ${_install_dir}
+  PATCH_COMMAND ${_patch_command}
+  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
+  BUILD_COMMAND ${_cmake_build_command}
+  INSTALL_COMMAND ${_cmake_install_command}
+  BUILD_IN_SOURCE TRUE
+  BUILD_ALWAYS FALSE
+  BUILD_BYPRODUCTS ${_openexr_byproducts}
+  USES_TERMINAL_BUILD TRUE
+)
+
+SET(_include_dir
+    ${_install_dir}/include/OpenEXR
+)
+
+FILE(MAKE_DIRECTORY ${_include_dir})
+
+ADD_LIBRARY(OpenEXR::IlmThread SHARED IMPORTED GLOBAL)
+ADD_DEPENDENCIES(OpenEXR::IlmThread ${_target})
+SET_PROPERTY(
+  TARGET OpenEXR::IlmThread
+  PROPERTY IMPORTED_LOCATION ${_ilmthread_lib}
+)
+SET_PROPERTY(
+  TARGET OpenEXR::IlmThread
+  PROPERTY IMPORTED_SONAME ${_ilmthread_name}
+)
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET OpenEXR::IlmThread
+    PROPERTY IMPORTED_IMPLIB ${_ilmthread_implib}
+  )
+ENDIF()
+LIST(APPEND RV_DEPS_LIST OpenEXR::IlmThread)
+
+ADD_LIBRARY(OpenEXR::Iex SHARED IMPORTED GLOBAL)
+ADD_DEPENDENCIES(OpenEXR::Iex ${_target})
+SET_PROPERTY(
+  TARGET OpenEXR::Iex
+  PROPERTY IMPORTED_LOCATION ${_iex_lib}
+)
+SET_PROPERTY(
+  TARGET OpenEXR::Iex
+  PROPERTY IMPORTED_SONAME ${_iex_name}
+)
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET OpenEXR::Iex
+    PROPERTY IMPORTED_IMPLIB ${_iex_implib}
+  )
+ENDIF()
+LIST(APPEND RV_DEPS_LIST OpenEXR::Iex)
+
+ADD_LIBRARY(OpenEXR::OpenEXR SHARED IMPORTED GLOBAL)
+ADD_DEPENDENCIES(OpenEXR::OpenEXR ${_target})
+SET_PROPERTY(
+  TARGET OpenEXR::OpenEXR
+  PROPERTY IMPORTED_LOCATION ${_openexr_lib}
+)
+SET_PROPERTY(
+  TARGET OpenEXR::OpenEXR
+  PROPERTY IMPORTED_SONAME ${_openexr_name}
+)
+IF(RV_TARGET_WINDOWS)
+  SET_PROPERTY(
+    TARGET OpenEXR::OpenEXR
+    PROPERTY IMPORTED_IMPLIB ${_openexr_implib}
+  )
+ENDIF()
+
+TARGET_INCLUDE_DIRECTORIES(
+  OpenEXR::OpenEXR
+  INTERFACE ${_include_dir}
+)
+TARGET_LINK_LIBRARIES(
+  OpenEXR::OpenEXR
+  INTERFACE Imath::Imath OpenEXR::Iex OpenEXR::IlmThread ZLIB::ZLIB
+)
+LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)

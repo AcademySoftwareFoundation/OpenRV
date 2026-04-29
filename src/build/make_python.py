@@ -350,7 +350,16 @@ def build() -> None:
 
         python_env = sys.executable
 
-        subprocess_env = {**os.environ, "PYTHON": python_env, "PATH": path_env}
+        subprocess_env = {
+            **os.environ,
+            "PYTHON": python_env,
+            "PATH": path_env,
+            # Prevent global vcpkg MSBuild integration (vcpkg integrate install)
+            # from injecting vcpkg include/lib paths into Python's PCBuild.
+            # Without this, _ctypes.pyd may link against vcpkg's libffi instead
+            # of Python's own, causing ABI mismatches at install time.
+            "VcpkgEnabled": "false",
+        }
         if OPENSSL_OUTPUT_DIR:
             subprocess_env["LC_RPATH"] = os.path.join(OPENSSL_OUTPUT_DIR, "lib")
 
@@ -419,7 +428,8 @@ def install_python_vfx2023() -> None:
         shutil.copyfile(src_file, dst_file)
 
     else:
-        make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
+        # -j1: Python's make install has a known upstream race condition under parallel jobs.
+        make_args = ["make", "install", "-j1", "-s"]
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
@@ -511,6 +521,15 @@ def install_python_vfx2024() -> None:
             if os.path.isfile(file_path):
                 shutil.move(file_path, os.path.join(dst_dir, filename))
 
+        # Copy include/ into bin/include/ so Python's sysconfig-reported include path
+        # (sys.prefix = bin/ because that's where the _pth file lives) is valid.
+        # CMake's FindPython queries python.exe for its include dir and gets bin/include/;
+        # without this copy that path doesn't exist and Python.h is not found.
+        include_src = os.path.join(OUTPUT_DIR, "include")
+        include_bin_dst = os.path.join(dst_dir, "include")
+        if os.path.exists(include_src) and not os.path.exists(include_bin_dst):
+            shutil.copytree(include_src, include_bin_dst)
+
         # Manually move python3.lib because the script provided do not copy it.
         python3_lib = "python3.lib"
         python3xx_lib = f"python{PYTHON_VERSION}.lib"
@@ -533,7 +552,8 @@ def install_python_vfx2024() -> None:
             shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
 
     else:
-        make_args = ["make", "install", f"-j{os.cpu_count() or 1}", "-s"]
+        # -j1: Python's make install has a known upstream race condition under parallel jobs.
+        make_args = ["make", "install", "-j1", "-s"]
 
         print(f"Executing {make_args} from {SOURCE_DIR}")
         subprocess_env = {**os.environ}
@@ -599,11 +619,17 @@ if __name__ == "__main__":
         LIB_DIR = "lib"
     else:
         # Assuming Linux because that variable is not used for Windows.
-        # TODO: Note: This might not be right on Debian based platform.
+        # Prefer lib64 for VFX >= 2024 (RHEL/Rocky convention), but fall back
+        # to lib when the directory doesn't exist (e.g. Conan packages).
         if VFX_PLATFORM == 2023:
             LIB_DIR = "lib"
         elif VFX_PLATFORM >= 2024:
-            LIB_DIR = "lib64"
+            if OPENSSL_OUTPUT_DIR and os.path.isdir(os.path.join(str(OPENSSL_OUTPUT_DIR), "lib64")):
+                LIB_DIR = "lib64"
+            elif OPENSSL_OUTPUT_DIR and os.path.isdir(os.path.join(str(OPENSSL_OUTPUT_DIR), "lib")):
+                LIB_DIR = "lib"
+            else:
+                LIB_DIR = "lib64"
 
     if platform.system() == "Windows":
         PYTHON_VERSION = args.python_version
