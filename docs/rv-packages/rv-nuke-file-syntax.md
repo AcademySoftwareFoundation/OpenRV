@@ -1,4 +1,4 @@
-# Nuke style file syntax in Open RV
+# Nuke style file syntax in Visto
 
 You can use nuke's printf-esque %d syntax in RV and we've extended the existing shake-esque syntax so you can mix and match.
 

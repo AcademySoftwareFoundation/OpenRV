@@ -2,7 +2,7 @@
 
 OpenColorIO (OCIO) is a software library which provides cross application color consistency.
 
-**Note:** Open RV supports OCIO v2, but is limited to the legacy API of OCIO v1.
+**Note:** Visto supports OCIO v2, but is limited to the legacy API of OCIO v1.
 
 You can use OCIO in RV's display, look, viewing, linearize and color pipelines. In each case OCIO can be used to convert from an incoming and outgoing color space with a user defined OCIO context. OCIO requires some work to set up and should be considered an advanced feature. Large facilities may find OCIO particularly useful in RV when used in conjunction with Nuke, Mari, or other products which support it.
 

@@ -354,7 +354,7 @@ Weight values for R, G, and B are applicable in linear color space. Values used 
 
 #### 7.6.4 Relative Saturation
 
-RV applies the formula:
+Visto.applies the formula:
 
 |                                |                                |                                |           |     |     |
 | ------------------------------ | ------------------------------ | ------------------------------ | --------- | --- | --- |
@@ -378,7 +378,7 @@ and *s* is the saturation value.
 
 #### 7.6.5 Contrast
 
-RV applies the formula:
+Visto.applies the formula:
 
 |         |         |         |           |     |     |
 | ------- | ------- | ------- | --------- | --- | --- |
@@ -396,7 +396,7 @@ where *k* is the contrast value.
 
 #### 7.6.6 Inversion
 
-RV applies the formula:
+Visto.applies the formula:
 
 |        |        |        |           |     |     |
 | ------ | ------ | ------ | --------- | --- | --- |
@@ -457,7 +457,7 @@ There are times when it's necessary to have two separate display LUTs — one wh
 
 There is a unique look LUT per source. There is a single display LUT for an RV session.
 
-RV applies the look LUT just before the display LUT.
+Visto.applies the look LUT just before the display LUT.
 
 See Chapter [8](rv-user-manual-chapter-eight.md#8-using-luts-in-rv) for a more detailed explanation of usage and how to load a LUT into RV.
 

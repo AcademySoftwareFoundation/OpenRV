@@ -54,7 +54,7 @@ SET_PROPERTY(
 #
 # VFX Platform option
 #
-# That option is to control the versions of the external dependencies that OpenRV downloads and install based on the VFX platform.
+# That option is to control the versions of the external dependencies that Visto downloads and install based on the VFX platform.
 #
 # e.g. For CY2023, OCIO 2.2.x should be supported. For CY2024, OCIO 2.3.x should be supported.
 #
@@ -89,7 +89,7 @@ SET_PROPERTY(
 #
 # FFmpeg option
 #
-# This option is to control the version of FFmpeg that OpenRV downloads and installs.
+# This option is to control the version of FFmpeg that Visto downloads and installs.
 #
 # There will be one version used by default per major release. Any other version will require RV_FFMPEG env var to be set with the desired major version.
 #

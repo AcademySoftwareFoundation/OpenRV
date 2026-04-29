@@ -195,7 +195,7 @@ ENDFOREACH()
 # Generate about_rv.cpp with build information
 #
 SET(_about_rv_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_rv.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_visto.cpp
 )
 
 # Get compiler name
@@ -323,9 +323,10 @@ STRING(REPLACE ";" "," _versions_str "${_versions_list}")
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_rv_cpp}
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py ${_about_rv_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
+  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
+ ${_about_rv_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
           "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_rv.py
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
   COMMENT "Generating about_rv.cpp with build information"
   VERBATIM
 )

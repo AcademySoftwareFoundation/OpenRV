@@ -53,16 +53,16 @@ ld: symbol(s) not found for architecture x86_64
 ### Multiple 'error: unknown type name 'string' reported in system files
 
 ```text
-In file included from /OpenRV/src/lib/graphics/TwkGLF/GLVideoDevice.cpp:5:
-In file included from /OpenRV/src/lib/graphics/TwkGLF/GLVideoDevice.h:7:
+In file included from /Visto/src/lib/graphics/TwkGLF/GLVideoDevice.cpp:5:
+In file included from /Visto/src/lib/graphics/TwkGLF/GLVideoDevice.h:7:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/string:519:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/__debug:14:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/iosfwd:98:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/__mbstate_t.h:29:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/wchar.h:123:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/wchar.h:91:
-In file included from /OpenRV/src/lib/base/TwkMath/time.h:7:
-In file included from /OpenRV/src/lib/base/TwkMath/math.h:12:
+In file included from /Visto/src/lib/base/TwkMath/time.h:7:
+In file included from /Visto/src/lib/base/TwkMath/math.h:12:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/algorithm:653:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/functional:500:
 In file included from /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk/usr/include/c++/v1/__functional/function.h:20:
@@ -106,7 +106,7 @@ Should be in `/home/nmontmarquette/local/cache/RV_build/RV_DEPS_DESKTOP_PACKAGE/
 ### (Linux) error: libaio.h: No such file or directory
 
 ```text
-/OpenRV/src/lib/base/TwkUtil/FileStream.cpp:170:10: fatal error: libaio.h: No such file or directory
+/Visto/src/lib/base/TwkUtil/FileStream.cpp:170:10: fatal error: libaio.h: No such file or directory
  #include <libaio.h>
           ^~~~~~~~~~
 ```
@@ -189,7 +189,7 @@ there are only two possibles solutions:
 ```text
 [ 99%] Linking CXX executable rv
 CMakeFiles/rv.dir/main.cpp.o: In function `utf8Main(int, char**)':
-/OpenRV/src/bin/apps/rv/main.cpp:419: undefined reference to `qInitResources_rv()'
+/Visto/src/bin/apps/rv/main.cpp:419: undefined reference to `qInitResources_rv()'
 collect2: error: ld returned 1 exit status
 make[2]: *** [src/bin/apps/rv/rv] Error 1
 make[1]: *** [src/bin/apps/rv/CMakeFiles/rv.dir/all] Error 2

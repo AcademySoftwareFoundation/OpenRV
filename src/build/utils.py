@@ -259,7 +259,7 @@ def download_file(url, file_path):
 def get_cygpath_windows(cygpath: str) -> str:
     """
     Returns the windows path corresponding to the cygpath passed as parameter.
-    :param string cygpath: cygpath to be translated. Example: C:/git/OpenRV/_build
+    :param string cygpath: cygpath to be translated. Example: C:/git/Visto/_build
     """
     return subprocess.check_output(["cygpath", "--windows", "--absolute", f"{cygpath}"]).rstrip().decode("utf-8")
 
@@ -396,7 +396,7 @@ def get_mingw64_path_on_windows(winpath: str) -> str:
     """
     On Windows: returns the mingw64 path corresponding to the windows passed as parameter.
     On other platforms: simply returns the path passed as parameter
-    :param string winpath: winpath to be translated. Example: C:\git\OpenRV\_build
+    :param string winpath: winpath to be translated. Example: C:\git\Visto\_build
     """
     if platform.system() != "Windows":
         return winpath

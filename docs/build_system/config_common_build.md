@@ -1,23 +1,23 @@
-# Building Open RV
+# Building Visto
 
 Once the platform-specific installation process is done, building RV is essentially the same process for all platforms.
 
-### 1. Building Open RV for the first time
+### 1. Building Visto for the first time
 
-#### 1.1 Clone the Open RV repository using HTTPS or SSH key
+#### 1.1 Clone the Visto repository using HTTPS or SSH key
 
-Clone the Open RV repository. Typically, this will create an "OpenRV" directory from your current location.
+Clone the Visto repository. Typically, this will create an "Visto" directory from your current location.
 
 ```bash
 # If using a password-protected SSH key:
-git clone --recursive git@github.com:AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
+git clone --recursive git@github.com:AcademySoftwareFoundation/Visto.git
+cd Visto
 ```
 
 ```bash
 # Or if using the web URL:
-git clone --recursive https://github.com/AcademySoftwareFoundation/OpenRV.git
-cd OpenRV
+git clone --recursive https://github.com/AcademySoftwareFoundation/Visto.git
+cd Visto
 ```
 
 If you cloned the repo without setting the `--recursive` flag, you can initialize the submodule in another step with the following command:
@@ -26,7 +26,7 @@ If you cloned the repo without setting the `--recursive` flag, you can initializ
 git submodule update --init --recursive
 ```
 
-**Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's Open RV repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
+**Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's Visto repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
 
 #### 1.2 Configuring Git to use the ignore file with `git blame`
 
@@ -36,9 +36,9 @@ A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-#### 1.3 Load command aliases to build Open RV
+#### 1.3 Load command aliases to build Visto
 
-Command-line aliases are provided to simplify the process of setting up the environment and to build Open RV. Once in your OpenRV directory:
+Command-line aliases are provided to simplify the process of setting up the environment and to build Visto. Once in your Visto directory:
 
 ```bash
 source rvcmds.sh
@@ -56,11 +56,11 @@ After the setup stage is done, a build is started and should produce a valid "rv
 
 ````{tabs}
 ```{code-tab} bash Release
-# Produces default optimized build in OpenRV/_build
+# Produces default optimized build in Visto/_build
 rvbootstrap
 ```
 ```{code-tab} bash Debug
-# Produces unoptimized debug build in OpenRV/_build_debug
+# Produces unoptimized debug build in Visto/_build_debug
 rvbootstrap
 ```
 ````
@@ -69,17 +69,17 @@ Note 1: launch the default optimized build unless you have a reason to want the 
 
 Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk to complete the build.
 
-### 2. Building Open RV after the first time
+### 2. Building Visto after the first time
 
-Once you've built Open RV for the first time, there is no need to run "rvboostrap" again.
+Once you've built Visto for the first time, there is no need to run "rvboostrap" again.
 
-#### 2.1 Build Open RV (incrementally) using rvmk
+#### 2.1 Build Visto (incrementally) using rvmk
 
-To build Open RV after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process.
+To build Visto after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process.
 
 ````{tabs}
 ```{code-tab} bash Release
-# Produces incremental optimized build in OpenRV/_build_debug
+# Produces incremental optimized build in Visto/_build_debug
 rvmk
 
 # Note: rvmk is just an alias to these two commands:
@@ -87,7 +87,7 @@ rvmk
 # rvbuild    # launches the build process
 ```
 ```{code-tab} bash Debug
-# Produces incremental unoptimized debug build in OpenRV/_build_debug
+# Produces incremental unoptimized debug build in Visto/_build_debug
 rvmk
 
 # Note: rvmk is just an alias to these two commands:
@@ -98,7 +98,7 @@ rvmk
 
 #### 2.2 Rebuilding the dependencies
 
-Building the source dependencies is done automatically the first time we build Open RV with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
+Building the source dependencies is done automatically the first time we build Visto with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
 
 ````{tabs}
 ```{code-tab} bash Release
@@ -109,18 +109,18 @@ rvbuildt dependencies
 ```
 ````
 
-### 3. Starting the Open RV executable
+### 3. Starting the Visto executable
 
-Once Open RV is finished building, its executable binary can be found here:
+Once Visto is finished building, its executable binary can be found here:
 
 For Windows and Linux:
 
 ````{tabs}
 ```{code-tab} bash Release
-OpenRV/_build/stage/app/bin/rv
+Visto/_build/stage/app/bin/rv
 ```
 ```{code-tab} bash Debug
-OpenRV/_build_debug/stage/app/bin/rv
+Visto/_build_debug/stage/app/bin/rv
 ```
 ````
 
@@ -128,16 +128,16 @@ For macOS:
 
 ````{tabs}
 ```{code-tab} bash Release
-OpenRV/_build/stage/app/RV.app/Contents/MacOS/RV
+Visto/_build/stage/app/Visto.app/Contents/MacOS/RV
 ```
 ```{code-tab} bash Debug
-OpenRV/_build_debug/stage/app/RV.app/Contents/MacOS/RV
+Visto/_build_debug/stage/app/Visto.app/Contents/MacOS/RV
 ```
 ````
 
 You can access the directory where the compiled binary is located by using the command "rvappdir" which should "cd" right into the correct directory (release or debug).
 
-### 4. Contributing to Open RV
+### 4. Contributing to Visto
 
 Before you can submit any code for a pull request, this repository uses the `pre-commit` tool to perform basic checks and to execute formatting hooks before a commit. To install the pre-commit hooks, run the following command:
 
@@ -187,7 +187,7 @@ To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/
 
 ### 8. Installing Blackmagicdesign&reg; Video Output Support (Optional)
 
-Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Open RV (optional): <https://www.blackmagicdesign.com/desktopvideo_sdk><br>
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Visto (optional): <https://www.blackmagicdesign.com/desktopvideo_sdk><br>
 Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
 Example:
 
@@ -197,9 +197,9 @@ rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_
 
 ### 9. NDI&reg; Video Output Support (Optional)
 
-Download and install the NDI&reg; SDK to add NDI&reg; output capability to Open RV (optional): <https://ndi.video/><br>
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to Visto (optional): <https://ndi.video/><br>
 
-Installing the NDI SDK must be done before building Open RV for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
+Installing the NDI SDK must be done before building Visto for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
 
 ### 10. How to enable non-free FFmpeg codecs
 
@@ -227,7 +227,7 @@ Example:
 By default, the ProRes decode via the SDK will use all available system threads.  To use a fixed maximum number of threads, set the
 environment variable `RV_PREF_GLOBAL_PRORES_DECODER_THREADS` to a positive value.
 
-On Apple Silicon machines, OpenRV supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default
+On Apple Silicon machines, Visto supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default
 but can be controlled using the `-DRV_FFMPEG_USE_VIDEOTOOLBOX` option. Set this option to `ON` to enable or `OFF` to disable VideoToolbox
 hardware decoding.
 
@@ -245,7 +245,7 @@ Apple by contacting [ProRes@apple.com](mailto:ProRes@apple.com).
 
 ### 12. Running the automated tests
 
-Open RV uses ctest to run its automated tests.
+Visto uses ctest to run its automated tests.
 
 To run all tests automatically:
 
@@ -275,9 +275,9 @@ You can run the tests with extra verbosity with the flag `--extra-verbose`.
 
 ### 13. Creating the installation package
 
-To create the installation package, invoke the `install` step using cmake. The install step prepares Open RV for packaging by building a copy of Open RV in the `_install` folder. This step will strip debug symbols from the executable if required.
+To create the installation package, invoke the `install` step using cmake. The install step prepares Visto for packaging by building a copy of Visto in the `_install` folder. This step will strip debug symbols from the executable if required.
 
-Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional Open RV.
+Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional Visto.
 
 #### 13.1 Creating the installation package automatically
 

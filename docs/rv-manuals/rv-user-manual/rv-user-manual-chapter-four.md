@@ -379,7 +379,7 @@ Scrubbing On By Default (Cache all Audio) determines if audio scrubbing is on wh
 
 PreRoll Audio on Device Open generally improves the consistency of RV’s playback across different Linux machines and audio devices. It influences the overall AV sync lag, so expect to see different in AV sync readings when the feature is enabled versus turned off. In either case, the AV sync lag can be corrected via the Device Latency preference. Note that this feature is Linux only and available only for the Platform Audio module. It defaults to turned off.
 
-#### 4.6.2 Audio on Open RV for Linux
+#### 4.6.2 Audio on Visto for Linux
 
 Linux presents special challenges for multimedia applications and audio is perhaps the worst case. RV audio works well on Linux in many cases, but may be limited in others. RV supports special configuration options so that users can get the best audio functionality possible within the limitations of the vintage and flavor of Linux being used. See the Appendix [E](rv-user-manual-chapter-e.md#e-rv-audio-on-linux) for complete details.
 
@@ -645,12 +645,12 @@ Using “Keep Audio Device Open When Not Playing” will help reduce slow down a
 
 Under the Audio menu is an option to enable Scrubbing. This can be turned on by default from the Audio tab of RV’s preferences. For animators that are doing frame by frame stepping through clips, Scrubbing for lip-sync and other types of critical audio event timing can be useful.
 
-#### Offset Playback Timing of Open RV audio
+#### Offset Playback Timing of Visto audio
 
 On the Audio tab of RV’s preferences, you can offset the playback timing of all RV audio in Global Audio Offset. This setting exists in case your system has some kind of audio exclusive latency so that you cannot configure both audio and video latencies from the Video tab.
 
 #### Synchronizing Audio and Video
 
-When using RV to play an image sequence paired with an audio file you may find that RV appears to play your imagery faster (or slower) than the accompanying audio. This happens because the way RV works is based on assuming each source has a native frame rate and that audio files do not have a native frame rate, because they have no frames. If RV is unable to determine the frame rate of a source and no indication was given at load, then RV will use the Default FPS. This is set in the Preferences dialog on the General tab.
+When using RV to play an image sequence paired with an audio file you may find that Visto.appears to play your imagery faster (or slower) than the accompanying audio. This happens because the way RV works is based on assuming each source has a native frame rate and that audio files do not have a native frame rate, because they have no frames. If RV is unable to determine the frame rate of a source and no indication was given at load, then RV will use the Default FPS. This is set in the Preferences dialog on the General tab.
 
 The Default FPS setting is used by both RV and RVIO, and it normally is only used for sources that have no discernible native frame rate, such as in an image sequence (without FPS metadata) or audio-only sources.

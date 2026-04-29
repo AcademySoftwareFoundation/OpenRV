@@ -4,5 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-ADD_SUBDIRECTORY(RV)
-ADD_SUBDIRECTORY(rvlinklauncher)
+ADD_SUBDIRECTORY(Visto)
+ADD_SUBDIRECTORY(vistolinklauncher)
+

@@ -7,7 +7,7 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "rv"
+    "visto"
 )
 
 SET(CMAKE_AUTOUIC
@@ -34,7 +34,7 @@ IF(RV_TARGET_WINDOWS)
   IF(DEFINED RV_RC_ICON)
     LIST(APPEND SOURCES ${RV_RC_ICON})
   ELSE()
-    LIST(APPEND SOURCES RV.RC) # Use Default Open RV logo
+    LIST(APPEND SOURCES RV.RC) # Use Default Visto logo
   ENDIF()
 ENDIF()
 

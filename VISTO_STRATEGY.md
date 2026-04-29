@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Technical Foundation (Completed in OpenRV Fork)
+## 1. Technical Foundation (Completed in Visto Fork)
 Before transitioning, we established a "Functional Confidence" baseline:
 
 - **Dependency Probes:** Automated verification for `OpenEXR`, `libtiff`, `libpng`, and `OpenColorIO`. These tests ensure that updating external libraries doesn't break core IO or color pipelines.
@@ -35,7 +35,7 @@ The primary barrier to community contribution is the 4-hour "fortress" build sys
 - **Name:** **Visto** (Italian/Spanish for "Seen" or "Viewed"). Chosen for its high discoverability, global readability, and 5-character brevity.
 - **Legal Posture:** 
     - **Apache 2.0 Compliance:** Retain all original copyright notices.
-    - **Trademark Safety:** Absolute separation from "OpenRV" and "Autodesk" brands to prevent legal challenges.
+    - **Trademark Safety:** Absolute separation from "Visto" and "Autodesk" brands to prevent legal challenges.
     - **Anonymity:** Use a pseudonym for maintainership while focusing on code-signing solutions for signed binaries.
 
 ---

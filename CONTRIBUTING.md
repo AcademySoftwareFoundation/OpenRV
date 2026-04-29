@@ -1,10 +1,10 @@
 # Contributing
 
-Thank you for your interest in contributing to Open RV. We are looking forward to collaborating with the community to evolve and improve Open RV.
+Thank you for your interest in contributing to Visto. We are looking forward to collaborating with the community to evolve and improve Visto.
 
 ## Project Roles and Responsibilities
 
-Please read this document to learn how to contribute to Open RV.
+Please read this document to learn how to contribute to Visto.
 
 Start by getting familiar with the [GOVERNANCE](GOVERNANCE.md) document. It details the rules and responsibilities for Contributors, Committers, and Technical Steering Committee members.
 
@@ -14,7 +14,7 @@ The RV Open Source Project Committers are listed in alphabetical order, by first
 
 ## Contributor License Agreement
 
-Before contributing code to Open RV source code, you must sign a Contributor License Agreement (CLA).
+Before contributing code to Visto source code, you must sign a Contributor License Agreement (CLA).
 
 You will get the opportunity to sign the CLA when you create your first pull request: the Linux Foundation's EasyCLA system will guide you through the process of signing the CLA.
 

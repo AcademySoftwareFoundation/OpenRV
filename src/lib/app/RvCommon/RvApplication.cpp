@@ -628,7 +628,7 @@ namespace Rv
 
         // Add a text box with detailed build and dependency information
         QTextEdit* textBox = new QTextEdit();
-        textBox->setHtml(about_RV);
+        textBox->setHtml(about_Visto);
         textBox->setReadOnly(true);
         textBox->setMinimumHeight(250);
         textBox->setMinimumWidth(500);
@@ -663,7 +663,7 @@ namespace Rv
     {
         if (m_newSessions.size())
         {
-            // Make sure that the RV application has been initialized
+            // Make sure that the Visto.application has been initialized
             // Otherwise wait for the next occurence of the newSession timer to
             // prevent a crash.
             if (!TwkApp::muProcess())
@@ -1955,3 +1955,4 @@ namespace Rv
     }
 
 } // namespace Rv
+Rv

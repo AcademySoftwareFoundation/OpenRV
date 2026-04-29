@@ -1,4 +1,4 @@
-name: OpenRV Linux
+name: Visto Linux
 
 on:
   workflow_call:

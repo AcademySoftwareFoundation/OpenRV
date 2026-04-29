@@ -454,7 +454,7 @@ def install_python_vfx2024() -> None:
         build_path = os.path.join(SOURCE_DIR, "PCBuild", "amd64")
         parent = os.path.dirname(SOURCE_DIR)
 
-        # Using the python that OpenRV built to execute the script because it seems
+        # Using the python that Visto built to execute the script because it seems
         # like it need to be the same dot release. (e.g. run the script with 3.11 to install a 3.11)
         python_executable = "python"
         if VARIANT == "Debug":

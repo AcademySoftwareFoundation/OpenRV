@@ -634,7 +634,7 @@ class: ModeManagerMode : MinorMode
                 if (fileV > 2) parts.erase(0, 1);
                 if (fileV > 3) parts.erase(0, 1);
 
-                let reqVersion = (if getApplicationType()=="OpenRV" then openrvversion else reqV);
+                let reqVersion = (if getApplicationType()=="Visto" then openrvversion else reqV);
                 let skipReason = loadOrSkip(name, pkg, sdir, reqVersion, optload);
 
                 if (0 == optionsNoPackages() && skipReason eq nil)

@@ -64,7 +64,7 @@ Then, in each entry marked *Optional Flags* , type this:
 
 Done!
 
-### Build a Session in Open RV
+### Build a Session in Visto
 
 The main point to remember about playblasting to RV is that if you leave RV open, each successive playblast will be merged into the RV Session, so you can easily compare the current render with others in the session.
 

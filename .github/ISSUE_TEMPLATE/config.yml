@@ -2,13 +2,13 @@ blank_issues_enabled: yes
 
 contact_links:
   - name: "Proposing new features"
-    url: "https://github.com/AcademySoftwareFoundation/OpenRV/discussions/categories/ideas"
+    url: "https://github.com/AcademySoftwareFoundation/Visto/discussions/categories/ideas"
     about: "Post a message to the 'idea' category"
 
-  - name: "Discussing with the Open RV community"
-    url: "https://github.com/AcademySoftwareFoundation/OpenRV/discussions/categories/general"
+  - name: "Discussing with the Visto community"
+    url: "https://github.com/AcademySoftwareFoundation/Visto/discussions/categories/general"
     about: "Post a message to the 'general' category"
 
   - name: "Troubleshooting build issues"
-    url: "https://github.com/AcademySoftwareFoundation/OpenRV/discussions/categories/build-issues"
+    url: "https://github.com/AcademySoftwareFoundation/Visto/discussions/categories/build-issues"
     about: "Post a message to the 'build-issues' category"

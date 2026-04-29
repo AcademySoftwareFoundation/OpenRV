@@ -4,9 +4,9 @@
 
 These instructions guide GitHub Copilot code review across all files in this repository.
 
-## About Open RV
+## About Visto
 
-Open RV is an open-source, hardware-accelerated image and video sequence viewer built for visual effects (VFX) and animation production pipelines. It is maintained under the Academy Software Foundation (ASWF). It runs on macOS, Windows, and RHEL-based Linux distributions. The build targets the VFX Reference Platform specification for dependency compatibility across studios.
+Visto is an open-source, hardware-accelerated image and video sequence viewer built for visual effects (VFX) and animation production pipelines. It is maintained under the Academy Software Foundation (ASWF). It runs on macOS, Windows, and RHEL-based Linux distributions. The build targets the VFX Reference Platform specification for dependency compatibility across studios.
 
 ## Code Standards Reference
 

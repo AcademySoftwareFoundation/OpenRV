@@ -1,6 +1,6 @@
-# Preparing Open RV on Windows
+# Preparing Visto on Windows
 
-Open RV 2025 can be built for Windows using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/OpenRV/tree/main/cmake/defaults)
+Visto 2025 can be built for Windows using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/Visto/tree/main/cmake/defaults)
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
@@ -76,11 +76,11 @@ All other dependencies are shared across variations.
 8. [Install MSYS2](install_msys2)
    1. [Install required MSYS2 pacman packages (from an MSYS2-MinGW64 shell)](install_msys2_packages)
 9. [Setup environment variables](setup_env)
-10. [Build Open RV](build_windows_openrv)
+10. [Build Visto](build_windows_openrv)
 
 ````{warning}
 You should be cloning the repository later in the steps, but if you must clone it beforehand, clone it into the root 
-of a drive (e.g. ````c:````). See [Get Open RV source code](build_windows_openrv2).
+of a drive (e.g. ````c:````). See [Get Visto source code](build_windows_openrv2).
 `````
 
 (mvs)=
@@ -88,15 +88,15 @@ of a drive (e.g. ````c:````). See [Get Open RV source code](build_windows_openrv
 ## 1. Microsoft Visual Studio
 
 ```{warning}
-Open RV will not compile with Microsoft Visual Studio 2022 version 17.11.X with the default compiler because of issues
+Visto will not compile with Microsoft Visual Studio 2022 version 17.11.X with the default compiler because of issues
 between PySide2 and that version of the compiler.
 \
 \
-You can still install 17.11.X, but you will need to install MSVC v143 version 14.40 to compile Open RV itself and
+You can still install 17.11.X, but you will need to install MSVC v143 version 14.40 to compile Visto itself and
 MSVC v143 14.39.X to compile Boost.
 ```
 
-Any variant of Microsoft Visual Studio 2022 will work with Open RV (e.g. Enterprise, Professional or Community).
+Any variant of Microsoft Visual Studio 2022 will work with Visto (e.g. Enterprise, Professional or Community).
 You can select the version on the [Visual Studio website](https://visualstudio.microsoft.com/downloads).
 
 ### Installation
@@ -104,7 +104,7 @@ You can select the version on the [Visual Studio website](https://visualstudio.m
 ```{note}
 **Quick guide**:
 - You must select **Desktop Development with C++**
-- In the individual components section, you must install **MSVC v143 14.40.X** for Open RV and **MSVC v143 14.39.X** to compile Boost.
+- In the individual components section, you must install **MSVC v143 14.40.X** for Visto and **MSVC v143 14.39.X** to compile Boost.
 ```
 
 `````{carousel}
@@ -141,7 +141,7 @@ If Microsoft Visual Studio 2022 was installed for the first time (using the step
 the default compiler, although varying setup may affect this.
 \
 \
-To ensure compatibility with Open RV, we need to make sure that MSVC v143 v14.40 is the default compiler.
+To ensure compatibility with Visto, we need to make sure that MSVC v143 v14.40 is the default compiler.
 \
 \
 Here are the possible methods to set the default compiler:
@@ -233,7 +233,7 @@ The **recommended** path is:
 
 ### 3.1 Copy python.exe and rename it to python3.exe
 
-Copy the Python executable as **python3.exe** to ensure compatibility with Open RV, which requires the `python3` command.
+Copy the Python executable as **python3.exe** to ensure compatibility with Visto, which requires the `python3` command.
 This also aligns with Linux and macOS conventions, where both python and python3 are valid commands.
 
 (install_cmake)=
@@ -414,9 +414,9 @@ Additional information can be found on the [MSYS2 github](https://github.com/msy
 
 ```
 
-Download and install the latest [MSYS2](https://www.msys2.org/). Open RV is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Open RV is built with Microsoft Visual Studio 2022 via the CMake "Visual Studio 17 2022" generator.
+Download and install the latest [MSYS2](https://www.msys2.org/). Visto is **NOT** a mingw64 build. It is a Microscoft Visual Studio 2022 build. Visto is built with Microsoft Visual Studio 2022 via the CMake "Visual Studio 17 2022" generator.
 
-MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Open RV build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
+MSYS2 is only used for convenience as it comes with a package manager with utility packages required for the Visto build such as cmake, git, flex, bison, nasm, unzip, zip, etc.
 
 (install_msys2_packages)=
 
@@ -431,7 +431,7 @@ Other executables such as MSYS2 (msys2.exe) or MSYS2 MingGW32 (mingw32.exe) will
 
 ```
 
-From a MSYS2-MinGW64 shell, install the following packages which are required to build Open RV:
+From a MSYS2-MinGW64 shell, install the following packages which are required to build Visto:
 
 ```shell
 pacman -Sy --needed \
@@ -479,7 +479,7 @@ Verify sccache is available:
 sccache --version
 ```
 
-OpenRV will automatically detect and use sccache when available.
+Visto will automatically detect and use sccache when available.
 
 ````{note}
 **First-time build**: sccache has no effect on the first build as it establishes the cache.
@@ -507,7 +507,7 @@ This is the step where the path of Strawberry Perl, Python, CMake and Qt will be
 
 ```
 
-Some environment variables need to be set within MSYS2 for the Open RV build system. The **PATH** environment variable must be
+Some environment variables need to be set within MSYS2 for the Visto build system. The **PATH** environment variable must be
 modified, new environment variables called **ACLOCAL_PATH** and **QT_HOME** must be created.
 
 These modifications will be added to the `.bash_profile` file located in the User's home directory within the MSYS2 environment. By modifiying `.bash_profile`, these environment variable will be modified everytime a new MSYS2 MINGW64 terminal is opened.
@@ -580,19 +580,19 @@ source ~/.bash_profile
 
 (build_windows_openrv)=
 
-## 10. Build Open RV
+## 10. Build Visto
 
-Once the platform-specific installation process is complete, building Open RV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+Once the platform-specific installation process is complete, building Visto follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 
 ### Windows-Specific Build Notes
 
 ```{warning}
 Even as of Windows 11, for legacy reasons, a default system path length is still limited to 254 bytes long.
-For that reason, it is recommended to clone **Open RV** into the drive's root directory (e.g.: `C:\`).
+For that reason, it is recommended to clone **Visto** into the drive's root directory (e.g.: `C:\`).
 ```
 
 `````{warning}
-Open RV repository **should** be cloned into the root of a drive (e.g. ````c:````).\
+Visto repository **should** be cloned into the root of a drive (e.g. ````c:````).\
 \
 Otherwise, the PySide2 compilation could be failing due to the path being too long. If you can't do that, please take a look
 at [Maximum Path Length Limitation](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) on Microsoft website.

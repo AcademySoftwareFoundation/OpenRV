@@ -9,7 +9,7 @@
 # agreement to the ShotGrid Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by ShotGrid Software Inc.
 """
-Theme Generator for OpenRV
+Theme Generator for Visto
 Generates platform-specific stylesheets from templates with interactive variable support
 
 Automatically detects platform and uses:
@@ -63,13 +63,13 @@ def get_platform_template() -> str:
     # Windows and Linux both use the Linux template, only macOS uses the macOS template
     template_name = "rv_mac_dark.qss.template" if system == "darwin" else "rv_linux_dark.qss.template"
 
-    # Check if we're being run from OpenRV root directory
+    # Check if we're being run from Visto root directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
     current_dir = os.getcwd()
 
     # If script is in src/lib/app/RvCommon and we're not in that directory
     if os.path.basename(script_dir) == "RvCommon" and current_dir != script_dir:
-        # Check if current directory looks like OpenRV root (has src/lib/app/RvCommon)
+        # Check if current directory looks like Visto root (has src/lib/app/RvCommon)
         rvcommon_path = os.path.join(current_dir, "src", "lib", "app", "RvCommon")
         if os.path.exists(rvcommon_path):
             template_path = os.path.join("src", "lib", "app", "RvCommon", template_name)
@@ -80,14 +80,14 @@ def get_platform_template() -> str:
 
 
 def adjust_output_path(output_file: str) -> str:
-    """Adjust output path to RvCommon directory if running from OpenRV root"""
-    # Check if we're being run from OpenRV root directory
+    """Adjust output path to RvCommon directory if running from Visto root"""
+    # Check if we're being run from Visto root directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
     current_dir = os.getcwd()
 
     # If script is in src/lib/app/RvCommon and we're not in that directory
     if os.path.basename(script_dir) == "RvCommon" and current_dir != script_dir:
-        # Check if current directory looks like OpenRV root (has src/lib/app/RvCommon)
+        # Check if current directory looks like Visto root (has src/lib/app/RvCommon)
         rvcommon_path = os.path.join(current_dir, "src", "lib", "app", "RvCommon")
         if os.path.exists(rvcommon_path):
             # Only adjust if output path is just a filename (no directory)
@@ -100,17 +100,17 @@ def adjust_output_path(output_file: str) -> str:
 
 
 def adjust_config_path(config_file: Optional[str]) -> Optional[str]:
-    """Adjust config file path to RvCommon directory if running from OpenRV root"""
+    """Adjust config file path to RvCommon directory if running from Visto root"""
     if not config_file:
         return config_file
 
-    # Check if we're being run from OpenRV root directory
+    # Check if we're being run from Visto root directory
     script_dir = os.path.dirname(os.path.abspath(__file__))
     current_dir = os.getcwd()
 
     # If script is in src/lib/app/RvCommon and we're not in that directory
     if os.path.basename(script_dir) == "RvCommon" and current_dir != script_dir:
-        # Check if current directory looks like OpenRV root (has src/lib/app/RvCommon)
+        # Check if current directory looks like Visto root (has src/lib/app/RvCommon)
         rvcommon_path = os.path.join(current_dir, "src", "lib", "app", "RvCommon")
         if os.path.exists(rvcommon_path):
             # Only adjust if config path is just a filename (no directory)
@@ -402,10 +402,10 @@ def generate_theme(
     """Generate a theme file"""
     logger.info(f"Generating theme: {output_file}")
 
-    # Adjust output path if running from OpenRV root
+    # Adjust output path if running from Visto root
     output_file = adjust_output_path(output_file)
 
-    # Adjust config path if running from OpenRV root
+    # Adjust config path if running from Visto root
     config_file = adjust_config_path(config_file)
 
     # Automatically select template based on platform
@@ -448,7 +448,7 @@ def generate_theme(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate an OpenRV theme from template (auto-detects platform)",
+        description="Generate an Visto theme from template (auto-detects platform)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

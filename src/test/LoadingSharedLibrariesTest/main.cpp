@@ -22,7 +22,7 @@ using namespace TwkUtil;
 // Simple way to communication CLI param with the tests
 std::string g_filename;
 
-// The 'LD_LIBRARY_PATH' is mandatory for the RV app under Linux
+// The 'LD_LIBRARY_PATH' is mandatory for the Visto.app under Linux
 // let's check it is defined.
 TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable") { REQUIRE(getenv("LD_LIBRARY_PATH")); }
 

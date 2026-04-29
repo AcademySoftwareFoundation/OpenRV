@@ -455,7 +455,7 @@ int utf8Main(int argc, char* argv[])
                  <<
                     endl;
             cout << "RV-Version: " << p.rvversion << endl;
-            cout << "OpenRV-Version: " << p.openrvversion << endl;
+            cout << "Visto-Version: " << p.openrvversion << endl;
             cout << "Hidden: " << (p.hidden ? "YES" : "NO") << endl;
             cout << "System: " << (p.system ? "YES" : "NO") << endl;
             cout << "Optional: " << (p.optional ? "YES" : "NO") << endl;

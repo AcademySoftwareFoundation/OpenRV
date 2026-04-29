@@ -1,4 +1,4 @@
-name: OpenRV macOS
+name: Visto macOS
 
 on:
   workflow_call:

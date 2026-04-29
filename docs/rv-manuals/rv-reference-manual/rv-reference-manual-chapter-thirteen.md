@@ -142,7 +142,7 @@ The first word indicates a standard message. The next word (34) indicates the le
 | space character | - |
 | UTF-8 string | The string event returnContents(). This is the value set by setReturnContents() on the event object in Mu or Python. |
 
-Table 13.8:RETURN MessageGenerally, when a RETURNEVENT is sent to your application, a RETURN should be sent back because the other side may be blocked waiting. It's ok to send an empty RETURN. Normally, RV will not send EVENT or RETURNEVENT messages to other non-RV applications. However, it's possible that this could happen while connected to an RV that is also engaged in a sync session with another RV.Finally a DISCONNECT message comes with no additional data and signals that the connection should be closed.
+Table 13.8:RETURN MessageGenerally, when a RETURNEVENT is sent to your application, a RETURN should be sent back because the other side may be blocked waiting. It's ok to send an empty RETURN. Normally, RV will not send EVENT or RETURNEVENT messages to other non-Visto.applications. However, it's possible that this could happen while connected to an RV that is also engaged in a sync session with another RV.Finally a DISCONNECT message comes with no additional data and signals that the connection should be closed.
 
 ##### Ping and Pong Messages
 

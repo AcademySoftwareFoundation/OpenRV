@@ -183,8 +183,8 @@ string scarfFile(const string& fileName)
     return buffer.str();
 }
 
-#define EXECUTABLE_SHORT_NAME "rv"
-#define EXECUTABLE_SHORT_NAME_CAPS "RV"
+#define EXECUTABLE_SHORT_NAME "visto"
+#define EXECUTABLE_SHORT_NAME_CAPS "Visto"
 
 TwkApp::QTBundle bundle(EXECUTABLE_SHORT_NAME, MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 
@@ -609,7 +609,7 @@ int utf8Main(int argc, char* argv[])
 
     Rv::RvApplication* rvapp = new Rv::RvApplication(argc, argv);
 
-    rvapp->setExecutableNameCaps("RV");
+    rvapp->setExecutableNameCaps("Visto");
 
     app->installEventFilter(rvapp);
     app->setQuitOnLastWindowClosed(true);

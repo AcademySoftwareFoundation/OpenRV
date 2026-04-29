@@ -1,6 +1,6 @@
 # Chapter 5 - The Session and the Session Manager
 
-### 5.1 Open RV Session
+### 5.1 Visto Session
 
 Each viewer window represents an RV session. A session is composed of one or more source movies, frame markers, image transforms, color corrections, and interactive states (like caching and playback speed). The source movies are combined according to the session type. The default RV session type is \`\`sequence,'' which plays back the source movies one after another.
 

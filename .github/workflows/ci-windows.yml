@@ -1,4 +1,4 @@
-name: OpenRV Windows
+name: Visto Windows
 
 on:
   workflow_call:

@@ -1318,7 +1318,7 @@ int utf8Main(int argc, char* argv[])
             opts.tgaIOMethod, opts.tgaIOSize, "-init %S", &initscript, "Override init script", "-err-to-out", ARG_FLAG(&err2out),
             "Output errors to standard output (instead of standard error)", "-strictlicense", ARG_FLAG(&strictlicense),
             "Exit rather than consume an RV license if no rvio licenses are "
-            "available (this param is simply ignored for Open RV as it is not "
+            "available (this param is simply ignored for Visto as it is not "
             "required)",
             //"-noprerender", ARG_FLAG(&noprerender), "Turn off prerendering
             // optimization",

@@ -7,7 +7,7 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "rvpush"
+    "vistopush"
 )
 
 SET(CMAKE_AUTOUIC

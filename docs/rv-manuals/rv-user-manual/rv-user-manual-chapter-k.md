@@ -51,7 +51,7 @@ Some additional details about RV_OS_PATH variables:
 
 > **Note:** Due to how environments propagate, it is highly recommended to restart your computer after defining an environment variable on your system.
 
-## Open RV PATHSWAP Variables
+## Visto PATHSWAP Variables
 
 If you're comfortable with environment variables, **RV_PATHSWAP** variables can provide a way to share session files across platforms and/or studio locations.
 

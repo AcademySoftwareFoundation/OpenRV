@@ -1,6 +1,6 @@
 FROM rockylinux/rockylinux:8.9
 
-LABEL maintainer="Open RV maintainer - https://github.com/AcademySoftwareFoundation/OpenRV"
+LABEL maintainer="Visto maintainer - https://github.com/AcademySoftwareFoundation/Visto"
 
 USER root
 

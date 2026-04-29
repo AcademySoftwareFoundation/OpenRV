@@ -14,11 +14,11 @@ require io;
 require qt;
 
 documentation: """
-OpenRVHelpMenuMinorMode adds a Help menu and some modal event tables that
+VistoHelpMenuMinorMode adds a Help menu and some modal event tables that
 implement things like describe key, etc. Help minor mode should always
 appear list in the menu bar.
 """
-class: OpenRVHelpMenuMinorMode : MinorMode
+class: VistoHelpMenuMinorMode : MinorMode
 {
     \: showManual (void; Event ev, string env)
     {
@@ -131,17 +131,17 @@ class: OpenRVHelpMenuMinorMode : MinorMode
 
     \: inactiveState (int;) { DisabledMenuState; }
 
-    method: OpenRVHelpMenuMinorMode (OpenRVHelpMenuMinorMode;)
+    method: VistoHelpMenuMinorMode (VistoHelpMenuMinorMode;)
     {
         Menu menuList = newMenu(MenuItem[] {
                 menuText("Online Resources"),
                 menuItem("   RV User's Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-user-manual/rv-user-manual-chapter-one.html"), enabledItem),
                 menuItem("   RV Reference Manual", "", "help_category", opUrl(,"https://aswf-openrv.readthedocs.io/en/latest/rv-manuals/rv-reference-manual/rv-reference-manual-chapter-one.html"), enabledItem),
-                menuItem("   Mu User's Manual", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-mu-programming.md"), enabledItem),
+                menuItem("   Mu User's Manual", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/Visto/blob/main/docs/rv-manuals/rv-mu-programming.md"), enabledItem),
                 menuSeparator(),
-                menuItem("   GTO File Format (.rv files)", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/docs/rv-manuals/rv-gto.md"), enabledItem),
+                menuItem("   GTO File Format (.rv files)", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/Visto/blob/main/docs/rv-manuals/rv-gto.md"), enabledItem),
                 menuSeparator(),
-                menuItem("   Academy Software Foundation Open RV", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/OpenRV"), enabledItem),
+                menuItem("   Academy Software Foundation Visto", "", "help_category", opUrl(,"https://github.com/AcademySoftwareFoundation/Visto"), enabledItem),
                 menuSeparator(),
                 menuText("Other Resource"),
                 menuItem("   Mu Command API Browser...", "", "help_category", docbrowser, enabledItem),
@@ -257,7 +257,7 @@ class: OpenRVHelpMenuMinorMode : MinorMode
 
 \: createMode (Mode;)
 {
-    return OpenRVHelpMenuMinorMode();
+    return VistoHelpMenuMinorMode();
 }
 
 }

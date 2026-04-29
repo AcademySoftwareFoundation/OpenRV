@@ -47,7 +47,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2023")
     ENDIF()
   ENDIF()
 
-  # Imath Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
+  # Imath Can find the build version in Visto/_build/RV_DEPS_IMATH/install/lib/
   SET(RV_DEPS_IMATH_VERSION
       "3.1.12"
   )

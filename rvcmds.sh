@@ -158,7 +158,7 @@ __rv_update_paths() {
   RV_INST_DIR="${RV_HOME}/_install${RV_PATH_SUFFIX}"
   RV_APP_DIR="${RV_BUILD_DIR}/stage/app/bin"
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    RV_APP_DIR="${RV_BUILD_DIR}/stage/app/RV.app/Contents/MacOS"
+    RV_APP_DIR="${RV_BUILD_DIR}/stage/app/Visto.app/Contents/MacOS"
   fi
 }
 
@@ -358,7 +358,7 @@ alias rvclean='rvhomedir && __rv_clean_build'
 alias rvresenv='rvhomedir && ( [ -n "$VIRTUAL_ENV" ] && deactivate || true ) && rm -rf .venv && rvenv && rvsetup'
 alias rvmk='rvcfg && rvbuild'
 alias rvbootstrap='rvsetup && rvmk'
-alias rvrun='rvappdir && ./rv'
+alias rvrun='rvappdir && ./visto'
 alias rverrors='less ${RV_BUILD_DIR}/build_errors.log'
 alias rverrsummary='cat ${RV_BUILD_DIR}/error_summary.txt 2>/dev/null || echo "No error summary found. Build may have succeeded or not run yet."'
 

@@ -8,7 +8,7 @@ INCLUDE(cxx_defaults)
 INCLUDE(CPack)
 
 SET(_target
-    "RV"
+    "Visto"
 )
 
 FIND_PACKAGE(

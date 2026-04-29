@@ -1,5 +1,5 @@
-name: Build OpenRV on Linux
-description: Build and test OpenRV on Rocky Linux
+name: Build Visto on Linux
+description: Build and test Visto on Rocky Linux
 
 inputs:
   rocky-version:
@@ -155,7 +155,7 @@ runs:
       shell: bash
 
     - name: Add repository as safe directory
-      run: git config --global --add safe.directory /__w/OpenRV/OpenRV
+      run: git config --global --add safe.directory /__w/Visto/Visto
       shell: bash
 
     - name: Install pyenv
@@ -254,7 +254,7 @@ runs:
         cargo --version
       shell: bash
 
-    # For Rocky Linux, we can't cache the dependencies of Open RV
+    # For Rocky Linux, we can't cache the dependencies of Visto
     # because there is not enough room in the cache (10GB limit) for all platforms.
     # ccache is used for this run only (not stored in Actions cache) to speed up the build.
     # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
@@ -271,27 +271,27 @@ runs:
     #     max-size: 2G
     #     verbose: 2
 
-    - name: Configure OpenRV
+    - name: Configure Visto
       if: ${{ inputs.vfx-platform == 'CY2023' }}
       run: |
         cmake --version
-        export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ inputs.qt-version}}/gcc_64
+        export QT_HOME=/__w/Visto/Visto/deps/Qt/${{ inputs.qt-version}}/gcc_64
         cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
       shell: bash
 
-    - name: Configure OpenRV
+    - name: Configure Visto
       if: ${{ inputs.vfx-platform == 'CY2024' }}
       run: |
         cmake --version
-        export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ inputs.qt-version}}/gcc_64
+        export QT_HOME=/__w/Visto/Visto/deps/Qt/${{ inputs.qt-version}}/gcc_64
         cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
       shell: bash
 
-    - name: Build OpenRV dependencies
+    - name: Build Visto dependencies
       run: cmake --build _build --config ${{ inputs.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
       shell: bash
 
-    - name: Build OpenRV main executable
+    - name: Build Visto main executable
       run: cmake --build _build --config ${{ inputs.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
       shell: bash
 
@@ -305,6 +305,6 @@ runs:
         rm -rf _build/_deps
       shell: bash
 
-    - name: Install OpenRV
+    - name: Install Visto
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: bash

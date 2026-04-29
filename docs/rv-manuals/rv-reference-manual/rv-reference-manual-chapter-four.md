@@ -24,7 +24,7 @@ or
  import rv.commands 
 ```
 
-### Open RV Python quickstart
+### Visto Python quickstart
 
 In order to extend RV using Python you will be making a "mode" as part of an rvpkg package—this is identical to the way it’s done in Mu and this is the method that we use internally to add new functions to RV's interface. Creation of a modes and packages is documented later in this chapter. Here is a very simple mode written in Python which is part of the RV packages as `pyhello-1.1.rvpkg`.
 
@@ -200,7 +200,7 @@ Table 4.1:Mu-Python Value Conversion
 You can use PySide2 to make Qt interface components (RV is a Qt Application). Below is a simple pyside example using RV's py-interp.
 
 ```python
-#!/Applications/RV.app/Contents/MacOS/py-interp
+#!/Applications/Visto.app/Contents/MacOS/py-interp
 
 # Import PySide2 classes
 import sys
@@ -246,7 +246,7 @@ rvSessionTopToolBar = rv.qtutils.sessionTopToolBar()
 rvSessionBottomToolBar = rv.qtutils.sessionBottomToolBar() 
 ```
 
-### 4.5 Open RV Python Implementation FAQ
+### 4.5 Visto Python Implementation FAQ
 
 #### Can I draw on the view the way Mu does using OpenGL?
 
@@ -272,6 +272,6 @@ The Python <-> Mu bridge does not slow things down. The MuSymbol type used to in
 
 The Mu calling into Python bridge is roughly the cost of calling a Python function from C.  
 
-## Why does my external Python process (which I call from Open RV) now behave differently?  
+## Why does my external Python process (which I call from Visto) now behave differently?  
 
 This is probably caused by the fact that RV modifies the PYTHONPATH to incorporate the Python plug-in folder and RV's python standard libraries to run. Forked processes will inherit the PYTHONPATH. If you are using QProcess to launch the external process you can call `QProcess.setEnvironment()` to set the PYTHONPATH before calling `QProcess.start()`.

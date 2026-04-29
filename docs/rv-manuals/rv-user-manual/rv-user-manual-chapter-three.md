@@ -77,7 +77,7 @@ which is identical to this:
 shell> rv -gamma 0.454545454545
 ```
 
-## Troubleshooting Open RV
+## Troubleshooting Visto
 
 Launching RV from the command line is the best way to troubleshoot RV by giving you access to error messages or crash dumps.
 
@@ -85,9 +85,9 @@ You can also access the logs at the following locations:
 
 | OS | Logs location |
 | --- | --- |
-| Linux | ~/.local/share/ASWF/OpenRV/OpenRV.log |
-| macOS | ~/Library/Logs/ASWF/OpenRV.log |
-| Windows | %AppData%\Roaming\ASWF\OpenRV\OpenRV.log |
+| Linux | ~/.local/share/ASWF/Visto/Visto.log |
+| macOS | ~/Library/Logs/ASWF/Visto.log |
+| Windows | %AppData%\Roaming\ASWF\Visto\Visto.log |
 
 These logs contain anything that is written in the RV Console.
 

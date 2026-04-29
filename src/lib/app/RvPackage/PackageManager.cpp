@@ -299,7 +299,7 @@ namespace Rv
         }
 
         //
-        //  Don't read/write settings unless this is the RV app (as opposed to
+        //  Don't read/write settings unless this is the Visto.app (as opposed to
         //  rvpkg).
         //
         if (QCoreApplication::applicationName() == INTERNAL_APPLICATION_NAME)
@@ -1317,9 +1317,9 @@ namespace Rv
                         }
                     }
 
-                    static const bool isOpenRV = std::string_view(INTERNAL_APPLICATION_NAME) == "OpenRV";
+                    static const bool isVisto = std::string_view(INTERNAL_APPLICATION_NAME) == "Visto";
 
-                    package.compatible = versionCompatible(isOpenRV ? package.openrvversion : package.rvversion, TWK_DEPLOY_MAJOR_VERSION(),
+                    package.compatible = versionCompatible(isVisto ? package.openrvversion : package.rvversion, TWK_DEPLOY_MAJOR_VERSION(),
                                                            TWK_DEPLOY_MINOR_VERSION(), TWK_DEPLOY_PATCH_LEVEL());
 
                     package.zipFile = true;
@@ -1624,7 +1624,7 @@ namespace Rv
         m_packages.clear();
 
         //
-        //  Don't read/write settings unless this is the RV app (as opposed to
+        //  Don't read/write settings unless this is the Visto.app (as opposed to
         //  rvpkg).
         //
         if (QCoreApplication::applicationName() == INTERNAL_APPLICATION_NAME)

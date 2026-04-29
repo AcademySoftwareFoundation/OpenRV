@@ -1,4 +1,4 @@
-package: Open RV Help menu
+package: Visto Help menu
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
 version: 1.0
@@ -16,6 +16,6 @@ modes:
 description: |
 
     <p>
-    Open RV Help menu
+    Visto Help menu
     </p>
 

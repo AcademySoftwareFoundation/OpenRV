@@ -3,8 +3,8 @@
 # -- Project information
 import re
 
-project = "Open RV"
-author = "Open RV contributors"
+project = "Visto"
+author = "Visto contributors"
 
 version = "0.0"
 release = "0.0.0"
