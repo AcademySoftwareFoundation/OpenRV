@@ -5,10 +5,37 @@
 #
 import os
 import sys
-import rv.commands
-import rv.extra_commands
-import rv.runtime
-from pymu import MuSymbol
+
+import site
+
+# Find the Visto project root relative to the executable
+visto_root = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..", "..", "..", "..", "..", ".."))
+venv_fallback = os.path.join(visto_root, ".venv")
+
+possible_venvs = []
+if "VIRTUAL_ENV" in os.environ:
+    possible_venvs.append(os.environ["VIRTUAL_ENV"])
+if os.path.exists(venv_fallback):
+    possible_venvs.append(venv_fallback)
+
+py_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+for venv_path in possible_venvs:
+    site_packages = os.path.join(venv_path, "lib", py_version, "site-packages")
+    if os.path.exists(site_packages):
+        site.addsitedir(site_packages)
+        break
+
+# Add homebrew python path explicitly just in case
+homebrew_path = f"/opt/homebrew/lib/python{sys.version_info.major}.{sys.version_info.minor}/site-packages"
+if os.path.exists(homebrew_path):
+    site.addsitedir(homebrew_path)
+
+print("VISTO SYS.PATH:", sys.path)
+
+import rv.commands  # noqa: E402
+import rv.extra_commands  # noqa: E402
+import rv.runtime  # noqa: E402
+from pymu import MuSymbol  # noqa: E402
 
 all_mu_commands = [
     "insertByteProperty",
