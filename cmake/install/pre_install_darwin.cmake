@@ -83,6 +83,11 @@ MACRO(after_copy_platform FILE_PATH FILES_TO_FIX_RPATH)
 ENDMACRO()
 
 MACRO(post_install_platform)
+  IF(RV_USE_SYSTEM_DEPS)
+    MESSAGE(STATUS "RV_USE_SYSTEM_DEPS is ON, skipping post-install RPATH cleanup to preserve system library links.")
+    RETURN()
+  ENDIF()
+
   SET(_output_file_to_fix_
       "${RV_DEPS_BASE_DIR}/files_to_fix.txt"
   )

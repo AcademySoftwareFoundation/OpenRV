@@ -10,6 +10,7 @@ set -e
 # Default settings
 BUILD_TYPE="Release"
 CLEAN_BUILD=0
+INSTALL=0
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -17,12 +18,14 @@ while [[ "$#" -gt 0 ]]; do
         --debug) BUILD_TYPE="Debug"; shift ;;
         --release) BUILD_TYPE="Release"; shift ;;
         --clean) CLEAN_BUILD=1; shift ;;
+        --install) INSTALL=1; shift ;;
         -h|--help)
             echo "Usage: ./build.sh [OPTIONS]"
             echo "Options:"
             echo "  --debug    Build in Debug mode"
             echo "  --release  Build in Release mode (default)"
             echo "  --clean    Remove build directory and virtual environment before building"
+            echo "  --install  Install the build to the _install directory"
             exit 0
             ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
@@ -31,6 +34,7 @@ done
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${PROJECT_ROOT}/_build"
+INST_DIR="${PROJECT_ROOT}/_install"
 VENV_DIR="${PROJECT_ROOT}/.venv"
 
 echo "=== Visto Build Script ==="
@@ -125,7 +129,15 @@ cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel "${PARALLELISM}
 echo "Building main_executable target..."
 cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel "${PARALLELISM}" --target main_executable
 
+if [ "${INSTALL}" -eq 1 ]; then
+    echo "--- Installing Visto ---"
+    cmake --install "${BUILD_DIR}" --prefix "${INST_DIR}" --config "${BUILD_TYPE}"
+fi
+
 echo "=== Build Complete ==="
+if [ "${INSTALL}" -eq 1 ]; then
+    echo "Installed to: ${INST_DIR}"
+fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Executable is at: ${BUILD_DIR}/stage/app/Visto.app/Contents/MacOS/visto"
 else
