@@ -1777,7 +1777,7 @@ namespace TwkMovie
         {
         case 270:
         case -90:
-            track->fb.setOrientation(FrameBuffer::BOTTOMRIGHT);
+            track->fb.setOrientation(FrameBuffer::TOPLEFT);
             track->rotate = yuvPlanar;
             rotate = true;
             break;

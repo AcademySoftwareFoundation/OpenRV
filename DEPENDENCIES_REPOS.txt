@@ -1,0 +1,22 @@
+# Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
+# atomic_ops https://github.com/ivmai/libatomic_ops
+# dav1d https://github.com/videolan/dav1d
+# doctest https://github.com/doctest/doctest
+# expat https://github.com/libexpat/libexpat
+# ffmpeg https://github.com/FFmpeg/FFmpeg
+# gc https://github.com/ivmai/bdwgc
+# glew https://github.com/nigels-com/glew
+# imgui https://github.com/ocornut/imgui implot https://github.com/epezent/implot backend-qt https://github.com/dpaulat/imgui-backend-qt
+# jpegturbo https://github.com/libjpeg-turbo/libjpeg-turbo TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake to fully integrate new versioning
+# oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
+# openjpeg https://github.com/uclouvain/openjpeg
+# openjph https://github.com/aous72/OpenJPH
+# otio https://github.com/AcademySoftwareFoundation/OpenTimelineIO
+# pcre2 https://github.com/PCRE2Project/pcre2
+# png https://github.com/glennrp/libpng
+# raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
+# https://github.com/LibRaw/LibRaw/blob/0.21-stable/libraw/libraw_version.h
+# spdlog https://github.com/gabime/spdlog
+# tiff https://gitlab.com/libtiff/libtiff
+# webp https://github.com/webmproject/libwebp
+# zlib https://github.com/madler/zlib
