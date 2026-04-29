@@ -86,7 +86,8 @@ namespace Mu
         ClassInstance* o = NODE_ARG_OBJECT(0, ClassInstance);
         const Node* n = 0;
 
-        for (size_t i = 1; n = NODE_THIS.argNode(i); i++)
+        for (size_t i = 1; (n = NODE_THIS.argNode(i)); i++)
+
         {
             o->fieldType(i - 1)->nodeEval(o->field(i - 1), n, NODE_THREAD);
         }

@@ -198,7 +198,7 @@ namespace Mu
 
         List list(static_cast<const ListType*>(NODE_THIS.type()), NODE_THREAD, NODE_THIS.argNode(0));
 
-        for (size_t i = 1; n = NODE_THIS.argNode(i); i++)
+        for (size_t i = 1; (n = NODE_THIS.argNode(i)); i++)
         {
             list.append(NODE_THREAD, NODE_THIS.argNode(i));
         }

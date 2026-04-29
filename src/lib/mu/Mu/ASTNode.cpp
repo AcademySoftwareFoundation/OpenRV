@@ -195,7 +195,7 @@ namespace Mu
 
         for (const ScopeState* ss = scope; ss; ss = ss->parent)
         {
-            if (t = ss->symbol->findSymbolOfTypeByQualifiedName<Type>(uname))
+            if ((t = ss->symbol->findSymbolOfTypeByQualifiedName<Type>(uname)))
             {
                 break;
             }

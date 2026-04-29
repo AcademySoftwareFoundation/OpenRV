@@ -55,7 +55,7 @@ namespace Mu
         Pointer _Pointer;
         Name::Ref _name;
 
-        Value() { memset(this, 0, sizeof(Value)); }
+        Value() : _Vector4f() {}
 
         explicit Value(const Vector4f& v) { assignOp(_Vector4f, v); }
 
@@ -115,7 +115,7 @@ namespace Mu
         T t;
     };
 
-    inline Value::Value(const Value& v) { memcpy(this, &v, sizeof(Value)); }
+    inline Value::Value(const Value& v) = default;
 
     // template <typename T> T Value::as() const { return reinterpret_cast<const
     // Valign<T>*>(this)->t; } template <typename T> T& Value::as() { return
@@ -139,7 +139,7 @@ namespace Mu
 
     inline void zero(Value& v)
     {
-        memset(&v, 0, sizeof(v));
+        v = Value();
         // assignOp(v._Vector4f, 0.f);
     }
 
