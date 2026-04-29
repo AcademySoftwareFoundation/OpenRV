@@ -138,8 +138,9 @@ runs:
         until [ $retry_count -ge $max_retries ]; do
           echo "Attempt $((retry_count + 1)) of $max_retries"
 
-          if brew install --formula ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python yasm clang-format black meson nasm pkg-config glew ccache && \
-             brew install --formula icu4c; then
+          if brew install --formula \
+             ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python@3.14 yasm clang-format black meson nasm pkg-config glew ccache \
+             ffmpeg openexr imath opencolorio libraw libtiff libpng boost openimageio openjpeg webp yaml-cpp spdlog icu4c openjph jpeg-turbo; then
             echo "Homebrew dependencies installed successfully"
             break
           else
@@ -212,7 +213,7 @@ runs:
       run: |
         which cmake
         cmake --version
-        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }} -DRV_USE_SYSTEM_DEPS=ON
       shell: bash
 
     - name: Configure OpenRV
@@ -220,7 +221,7 @@ runs:
       run: |
         which cmake
         cmake --version
-        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
+        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }} -DRV_USE_SYSTEM_DEPS=ON
       shell: bash
 
     - name: Build OpenRV dependencies

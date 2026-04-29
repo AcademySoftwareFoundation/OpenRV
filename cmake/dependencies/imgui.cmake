@@ -4,16 +4,18 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(imgui QUIET)
+  IF(imgui_FOUND)
+    MESSAGE(STATUS "Using system imgui")
+    RETURN()
+  ENDIF()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "${RV_DEPS_IMGUI_VERSION}" "" "")
-RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 SET(_imgui_download_url
-    "https://github.com/pthom/imgui/archive/refs/tags/${_version}.zip"
-)
-
-# Hashes for verification (replace with actual hash values)
-SET(_imgui_download_hash
-    ${RV_DEPS_IMGUI_DOWNLOAD_HASH}
+    "https://github.com/ocornut/imgui/archive/refs/tags/${_version}.zip"
 )
 
 # There is no version suffix for imgui library name.
@@ -43,10 +45,10 @@ ELSE()
   )
 ENDIF()
 
-# Download implot into a separate directory
+# Download implot from official repo
 EXTERNALPROJECT_ADD(
   implot_download
-  GIT_REPOSITORY "https://github.com/pthom/implot.git"
+  GIT_REPOSITORY "https://github.com/epezent/implot.git"
   GIT_TAG ${RV_DEPS_IMPLOT_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
@@ -59,12 +61,7 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-SET(_patch_command_for_imgui_backend_qt
-    # This patch is needed to make the backend compatible with Qt 5 and Qt 6.
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_impl_qt.cpp.patch
-)
-
-# Download imgui_backend_qt into a separate directory
+# Download imgui_backend_qt (still using dpaulat as it's the standard for Qt integration)
 EXTERNALPROJECT_ADD(
   imgui_backend_qt_download
   GIT_REPOSITORY "https://github.com/dpaulat/imgui-backend-qt.git"
@@ -80,10 +77,10 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_DOWNLOAD TRUE
 )
 
-# Download imgui-node-editor into a separate directory Using imgui-node-editor fork from imgui-bundle repository.
+# Download imgui-node-editor from official repo
 EXTERNALPROJECT_ADD(
   imgui_node_editor_download
-  GIT_REPOSITORY "https://github.com/pthom/imgui-node-editor.git"
+  GIT_REPOSITORY "https://github.com/thedmd/imgui-node-editor.git"
   GIT_TAG ${RV_DEPS_IMGUI_NODE_EDITOR_TAG}
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
@@ -100,23 +97,12 @@ SET(_qt_location
     ${RV_DEPS_QT_LOCATION}
 )
 SET(_find_qt_version
-    "Qt${RV_DEPS_QT_MAJOR}"
-)
-IF(NOT _qt_location)
-  SET(_qt_major
-      ${RV_DEPS_QT_MAJOR}
-  )
-  MESSAGE(FATAL_ERROR "Qt is not found in path \"${_qt_location}\". Please provide -DRV_DEPS_QT_LOCATION=<path> to CMake.")
-ENDIF()
-
-SET(_patch_command_for_imgui
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_cpp_h.patch
+    "Qt6"
 )
 
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_imgui_download_url}
-  URL_MD5 ${_imgui_download_hash}
   DOWNLOAD_NAME ${_target}_${_version}.zip
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
@@ -125,8 +111,7 @@ EXTERNALPROJECT_ADD(
     ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists.txt ${CMAKE_BINARY_DIR}/${_target}/src/CMakeLists.txt && ${CMAKE_COMMAND} -E
     copy_directory ${CMAKE_BINARY_DIR}/${_target}/deps/implot ${CMAKE_BINARY_DIR}/${_target}/src/implot && ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-backend-qt/backends ${CMAKE_BINARY_DIR}/${_target}/src/backends && ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor && ${_patch_command_for_imgui_backend_qt} &&
-    ${_patch_command_for_imgui}
+    ${CMAKE_BINARY_DIR}/${_target}/deps/imgui-node-editor ${CMAKE_BINARY_DIR}/${_target}/src/imgui-node-editor
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
   INSTALL_COMMAND ${_cmake_install_command}

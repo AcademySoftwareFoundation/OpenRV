@@ -4,6 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(Qt6 REQUIRED COMPONENTS Core Widgets WebEngineCore WebEngineWidgets OpenGLWidgets Svg Network Sql Xml OpenGL)
+  MESSAGE(STATUS "Using system Qt ${Qt6_VERSION}")
+  RETURN()
+ENDIF()
+
 SET(RV_DEPS_QT_LOCATION
     ""
     CACHE STRING "Path to pre-compiled Qt6"

@@ -58,14 +58,10 @@ SET(_PYTHON_LIB_DIR
     "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
 )
 
-SET(_patch_command_for_imgui_bindings
-    patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/pybind_imgui.cpp.patch
-)
-
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "https://github.com/pthom/imgui_bundle.git"
-  GIT_TAG "76cbc64953858ff2a8699aa1f7e8c7cb77e3b17a"
+  GIT_TAG "v1.5.0"
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle
@@ -73,8 +69,7 @@ EXTERNALPROJECT_ADD(
   PATCH_COMMAND
     ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/imgui/CMakeLists_PyImGUI.cmake
     ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/CMakeLists.txt && ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_imgui_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/bindings &&
-    ${_patch_command_for_imgui_bindings}
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui/pybind_imgui_module.cpp ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle/external/imgui/bindings
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND
     ${CMAKE_COMMAND} ${_configure_options} -DCMAKE_PREFIX_PATH=$ENV{QT_HOME}/lib/cmake -DPython_ROOT=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install

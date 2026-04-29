@@ -4,7 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(spdlog REQUIRED)
+  RETURN()
+ENDIF()
+
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "make" "")
 
 SET(_download_url
     "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"

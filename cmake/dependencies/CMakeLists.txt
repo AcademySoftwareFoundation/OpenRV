@@ -50,12 +50,8 @@ IF(RV_TARGET_WINDOWS)
   INCLUDE(expat)
 ENDIF()
 
-# TODO_QT: Not generic enough.. But maybe we could use something like NOT CY2023 since after 2023, it is Qt6
-IF(RV_VFX_PLATFORM STREQUAL "CY2023")
-  INCLUDE(qt5)
-ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  INCLUDE(qt6)
-ENDIF()
+# Always use Qt6 for Visto
+INCLUDE(qt6)
 
 INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)

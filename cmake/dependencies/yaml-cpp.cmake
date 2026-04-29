@@ -4,6 +4,20 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(yaml-cpp REQUIRED)
+  IF(NOT TARGET yaml-cpp::yaml-cpp)
+    ADD_LIBRARY(yaml-cpp::yaml-cpp INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(yaml-cpp::yaml-cpp INTERFACE yaml-cpp)
+  ENDIF()
+  # Map old name 'yaml_cpp' to new name 'yaml-cpp::yaml-cpp' for compatibility
+  IF(NOT TARGET yaml_cpp)
+    ADD_LIBRARY(yaml_cpp INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(yaml_cpp INTERFACE yaml-cpp::yaml-cpp)
+  ENDIF()
+  RETURN()
+ENDIF()
+
 # ##############################################################################################################################################################
 #
 # Expose OCIO's own 'yaml_cpp' target replacing the legacy 'src/pub/yaml_cpp' folder.

@@ -1,26 +1,18 @@
-# This file contains all the packages that will be packaged with RV. Please add the license next to the package.
-# NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
-#       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
-#       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
-# NOTE: By default, all packages are built from source to ensure proper ABI compatibility with our custom Python.
-#       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
-#       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
+# Visto Python Requirements (Build Template)
+# This file is used to generate the requirements for the packaged environment.
+# We prefer latest stable versions.
 
-pip==24.0               # License: MIT License (MIT)
-setuptools==69.5.1      # License: MIT License
-wheel==0.43.0           # License: MIT License (MIT)
-numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
-# Using a fork until the main branch of OTIO merge the PR to fix a crash on windows
-# with a debug build of OpenRV.
-opentimelineio @ git+https://github.com/cedrik-fuoco-adsk/OpenTimelineIO.git@fix-windows-debug-crash # License: Other/Proprietary License (Modified Apache 2.0 License)
-PyOpenGL==3.1.7         # License: BSD License (BSD)
-PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
-
-# Additional packages required by RV and for testing the Python distribution
-
-certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
-six==1.16.0             # License: MIT License (MIT)
-packaging==24.0         # License: Apache Software License, BSD License
-requests==2.31.0        # License: Apache Software License (Apache 2.0)
-cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
-pydantic==2.7.1         # License: MIT License (MIT)
+pip
+setuptools
+wheel
+numpy
+opentimelineio
+PyOpenGL
+PyOpenGL_accelerate
+certifi
+six
+packaging
+requests
+cryptography
+pydantic
+PySide6

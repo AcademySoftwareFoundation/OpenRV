@@ -12,6 +12,25 @@
 # [OIIO -- Build instructions](https://github.com/OpenImageIO/oiio/blob/master/INSTALL.md)
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(OpenImageIO REQUIRED)
+  # Map to internal target names if they differ
+  IF(NOT TARGET OpenImageIO::OpenImageIO)
+    ADD_LIBRARY(OpenImageIO::OpenImageIO INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(OpenImageIO::OpenImageIO INTERFACE OpenImageIO::OpenImageIO)
+  ENDIF()
+  IF(NOT TARGET OpenImageIO::OpenImageIO_Util)
+    ADD_LIBRARY(OpenImageIO::OpenImageIO_Util INTERFACE IMPORTED GLOBAL)
+    # Some distributions might not have a separate Util target, or it might be named differently
+    IF(TARGET OpenImageIO::OpenImageIO_Util)
+       TARGET_LINK_LIBRARIES(OpenImageIO::OpenImageIO_Util INTERFACE OpenImageIO::OpenImageIO_Util)
+    ELSE()
+       TARGET_LINK_LIBRARIES(OpenImageIO::OpenImageIO_Util INTERFACE OpenImageIO::OpenImageIO)
+    ENDIF()
+  ENDIF()
+  RETURN()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OIIO" "${RV_DEPS_OIIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

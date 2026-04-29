@@ -8,6 +8,17 @@
 # Build instructions: https://github.com/aous72/OpenJPH/blob/master/docs/compiling.md
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(PkgConfig REQUIRED)
+  PKG_CHECK_MODULES(OPENJPH REQUIRED openjph)
+  IF(NOT TARGET OpenJph::OpenJph)
+    ADD_LIBRARY(OpenJph::OpenJph INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(OpenJph::OpenJph INTERFACE ${OPENJPH_LIBRARIES})
+    TARGET_INCLUDE_DIRECTORIES(OpenJph::OpenJph INTERFACE ${OPENJPH_INCLUDE_DIRS})
+  ENDIF()
+  RETURN()
+ENDIF()
+
 # version 2+ requires changes to IOjp2 project
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENJPH" "${RV_DEPS_OPENJPH_VERSION}" "make" "")
 IF(RV_TARGET_LINUX)

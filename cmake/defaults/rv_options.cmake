@@ -20,6 +20,8 @@ SET(RV_DEPS_DOWNLOAD_DIR
     CACHE STRING "RV's 3rd party download cache location."
 )
 
+OPTION(RV_USE_SYSTEM_DEPS "Use system-provided dependencies (brew, apt, dnf, choco) instead of building them." OFF)
+
 IF(NOT EXISTS (${RV_DEPS_BASE_DIR}))
   FILE(MAKE_DIRECTORY ${RV_DEPS_BASE_DIR})
 ENDIF()

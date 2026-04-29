@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <stl_ext/string_algo.h>
-#include <tiffiop.h>
+#include <tiffio.h>
 #include <tiffvers.h>
 #include <TwkFB/Exception.h>
 #include <TwkMath/Mat44.h>
@@ -330,20 +330,23 @@ namespace TwkFB
         //  Now the rest of the tags
         //
 
-        for (int fi = 0, nfi = tif->tif_nfields; fi < nfi; fi++)
+        int nfi = TIFFGetTagListCount(tif);
+        for (int fi = 0; fi < nfi; fi++)
         {
-            const TIFFField* const fip = tif->tif_fields[fi];
+            uint32_t tag = TIFFGetTagListEntry(tif, fi);
+            const TIFFField* const fip = TIFFFieldWithTag(tif, tag);
+            if (!fip) continue;
 
-            if (fip->field_tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
-                fip->field_tag != EXIFTAG_COLORSPACE &&
+            if (tag != TIFFTAG_ICCPROFILE && // exclude tags we handle seperately
+                tag != EXIFTAG_COLORSPACE &&
 
-                fip->field_tag != TIFFTAG_COMPRESSION && // prevent the overwriting of the compression type with numerical value
+                tag != TIFFTAG_COMPRESSION && // prevent the overwriting of the compression type with numerical value
 
-                fip->field_tag != TIFFTAG_XRESOLUTION && fip->field_tag != TIFFTAG_YRESOLUTION && fip->field_tag != TIFFTAG_SOFTWARE
-                && fip->field_tag != EXIFTAG_PIXELXDIMENSION && fip->field_tag != EXIFTAG_PIXELYDIMENSION
-                && fip->field_tag != TIFFTAG_RESOLUTIONUNIT && fip->field_tag != TIFFTAG_PLANARCONFIG &&
+                tag != TIFFTAG_XRESOLUTION && tag != TIFFTAG_YRESOLUTION && tag != TIFFTAG_SOFTWARE
+                && tag != EXIFTAG_PIXELXDIMENSION && tag != EXIFTAG_PIXELYDIMENSION
+                && tag != TIFFTAG_RESOLUTIONUNIT && tag != TIFFTAG_PLANARCONFIG &&
 
-                fip->field_tag != TIFFTAG_SUBIFD &&
+                tag != TIFFTAG_SUBIFD &&
 
                 // There are some variable length tags that require more than
                 // one argument. This is an attempt to filter those out.
@@ -353,17 +356,17 @@ namespace TwkFB
                 // see tif_dir.c _TIFFVGetField for multiple uses of va_arg()
                 // by a tag type.
 
-                (fip->field_readcount != TIFF_VARIABLE || fip->field_type == TIFF_ASCII) &&
+                (TIFFFieldReadCount(fip) != TIFF_VARIABLE || TIFFFieldDataType(fip) == TIFF_ASCII) &&
 
-                // fip->field_tag != TIFFTAG_COLORMAP &&
-                // fip->field_tag != TIFFTAG_HALFTONEHINTS &&
-                fip->field_tag != TIFFTAG_PAGENUMBER &&
-                // fip->field_tag != TIFFTAG_SUBIFD &&
-                fip->field_tag != TIFFTAG_YCBCRSUBSAMPLING &&
-                // fip->field_tag != TIFFTAG_TRANSFERFUNCTION &&
+                // tag != TIFFTAG_COLORMAP &&
+                // tag != TIFFTAG_HALFTONEHINTS &&
+                tag != TIFFTAG_PAGENUMBER &&
+                // tag != TIFFTAG_SUBIFD &&
+                tag != TIFFTAG_YCBCRSUBSAMPLING &&
+                // tag != TIFFTAG_TRANSFERFUNCTION &&
 
-                fip->field_tag != TIFFTAG_PHOTOMETRIC && fip->field_tag != TIFFTAG_IMAGEWIDTH && fip->field_tag != TIFFTAG_IMAGELENGTH
-                && fip->field_tag != TIFFTAG_BITSPERSAMPLE && fip->field_tag != TIFFTAG_SAMPLESPERPIXEL)
+                tag != TIFFTAG_PHOTOMETRIC && tag != TIFFTAG_IMAGEWIDTH && tag != TIFFTAG_IMAGELENGTH
+                && tag != TIFFTAG_BITSPERSAMPLE && tag != TIFFTAG_SAMPLESPERPIXEL)
             {
                 unsigned char ch;
                 char* text;
@@ -381,32 +384,32 @@ namespace TwkFB
                     //  EXIF
                     //
 
-                    for (unsigned int tag = exifTags[0].tag, i = 0; (tag = exifTags[i].tag) && !exif_tag; i++)
+                    for (unsigned int etag = exifTags[0].tag, i = 0; (etag = exifTags[i].tag) && !exif_tag; i++)
                     {
-                        exif_tag = (tag == fip->field_tag);
+                        exif_tag = (etag == tag);
                     }
                 }
 
-                string aname = (exif_tag ? string("EXIF/") : string("TIFF/")) + fip->field_name;
+                string aname = (exif_tag ? string("EXIF/") : string("TIFF/")) + TIFFFieldName(fip);
 
-                switch (fip->field_type)
+                switch (TIFFFieldDataType(fip))
                 {
                 case TIFF_ASCII:
-                    if (fip->field_passcount)
+                    if (TIFFFieldPassCount(fip))
                     {
-                        if (TIFFGetField(tif, fip->field_tag, &Len, &text))
+                        if (TIFFGetField(tif, tag, &Len, &text))
                         {
                             img.attribute<string>(aname) = text;
                         }
                     }
-                    else if (TIFFGetField(tif, fip->field_tag, &text))
+                    else if (TIFFGetField(tif, tag, &text))
                     {
                         img.attribute<string>(aname) = text;
                     }
                     break;
 
                 case TIFF_SHORT:
-                    if (TIFFGetField(tif, fip->field_tag, &us))
+                    if (TIFFGetField(tif, tag, &us))
                     {
                         img.attribute<int>(aname) = us;
                     }
@@ -418,12 +421,12 @@ namespace TwkFB
                     {
                         void* array = 0;
 
-                        if (TIFFGetField(tif, fip->field_tag, &ui, &array))
+                        if (TIFFGetField(tif, tag, &ui, &array))
                         {
                             img.attribute<string>(aname) = "";
                         }
                     }
-                    else if (TIFFGetField(tif, fip->field_tag, &ui))
+                    else if (TIFFGetField(tif, tag, &ui))
                     {
                         img.attribute<int>(aname) = ui;
                     }
@@ -432,7 +435,7 @@ namespace TwkFB
                 case TIFF_RATIONAL:
                 case TIFF_SRATIONAL:
                 case TIFF_FLOAT:
-                    if (TIFFGetField(tif, fip->field_tag, &f))
+                    if (TIFFGetField(tif, tag, &f))
                     {
                         img.attribute<float>(aname) = f;
                     }
@@ -444,7 +447,7 @@ namespace TwkFB
                     {
                         char* array = 0;
 
-                        if (TIFFGetField(tif, fip->field_tag, &ui, &array))
+                        if (TIFFGetField(tif, tag, &ui, &array))
                         {
                             img.attribute<string>(aname) = array;
                         }
@@ -457,12 +460,12 @@ namespace TwkFB
                     {
                         char* array = 0;
 
-                        if (TIFFGetField(tif, fip->field_tag, &ui, &array))
+                        if (TIFFGetField(tif, tag, &ui, &array))
                         {
                             img.attribute<string>(aname) = array;
                         }
                     }
-                    // if(TIFFGetField(tif, fip->field_tag, &ch))
+                    // if(TIFFGetField(tif, tag, &ch))
                     //{
                     // img.attribute<int>(aname) = ch;
                     //}

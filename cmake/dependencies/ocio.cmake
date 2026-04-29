@@ -7,6 +7,16 @@
 # Build instructions: https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(OpenColorIO REQUIRED)
+  # Map to internal target name
+  IF(NOT TARGET OpenColorIO::OpenColorIO)
+    ADD_LIBRARY(OpenColorIO::OpenColorIO INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(OpenColorIO::OpenColorIO INTERFACE OpenColorIO::OpenColorIO)
+  ENDIF()
+  RETURN()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 

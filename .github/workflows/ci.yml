@@ -22,7 +22,6 @@ on:
 
 jobs:
   detect-changes:
-    if: github.repository_owner == 'AcademySoftwareFoundation'
     runs-on: ubuntu-latest
     outputs:
       cmake_changed: ${{ steps.filter.outputs.cmake }}
@@ -38,7 +37,6 @@ jobs:
               - '**/*.cmake'
 
   linux:
-    if: github.repository_owner == 'AcademySoftwareFoundation'
     needs: detect-changes
     uses: ./.github/workflows/ci-linux.yml
     with:
@@ -48,7 +46,6 @@ jobs:
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
 
   macos:
-    if: github.repository_owner == 'AcademySoftwareFoundation'
     needs: detect-changes
     uses: ./.github/workflows/ci-macos.yml
     with:
@@ -58,7 +55,6 @@ jobs:
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
 
   windows:
-    if: github.repository_owner == 'AcademySoftwareFoundation'
     needs: detect-changes
     uses: ./.github/workflows/ci-windows.yml
     with:

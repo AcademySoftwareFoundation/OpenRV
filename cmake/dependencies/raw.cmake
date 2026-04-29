@@ -9,6 +9,17 @@
 # https://www.libraw.org/docs/Install-LibRaw-eng.html
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(PkgConfig REQUIRED)
+  PKG_CHECK_MODULES(LIBRAW REQUIRED libraw)
+  IF(NOT TARGET LibRaw::raw)
+    ADD_LIBRARY(LibRaw::raw INTERFACE IMPORTED GLOBAL)
+    TARGET_LINK_LIBRARIES(LibRaw::raw INTERFACE ${LIBRAW_LIBRARIES})
+    TARGET_INCLUDE_DIRECTORIES(LibRaw::raw INTERFACE ${LIBRAW_INCLUDE_DIRS})
+  ENDIF()
+  RETURN()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_RAW" "${RV_DEPS_RAW_VERSION}" "make" "../src/configure")
 IF(RV_TARGET_LINUX)
   # Overriding _lib_dir created in 'RV_CREATE_STANDARD_DEPS_VARIABLES' since this CMake-based project isn't using lib64

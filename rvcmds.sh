@@ -21,36 +21,8 @@ if [[ $SOURCED == 0 ]]; then
   exit 1
 fi
 
-__rv_select_vfx_platform() {
-  # If RV_VFX_PLATFORM is already set to a valid value, use it.
-  if [[ "$RV_VFX_PLATFORM" =~ ^CY202(3|4|5|6)$ ]]; then
-    echo "RV_VFX_PLATFORM already set to $RV_VFX_PLATFORM."
-    return
-  fi
-
-  # If it's set to something invalid, unset it and prompt.
-  if [ -n "$RV_VFX_PLATFORM" ]; then
-    echo "Invalid RV_VFX_PLATFORM: '$RV_VFX_PLATFORM'. Please choose a valid option."
-    unset RV_VFX_PLATFORM
-  fi
-
-  while [ -z "$RV_VFX_PLATFORM" ]; do
-    echo "Please select the VFX Platform year to build for:"
-    PS3="Enter a number: "
-    select opt in CY2023 CY2024 CY2025 CY2026; do
-      if [[ -n "$opt" ]]; then
-        export RV_VFX_PLATFORM=$opt
-        echo "Using VFX Platform: $RV_VFX_PLATFORM"
-        break
-      else
-        echo "Invalid selection. Please try again."
-      fi
-    done
-  done
-}
-
-__rv_select_vfx_platform
-
+# Always use latest supported platform (Qt6)
+export RV_VFX_PLATFORM="CY2026"
 
 # Linux
 if [[ "$OSTYPE" == "linux"* ]]; then
@@ -61,7 +33,8 @@ if [[ "$OSTYPE" == "linux"* ]]; then
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   CMAKE_GENERATOR="${CMAKE_GENERATOR:-Ninja}"
   RV_TOOLCHAIN=""
-  export PATH="/opt/homebrew/opt/python@3.11/libexec/bin:$PATH" 
+  # Use brew python 3.14 or latest
+  export PATH="/opt/homebrew/opt/python@3.14/libexec/bin:/opt/homebrew/bin:$PATH" 
 
 # Windows
 elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
@@ -81,75 +54,27 @@ if [ -z "$QT_HOME" ]; then
   echo "Searching for Qt installation..."
 
   if [[ "$OSTYPE" == "linux"* ]]; then
-    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
-      QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-      QT_VERSION="6.8"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
-      QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-      QT_VERSION="6.5"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
-      QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/gcc_64' | sort -V | tail -n 1)
-      QT_VERSION="5.15"
-    fi
+    # Prefer system or standard paths
+    QT_HOME=$(find /usr/lib64/qt6 /usr/lib/qt6 ~/Qt*/6.* -maxdepth 4 -type d -path '*/gcc_64' 2>/dev/null | sort -V | tail -n 1)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
-    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
-      QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-      if [ -z "$QT_HOME" ]; then
-        QT_HOME=$(find ~/Qt*/6.8.* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-      fi
-      QT_VERSION="6.8"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
-      QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-      if [ -z "$QT_HOME" ]; then
-        QT_HOME=$(find ~/Qt*/6.5* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-      fi
-      QT_VERSION="6.5"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
-      QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/macos' | sort -V | tail -n 1)
-      if [ -z "$QT_HOME" ]; then
-        QT_HOME=$(find ~/Qt*/5.15* -maxdepth 4 -type d -path '*/clang_64' | sort -V | tail -n 1)
-      fi
-      QT_VERSION="5.15"
+    # Prefer brew install qt
+    if [ -d "/opt/homebrew/opt/qt/lib/cmake/Qt6" ]; then
+      QT_HOME="/opt/homebrew/opt/qt"
+    else
+      QT_HOME=$(find /opt/homebrew/Cellar/qt/*/lib/cmake/Qt6 -maxdepth 0 2>/dev/null | sort -V | tail -n 1 | sed 's|/lib/cmake/Qt6||')
+    fi
+    # Fallback to online installer
+    if [ -z "$QT_HOME" ]; then
+      QT_HOME=$(find ~/Qt*/6.* -maxdepth 4 -type d -path '*/macos' 2>/dev/null | sort -V | tail -n 1)
     fi
   elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
-    if [[ "$RV_VFX_PLATFORM" == "CY2026" ]]; then
-      QT_HOME=$(find c:/Qt*/6.8* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-      QT_VERSION="6.8"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2025" || "$RV_VFX_PLATFORM" == "CY2024" ]]; then
-      QT_HOME=$(find c:/Qt*/6.5* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-      QT_VERSION="6.5"
-    elif [[ "$RV_VFX_PLATFORM" == "CY2023" ]]; then
-      QT_HOME=$(find c:/Qt*/5.15* -maxdepth 4 -type d -path '*/msvc2019_64' | sort -V | tail -n 1)
-      QT_VERSION="5.15"
-    fi
+    QT_HOME=$(find c:/Qt*/6.* -maxdepth 4 -type d -path '*/msvc2019_64' 2>/dev/null | sort -V | tail -n 1)
   fi
 
   if [ -n "$QT_HOME" ]; then
-    echo "Found Qt $QT_VERSION installation at $QT_HOME"
+    echo "Found Qt installation at $QT_HOME"
   else
-    echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."
-    echo "Could not find required Qt installation. Please set QT_HOME to the correct path in your environment variables."
-  fi
- 
-# Qt installation path already set
-else 
-  if [[ $QT_HOME == *"6.8"* ]]; then
-    echo "Using Qt 6.8 installation already set at $QT_HOME"
-    if [[ "$RV_VFX_PLATFORM" != "CY2026" ]]; then
-        echo "Warning: QT_HOME is set to a Qt 6.8 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
-    fi
-  elif [[ $QT_HOME == *"6.5"* ]]; then
-    echo "Using Qt 6.5 installation already set at $QT_HOME"
-    if [[ "$RV_VFX_PLATFORM" != "CY2024" && "$RV_VFX_PLATFORM" != "CY2025" ]]; then
-        echo "Warning: QT_HOME is set to a Qt 6.5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
-    fi
-  elif [[ $QT_HOME == *"5.15"* ]]; then
-    echo "Using Qt 5.15 installation already set at $QT_HOME"
-    if [[ "$RV_VFX_PLATFORM" != "CY2023" ]]; then
-        echo "Warning: QT_HOME is set to a Qt5 path, but RV_VFX_PLATFORM is $RV_VFX_PLATFORM."
-    fi
-  else
-    echo "Warning: Could not determine Qt version from path: $QT_HOME. Assuming it is compatible."
+    echo "Error: Could not find required Qt 6 installation. Please set QT_HOME to the correct path."
   fi
 fi
 
@@ -165,24 +90,27 @@ if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$QT_HOME" ] && command -v xcodebuild >/
   fi
 fi
 
-# Must be executed in a function as it changes the shell environment
+# Use uv for blazing fast python environments
 __rv_env_shell() {
-  local activate_path=".venv/bin/activate"
-
-  # Using msys2/cygwin as a way to detect if the script is running on Windows.
-  if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
-    activate_path=".venv/Scripts/activate"
-  fi
-
-  # Deactivate first if already in a virtual environment to ensure fresh activation
+  # Deactivate first if already in a virtual environment
   if [ -n "$VIRTUAL_ENV" ]; then
     deactivate 2>/dev/null || true
   fi
 
-  if [ -d ".venv" ]; then
-    source "$activate_path"
+  if command -v uv >/dev/null 2>&1; then
+    if [ ! -d ".venv" ]; then
+      uv venv .venv --python 3.14
+    fi
+    source .venv/bin/activate
   else
-    python3 -m venv .venv
+    echo "uv not found, falling back to venv. Install uv for faster environment setup!"
+    local activate_path=".venv/bin/activate"
+    if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
+      activate_path=".venv/Scripts/activate"
+    fi
+    if [ ! -d ".venv" ]; then
+      python3 -m venv .venv
+    fi
     source "$activate_path"
   fi
   
@@ -416,13 +344,14 @@ __rv_build_with_errors() {
 alias rvappdir='cd ${RV_APP_DIR}'
 alias rvhomedir='cd ${RV_HOME}'
 alias rvenv='rvhomedir && __rv_env_shell'
-alias rvsetup='rvenv && SETUPTOOLS_USE_DISTUTILS=${SETUPTOOLS_USE_DISTUTILS} python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt'
-alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -DRV_DEPS_QT_LOCATION=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL}'
+alias rvsetup='rvenv && if command -v uv >/dev/null 2>&1; then uv pip install --upgrade -r ${RV_HOME}/requirements.txt; else python3 -m pip install --upgrade -r ${RV_HOME}/requirements.txt; fi'
+alias rvcfg='rvhomedir && rvenv && cmake -B ${RV_BUILD_DIR} -G "${CMAKE_GENERATOR}" ${RV_TOOLCHAIN} ${CMAKE_WIN_ARCH} -DCMAKE_BUILD_TYPE=${RV_BUILD_TYPE} -DRV_DEPS_QT_LOCATION=${QT_HOME} -DRV_VFX_PLATFORM=${RV_VFX_PLATFORM} -DRV_DEPS_WIN_PERL_ROOT=${WIN_PERL} -DRV_USE_SYSTEM_DEPS=ON'
 alias rvbuildt='rvenv && __rv_build_with_errors'
 alias rvbuild='rvenv && rvbuildt main_executable'
 alias rvtest='rvenv && ctest --test-dir ${RV_BUILD_DIR} --extra-verbose'
 alias rvinst='rvenv && cmake --install ${RV_BUILD_DIR} --prefix ${RV_INST_DIR} --config ${RV_BUILD_TYPE}'
 alias rvclean='rvhomedir && __rv_clean_build'
+alias rvresenv='rvhomedir && ( [ -n "$VIRTUAL_ENV" ] && deactivate || true ) && rm -rf .venv && rvenv && rvsetup'
 alias rvmk='rvcfg && rvbuild'
 alias rvbootstrap='rvsetup && rvmk'
 alias rvrun='rvappdir && ./rv'

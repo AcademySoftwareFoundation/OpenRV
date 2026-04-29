@@ -4,6 +4,24 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(Imath REQUIRED)
+  FIND_PACKAGE(OpenEXR REQUIRED)
+  
+  # Map system targets to our expected names if they differ
+  IF(NOT TARGET OpenEXR::OpenEXR)
+     ADD_LIBRARY(OpenEXR::OpenEXR INTERFACE IMPORTED GLOBAL)
+     TARGET_LINK_LIBRARIES(OpenEXR::OpenEXR INTERFACE OpenEXR::OpenEXR_Libraries)
+  ENDIF()
+  
+  IF(NOT TARGET Imath::Imath)
+     ADD_LIBRARY(Imath::Imath INTERFACE IMPORTED GLOBAL)
+     TARGET_LINK_LIBRARIES(Imath::Imath INTERFACE Imath::Imath)
+  ENDIF()
+
+  RETURN()
+ENDIF()
+
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
 
 SET(_make_command

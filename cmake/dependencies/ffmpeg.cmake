@@ -16,6 +16,34 @@
 # cmake-format: on
 # ------------------------------------------------------------------------------
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(PkgConfig REQUIRED)
+  PKG_CHECK_MODULES(FFMPEG_LIBS REQUIRED
+    libavcodec
+    libavformat
+    libavutil
+    libswresample
+    libswscale
+  )
+
+  FOREACH(_lib avcodec avformat avutil swresample swscale)
+    IF(NOT TARGET ffmpeg::${_lib})
+      ADD_LIBRARY(ffmpeg::${_lib} INTERFACE IMPORTED GLOBAL)
+      SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES "${FFMPEG_lib${_lib}_LINK_LIBRARIES}")
+      SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${FFMPEG_lib${_lib}_INCLUDE_DIRS}")
+      SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_COMPILE_OPTIONS "${FFMPEG_lib${_lib}_CFLAGS_OTHER}")
+      
+      # Map pkg-config names to our internal target names
+      IF(TARGET PkgConfig::FFMPEG_lib${_lib})
+         # Use the pkg-config generated target if available for better dependency handling
+         SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES PkgConfig::FFMPEG_lib${_lib})
+      ENDIF()
+    ENDIF()
+  ENDFOREACH()
+  
+  RETURN()
+ENDIF()
+
 SET(_target
     "RV_DEPS_FFMPEG"
 )
@@ -215,71 +243,8 @@ OPTION(RV_FFMPEG_USE_VIDEOTOOLBOX "FFmpeg laveraging the VideoToolbox framework"
 # Make a list of the Open RV's FFmpeg config options unless already customized. Note that a super project, a project consuming Open RV as a submodule, can
 # customize the FFmpeg config options via the RV_FFMPEG_CONFIG_OPTIONS cmake property.
 IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
-  SET(NON_FREE_DECODERS_TO_DISABLE
-      "aac"
-      "aac_at"
-      "aac_fixed"
-      "aac_latm"
-      "ac3"
-      "bink"
-      "binkaudio_dct"
-      "binkaudio_rdft"
-      "dnxhd"
-      "dvvideo"
-      "prores"
-      "qtrle"
-      "vp9"
-      "vp9_cuvid"
-      "vp9_mediacodec"
-      "vp9_qsv"
-      "vp9_rkmpp"
-      "vp9_v4l2m2m"
-  )
-
-  FOREACH(
-    NON_FREE_DECODER_TO_DISABLE
-    ${NON_FREE_DECODERS_TO_DISABLE}
-  )
-    IF(NOT NON_FREE_DECODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE)
-      LIST(APPEND _disabled_decoders "--disable-decoder=${NON_FREE_DECODER_TO_DISABLE}")
-    ELSE()
-      MESSAGE(STATUS "FFmpeg decoder ${NON_FREE_DECODER_TO_DISABLE} enabled")
-    ENDIF()
-  ENDFOREACH()
-
-  SET(NON_FREE_ENCODERS_TO_DISABLE
-      "aac"
-      "aac_mf"
-      "dnxhd"
-      "dvvideo"
-      "prores"
-      "qtrle"
-      "vp9_qsv"
-      "vp9_vaapi"
-  )
-  FOREACH(
-    NON_FREE_ENCODER_TO_DISABLE
-    ${NON_FREE_ENCODERS_TO_DISABLE}
-  )
-    IF(NOT NON_FREE_ENCODER_TO_DISABLE IN_LIST RV_FFMPEG_NON_FREE_ENCODERS_TO_ENABLE)
-      LIST(APPEND _disabled_encoders "--disable-encoder=${NON_FREE_ENCODER_TO_DISABLE}")
-    ELSE()
-      MESSAGE(STATUS "FFmpeg encoder ${NON_FREE_ENCODER_TO_DISABLE} enabled")
-    ENDIF()
-  ENDFOREACH()
-
-  LIST(APPEND _disabled_parsers "--disable-parser=vp9")
-
-  LIST(APPEND _disabled_filters "--disable-filter=geq")
-
-  LIST(APPEND _disabled_protocols "--disable-protocol=ffrtmpcrypt")
-  LIST(APPEND _disabled_protocols "--disable-protocol=rtmpe")
-  LIST(APPEND _disabled_protocols "--disable-protocol=rtmpte")
-
-  SET(RV_FFMPEG_CONFIG_OPTIONS
-      ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
-  )
-
+  SET(RV_FFMPEG_CONFIG_OPTIONS "")
+  
   IF(NOT RV_FFMPEG_CONFIG_OPTIONS STREQUAL RV_FFMPEG_CONFIG_OPTIONS_CACHE)
     SET(${_force_rebuild}
         TRUE
@@ -324,6 +289,104 @@ LIST(JOIN _ffmpeg_pkg_config_path ":" _ffmpeg_pkg_config_path)
 
 SEPARATE_ARGUMENTS(RV_FFMPEG_PATCH_COMMAND_STEP)
 
+EXTERNALPROJECT_ADD(
+  ${_target}
+  DEPENDS ${RV_FFMPEG_DEPENDS}
+  DOWNLOAD_NAME ${_target}_${_version}.zip
+  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  INSTALL_DIR ${_install_dir}
+  URL ${_download_url}
+  URL_MD5 ${_download_hash}
+  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
+  PATCH_COMMAND ${RV_FFMPEG_PATCH_COMMAND_STEP}
+  CONFIGURE_COMMAND
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=${_ffmpeg_pkg_config_path}" ${_configure_command} --prefix=${_install_dir} ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
+    ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
+  BUILD_COMMAND ${_make_command} -j${_cpu_count}
+  INSTALL_COMMAND ${_make_command} install
+  BUILD_IN_SOURCE TRUE
+  BUILD_ALWAYS ${_force_rebuild}
+  BUILD_BYPRODUCTS ${_build_byproducts}
+  USES_TERMINAL_BUILD TRUE
+)
+
+IF(RV_FFMPEG_POST_CONFIGURE_STEP)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} post_configure_step
+    ${RV_FFMPEG_POST_CONFIGURE_STEP}
+    DEPENDEES configure
+    DEPENDERS build
+  )
+ENDIF()
+
+FILE(MAKE_DIRECTORY ${_include_dir})
+
+FOREACH(
+  _ffmpeg_lib
+  ${_ffmpeg_libs}
+)
+  ADD_LIBRARY(ffmpeg::${_ffmpeg_lib} SHARED IMPORTED GLOBAL)
+  ADD_DEPENDENCIES(ffmpeg::${_ffmpeg_lib} ${_target})
+  SET_PROPERTY(
+    TARGET ffmpeg::${_ffmpeg_lib}
+    PROPERTY IMPORTED_LOCATION ${_ffmpeg_${_ffmpeg_lib}_lib}
+  )
+  IF(RV_TARGET_WINDOWS)
+    SET_PROPERTY(
+      TARGET ffmpeg::${_ffmpeg_lib}
+      PROPERTY IMPORTED_IMPLIB ${_ffmpeg_${_ffmpeg_lib}_implib}
+    )
+  ENDIF()
+  TARGET_INCLUDE_DIRECTORIES(
+    ffmpeg::${_ffmpeg_lib}
+    INTERFACE ${_include_dir}
+  )
+
+  LIST(APPEND RV_DEPS_LIST ffmpeg::${_ffmpeg_lib})
+ENDFOREACH()
+
+TARGET_LINK_LIBRARIES(
+  ffmpeg::avutil
+  INTERFACE OpenSSL::Crypto
+)
+
+TARGET_LINK_LIBRARIES(
+  ffmpeg::swresample
+  INTERFACE ffmpeg::avutil
+)
+TARGET_LINK_LIBRARIES(
+  ffmpeg::swscale
+  INTERFACE ffmpeg::avutil
+)
+TARGET_LINK_LIBRARIES(
+  ffmpeg::avcodec
+  INTERFACE ffmpeg::swresample
+)
+TARGET_LINK_LIBRARIES(
+  ffmpeg::avformat
+  INTERFACE ffmpeg::avcodec
+)
+
+ADD_CUSTOM_TARGET(
+  clean-${_target}
+  COMMENT "Cleaning '${_target}' ..."
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
+  COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
+)
+
+# Note: On Windows, FFmpeg stores both import libs and DLLs in the install bin directory, so we copy _lib_dir (which is install/bin on Windows) to both stage
+# dirs.
+IF(RV_TARGET_WINDOWS)
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} USE_FLAG_FILE)
+ELSE()
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} USE_FLAG_FILE)
+ENDIF()
+
+SET(RV_DEPS_FFMPEG_VERSION
+    ${_version}
+    CACHE INTERNAL "" FORCE
+)
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS ${RV_FFMPEG_DEPENDS}
