@@ -1,17 +1,18 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(ZLIB REQUIRED)
-  IF(NOT TARGET ZLIB::ZLIB)
-    ADD_LIBRARY(ZLIB::ZLIB INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(ZLIB::ZLIB INTERFACE ZLIB::ZLIB)
+  IF(TARGET ZLIB::ZLIB)
+    SET_PROPERTY(
+      TARGET ZLIB::ZLIB
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   RETURN()
 ENDIF()

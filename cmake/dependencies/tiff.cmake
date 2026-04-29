@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -20,16 +19,16 @@
 # OpenImageIO required >= 3.9, using latest 4.0
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(TIFF REQUIRED)
-  # Map to internal target name if needed
-  IF(NOT TARGET TIFF::TIFF)
-    ADD_LIBRARY(TIFF::TIFF INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(TIFF::TIFF INTERFACE TIFF::TIFF)
+  IF(TARGET TIFF::TIFF)
+    SET_PROPERTY(
+      TARGET TIFF::TIFF
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   RETURN()
 ENDIF()
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_TIFF" "${RV_DEPS_TIFF_VERSION}" "make" "")
-
 
 SET(_download_url
     "https://gitlab.com/libtiff/libtiff/-/archive/v${_version}/libtiff-v${_version}.tar.gz"

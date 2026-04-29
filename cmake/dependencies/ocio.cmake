@@ -12,6 +12,9 @@
 
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(OpenColorIO REQUIRED)
+  IF(TARGET OpenColorIO::OpenColorIO)
+    SET_PROPERTY(TARGET OpenColorIO::OpenColorIO PROPERTY IMPORTED_GLOBAL TRUE)
+  ENDIF()
   # Map to internal target name
   IF(NOT TARGET OpenColorIO::OpenColorIO)
     ADD_LIBRARY(OpenColorIO::OpenColorIO INTERFACE IMPORTED GLOBAL)

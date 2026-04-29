@@ -89,9 +89,7 @@ FUNCTION(rv_stage)
         )
       ENDIF()
 
-      IF(_native_target_type STREQUAL "EXECUTABLE"
-         OR _native_target_type STREQUAL "SHARED_LIBRARY"
-      )
+      IF((_native_target_type STREQUAL "EXECUTABLE" OR _native_target_type STREQUAL "SHARED_LIBRARY") AND NOT RV_USE_SYSTEM_DEPS)
         FOREACH(
           dep
           ${RV_DEPS_LIST}
@@ -102,11 +100,13 @@ FUNCTION(rv_stage)
               TARGET ${dep}
               PROPERTY LOCATION
             )
-            GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
-            ADD_CUSTOM_COMMAND(
-              COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
-              COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
-            )
+            IF(dep_file_path)
+              GET_FILENAME_COMPONENT(dep_file_name ${dep_file_path} NAME)
+              ADD_CUSTOM_COMMAND(
+                COMMENT "Fixing ${dep_file_name}'s rpath in ${arg_TARGET}" TARGET ${arg_TARGET} POST_BUILD
+                COMMAND ${CMAKE_INSTALL_NAME_TOOL} -change "${dep_file_path}" "@rpath/${dep_file_name}" "$<TARGET_FILE:${arg_TARGET}>"
+              )
+            ENDIF()
           ENDIF()
         ENDFOREACH()
       ENDIF()

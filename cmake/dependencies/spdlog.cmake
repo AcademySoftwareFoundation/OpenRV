@@ -9,6 +9,12 @@
 
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(spdlog REQUIRED)
+  IF(TARGET spdlog::spdlog)
+    SET_PROPERTY(TARGET spdlog::spdlog PROPERTY IMPORTED_GLOBAL TRUE)
+  ENDIF()
+  IF(TARGET spdlog::spdlog_header_only)
+    SET_PROPERTY(TARGET spdlog::spdlog_header_only PROPERTY IMPORTED_GLOBAL TRUE)
+  ENDIF()
   RETURN()
 ENDIF()
 

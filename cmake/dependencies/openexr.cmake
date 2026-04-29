@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -10,17 +9,26 @@
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(Imath REQUIRED)
   FIND_PACKAGE(OpenEXR REQUIRED)
-  
-  # Map system targets to our expected names if they differ
-  IF(NOT TARGET OpenEXR::OpenEXR)
-     ADD_LIBRARY(OpenEXR::OpenEXR INTERFACE IMPORTED GLOBAL)
-     TARGET_LINK_LIBRARIES(OpenEXR::OpenEXR INTERFACE OpenEXR::OpenEXR_Libraries)
-  ENDIF()
-  
-  IF(NOT TARGET Imath::Imath)
-     ADD_LIBRARY(Imath::Imath INTERFACE IMPORTED GLOBAL)
-     TARGET_LINK_LIBRARIES(Imath::Imath INTERFACE Imath::Imath)
-  ENDIF()
+
+  # Promote targets to GLOBAL so they are visible everywhere
+  FOREACH(
+    _tgt
+    OpenEXR::OpenEXR OpenEXR::Iex OpenEXR::IlmThread OpenEXR::OpenEXRCore
+  )
+    IF(TARGET ${_tgt})
+      SET_PROPERTY(
+        TARGET ${_tgt}
+        PROPERTY IMPORTED_GLOBAL TRUE
+      )
+      LIST(APPEND RV_DEPS_LIST ${_tgt})
+    ENDIF()
+  ENDFOREACH()
+
+  # Make sure RV_DEPS_LIST is updated in parent scope if needed, though CACHE INTERNAL is used at the end of CMakeLists.txt
+  SET(RV_DEPS_LIST
+      ${RV_DEPS_LIST}
+      CACHE INTERNAL ""
+  )
 
   RETURN()
 ENDIF()

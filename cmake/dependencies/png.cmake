@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -15,9 +14,11 @@
 
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(PNG REQUIRED)
-  IF(NOT TARGET PNG::PNG)
-    ADD_LIBRARY(PNG::PNG INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(PNG::PNG INTERFACE PNG::PNG)
+  IF(TARGET PNG::PNG)
+    SET_PROPERTY(
+      TARGET PNG::PNG
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
   ENDIF()
   RETURN()
 ENDIF()

@@ -7,6 +7,45 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(Boost REQUIRED COMPONENTS 
+    atomic
+    chrono
+    date_time
+    filesystem
+    graph
+    iostreams
+    locale
+    program_options
+    random
+    regex
+    serialization
+    thread
+    timer
+  )
+  
+  IF(TARGET Boost::headers)
+    SET_PROPERTY(TARGET Boost::headers PROPERTY IMPORTED_GLOBAL TRUE)
+  ELSEIF(NOT TARGET Boost::headers)
+    ADD_LIBRARY(Boost::headers INTERFACE IMPORTED GLOBAL)
+    TARGET_INCLUDE_DIRECTORIES(Boost::headers INTERFACE ${Boost_INCLUDE_DIRS})
+  ENDIF()
+
+  # Promote component targets to global
+  FOREACH(_lib atomic chrono date_time filesystem graph iostreams locale program_options random regex serialization thread timer)
+    IF(TARGET Boost::${_lib})
+      SET_PROPERTY(TARGET Boost::${_lib} PROPERTY IMPORTED_GLOBAL TRUE)
+    ENDIF()
+  ENDFOREACH()
+
+  # Provide a dummy Boost::system target since modern Boost has dropped it, but Visto still references it
+  IF(NOT TARGET Boost::system)
+    ADD_LIBRARY(Boost::system INTERFACE IMPORTED GLOBAL)
+  ENDIF()
+
+  RETURN()
+ENDIF()
+
 # IMPORTANT: CMake minimum version need to be increased everytime Boost version is increased. e.g. CMake 3.27 is needed for Boost 1.82 to be found by
 # FindBoost.cmake.
 #

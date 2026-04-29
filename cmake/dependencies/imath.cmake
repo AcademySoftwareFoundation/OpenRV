@@ -1,11 +1,21 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(Imath REQUIRED)
+  IF(TARGET Imath::Imath)
+    SET_PROPERTY(
+      TARGET Imath::Imath
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
+  ENDIF()
+  RETURN()
+ENDIF()
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "${RV_DEPS_IMATH_VERSION}" "" "")
 
