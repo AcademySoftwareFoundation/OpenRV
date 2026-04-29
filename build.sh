@@ -69,10 +69,12 @@ if [ -z "$QT_HOME" ]; then
     if [[ "$OSTYPE" == "linux"* ]]; then
         QT_HOME=$(find /usr/lib64/qt6 /usr/lib/qt6 ~/Qt*/6.* -maxdepth 4 -type d -path '*/gcc_64' 2>/dev/null | sort -V | tail -n 1)
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        if [ -d "/opt/homebrew/opt/qt/lib/cmake/Qt6" ]; then
+        if [ -d "/opt/homebrew/opt/qtbase/lib/cmake/Qt6" ]; then
+            QT_HOME="/opt/homebrew/opt/qtbase"
+        elif [ -d "/opt/homebrew/opt/qt/lib/cmake/Qt6" ]; then
             QT_HOME="/opt/homebrew/opt/qt"
         else
-            QT_HOME=$(find /opt/homebrew/Cellar/qt/*/lib/cmake/Qt6 -maxdepth 0 2>/dev/null | sort -V | tail -n 1 | sed 's|/lib/cmake/Qt6||')
+            QT_HOME=$(find /opt/homebrew/Cellar/qtbase/*/lib/cmake/Qt6 /opt/homebrew/Cellar/qt/*/lib/cmake/Qt6 -maxdepth 0 2>/dev/null | sort -V | tail -n 1 | sed 's|/lib/cmake/Qt6||')
         fi
         if [ -z "$QT_HOME" ]; then
             QT_HOME=$(find ~/Qt*/6.* -maxdepth 4 -type d -path '*/macos' 2>/dev/null | sort -V | tail -n 1)
