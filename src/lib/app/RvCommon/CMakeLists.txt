@@ -257,66 +257,8 @@ SET(_arch_name
 )
 
 # Create a JSON-like string with versions (using semicolon as separator for CMake list)
-SET(_versions_list
-    "Qt:${RV_DEPS_QT_VERSION}"
-    "Python:${RV_DEPS_PYTHON3_VERSION}"
-    "PySide:${RV_DEPS_PYSIDE_VERSION}"
-    "Boost:${RV_DEPS_BOOST_VERSION}"
-    "Imath:${RV_DEPS_IMATH_VERSION}"
-    "OpenEXR:${RV_DEPS_OPENEXR_VERSION}"
-    "OpenImageIO:${RV_DEPS_OIIO_VERSION}"
-    "OpenColorIO:${RV_DEPS_OCIO_VERSION}"
-    "FFmpeg:${RV_DEPS_FFMPEG_VERSION}"
-    "OpenSSL:${RV_DEPS_OPENSSL_VERSION}"
-    "GLEW:${RV_DEPS_GLEW_VERSION_LIB}"
-    "spdlog:${RV_DEPS_SPDLOG_VERSION}"
-    "yaml-cpp:${RV_DEPS_YAML_CPP_VERSION}"
-    "zlib:${RV_DEPS_ZLIB_VERSION}"
-    "dav1d:${RV_DEPS_DAV1D_VERSION}"
-    "jpegturbo:${RV_DEPS_JPEGTURBO_VERSION}"
-    "png:${RV_DEPS_PNG_VERSION}"
-    "tiff:${RV_DEPS_TIFF_VERSION}"
-    "webp:${RV_DEPS_WEBP_VERSION}"
-    "openjpeg:${RV_DEPS_OPENJPEG_VERSION}"
-    "openjph:${RV_DEPS_OPENJPH_VERSION}"
-    "raw:${RV_DEPS_RAW_VERSION}"
-    "gc:${RV_DEPS_GC_VERSION}"
-    "aja:${RV_DEPS_AJA_VERSION}"
-    "bmd:${RV_DEPS_BMD_VERSION}"
-    "imgui:${RV_DEPS_IMGUI_VERSION}"
-    "numpy:$ENV{RV_DEPS_NUMPY_VERSION}"
-    "otio:${RV_DEPS_OTIO_VERSION}"
-    "expat:${RV_DEPS_EXPAT_VERSION}"
-    "nanobind:${RV_DEPS_NANOBIND_VERSION}"
-    "pcre2:${RV_DEPS_PCRE2_VERSION}"
-)
 
 # Add commercial RV-specific SDK versions if they exist
-IF(DEFINED RV_DEPS_PRORES_VERSION
-   AND RV_DEPS_PRORES_VERSION
-)
-  LIST(APPEND _versions_list "prores:${RV_DEPS_PRORES_VERSION}")
-ENDIF()
-IF(DEFINED RV_DEPS_R3DSDK_VERSION
-   AND RV_DEPS_R3DSDK_VERSION
-)
-  LIST(APPEND _versions_list "r3dsdk:${RV_DEPS_R3DSDK_VERSION}")
-ENDIF()
-IF(DEFINED RV_DEPS_ARRIRAW_VERSION
-   AND RV_DEPS_ARRIRAW_VERSION
-)
-  LIST(APPEND _versions_list "arriraw:${RV_DEPS_ARRIRAW_VERSION}")
-ENDIF()
-IF(DEFINED RV_DEPS_X264_VERSION
-   AND RV_DEPS_X264_VERSION
-)
-  LIST(APPEND _versions_list "x264:${RV_DEPS_X264_VERSION}")
-ENDIF()
-IF(DEFINED RV_DEPS_NDI_VERSION
-   AND RV_DEPS_NDI_VERSION
-)
-  LIST(APPEND _versions_list "ndi:${RV_DEPS_NDI_VERSION}")
-ENDIF()
 
 #
 # Generate about_visto.cpp with build information
@@ -344,12 +286,10 @@ SET(_vfx_platform_str
     "${RV_VFX_PLATFORM}"
 )
 
-STRING(REPLACE ";" "," _versions_str "${_versions_list}")
-
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_visto_cpp}
   COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py ${_about_visto_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
-          "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
+          "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "" "${RV_GIT_COMMIT_SHORT_HASH}"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
   COMMENT "Generating about_visto.cpp with build information"
   VERBATIM

@@ -9,378 +9,52 @@
 # Build instructions: https://opencolorio.readthedocs.io/en/latest/quick_start/installation.html#building-from-source
 #
 
-IF(RV_USE_SYSTEM_DEPS)
-  FIND_PACKAGE(OpenColorIO REQUIRED)
-  IF(TARGET OpenColorIO::OpenColorIO)
-    SET_PROPERTY(
-      TARGET OpenColorIO::OpenColorIO
-      PROPERTY IMPORTED_GLOBAL TRUE
-    )
-  ENDIF()
-  # Map to internal target name
-  IF(NOT TARGET OpenColorIO::OpenColorIO)
-    ADD_LIBRARY(OpenColorIO::OpenColorIO INTERFACE IMPORTED GLOBAL)
-    TARGET_LINK_LIBRARIES(
-      OpenColorIO::OpenColorIO
-      INTERFACE OpenColorIO::OpenColorIO
-    )
-  ENDIF()
-  
-    IF(DEFINED OpenColorIO_VERSION)
-      SET(RV_DEPS_OCIO_VERSION "${OpenColorIO_VERSION}")
-      SET(RV_DEPS_OCIO_VERSION "${OpenColorIO_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED OPENCOLORIO_VERSION)
-      SET(RV_DEPS_OCIO_VERSION "${OPENCOLORIO_VERSION}")
-      SET(RV_DEPS_OCIO_VERSION "${OPENCOLORIO_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED OpenColorIO_VERSION_STRING)
-      SET(RV_DEPS_OCIO_VERSION "${OpenColorIO_VERSION_STRING}")
-      SET(RV_DEPS_OCIO_VERSION "${OpenColorIO_VERSION_STRING}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED OPENCOLORIO_VERSION_STRING)
-      SET(RV_DEPS_OCIO_VERSION "${OPENCOLORIO_VERSION_STRING}")
-      SET(RV_DEPS_OCIO_VERSION "${OPENCOLORIO_VERSION_STRING}" CACHE STRING "" FORCE)
-    ENDIF()
-    RETURN()
-ENDIF()
-
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OCIO" "${RV_DEPS_OCIO_VERSION}" "make" "")
-RV_SHOW_STANDARD_DEPS_VARIABLES()
-
-# The folder OCIO is building its own dependencies
-SET(RV_DEPS_OCIO_DIST_DIR
-    ${_build_dir}/ext/dist
-)
-
-IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  # Here the postfix is "d" and not "_d": the postfix inside OCIO is: "d".
-  SET(_ocio_debug_postfix
-      "d"
+FIND_PACKAGE(OpenColorIO REQUIRED)
+IF(TARGET OpenColorIO::OpenColorIO)
+  SET_PROPERTY(
+    TARGET OpenColorIO::OpenColorIO
+    PROPERTY IMPORTED_GLOBAL TRUE
   )
-  MESSAGE(DEBUG "Using debug postfix: '${_ocio_debug_postfix}'")
-ELSE()
-  SET(_ocio_debug_postfix
-      ""
+ENDIF()
+# Map to internal target name
+IF(NOT TARGET OpenColorIO::OpenColorIO)
+  ADD_LIBRARY(OpenColorIO::OpenColorIO INTERFACE IMPORTED GLOBAL)
+  TARGET_LINK_LIBRARIES(
+    OpenColorIO::OpenColorIO
+    INTERFACE OpenColorIO::OpenColorIO
   )
 ENDIF()
 
-SET(_download_hash
-    ${RV_DEPS_OCIO_DOWNLOAD_HASH}
-)
-
-SET(_download_url
-    "https://github.com/AcademySoftwareFoundation/OpenColorIO/archive/refs/tags/v${_version}.zip"
-)
-
-# Another project that isn't adding a debug postfix
-RV_MAKE_STANDARD_LIB_NAME("OpenColorIO" "${_version}" "SHARED" "")
-
-IF(RV_TARGET_WINDOWS)
-  SET(_byproducts
-      ""
-  ) # Empty out the List as it has the wrong DLL name: it doesn't have the version suffix
-
-  # OpenColorIO shared library has the same name on Release and Debug.
-  SET(_ocio_win_sharedlibname
-      "OpenColorIO_${RV_DEPS_OCIO_VERSION_SHORT}.dll"
+IF(DEFINED OpenColorIO_VERSION)
+  SET(RV_DEPS_OCIO_VERSION
+      "${OpenColorIO_VERSION}"
   )
-
-  SET(_ocio_win_sharedlib_path
-      ${_bin_dir}/${_ocio_win_sharedlibname}
+  SET(RV_DEPS_OCIO_VERSION
+      "${OpenColorIO_VERSION}"
+      CACHE STRING "" FORCE
   )
-  LIST(APPEND _byproducts ${_ocio_win_sharedlib_path})
-ENDIF()
-
-IF(RV_TARGET_WINDOWS)
-  SET(_ociolib_dir
-      "${RV_DEPS_OCIO_DIST_DIR}/lib"
+ELSEIF(DEFINED OPENCOLORIO_VERSION)
+  SET(RV_DEPS_OCIO_VERSION
+      "${OPENCOLORIO_VERSION}"
   )
-ENDIF()
-IF(RHEL_VERBOSE)
-  SET(_ociolib_dir
-      "${RV_DEPS_OCIO_DIST_DIR}/lib64"
+  SET(RV_DEPS_OCIO_VERSION
+      "${OPENCOLORIO_VERSION}"
+      CACHE STRING "" FORCE
   )
-ELSE()
-  SET(_ociolib_dir
-      "${RV_DEPS_OCIO_DIST_DIR}/lib"
+ELSEIF(DEFINED OpenColorIO_VERSION_STRING)
+  SET(RV_DEPS_OCIO_VERSION
+      "${OpenColorIO_VERSION_STRING}"
+  )
+  SET(RV_DEPS_OCIO_VERSION
+      "${OpenColorIO_VERSION_STRING}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED OPENCOLORIO_VERSION_STRING)
+  SET(RV_DEPS_OCIO_VERSION
+      "${OPENCOLORIO_VERSION_STRING}"
+  )
+  SET(RV_DEPS_OCIO_VERSION
+      "${OPENCOLORIO_VERSION_STRING}"
+      CACHE STRING "" FORCE
   )
 ENDIF()
-
-#
-# Now, also add yaml-cpp as by-product
-SET(_yaml_cpp_lib
-    "${_ociolib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${_ocio_debug_postfix}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-)
-LIST(APPEND _byproducts "${_yaml_cpp_lib}")
-
-#
-# and finally the PyOpenColorIO library
-IF(RV_TARGET_WINDOWS)
-  SET(_pyocio_lib_dir
-      "${_lib_dir}/site-packages"
-  )
-  SET(_pyocio_libname
-      PyOpenColorIO.pyd
-  )
-ELSE()
-  SET(_pyocio_lib_dir
-      "${_lib_dir}/python${RV_DEPS_PYTHON_VERSION_SHORT}/site-packages"
-  )
-  SET(_pyocio_libname
-      PyOpenColorIO.so
-  )
-ENDIF()
-
-IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  SET(_pyocio_lib_dir
-      "${_pyocio_lib_dir}/PyOpenColorIO"
-  )
-ENDIF()
-
-SET(_pyocio_lib
-    "${_pyocio_lib_dir}/${_pyocio_libname}"
-)
-SET(_pyocio_dest_dir
-    ${RV_STAGE_LIB_DIR}/python${RV_DEPS_PYTHON_VERSION_SHORT}
-)
-LIST(APPEND _byproducts "${_pyocio_lib}")
-
-#
-# Assemble CMake configure options
-#
-# The '_configure_options' list gets reset and initialized in 'RV_CREATE_STANDARD_DEPS_VARIABLES'
-LIST(APPEND _configure_options "-DOCIO_BUILD_TESTS=OFF")
-LIST(APPEND _configure_options "-DOCIO_BUILD_GPU_TESTS=OFF")
-LIST(APPEND _configure_options "-DOCIO_BUILD_PYTHON=ON") # This build PyOpenColorIO
-
-# SIMD CPU performance optimizations OCIO 2.2.1 only supports SSE OCIO 2.3.X can utilize SSE/AVX (Intel) and ARM NEON (Apple M chips) SIMD instructions.
-IF(RV_VFX_CY2023)
-  SET(_ocio_simd_options_str
-      "-DOCIO_USE_SSE=ON"
-  )
-ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  SET(_ocio_simd_options_str
-      "-DOCIO_USE_SIMD=ON"
-  )
-  LIST(APPEND _configure_options "${_ocio_simd_options_str}")
-ENDIF()
-
-# Ref.: https://cmake.org/cmake/help/latest/module/FindPython.html#hints
-LIST(APPEND _configure_options "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install")
-IF(NOT RV_TARGET_WINDOWS)
-  SET(OCIO_PYTHON_PATH
-      ${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${RV_DEPS_PYTHON_VERSION_SHORT}
-  )
-  LIST(APPEND _configure_options "-DPython_EXECUTABLE=${OCIO_PYTHON_PATH}")
-ENDIF()
-LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
-
-# Using Imath_ROOT because Imath_DIR does not seems to be enough on UNIX-based platform (at least Rocky linux).
-LIST(APPEND _configure_options "-DImath_ROOT=${RV_DEPS_IMATH_ROOT_DIR}")
-
-LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
-
-# OCIO apps are not needed.
-LIST(APPEND _configure_options "-DOCIO_BUILD_APPS=OFF")
-# Use MISSING so OCIO vendors its own third-party deps when not already provided by RV_DEPS (vs NONE/default), pinning versions and avoiding ABI/licensing drift
-# with system libs; typical CI pulls in Imath/OpenEXR components, yaml-cpp, pystring, expat, lcms2, zlib, and related OCIO external packages.
-LIST(APPEND _configure_options "-DOCIO_INSTALL_EXT_PACKAGES=MISSING")
-
-IF(NOT RV_TARGET_WINDOWS)
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
-    INSTALL_DIR ${_install_dir}
-    DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${_cmake_build_command}
-    INSTALL_COMMAND ${_cmake_install_command}
-    BUILD_IN_SOURCE FALSE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-ELSE() # Windows
-  SET(_pyopencolorio_patch_script_path
-      ${PROJECT_SOURCE_DIR}/src/build/patch_OCIO/ocio_pyopencolorio_patch.py
-  )
-  SET(_pyopencolorio_cmakelists_path
-      ${_source_dir}/src/bindings/python/CMakeLists.txt
-  )
-  SET(_backup_pyopencolorio_cmakelists_path
-      ${_pyopencolorio_cmakelists_path}.bk
-  )
-  IF(EXISTS ${_backup_pyopencolorio_cmakelists_path})
-    FILE(REMOVE ${_backup_pyopencolorio_cmakelists_path})
-  ENDIF()
-
-  # Some options are not multi-platform so we start clean.
-  SET(_configure_options
-      ""
-  )
-  STRING(REPLACE "." "" PYTHON_VERSION_SHORT_NO_DOT ${RV_DEPS_PYTHON_VERSION_SHORT})
-
-  # Windows only. Because of an issue in Debug with minizip-ng finding ZLIB at two locations, ZLIB_LIBRARY and ZLIB_INCLUDE_DIR is used for both Release and
-  # Debug. ZLIB_ROOT is not enough to fix the issue.
-  GET_TARGET_PROPERTY(_zlib_library ZLIB::ZLIB IMPORTED_IMPLIB)
-  GET_TARGET_PROPERTY(_zlib_include_dir ZLIB::ZLIB INTERFACE_INCLUDE_DIRECTORIES)
-
-  LIST(
-    APPEND
-    _configure_options
-    # Not using Ninja: Ninja doesn't build due to Minizip wrong include style, VS uses search paths even for double-quotes includes.
-    "-G ${CMAKE_GENERATOR}"
-    "-DOCIO_VERBOSE=ON"
-    "-DCMAKE_INSTALL_PREFIX=${_install_dir}"
-    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-    "-DZLIB_LIBRARY=${_zlib_library}"
-    "-DZLIB_INCLUDE_DIR=${_zlib_include_dir}"
-    "-Dexpat_ROOT=${RV_DEPS_EXPAT_ROOT_DIR}"
-    "-DImath_DIR=${RV_DEPS_IMATH_ROOT_DIR}/lib/cmake/Imath"
-    "-DPython_ROOT_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install"
-    # Force CMake to use our custom Python, not the system/registry Python. Python_FIND_REGISTRY=NEVER prevents Windows registry lookups that find the system
-    # Python from actions/setup-python. Python_FIND_STRATEGY=LOCATION ensures Python_ROOT_DIR is checked before the default search paths.
-    "-DPython_FIND_REGISTRY=NEVER"
-    "-DPython_FIND_STRATEGY=LOCATION"
-    # Mandatory param: OCIO CMake code finds Python.
-    "-DPython_LIBRARY=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib" # with this param
-    # DRV_Python_LIBRARIES: A Patch RV created for PyOpenColorIO inside OCIO: Hardcode to Release since FindPython.cmake will find the Debug lib, which we don't
-    # want and doesn't build.
-    "-DRV_Python_LIBRARIES=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python${PYTHON_VERSION_SHORT_NO_DOT}.lib"
-    "-DPython_INCLUDE_DIR=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/include"
-    "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}"
-    "-DBUILD_SHARED_LIBS=ON"
-    "-DOCIO_BUILD_PYTHON=ON"
-    "-DOCIO_INSTALL_EXT_PACKAGES=MISSING"
-    "-DOCIO_BUILD_TESTS=OFF"
-    "-DOCIO_BUILD_GPU_TESTS=OFF"
-    "-DOCIO_BUILD_DOCS=OFF"
-    # OCIO apps are not needed.
-    "-DOCIO_BUILD_APPS=OFF"
-    "-DOCIO_WARNING_AS_ERROR=OFF"
-    "-DOCIO_BUILD_JAVA=OFF"
-    "${_ocio_simd_options_str}"
-    "-S ${_source_dir}"
-    "-B ${_build_dir}"
-  )
-
-  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    # Use debug Python executable.
-    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python_d.exe")
-  ELSE()
-    LIST(APPEND _configure_options "-DPython_EXECUTABLE=${RV_DEPS_BASE_DIR}/RV_DEPS_PYTHON3/install/bin/python.exe")
-  ENDIF()
-
-  LIST(
-    APPEND
-    _ocio_build_options
-    "--build"
-    "${_build_dir}"
-    "--config"
-    "${CMAKE_BUILD_TYPE}"
-    "--parallel"
-    ${_cpu_count}
-  )
-
-  EXTERNALPROJECT_ADD(
-    ${_target}
-    URL ${_download_url}
-    URL_MD5 ${_download_hash}
-    DOWNLOAD_NAME ${_target}_${_version}.zip
-    DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    SOURCE_DIR ${_source_dir}
-    BINARY_DIR ${_build_dir}
-    INSTALL_DIR ${_install_dir}
-    DEPENDS Boost::headers RV_DEPS_PYTHON3 Imath::Imath ZLIB::ZLIB EXPAT::EXPAT
-    PATCH_COMMAND python3 ${_pyopencolorio_patch_script_path} ${_pyopencolorio_cmakelists_path}
-    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-    BUILD_COMMAND ${CMAKE_COMMAND} ${_ocio_build_options}
-    INSTALL_COMMAND ${_cmake_install_command}
-    BUILD_IN_SOURCE FALSE
-    BUILD_ALWAYS FALSE
-    BUILD_BYPRODUCTS ${_byproducts}
-    USES_TERMINAL_BUILD TRUE
-  )
-ENDIF()
-
-SET(_ocio_stage_plugins_python_dir
-    "${RV_STAGE_PLUGINS_PYTHON_DIR}"
-)
-IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  SET(_ocio_stage_plugins_python_dir
-      "${_ocio_stage_plugins_python_dir}/PyOpenColorIO"
-  )
-ENDIF()
-
-IF(RV_VFX_CY2023)
-  # All platform
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Copying PyOpenColorIO lib into '${_ocio_stage_plugins_python_dir}'."
-    COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}
-  )
-ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-  # All platform CY2024 and above
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Copying PyOpenColorIO directory into '${_ocio_stage_plugins_python_dir}'."
-    # Copy PyOpenColorIO directory to the stage python plugins directory.
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_pyocio_lib_dir} ${_ocio_stage_plugins_python_dir}
-  )
-ENDIF()
-
-IF(RV_TARGET_WINDOWS)
-  SET(_rv_stage_lib_site_package_dir
-      "${RV_STAGE_LIB_DIR}/site-packages"
-  )
-  IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
-    SET(_rv_stage_lib_site_package_dir
-        "${_rv_stage_lib_site_package_dir}/PyOpenColorIO"
-    )
-  ENDIF()
-
-  # Windows only.
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    # Copy OCIO shared library to the stage python plugins directory.
-    COMMAND ${CMAKE_COMMAND} -E copy ${_ocio_win_sharedlib_path} ${_ocio_stage_plugins_python_dir}
-  )
-
-  # Windows only. Debug Python on Windows search for modules with *_d suffix, but OCIO does not create a PyOpenColor_d.pyd.
-  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-    ADD_CUSTOM_COMMAND(
-      TARGET ${_target}
-      POST_BUILD
-      COMMENT "Rename PyOpenColorIO.py to PyOpenColorIO_d.py in '${_rv_stage_lib_site_package_dir}' and '${_ocio_stage_plugins_python_dir}."
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${_rv_stage_lib_site_package_dir}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_rv_stage_lib_site_package_dir}/PyOpenColorIO_d.pyd
-      COMMAND ${CMAKE_COMMAND} -E copy ${_pyocio_lib} ${_ocio_stage_plugins_python_dir}/PyOpenColorIO_d.pyd
-    )
-  ENDIF()
-ENDIF()
-
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} USE_FLAG_FILE)
-
-RV_ADD_IMPORTED_LIBRARY(
-  NAME
-  OpenColorIO::OpenColorIO
-  TYPE
-  SHARED
-  LOCATION
-  ${_libpath}
-  IMPLIB
-  ${_implibpath}
-  INCLUDE_DIRS
-  ${_include_dir}
-  DEPENDS
-  ${_target}
-  ADD_TO_DEPS_LIST
-)

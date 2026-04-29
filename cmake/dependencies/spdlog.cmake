@@ -6,97 +6,50 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-IF(RV_USE_SYSTEM_DEPS)
-  FIND_PACKAGE(spdlog REQUIRED)
-  IF(TARGET spdlog::spdlog)
-    SET_PROPERTY(
-      TARGET spdlog::spdlog
-      PROPERTY IMPORTED_GLOBAL TRUE
-    )
-  ENDIF()
-  IF(TARGET spdlog::spdlog_header_only)
-    SET_PROPERTY(
-      TARGET spdlog::spdlog_header_only
-      PROPERTY IMPORTED_GLOBAL TRUE
-    )
-  ENDIF()
-  
-    IF(DEFINED spdlog_VERSION)
-      SET(RV_DEPS_SPDLOG_VERSION "${spdlog_VERSION}")
-      SET(RV_DEPS_SPDLOG_VERSION "${spdlog_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED SPDLOG_VERSION)
-      SET(RV_DEPS_SPDLOG_VERSION "${SPDLOG_VERSION}")
-      SET(RV_DEPS_SPDLOG_VERSION "${SPDLOG_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED spdlog_VERSION_STRING)
-      SET(RV_DEPS_SPDLOG_VERSION "${spdlog_VERSION_STRING}")
-      SET(RV_DEPS_SPDLOG_VERSION "${spdlog_VERSION_STRING}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED SPDLOG_VERSION_STRING)
-      SET(RV_DEPS_SPDLOG_VERSION "${SPDLOG_VERSION_STRING}")
-      SET(RV_DEPS_SPDLOG_VERSION "${SPDLOG_VERSION_STRING}" CACHE STRING "" FORCE)
-    ENDIF()
-    RETURN()
+FIND_PACKAGE(spdlog REQUIRED)
+IF(TARGET spdlog::spdlog)
+  SET_PROPERTY(
+    TARGET spdlog::spdlog
+    PROPERTY IMPORTED_GLOBAL TRUE
+  )
 ENDIF()
-
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "make" "")
-
-SET(_download_url
-    "https://github.com/gabime/spdlog/archive/refs/tags/v${_version}.zip"
-)
-
-SET(_download_hash
-    ${RV_DEPS_SPDLOG_DOWNLOAD_HASH}
-)
-
-IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
-  SET(RV_SPDLOG_DEBUG_POSTFIX
-      "d"
+IF(TARGET spdlog::spdlog_header_only)
+  SET_PROPERTY(
+    TARGET spdlog::spdlog_header_only
+    PROPERTY IMPORTED_GLOBAL TRUE
   )
 ENDIF()
 
-SET(_spdlog_lib_name
-    ${CMAKE_STATIC_LIBRARY_PREFIX}spdlog${RV_SPDLOG_DEBUG_POSTFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}
-)
-
-SET(_spdlog_lib
-    ${_lib_dir}/${_spdlog_lib_name}
-)
-
-LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
-
-EXTERNALPROJECT_ADD(
-  ${_target}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  INSTALL_DIR ${_install_dir}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  PATCH_COMMAND patch -N -u -b include/spdlog/tweakme.h -i "${PROJECT_SOURCE_DIR}/cmake/patches/spdlog_tweakme.h.patch" || true
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_spdlog_lib}
-  USES_TERMINAL_BUILD TRUE
-)
-
-RV_ADD_IMPORTED_LIBRARY(
-  NAME
-  spdlog::spdlog
-  TYPE
-  STATIC
-  LOCATION
-  ${_spdlog_lib}
-  SONAME
-  ${_spdlog_lib_name}
-  INCLUDE_DIRS
-  ${_include_dir}
-  DEPENDS
-  ${_target}
-  ADD_TO_DEPS_LIST
-)
-
-RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name})
+IF(DEFINED spdlog_VERSION)
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${spdlog_VERSION}"
+  )
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${spdlog_VERSION}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED SPDLOG_VERSION)
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${SPDLOG_VERSION}"
+  )
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${SPDLOG_VERSION}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED spdlog_VERSION_STRING)
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${spdlog_VERSION_STRING}"
+  )
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${spdlog_VERSION_STRING}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED SPDLOG_VERSION_STRING)
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${SPDLOG_VERSION_STRING}"
+  )
+  SET(RV_DEPS_SPDLOG_VERSION
+      "${SPDLOG_VERSION_STRING}"
+      CACHE STRING "" FORCE
+  )
+ENDIF()

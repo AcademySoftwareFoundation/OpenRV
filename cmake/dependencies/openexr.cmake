@@ -6,291 +6,59 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-IF(RV_USE_SYSTEM_DEPS)
-  FIND_PACKAGE(Imath REQUIRED)
-  FIND_PACKAGE(OpenEXR REQUIRED)
+FIND_PACKAGE(Imath REQUIRED)
+FIND_PACKAGE(OpenEXR REQUIRED)
 
-  # Promote targets to GLOBAL so they are visible everywhere
-  FOREACH(
-    _tgt
-    OpenEXR::OpenEXR OpenEXR::Iex OpenEXR::IlmThread OpenEXR::OpenEXRCore
-  )
-    IF(TARGET ${_tgt})
-      SET_PROPERTY(
-        TARGET ${_tgt}
-        PROPERTY IMPORTED_GLOBAL TRUE
-      )
-      LIST(APPEND RV_DEPS_LIST ${_tgt})
-    ENDIF()
-  ENDFOREACH()
-
-  # Make sure RV_DEPS_LIST is updated in parent scope if needed, though CACHE INTERNAL is used at the end of CMakeLists.txt
-  SET(RV_DEPS_LIST
-      ${RV_DEPS_LIST}
-      CACHE INTERNAL ""
-  )
-
-  
-    IF(DEFINED Imath_VERSION)
-      SET(RV_DEPS_OPENEXR_VERSION "${Imath_VERSION}")
-      SET(RV_DEPS_OPENEXR_VERSION "${Imath_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED IMATH_VERSION)
-      SET(RV_DEPS_OPENEXR_VERSION "${IMATH_VERSION}")
-      SET(RV_DEPS_OPENEXR_VERSION "${IMATH_VERSION}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED Imath_VERSION_STRING)
-      SET(RV_DEPS_OPENEXR_VERSION "${Imath_VERSION_STRING}")
-      SET(RV_DEPS_OPENEXR_VERSION "${Imath_VERSION_STRING}" CACHE STRING "" FORCE)
-    ELSEIF(DEFINED IMATH_VERSION_STRING)
-      SET(RV_DEPS_OPENEXR_VERSION "${IMATH_VERSION_STRING}")
-      SET(RV_DEPS_OPENEXR_VERSION "${IMATH_VERSION_STRING}" CACHE STRING "" FORCE)
-    ENDIF()
-    RETURN()
-ENDIF()
-
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_OPENEXR" "${RV_DEPS_OPENEXR_VERSION}" "" "")
-
-SET(_make_command
-    make
+# Promote targets to GLOBAL so they are visible everywhere
+FOREACH(
+  _tgt
+  OpenEXR::OpenEXR OpenEXR::Iex OpenEXR::IlmThread OpenEXR::OpenEXRCore
 )
-IF(${RV_OSX_EMULATION})
-  SET(_darwin_x86_64
-      "arch" "${RV_OSX_EMULATION_ARCH}"
+  IF(TARGET ${_tgt})
+    SET_PROPERTY(
+      TARGET ${_tgt}
+      PROPERTY IMPORTED_GLOBAL TRUE
+    )
+    LIST(APPEND RV_DEPS_LIST ${_tgt})
+  ENDIF()
+ENDFOREACH()
+
+# Make sure RV_DEPS_LIST is updated in parent scope if needed, though CACHE INTERNAL is used at the end of CMakeLists.txt
+SET(RV_DEPS_LIST
+    ${RV_DEPS_LIST}
+    CACHE INTERNAL ""
+)
+
+IF(DEFINED Imath_VERSION)
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${Imath_VERSION}"
   )
-  SET(_make_command
-      ${_darwin_x86_64} ${_make_command}
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${Imath_VERSION}"
+      CACHE STRING "" FORCE
   )
-ENDIF()
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
+ELSEIF(DEFINED IMATH_VERSION)
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${IMATH_VERSION}"
+  )
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${IMATH_VERSION}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED Imath_VERSION_STRING)
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${Imath_VERSION_STRING}"
+  )
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${Imath_VERSION_STRING}"
+      CACHE STRING "" FORCE
+  )
+ELSEIF(DEFINED IMATH_VERSION_STRING)
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${IMATH_VERSION_STRING}"
+  )
+  SET(RV_DEPS_OPENEXR_VERSION
+      "${IMATH_VERSION_STRING}"
+      CACHE STRING "" FORCE
   )
 ENDIF()
-SET(_openexr_libname_suffix_
-    "${RV_DEPS_OPENEXR_LIBNAME_SUFFIX}"
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET(_openexr_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSE()
-  SET(_openexr_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-SET(_openexr_lib
-    ${_lib_dir}/${_openexr_name}
-)
-
-SET(LIB_VERSION_SUFFIX
-    "${RV_DEPS_OPENEXR_LIB_VERSION_SUFFIX}"
-)
-
-IF(RV_TARGET_DARWIN)
-  SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSEIF(RV_TARGET_LINUX)
-  SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
-  )
-ELSEIF(RV_TARGET_WINDOWS)
-  SET(_openexrcore_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}OpenEXRCore-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-
-SET(_openexrcore_lib
-    ${_lib_dir}/${_openexrcore_name}
-)
-
-IF(RV_TARGET_DARWIN)
-  SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSEIF(RV_TARGET_LINUX)
-  SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
-  )
-ELSEIF(RV_TARGET_WINDOWS)
-  SET(_ilmthread_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-
-SET(_ilmthread_lib
-    ${_lib_dir}/${_ilmthread_name}
-)
-
-IF(RV_TARGET_DARWIN)
-  SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}.${LIB_VERSION_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ELSEIF(RV_TARGET_LINUX)
-  SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}.${LIB_VERSION_SUFFIX}
-  )
-ELSEIF(RV_TARGET_WINDOWS)
-  SET(_iex_name
-      ${CMAKE_SHARED_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}
-  )
-ENDIF()
-
-SET(_iex_lib
-    ${_lib_dir}/${_iex_name}
-)
-
-LIST(APPEND _openexr_byproducts ${_openexr_lib} ${_ilmthread_lib} ${_iex_lib})
-
-IF(RV_TARGET_WINDOWS)
-  SET(_openexr_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}OpenEXR-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
-  )
-  SET(_ilmthread_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}IlmThread-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
-  )
-  SET(_iex_implib
-      ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}Iex-${_openexr_libname_suffix_}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
-  )
-
-  LIST(APPEND _openexr_byproducts ${_openexr_implib} ${_ilmthread_implib} ${_iex_implib})
-ENDIF()
-
-SET(_openexr_patch_file_
-    "${CMAKE_CURRENT_SOURCE_DIR}/patch/${RV_DEPS_OPENEXR_PATCH_NAME}.patch"
-)
-
-IF(EXISTS "${_openexr_patch_file_}")
-  SET(_patch_command
-      patch -p1 < ${_openexr_patch_file_}
-  )
-  MESSAGE(STATUS "Patch command set for ${_target}: ${_patch_command}")
-ELSE()
-  # If it does not exist, set the command to an empty string. ExternalProject_Add will skip the patch step if the command is empty.
-  SET(_patch_command
-      ""
-  )
-  MESSAGE(STATUS "ERROR Patch file not found, skipping patch for ${_target}: ${_patch_file}")
-ENDIF()
-
-LIST(APPEND _configure_options "-DCMAKE_PREFIX_PATH=${RV_DEPS_IMATH_CMAKE_DIR}")
-LIST(APPEND _configure_options "-DBUILD_TESTING=OFF")
-IF(RV_TARGET_WINDOWS)
-  GET_TARGET_PROPERTY(_zlib_implibpath ZLIB::ZLIB IMPORTED_IMPLIB)
-  LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${RV_DEPS_ZLIB_INCLUDE_DIR}")
-  LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_zlib_implibpath}")
-ENDIF()
-
-# OpenEXR tools are not needed.
-LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
-
-# Disable OpenEXR's automatic rpath setup to avoid conflicts with RV's rpath management OpenEXR 3.3+ automatically adds @loader_path/../lib which conflicts with
-# our install scripts
-LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
-
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v${_version}.zip"
-  URL_MD5 ${RV_DEPS_OPENEXR_DOWNLOAD_HASH}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  DEPENDS Imath::Imath ZLIB::ZLIB
-  INSTALL_DIR ${_install_dir}
-  PATCH_COMMAND ${_patch_command}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_openexr_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
-
-SET(_include_dir
-    ${_install_dir}/include/OpenEXR
-)
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(
-    TARGET
-    ${_target}
-    BIN_DIR
-    ${_bin_dir}
-    OUTPUTS
-    ${RV_STAGE_BIN_DIR}/${_openexr_name}
-    ${RV_STAGE_BIN_DIR}/${_openexrcore_name}
-    ${RV_STAGE_BIN_DIR}/${_ilmthread_name}
-    ${RV_STAGE_BIN_DIR}/${_iex_name}
-  )
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(
-    TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_openexrcore_name} ${RV_STAGE_LIB_DIR}/${_ilmthread_name} ${RV_STAGE_LIB_DIR}/${_iex_name}
-  )
-ENDIF()
-
-ADD_LIBRARY(OpenEXR::IlmThread SHARED IMPORTED GLOBAL)
-SET_PROPERTY(
-  TARGET OpenEXR::IlmThread
-  PROPERTY IMPORTED_LOCATION ${_ilmthread_lib}
-)
-SET_PROPERTY(
-  TARGET OpenEXR::IlmThread
-  PROPERTY IMPORTED_SONAME ${_ilmthread_name}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET OpenEXR::IlmThread
-    PROPERTY IMPORTED_IMPLIB ${_ilmthread_implib}
-  )
-ENDIF()
-LIST(APPEND RV_DEPS_LIST OpenEXR::IlmThread)
-
-ADD_LIBRARY(OpenEXR::Iex SHARED IMPORTED GLOBAL)
-SET_PROPERTY(
-  TARGET OpenEXR::Iex
-  PROPERTY IMPORTED_LOCATION ${_iex_lib}
-)
-SET_PROPERTY(
-  TARGET OpenEXR::Iex
-  PROPERTY IMPORTED_SONAME ${_iex_name}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET OpenEXR::Iex
-    PROPERTY IMPORTED_IMPLIB ${_iex_implib}
-  )
-ENDIF()
-LIST(APPEND RV_DEPS_LIST OpenEXR::Iex)
-
-ADD_LIBRARY(OpenEXR::OpenEXR SHARED IMPORTED GLOBAL)
-SET_PROPERTY(
-  TARGET OpenEXR::OpenEXR
-  PROPERTY IMPORTED_LOCATION ${_openexr_lib}
-)
-SET_PROPERTY(
-  TARGET OpenEXR::OpenEXR
-  PROPERTY IMPORTED_SONAME ${_openexr_name}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET OpenEXR::OpenEXR
-    PROPERTY IMPORTED_IMPLIB ${_openexr_implib}
-  )
-ENDIF()
-
-TARGET_INCLUDE_DIRECTORIES(
-  OpenEXR::OpenEXR
-  INTERFACE ${_include_dir}
-)
-TARGET_LINK_LIBRARIES(
-  OpenEXR::OpenEXR
-  INTERFACE Imath::Imath OpenEXR::Iex OpenEXR::IlmThread ZLIB::ZLIB
-)
-LIST(APPEND RV_DEPS_LIST OpenEXR::OpenEXR)
-
-ADD_DEPENDENCIES(OpenEXR::OpenEXR ${_target})
