@@ -3,7 +3,7 @@ name: Release PR
 on:
   push:
     branches:
-      - main
+      - RB-3.X.X-VFX2024
 
 permissions:
   contents: write
@@ -53,8 +53,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore(release): update CHANGELOG for ${{ steps.version.outputs.content }}"
-          branch: release/next
+          branch: release/next-VFX2024
           delete-branch: true
-          title: "chore(release): release ${{ steps.version.outputs.content }}"
+          title: "chore(release): VFX2024 release ${{ steps.version.outputs.content }}"
           body: ${{ steps.release-notes.outputs.content }}
           labels: autorelease
