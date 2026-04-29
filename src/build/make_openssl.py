@@ -188,6 +188,8 @@ def configure() -> None:
     configure_args.append(f"--prefix={OUTPUT_DIR}")
     configure_args.append(f"--openssldir={OUTPUT_DIR}")
 
+    configure_args.append("enable-md2")
+
     if platform.system() == "Linux":
         configure_args.append("-Wl,-rpath,'$$ORIGIN/../lib'")
 
