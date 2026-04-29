@@ -81,8 +81,10 @@ def get_source_media_info(source):
         if source:
             media = rvc.getStringProperty(source + ".media.movie")[0]
             info = rvc.sourceMediaInfo(source, media)
-    finally:
-        return info
+    except Exception:
+        pass
+
+    return info
 
 
 def get_media_rep(switch_nodes):

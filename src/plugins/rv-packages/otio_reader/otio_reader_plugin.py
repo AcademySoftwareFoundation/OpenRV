@@ -33,13 +33,8 @@ import sys
 from rv import commands, extra_commands
 from rv import rvtypes
 
-# Set RTLD_GLOBAL so that OpenTimelineIO's C++ type info (like std::any) is shared
-# across its multiple modules, preventing "RuntimeError: bad any cast".
-_old_flags = sys.getdlopenflags()
-sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
+print("OTIO IMPORT: dlopenflags before import =", sys.getdlopenflags())
 import opentimelineio as otio  # noqa: E402
-
-sys.setdlopenflags(_old_flags)
 import otio_reader  # noqa: E402
 import otio_writer  # noqa: E402
 
@@ -103,10 +98,17 @@ class ExampleOTIOReaderPlugin(rvtypes.MinorMode):
         if ext:
             ext = ext[1:]
 
-        if ext in otio.adapters.suffixes_with_defined_adapters(read=True):
-            self.mode = Mode.loading
-            movieproc = "blank,otioFile={}.movieproc".format(in_path)
-            event.setReturnContent(movieproc)
+        try:
+            if ext in otio.adapters.suffixes_with_defined_adapters(read=True):
+                self.mode = Mode.loading
+                movieproc = "blank,otioFile={}.movieproc".format(in_path)
+                event.setReturnContent(movieproc)
+                return
+        except RuntimeError as e:
+            # Catch "bad any cast" and other C++ exceptions from OTIO bindings on macOS
+            print("WARNING: OTIO Reader disabled due to binding error:", e)
+
+        event.reject()
 
     def after_progressive_loading(self, event):
         """

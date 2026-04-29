@@ -3,10 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-import os
 import sys
+import os
 
-import site
+# Set RTLD_GLOBAL so that Python C++ extensions (like OpenTimelineIO's _otio.so)
+# share their C++ RTTI types (e.g. std::any) across different dynamic modules.
+# This prevents "RuntimeError: bad any cast" on macOS.
+sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
+
+import site  # noqa: E402
 
 # Find the Visto project root relative to the executable
 visto_root = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..", "..", "..", "..", "..", ".."))

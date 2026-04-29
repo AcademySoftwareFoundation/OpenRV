@@ -3188,10 +3188,10 @@ class: SessionManagerMode : MinorMode
         _viewTreeView.setShowDropIndicator(true);
         _viewTreeView.setHeaderHidden(false);
         // _viewTreeView.setSelectionMode(QAbstractItemView.ExtendedSelection);
-        _viewTreeView.setEditTriggers(QAbstractItemView.EditKeyPressed);
-        _viewTreeView.setContextMenuPolicy(Qt.CustomContextMenu);
-        _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
-        _viewTreeView.setDefaultDropAction(Qt.MoveAction);
+        // _viewTreeView.setEditTriggers(QAbstractItemView.EditKeyPressed);
+        // _viewTreeView.setContextMenuPolicy(Qt.CustomContextMenu);
+        // _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
+        // _viewTreeView.setDefaultDropAction(Qt.MoveAction);
         _viewTreeView.setExpandsOnDoubleClick(false);
         _viewTreeView.setIndentation(TREE_VIEW_INDENTATION);
 
@@ -3199,11 +3199,11 @@ class: SessionManagerMode : MinorMode
         _inputsView.setDragEnabled(true);
         _inputsView.setAcceptDrops(true);
         // _inputsView.setSelectionMode(QAbstractItemView.ExtendedSelection);
-        _inputsView.setSelectionBehavior(QAbstractItemView.SelectRows);
-        _inputsView.setDefaultDropAction(Qt.MoveAction);
+        // _inputsView.setSelectionBehavior(QAbstractItemView.SelectRows);
+        // _inputsView.setDefaultDropAction(Qt.MoveAction);
         _inputsView.setShowDropIndicator(true);
-        _inputsView.setDragDropMode(QAbstractItemView.DragDrop);
-        _inputsView.setEditTriggers(QAbstractItemView.NoEditTriggers);
+        // _inputsView.setDragDropMode(QAbstractItemView.DragDrop);
+        // _inputsView.setEditTriggers(QAbstractItemView.NoEditTriggers);
         //_inputsView.setDragDropOverwriteMode(true);
 
 
@@ -3256,10 +3256,10 @@ class: SessionManagerMode : MinorMode
         _addButton.setDefaultAction(addAction);
         _deleteButton.setDefaultAction(deleteAction);
         _editViewInfoButton.setDefaultAction(editInfoAction);
-        _addButton.setPopupMode(QToolButton.InstantPopup);
+        // _addButton.setPopupMode(QToolButton.InstantPopup);
 
         _configButton.setDefaultAction(configAction);
-        _configButton.setPopupMode(QToolButton.InstantPopup);
+        // _configButton.setPopupMode(QToolButton.InstantPopup);
 
         _colorDialog = QColorDialog(m);
         _colorDialog.setOption(QColorDialog.ShowAlphaChannel, false);
@@ -3364,7 +3364,7 @@ class: SessionManagerMode : MinorMode
         }
 
         _addButton.setMenu(addMenu);
-        _addButton.setArrowType(Qt.NoArrow);
+        // _addButton.setArrowType(Qt.NoArrow);
         _createMenu = addMenu;
 
         let folderMenu       = QMenu("New Folder", _folderButton),
@@ -3374,8 +3374,8 @@ class: SessionManagerMode : MinorMode
 
         _folderButton.setDefaultAction(folderAction);
         _folderButton.setMenu(folderMenu);
-        _folderButton.setArrowType(Qt.NoArrow);
-        _folderButton.setPopupMode(QToolButton.InstantPopup);
+        // _folderButton.setArrowType(Qt.NoArrow);
+        // _folderButton.setPopupMode(QToolButton.InstantPopup);
         _folderMenu = folderMenu;
 
         let configMenu     = QMenu("Config", _configButton),

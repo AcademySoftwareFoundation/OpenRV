@@ -322,11 +322,11 @@ def _create_media_reference(node_name, source_node):
     source_basename = os.path.basename(source_path)
 
     frame_zero_padding = None
-    image_seq_pattern = re.findall("\.%0\d+d\.", source_basename)
+    image_seq_pattern = re.findall(r"\.%0\d+d\.", source_basename)
     if image_seq_pattern:
-        frame_zero_padding = int(re.search("\d+", image_seq_pattern[0]).group(0))
+        frame_zero_padding = int(re.search(r"\d+", image_seq_pattern[0]).group(0))
     else:
-        image_seq_pattern = re.findall("\.\d+-\d+#|@+", source_basename)
+        image_seq_pattern = re.findall(r"\.\d+-\d+#|@+", source_basename)
         if image_seq_pattern:
             pattern = re.search("#|@+", image_seq_pattern[0]).group(0)
             frame_zero_padding = 4 if "#" in pattern else len(pattern)
