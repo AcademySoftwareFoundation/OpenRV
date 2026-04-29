@@ -1460,9 +1460,9 @@ namespace TwkMovie
         {
             const AVPixelFormat nativeFormat = (*avCodecContext)->pix_fmt;
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-            if (desc == nullptr)
+            if (desc == nullptr && nativeFormat != AV_PIX_FMT_NONE)
             {
-                std::cerr << "ERROR: MovieFFMpeg: Invalid pixel format! " << m_filename << '\n';
+                std::cerr << "ERROR: MovieFFMpeg: Invalid pixel format! " << m_filename << " (format: " << nativeFormat << ")\n";
                 avcodec_free_context(avCodecContext);
                 return false;
             }
