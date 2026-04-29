@@ -240,7 +240,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         const QTextBlock arg1 = getqtype<QTextBlockType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QTextBlock_operatorLT__bool_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -248,7 +248,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         const QTextBlock arg1 = getqtype<QTextBlockType>(param_other);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QTextBlock_operatorEQ_EQ__bool_QTextBlock_QTextBlock(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -256,7 +256,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTextBlock arg0 = getqtype<QTextBlockType>(param_this);
         const QTextBlock arg1 = getqtype<QTextBlockType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_blockFormatIndex0, int)

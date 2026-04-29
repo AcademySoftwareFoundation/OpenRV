@@ -134,7 +134,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QGradient& arg0 = getqtype<QGradientType>(param_this);
         const QGradient arg1 = getqtype<QGradientType>(param_gradient);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QGradient_operatorEQ_EQ__bool_QGradient_QGradient(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_gradient)
@@ -142,7 +142,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QGradient& arg0 = getqtype<QGradientType>(param_this);
         const QGradient arg1 = getqtype<QGradientType>(param_gradient);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QGradient0, Pointer)

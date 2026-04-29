@@ -358,7 +358,7 @@ namespace Mu
         const Node* n;
         unsigned char* data = o->data<unsigned char>();
 
-        for (size_t i = 0; n = NODE_THIS.argNode(i); i++)
+        for (size_t i = 0; (n = NODE_THIS.argNode(i)); i++)
         {
             etype->nodeEval(data, n, NODE_THREAD);
             data += size;

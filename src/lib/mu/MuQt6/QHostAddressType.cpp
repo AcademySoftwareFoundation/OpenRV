@@ -239,7 +239,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         const QHostAddress arg1 = getqtype<QHostAddressType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QHostAddress_operatorBang_EQ__bool_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
@@ -247,7 +247,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         QHostAddress::SpecialAddress arg1 = (QHostAddress::SpecialAddress)(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_QHostAddress(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -255,7 +255,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         const QHostAddress arg1 = getqtype<QHostAddressType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     bool qt_QHostAddress_operatorEQ_EQ__bool_QHostAddress_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_other)
@@ -263,7 +263,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QHostAddress arg0 = getqtype<QHostAddressType>(param_this);
         QHostAddress::SpecialAddress arg1 = (QHostAddress::SpecialAddress)(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QHostAddress0, Pointer)

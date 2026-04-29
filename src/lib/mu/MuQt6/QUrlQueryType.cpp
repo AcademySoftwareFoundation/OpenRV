@@ -205,7 +205,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
         const QUrlQuery arg1 = getqtype<QUrlQueryType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QUrlQuery_operatorEQ_EQ__bool_QUrlQuery_QUrlQuery(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -213,7 +213,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrlQuery& arg0 = getqtype<QUrlQueryType>(param_this);
         const QUrlQuery arg1 = getqtype<QUrlQueryType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QUrlQuery0, Pointer)

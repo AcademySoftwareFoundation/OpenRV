@@ -304,7 +304,10 @@ namespace Mu
         QImage& arg0 = getqtype<QImageType>(param_this);
         bool arg1 = (bool)(param_horizontal);
         bool arg2 = (bool)(param_vertical);
-        arg0.mirror(arg1, arg2);
+        Qt::Orientations orientations;
+        if (arg1) orientations |= Qt::Horizontal;
+        if (arg2) orientations |= Qt::Vertical;
+        if (orientations) arg0.mirror(orientations);
     }
 
     Pointer qt_QImage_mirrored_QImage_QImage_bool_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_horizontal,
@@ -314,7 +317,10 @@ namespace Mu
         const QImage& arg0 = getqtype<QImageType>(param_this);
         bool arg1 = (bool)(param_horizontal);
         bool arg2 = (bool)(param_vertical);
-        return makeqtype<QImageType>(c, arg0.mirrored(arg1, arg2), "qt.QImage");
+        Qt::Orientations orientations;
+        if (arg1) orientations |= Qt::Horizontal;
+        if (arg2) orientations |= Qt::Vertical;
+        return makeqtype<QImageType>(c, orientations ? arg0.mirrored(orientations) : arg0, "qt.QImage");
     }
 
     Pointer qt_QImage_offset_QPoint_QImage(Mu::Thread& NODE_THREAD, Pointer param_this)
@@ -622,7 +628,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QImage arg1 = getqtype<QImageType>(param_image);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QImage_operatorEQ_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
@@ -630,7 +636,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QImage arg1 = getqtype<QImageType>(param_image);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QImage_trueMatrix_QTransform_QTransform_int_int(Mu::Thread& NODE_THREAD, Pointer param_matrix, int param_width,

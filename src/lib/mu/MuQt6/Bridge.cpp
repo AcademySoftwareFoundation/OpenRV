@@ -1157,81 +1157,81 @@ namespace Mu
             params[0] = new ParameterVariable(context, "this", c);
             params[1] = 0;
 
-            switch (mp.type())
+            switch (mp.userType())
             {
-            case QVariant::Int:
+            case QMetaType::Int:
                 t = "int";
                 rtype = context->intType();
                 getfunc = getpropInt;
                 putfunc = putpropInt;
                 break;
-            case QVariant::String:
+            case QMetaType::QString:
                 t = "string";
                 rtype = context->stringType();
                 getfunc = getpropString;
                 putfunc = putpropString;
                 break;
-            case QVariant::Bool:
+            case QMetaType::Bool:
                 t = "bool";
                 rtype = context->boolType();
                 getfunc = getpropBool;
                 putfunc = putpropBool;
                 break;
-            case QVariant::Double:
+            case QMetaType::Double:
                 t = "double";
                 rtype = context->doubleType();
                 getfunc = getpropDouble;
                 putfunc = putpropDouble;
                 break;
-            case QVariant::Icon:
+            case QMetaType::QIcon:
                 t = "qt.QIcon";
                 rtype = iconType;
                 getfunc = getpropIcon;
                 putfunc = putpropIcon;
                 break;
-            case QVariant::Size:
+            case QMetaType::QSize:
                 t = "qt.QSize";
                 rtype = sizeType;
                 getfunc = getpropSize;
                 putfunc = putpropSize;
                 break;
-            case QVariant::Point:
+            case QMetaType::QPoint:
                 t = "qt.QPoint";
                 rtype = pointType;
                 getfunc = getpropPoint;
                 putfunc = putpropPoint;
                 break;
-            case QVariant::Rect:
+            case QMetaType::QRect:
                 t = "qt.QRect";
                 rtype = rectType;
                 getfunc = getpropRect;
                 putfunc = putpropRect;
                 break;
-            case QVariant::Font:
+            case QMetaType::QFont:
                 t = "qt.QFont";
                 rtype = fontType;
                 getfunc = getpropFont;
                 putfunc = putpropFont;
                 break;
-            case QVariant::Url:
+            case QMetaType::QUrl:
                 t = "qt.QUrl";
                 rtype = urlType;
                 getfunc = getpropUrl;
                 putfunc = putpropUrl;
                 break;
-            case QVariant::KeySequence:
+            case QMetaType::QKeySequence:
                 t = "qt.QKeySequence";
                 rtype = keysequenceType;
                 getfunc = getpropKeySeq;
                 putfunc = putpropKeySeq;
                 break;
-            case QVariant::Color:
+            case QMetaType::QColor:
                 t = "qt.QColor";
                 rtype = colorType;
                 getfunc = getpropColor;
                 putfunc = putpropColor;
                 break;
-            case QVariant::UserType:
+            case QMetaType::User:
                 if (mp.isEnumType())
                 {
                     t = "int";

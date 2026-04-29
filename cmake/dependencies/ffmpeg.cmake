@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -21,29 +20,48 @@
 
 IF(RV_USE_SYSTEM_DEPS)
   FIND_PACKAGE(PkgConfig REQUIRED)
-  PKG_CHECK_MODULES(FFMPEG_LIBS REQUIRED
-    libavcodec
-    libavformat
-    libavutil
-    libswresample
-    libswscale
-  )
-
+  
+  # Individual check for each module to get specific variables
   FOREACH(_lib avcodec avformat avutil swresample swscale)
+    PKG_CHECK_MODULES(FFMPEG_lib${_lib} REQUIRED lib${_lib})
+    
     IF(NOT TARGET ffmpeg::${_lib})
       ADD_LIBRARY(ffmpeg::${_lib} INTERFACE IMPORTED GLOBAL)
-      SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES "${FFMPEG_lib${_lib}_LINK_LIBRARIES}")
+      
+      # Try to find the actual library file to avoid "library not found" errors
+      FIND_LIBRARY(FFMPEG_lib${_lib}_PATH NAMES ${_lib} PATHS ${FFMPEG_lib${_lib}_LIBRARY_DIRS} ${FFMPEG_lib${_lib}_LIBDIR})
+      
+      IF(FFMPEG_lib${_lib}_PATH)
+        SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES "${FFMPEG_lib${_lib}_PATH}")
+      ELSE()
+        # Fallback to the names if path not found
+        SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES "${FFMPEG_lib${_lib}_LIBRARIES}")
+      ENDIF()
+      
       SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${FFMPEG_lib${_lib}_INCLUDE_DIRS}")
       SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_COMPILE_OPTIONS "${FFMPEG_lib${_lib}_CFLAGS_OTHER}")
       
-      # Map pkg-config names to our internal target names
+      # Promote to global if it came from PkgConfig target
       IF(TARGET PkgConfig::FFMPEG_lib${_lib})
-         # Use the pkg-config generated target if available for better dependency handling
+         SET_PROPERTY(TARGET PkgConfig::FFMPEG_lib${_lib} PROPERTY IMPORTED_GLOBAL TRUE)
+         # Prefer the PkgConfig target as it handles internal dependencies better
          SET_PROPERTY(TARGET ffmpeg::${_lib} PROPERTY INTERFACE_LINK_LIBRARIES PkgConfig::FFMPEG_lib${_lib})
       ENDIF()
     ENDIF()
   ENDFOREACH()
   
+  # Ensure cross-linking between components
+  TARGET_LINK_LIBRARIES(ffmpeg::avcodec INTERFACE ffmpeg::avutil ffmpeg::swresample)
+  TARGET_LINK_LIBRARIES(ffmpeg::avformat INTERFACE ffmpeg::avcodec)
+  TARGET_LINK_LIBRARIES(ffmpeg::swscale INTERFACE ffmpeg::avutil)
+  TARGET_LINK_LIBRARIES(ffmpeg::swresample INTERFACE ffmpeg::avutil)
+  
+  # Add OpenSSL dependency to avutil as many FFmpeg builds require it
+  FIND_PACKAGE(OpenSSL QUIET)
+  if (TARGET OpenSSL::Crypto)
+    TARGET_LINK_LIBRARIES(ffmpeg::avutil INTERFACE OpenSSL::Crypto)
+  endif()
+
   RETURN()
 ENDIF()
 
@@ -292,104 +310,6 @@ LIST(JOIN _ffmpeg_pkg_config_path ":" _ffmpeg_pkg_config_path)
 
 SEPARATE_ARGUMENTS(RV_FFMPEG_PATCH_COMMAND_STEP)
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  DEPENDS ${RV_FFMPEG_DEPENDS}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  INSTALL_DIR ${_install_dir}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  PATCH_COMMAND ${RV_FFMPEG_PATCH_COMMAND_STEP}
-  CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=${_ffmpeg_pkg_config_path}" ${_configure_command} --prefix=${_install_dir} ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
-    ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
-  BUILD_COMMAND ${_make_command} -j${_cpu_count}
-  INSTALL_COMMAND ${_make_command} install
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS ${_force_rebuild}
-  BUILD_BYPRODUCTS ${_build_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
-
-IF(RV_FFMPEG_POST_CONFIGURE_STEP)
-  EXTERNALPROJECT_ADD_STEP(
-    ${_target} post_configure_step
-    ${RV_FFMPEG_POST_CONFIGURE_STEP}
-    DEPENDEES configure
-    DEPENDERS build
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-
-FOREACH(
-  _ffmpeg_lib
-  ${_ffmpeg_libs}
-)
-  ADD_LIBRARY(ffmpeg::${_ffmpeg_lib} SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(ffmpeg::${_ffmpeg_lib} ${_target})
-  SET_PROPERTY(
-    TARGET ffmpeg::${_ffmpeg_lib}
-    PROPERTY IMPORTED_LOCATION ${_ffmpeg_${_ffmpeg_lib}_lib}
-  )
-  IF(RV_TARGET_WINDOWS)
-    SET_PROPERTY(
-      TARGET ffmpeg::${_ffmpeg_lib}
-      PROPERTY IMPORTED_IMPLIB ${_ffmpeg_${_ffmpeg_lib}_implib}
-    )
-  ENDIF()
-  TARGET_INCLUDE_DIRECTORIES(
-    ffmpeg::${_ffmpeg_lib}
-    INTERFACE ${_include_dir}
-  )
-
-  LIST(APPEND RV_DEPS_LIST ffmpeg::${_ffmpeg_lib})
-ENDFOREACH()
-
-TARGET_LINK_LIBRARIES(
-  ffmpeg::avutil
-  INTERFACE OpenSSL::Crypto
-)
-
-TARGET_LINK_LIBRARIES(
-  ffmpeg::swresample
-  INTERFACE ffmpeg::avutil
-)
-TARGET_LINK_LIBRARIES(
-  ffmpeg::swscale
-  INTERFACE ffmpeg::avutil
-)
-TARGET_LINK_LIBRARIES(
-  ffmpeg::avcodec
-  INTERFACE ffmpeg::swresample
-)
-TARGET_LINK_LIBRARIES(
-  ffmpeg::avformat
-  INTERFACE ffmpeg::avcodec
-)
-
-ADD_CUSTOM_TARGET(
-  clean-${_target}
-  COMMENT "Cleaning '${_target}' ..."
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${_base_dir}
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
-)
-
-# Note: On Windows, FFmpeg stores both import libs and DLLs in the install bin directory, so we copy _lib_dir (which is install/bin on Windows) to both stage
-# dirs.
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} USE_FLAG_FILE)
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} USE_FLAG_FILE)
-ENDIF()
-
-SET(RV_DEPS_FFMPEG_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS ${RV_FFMPEG_DEPENDS}

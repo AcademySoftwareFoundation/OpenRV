@@ -224,7 +224,8 @@ namespace Mu
             {
                 if (Object* e = NODE_THREAD.exception())
                 {
-                    if (rval = t->match(e->type()))
+                    if ((rval = t->match(e->type())))
+
                     {
                         NODE_ARG(0, Pointer);
 

@@ -371,32 +371,32 @@ yyFlexLexer::yyIdentifier(const char *text)
 		    {
 			if (!type)
 			{
-			    if (type  = dynamic_cast<Mu::Type*>(sym))
+			    if ((type  = dynamic_cast<Mu::Type*>(sym)))
 				continue;
 			}
 
 			if (!module)
 			{
-			    if (module = dynamic_cast<Mu::Module*>(sym))
+			    if ((module = dynamic_cast<Mu::Module*>(sym)))
 				continue;
 			}
 
 			if (!mvar)
 			{
-			    if (mvar = dynamic_cast<Mu::MemberVariable*>(sym))
+			    if ((mvar = dynamic_cast<Mu::MemberVariable*>(sym)))
 				continue;
 			}
 
 			if (!alias)
 			{
-			    if (alias  = dynamic_cast<Mu::Alias*>(sym))
+			    if ((alias  = dynamic_cast<Mu::Alias*>(sym)))
 				continue;
 			}
 
 			if (!constant)
 			{
-			    if (constant =
-				dynamic_cast<Mu::SymbolicConstant*>(sym))
+			    if ((constant =
+				dynamic_cast<Mu::SymbolicConstant*>(sym)))
 				continue;
 			}
 		    }
@@ -478,38 +478,38 @@ yyFlexLexer::yyIdentifier(const char *text)
 		    {
 			if (!type)
 			{
-			    if (type = dynamic_cast<Mu::Type*>(sym))
+			    if ((type = dynamic_cast<Mu::Type*>(sym)))
 				continue;
 			}
 
 			if (!typemod)
 			{
-			    if (typemod = dynamic_cast<Mu::TypeModifier*>(sym))
+			    if ((typemod = dynamic_cast<Mu::TypeModifier*>(sym)))
 				continue;
 			}
 
 			if (!module)
 			{
-			    if (module = dynamic_cast<Mu::Module*>(sym))
+			    if ((module = dynamic_cast<Mu::Module*>(sym)))
 				continue;
 			}
 
 			if (!constant)
 			{
-			    if (constant =
-				dynamic_cast<Mu::SymbolicConstant*>(sym))
+			    if ((constant =
+				dynamic_cast<Mu::SymbolicConstant*>(sym)))
 				continue;
 			}
 
 			if (!alias)
 			{
-			    if (alias = dynamic_cast<Mu::Alias*>(sym))
+			    if ((alias = dynamic_cast<Mu::Alias*>(sym)))
 				continue;
 			}
 
 			if (!construct)
 			{
-			    if (construct = dynamic_cast<Mu::Construct*>(sym))
+			    if ((construct = dynamic_cast<Mu::Construct*>(sym)))
 				continue;
 			}
 		    }

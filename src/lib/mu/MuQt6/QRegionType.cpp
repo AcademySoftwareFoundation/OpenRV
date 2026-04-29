@@ -268,7 +268,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     Pointer qt_QRegion_operatorAmp__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -340,7 +340,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QRegion_operatorCaret__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)

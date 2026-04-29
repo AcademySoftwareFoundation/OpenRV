@@ -51,7 +51,8 @@ namespace Mu
     using namespace std;
 
     SignalSpy::SignalSpy(QObject* o, const char* sig, const Function* F, Process* p)
-        : QSignalSpy(o, sig)
+        : QObject(o)
+        , QSignalSpy(o, sig)
         , _F(F)
         , _process(p)
         , _env(p->callEnv())

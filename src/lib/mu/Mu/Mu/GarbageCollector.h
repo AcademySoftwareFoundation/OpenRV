@@ -293,16 +293,16 @@ namespace Mu
 #ifdef _MSC_VER
         typedef STLString<wchar_t>::Type UTF16String;
 #else
-        typedef STLString<unsigned short>::Type UTF16String;
+        typedef STLString<char16_t>::Type UTF16String;
 #endif
 
 #ifdef _MSC_VER
-        typedef unsigned int UTF32Char;
+        typedef char32_t UTF32Char;
 #else
         typedef wchar_t UTF32Char;
 #endif
 
-        typedef STLString<wchar_t>::Type UTF32String;
+        typedef STLString<UTF32Char>::Type UTF32String;
 
         //
         //  Storage choice for symbol names and strings.

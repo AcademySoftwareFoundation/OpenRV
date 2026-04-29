@@ -186,7 +186,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QProcessEnvironment& arg0 = getqtype<QProcessEnvironmentType>(param_this);
         const QProcessEnvironment arg1 = getqtype<QProcessEnvironmentType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QProcessEnvironment_operatorEQ_EQ__bool_QProcessEnvironment_QProcessEnvironment(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -195,7 +195,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QProcessEnvironment& arg0 = getqtype<QProcessEnvironmentType>(param_this);
         const QProcessEnvironment arg1 = getqtype<QProcessEnvironmentType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QProcessEnvironment_systemEnvironment_QProcessEnvironment(Mu::Thread& NODE_THREAD)

@@ -244,6 +244,12 @@ FOREACH(
   LIST(APPEND _sources "Q${_entry}Type.cpp")
 ENDFOREACH()
 
+FIND_PROGRAM(QT_MOC_EXECUTABLE NAMES moc PATHS ${RV_DEPS_QT_LOCATION}/bin ${RV_DEPS_QT_LOCATION}/libexec NO_DEFAULT_PATH)
+IF(NOT QT_MOC_EXECUTABLE)
+  # Fallback to standard search if not found in specific location
+  FIND_PROGRAM(QT_MOC_EXECUTABLE NAMES moc)
+ENDIF()
+
 FILE(
   GLOB _files_to_moc
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
@@ -310,7 +316,7 @@ SET_PROPERTY(
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
-  COMMAND ${RV_DEPS_QT_LOCATION}/bin/moc -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
+  COMMAND ${QT_MOC_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/moc_SignalSpy.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/SignalSpy.h
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/SignalSpy.cpp
   COMMENT "Generating SignalSpy moc file ..."

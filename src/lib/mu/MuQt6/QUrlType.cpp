@@ -435,7 +435,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         const QUrl arg1 = getqtype<QUrlType>(param_url);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QUrl_operatorEQ_EQ__bool_QUrl_QUrl(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_url)
@@ -443,7 +443,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QUrl& arg0 = getqtype<QUrlType>(param_this);
         const QUrl arg1 = getqtype<QUrlType>(param_url);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QUrl_fromEncoded_QUrl_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_input, int param_parsingMode)

@@ -151,7 +151,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QKeySequence_operatorLT__bool_QKeySequence_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -159,7 +159,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QKeySequence_operatorLT_EQ__bool_QKeySequence_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -167,7 +167,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator<=(arg1);
+        return arg0 <= (arg1);
     }
 
     bool qt_QKeySequence_operatorEQ_EQ__bool_QKeySequence_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -175,7 +175,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     bool qt_QKeySequence_operatorGT__bool_QKeySequence_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -183,7 +183,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator>(arg1);
+        return arg0 > (arg1);
     }
 
     bool qt_QKeySequence_operatorGT_EQ__bool_QKeySequence_QKeySequence(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -191,7 +191,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QKeySequence& arg0 = getqtype<QKeySequenceType>(param_this);
         const QKeySequence arg1 = getqtype<QKeySequenceType>(param_other);
-        return arg0.operator>=(arg1);
+        return arg0 >= (arg1);
     }
 
     Pointer qt_QKeySequence_fromString_QKeySequence_string_int(Mu::Thread& NODE_THREAD, Pointer param_str, int param_format)

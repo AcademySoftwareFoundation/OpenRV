@@ -1623,7 +1623,7 @@ namespace Mu
         string Reader::readString(istream& i)
         {
             string s;
-            for (int ch; ch = i.get();)
+            for (int ch; (ch = i.get());)
                 s += char(ch);
             return s;
         }
@@ -2897,4 +2897,3 @@ namespace Mu
 
     } // namespace Archive
 } // namespace Mu
-pace Mu

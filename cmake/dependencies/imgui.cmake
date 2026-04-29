@@ -17,10 +17,6 @@ ENDIF()
 
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "${RV_DEPS_IMGUI_VERSION}" "" "")
 
-SET(_imgui_download_url
-    "https://github.com/ocornut/imgui/archive/refs/tags/${_version}.zip"
-)
-
 # There is no version suffix for imgui library name.
 RV_MAKE_STANDARD_LIB_NAME("imgui" "" "SHARED" "")
 
@@ -105,8 +101,8 @@ SET(_find_qt_version
 
 EXTERNALPROJECT_ADD(
   ${_target}
-  URL ${_imgui_download_url}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
+  GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
+  GIT_TAG "docking"
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/${_target}/src

@@ -357,7 +357,7 @@ namespace Mu
 #endif
 
 #ifdef _MSC_VER
-    typedef unsigned int UTF32Char;
+    typedef char32_t UTF32Char;
     typedef STLString<UTF32Char>::Type UTF32String;
     typedef std::basic_string<UTF32Char> stdUTF32String;
 #else

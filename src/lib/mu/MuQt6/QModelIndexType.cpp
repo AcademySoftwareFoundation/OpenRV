@@ -160,7 +160,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QModelIndex arg0 = getqtype<QModelIndexType>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QModelIndex_operatorLT__bool_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -168,7 +168,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QModelIndex arg0 = getqtype<QModelIndexType>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_other);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QModelIndex_operatorEQ_EQ__bool_QModelIndex_QModelIndex(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -176,7 +176,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QModelIndex arg0 = getqtype<QModelIndexType>(param_this);
         const QModelIndex arg1 = getqtype<QModelIndexType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QModelIndex0, Pointer)

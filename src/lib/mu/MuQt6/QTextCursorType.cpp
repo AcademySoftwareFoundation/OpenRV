@@ -429,7 +429,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QTextCursor_operatorLT__bool_QTextCursor_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -437,7 +437,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QTextCursor_operatorLT_EQ__bool_QTextCursor_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -445,7 +445,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator<=(arg1);
+        return arg0 <= (arg1);
     }
 
     bool qt_QTextCursor_operatorEQ_EQ__bool_QTextCursor_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -453,7 +453,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     bool qt_QTextCursor_operatorGT__bool_QTextCursor_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -461,7 +461,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator>(arg1);
+        return arg0 > (arg1);
     }
 
     bool qt_QTextCursor_operatorGT_EQ__bool_QTextCursor_QTextCursor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -469,7 +469,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QTextCursor& arg0 = getqtype<QTextCursorType>(param_this);
         const QTextCursor arg1 = getqtype<QTextCursorType>(param_other);
-        return arg0.operator>=(arg1);
+        return arg0 >= (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QTextCursor0, Pointer)

@@ -625,7 +625,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         const QColor arg1 = getqtype<QColorType>(param_color);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QColor_operatorEQ_EQ__bool_QColor_QColor(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_color)
@@ -633,7 +633,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QColor arg0 = getqtype<QColorType>(param_this);
         const QColor arg1 = getqtype<QColorType>(param_color);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QColor_colorNames_stringBSB_ESB_(Mu::Thread& NODE_THREAD)

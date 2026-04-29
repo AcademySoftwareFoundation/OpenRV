@@ -334,7 +334,8 @@ namespace Mu
 
         SourceFileScope(this, internName(inputName));
 
-        if (p = Parse(inputName, &assembler))
+        if ((p = Parse(inputName, &assembler)))
+
         {
             _istream = saved_istream;
 
@@ -397,7 +398,7 @@ namespace Mu
 
         SourceFileScope(this, internName(file));
 
-        if (p = Parse(file, &assembler))
+        if ((p = Parse(file, &assembler)))
         {
             _istream = saved_istream;
 
@@ -446,7 +447,7 @@ namespace Mu
         PushInputStream pis(this, str);
         NodeAssembler assembler(this, p);
 
-        if (p = Parse("internal type parser", &assembler))
+        if ((p = Parse("internal type parser", &assembler)))
         {
             _istream = saved_istream;
 

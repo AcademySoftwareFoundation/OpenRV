@@ -260,7 +260,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QNetworkCookie& arg0 = getqtype<QNetworkCookieType>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QNetworkCookie_operatorEQ_EQ__bool_QNetworkCookie_QNetworkCookie(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -269,7 +269,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QNetworkCookie& arg0 = getqtype<QNetworkCookieType>(param_this);
         const QNetworkCookie arg1 = getqtype<QNetworkCookieType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QNetworkCookie_parseCookies_qt__QNetworkCookieBSB_ESB__QByteArray(Mu::Thread& NODE_THREAD, Pointer param_cookieString)

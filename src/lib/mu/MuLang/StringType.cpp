@@ -1173,7 +1173,7 @@ namespace Mu
         for (int i = 0, l = size(); i < l; i++)
         {
             h = (h << 4) + _utf8string[i];
-            if (g = h & 0xf0000000)
+            if ((g = h & 0xf0000000))
                 h ^= g >> 24;
             h &= ~g;
         }
@@ -1380,7 +1380,8 @@ namespace Mu
         String* ci = *static_cast<String**>(p);
         ostringstream str;
 
-        for (int ch; ch = i.get();)
+        for (int ch; (ch = i.get());)
+
         {
             str << char(ch);
         }

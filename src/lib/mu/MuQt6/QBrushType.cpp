@@ -261,7 +261,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         const QBrush arg1 = getqtype<QBrushType>(param_brush);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QBrush_operatorEQ_EQ__bool_QBrush_QBrush(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_brush)
@@ -269,7 +269,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QBrush& arg0 = getqtype<QBrushType>(param_this);
         const QBrush arg1 = getqtype<QBrushType>(param_brush);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QBrush0, Pointer)

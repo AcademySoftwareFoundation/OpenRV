@@ -155,7 +155,7 @@ SET(RV_DEPS_GLEW_VERSION_LIB
 # backend-qt https://github.com/dpaulat/imgui-backend-qt
 
 SET(RV_DEPS_IMGUI_VERSION
-    "v1.91.8"
+    "docking"
 )
 SET(RV_DEPS_IMPLOT_TAG
     "v0.16"

@@ -14,7 +14,7 @@
 namespace Mu
 {
 
-    class SignalSpy : public QSignalSpy
+    class SignalSpy : public QObject, public QSignalSpy
     {
         Q_OBJECT
 

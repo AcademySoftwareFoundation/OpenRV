@@ -251,7 +251,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     Pointer qt_QByteArray_operatorPlus_EQ__QByteArray_QByteArray_QByteArray(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_ba)
@@ -267,7 +267,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QByteArray_operatorLT_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
@@ -275,7 +275,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator<=(arg1);
+        return arg0 <= (arg1);
     }
 
     bool qt_QByteArray_operatorEQ_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
@@ -283,7 +283,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     bool qt_QByteArray_operatorGT__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
@@ -291,7 +291,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator>(arg1);
+        return arg0 > (arg1);
     }
 
     bool qt_QByteArray_operatorGT_EQ__bool_QByteArray_string(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_str)
@@ -299,7 +299,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QByteArray& arg0 = getqtype<QByteArrayType>(param_this);
         const QString arg1 = qstring(param_str);
-        return arg0.operator>=(arg1);
+        return arg0 >= (arg1);
     }
 
     Pointer qt_QByteArray_fromBase64_QByteArray_QByteArray_int(Mu::Thread& NODE_THREAD, Pointer param_base64, int param_options)

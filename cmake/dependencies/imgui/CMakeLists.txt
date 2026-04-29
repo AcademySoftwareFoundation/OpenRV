@@ -7,12 +7,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 PROJECT(imgui)
 
+# Skip RPATH cleanup on install to avoid issues with system-linked builds
+SET(CMAKE_SKIP_INSTALL_RPATH TRUE)
+
 SET(IMGUI_SOURCES
     imgui.cpp
     imgui_draw.cpp
     imgui_tables.cpp
     imgui_widgets.cpp
-    imgui_stacklayout.cpp
     imgui_demo.cpp # for testing
     backends/imgui_impl_opengl2.cpp
     backends/imgui_impl_qt.cpp
@@ -29,8 +31,6 @@ SET(IMGUI_HEADERS
     backends/imgui_impl_opengl2.h
     backends/imgui_impl_qt.hpp
     imgui_internal.h
-    imgui_stacklayout_internal.h
-    imgui_stacklayout.h
     imconfig.h
     imstb_rectpack.h
     imstb_textedit.h
@@ -96,7 +96,7 @@ TARGET_LINK_LIBRARIES(
 )
 TARGET_INCLUDE_DIRECTORIES(
   imgui
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/implot ${CMAKE_CURRENT_SOURCE_DIR}/imgui-node-editor ${CMAKE_CURRENT_SOURCE_DIR}/backends
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/implot ${CMAKE_CURRENT_SOURCE_DIR}/imgui-node-editor ${CMAKE_CURRENT_SOURCE_DIR}/backends
 )
 
 INSTALL(

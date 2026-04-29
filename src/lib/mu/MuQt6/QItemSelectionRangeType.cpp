@@ -232,7 +232,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelectionRange arg0 = getqtype<QItemSelectionRangeType>(param_this);
         const QItemSelectionRange arg1 = getqtype<QItemSelectionRangeType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QItemSelectionRange_operatorEQ_EQ__bool_QItemSelectionRange_QItemSelectionRange(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -241,7 +241,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QItemSelectionRange arg0 = getqtype<QItemSelectionRangeType>(param_this);
         const QItemSelectionRange arg1 = getqtype<QItemSelectionRangeType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QItemSelectionRange0, Pointer)

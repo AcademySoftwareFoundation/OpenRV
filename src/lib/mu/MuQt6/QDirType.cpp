@@ -401,7 +401,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QDir& arg0 = getqtype<QDirType>(param_this);
         const QDir arg1 = getqtype<QDirType>(param_dir);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QDir_operatorEQ_EQ__bool_QDir_QDir(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_dir)
@@ -409,7 +409,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QDir& arg0 = getqtype<QDirType>(param_this);
         const QDir arg1 = getqtype<QDirType>(param_dir);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     void qt_QDir_addSearchPath_void_string_string(Mu::Thread& NODE_THREAD, Pointer param_prefix, Pointer param_path)

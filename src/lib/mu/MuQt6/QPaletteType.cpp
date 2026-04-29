@@ -432,7 +432,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPalette& arg0 = getqtype<QPaletteType>(param_this);
         const QPalette arg1 = getqtype<QPaletteType>(param_p);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QPalette_operatorEQ_EQ__bool_QPalette_QPalette(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_p)
@@ -440,7 +440,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPalette& arg0 = getqtype<QPaletteType>(param_this);
         const QPalette arg1 = getqtype<QPaletteType>(param_p);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     static NODE_IMPLEMENTATION(_n_QPalette0, Pointer)

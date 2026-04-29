@@ -323,17 +323,16 @@ STRING(REPLACE ";" "," _versions_str "${_versions_list}")
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_rv_cpp}
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
- ${_about_rv_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
+  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py ${_about_rv_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
           "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
-  COMMENT "Generating about_rv.cpp with build information"
+  COMMENT "Generating about_visto.cpp with build information"
   VERBATIM
 )
 
-# Create explicit target to ensure about_rv.cpp is generated before RvCommon builds
+# Create explicit target to ensure about_visto.cpp is generated before RvCommon builds
 ADD_CUSTOM_TARGET(
-  generate_about_rv_cpp
+  generate_about_visto_cpp
   DEPENDS ${_about_rv_cpp}
 )
 
@@ -344,8 +343,8 @@ ADD_LIBRARY(
   ${_sources} qrc/RvCommon.qrc
 )
 
-# Ensure about_rv.cpp is generated before building RvCommon
-ADD_DEPENDENCIES(${_target} generate_about_rv_cpp)
+# Ensure about_visto.cpp is generated before building RvCommon
+ADD_DEPENDENCIES(${_target} generate_about_visto_cpp)
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS

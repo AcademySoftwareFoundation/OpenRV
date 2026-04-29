@@ -236,7 +236,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         const QTimeZone arg1 = getqtype<QTimeZoneType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QTimeZone_operatorEQ_EQ__bool_QTimeZone_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -244,7 +244,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTimeZone arg0 = getqtype<QTimeZoneType>(param_this);
         const QTimeZone arg1 = getqtype<QTimeZoneType>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     Pointer qt_QTimeZone_fromDurationAheadOfUtc_QTimeZone_int(Mu::Thread& NODE_THREAD, int param_offset)

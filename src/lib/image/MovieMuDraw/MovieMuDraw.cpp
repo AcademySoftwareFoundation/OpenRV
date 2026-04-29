@@ -80,7 +80,7 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM("can't find " << moduleName);
         }
 
-        if (m_main = module->findSymbolOfType<Mu::Function>(m_context->internName("main")))
+        if ((m_main = module->findSymbolOfType<Mu::Function>(m_context->internName("main"))))
         {
             bool sig1 = m_main->type() == m_context->parseType(funcSig, m_process);
             bool sig2 = m_main->type() == m_context->parseType(funcSig2, m_process);
@@ -97,7 +97,7 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM(moduleName << ".main not found");
         }
 
-        if (m_init = module->findSymbolOfType<Mu::Function>(m_context->internName("init")))
+        if ((m_init = module->findSymbolOfType<Mu::Function>(m_context->internName("init"))))
         {
             if (m_init->type() != m_context->parseType(funcSig, m_process))
             {

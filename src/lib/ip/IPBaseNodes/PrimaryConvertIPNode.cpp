@@ -118,7 +118,7 @@ namespace IPCore
             A = Imf::RGBtoXYZ(c0, 1.0) * A * Imf::XYZtoRGB(c1, 1.0);
             A.transpose(); // Transpose for passing into shader.
             TwkMath::Mat44f conversionMatrix;
-            memcpy(&conversionMatrix, &A, sizeof(float) * 16);
+            memcpy((void*)&conversionMatrix, &A, sizeof(float) * 16);
 
             image->shaderExpr = Shader::newColorMatrix(image->shaderExpr, conversionMatrix);
         }

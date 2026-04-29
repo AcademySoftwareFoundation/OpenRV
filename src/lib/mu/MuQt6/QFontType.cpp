@@ -537,7 +537,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         const QFont arg1 = getqtype<QFontType>(param_f);
-        return arg0.operator!=(arg1);
+        return arg0 != (arg1);
     }
 
     bool qt_QFont_operatorLT__bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
@@ -545,7 +545,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         const QFont arg1 = getqtype<QFontType>(param_f);
-        return arg0.operator<(arg1);
+        return arg0 < (arg1);
     }
 
     bool qt_QFont_operatorEQ_EQ__bool_QFont_QFont(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_f)
@@ -553,7 +553,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QFont& arg0 = getqtype<QFontType>(param_this);
         const QFont arg1 = getqtype<QFontType>(param_f);
-        return arg0.operator==(arg1);
+        return arg0 == (arg1);
     }
 
     void qt_QFont_insertSubstitution_void_string_string(Mu::Thread& NODE_THREAD, Pointer param_familyName, Pointer param_substituteName)
