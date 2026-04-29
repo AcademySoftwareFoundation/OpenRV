@@ -7,6 +7,8 @@
 # Generate about_rv.cpp with build and dependency information
 
 import argparse
+import subprocess
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +17,29 @@ from pathlib import Path
 def get_git_info(git_hash_from_cmake=""):
     """Get git commit hash from CMake"""
     return git_hash_from_cmake if git_hash_from_cmake else "unknown"
+
+
+def get_runtime_placeholder(name):
+    return f"%RUNTIME_{name.upper()}%"
+
+
+def get_pkg_version(pkg_name, brew_name=None):
+    try:
+        return subprocess.check_output(
+            ["pkg-config", "--modversion", pkg_name], stderr=subprocess.DEVNULL, text=True
+        ).strip()
+    except Exception:
+        if brew_name:
+            try:
+                out = subprocess.check_output(
+                    ["brew", "info", "--json", brew_name], stderr=subprocess.DEVNULL, text=True
+                )
+
+                data = json.loads(out)
+                return data[0]["versions"]["stable"]
+            except Exception:
+                pass
+        return "Unknown"
 
 
 def parse_versions(versions_str):
@@ -29,16 +54,6 @@ def parse_versions(versions_str):
 
 
 def get_dependencies_info(versions, app_name, platform=""):
-    """Generate dependency information using detected versions"""
-
-    def get_version(key, default="Unknown"):
-        version = versions.get(key, default)
-        # Strip FFmpeg's 'n' prefix (e.g., n6.1.2 -> 6.1.2)
-        if key == "FFmpeg" and version.startswith("n"):
-            version = version[1:]
-        return version
-
-    # Visto uses LGPL, commercial RV uses Qt Commercial
     is_commercial_rv = app_name == "RV"
     qt_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
     pyside_license = "Qt Commercial" if is_commercial_rv else "LGPL v3"
@@ -46,59 +61,70 @@ def get_dependencies_info(versions, app_name, platform=""):
     is_macos = "darwin" in platform.lower() or "macos" in platform.lower()
 
     vfx_deps = [
-        ("Boost", get_version("Boost"), "Boost Software License"),
-        ("Imath", get_version("Imath"), "BSD 3-Clause"),
-        ("NumPy", get_version("numpy", "1.24+"), "BSD 3-Clause"),
-        ("OpenColorIO", get_version("OpenColorIO"), "BSD 3-Clause"),
-        ("OpenEXR", get_version("OpenEXR"), "BSD 3-Clause"),
-        ("OpenImageIO", get_version("OpenImageIO"), "Apache 2.0"),
-        ("OpenTimelineIO", get_version("otio"), "Apache 2.0"),
-        ("PySide", get_version("PySide"), pyside_license),
-        ("Python", get_version("Python"), "PSF License"),
-        ("Qt Framework", get_version("Qt"), qt_license),
+        ("Boost", get_pkg_version("boost"), get_runtime_placeholder("boost"), "Boost Software License"),
+        ("Imath", get_pkg_version("Imath", "imath"), get_runtime_placeholder("imath"), "BSD 3-Clause"),
+        ("NumPy", "Unknown", get_runtime_placeholder("numpy"), "BSD 3-Clause"),
+        (
+            "OpenColorIO",
+            get_pkg_version("OpenColorIO", "opencolorio"),
+            get_runtime_placeholder("opencolorio"),
+            "BSD 3-Clause",
+        ),
+        ("OpenEXR", get_pkg_version("OpenEXR", "openexr"), get_runtime_placeholder("openexr"), "BSD 3-Clause"),
+        (
+            "OpenImageIO",
+            get_pkg_version("OpenImageIO", "openimageio"),
+            get_runtime_placeholder("openimageio"),
+            "Apache 2.0",
+        ),
+        ("OpenTimelineIO", "Unknown", get_runtime_placeholder("opentimelineio"), "Apache 2.0"),
+        ("PySide", get_pkg_version("PySide6"), get_runtime_placeholder("pyside"), pyside_license),
+        ("Python", get_pkg_version("python3", "python"), get_runtime_placeholder("python"), "PSF License"),
+        ("Qt Framework", get_pkg_version("Qt6Core", "qt"), get_runtime_placeholder("qt"), qt_license),
     ]
 
-    # RV-specific proprietary components (only for commercial RV, alphabetical order)
     rv_specific_deps = []
     if is_commercial_rv:
-        # Apple ProRes is only available on macOS (and not on ARM64 currently)
         if is_macos:
-            prores_ver = get_version("prores", "Not Used")
-            rv_specific_deps.append(("Apple ProRes", prores_ver, "Apple Proprietary"))
-
-        # Always add these for commercial RV (version will show "Not Used" if not available)
+            rv_specific_deps.append(
+                ("Apple ProRes", "Not Used", get_runtime_placeholder("prores"), "Apple Proprietary")
+            )
         rv_specific_deps.extend(
             [
-                ("ARRI SDK", get_version("arriraw", "Not Used"), "ARRI Proprietary"),
-                ("NDI SDK", get_version("ndi", "Not Used"), "NDI Proprietary"),
-                ("RED R3D SDK", get_version("r3dsdk", "Not Used"), "RED Proprietary"),
-                ("x264", get_version("x264", "Not Used"), "x264 Commercial License"),
+                ("ARRI SDK", "Not Used", get_runtime_placeholder("arri"), "ARRI Proprietary"),
+                ("NDI SDK", "Not Used", get_runtime_placeholder("ndi"), "NDI Proprietary"),
+                ("RED R3D SDK", "Not Used", get_runtime_placeholder("red"), "RED Proprietary"),
+                ("x264", "Not Used", get_runtime_placeholder("x264"), "x264 Commercial License"),
             ]
         )
 
-    # Other third-party components (alphabetical order)
     other_deps = [
-        ("AJA NTV2 SDK", get_version("aja"), "MIT License"),
-        ("Blackmagic DeckLink SDK", get_version("bmd"), "Proprietary"),
-        ("Boehm GC", get_version("gc"), "MIT-style"),
-        ("dav1d", get_version("dav1d"), "BSD 2-Clause"),
-        ("Dear ImGui", get_version("imgui"), "MIT License"),
-        ("Expat", get_version("expat"), "MIT License"),
-        ("FFmpeg", get_version("FFmpeg"), "LGPL v2.1+"),
-        ("GLEW", get_version("GLEW"), "Modified BSD / MIT"),
-        ("libjpeg-turbo", get_version("jpegturbo"), "BSD-style"),
-        ("libpng", get_version("png"), "libpng License"),
-        ("LibRaw", get_version("raw"), "LGPL v2.1 / CDDL"),
-        ("libtiff", get_version("tiff"), "libtiff License"),
-        ("libwebp", get_version("webp"), "BSD 3-Clause"),
-        ("nanobind", get_version("nanobind"), "BSD 3-Clause"),
-        ("OpenJPEG", get_version("openjpeg"), "BSD 2-Clause"),
-        ("OpenJPH", get_version("openjph"), "BSD 2-Clause"),
-        ("OpenSSL", get_version("OpenSSL"), "Apache License 2.0"),
-        ("PCRE2", get_version("pcre2"), "BSD License"),
-        ("spdlog", get_version("spdlog"), "MIT License"),
-        ("yaml-cpp", get_version("yaml-cpp"), "MIT License"),
-        ("zlib", get_version("zlib"), "zlib License"),
+        ("AJA NTV2 SDK", "Unknown", get_runtime_placeholder("aja"), "MIT License"),
+        ("Blackmagic DeckLink SDK", "Unknown", get_runtime_placeholder("bmd"), "Proprietary"),
+        ("Boehm GC", get_pkg_version("bdw-gc", "bdw-gc"), get_runtime_placeholder("bdw-gc"), "MIT-style"),
+        ("dav1d", get_pkg_version("dav1d", "dav1d"), get_runtime_placeholder("dav1d"), "BSD 2-Clause"),
+        ("Dear ImGui", "Unknown", get_runtime_placeholder("imgui"), "MIT License"),
+        ("Expat", get_pkg_version("expat", "expat"), get_runtime_placeholder("expat"), "MIT License"),
+        ("FFmpeg", get_pkg_version("libavcodec", "ffmpeg"), get_runtime_placeholder("ffmpeg"), "LGPL v2.1+"),
+        ("GLEW", get_pkg_version("glew", "glew"), get_runtime_placeholder("glew"), "Modified BSD / MIT"),
+        (
+            "libjpeg-turbo",
+            get_pkg_version("libturbojpeg", "jpeg-turbo"),
+            get_runtime_placeholder("jpeg-turbo"),
+            "BSD-style",
+        ),
+        ("libpng", get_pkg_version("libpng", "libpng"), get_runtime_placeholder("libpng"), "libpng License"),
+        ("LibRaw", get_pkg_version("libraw", "libraw"), get_runtime_placeholder("libraw"), "LGPL v2.1 / CDDL"),
+        ("libtiff", get_pkg_version("libtiff-4", "libtiff"), get_runtime_placeholder("libtiff"), "libtiff License"),
+        ("libwebp", get_pkg_version("libwebp", "webp"), get_runtime_placeholder("webp"), "BSD 3-Clause"),
+        ("nanobind", "Unknown", get_runtime_placeholder("nanobind"), "BSD 3-Clause"),
+        ("OpenJPEG", get_pkg_version("libopenjp2", "openjpeg"), get_runtime_placeholder("openjpeg"), "BSD 2-Clause"),
+        ("OpenJPH", "Unknown", get_runtime_placeholder("openjph"), "BSD 2-Clause"),
+        ("OpenSSL", get_pkg_version("openssl", "openssl"), get_runtime_placeholder("openssl"), "Apache License 2.0"),
+        ("PCRE2", get_pkg_version("libpcre2-8", "pcre2"), get_runtime_placeholder("pcre2"), "BSD License"),
+        ("spdlog", get_pkg_version("spdlog", "spdlog"), get_runtime_placeholder("spdlog"), "MIT License"),
+        ("yaml-cpp", get_pkg_version("yaml-cpp", "yaml-cpp"), get_runtime_placeholder("yaml-cpp"), "MIT License"),
+        ("zlib", get_pkg_version("zlib", "zlib"), get_runtime_placeholder("zlib"), "zlib License"),
     ]
 
     return vfx_deps, other_deps, rv_specific_deps
@@ -146,30 +172,32 @@ def generate_about_cpp(
         # Extract year from platform (e.g., "CY2024" -> "2024")
         vfx_year = vfx_platform.replace("CY", "") if vfx_platform.startswith("CY") else vfx_platform
         html_content.append("<tr>")
-        html_content.append(f'<td colspan="3"><b>VFX Reference Platform {vfx_year}</b></td>')
+        html_content.append(f'<td colspan="4"><b>VFX Reference Platform {vfx_year}</b></td>')
         html_content.append("</tr>")
 
         # Column headers
         html_content.append("<tr>")
         html_content.append("<td><b>Description</b></td>")
-        html_content.append("<td><b>Version</b></td>")
+        html_content.append("<td><b>Build Version</b></td>")
+        html_content.append("<td><b>Runtime Version</b></td>")
         html_content.append("<td><b>License</b></td>")
         html_content.append("</tr>")
 
         # VFX Platform dependencies
-        for desc, version, license in vfx_deps:
+        for desc, build_version, runtime_version, license in vfx_deps:
             html_content.append("<tr>")
             html_content.append(f"<td>{desc}</td>")
-            html_content.append(f"<td>{version}</td>")
+            html_content.append(f"<td>{build_version}</td>")
+            html_content.append(f"<td>{runtime_version}</td>")
             html_content.append(f"<td>{license}</td>")
             html_content.append("</tr>")
 
         # Empty row separator
-        html_content.append('<tr><td colspan="3">&nbsp;</td></tr>')
+        html_content.append('<tr><td colspan="4">&nbsp;</td></tr>')
 
     # Other Dependencies header row
     html_content.append("<tr>")
-    html_content.append('<td colspan="3"><b>Other Dependencies</b></td>')
+    html_content.append('<td colspan="4"><b>Other Dependencies</b></td>')
     html_content.append("</tr>")
 
     # Column headers for other dependencies
@@ -180,35 +208,38 @@ def generate_about_cpp(
     html_content.append("</tr>")
 
     # Other dependencies
-    for desc, version, license in other_deps:
+    for desc, build_version, runtime_version, license in other_deps:
         html_content.append("<tr>")
         html_content.append(f"<td>{desc}</td>")
-        html_content.append(f"<td>{version}</td>")
+        html_content.append(f"<td>{build_version}</td>")
+        html_content.append(f"<td>{runtime_version}</td>")
         html_content.append(f"<td>{license}</td>")
         html_content.append("</tr>")
 
     # RV-Specific Components section (only for commercial RV)
     if rv_specific_deps:
         # Empty row separator
-        html_content.append('<tr><td colspan="3">&nbsp;</td></tr>')
+        html_content.append('<tr><td colspan="4">&nbsp;</td></tr>')
 
         # RV Components header row
         html_content.append("<tr>")
-        html_content.append('<td colspan="3"><b>RV-Specific Components</b></td>')
+        html_content.append('<td colspan="4"><b>RV-Specific Components</b></td>')
         html_content.append("</tr>")
 
         # Column headers
         html_content.append("<tr>")
         html_content.append("<td><b>Description</b></td>")
-        html_content.append("<td><b>Version</b></td>")
+        html_content.append("<td><b>Build Version</b></td>")
+        html_content.append("<td><b>Runtime Version</b></td>")
         html_content.append("<td><b>License</b></td>")
         html_content.append("</tr>")
 
         # RV-specific components
-        for desc, version, license in rv_specific_deps:
+        for desc, build_version, runtime_version, license in rv_specific_deps:
             html_content.append("<tr>")
             html_content.append(f"<td>{desc}</td>")
-            html_content.append(f"<td>{version}</td>")
+            html_content.append(f"<td>{build_version}</td>")
+            html_content.append(f"<td>{runtime_version}</td>")
             html_content.append(f"<td>{license}</td>")
             html_content.append("</tr>")
 

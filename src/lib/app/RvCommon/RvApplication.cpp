@@ -631,7 +631,51 @@ namespace Rv
 
         // Add a text box with detailed build and dependency information
         QTextEdit* textBox = new QTextEdit();
-        textBox->setHtml(about_Visto);
+
+        QString aboutHtml = QString::fromUtf8(about_Visto);
+
+        // Helper lambda to fetch Homebrew symlink target version
+        auto getHomebrewRuntimeVersion = [](const QString& packageName) -> QString
+        {
+            QFileInfo info("/opt/homebrew/opt/" + packageName);
+            if (!info.exists() || !info.isSymLink())
+            {
+                info = QFileInfo("/usr/local/opt/" + packageName);
+            }
+            if (info.isSymLink())
+            {
+                QFileInfo targetInfo(info.symLinkTarget());
+                return targetInfo.fileName();
+            }
+            return "<i>Static</i>";
+        };
+
+        // Resolve runtime versions using actual C++ APIs for core dependencies
+        aboutHtml.replace("%RUNTIME_QT%", qVersion());
+
+        // Resolve remaining dependencies by checking Homebrew symlinks
+        QRegularExpression regex("%RUNTIME_([a-zA-Z0-9_-]+)%");
+        QRegularExpressionMatchIterator i = regex.globalMatch(aboutHtml);
+        while (i.hasNext())
+        {
+            QRegularExpressionMatch match = i.next();
+            QString placeholder = match.captured(0);
+            QString packageName = match.captured(1);
+
+            // Convert placeholder keys like 'libtiff-4' to brew package 'libtiff'
+            if (packageName == "libtiff-4")
+                packageName = "libtiff";
+            if (packageName == "libopenjp2")
+                packageName = "openjpeg";
+            if (packageName == "libpcre2-8")
+                packageName = "pcre2";
+
+            QString runtimeVersion = getHomebrewRuntimeVersion(packageName);
+            aboutHtml.replace(placeholder, runtimeVersion);
+        }
+
+        textBox->setHtml(aboutHtml);
+
         textBox->setReadOnly(true);
         textBox->setMinimumHeight(250);
         textBox->setMinimumWidth(500);
