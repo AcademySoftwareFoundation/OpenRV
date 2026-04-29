@@ -112,6 +112,7 @@ CMAKE_ARGS=(
     "-DRV_DEPS_QT_LOCATION=${QT_HOME}"
     "-DRV_VFX_PLATFORM=CY2026"
     "-DRV_USE_SYSTEM_DEPS=ON"
+    "-DRV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE=ac3;hevc;mpeg2video;prores;prores_aw;prores_ks;prores_lgpl;svq1;svq3"
 )
 
 # Add Windows specifics if running in MSYS/Cygwin
