@@ -152,16 +152,16 @@ SET(RV_DEPS_GLEW_VERSION_LIB
 # imgui https://github.com/ocornut/imgui implot https://github.com/epezent/implot backend-qt https://github.com/dpaulat/imgui-backend-qt
 
 SET(RV_DEPS_IMGUI_VERSION
-    "v1.92.0-docking"
+    "v1.90.1-docking"
 )
 SET(RV_DEPS_IMPLOT_TAG
-    "master"
+    "v0.16"
 )
 SET(RV_DEPS_IMGUI_BACKEND_QT_TAG
-    "023345ca8abf731fc50568c0197ceebe76bb4324"
+    "0fe974e"
 )
 SET(RV_DEPS_IMGUI_NODE_EDITOR_TAG
-    "master"
+    "v0.9.3"
 )
 
 # jpegturbo https://github.com/libjpeg-turbo/libjpeg-turbo TODO: Needs additional work in cmake/dependencies/jpegturbo.cmake to fully integrate new versioning

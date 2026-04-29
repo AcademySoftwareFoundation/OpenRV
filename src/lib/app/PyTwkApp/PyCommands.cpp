@@ -13,8 +13,8 @@
 #include <TwkPython/PyLockObject.h>
 #include <Python.h>
 
-#include <imgui.h>
-#include <ImGuiPythonBridge.h>
+// #include <imgui.h>
+// #include <ImGuiPythonBridge.h>
 
 #include <MuPy/PyModule.h>
 #include <TwkApp/Action.h>
@@ -181,33 +181,35 @@ namespace TwkApp
         return PyLong_FromLong(1);
     }
 
-    static PyObject* py_imgui_register_diagnostics_callback(PyObject*, PyObject* args)
-    {
-        PyObject* callable;
-        if (!PyArg_ParseTuple(args, "O", &callable))
-            return nullptr;
-        Rv::ImGuiPythonBridge::registerCallback(callable);
-        if (!PyCallable_Check(callable))
+    /*
+        static PyObject* py_imgui_register_diagnostics_callback(PyObject*, PyObject* args)
         {
-            PyErr_SetString(PyExc_TypeError, "Argument must be callable");
-            return nullptr;
+            PyObject* callable;
+            if (!PyArg_ParseTuple(args, "O", &callable))
+                return nullptr;
+            Rv::ImGuiPythonBridge::registerCallback(callable);
+            if (!PyCallable_Check(callable))
+            {
+                PyErr_SetString(PyExc_TypeError, "Argument must be callable");
+                return nullptr;
+            }
+            Py_RETURN_NONE;
         }
-        Py_RETURN_NONE;
-    }
 
-    static PyObject* py_imgui_unregister_diagnostics_callback(PyObject*, PyObject* args)
-    {
-        PyObject* callable;
-        if (!PyArg_ParseTuple(args, "O", &callable))
-            return nullptr;
-        Rv::ImGuiPythonBridge::unregisterCallback(callable);
-        if (!PyCallable_Check(callable))
+        static PyObject* py_imgui_unregister_diagnostics_callback(PyObject*, PyObject* args)
         {
-            PyErr_SetString(PyExc_TypeError, "Argument must be callable");
-            return nullptr;
+            PyObject* callable;
+            if (!PyArg_ParseTuple(args, "O", &callable))
+                return nullptr;
+            Rv::ImGuiPythonBridge::unregisterCallback(callable);
+            if (!PyCallable_Check(callable))
+            {
+                PyErr_SetString(PyExc_TypeError, "Argument must be callable");
+                return nullptr;
+            }
+            Py_RETURN_NONE;
         }
-        Py_RETURN_NONE;
-    }
+    */
 
     static vector<PyMethodDef> methods;
 
@@ -215,9 +217,9 @@ namespace TwkApp
         {"bind", bind, METH_VARARGS, "bind event to action."},
         {"bindRegex", bindRegex, METH_VARARGS, "bind regex event to action."},
         {"defineModeMenu", defineModeMenu, METH_VARARGS, "define the menu for a mode."},
-        {"register_diagnostics_callback", py_imgui_register_diagnostics_callback, METH_VARARGS, "Register a Python ImGui draw callback"},
-        {"unregister_diagnostics_callback", py_imgui_unregister_diagnostics_callback, METH_VARARGS,
-         "Unregister a Python ImGui draw callback"},
+        // {"register_diagnostics_callback", py_imgui_register_diagnostics_callback, METH_VARARGS, "Register a Python ImGui draw callback"},
+        // {"unregister_diagnostics_callback", py_imgui_unregister_diagnostics_callback, METH_VARARGS,
+        //  "Unregister a Python ImGui draw callback"},
         {NULL}};
 
     void pyInitCommands(void* othermethods)

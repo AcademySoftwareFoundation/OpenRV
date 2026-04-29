@@ -1,6 +1,5 @@
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -68,7 +67,7 @@ SET(_PYTHON_LIB_DIR
 EXTERNALPROJECT_ADD(
   ${_target}
   GIT_REPOSITORY "https://github.com/pthom/imgui_bundle.git"
-  GIT_TAG "v1.92.0"
+  GIT_TAG "v1.5.0"
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${CMAKE_BINARY_DIR}/RV_DEPS_IMGUI/deps/imgui-bundle

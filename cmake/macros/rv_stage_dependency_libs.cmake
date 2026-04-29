@@ -31,9 +31,7 @@
 #                                   # Prefer OUTPUTS when possible; use this only when outputs are hard to enumerate.
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
-  IF(RV_USE_SYSTEM_DEPS)
-    RETURN()
-  ENDIF()
+
 
   CMAKE_PARSE_ARGUMENTS(
     _ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN}

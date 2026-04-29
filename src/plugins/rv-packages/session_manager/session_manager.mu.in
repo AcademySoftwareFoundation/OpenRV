@@ -3187,7 +3187,7 @@ class: SessionManagerMode : MinorMode
         _viewTreeView.setAcceptDrops(true);
         _viewTreeView.setShowDropIndicator(true);
         _viewTreeView.setHeaderHidden(false);
-        _viewTreeView.setSelectionMode(QAbstractItemView.ExtendedSelection);
+        // _viewTreeView.setSelectionMode(QAbstractItemView.ExtendedSelection);
         _viewTreeView.setEditTriggers(QAbstractItemView.EditKeyPressed);
         _viewTreeView.setContextMenuPolicy(Qt.CustomContextMenu);
         _viewTreeView.setDragDropMode(QAbstractItemView.DragDrop);
@@ -3198,7 +3198,7 @@ class: SessionManagerMode : MinorMode
         _inputsView.setModel(_inputsModel);
         _inputsView.setDragEnabled(true);
         _inputsView.setAcceptDrops(true);
-        _inputsView.setSelectionMode(QAbstractItemView.ExtendedSelection);
+        // _inputsView.setSelectionMode(QAbstractItemView.ExtendedSelection);
         _inputsView.setSelectionBehavior(QAbstractItemView.SelectRows);
         _inputsView.setDefaultDropAction(Qt.MoveAction);
         _inputsView.setShowDropIndicator(true);

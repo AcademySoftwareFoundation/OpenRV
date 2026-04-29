@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -58,10 +57,9 @@ INCLUDE(qt6)
 
 INCLUDE(openssl) # Python3 requirement
 INCLUDE(python3)
-INCLUDE(imgui)
+# INCLUDE(imgui)
 INCLUDE(nanobind)
-INCLUDE(pyimgui)
-INCLUDE(pyimplot)
+# INCLUDE(pyimgui) INCLUDE(pyimplot)
 INCLUDE(boost)
 INCLUDE(dav1d)
 IF(RV_TARGET_WINDOWS)

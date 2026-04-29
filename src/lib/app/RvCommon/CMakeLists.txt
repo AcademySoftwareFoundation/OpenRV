@@ -46,7 +46,6 @@ SET(_sources
     RvDocument.cpp
     RvConsoleApplication.cpp
     RvApplication.cpp
-    DiagnosticsView.cpp
     GLView.cpp
     TwkQTAction.cpp
     MediaDirModel.cpp
@@ -349,8 +348,8 @@ STRING(REPLACE ";" "," _versions_str "${_versions_list}")
 
 ADD_CUSTOM_COMMAND(
   OUTPUT ${_about_visto_cpp}
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py ${_about_visto_cpp} "${_compiler_name}" "${_vfx_platform_str}"
-          "${_platform_name}" "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
+  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py ${_about_visto_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
+          "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "${_versions_str}" "${RV_GIT_COMMIT_SHORT_HASH}"
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
   COMMENT "Generating about_visto.cpp with build information"
   VERBATIM
@@ -371,7 +370,6 @@ ADD_LIBRARY(
 
 # Ensure about_visto.cpp is generated before building RvCommon
 ADD_DEPENDENCIES(${_target} generate_about_visto_cpp)
-
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS
@@ -429,8 +427,7 @@ TARGET_LINK_LIBRARIES(
           IOtarga
           IOtiff
           spdlog::spdlog
-          ImGuiPythonBridge
-          imgui::imgui
+          # ImGuiPythonBridge imgui::imgui
 )
 
 IF(RV_TARGET_DARWIN)

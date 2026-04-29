@@ -24,7 +24,7 @@
 #include <GL/glew.h>
 #endif
 #include <RvCommon/GLView.h> // WINDOWS: include AFTER other stuff
-#include <RvCommon/DiagnosticsView.h>
+// #include <RvCommon/DiagnosticsView.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtGui/QtGui>
 #include <QtNetwork/QtNetwork>
@@ -203,15 +203,15 @@ namespace Rv
         }
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
-        m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
+        // m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
 
         // Dockable to QMainWindow, not centralwidget.
-        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-        m_diagnosticsDock->setWidget(m_diagnosticsView);
-        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-        m_diagnosticsDock->hide();                    // Hide by default
-        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        // m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+        // m_diagnosticsDock->setWidget(m_diagnosticsView);
+        // m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        // addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+        // m_diagnosticsDock->hide();                    // Hide by default
+        // m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -842,7 +842,7 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics() { m_diagnosticsDock->show(); }
+    void RvDocument::showDiagnostics() { /*m_diagnosticsDock->show();*/ }
 
     void RvDocument::setStereo(bool b)
     {
