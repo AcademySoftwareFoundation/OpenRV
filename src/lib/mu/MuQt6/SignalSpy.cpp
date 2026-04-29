@@ -52,7 +52,6 @@ namespace Mu
 
     SignalSpy::SignalSpy(QObject* o, const char* sig, const Function* F, Process* p)
         : QObject(o)
-        , QSignalSpy(o, sig)
         , _F(F)
         , _process(p)
         , _env(p->callEnv())
@@ -129,6 +128,19 @@ namespace Mu
                 cout << "WARNING: " << sig << " not translated correctly" << endl;
             }
         }
+
+        QByteArray normSig = QMetaObject::normalizedSignature(sig);
+        if (!normSig.startsWith("2"))
+        {
+            normSig.prepend("2");
+        }
+        int sigIndex = o->metaObject()->indexOfSignal(normSig.constData());
+
+        auto conn = QMetaObject::connect(o, sigIndex, this, this->metaObject()->methodCount());
+        if (!conn)
+        {
+            cout << "SignalSpy ERROR: methodCount() connection failed for signal: " << normSig.constData() << endl;
+        }
     }
 
     SignalSpy::~SignalSpy() { _F = 0; }
@@ -200,55 +212,43 @@ namespace Mu
 
                 case TreeItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QTreeWidgetItem* o = v.value<QTreeWidgetItem*>();
-                    args[i]._Pointer = !o ? NULL : makeqpointer<QTreeWidgetItemType>((QTreeWidgetItemType*)_F->argType(i), o);
+                    QTreeWidgetItem** o = reinterpret_cast<QTreeWidgetItem**>(a[i + 1]);
+                    args[i]._Pointer = !(*o) ? NULL : makeqpointer<QTreeWidgetItemType>((QTreeWidgetItemType*)_F->argType(i), *o);
                 }
                 break;
 
                 case TableItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QTableWidgetItem* o = v.value<QTableWidgetItem*>();
-                    args[i]._Pointer = !o ? NULL : makeqpointer<QTableWidgetItemType>((QTableWidgetItemType*)_F->argType(i), o);
+                    QTableWidgetItem** o = reinterpret_cast<QTableWidgetItem**>(a[i + 1]);
+                    args[i]._Pointer = !(*o) ? NULL : makeqpointer<QTableWidgetItemType>((QTableWidgetItemType*)_F->argType(i), *o);
                 }
                 break;
 
                 case ListItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QListWidgetItem* o = v.value<QListWidgetItem*>();
-                    args[i]._Pointer = !o ? NULL : makeqpointer<QListWidgetItemType>((QListWidgetItemType*)_F->argType(i), o);
+                    QListWidgetItem** o = reinterpret_cast<QListWidgetItem**>(a[i + 1]);
+                    args[i]._Pointer = !(*o) ? NULL : makeqpointer<QListWidgetItemType>((QListWidgetItemType*)_F->argType(i), *o);
                 }
                 break;
 
                 case StandardItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QStandardItem* o = v.value<QStandardItem*>();
-                    args[i]._Pointer = !o ? NULL : makeqpointer<QStandardItemType>((QStandardItemType*)_F->argType(i), o);
+                    QStandardItem** o = reinterpret_cast<QStandardItem**>(a[i + 1]);
+                    args[i]._Pointer = !(*o) ? NULL : makeqpointer<QStandardItemType>((QStandardItemType*)_F->argType(i), *o);
                 }
                 break;
 
                 case ModelIndexArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QModelIndex o = v.value<QModelIndex>();
-                    args[i]._Pointer = makeqtype<QModelIndexType>((Context*)c, o, "qt.QModelIndex");
+                    QModelIndex* o = reinterpret_cast<QModelIndex*>(a[i + 1]);
+                    args[i]._Pointer = makeqtype<QModelIndexType>((Context*)c, *o, "qt.QModelIndex");
                 }
                 break;
 
                 case ItemSelectionArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
-                    QVariant v(type, a[i + 1]);
-                    QItemSelection o = v.value<QItemSelection>();
-                    args[i]._Pointer = makeqtype<QItemSelectionType>((Context*)c, o, "qt.QItemSelection");
+                    QItemSelection* o = reinterpret_cast<QItemSelection*>(a[i + 1]);
+                    args[i]._Pointer = makeqtype<QItemSelectionType>((Context*)c, *o, "qt.QItemSelection");
                 }
                 break;
 

@@ -14,7 +14,7 @@
 namespace Mu
 {
 
-    class SignalSpy : public QObject, public QSignalSpy
+    class SignalSpy : public QObject
     {
         Q_OBJECT
 
@@ -43,6 +43,7 @@ namespace Mu
 
         virtual ~SignalSpy();
 
+    public:
         int original_qt_metacall(QMetaObject::Call, int, void**);
 
     private:

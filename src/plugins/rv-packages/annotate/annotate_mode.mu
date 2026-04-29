@@ -1528,7 +1528,7 @@ class: AnnotateMinorMode : MinorMode
     method: chooseColorSlot (void; bool checked)
     {
         _colorDialog.setCurrentColor(toQColor(_currentDrawMode.color));
-        _colorDialog.setWindowModality(Qt.NonModal);
+        // _colorDialog.setWindowModality(Qt.NonModal);
         _colorDialog.show();
     }
 

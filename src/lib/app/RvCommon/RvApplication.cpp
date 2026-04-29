@@ -139,7 +139,10 @@ namespace
 
                                     // Qt pointer dispatch warning when touch events arrive without
                                     // a target window (harmless, happens during window transitions)
-                                    "skipping QEventPoint"sv};
+                                    "skipping QEventPoint"sv,
+
+                                    // Harmless MuQt6 bridging GC warning
+                                    "wildcard call disconnects from destroyed signal"sv};
 
         return any_of(silenced.begin(), silenced.end(), [text](const auto& msg) { return text.find(msg) != string::npos; });
     }
