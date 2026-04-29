@@ -874,7 +874,7 @@ namespace Rv
             for (int i = 0; i <= Qt::UserRole; ++i)
             {
                 QVariant variantData = data(index, i);
-                if (variantData.type() != QVariant::Invalid)
+                if (variantData.type() != QMetaType::UnknownType)
                     roles.insert(i, variantData);
             }
         }

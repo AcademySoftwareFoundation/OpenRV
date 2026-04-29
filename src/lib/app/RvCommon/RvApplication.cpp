@@ -621,8 +621,8 @@ namespace Rv
         if (doc)
             parent = (RvDocument*)doc->opaquePointer();
 
-        QMessageBox* msgBox = new QMessageBox("About " UI_APPLICATION_NAME, QString(temp.data()), QMessageBox::Information, 0, 0, 0, parent,
-                                              Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
+        QMessageBox* msgBox = new QMessageBox(QMessageBox::Information, "About " UI_APPLICATION_NAME, QString(temp.data()),
+                                              QMessageBox::NoButton, parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint);
         msgBox->setAttribute(Qt::WA_DeleteOnClose);
         QIcon icon = msgBox->windowIcon();
         QSize size = icon.actualSize(QSize(64, 64));

@@ -53,24 +53,24 @@ namespace Rv
         return NULL;
     }
 
-    static QVariant::Type pyTypeToQVariantType(PyObject* obj)
+    static int pyTypeToQVariantType(PyObject* obj)
     {
         if (PyBool_Check(obj))
-            return QVariant::Bool;
+            return QMetaType::Bool;
         else if (PyLong_Check(obj))
-            return QVariant::Int;
+            return QMetaType::Int;
         else if (PyFloat_Check(obj))
-            return QVariant::Double;
+            return QMetaType::Double;
         else if (PyBytes_Check(obj))
-            return QVariant::String;
+            return QMetaType::QString;
         else if (PyUnicode_Check(obj))
-            return QVariant::String;
+            return QMetaType::QString;
         else if (PyList_Check(obj))
-            return QVariant::List;
-        return QVariant::List;
+            return QMetaType::QVariantList;
+        return QMetaType::QVariantList;
     }
 
-    static PyObject* qvariantToPyObject(QVariant::Type type, const QVariant& value)
+    static PyObject* qvariantToPyObject(int type, const QVariant& value)
     {
         //
         //  As far as I can tell, all these functions "pass ownership" of a
@@ -82,17 +82,17 @@ namespace Rv
 
         switch (type)
         {
-        case QVariant::Bool:
+        case QMetaType::Bool:
             ret = value.toBool() ? Py_True : Py_False;
             break;
-        case QVariant::Int:
+        case QMetaType::Int:
             ret = PyLong_FromLong(value.toInt());
             break;
-        case QVariant::Double:
+        case QMetaType::Double:
         case QMetaType::Float: // does this happen?
             ret = PyFloat_FromDouble(value.toDouble());
             break;
-        case QVariant::String:
+        case QMetaType::QString:
         {
             //
             //  No you can't do this all in one step!  if you go all the way
@@ -104,7 +104,7 @@ namespace Rv
             ret = PyUnicode_DecodeUTF8(s, strlen(s), "ignore");
         }
         break;
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             QStringList list = value.toStringList();
             PyObject* pylist = PyList_New(list.size());
@@ -119,7 +119,7 @@ namespace Rv
             ret = pylist;
         }
         break;
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             QVariantList list = value.toList();
             PyObject* pylist = PyList_New(list.size());
@@ -203,7 +203,7 @@ namespace Rv
         else
         {
             QVariant value = settings.value(name);
-            QVariant::Type type = pyTypeToQVariantType(defaultObj);
+            int type = pyTypeToQVariantType(defaultObj);
             ret = qvariantToPyObject(type, value);
         }
         settings.endGroup();

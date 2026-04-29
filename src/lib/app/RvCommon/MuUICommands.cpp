@@ -1399,29 +1399,29 @@ namespace Rv
         settings.endGroup();
     }
 
-    static QVariant::Type settingsTypeToQVariantType(SettingsValueType::ValueType t)
+    static int settingsTypeToQVariantType(SettingsValueType::ValueType t)
     {
         switch (t)
         {
         case SettingsValueType::FloatType:
-            return QVariant::Double;
+            return QMetaType::Double;
         case SettingsValueType::IntType:
-            return QVariant::Int;
+            return QMetaType::Int;
         case SettingsValueType::StringType:
-            return QVariant::String;
+            return QMetaType::QString;
         case SettingsValueType::BoolType:
-            return QVariant::Bool;
+            return QMetaType::Bool;
         case SettingsValueType::FloatArrayType:
-            return QVariant::List; // same as in
+            return QMetaType::QVariantList; // same as in
         case SettingsValueType::IntArrayType:
-            return QVariant::List; // same as float
+            return QMetaType::QVariantList; // same as float
         case SettingsValueType::StringArrayType:
-            return QVariant::StringList;
+            return QMetaType::QStringList;
         default:
             break;
         }
 
-        return QVariant::List;
+        return QMetaType::QVariantList;
     }
 
     NODE_IMPLEMENTATION(readSetting, Pointer)
@@ -1447,30 +1447,30 @@ namespace Rv
         const SettingsValueType* vtype = static_cast<const SettingsValueType*>(NODE_THIS.type());
 
         VariantInstance* vobj = 0;
-        QVariant::Type type = defaultObj ? settingsTypeToQVariantType(vtype->valueType(defaultObj)) : value.type();
+        int type = defaultObj ? settingsTypeToQVariantType(vtype->valueType(defaultObj)) : value.metaType().id();
 
         switch (type)
         {
-        case QVariant::Bool:
+        case QMetaType::Bool:
             vobj = VariantInstance::allocate(vtype->boolType());
             *vobj->data<bool>() = value.toBool();
             break;
-        case QVariant::Int:
+        case QMetaType::Int:
             vobj = VariantInstance::allocate(vtype->intType());
             *vobj->data<int>() = value.toInt();
             break;
-        case QVariant::Double:
+        case QMetaType::Double:
             vobj = VariantInstance::allocate(vtype->floatType());
             *vobj->data<float>() = value.toDouble();
             break;
-        case QVariant::String:
+        case QMetaType::QString:
         {
             vobj = VariantInstance::allocate(vtype->stringType());
             StringType::String* s = vobj->data<StringType::String>();
             s->set(value.toString().toUtf8().constData());
         }
         break;
-        case QVariant::StringList:
+        case QMetaType::QStringList:
         {
             //
             //    Creating it will also create the tagged object it
@@ -1489,7 +1489,7 @@ namespace Rv
             }
         }
         break;
-        case QVariant::List:
+        case QMetaType::QVariantList:
         {
             QVariantList list = value.toList();
 

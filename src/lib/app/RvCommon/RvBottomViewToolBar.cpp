@@ -781,7 +781,7 @@ namespace Rv
 
                 if (action && !action->isEnabled() && !action->toolTip().isEmpty())
                 {
-                    QToolTip::showText(mouseEvent->globalPos(), action->toolTip(), m_playModeMenu);
+                    QToolTip::showText(mouseEvent->globalPosition().toPoint(), action->toolTip(), m_playModeMenu);
                 }
                 else
                 {
