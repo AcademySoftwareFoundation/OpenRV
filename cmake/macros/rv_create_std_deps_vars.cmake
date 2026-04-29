@@ -938,7 +938,7 @@ FUNCTION(RV_BUILD_PKG_CONFIG_PATH _rbpcp_out_var)
       _rbpcp_element IN
       LISTS _rbpcp_dirs
     )
-      STRING(REPLACE "\\" "/" _rbpcp_element "${_rbpcp_element}")
+      FILE(TO_CMAKE_PATH "${_rbpcp_element}" _rbpcp_element)
       STRING(REPLACE ":" "" _rbpcp_element "${_rbpcp_element}")
       STRING(FIND "${_rbpcp_element}" "/" _rbpcp_slash_idx)
       IF(_rbpcp_slash_idx GREATER 0)

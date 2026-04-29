@@ -21,9 +21,9 @@ FOREACH(
           "${${_variableName}}"
       )
       IF(RV_TARGET_WINDOWS)
-        # Convert backslashes to forward slashes so Windows paths like "D:\a\OpenRV\..." don't produce invalid escape sequences (\a, \O, etc.) in the generated
+        # Normalize Windows paths like "D:\a\OpenRV\..." so backslashes don't produce invalid escape sequences (\a, \O, etc.) in the generated
         # cmake_install.cmake.
-        STRING(REPLACE "\\" "/" _install_safe_value "${_install_safe_value}")
+        FILE(TO_CMAKE_PATH "${_install_safe_value}" _install_safe_value)
       ENDIF()
       INSTALL(CODE "SET(${_variableName} ${_install_safe_value})")
     ENDIF()

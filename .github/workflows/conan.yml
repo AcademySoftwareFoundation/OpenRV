@@ -2,9 +2,12 @@
 name: Conan-OpenRV
 
 on:
-  schedule:
-    # Midnight build every day (matches ci.yml)
-    - cron: "0 0 * * *"
+  push:
+    branches:
+      # This will run when PR is merged or direct pushes to main.
+      - main
+
+  pull_request: # This handles PR creation and subsequent commits.
 
   # This allows manual triggering of the workflow from the web
   workflow_dispatch:

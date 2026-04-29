@@ -145,8 +145,8 @@ ENDIF()
 LIST(APPEND _configure_options "-DOCIO_PYTHON_VERSION=${RV_DEPS_PYTHON_VERSION_SHORT}")
 
 # Write an initial-cache script so CMAKE_PREFIX_PATH (a semicolon-separated list) survives ExternalProject's double expansion of CONFIGURE_COMMAND args. Uses
-# RV_DEPS_CMAKE_PREFIX_PATH (snapshot before Qt6 additions). Backslashes converted to forward slashes to prevent escape issues in the generated CMake script.
-# Written once here and referenced by both platform branches (the Windows block resets _configure_options but reuses the same cache file).
+# RV_DEPS_CMAKE_PREFIX_PATH (snapshot before Qt6 additions). On Windows, paths are normalized to forward slashes to prevent escape issues in the generated CMake
+# script. Written once here and referenced by both platform branches (the Windows block resets _configure_options but reuses the same cache file).
 SET(_ocio_initial_cache
     "${_build_dir}/_rv_initial_cache.cmake"
 )
@@ -154,7 +154,13 @@ SET(_ocio_cache_content
     ""
 )
 IF(RV_DEPS_CMAKE_PREFIX_PATH)
-  STRING(REPLACE "\\" "/" _ocio_clean_prefix "${RV_DEPS_CMAKE_PREFIX_PATH}")
+  IF(WIN32)
+    FILE(TO_CMAKE_PATH "${RV_DEPS_CMAKE_PREFIX_PATH}" _ocio_clean_prefix)
+  ELSE()
+    SET(_ocio_clean_prefix
+        "${RV_DEPS_CMAKE_PREFIX_PATH}"
+    )
+  ENDIF()
   STRING(APPEND _ocio_cache_content "set(CMAKE_PREFIX_PATH \"${_ocio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
 # When deps come from a package manager (Conan), block find_package from searching the Homebrew shared prefix to prevent header contamination.
