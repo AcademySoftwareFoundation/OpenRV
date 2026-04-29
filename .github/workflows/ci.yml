@@ -4,21 +4,9 @@ on:
   push:
     branches:
       # This will run when PR is merged or direct pushes to main.
-      - main
+      - RB-3.1.X-VFX2024
 
   pull_request: # This handles PR creation and subsequent commits.
-
-  schedule:
-    # Midnight build every day
-    - cron: "0 0 * * *"
-
-  # This allows manual triggering of the workflow from the web
-  workflow_dispatch:
-    inputs:
-      SKIP_DEPS_CACHE:
-        description: 'Skip dependencies caching'
-        required: true
-        default: 'false'
 
 env:
   SKIP_DEPS_CACHE: 'false'
@@ -62,47 +50,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "ubuntu-latest"
-            rocky-version: "8"
-            image: "amd64/rockylinux:8"
-            arch-type: "x86_64"
-            build-type: "Release"
-            qt-version: "5.15.2"
-            cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
-            extra_repo: "powertools"
-          - os: "ubuntu-latest"
-            rocky-version: "9"
-            image: "amd64/rockylinux:9"
-            arch-type: "x86_64"
-            build-type: "Release"
-            qt-version: "5.15.2"
-            cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
-            extra_repo: "crb"
-          - os: "ubuntu-latest"
-            rocky-version: "8"
-            image: "amd64/rockylinux:8"
-            arch-type: "x86_64"
-            build-type: "Debug"
-            qt-version: "5.15.2"
-            cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
-            extra_repo: "powertools"
-          - os: "ubuntu-latest"
-            rocky-version: "9"
-            image: "amd64/rockylinux:9"
-            arch-type: "x86_64"
-            build-type: "Debug"
-            qt-version: "5.15.2"
-            cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
-            extra_repo: "crb"
-
           # CY2024
           - os: "ubuntu-latest"
             rocky-version: "8"
@@ -660,25 +607,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Release"
-            qt-version: "5.15.2"
-            python-version: "3.10"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2023"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Debug"
-            qt-version: "5.15.2"
-            python-version: "3.10"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2023"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-
           # VFX2024
           - os: "windows-2022"
             arch-type: "x86_64"
