@@ -16,4 +16,3 @@ packaging
 requests
 cryptography
 pydantic
-PySide6
