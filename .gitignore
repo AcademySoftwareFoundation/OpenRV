@@ -45,3 +45,6 @@ rvnuke_mode.mu
 *_rc.py
 # see generate_about_rv.py
 about_rv.cpp
+
+# Build logs
+logs/

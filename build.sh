@@ -11,6 +11,7 @@ set -e
 BUILD_TYPE="Release"
 CLEAN_BUILD=0
 INSTALL=0
+LOG_FILE=""
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -19,6 +20,16 @@ while [[ "$#" -gt 0 ]]; do
         --release) BUILD_TYPE="Release"; shift ;;
         --clean) CLEAN_BUILD=1; shift ;;
         --install) INSTALL=1; shift ;;
+        --log)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                LOG_FILE="$2"
+                shift 2
+            else
+                mkdir -p logs
+                LOG_FILE="logs/build_$(date +%Y%m%d_%H%M%S).log"
+                shift 1
+            fi
+            ;;
         -h|--help)
             echo "Usage: ./build.sh [OPTIONS]"
             echo "Options:"
@@ -26,11 +37,18 @@ while [[ "$#" -gt 0 ]]; do
             echo "  --release  Build in Release mode (default)"
             echo "  --clean    Remove build directory and virtual environment before building"
             echo "  --install  Install the build to the _install directory"
+            echo "  --log [f]  Log output to a file (default: logs/build_TIMESTAMP.log)"
             exit 0
             ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
 done
+
+if [ -n "$LOG_FILE" ]; then
+    mkdir -p "$(dirname "$LOG_FILE")"
+    echo "Logging build output to: $LOG_FILE"
+    exec > >(tee -a "$LOG_FILE") 2>&1
+fi
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${PROJECT_ROOT}/_build"
