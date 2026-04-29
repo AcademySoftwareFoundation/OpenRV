@@ -824,6 +824,8 @@ namespace TwkMovie
         AVPixelFormat getBestAVFormat(AVPixelFormat native)
         {
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
+            if (!desc)
+                return AV_PIX_FMT_RGB24;
             int bitSize = desc->comp[0].depth - desc->comp[0].shift;
             bool hasAlpha = true; //(desc->flags & AV_PIX_FMT_FLAG_ALPHA);
             return (hasAlpha) ? ((bitSize > 8) ? AV_PIX_FMT_RGBA64 : AV_PIX_FMT_RGBA)
@@ -844,6 +846,8 @@ namespace TwkMovie
             //
 
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
+            if (!desc)
+                return AV_PIX_FMT_RGB24;
             int bitSize = desc->comp[0].depth - desc->comp[0].shift;
             bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
             bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
@@ -1724,8 +1728,9 @@ namespace TwkMovie
         AVCodecContext* videoCodecContext = track->avCodecContext;
         AVPixelFormat nativeFormat = videoCodecContext->pix_fmt;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-        bool yuvPlanar =
-            (!(desc->flags & AV_PIX_FMT_FLAG_ALPHA) && (desc->flags & AV_PIX_FMT_FLAG_PLANAR) && !(desc->flags & AV_PIX_FMT_FLAG_RGB));
+        bool yuvPlanar = desc ? (!(desc->flags & AV_PIX_FMT_FLAG_ALPHA) && (desc->flags & AV_PIX_FMT_FLAG_PLANAR)
+                                 && !(desc->flags & AV_PIX_FMT_FLAG_RGB))
+                              : false;
 
         int rotation = 0;
         AVDictionaryEntry* rotEntry;
@@ -2620,6 +2625,13 @@ namespace TwkMovie
         AVStream* firstVideoStream = m_avFormatContext->streams[m_videoTracks[0]->number];
         AVCodecContext* firstVideoCodecContext = m_videoTracks[0]->avCodecContext;
         AVPixelFormat nativeFormat = firstVideoCodecContext->pix_fmt;
+
+        // Fallback for formats where the initial pix_fmt might be AV_PIX_FMT_NONE
+        if (nativeFormat == AV_PIX_FMT_NONE)
+        {
+            nativeFormat = AV_PIX_FMT_RGB24;
+        }
+
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         m_info.numChannels = desc->nb_components;
@@ -3924,8 +3936,8 @@ namespace TwkMovie
             // Use the pixel format detected when the file was opened as a
             // fallback. Assumes that m_pxlFormatOnOpen is set because the file
             // was opened.
-            outFrame->format = m_pxlFormatOnOpen;
-            nativeFormat = m_pxlFormatOnOpen;
+            outFrame->format = (m_pxlFormatOnOpen != AV_PIX_FMT_NONE) ? m_pxlFormatOnOpen : AV_PIX_FMT_RGB24;
+            nativeFormat = (AVPixelFormat)outFrame->format;
             desc = av_pix_fmt_desc_get(nativeFormat);
         }
 
