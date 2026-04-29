@@ -129,9 +129,20 @@ cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel "${PARALLELISM}
 echo "Building main_executable target..."
 cmake --build "${BUILD_DIR}" --config "${BUILD_TYPE}" --parallel "${PARALLELISM}" --target main_executable
 
+# 6. Sanitize Homebrew Links
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "--- Sanitizing Homebrew Links ---"
+    python3 "${PROJECT_ROOT}/src/build/sanitize_homebrew_links.py" "${BUILD_DIR}/stage"
+fi
+
 if [ "${INSTALL}" -eq 1 ]; then
     echo "--- Installing Visto ---"
     cmake --install "${BUILD_DIR}" --prefix "${INST_DIR}" --config "${BUILD_TYPE}"
+    
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "--- Sanitizing Installed Homebrew Links ---"
+        python3 "${PROJECT_ROOT}/src/build/sanitize_homebrew_links.py" "${INST_DIR}"
+    fi
 fi
 
 echo "=== Build Complete ==="
