@@ -33,10 +33,15 @@ import sys
 from rv import commands, extra_commands
 from rv import rvtypes
 
-import opentimelineio as otio
+# Set RTLD_GLOBAL so that OpenTimelineIO's C++ type info (like std::any) is shared
+# across its multiple modules, preventing "RuntimeError: bad any cast".
+_old_flags = sys.getdlopenflags()
+sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
+import opentimelineio as otio  # noqa: E402
 
-import otio_reader
-import otio_writer
+sys.setdlopenflags(_old_flags)
+import otio_reader  # noqa: E402
+import otio_writer  # noqa: E402
 
 
 class Mode(object):
