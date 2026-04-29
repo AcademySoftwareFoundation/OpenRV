@@ -36,76 +36,49 @@ A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-#### 1.3 Load command aliases to build Visto
+#### 1.3 Build Visto using build.sh
 
-Command-line aliases are provided to simplify the process of setting up the environment and to build Visto. Once in your Visto directory:
+We provide a standard `build.sh` script to simplify the process of setting up the environment and compiling Visto. Once in your Visto directory:
 
 ```bash
-source rvcmds.sh
+./build.sh
 ```
 
-By default, the commands and aliases will be configured for a release build, but you can swith between debug and release configurations by calling "rvdebug" or "rvrelease"
+By default, the script configures and builds a Release version. You can switch between debug and release configurations by passing arguments to the script.
 
-#### 1.4 First-time build only: rvbootstrap
+#### 1.4 First-time build
 
-This step only needs to be done on a freshly cloned git repository, after you source rvcmds.sh.
+This script handles everything automatically: it will create a Python virtual environment (using `uv` if available for maximum speed), fetch source dependencies if necessary, and compile the engine.
 
-Under the hood, this command will create an initial setup environment, will fetch source dependencies, install other required elements, and will create a Python virtual environment in the current directory under the `.venv` directory.
-
-After the setup stage is done, a build is started and should produce a valid "rv" executable binary.
+After the setup stage is done, a build is started and should produce a valid "visto" executable binary.
 
 ````{tabs}
 ```{code-tab} bash Release
 # Produces default optimized build in Visto/_build
-rvbootstrap
+./build.sh --release
 ```
 ```{code-tab} bash Debug
 # Produces unoptimized debug build in Visto/_build_debug
-rvbootstrap
+./build.sh --debug
 ```
 ````
 
 Note 1: launch the default optimized build unless you have a reason to want the unoptimized debug build.
 
-Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call rvmk to complete the build.
+Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call `./build.sh` to complete the build.
 
 ### 2. Building Visto after the first time
 
-Once you've built Visto for the first time, there is no need to run "rvboostrap" again.
-
-#### 2.1 Build Visto (incrementally) using rvmk
-
-To build Visto after the first time, "rvmk" will correctly configure the environment variables and launch the incremental build process.
+To build Visto after the first time, simply run `./build.sh` again. It will launch an incremental build.
 
 ````{tabs}
 ```{code-tab} bash Release
-# Produces incremental optimized build in Visto/_build_debug
-rvmk
-
-# Note: rvmk is just an alias to these two commands:
-# rvcfg      # sets environment variables
-# rvbuild    # launches the build process
+# Produces incremental optimized build
+./build.sh --release
 ```
 ```{code-tab} bash Debug
-# Produces incremental unoptimized debug build in Visto/_build_debug
-rvmk
-
-# Note: rvmk is just an alias to these two commands:
-# rvcfg       # sets environment variables
-# rvbuild     # launches the build process
-```
-````
-
-#### 2.2 Rebuilding the dependencies
-
-Building the source dependencies is done automatically the first time we build Visto with "rvbootstrap/d" so you typically never need to rebuild them. In the rare event you would need to fix a bug or update one such third-party source dependency, dependencies can be rebuild this way:
-
-````{tabs}
-```{code-tab} bash Release
-rvbuildt dependencies
-```
-```{code-tab} bash Debug
-rvbuildt dependencies
+# Produces incremental unoptimized debug build
+./build.sh --debug
 ```
 ````
 
@@ -117,10 +90,10 @@ For Windows and Linux:
 
 ````{tabs}
 ```{code-tab} bash Release
-Visto/_build/stage/app/bin/rv
+_build/stage/app/bin/visto
 ```
 ```{code-tab} bash Debug
-Visto/_build_debug/stage/app/bin/rv
+_build/stage/app/bin/visto
 ```
 ````
 
@@ -128,14 +101,12 @@ For macOS:
 
 ````{tabs}
 ```{code-tab} bash Release
-Visto/_build/stage/app/Visto.app/Contents/MacOS/RV
+_build/stage/app/Visto.app/Contents/MacOS/visto
 ```
 ```{code-tab} bash Debug
-Visto/_build_debug/stage/app/Visto.app/Contents/MacOS/RV
+_build/stage/app/Visto.app/Contents/MacOS/visto
 ```
 ````
-
-You can access the directory where the compiled binary is located by using the command "rvappdir" which should "cd" right into the correct directory (release or debug).
 
 ### 4. Contributing to Visto
 
@@ -181,7 +152,11 @@ It is highly recommended to also add Ruff to your IDE. For VSCode users, you can
 
 ### 7. Cleaning up your build directory
 
-To clean your build directory and restart from a clean slate, use the `rvclean` alias, or delete the `_build` (or `_build_debug`) directory.
+To clean your build directory and restart from a clean slate, use the `--clean` argument, or manually delete the `_build` directory:
+
+```bash
+./build.sh --clean
+```
 
 To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/to/third/party`.
 
