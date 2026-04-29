@@ -9,8 +9,26 @@
 #
 # WebP official sources:   -- https://chromium.googlesource.com/webm/libwebp
 #
+#
 # WebP build from sources: -- https://github.com/webmproject/libwebp/blob/main/doc/building.md
 #
+
+IF(RV_USE_SYSTEM_DEPS)
+  FIND_PACKAGE(WebP QUIET)
+  IF(WebP_FOUND)
+    MESSAGE(STATUS "Using system WebP")
+    IF(DEFINED WebP_VERSION)
+      SET(RV_DEPS_WEBP_VERSION "${WebP_VERSION}")
+      SET(RV_DEPS_WEBP_VERSION "${WebP_VERSION}" CACHE STRING "" FORCE)
+    ELSEIF(DEFINED WEBP_VERSION)
+      SET(RV_DEPS_WEBP_VERSION "${WEBP_VERSION}")
+      SET(RV_DEPS_WEBP_VERSION "${WEBP_VERSION}" CACHE STRING "" FORCE)
+    ENDIF()
+    # If the system package doesn't provide a WebP::webp target, we might need to create an alias,
+    # but FindWebP usually provides WebP::webp.
+    RETURN()
+  ENDIF()
+ENDIF()
 
 # OpenImageIO was tested up to 1.2.1
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_WEBP" "${RV_DEPS_WEBP_VERSION}" "make" "")
