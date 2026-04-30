@@ -1,0 +1,111 @@
+name: Build and Release macOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build macOS (and Release)
+    runs-on: macos-14 # arm64
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0 # Need all history and tags to determine version
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install --formula \
+               ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python@3.14 yasm clang-format black meson nasm pkg-config glew ccache \
+               ffmpeg openexr imath opencolorio libraw libtiff libpng boost openimageio openjpeg webp yaml-cpp spdlog icu4c openjph jpeg-turbo
+        shell: bash
+
+      - name: Install Qt 6.5.3
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          host: 'mac'
+          target: 'desktop'
+          arch: 'clang_64'
+          dir: "${{ github.workspace }}/deps"
+          install-deps: 'false'
+          modules: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+          archives: 'qtbase qtdeclarative qtsvg qttools qttranslations'
+          cache: false
+          setup-python: true
+          tools: 'tools_qtcreator'
+          set-env: 'true'
+          tools-only: 'false'
+          aqtversion: '==3.2.*'
+
+      - name: Set QT_HOME
+        run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/6.5.3/macos" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Build UTV (macOS)
+        run: |
+          chmod +x ./build.sh
+          ./build.sh --release --clean
+        shell: bash
+
+      - name: Package macOS App
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cd _build/stage/app
+          zip -ry UTV-macOS-arm64.zip UTV.app
+        shell: bash
+
+      - name: Determine Next Semantic Version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: versioning
+        run: |
+          YEAR=$(date +%Y)
+          LATEST_TAG=$(git tag -l "${YEAR}.*" | sort -V | tail -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_VERSION="${YEAR}.1"
+          else
+            MINOR=$(echo $LATEST_TAG | cut -d'.' -f2)
+            NEW_VERSION="${YEAR}.$((MINOR + 1))"
+          fi
+          echo "Next version is: $NEW_VERSION"
+          echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Create and Push Tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.versioning.outputs.version }}
+          git push origin ${{ steps.versioning.outputs.version }}
+        shell: bash
+
+      - name: Generate Release Notes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: release-notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.versioning.outputs.version }}
+          name: UTV Release ${{ steps.versioning.outputs.version }}
+          body: ${{ steps.release-notes.outputs.content }}
+          files: _build/stage/app/UTV-macOS-arm64.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

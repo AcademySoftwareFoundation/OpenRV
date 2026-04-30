@@ -4,16 +4,7 @@ name: UTV
 # Copyright (C) 2026  Makai Systems. All Rights Reserved.
 
 on:
-  push:
-    branches:
-      # This will run when PR is merged or direct pushes to main.
-      - main
-
-  pull_request: # This handles PR creation and subsequent commits.
-
-  schedule:
-    # Midnight build every day
-    - cron: "0 0 * * *"
+  # This allows manual triggering of the workflow from the web
 
   # This allows manual triggering of the workflow from the web
   workflow_dispatch:

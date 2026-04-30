@@ -4,9 +4,7 @@ name: Release PR
 # Copyright (C) 2026  Makai Systems. All Rights Reserved.
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
