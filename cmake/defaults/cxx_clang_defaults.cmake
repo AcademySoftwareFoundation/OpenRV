@@ -20,11 +20,25 @@ IF(NOT RV_TARGET_APPLE_ARM64)
 ENDIF()
 
 SET(__compiler_options__
-    -Wall ${__compiler_options_x86_64}
+    -Wall
+    ${__compiler_options_x86_64}
+    -Wno-dangling-else
+    -Wno-deprecated-declarations
+    -Wno-deprecated-non-prototype
+    -Wno-enum-compare
+    -Wno-final-dtor-non-final-class
+    -Wno-format-overflow
+    -Wno-implicit-const-int-float-conversion
+    -Wno-invalid-source-encoding
+    -Wno-nonnull
+    -Wno-parentheses-equality
+    -Wno-pointer-bool-conversion
+    -Wno-shift-negative-value
+    -Wno-tautological-pointer-compare
+    -Wno-writable-strings
 )
-
 # Common options
-ADD_COMPILE_OPTIONS(${_verbose_invocation} ${_compiler_options__} -Wnonportable-include-path)
+ADD_COMPILE_OPTIONS(${_verbose_invocation} ${__compiler_options__} -Wnonportable-include-path)
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options
