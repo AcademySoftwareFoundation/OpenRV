@@ -12,21 +12,9 @@ Start by getting familiar with the [GOVERNANCE](GOVERNANCE.md) document. It deta
 
 The RV Open Source Project Committers are listed in alphabetical order, by first name, in [COMMITERS](COMMITERS.md)
 
-## Contributor License Agreement
-
-Before contributing code to UTV source code, you must sign a Contributor License Agreement (CLA).
-
-You will get the opportunity to sign the CLA when you create your first pull request: the Linux Foundation's EasyCLA system will guide you through the process of signing the CLA.
-
-If you can't to use the EasyCLA system, you can always send a signed CLA to `ori-tsc@aswf.io` (making sure to include your *github username*), and wait for confirmation that we've received it.
-
-Here are the two possible CLAs:
-
-There are two contribution agreement types, one for individuals contributing independently, and one for corporations who want to manage a list of contributors for their organization. Please review the documents in the EasyCLA portal to determine which is the right one for you.
-
 ## Coding Conventions
 
-Please follow the coding conventions and style in each file and in each library when adding new files.
+Please follow the coding conventions and style in each file and in each library when adding new files.  There is also a `pre-commit` hook we use to check formatting before committing.
 
 ## Git Workflow
 
@@ -40,17 +28,7 @@ Please follow the coding conventions and style in each file and in each library 
 
 ### Pull Request Labels
 
-After a pull request is opened, the Technical Steering Committee (TSC) assigns workflow labels to communicate its current status. Here is what each label means:
-
-| Label | Meaning |
-| ----- | ------- |
-| `PR: Triaging` | The PR is being triaged. This will determine the priority for the TSC to review and test it. |
-| `PR: Acknowledged` | The new PR has been acknowledged by the TSC. |
-| `PR: Planned_P1` | The PR will be reviewed and tested soon. Expect a 1–4 week delay. |
-| `PR: Planned_P2` | The PR will be reviewed and tested eventually. Expect a 1–3 month delay. |
-| `PR: In Progress` | The PR is being reviewed by a code reviewer. |
-| `PR: In Testing` | The PR is being built and tested by QA. |
-| `PR: Unplanned` | The PR is not a priority. The TSC will comment on the PR to explain the decision. |
+After a pull request is opened, auto labeling will be applied to the PR.
 
 ### Semantic PR Titles (Required)
 

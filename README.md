@@ -19,9 +19,11 @@
 
 UTV is a highly performant, natively installable image and sequence viewer.
 
-While heavily inspired by high-end visual effects software, UTV strips away the massive dependencies and VFX reference platform mandates. It is designed to be a **lightweight, distributable framecycler** that anyone can install and run instantly.
+Forked from high-end visual effects software [OpenRV](https://github.com/AcademySoftwareFoundation/OpenRV), UTV strips away the massive dependencies, build times, and VFX reference platform mandates.  It is designed to be a **lightweight, distributable framecycler** that anyone can install and run instantly.  Non cached build times on a m4 mac air take just 4:30 minutes. ccache clean builds take 50 seconds.
 
 Whether you are a freelance artist, an editor, or just need to smoothly scrub through 4K image sequences, UTV provides a world-class engine without the bloat of an enterprise pipeline.
+
+**Note that this project is currently building for MacOS on apple silicon only but we are planning a fast follow for Windows (choco/winget) and Linux (apt/dnf)**
 
 ---
 
