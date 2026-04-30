@@ -283,7 +283,8 @@ namespace Mu
 
         QUiLoader loader;
         QFile file(filename->c_str());
-        if (!file.open(QFile::ReadOnly)) return 0;
+        if (!file.open(QFile::ReadOnly))
+            return 0;
         QWidget* w = loader.load(&file, parent);
         file.close();
 

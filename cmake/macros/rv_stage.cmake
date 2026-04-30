@@ -89,7 +89,10 @@ FUNCTION(rv_stage)
         )
       ENDIF()
 
-      IF((_native_target_type STREQUAL "EXECUTABLE" OR _native_target_type STREQUAL "SHARED_LIBRARY") AND NOT RV_USE_SYSTEM_DEPS)
+      IF((_native_target_type STREQUAL "EXECUTABLE"
+          OR _native_target_type STREQUAL "SHARED_LIBRARY")
+         AND NOT RV_USE_SYSTEM_DEPS
+      )
         FOREACH(
           dep
           ${RV_DEPS_LIST}

@@ -305,9 +305,12 @@ namespace Mu
         bool arg1 = (bool)(param_horizontal);
         bool arg2 = (bool)(param_vertical);
         Qt::Orientations orientations;
-        if (arg1) orientations |= Qt::Horizontal;
-        if (arg2) orientations |= Qt::Vertical;
-        if (orientations) arg0.mirror(orientations);
+        if (arg1)
+            orientations |= Qt::Horizontal;
+        if (arg2)
+            orientations |= Qt::Vertical;
+        if (orientations)
+            arg0.mirror(orientations);
     }
 
     Pointer qt_QImage_mirrored_QImage_QImage_bool_bool(Mu::Thread& NODE_THREAD, Pointer param_this, bool param_horizontal,
@@ -318,8 +321,10 @@ namespace Mu
         bool arg1 = (bool)(param_horizontal);
         bool arg2 = (bool)(param_vertical);
         Qt::Orientations orientations;
-        if (arg1) orientations |= Qt::Horizontal;
-        if (arg2) orientations |= Qt::Vertical;
+        if (arg1)
+            orientations |= Qt::Horizontal;
+        if (arg2)
+            orientations |= Qt::Vertical;
         return makeqtype<QImageType>(c, orientations ? arg0.mirrored(orientations) : arg0, "qt.QImage");
     }
 

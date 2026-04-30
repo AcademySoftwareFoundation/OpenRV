@@ -55,7 +55,10 @@ namespace Mu
         Pointer _Pointer;
         Name::Ref _name;
 
-        Value() : _Vector4f() {}
+        Value()
+            : _Vector4f()
+        {
+        }
 
         explicit Value(const Vector4f& v) { assignOp(_Vector4f, v); }
 
