@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -100,7 +99,7 @@ SET(RV_FFMPEG_SUPPORTED_OPTIONS
 )
 # Default option
 SET(_RV_FFMPEG
-    "6"
+    "8"
 )
 
 IF(DEFINED RV_FFMPEG)
