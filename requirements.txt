@@ -6,14 +6,14 @@
 # This file contains the packages required to run UTV.
 # We prefer using 'uv' for fast installations.
 
+certifi
+cryptography
+nanobind
 numpy
 opentimelineio
+packaging
+pydantic
 PyOpenGL
 PyOpenGL_accelerate
-certifi
-six
-packaging
 requests
-cryptography
-pydantic
-nanobind
+six
