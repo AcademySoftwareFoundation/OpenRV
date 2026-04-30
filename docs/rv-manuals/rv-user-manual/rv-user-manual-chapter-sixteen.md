@@ -144,7 +144,7 @@ Note that you can cut in and out of movie files as well:
 shell> rvio [ foo.mov -in 101 -out 120 ] [ bar.mov -in 58 -out 123 ] -o out.mov
 ```
 
-#### 16.2.2 Processing Visto Session Files
+#### 16.2.2 Processing UTV Session Files
 
 RV session files can be used as a way to author operations for processing with RVIO. Most operations and settings in RV can be used by RVIO. For example RV can be used in a compositing mode to do an over or difference or split-screen comparison. RV can also be used to set up edits with per source color corrections (e.g. a unique LUT for each sequences, exposure or color adjustments per sequences, an overall output LUT, etc.).
 

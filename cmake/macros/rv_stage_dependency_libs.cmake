@@ -1,8 +1,7 @@
 #
 # Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project.
-# Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the UTV project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -31,7 +30,6 @@
 #                                   # Prefer OUTPUTS when possible; use this only when outputs are hard to enumerate.
 # cmake-format: on
 FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
-
 
   CMAKE_PARSE_ARGUMENTS(
     _ARG "USE_FLAG_FILE" "TARGET;LIB_DIR;BIN_DIR;INCLUDE_DIR;STAGE_LIB_DIR;LIBNAME" "OUTPUTS;EXTRA_LIB_DIRS;DEPENDS;PRE_COMMANDS;FILES" ${ARGN}

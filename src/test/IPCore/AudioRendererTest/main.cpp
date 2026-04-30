@@ -15,7 +15,7 @@
 using namespace std;
 using namespace IPCore;
 
-// The 'LD_LIBRARY_PATH' is mandatory for the Visto.app under Linux
+// The 'LD_LIBRARY_PATH' is mandatory for the UTV.app under Linux
 // let's check it is defined.
 TEST_CASE("test definition of the LD_LIBRARY_PATH environment variable") { REQUIRE(getenv("LD_LIBRARY_PATH")); }
 

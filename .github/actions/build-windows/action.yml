@@ -1,5 +1,5 @@
-name: Build Visto on Windows
-description: Build and test Visto on Windows
+name: Build UTV on Windows
+description: Build and test UTV on Windows
 
 inputs:
   build-type:
@@ -187,7 +187,7 @@ runs:
       # Used for this run only (SCCACHE_GHA_ENABLED=false); not stored in Actions cache.
       # For sccache to actually cache the Windows/MSVC build, CMake must use it as the compiler
       # launcher, e.g. -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache
-      # in the Configure Visto step (and sccache must be on PATH when the build runs).
+      # in the Configure UTV step (and sccache must be on PATH when the build runs).
       uses: mozilla-actions/sccache-action@v0.0.6
       with:
         version: "v0.8.1"
@@ -198,7 +198,7 @@ runs:
         sccache --version || echo "WARNING: sccache not found in PATH"
       shell: msys2 {0}
 
-    - name: Configure Visto
+    - name: Configure UTV
       if: ${{ inputs.vfx-platform == 'CY2023' }}
       run: |
         cmake --version
@@ -206,7 +206,7 @@ runs:
         cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
       shell: msys2 {0}
 
-    - name: Configure Visto
+    - name: Configure UTV
       if: ${{ inputs.vfx-platform == 'CY2024' }}
       run: |
         cmake --version
@@ -214,12 +214,12 @@ runs:
         cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
       shell: msys2 {0}
 
-    - name: Build Visto dependencies
+    - name: Build UTV dependencies
       run: cmake --build _build --config ${{ inputs.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
       shell: msys2 {0}
       id: build_deps
 
-    - name: Build Visto main executable
+    - name: Build UTV main executable
       run: cmake --build _build --config ${{ inputs.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
       shell: msys2 {0}
 
@@ -230,6 +230,6 @@ runs:
         ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
       shell: msys2 {0}
 
-    - name: Install Visto
+    - name: Install UTV
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: msys2 {0}

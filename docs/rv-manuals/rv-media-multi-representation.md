@@ -1,4 +1,4 @@
-# Using Multiple Media Representations in Visto
+# Using Multiple Media Representations in UTV
 
 ## Introduction
 
@@ -50,7 +50,7 @@ For technical information on MMR in OTIO, see [Media Multi-Reference Support](..
 
 ## Multiple Media Representations: Technical Details
 
-### Setting Visto Fall Back Order on Missing Source Media
+### Setting UTV Fall Back Order on Missing Source Media
 
 During playback, if RV loses access to the source media selected by the user, RV falls back to the next available source media. It follows this order: Frames > Movie > Streaming(S3).
 

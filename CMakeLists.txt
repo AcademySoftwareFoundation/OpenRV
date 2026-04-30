@@ -41,11 +41,11 @@ IF(NOT RV_RELEASE_DESCRIPTION)
 ENDIF()
 
 SET(RV_UI_APPLICATION_NAME
-    "Visto"
+    "UTV"
     CACHE STRING "RV's UI application name"
 )
 SET(RV_INTERNAL_APPLICATION_NAME
-    "Visto"
+    "UTV"
     CACHE STRING "RV's internal application name"
 )
 SET(RV_INTERNAL_ORGANIZATION_NAME

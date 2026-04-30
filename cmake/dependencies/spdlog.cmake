@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2023  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the UTV project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #

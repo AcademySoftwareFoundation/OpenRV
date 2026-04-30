@@ -6,7 +6,7 @@ RV and its companion tools, RVIO and RVLS have been created to support digital a
 
 This chapter provides quick-start guides to RV and RVIO. If you already have successfully installed RV, and want to get going right away, this chapter will show you enough to get started.
 
-### 1.2 Getting Started With Visto
+### 1.2 Getting Started With UTV
 
 #### 1.2.1 Loading Media and Saving Sessions
 
@@ -46,7 +46,7 @@ If your image sequences are too large to play back at speed directly from disk, 
 
 RV gives you the option to load media (image sequences or audio) as a *Source* or a *Layer* . A source is a new sequence or movie that gets added to the end of the default sequence of the RV session. Adding sources is the simplest way to build an edit in RV. Layers are the way that RV associates related media, e.g. an audio clip that goes with an EXR sequence can be added as a layer so that it plays back along with the sequence. Layers make it very simple to string together sequences with associated audio clips–each movie or image sequence can be added as source with a corresponding audio clip added as a layer (see soundfile commandline example above). RV's stereoscopic display features can interpret the first two image layers in a source as left and right views.
 
-#### 1.2.4 Visto Views
+#### 1.2.4 UTV Views
 
 RV provides three default views, and the ability to make views of your own. The three that all sessions have are the Default Sequence, which shows you all your sources in order, the Default Stack, which shows you all your sources stacked on top of one another, and the Default Layout, which has all the sources arranged in a grid (or a column, row, or any other custom layout of your own design). In addition to the default views, you can create any number of Sources, Sequences, Stacks, and Layouts of your own. See [5](rv-user-manual-chapter-five.md#51-rv-session) for information about the process of creating and managing your own views.
 
@@ -109,7 +109,7 @@ RV's Preferences can be opened with the RV->Preferences menu item. These are wor
 shell> rv -help
 ```
 
-### 1.2.10 Customizing Visto
+### 1.2.10 Customizing UTV
 
 RV is built to be customized. For many users, this may be completely ignored or be limited to sharing startup scripts and packages created by other users. A package is a collection of script code (Mu or Python) and interface elements which can be automatically loaded into RV. A package can be installed site wide, per-show, or per-user and a command line tool (rvpkg) is included for package administration tasks.
 
@@ -138,7 +138,7 @@ shell> rvio -help
 
 RVIO usage is more fully described in Chapter [16](rv-user-manual-chapter-sixteen.md#16-rvio) .
 
-#### 1.3.2 Processing Visto Session Files
+#### 1.3.2 Processing UTV Session Files
 
 RVIO can also take RV session files (.rv files) as input. RV session files can contain composites, color corrections, LUTs, CDLs, edits, and other information that might be easier to specify interactively in RV than by using the command line. RV session files can be saved from RV and then processed with RVIO. For example
 

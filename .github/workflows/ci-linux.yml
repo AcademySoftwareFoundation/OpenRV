@@ -1,4 +1,4 @@
-name: Visto Linux
+name: UTV Linux
 
 on:
   workflow_call:

@@ -1,6 +1,6 @@
-# Preparing Visto on Rocky 8 and 9
+# Preparing UTV on Rocky 8 and 9
 
-Visto 2025 can be built for Rocky 8 and Rocky 9, using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/Visto/tree/main/cmake/defaults), with only minor differences for the config manager repo and the requirement for Perl-CPAN.
+UTV 2025 can be built for Rocky 8 and Rocky 9, using the [VFX reference platform](https://vfxplatform.com/). Dependencies can be viewed in the `cmake/defaults/` folder. eg [cmake/defaults/CY2026.cmake](https://github.com/AcademySoftwareFoundation/UTV/tree/main/cmake/defaults), with only minor differences for the config manager repo and the requirement for Perl-CPAN.
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
@@ -74,7 +74,7 @@ All other dependencies are shared across variations.
 3. [Install CMake](rocky_install_cmake)
 4. [Install Rust](rocky_install_rust)
 5. [Install Qt](rocky_install_qt)
-6. [Build Visto](rocky_build_openrv)
+6. [Build UTV](rocky_build_openrv)
 7. [Building with Docker (Optional)](rocky_building_with_docker)
 
 (rocky_install_tools_and_dependencies)=
@@ -134,7 +134,7 @@ Configure ccache with a larger cache size:
 ccache --max-size=10G
 ```
 
-Visto will automatically detect and use ccache when available. To verify it's working after building:
+UTV will automatically detect and use ccache when available. To verify it's working after building:
 
 ```bash
 ccache --show-stats
@@ -246,21 +246,21 @@ Download the latest open-source [Qt installer](https://www.qt.io/download-open-s
 
 Note 1: If you install Qt at a different installation path, you will need to manually export the environment variable "QT_HOME" to that path in your ~/.bashrc file such that the build scripts will be able to find it.
 
-Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build Visto.
+Note 2: Qt modules for Logs, Android, iOS and WebAssembly are not required to build UTV.
 
 (rocky_build_openrv)=
 
-### 6. Build Visto
+### 6. Build UTV
 
-Once the platform-specific installation process is complete, building Visto follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
+Once the platform-specific installation process is complete, building UTV follows the same process for all platforms. Please refer to the [Common Build Instructions](config_common_build.md) for the complete build process.
 
 (rocky_building_with_docker)=
 
 ### 7. Building with Docker (Optional)
 
-To build Visto using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies.
+To build UTV using Docker, use the provided Dockerfile found in this repository, which should already contain all required dependencies.
 
-Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build Visto within the docker container.
+Please go through the cloning procedure found in the [common build process](config_common_build.md). Once cloned, get back here to build the docker image, run the container, and build UTV within the docker container.
 
 #### 7.1. Build the image and run
 
@@ -294,15 +294,15 @@ docker container ls
 docker container exec -it <id> /bin/bash  # replace 'id' with your value
 ```
 
-#### 7.3. Build Visto in the container
+#### 7.3. Build UTV in the container
 
-Once you are into the container, you can follow the [common build process](config_common_build.md) to build Visto.
+Once you are into the container, you can follow the [common build process](config_common_build.md) to build UTV.
 
 #### 7.4. Copy the stage folder outside of the container
 
-If you are on a host that is the same as, or compatible with, your version of Rocky Linux, you can copy the stage folder outside of the container and execute Visto.
+If you are on a host that is the same as, or compatible with, your version of Rocky Linux, you can copy the stage folder outside of the container and execute UTV.
 
 ```bash
 # Container id is the same as the one used in the step above
-docker cp <container id>:/home/rv/Visto/_build/stage ./openrv_stage
+docker cp <container id>:/home/rv/UTV/_build/stage ./openrv_stage
 ```

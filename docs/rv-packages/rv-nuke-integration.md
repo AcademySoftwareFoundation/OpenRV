@@ -1,4 +1,4 @@
-# Nuke/Visto integration
+# Nuke/UTV integration
 
 ## Introduction
 
@@ -50,7 +50,7 @@ Before you send us bug reports and feature requests, however, you might want to 
 
 ## Updating an Existing Installation
 
-If this Package is updated within a new Visto distribution, you might need to update the Python code on the “Nuke side”. To do so, just follow the Installation instructions below.
+If this Package is updated within a new UTV distribution, you might need to update the Python code on the “Nuke side”. To do so, just follow the Installation instructions below.
 
 If the RV and Nuke components of the integration package are mis-matched, you’ll get an error dialog when you start RV from Nuke.
 
@@ -140,7 +140,7 @@ If this box is checked, the total set of Read nodes in the project will be dynam
 
 You must set the RV executable path using the *RV/Preferences..* menu item before you use RV with Nuke at all, and whenever you start work on a new project/script, use *RV/Project Settings…* to make sure that the *Session Directory* is set to something reasonable before you start RV from that script for the first time. See above for details.
 
-### Visto Toolbar
+### UTV Toolbar
 
 Note that all the items on the RV menu are also available on the RV toolbar, which you can find in the Panes submenu.
 
@@ -206,7 +206,7 @@ During a Render, RV updates dynamically to show you all the frames rendered so f
 
 A Full Checkpoint is just like a regular checkpoint except that an entire sequence of frames is saved. To create a Full Checkpoint, select a Render in the RV Session Manager and then select *Create Full Checkpoint* from the *Nuke* menu in RV.
 
-## Working with Media in Visto
+## Working with Media in UTV
 
 Relevant here is the chapter on the [Session Manager](../rv-manuals/rv-user-manual/rv-user-manual-chapter-five.md) and the section on [navigation](../rv-manuals/rv-user-manual/rv-user-manual-chapter-five.md#54-navigating-between-views)
 
@@ -218,7 +218,7 @@ The Nuke integration makes use of Folders to organize your media. You’ll have 
 
 You can easily Compare two or more renders or checkpoints (or any views, actually). Just select the views of interest in the Session Managerand select on the comparison items on RV’s *Nuke* menu: *Nuke/Wipe Selected Views* or *Nuke/Tile Selected Views* .
 
-## Modifying the Nuke Project from Visto
+## Modifying the Nuke Project from UTV
 
 ### Restoring Checkpoints
 

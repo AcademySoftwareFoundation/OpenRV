@@ -1,11 +1,11 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "VistoLinkLauncher"
+    "UTVLinkLauncher"
 )
 
 SET(_sources
-    VistoLinkLauncher.mm
+    UTVLinkLauncher.mm
 )
 
 ADD_EXECUTABLE(

@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the UTV project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -61,7 +61,7 @@ FOREACH(
   ENDIF()
 ENDFOREACH()
 
-# Provide a dummy Boost::system target since modern Boost has dropped it, but Visto still references it
+# Provide a dummy Boost::system target since modern Boost has dropped it, but UTV still references it
 IF(NOT TARGET Boost::system)
   ADD_LIBRARY(Boost::system INTERFACE IMPORTED GLOBAL)
 ENDIF()

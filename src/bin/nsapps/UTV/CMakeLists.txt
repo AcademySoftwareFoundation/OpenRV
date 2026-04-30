@@ -8,7 +8,7 @@ INCLUDE(cxx_defaults)
 INCLUDE(CPack)
 
 SET(_target
-    "Visto"
+    "UTV"
 )
 
 FIND_PACKAGE(

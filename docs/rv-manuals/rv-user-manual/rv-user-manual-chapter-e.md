@@ -1,4 +1,4 @@
-# E - Visto Audio on Linux
+# E - UTV Audio on Linux
 
 ### E.1 Overview
 
@@ -12,7 +12,7 @@ The Linux desktop projects, KDE and Gnome, both have sound servers build on top 
 
 Some distributions use a newer desktop sound server called PulseAudio . PulseAudio ships with most distributions and is on by default in RHEL, CentOS, and Fedora, and comes with Debian and Ubuntu. RV can use PulseAudio through the ALSA (Safe) module, however we strongly recommend against using PulseAudio. Though the PulseAudio server is designed to allow multiple applications to simultaneously play audio (and can run in real-time mode), we have found a decrease in stability with each new release of the module. Even for simple read-only API calls that query the state of the device. If possible for your workflow we suggest you remove PulseAudio, if it is not otherwise necessary.
 
-#### E.1.1 How Visto Handles Linux Audio
+#### E.1.1 How UTV Handles Linux Audio
 
 RV has two ALSA audio back ends for Linux: the old and safe versions. The old version is meant to run on distributions which shipped with ALSA versions 1.0.13 or earlier and which do not have PulseAudio installed. The safe version should work well with PulseAudio systems. Unless you know that your system is using PulseAudio you should try the ALSA Old back end to start with.
 

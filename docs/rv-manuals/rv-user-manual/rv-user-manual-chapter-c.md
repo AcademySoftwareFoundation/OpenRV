@@ -1,4 +1,4 @@
-# C - The RVLINK Protocol: Using Visto as a URL Handler
+# C - The RVLINK Protocol: Using UTV as a URL Handler
 
 RV can act as a protocol handler for URLs using the "rvlink" protocol. These URLs have the form:
 

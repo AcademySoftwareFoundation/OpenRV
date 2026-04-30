@@ -7,7 +7,7 @@
 INCLUDE(cxx_defaults)
 
 SET(_target
-    "vistoio"
+    "utvio"
 )
 
 LIST(APPEND _sources UICommands.cpp main.cpp utf8Main.cpp)

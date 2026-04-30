@@ -1,6 +1,6 @@
 FROM rockylinux/rockylinux:9
 
-LABEL maintainer="Visto maintainer - https://github.com/AcademySoftwareFoundation/Visto"
+LABEL maintainer="UTV maintainer - https://github.com/AcademySoftwareFoundation/UTV"
 
 USER root
 

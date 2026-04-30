@@ -1,47 +1,54 @@
-# Visto: Strategic Roadmap & Foundation
+# UTV: Strategic Roadmap & Foundation
 
 **Project Vision:** A high-performance, community-driven media review engine that is easy to build, easy to install, and free from corporate gatekeeping.
 
 ---
 
-## 1. Technical Foundation (Completed in Visto Fork)
+## 1. Technical Foundation (Completed in UTV Fork)
+
 Before transitioning, we established a "Functional Confidence" baseline:
 
 - **Dependency Probes:** Automated verification for `OpenEXR`, `libtiff`, `libpng`, and `OpenColorIO`. These tests ensure that updating external libraries doesn't break core IO or color pipelines.
 - **Core Unit Tests:** Established coverage for `TwkMath` (Vector/Matrix), `TwkImg` (Bilinear Resampling), and essential utilities (`TwkRegEx`, `Base64`).
-- **CI/CD Infrastructure:** 
-    - **JUnit Integration:** Automated test summaries directly in PRs.
-    - **Binary Artifacts:** Every build now uploads a zip of the `_install` directory, allowing maintainers to test PRs instantly.
-    - **Labeling:** Automated subsystem and PR size labeling to streamline reviews.
+- **CI/CD Infrastructure:**
+  - **JUnit Integration:** Automated test summaries directly in PRs.
+  - **Binary Artifacts:** Every build now uploads a zip of the `_install` directory, allowing maintainers to test PRs instantly.
+  - **Labeling:** Automated subsystem and PR size labeling to streamline reviews.
 
 ---
 
 ## 2. Technical Roadmap: The "Dismantling"
-The primary barrier to community contribution is the 4-hour "fortress" build system. The goal for **Visto** is a 5-minute build using system-provided dependencies.
+
+The primary barrier to community contribution is the 4-hour "fortress" build system. The goal for **UTV** is a 5-minute build using system-provided dependencies.
 
 ### Phase 1: Dependency Decoupling
+
 - **Goal:** Replace `cmake/dependencies` with standard `find_package()` calls.
 - **Priority:** FFmpeg, OpenEXR, OCIO, and Qt6.
 - **Strategy:** Allow the build to use libraries from Homebrew (`/opt/homebrew`), DNF, or APT.
 
 ### Phase 2: Distribution & Accessibility
-- **Goal:** Make Visto installable via a single command.
+
+- **Goal:** Make UTV installable via a single command.
 - **Action:** Create a Homebrew Tap, a Chocolatey package, and a DNF copr repository.
 - **Binary Strategy:** Link against system FFmpeg to shift codec patent/licensing responsibility to the user's environment, reducing legal risk for the project maintainers.
 
 ---
 
 ## 3. Governance & Branding
-- **Name:** **Visto** (Italian/Spanish for "Seen" or "Viewed"). Chosen for its high discoverability, global readability, and 5-character brevity.
-- **Legal Posture:** 
-    - **Apache 2.0 Compliance:** Retain all original copyright notices.
-    - **Trademark Safety:** Absolute separation from "Visto" and "Autodesk" brands to prevent legal challenges.
-    - **Anonymity:** Use a pseudonym for maintainership while focusing on code-signing solutions for signed binaries.
+
+- **Name:** **UTV** (Italian/Spanish for "Seen" or "Viewed"). Chosen for its high discoverability, global readability, and 5-character brevity.
+- **Legal Posture:**
+  - **Apache 2.0 Compliance:** Retain all original copyright notices.
+  - **Trademark Safety:** Absolute separation from "UTV" and "Autodesk" brands to prevent legal challenges.
+  - **Anonymity:** Use a pseudonym for maintainership while focusing on code-signing solutions for signed binaries.
 
 ---
 
 ## 4. Contributor Culture
-Visto will prioritize:
+
+UTV will prioritize:
+
 - **Speed of Merge:** Use the automated probes and PR binaries to accept high-quality community code within days, not months.
 - **Transparency:** Clearer documentation on internal engine logic (IPGraph, Session) to lower the barrier for new developers.
 - **Test-First Development:** Maintain the "Probe" pattern for every new feature or dependency update.

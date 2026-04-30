@@ -19,14 +19,14 @@ ADD_LIBRARY(
   ${_sources}
 )
 
-# Note that a super project, a project consuming Visto as a submodule, could decide to fetch the NDI_SDK::NDI_SDK from artifactory and thus have already
-# created the NDI_SDK::NDI_SDK target. In that case, we should not try to find.
+# Note that a super project, a project consuming UTV as a submodule, could decide to fetch the NDI_SDK::NDI_SDK from artifactory and thus have already created
+# the NDI_SDK::NDI_SDK target. In that case, we should not try to find.
 IF(NOT TARGET NDI_SDK::NDI_SDK)
   FIND_PACKAGE(NDI_SDK)
   IF(NOT NDI_SDK_FOUND)
     MESSAGE(
       WARNING
-        "NDI SDK not found, disabling NDI output plugin.\nDownload the NDI SDK to add NDI output capability to Visto (optional): https://ndi.video/. Set the NDI_SDK_ROOT environment variable to the root of the NDI SDK installation if the NDI SDK fails to be automatically located."
+        "NDI SDK not found, disabling NDI output plugin.\nDownload the NDI SDK to add NDI output capability to UTV (optional): https://ndi.video/. Set the NDI_SDK_ROOT environment variable to the root of the NDI SDK installation if the NDI SDK fails to be automatically located."
     )
     RETURN()
   ENDIF()

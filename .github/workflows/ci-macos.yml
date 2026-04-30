@@ -1,4 +1,4 @@
-name: Visto macOS
+name: UTV macOS
 
 on:
   workflow_call:

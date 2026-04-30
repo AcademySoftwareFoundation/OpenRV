@@ -1,4 +1,4 @@
-# Chapter 9 - Using CDLs in Visto
+# Chapter 9 - Using CDLs in UTV
 
 As discussed previously there are two default places to set ASC CDL properties in the RV node graph. One is as a file CDL on the RVLinearize node in the RVLinearizePipepline and the other is as a look CDL on the RVColor node in the RVLookPipeline. In the case of the RVLinearize node the CDL is applied before linearization occurs whereas in the case of the RVColor node the CDL s applied after linearization and linear color changes.
 

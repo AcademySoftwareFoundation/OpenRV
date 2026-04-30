@@ -7,7 +7,7 @@
 # Note: This cache variable can be overriden to FALSE in a super-project if a custom mio_ffmpeg is built as part of that super-project.
 SET(RV_BUILD_MIO_FFMPEG
     TRUE
-    CACHE BOOL "Whether or not to build the Visto mio_ffmpeg movie plugin"
+    CACHE BOOL "Whether or not to build the UTV mio_ffmpeg movie plugin"
 )
 
 IF(RV_BUILD_MIO_FFMPEG)

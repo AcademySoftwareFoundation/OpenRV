@@ -1,8 +1,8 @@
-# Visto Project Roles and Responsibilities
+# UTV Project Roles and Responsibilities
 
-Visto is a project of the Academy Software Foundation and relies on the ASWF governance policies, supported by the Linux Foundation.
+UTV is a project of the Academy Software Foundation and relies on the ASWF governance policies, supported by the Linux Foundation.
 
-Visto is overseen by the Open Review Initiative but it has its own governance.
+UTV is overseen by the Open Review Initiative but it has its own governance.
 
 There are three primary project roles:
 
@@ -12,7 +12,7 @@ There are three primary project roles:
 
 ## Contributors
 
-Visto grows and thrives from assistance from Contributors. Contributors include anyone in the community who contributes code, documentation, or other technical artifacts that have been incorporated into the project's repository.
+UTV grows and thrives from assistance from Contributors. Contributors include anyone in the community who contributes code, documentation, or other technical artifacts that have been incorporated into the project's repository.
 Anyone can be a Contributor. You need no formal approval from the project, beyond the legal forms.  
 
 ### How to Become a Contributor
@@ -23,14 +23,14 @@ Anyone can be a Contributor. You need no formal approval from the project, beyon
 
 ## Committers
 
-Project Committers have merge access on the Visto GitHub repository, or repositories underneath its control, and are responsible for approving submissions by Contributors.
+Project Committers have merge access on the UTV GitHub repository, or repositories underneath its control, and are responsible for approving submissions by Contributors.
 
 ### Committer Responsibilities
 
 Typical activities of a Committer include:
 
 * Helping users and novice contributors.
-* Ensuring a response to questions posted to the Visto-dev developer mail list
+* Ensuring a response to questions posted to the UTV-dev developer mail list
 * Contributing code and documentation changes that improve the project.
 * Reviewing and commenting on issues and pull requests.
 * Ensuring that changes and new code meet acceptable standards and are in the long-term interest of the project.
@@ -39,7 +39,7 @@ Typical activities of a Committer include:
 
 ### How to Become a Committer
 
-Any member of the Visto community (though typically an existing Committer or TSC member) may nominate an individual making significant and valuable contributions to the Visto project to become a new Committer. To nominate a new Committer, open an issue in the Visto repository, send mail to the TSC mail list, or raise the issue at a TSC meeting.
+Any member of the UTV community (though typically an existing Committer or TSC member) may nominate an individual making significant and valuable contributions to the UTV project to become a new Committer. To nominate a new Committer, open an issue in the UTV repository, send mail to the TSC mail list, or raise the issue at a TSC meeting.
 The TSC may periodically review the Committer list to identify inactive Committers. Past Committers are typically given Emeritus status. Emeriti may request that the TSC restore them to active Committer status.
 
 ## Technical Steering Committee
@@ -63,13 +63,13 @@ The leadership roles are:
 
 The chair role is assumed to rotate annually (though there are no term limits, so the TSC may reelect an existing chair). The chief architect position should be a source of stability and coherent design vision, so the TSC is encouraged to choose an architect who can serve for many years and only change architects when it is necessary for the health of the project and its community.
 
-At the time of election, the TSC will also agree upon which of these two leaders will serve as the Visto representative for the term. This member represents the project at all ASWF ORI meetings.
+At the time of election, the TSC will also agree upon which of these two leaders will serve as the UTV representative for the term. This member represents the project at all ASWF ORI meetings.
 
 ### Current TSC Members
 
 Current voting members of the TSC are:
 
-* Chair and Visto representative: Alain Compagnat ([compaga](https://github.com/compaga))
+* Chair and UTV representative: Alain Compagnat ([compaga](https://github.com/compaga))
 * Chief architect: Bernard Laberge ([bernie-laberge](https://github.com/bernie-laberge))
 * Roger Nelson ([rogernelson](https://github.com/rogernelson))
 * [Name] To be filled
@@ -77,7 +77,7 @@ Current voting members of the TSC are:
 
 ### TSC Nomination and Succession
 
-Any proposal for additional members of the TSC may be submitted by Committers, TSC members, or other major stakeholders of the Visto community by opening an issue outlining their case or raising the issue at a TSC meeting. New TSC members are accepted or rejected by majority vote of the TSC.
+Any proposal for additional members of the TSC may be submitted by Committers, TSC members, or other major stakeholders of the UTV community by opening an issue outlining their case or raising the issue at a TSC meeting. New TSC members are accepted or rejected by majority vote of the TSC.
 
 If a TSC member is for an extended period not regularly participating or performing the responsibilities expected of TSC members, the TSC may by majority vote request an alternate TSC member be submitted by that organization, or remove the inactive member from the TSC.
 A voting member of the TSC may nominate a successor in the event that such voting member decides to leave the TSC, and the TSC, including the departing member, shall confirm or reject such nomination by a vote. In the event that the departing member's nomination for successor is rejected by vote of the TSC, the departing member shall be entitled to continue nominating successors until one such successor is confirmed by vote of the TSC. If the departing member fails or is unable to nominate a successor, the TSC may nominate one on the departing member's behalf.
@@ -86,7 +86,7 @@ TSC membership is presumed to be retained by the individual even if they change 
 
 ### TSC Meetings
 
-Any meetings of the TSC are intended to be open to the public, except where there is a reasonable need for privacy. The TSC meets regularly in a voice conference call, at a cadence deemed appropriate by the TSC. The TSC Chair moderates the meeting, or appoints another TSC member to moderate in his or her absence. Meetings may also be streamed online where appropriate; connection details will be posted to the Visto-dev mail list in advance of the scheduled meeting.
+Any meetings of the TSC are intended to be open to the public, except where there is a reasonable need for privacy. The TSC meets regularly in a voice conference call, at a cadence deemed appropriate by the TSC. The TSC Chair moderates the meeting, or appoints another TSC member to moderate in his or her absence. Meetings may also be streamed online where appropriate; connection details will be posted to the UTV-dev mail list in advance of the scheduled meeting.
 
 Items are added to the TSC agenda which are considered contentious or are modifications of governance, contribution policy, TSC membership, or release process, in addition to topics involving the high-level technical direction of the project.
 

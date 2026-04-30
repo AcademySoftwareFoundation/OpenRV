@@ -16,7 +16,7 @@ SET(RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH
 IF(NOT RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH)
   MESSAGE(
     WARNING
-      "Blackmagic Decklink SDK path not specified, disabling Blackmagic output plugin.\nDownload the Blackmagic Desktop Video SDK to add Blackmagic output capability to Visto (optional): https://www.blackmagicdesign.com/desktopvideo_sdk. Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.\nOR if using build.sh, specify --bmd-sdk='...'\nExample:\nrvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'"
+      "Blackmagic Decklink SDK path not specified, disabling Blackmagic output plugin.\nDownload the Blackmagic Desktop Video SDK to add Blackmagic output capability to UTV (optional): https://www.blackmagicdesign.com/desktopvideo_sdk. Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.\nOR if using build.sh, specify --bmd-sdk='...'\nExample:\nrvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_SDK_14.1.zip'"
   )
   RETURN()
 ENDIF()

@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the UTV project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -52,7 +52,7 @@ IF(RV_TARGET_WINDOWS)
   INCLUDE(expat)
 ENDIF()
 
-# Always use Qt6 for Visto
+# Always use Qt6 for UTV
 INCLUDE(qt6)
 
 INCLUDE(openssl) # Python3 requirement

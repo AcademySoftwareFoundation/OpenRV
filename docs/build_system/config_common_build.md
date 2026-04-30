@@ -1,23 +1,23 @@
-# Building Visto
+# Building UTV
 
 Once the platform-specific installation process is done, building RV is essentially the same process for all platforms.
 
-### 1. Building Visto for the first time
+### 1. Building UTV for the first time
 
-#### 1.1 Clone the Visto repository using HTTPS or SSH key
+#### 1.1 Clone the UTV repository using HTTPS or SSH key
 
-Clone the Visto repository. Typically, this will create an "Visto" directory from your current location.
+Clone the UTV repository. Typically, this will create an "UTV" directory from your current location.
 
 ```bash
 # If using a password-protected SSH key:
-git clone --recursive git@github.com:AcademySoftwareFoundation/Visto.git
-cd Visto
+git clone --recursive git@github.com:AcademySoftwareFoundation/UTV.git
+cd UTV
 ```
 
 ```bash
 # Or if using the web URL:
-git clone --recursive https://github.com/AcademySoftwareFoundation/Visto.git
-cd Visto
+git clone --recursive https://github.com/AcademySoftwareFoundation/UTV.git
+cd UTV
 ```
 
 If you cloned the repo without setting the `--recursive` flag, you can initialize the submodule in another step with the following command:
@@ -26,7 +26,7 @@ If you cloned the repo without setting the `--recursive` flag, you can initializ
 git submodule update --init --recursive
 ```
 
-**Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's Visto repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
+**Note: If you plan to contribute and submit pull requests for review** you should create a GitHub account and follow the standard GitHub fork model for submitting PRs. This involves creating your own github account, forking the Academy Software Foundation's UTV repository, making your changes in a branch of your forked version, and then submitting pull requests from your forked repository (don't forget to sync your fork regularly!). In that case, substitute the above repository URL above with the URL of your own fork.
 
 #### 1.2 Configuring Git to use the ignore file with `git blame`
 
@@ -36,9 +36,9 @@ A `.git-blame-ignore-revs` file lists commits to ignore when running `git blame`
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 ```
 
-#### 1.3 Build Visto using build.sh
+#### 1.3 Build UTV using build.sh
 
-We provide a standard `build.sh` script to simplify the process of setting up the environment and compiling Visto. Once in your Visto directory:
+We provide a standard `build.sh` script to simplify the process of setting up the environment and compiling UTV. Once in your UTV directory:
 
 ```bash
 ./build.sh
@@ -50,15 +50,15 @@ By default, the script configures and builds a Release version. You can switch b
 
 This script handles everything automatically: it will create a Python virtual environment (using `uv` if available for maximum speed), fetch source dependencies if necessary, and compile the engine.
 
-After the setup stage is done, a build is started and should produce a valid "visto" executable binary.
+After the setup stage is done, a build is started and should produce a valid "utv" executable binary.
 
 ````{tabs}
 ```{code-tab} bash Release
-# Produces default optimized build in Visto/_build
+# Produces default optimized build in UTV/_build
 ./build.sh --release
 ```
 ```{code-tab} bash Debug
-# Produces unoptimized debug build in Visto/_build_debug
+# Produces unoptimized debug build in UTV/_build_debug
 ./build.sh --debug
 ```
 ````
@@ -67,9 +67,9 @@ Note 1: launch the default optimized build unless you have a reason to want the 
 
 Note 2: It's possible that after boostrapping the build fails. If this happens, building again often fixes the problem. From the command line, call `./build.sh` to complete the build.
 
-### 2. Building Visto after the first time
+### 2. Building UTV after the first time
 
-To build Visto after the first time, simply run `./build.sh` again. It will launch an incremental build.
+To build UTV after the first time, simply run `./build.sh` again. It will launch an incremental build.
 
 ````{tabs}
 ```{code-tab} bash Release
@@ -82,18 +82,18 @@ To build Visto after the first time, simply run `./build.sh` again. It will laun
 ```
 ````
 
-### 3. Starting the Visto executable
+### 3. Starting the UTV executable
 
-Once Visto is finished building, its executable binary can be found here:
+Once UTV is finished building, its executable binary can be found here:
 
 For Windows and Linux:
 
 ````{tabs}
 ```{code-tab} bash Release
-_build/stage/app/bin/visto
+_build/stage/app/bin/utv
 ```
 ```{code-tab} bash Debug
-_build/stage/app/bin/visto
+_build/stage/app/bin/utv
 ```
 ````
 
@@ -101,14 +101,14 @@ For macOS:
 
 ````{tabs}
 ```{code-tab} bash Release
-_build/stage/app/Visto.app/Contents/MacOS/visto
+_build/stage/app/UTV.app/Contents/MacOS/utv
 ```
 ```{code-tab} bash Debug
-_build/stage/app/Visto.app/Contents/MacOS/visto
+_build/stage/app/UTV.app/Contents/MacOS/utv
 ```
 ````
 
-### 4. Contributing to Visto
+### 4. Contributing to UTV
 
 Before you can submit any code for a pull request, this repository uses the `pre-commit` tool to perform basic checks and to execute formatting hooks before a commit. To install the pre-commit hooks, run the following command:
 
@@ -162,7 +162,7 @@ To keep your third-party build between cleanups, set: `-DRV_DEPS_BASE_DIR=/path/
 
 ### 8. Installing Blackmagicdesign&reg; Video Output Support (Optional)
 
-Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to Visto (optional): <https://www.blackmagicdesign.com/desktopvideo_sdk><br>
+Download the Blackmagicdesign&reg; SDK to add Blackmagicdesign&reg; output capability to UTV (optional): <https://www.blackmagicdesign.com/desktopvideo_sdk><br>
 Then set RV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH to the path of the downloaded zip file on the rvcfg line.<br>
 Example:
 
@@ -172,9 +172,9 @@ rvcfg -DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH='<downloads_path>/Blackmagic_DeckLink_
 
 ### 9. NDI&reg; Video Output Support (Optional)
 
-Download and install the NDI&reg; SDK to add NDI&reg; output capability to Visto (optional): <https://ndi.video/><br>
+Download and install the NDI&reg; SDK to add NDI&reg; output capability to UTV (optional): <https://ndi.video/><br>
 
-Installing the NDI SDK must be done before building Visto for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
+Installing the NDI SDK must be done before building UTV for the first time (if you add it later, it's easiest to just delete your build folder, and execute the first-time build procedure again)
 
 ### 10. How to enable non-free FFmpeg codecs
 
@@ -202,7 +202,7 @@ Example:
 By default, the ProRes decode via the SDK will use all available system threads.  To use a fixed maximum number of threads, set the
 environment variable `RV_PREF_GLOBAL_PRORES_DECODER_THREADS` to a positive value.
 
-On Apple Silicon machines, Visto supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default
+On Apple Silicon machines, UTV supports hardware decoding through Apple's VideoToolbox framework. This feature is enabled by default
 but can be controlled using the `-DRV_FFMPEG_USE_VIDEOTOOLBOX` option. Set this option to `ON` to enable or `OFF` to disable VideoToolbox
 hardware decoding.
 
@@ -220,7 +220,7 @@ Apple by contacting [ProRes@apple.com](mailto:ProRes@apple.com).
 
 ### 12. Running the automated tests
 
-Visto uses ctest to run its automated tests.
+UTV uses ctest to run its automated tests.
 
 To run all tests automatically:
 
@@ -250,9 +250,9 @@ You can run the tests with extra verbosity with the flag `--extra-verbose`.
 
 ### 13. Creating the installation package
 
-To create the installation package, invoke the `install` step using cmake. The install step prepares Visto for packaging by building a copy of Visto in the `_install` folder. This step will strip debug symbols from the executable if required.
+To create the installation package, invoke the `install` step using cmake. The install step prepares UTV for packaging by building a copy of UTV in the `_install` folder. This step will strip debug symbols from the executable if required.
 
-Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional Visto.
+Afterwards, it's up to you to either sign or package the result, or to do both. The result should contain the minimum required to have a functional UTV.
 
 #### 13.1 Creating the installation package automatically
 

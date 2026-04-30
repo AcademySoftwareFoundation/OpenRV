@@ -58,7 +58,7 @@ The custom transition hook is similar to the custom schema hooks, except instead
 
 The custom transition hook is similar to the custom schema hooks, except instead of being based on the schema name, it is called whenever the `transition_type` field of the Transition schema is set to Custom. The `customTransitionHook.py` is an example of this.
 
-### Custom Visto node hooks
+### Custom UTV node hooks
 
 During export, the custom RV node hooks are called whenever the `otio_reader` encounters a node it cannot handle.  These hooks are named `export_[node_name]`. The provided `cdlExportHook.py` is an example of this. This is commonly used for effects in RV that do not have equivalent OTIO schemas.
 

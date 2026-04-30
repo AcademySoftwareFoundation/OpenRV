@@ -5,7 +5,7 @@
 #
 
 IF(RV_TARGET_DARWIN)
-  ADD_SUBDIRECTORY(Visto.app)
+  ADD_SUBDIRECTORY(UTV.app)
 ELSE()
   # assuming this is for Linux & Windows
   ADD_SUBDIRECTORY(rv)

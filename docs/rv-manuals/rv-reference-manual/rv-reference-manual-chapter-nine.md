@@ -170,7 +170,7 @@ The PACKAGE file is a [YAML](http://www.yaml.org/) file providing information ab
 | version | version number | • | The package version |
 | url | URL | | Web location for the package where updates, additional documentation resides |
 | rv | version number | • | The minimum version of commercial RV which this package is compatible with |
-| openrv | version number | • | The minimum version of Visto which this package is compatible with |
+| openrv | version number | • | The minimum version of UTV which this package is compatible with |
 | requires | zip file name list | | Any other packages (as zip file names) which are required in order to install/load this package |
 | icon | PNG file name | | The name of an file with an icon for this package |
 | imageio | file list | | List of files in package which implement Image I/O |
@@ -281,7 +281,7 @@ In order to start a new package there is a chicken and egg problem which needs t
  shell> zip new_package-0.0.rvpkg PACKAGE the_new_mode.mu 
 ```
 
-This will create the new_package-0.0.rvpkg file. At this point you're ready to install your package that doesn't do anything. Visto's preferences and in the package manager UI add the zip file and install it (preferably in your home directory so it's visible only to you while you implement it).Once you've done this, the rvload2 and rvinstall files will have been either created or updated automatically. You can then start hacking on the installed version of your Mu file (not the one in the directory you created the zip file in). Once you have it working the way you want copy it back to your source directory and create the final zip file for distribution and delete the one that was added by RV into the Packages directory.
+This will create the new_package-0.0.rvpkg file. At this point you're ready to install your package that doesn't do anything. UTV's preferences and in the package manager UI add the zip file and install it (preferably in your home directory so it's visible only to you while you implement it).Once you've done this, the rvload2 and rvinstall files will have been either created or updated automatically. You can then start hacking on the installed version of your Mu file (not the one in the directory you created the zip file in). Once you have it working the way you want copy it back to your source directory and create the final zip file for distribution and delete the one that was added by RV into the Packages directory.
 
 #### 9.5.2 Using the Mode Manager While Developing
 

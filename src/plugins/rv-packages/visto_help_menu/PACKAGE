@@ -1,4 +1,4 @@
-package: Visto Help menu
+package: UTV Help menu
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
 version: 1.0
@@ -16,6 +16,6 @@ modes:
 description: |
 
     <p>
-    Visto Help menu
+    UTV Help menu
     </p>
 

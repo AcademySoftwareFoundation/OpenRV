@@ -1,7 +1,7 @@
 #
 # Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
 #
-# Modified for the Visto project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
+# Modified for the UTV project. Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -53,7 +53,7 @@ SET_PROPERTY(
 #
 # VFX Platform option
 #
-# That option is to control the versions of the external dependencies that Visto downloads and install based on the VFX platform.
+# That option is to control the versions of the external dependencies that UTV downloads and install based on the VFX platform.
 #
 # e.g. For CY2023, OCIO 2.2.x should be supported. For CY2024, OCIO 2.3.x should be supported.
 #
@@ -88,7 +88,7 @@ SET_PROPERTY(
 #
 # FFmpeg option
 #
-# This option is to control the version of FFmpeg that Visto downloads and installs.
+# This option is to control the version of FFmpeg that UTV downloads and installs.
 #
 # There will be one version used by default per major release. Any other version will require RV_FFMPEG env var to be set with the desired major version.
 #

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Visto Build Script
+# UTV Build Script
 # Matches CI/CD execution for local development.
 # Copyright (C) 2026 Makai Systems. All Rights Reserved.
 #
@@ -61,7 +61,7 @@ BUILD_DIR="${PROJECT_ROOT}/_build"
 INST_DIR="${PROJECT_ROOT}/_install"
 VENV_DIR="${PROJECT_ROOT}/.venv"
 
-echo "=== Visto Build Script ==="
+echo "=== UTV Build Script ==="
 echo "Build Type: ${BUILD_TYPE}"
 
 if [ "${CLEAN_BUILD}" -eq 1 ]; then
@@ -150,7 +150,7 @@ fi
 cmake "${CMAKE_ARGS[@]}"
 
 # 5. Build
-echo "--- Building Visto ---"
+echo "--- Building UTV ---"
 PARALLELISM=${RV_BUILD_PARALLELISM:-$(python3 -c 'import os; print(os.cpu_count())')}
 
 echo "Building dependencies target..."
@@ -166,7 +166,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 if [ "${INSTALL}" -eq 1 ]; then
-    echo "--- Installing Visto ---"
+    echo "--- Installing UTV ---"
     cmake --install "${BUILD_DIR}" --prefix "${INST_DIR}" --config "${BUILD_TYPE}"
     
     if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -180,7 +180,7 @@ if [ "${INSTALL}" -eq 1 ]; then
     echo "Installed to: ${INST_DIR}"
 fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Executable is at: ${BUILD_DIR}/stage/app/Visto.app/Contents/MacOS/Visto"
+    echo "Executable is at: ${BUILD_DIR}/stage/app/UTV.app/Contents/MacOS/UTV"
 else
-    echo "Executable is at: ${BUILD_DIR}/stage/app/bin/visto"
+    echo "Executable is at: ${BUILD_DIR}/stage/app/bin/utv"
 fi

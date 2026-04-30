@@ -3880,7 +3880,7 @@ namespace IPMu
         NODE_RETURN(stype->allocate(r));
     }
 
-    // This is for backwards compatibility with the old live review plugin and latest Visto.
+    // This is for backwards compatibility with the old live review plugin and latest UTV.
     // TODO: Remove setFilterLiveReviewEvents command in the future.
     NODE_IMPLEMENTATION(setFilterLiveReviewEvents, void)
     {

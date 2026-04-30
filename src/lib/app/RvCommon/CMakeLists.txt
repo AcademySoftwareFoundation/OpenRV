@@ -194,7 +194,7 @@ ENDFOREACH()
 # Generate about_rv.cpp with build information
 #
 SET(_about_rv_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_visto.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_utv.cpp
 )
 
 # Get compiler name
@@ -261,10 +261,10 @@ SET(_arch_name
 # Add commercial RV-specific SDK versions if they exist
 
 #
-# Generate about_visto.cpp with build information
+# Generate about_utv.cpp with build information
 #
-SET(_about_visto_cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_visto.cpp
+SET(_about_utv_cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/${_target}/generated/about_utv.cpp
 )
 
 # Get compiler name
@@ -287,29 +287,29 @@ SET(_vfx_platform_str
 )
 
 ADD_CUSTOM_COMMAND(
-  OUTPUT ${_about_visto_cpp}
-  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py ${_about_visto_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
+  OUTPUT ${_about_utv_cpp}
+  COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_utv.py ${_about_utv_cpp} "${_compiler_name}" "${_vfx_platform_str}" "${_platform_name}"
           "${_arch_name}" "${RV_UI_APPLICATION_NAME}" "" "${RV_GIT_COMMIT_SHORT_HASH}"
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_visto.py
-  COMMENT "Generating about_visto.cpp with build information"
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/generate_about_utv.py
+  COMMENT "Generating about_utv.cpp with build information"
   VERBATIM
 )
 
-# Create explicit target to ensure about_visto.cpp is generated before RvCommon builds
+# Create explicit target to ensure about_utv.cpp is generated before RvCommon builds
 ADD_CUSTOM_TARGET(
-  generate_about_visto_cpp
-  DEPENDS ${_about_visto_cpp}
+  generate_about_utv_cpp
+  DEPENDS ${_about_utv_cpp}
 )
 
-LIST(APPEND _sources ${_about_visto_cpp})
+LIST(APPEND _sources ${_about_utv_cpp})
 
 ADD_LIBRARY(
   ${_target} STATIC
   ${_sources} qrc/RvCommon.qrc
 )
 
-# Ensure about_visto.cpp is generated before building RvCommon
-ADD_DEPENDENCIES(${_target} generate_about_visto_cpp)
+# Ensure about_utv.cpp is generated before building RvCommon
+ADD_DEPENDENCIES(${_target} generate_about_utv_cpp)
 
 # Need that with Qt6 since the code for this target does not support unicode correctly.
 IF(RV_TARGET_WINDOWS

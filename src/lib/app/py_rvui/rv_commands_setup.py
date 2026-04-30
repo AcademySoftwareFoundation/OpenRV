@@ -13,9 +13,9 @@ sys.setdlopenflags(os.RTLD_GLOBAL | os.RTLD_NOW)
 
 import site  # noqa: E402
 
-# Find the Visto project root relative to the executable
-visto_root = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..", "..", "..", "..", "..", ".."))
-venv_fallback = os.path.join(visto_root, ".venv")
+# Find the UTV project root relative to the executable
+utv_root = os.path.abspath(os.path.join(os.path.dirname(sys.executable), "..", "..", "..", "..", "..", ".."))
+venv_fallback = os.path.join(utv_root, ".venv")
 
 possible_venvs = []
 if "VIRTUAL_ENV" in os.environ:
@@ -35,7 +35,7 @@ homebrew_path = f"/opt/homebrew/lib/python{sys.version_info.major}.{sys.version_
 if os.path.exists(homebrew_path):
     site.addsitedir(homebrew_path)
 
-print("VISTO SYS.PATH:", sys.path)
+print("UTV SYS.PATH:", sys.path)
 
 import rv.commands  # noqa: E402
 import rv.extra_commands  # noqa: E402

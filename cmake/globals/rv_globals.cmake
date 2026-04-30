@@ -38,7 +38,7 @@ FILE(MAKE_DIRECTORY ${RV_PACKAGES_DIR})
 
 IF(RV_TARGET_DARWIN)
   SET(RV_STAGE_ROOT_DIR
-      ${RV_APP_ROOT}/Visto.app/Contents
+      ${RV_APP_ROOT}/UTV.app/Contents
       CACHE STRING "RV's build install root directory."
   )
   SET(RV_STAGE_BIN_DIR
@@ -252,6 +252,6 @@ IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 ENDIF()
 
 SET(RV_COPYRIGHT_TEXT
-    "Copyright Contributors to the Visto Project"
+    "Copyright Contributors to the UTV Project"
     CACHE STRING "RV's copyright text."
 )

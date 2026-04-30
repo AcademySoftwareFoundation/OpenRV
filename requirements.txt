@@ -1,9 +1,9 @@
-# Visto Python Requirements
+# UTV Python Requirements
 #
-# Modified for the Visto project.
+# Modified for the UTV project.
 # Copyright (C) 2026  Makai Systems. All Rights Reserved.
 #
-# This file contains the packages required to run Visto.
+# This file contains the packages required to run UTV.
 # We prefer using 'uv' for fast installations.
 
 numpy

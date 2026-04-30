@@ -109,7 +109,7 @@
                 }
             }
         }
-        NSLog(@"Found %lu Visto.apps using mdfind", (unsigned long)[appURLs count]);
+        NSLog(@"Found %lu UTV.apps using mdfind", (unsigned long)[appURLs count]);
     } @catch (NSException *e) {
         NSLog(@"mdfind failed: %@", e);
     }
@@ -155,8 +155,8 @@
         latestRVLinkURL = [rvlinkURL copy];
     }
 
-    // Find all Visto.apps using both discovery methods
-    NSLog(@"Discovering Visto.applications using multiple methods...");
+    // Find all UTV.apps using both discovery methods
+    NSLog(@"Discovering UTV.applications using multiple methods...");
     
     // Method 1: Find apps by bundle ID (com.autodesk.RV)
     NSMutableArray<NSURL *> *mdfindApps = [self findRVAppsUsingMDFind];
@@ -186,13 +186,13 @@
         }
     }
     
-    NSLog(@"Total unique Visto.applications found: %lu", (unsigned long)[appURLs count]);
+    NSLog(@"Total unique UTV.applications found: %lu", (unsigned long)[appURLs count]);
 
-    // Check if we found any Visto.apps
+    // Check if we found any UTV.apps
     if ([appURLs count] == 0) {
         currentAlert = [[NSAlert alloc] init];
         [currentAlert setMessageText:@"No RV Applications Found"];
-        [currentAlert setInformativeText:@"Could not find any installed Visto.applications to open the rvlink URL."];
+        [currentAlert setInformativeText:@"Could not find any installed UTV.applications to open the rvlink URL."];
         [currentAlert addButtonWithTitle:@"OK"];
         [currentAlert runModal];
         [currentAlert release];
@@ -200,11 +200,11 @@
         return;
     }
 
-    // If only one Visto.app found, launch it directly without showing chooser
+    // If only one UTV.app found, launch it directly without showing chooser
     if ([appURLs count] == 1) {
         NSURL *selectedAppURL = [appURLs firstObject];
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:[selectedAppURL path]];
-        NSLog(@"Only one Visto.application found, launching directly: %@", displayName);
+        NSLog(@"Only one UTV.application found, launching directly: %@", displayName);
         
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
@@ -246,10 +246,10 @@
         // Create a more readable title that shows distinguishing path info
         NSString *itemTitle;
         if ([appPath hasPrefix:@"/Applications/"]) {
-            // For apps in Applications folder, show "Visto.app - /Applications/Visto.app"
+            // For apps in Applications folder, show "UTV.app - /Applications/UTV.app"
             itemTitle = [NSString stringWithFormat:@"%@ - %@", displayName, appPath];
         } else if ([appPath hasPrefix:@"/Users/"]) {
-            // For user-specific installations, show "Visto.app - ~/path/to/Visto.app"
+            // For user-specific installations, show "UTV.app - ~/path/to/UTV.app"
             NSString *homeDir = NSHomeDirectory();
             if ([appPath hasPrefix:homeDir]) {
                 NSString *relativePath = [appPath substringFromIndex:[homeDir length]];
@@ -377,7 +377,7 @@ int main(int argc, const char * argv[])
             
             NSAlert *registrationAlert = [[NSAlert alloc] init];
             [registrationAlert setMessageText:@"RVLinkLauncher Registration Complete"];
-            [registrationAlert setInformativeText:@"RVLinkLauncher is now registered to handle rvlink:// URLs. Future rvlink:// links will automatically open with your choice of Visto.application."];
+            [registrationAlert setInformativeText:@"RVLinkLauncher is now registered to handle rvlink:// URLs. Future rvlink:// links will automatically open with your choice of UTV.application."];
             [registrationAlert addButtonWithTitle:@"OK"];
             [registrationAlert runModal];
             [registrationAlert release];

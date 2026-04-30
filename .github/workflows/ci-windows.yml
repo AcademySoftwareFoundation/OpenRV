@@ -1,4 +1,4 @@
-name: Visto Windows
+name: UTV Windows
 
 on:
   workflow_call:

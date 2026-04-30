@@ -1,8 +1,8 @@
-Visto
+UTV
 
 Copyright (C) 2026  Makai Systems. All Rights Reserved.
 
-This project, Visto, is a derivative work of Visto.
+This project, UTV, is a derivative work of UTV.
 
 Original portions of this work are:
 Copyright (C) 2022-2025 Autodesk, Inc. All Rights Reserved.

@@ -1,8 +1,8 @@
-# Chapter 6 - Visto File Format
+# Chapter 6 - UTV File Format
 
 The RV file format (.rv) is a text GTO file. GTO is an open source file format which stores arbitrary data — mostly for use in computer graphics applications. The text GTO format is meant to be simple and human readable. It's helpful to have familiarized yourself with the GTO documentation before reading this section. The documentation should come with RV, or you can read it on line at the [GTO](../../rv-manuals/rv-gto.md).
 
-### 6.1 How Visto Uses GTO
+### 6.1 How UTV Uses GTO
 
 RV defines a number of new GTO object protocols (types of objects). The GTO file is made up of objects, which contain components, which contain properties where the actual data resides. RV's use of the format is to store nodes in an image processing graph as GTO objects. How the nodes are connected is determined by RV and is not currently arbitrary so there are no connections between the objects stored in the file.Some examples of RV object types include:
 

@@ -1,7 +1,7 @@
-name: Build Visto on macOS
-description: Build and test Visto on macOS
+name: Build UTV on macOS
+description: Build and test UTV on macOS
 
-# Modified for the Visto project.
+# Modified for the UTV project.
 # Copyright (C) 2026  Makai Systems. All Rights Reserved.
 
 inputs:
@@ -62,7 +62,7 @@ runs:
       shell: bash
 
     - name: Add repository as safe directory
-      run: git config --global --add safe.directory /__w/Visto/Visto
+      run: git config --global --add safe.directory /__w/UTV/UTV
       shell: bash
 
     - name: Install cmake
@@ -211,7 +211,7 @@ runs:
     # Let's revisit this if we can reduce the size of the cache (potentially dropping x86_64 for Mac)
     # or by moving some dependencies from the cache to Conan or another dependency manager.
 
-    - name: Configure Visto
+    - name: Configure UTV
       if: ${{ inputs.vfx-platform == 'CY2023' }}
       run: |
         which cmake
@@ -219,7 +219,7 @@ runs:
         cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }} -DRV_USE_SYSTEM_DEPS=ON
       shell: bash
 
-    - name: Configure Visto
+    - name: Configure UTV
       if: ${{ inputs.vfx-platform == 'CY2024' }}
       run: |
         which cmake
@@ -227,14 +227,14 @@ runs:
         cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }} -DRV_USE_SYSTEM_DEPS=ON
       shell: bash
 
-    - name: Build Visto dependencies
+    - name: Build UTV dependencies
       if: steps.cmake-dependencies.outputs.cache-hit != 'true'
       run: |
         cmake --build _build --config ${{ inputs.build-type }} --target dependencies --parallel=$(python -c 'import os; print(os.cpu_count())') -v
         ls -al _build
       shell: bash
 
-    - name: Build Visto main executable
+    - name: Build UTV main executable
       run: cmake --build _build --config ${{ inputs.build-type }} --target main_executable --parallel=$(python -c 'import os; print(os.cpu_count())') -v
       shell: bash
 
@@ -242,7 +242,7 @@ runs:
       run: ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
       shell: bash
 
-    - name: Install Visto
+    - name: Install UTV
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: bash
 

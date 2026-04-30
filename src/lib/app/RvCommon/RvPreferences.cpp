@@ -2982,7 +2982,7 @@ namespace Rv
             str << "<tr><td align=right> <b>RV Version</b> </td><td> " << p.rvversion.toUtf8().data() << " </td></tr>";
 
         if (p.openrvversion != "")
-            str << "<tr><td align=right> <b>Visto Version</b> </td><td> " << p.openrvversion.toUtf8().data() << " </td></tr>";
+            str << "<tr><td align=right> <b>UTV Version</b> </td><td> " << p.openrvversion.toUtf8().data() << " </td></tr>";
 
         str << "<tr><td align=right> <b>File</b> </td><td> " << p.file.toUtf8().data() << " </td></tr>";
 

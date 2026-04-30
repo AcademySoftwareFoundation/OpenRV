@@ -1,4 +1,4 @@
-# D - Using Visto as Nuke's Flip Book Player
+# D - Using UTV as Nuke's Flip Book Player
 
 Nuke can easily be configured to use RV as a flipbook. Nuke can also be set up to render out OpenEXR temp files instead of the default rgb files.
 
@@ -22,7 +22,7 @@ mkdir $HOME/.nuke/python
 
 Done! Now Nuke well pick up new stuff from this area on start-up
 
-### D.2 Adding Visto support in the custom plugins area
+### D.2 Adding UTV support in the custom plugins area
 
 The following assumes that you've setup a custom plugin area as described in the previous section.
 
