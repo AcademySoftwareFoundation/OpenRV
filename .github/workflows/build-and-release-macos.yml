@@ -86,7 +86,7 @@ jobs:
           aqtversion: '==3.2.*'
 
       - name: Set QT_HOME
-        run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/6.5.3/macos" >> $GITHUB_ENV
+        run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/6.11.0/macos" >> $GITHUB_ENV
         shell: bash
 
       - name: Build UTV (macOS)
