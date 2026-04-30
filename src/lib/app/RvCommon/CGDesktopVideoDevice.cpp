@@ -12,6 +12,9 @@
 #include <IOKit/graphics/IOFramebufferShared.h>
 #include <IOKit/graphics/IOGraphicsInterface.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include <QuartzCore/CVDisplayLink.h>
 #include <IPCore/Session.h>
 
@@ -564,3 +567,5 @@ namespace Rv
     }
 
 } // namespace Rv
+
+#pragma clang diagnostic pop

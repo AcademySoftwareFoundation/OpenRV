@@ -8,6 +8,9 @@
 #define AVFDISPLAYLINK_H
 
 #include <QtCore/qobject.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include <QuartzCore/CVDisplayLink.h>
 
 namespace IPCore
@@ -50,6 +53,7 @@ namespace Rv
 
 #endif // DISPLAYLINK_H
 
+#pragma clang diagnostic pop
 #ifdef check
 #undef check
 #endif

@@ -6,6 +6,9 @@
 #include <RvCommon/CGDesktopVideoDeviceArm.h>
 #include <OpenGL/OpenGL.h>
 #include <IOKit/graphics/IOGraphicsLib.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include <QuartzCore/CVDisplayLink.h>
 #include <IPCore/Session.h>
 
@@ -498,3 +501,5 @@ namespace Rv
     }
 
 } // namespace Rv
+
+#pragma clang diagnostic pop

@@ -4,6 +4,9 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include <RvCommon/DisplayLink.h>
 #include <RvCommon/CGDesktopVideoDevice.h>
 #include <iostream>
@@ -94,3 +97,5 @@ namespace Rv
     }
 
 } // namespace Rv
+
+#pragma clang diagnostic pop
