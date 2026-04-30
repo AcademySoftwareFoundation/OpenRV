@@ -20,7 +20,6 @@ IF(NOT RV_TARGET_APPLE_ARM64)
 ENDIF()
 
 SET(__compiler_options__
-    -Wall
     ${__compiler_options_x86_64}
     -Wno-dangling-else
     -Wno-deprecated-declarations
