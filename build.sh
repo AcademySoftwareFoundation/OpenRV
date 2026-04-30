@@ -12,6 +12,8 @@ BUILD_TYPE="Release"
 CLEAN_BUILD=0
 INSTALL=0
 LOG_FILE=""
+BMD_SDK=""
+PRORES_SDK=""
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -20,6 +22,8 @@ while [[ "$#" -gt 0 ]]; do
         --release) BUILD_TYPE="Release"; shift ;;
         --clean) CLEAN_BUILD=1; shift ;;
         --install) INSTALL=1; shift ;;
+        --bmd-sdk) BMD_SDK="$2"; shift 2 ;;
+        --prores-sdk) PRORES_SDK="$2"; shift 2 ;;
         --log)
             if [[ -n "$2" && "$2" != -* ]]; then
                 LOG_FILE="$2"
@@ -38,6 +42,8 @@ while [[ "$#" -gt 0 ]]; do
             echo "  --clean    Remove build directory and virtual environment before building"
             echo "  --install  Install the build to the _install directory"
             echo "  --log [f]  Log output to a file (default: logs/build_TIMESTAMP.log)"
+            echo "  --bmd-sdk  Path to the Blackmagic Decklink SDK zip file"
+            echo "  --prores-sdk Path to the Apple ProRes SDK zip file"
             exit 0
             ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
@@ -112,10 +118,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         XCODE_MAJOR_VERSION=$(xcodebuild -version | head -n 1 | awk '{print $2}' | cut -d. -f1)
         if [[ -n "$XCODE_MAJOR_VERSION" && "$XCODE_MAJOR_VERSION" =~ ^[0-9]+$ && "$XCODE_MAJOR_VERSION" -ge 26 ]]; then
             QT_BASE_DIR="$(dirname "$(dirname "$QT_HOME")")"
-            if [ -d "$QT_BASE_DIR" ]; then
-                echo "Xcode 26+ detected, ensuring Qt AGL fix is applied..."
-                QT_HOME="$QT_BASE_DIR" bash "${PROJECT_ROOT}/apply_qt_fix.sh"
-            fi
         fi
     fi
 fi
@@ -131,6 +133,14 @@ CMAKE_ARGS=(
     "-DRV_VFX_PLATFORM=CY2026"
     "-DRV_USE_SYSTEM_DEPS=ON"
 )
+
+if [ -n "$BMD_SDK" ]; then
+    CMAKE_ARGS+=("-DRV_DEPS_BMD_DECKLINK_SDK_ZIP_PATH=${BMD_SDK}")
+fi
+
+if [ -n "$PRORES_SDK" ]; then
+    CMAKE_ARGS+=("-DRV_DEPS_APPLE_PRORES_SDK_ZIP_PATH=${PRORES_SDK}")
+fi
 
 # Add Windows specifics if running in MSYS/Cygwin
 if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
