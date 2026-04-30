@@ -20,7 +20,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.14'
           
       - name: Install pre-commit
         run: pip install pre-commit
@@ -31,7 +31,7 @@ jobs:
   build-and-release:
     name: Build macOS (and Release)
     needs: lint
-    runs-on: macos-14 # arm64
+    runs-on: macos-26 # arm64
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
