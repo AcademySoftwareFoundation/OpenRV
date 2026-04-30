@@ -180,7 +180,7 @@ if [ "${INSTALL}" -eq 1 ]; then
     echo "Installed to: ${INST_DIR}"
 fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Executable is at: ${BUILD_DIR}/stage/app/Visto.app/Contents/MacOS/visto"
+    echo "Executable is at: ${BUILD_DIR}/stage/app/Visto.app/Contents/MacOS/Visto"
 else
     echo "Executable is at: ${BUILD_DIR}/stage/app/bin/visto"
 fi

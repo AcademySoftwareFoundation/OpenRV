@@ -579,7 +579,7 @@
          </dict>
       </array>
       <key>CFBundleExecutable</key>
-      <string>RV</string>
+      <string>${RV_INTERNAL_APPLICATION_NAME}</string>
       <key>CFBundleGetInfoString</key>
       <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}, Copyright ${RV_VERSION_YEAR} Autodesk, Inc.</string>
       <key>CFBundleIconFile</key>
