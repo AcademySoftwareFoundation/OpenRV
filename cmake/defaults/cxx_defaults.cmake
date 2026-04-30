@@ -66,8 +66,8 @@ INCLUDE(CYCOMMON)
 #
 # Add preprocessor variable for use in the code and cmake variable to decide the version of an external dependencies based on the VFX platform.
 #
-# Note that the macro in rv_vfx.cmake are dependant on those RV_VFX_CY20XX.
-INCLUDE(${RV_VFX_PLATFORM})
+# Note that the macro in rv_vfx.cmake are dependant on those RV_VFX_CY20XX. INCLUDE(${RV_VFX_PLATFORM}) removed because VFX reference platform configurations
+# are consolidated into CYCOMMON.cmake
 
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2024")
   SET(RV_QT_PACKAGE_NAME

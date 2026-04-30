@@ -6,6 +6,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# Global VFX Platform Configuration
+SET(RV_VFX_CY_YEAR
+    "2026"
+)
+SET(RV_VFX_CY2026
+    ON
+)
+ADD_COMPILE_DEFINITIONS(QT65ON)
+
 # Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
 SET(RV_DEPS_AJA_VERSION
     "17.6.0.hotfix1"
