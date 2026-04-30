@@ -67,10 +67,10 @@ jobs:
                ffmpeg openexr imath opencolorio libraw libtiff libpng boost openimageio openjpeg webp yaml-cpp spdlog icu4c openjph jpeg-turbo
         shell: bash
 
-      - name: Install Qt 6.5.3
+      - name: Install Qt 6.11.0
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.5.3'
+          version: '6.11.0'
           host: 'mac'
           target: 'desktop'
           arch: 'clang_64'
