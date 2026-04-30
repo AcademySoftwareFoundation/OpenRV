@@ -23,6 +23,7 @@ Here is a list of the people who've contributed code to the UTV project, sorted 
 * Mark Reid ([markreidvfx](https://github.com/markreidvfx))
 * Martin Chesnay ([mchesnay](https://github.com/mchesnay))
 * Matt Daw ([mattdaw](https://github.com/mattdaw))
+* Michael Oliver ([mcoliver](https://github.com/mcoliver))
 * Nicolas Montmarquette ([nmontmarquette](https://github.com/nmontmarquette))
 * Paul Barton ([paulbarton90](https://github.com/paulbarton90))
 * Robert Zhou ([meepzh](https://github.com/meepzh))
