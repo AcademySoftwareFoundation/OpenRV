@@ -14,6 +14,7 @@ INSTALL=0
 LOG_FILE=""
 BMD_SDK=""
 PRORES_SDK=""
+CUSTOM_VERSION=""
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -24,6 +25,7 @@ while [[ "$#" -gt 0 ]]; do
         --install) INSTALL=1; shift ;;
         --bmd-sdk) BMD_SDK="$2"; shift 2 ;;
         --prores-sdk) PRORES_SDK="$2"; shift 2 ;;
+        --version) CUSTOM_VERSION="$2"; shift 2 ;;
         --log)
             if [[ -n "$2" && "$2" != -* ]]; then
                 LOG_FILE="$2"
@@ -44,6 +46,7 @@ while [[ "$#" -gt 0 ]]; do
             echo "  --log [f]  Log output to a file (default: logs/build_TIMESTAMP.log)"
             echo "  --bmd-sdk  Path to the Blackmagic Decklink SDK zip file"
             echo "  --prores-sdk Path to the Apple ProRes SDK zip file"
+            echo "  --version  Custom semantic version (e.g. 2026.1)"
             exit 0
             ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
@@ -140,6 +143,12 @@ fi
 
 if [ -n "$PRORES_SDK" ]; then
     CMAKE_ARGS+=("-DRV_DEPS_APPLE_PRORES_SDK_ZIP_PATH=${PRORES_SDK}")
+fi
+
+if [ -n "$CUSTOM_VERSION" ]; then
+    MAJOR=$(echo "$CUSTOM_VERSION" | cut -d'.' -f1)
+    MINOR=$(echo "$CUSTOM_VERSION" | cut -d'.' -f2)
+    CMAKE_ARGS+=("-DRV_MAJOR_VERSION=${MAJOR}" "-DRV_MINOR_VERSION=${MINOR}" "-DRV_VERSION_YEAR=${MAJOR}")
 fi
 
 # Add Windows specifics if running in MSYS/Cygwin

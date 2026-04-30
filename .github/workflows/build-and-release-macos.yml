@@ -10,8 +10,27 @@ permissions:
   contents: write
 
 jobs:
+  lint:
+    name: Lint codebase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install pre-commit
+        run: pip install pre-commit
+        
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files
+
   build-and-release:
     name: Build macOS (and Release)
+    needs: lint
     runs-on: macos-14 # arm64
     steps:
       - name: Check out repository
@@ -19,6 +38,27 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0 # Need all history and tags to determine version
+
+      - name: Determine Next Semantic Version
+        id: versioning
+        run: |
+          YEAR=$(date +%Y)
+          LATEST_TAG=$(git tag -l "${YEAR}.*" | sort -V | tail -n 1)
+          if [ -z "$LATEST_TAG" ]; then
+            NEW_VERSION="${YEAR}.1"
+          else
+            MINOR=$(echo $LATEST_TAG | cut -d'.' -f2)
+            NEW_VERSION="${YEAR}.$((MINOR + 1))"
+          fi
+          
+          # If it's a pull request, append PR number
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            NEW_VERSION="${NEW_VERSION}-PR${{ github.event.pull_request.number }}"
+          fi
+          
+          echo "Next version is: $NEW_VERSION"
+          echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+        shell: bash
 
       - name: Install Homebrew dependencies
         run: |
@@ -52,40 +92,28 @@ jobs:
       - name: Build UTV (macOS)
         run: |
           chmod +x ./build.sh
-          ./build.sh --release --clean
+          # Only pass major.minor (strip -PR stuff for CMake)
+          CLEAN_VERSION=$(echo "${{ steps.versioning.outputs.version }}" | cut -d'-' -f1)
+          ./build.sh --release --clean --version $CLEAN_VERSION
         shell: bash
 
-      - name: Determine Next Semantic Version
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        id: versioning
+      - name: Apply Ad-Hoc macOS Code Signature
         run: |
-          YEAR=$(date +%Y)
-          LATEST_TAG=$(git tag -l "${YEAR}.*" | sort -V | tail -n 1)
-          if [ -z "$LATEST_TAG" ]; then
-            NEW_VERSION="${YEAR}.1"
-          else
-            MINOR=$(echo $LATEST_TAG | cut -d'.' -f2)
-            NEW_VERSION="${YEAR}.$((MINOR + 1))"
-          fi
-          echo "Next version is: $NEW_VERSION"
-          echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          codesign --force --deep --sign - _build/stage/app/UTV.app
         shell: bash
 
       - name: Package macOS App
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd _build/stage/app
           zip -ry UTV-${{ steps.versioning.outputs.version }}-macOS-arm64.zip UTV.app
         shell: bash
 
-      - name: Create and Push Tag
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ steps.versioning.outputs.version }}
-          git push origin ${{ steps.versioning.outputs.version }}
-        shell: bash
+      - name: Upload PR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: UTV-${{ steps.versioning.outputs.version }}-macOS-arm64
+          path: _build/stage/app/UTV-${{ steps.versioning.outputs.version }}-macOS-arm64.zip
+          retention-days: 7
 
       - name: Generate Release Notes
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
