@@ -2,62 +2,81 @@
 
 ---
 
-[![UTV](docs/images/UTV_icon.png)](https://github.com/AcademySoftwareFoundation/UTV.git)
+<p align="center">
+  <img src="docs/images/UTV_icon.png" alt="UTV Logo" width="200" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/makaisystems/utv/releases"><img src="https://img.shields.io/github/v/release/makaisystems/utv?label=Release&color=success" alt="Latest Release" /></a>
+  <a href="https://github.com/makaisystems/utv/actions/workflows/build-and-release-macos.yml"><img src="https://img.shields.io/github/actions/workflow/status/makaisystems/utv/build-and-release-macos.yml?branch=main" alt="Build Status" /></a>
+  <img src="https://img.shields.io/badge/python-3.14-blue" alt="Python 3.14" />
+  <a href="https://github.com/makaisystems/utv/stargazers"><img src="https://img.shields.io/github/stars/makaisystems/utv?style=social" alt="GitHub Stars" /></a>
+</p>
+
 ---
 
-![Supported Versions](https://img.shields.io/badge/python-3.11-blue)
-[![Supported VFX Platform Versions](https://img.shields.io/badge/vfx%20platform-2024-lightgrey.svg)](http://www.vfxplatform.com/)
-[![docs](https://readthedocs.org/projects/aswf-openrv/badge/?version=latest)](https://aswf-openrv.readthedocs.io/en/latest)
+## 🎬 A Player for the Masses
 
-## Overview
+UTV is a highly performant, natively installable image and sequence viewer.
 
-UTV is an image and sequence viewer for VFX and animation artists.
-UTV is high-performant, hardware accelerated, and pipeline-friendly.
+While heavily inspired by high-end visual effects software, UTV strips away the massive dependencies and VFX reference platform mandates. It is designed to be a **lightweight, distributable framecycler** that anyone can install and run instantly.
 
-[UTV Documentation on Read the Docs](https://aswf-openrv.readthedocs.io/en/latest/)
+Whether you are a freelance artist, an editor, or just need to smoothly scrub through 4K image sequences, UTV provides a world-class engine without the bloat of an enterprise pipeline.
 
-## Cloning the repository
+---
 
-The quickest way to download UTV's source code is to clone this repository.
+## 🚀 Installation
+
+### macOS (Homebrew)
+
+You can install the pre-compiled native macOS (Apple Silicon) binary directly from our custom Homebrew tap:
 
 ```bash
-# Don't forget the --recursive flag! 
-git clone --recursive https://github.com/AcademySoftwareFoundation/UTV.git
+brew install --cask makaisystems/utv/utv
 ```
 
-However, if you'd like to actually build UTV or contribute to the project, we recommend you follow the instructions below *before* cloning the repository, as it involves quite a lot more setup than just cloning. If that's your case, skip this step for now, we'll get to cloning in a bit.
+*(Support for `apt`, `dnf`, `winget`, and `choco` is coming soon!)*
 
-## Contributing to UTV
+---
 
-We welcome community contributions. In general, to maximize your chances of successfully building and contributing to UTV, you should:
+## 🛠️ Building from Source
 
-- Be very familiar with git/github and its usage.
-- Have your own github account, where you will fork this repository
-- Clone your forked repository instead of the main UTV repository
-- Create a branch from your fork's 'main' branch before modifying code
-- Fix conflicts prior to creating a pull request
-- Update your branch (git pull, git rebase) before creating your pull request
+If you want to build UTV from source or contribute to the project, the process is streamlined.
 
-If you're comfortable and familiar with the above, we are looking forward to your contributions. Just continue reading, we'll help you along with your setup.
+### 1. Install Dependencies
 
-## Building the workstation
+Using Homebrew on macOS, install the required compilers and libraries:
 
-UTV is currently supported on macOS Ventura 13.x and later, Windows 10 and later, and Rocky Linux 8.x/9.x.
+```bash
+brew install ninja readline sqlite3 xz zlib tcl-tk@8 python-tk autoconf automake libtool python@3.14 yasm clang-format black meson nasm pkg-config glew ccache ffmpeg openexr imath opencolorio libraw libtiff libpng boost openimageio openjpeg webp yaml-cpp spdlog icu4c openjph jpeg-turbo
+```
 
-You should start by setting up the platform-specific packages and dependencies for your operating system:
+*(Note: UTV requires Qt 6.11 or later).*
 
-- [macOS Ventura and later](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_macos.html)
-- [Windows 10 and later](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_windows.html)
-- [Rocky Linux 8/9](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_linux_rocky89.html)
+### 2. Build the Application
 
-Once this platform-specific setup is complete, move to the common build instructions.
+Once dependencies are installed, simply run the build script:
 
-- [Common build instructions](https://aswf-openrv.readthedocs.io/en/latest/build_system/config_common_build.html)
+```bash
+git clone --recursive https://github.com/makaisystems/utv.git
+cd utv
+./build.sh --release --clean
+```
 
-Note that as of 2025, CentOS 7 is no longer supported as a platform for UTV since CentOS was end-of-life'd as of summer of 2024.
+The compiled binary will be placed in `_build/stage/app/UTV.app`.
 
-Also note that support for other *current* operating systems (typically, other Linux variants) is on a "if-we-can-find-time" basis because our primary mandate is to support immediate customer needs on official VFX reference platforms. We would however welcome community-driven contributions to support other platforms.
+---
 
-## About third-party licenses
+## 🤝 Contributing & Governance
+
+We welcome community contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) and [GOVERNANCE.md](GOVERNANCE.md) to get started.
+
+## 📈 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=makaisystems/utv&type=Date)](https://star-history.com/#makaisystems/utv&Date)
+
+---
+
+## 📜 About Third-Party Licenses
 
 See [THIRD-PARTY.md](THIRD-PARTY.md) for license information about portions of UTV that have been imported from other projects.
