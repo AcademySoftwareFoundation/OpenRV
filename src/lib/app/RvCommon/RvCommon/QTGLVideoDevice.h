@@ -36,12 +36,12 @@ namespace Rv
 
         QOpenGLWidget* widget() const { return m_view; }
 
-        virtual void makeCurrent() const;
+        virtual void makeCurrent() const override;
 
         const QTTranslator& translator() const { return *m_translator; }
 
-        virtual void redraw() const;
-        virtual void redrawImmediately() const;
+        virtual void redraw() const override;
+        virtual void redrawImmediately() const override;
 
         void setAbsolutePosition(int x, int y);
 
@@ -49,28 +49,28 @@ namespace Rv
         //  VideoDevice API
         //
 
-        virtual GLVideoDevice* newSharedContextWorkerDevice() const;
-        virtual Resolution resolution() const;
-        virtual Offset offset() const;
-        virtual Timing timing() const;
-        virtual VideoFormat format() const;
+        virtual GLVideoDevice* newSharedContextWorkerDevice() const override;
+        virtual Resolution resolution() const override;
+        virtual Offset offset() const override;
+        virtual Timing timing() const override;
+        virtual VideoFormat format() const override;
 
-        virtual size_t width() const;
-        virtual size_t height() const;
+        virtual size_t width() const override;
+        virtual size_t height() const override;
 
-        virtual Resolution internalResolution() const;
+        virtual Resolution internalResolution() const override;
 
-        virtual void open(const StringVector&);
-        virtual void close();
-        virtual bool isOpen() const;
+        virtual void open(const StringVector&) override;
+        virtual void close() override;
+        virtual bool isOpen() const override;
 
-        virtual void syncBuffers() const;
+        virtual void syncBuffers() const override;
 
-        virtual GLuint fboID() const;
+        virtual GLuint fboID() const override;
 
         bool isWorkerDevice() const { return Capabilities(capabilities()) == NoCapabilities; }
 
-        virtual void setPhysicalDevice(VideoDevice* d);
+        virtual void setPhysicalDevice(VideoDevice* d) override;
 
         // Device pixel ratio for high DPI displays
         // For reference: https://doc.qt.io/qt-6/highdpi.html

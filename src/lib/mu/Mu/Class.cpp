@@ -343,7 +343,7 @@ namespace Mu
                 const Class* super = _superClasses[i];
                 ClassInstance* sobj = i ? (reinterpret_cast<ClassInstance*>(obj->structure() + _superOffsets[i])) : obj;
 
-                if (sobj = super->dynamicCast(sobj, c, false))
+                if ((sobj = super->dynamicCast(sobj, c, false)))
                 {
                     return sobj;
                 }

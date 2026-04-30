@@ -136,7 +136,7 @@ namespace TwkContainer
 
         if (!p)
         {
-            if (np = newProperty(name, interp, info))
+            if ((np = newProperty(name, interp, info)))
             {
                 c->add(np);
                 np->resize(info.size);

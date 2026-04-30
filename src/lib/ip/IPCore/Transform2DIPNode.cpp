@@ -179,7 +179,7 @@ namespace IPCore
         //  Any tags that the UI has created are added to the image
         //
 
-        if (m_tag = component("tag"))
+        if ((m_tag = component("tag")))
         {
             const Component::Container& props = m_tag->properties();
 

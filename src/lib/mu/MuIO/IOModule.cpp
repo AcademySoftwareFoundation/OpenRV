@@ -671,7 +671,7 @@ namespace Mu
         {
             struct dirent* e = 0;
 
-            while (e = readdir(d))
+            while ((e = readdir(d)))
             {
                 ClassInstance* i = ClassInstance::allocate(tupleType);
                 DirEnt* dent = (DirEnt*)i->structure();

@@ -363,7 +363,7 @@ namespace TwkUtil
     {
         Node* node;
 
-        while (node = findNode(N))
+        while ((node = findNode(N)))
         {
             stl_ext::remove(node->m_recipients, N);
 

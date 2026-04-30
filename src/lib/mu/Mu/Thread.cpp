@@ -47,6 +47,9 @@
 #endif
 
 #if defined(RV_ARCH_ARM64)
+#undef darwin_thread_state
+#undef DARWIN_THREAD_STATE_COUNT
+#undef DARWIN_THREAD_STATE
 #define darwin_thread_state arm_thread_state64_t
 #define DARWIN_THREAD_STATE_COUNT ARM_THREAD_STATE64_COUNT
 #define DARWIN_THREAD_STATE ARM_THREAD_STATE64

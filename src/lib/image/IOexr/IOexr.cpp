@@ -1137,7 +1137,7 @@ namespace TwkFB
         else
         {
             ViewNames views;
-            if (vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView"))
+            if ((vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView")))
             {
                 // Implies read a MultiView file
                 views = vattr->value();
@@ -1223,7 +1223,7 @@ namespace TwkFB
         else
         {
             ViewNames views;
-            if (vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView"))
+            if ((vattr = file.header(partNum).findTypedAttribute<Imf::StringVectorAttribute>("multiView")))
             {
                 // Implies read a MultiView file
                 views = vattr->value();

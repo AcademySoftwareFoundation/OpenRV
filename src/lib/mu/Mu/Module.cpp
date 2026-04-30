@@ -84,7 +84,7 @@ namespace Mu
         }
 
 #ifdef HAVE_DLOPEN
-        if (dsoInterface._handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_GLOBAL))
+        if ((dsoInterface._handle = dlopen(soName.c_str(), RTLD_NOW | RTLD_GLOBAL)))
         {
             if (void* sym = dlsym(dsoInterface._handle, initName.c_str()))
 #if 0

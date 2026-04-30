@@ -160,7 +160,7 @@ namespace TwkAudio
         case Channel16:
             chstr = "CH16: channel 16";
             break;
-        case UnknownLayout:
+        case UnknownChannel:
         default:
             chstr = "UKN: Unknown";
             break;

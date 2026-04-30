@@ -165,7 +165,7 @@ namespace Mu
 
         addSymbol(symbol);
 
-        while (s = va_arg(ap, Symbol*))
+        while ((s = va_arg(ap, Symbol*)))
             addSymbol(s);
         va_end(ap);
     }

@@ -126,7 +126,7 @@ namespace Rv
 
             for (size_t i = 0; i < list.size(); i++)
             {
-                PyList_SetItem(pylist, i, qvariantToPyObject(list[i].type(), list[i]));
+                PyList_SetItem(pylist, i, qvariantToPyObject(list[i].typeId(), list[i]));
             }
 
             ret = pylist;

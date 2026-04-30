@@ -160,7 +160,7 @@ namespace TwkFB
         char* c = 0;
         string format;
 
-        while (c = fgets(temp, 128, fp))
+        while ((c = fgets(temp, 128, fp)))
         {
             if (*temp == 0 || *temp == '\n')
                 break;

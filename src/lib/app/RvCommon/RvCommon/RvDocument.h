@@ -49,7 +49,7 @@ namespace Rv
         RvDocument();
         virtual ~RvDocument();
 
-        virtual std::string name() const { return "RvDocument"; }
+        virtual std::string name() const override { return "RvDocument"; }
 
         RvSession* session() const { return m_session; }
 
@@ -130,7 +130,7 @@ namespace Rv
 
     protected:
         // Overrides for TwkUtil::Notifier
-        virtual bool receive(Notifier*, Notifier*, MessageId, MessageData*);
+        virtual bool receive(Notifier*, Notifier*, MessageId, MessageData*) override;
 
         void enableActions(bool, QMenu*);
 

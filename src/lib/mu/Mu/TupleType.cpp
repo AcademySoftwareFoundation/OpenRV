@@ -122,7 +122,7 @@ namespace Mu
         ClassInstance* o = ClassInstance::allocate(c);
         const Node* n = 0;
 
-        for (size_t i = 0; n = NODE_THIS.argNode(i); i++)
+        for (size_t i = 0; (n = NODE_THIS.argNode(i)); i++)
         {
             o->fieldType(i)->nodeEval(o->field(i), n, NODE_THREAD);
         }

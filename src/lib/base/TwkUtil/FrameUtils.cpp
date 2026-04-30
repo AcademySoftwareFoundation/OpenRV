@@ -479,7 +479,7 @@ struct LexinumericCompare
                     {
                         const string& s = *iter;
 
-                        if (m = Match(bestPatternRe, s))
+                        if ((m = Match(bestPatternRe, s)))
                         {
                             if (includeNonMatching)
                                 frameSequences.push_back(s);
@@ -506,7 +506,7 @@ struct LexinumericCompare
                 {
                     const string& s = *iter;
 
-                    if (m = Match(bestPatternRe, s))
+                    if ((m = Match(bestPatternRe, s)))
                     {
                         frames.push_back(m.subInt(0));
                         pad = std::min(pad, m.subLen(0));
@@ -720,7 +720,7 @@ struct LexinumericCompare
 
                     for (int i = 0; i < allFiles.size(); ++i)
                     {
-                        if (m = Match(frameMatcher, allFiles[i]))
+                        if ((m = Match(frameMatcher, allFiles[i])))
                         {
                             int f = atoi(m.subStr(0).c_str());
 
@@ -746,7 +746,7 @@ struct LexinumericCompare
 
                 for (int i = 0; i < allFiles.size(); ++i)
                 {
-                    if (m = Match(frameMatcher, allFiles[i]))
+                    if ((m = Match(frameMatcher, allFiles[i])))
                     {
                         DB("        file matches: " << allFiles[i] << " frame " << m.subStr(0));
                         ExistingFile ef;

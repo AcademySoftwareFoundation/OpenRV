@@ -25,21 +25,21 @@ namespace Rv
 
         virtual ~MediaFileTypes();
 
-        virtual FileTypeTraits* copyTraits() const;
+        virtual FileTypeTraits* copyTraits() const override;
 
         size_t defaultIndex() const;
 
-        virtual QStringList typeDescriptions();
+        virtual QStringList typeDescriptions() override;
         virtual QString extension(int index);
         virtual QString description(int index);
-        virtual bool isKnown(size_t index, const QString&) const;
-        virtual QStringList fileAttributes(const QString&) const;
+        virtual bool isKnown(size_t index, const QString&) const override;
+        virtual QStringList fileAttributes(const QString&) const override;
 
         QIcon fileIcon(const QString&) const;
         virtual QIcon fileInfoIcon(const QFileInfo&) const;
 
-        virtual bool hasImage(const QString&) const;
-        virtual QImage fileImage(const QString&) const;
+        virtual bool hasImage(const QString&) const override;
+        virtual QImage fileImage(const QString&) const override;
 
         bool sameAs(const FileTypeTraits*) const override;
 

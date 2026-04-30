@@ -659,7 +659,7 @@ namespace IPCore
                 }
             }
         }
-        if (m_tag = component("tag"))
+        if ((m_tag = component("tag")))
         {
             const Component::Container& props = m_tag->properties();
 

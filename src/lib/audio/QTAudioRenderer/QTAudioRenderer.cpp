@@ -345,9 +345,9 @@ namespace IPCore
 
         m_bytesPerSample = m_audioRenderer.m_format.channelCount() * sampleSize(m_audioRenderer.m_format);
 
-        if (m_ioDevice = new QTAudioIODevice(*this))
+        if ((m_ioDevice = new QTAudioIODevice(*this)))
         {
-            if (m_audioOutput = new QTAudioOutput(m_audioRenderer.m_device, m_audioRenderer.m_format, *m_ioDevice, *this))
+            if ((m_audioOutput = new QTAudioOutput(m_audioRenderer.m_device, m_audioRenderer.m_format, *m_ioDevice, *this)))
             {
                 m_ioDevice->start();
                 return true;

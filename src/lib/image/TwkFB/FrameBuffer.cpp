@@ -692,7 +692,7 @@ namespace TwkFB
         {
             FrameBuffer* fb = 0;
 
-            if (fb = planes[q])
+            if ((fb = planes[q]))
             {
                 fb->restructure(w / xSamplings[q], h / ySamplings[q], 0, nchannels, type, 0, 0, orient, true);
             }

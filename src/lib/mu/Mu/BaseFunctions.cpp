@@ -727,7 +727,7 @@ namespace Mu
             {
                 if (NODE_THIS.argNode(0)->type() == NODE_THIS.type())
                 {
-                    if (b = NODE_ARG(0, bool))
+                    if ((b = NODE_ARG(0, bool)))
                         NODE_ANY_TYPE_ARG(1);
                 }
                 else

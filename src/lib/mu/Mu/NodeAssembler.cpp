@@ -1196,7 +1196,7 @@ namespace Mu
 
         for (const Symbol* s = Fin->firstOverload(); s; s = s->nextOverload())
         {
-            if (F = dynamic_cast<const Function*>(s))
+            if ((F = dynamic_cast<const Function*>(s)))
             {
                 size_t ntotal = F->numArgs() + F->numFreeVariables();
                 found = true;
@@ -3978,7 +3978,7 @@ namespace Mu
             }
             else if (Node* n = dereferenceVariable("__case_result"))
             {
-                if (n = cast(n, p->constructor))
+                if ((n = cast(n, p->constructor)))
                 {
                     if (Node* r = resolvePatterns(p, n))
                     {

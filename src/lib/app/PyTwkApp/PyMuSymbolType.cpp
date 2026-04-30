@@ -230,7 +230,7 @@ namespace TwkApp
         PyLockObject locker;
         PyMuSymbolObject* self;
 
-        if (self = (PyMuSymbolObject*)type->tp_alloc(type, 0))
+        if ((self = (PyMuSymbolObject*)type->tp_alloc(type, 0)))
         {
             self->symbol = 0;
             self->function = 0;

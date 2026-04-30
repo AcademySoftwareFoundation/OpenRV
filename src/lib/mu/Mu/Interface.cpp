@@ -116,9 +116,9 @@ namespace Mu
                     const Function* f = 0;
                     const Function* cf = 0;
 
-                    if (f = dynamic_cast<const Function*>(s))
+                    if ((f = dynamic_cast<const Function*>(s)))
                     {
-                        if (cf = c->findFunction(f->name(), f->signature()))
+                        if ((cf = c->findFunction(f->name(), f->signature())))
                         {
                             //
                             //  Associate the class function with the

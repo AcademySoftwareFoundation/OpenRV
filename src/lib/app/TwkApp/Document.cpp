@@ -186,7 +186,7 @@ namespace TwkApp
                 m_majorMode->deactivate();
             }
 
-            if (m_majorMode = majorMode)
+            if ((m_majorMode = majorMode))
             {
                 m_majorMode->activate();
             }

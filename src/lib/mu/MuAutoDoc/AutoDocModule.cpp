@@ -114,7 +114,7 @@ namespace Mu
         {
             for (Symbol* x = sc; x; x = x->nextOverload())
             {
-                if (s = dynamic_cast<SymbolicConstant*>(x))
+                if ((s = dynamic_cast<SymbolicConstant*>(x)))
                 {
                     outputIndent(str, indent);
                     s->output(str);
@@ -130,7 +130,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (v = dynamic_cast<Variable*>(x))
+                if ((v = dynamic_cast<Variable*>(x)))
                 {
                     outputIndent(str, indent);
                     v->output(str);
@@ -146,7 +146,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (f = dynamic_cast<Function*>(x))
+                if ((f = dynamic_cast<Function*>(x)))
                 {
                     outputIndent(str, indent);
                     f->output(str);
@@ -162,7 +162,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (a = dynamic_cast<Alias*>(x))
+                if ((a = dynamic_cast<Alias*>(x)))
                 {
                     outputIndent(str, indent);
                     a->output(str);
@@ -264,7 +264,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (v = dynamic_cast<Variable*>(x))
+                if ((v = dynamic_cast<Variable*>(x)))
                 {
                     str << "<DT><CODE>";
                     v->output(str);
@@ -280,7 +280,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (f = dynamic_cast<Function*>(x))
+                if ((f = dynamic_cast<Function*>(x)))
                 {
                     str << "<DT><CODE>";
                     f->output(str);
@@ -296,7 +296,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (a = dynamic_cast<Alias*>(x))
+                if ((a = dynamic_cast<Alias*>(x)))
                 {
                     str << "<DT><CODE>";
                     a->output(str);
@@ -420,7 +420,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (f = dynamic_cast<Function*>(x))
+                if ((f = dynamic_cast<Function*>(x)))
                 {
                     texiDoc(str, f);
                     str << "\n";
@@ -435,7 +435,7 @@ namespace Mu
         {
             for (Symbol* x = s; x; x = x->nextOverload())
             {
-                if (a = dynamic_cast<Alias*>(x))
+                if ((a = dynamic_cast<Alias*>(x)))
                 {
                     texiDoc(str, a);
                     str << "\n";

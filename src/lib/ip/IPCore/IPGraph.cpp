@@ -2286,7 +2286,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 {
                     IPNode* itemNode = findNode(itemName);
                     TextureOutputGroupIPNode* textNode = 0;
-                    if (textNode = dynamic_cast<TextureOutputGroupIPNode*>(itemNode))
+                    if ((textNode = dynamic_cast<TextureOutputGroupIPNode*>(itemNode)))
                     {
                         if (textNode->isActive())
                         {

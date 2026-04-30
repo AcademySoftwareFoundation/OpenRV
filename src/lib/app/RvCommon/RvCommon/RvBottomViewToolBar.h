@@ -36,7 +36,7 @@ namespace Rv
         virtual ~RvBottomViewToolBar();
 
         void setSession(IPCore::Session*);
-        virtual Result receiveEvent(const TwkApp::Event&);
+        virtual Result receiveEvent(const TwkApp::Event&) override;
 
         void build();
         void makeActive(bool);

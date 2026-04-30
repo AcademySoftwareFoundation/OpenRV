@@ -428,7 +428,7 @@ namespace TwkFB
                                 cout << "INFO: " << extension << " requires plugin " << basename(pio->pathToPlugin()) << endl;
                             }
 
-                            if (io = loadFromProxy(i))
+                            if ((io = loadFromProxy(i)))
                             {
                                 return io;
                             }

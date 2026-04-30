@@ -21,7 +21,7 @@ namespace Mu
         for (int i = 0, l = s.size(); i < l; i++)
         {
             h = (h << 4) + s[i];
-            if (g = h & 0xf0000000)
+            if ((g = h & 0xf0000000))
                 h ^= g >> 24;
             h &= ~g;
         }
