@@ -55,13 +55,6 @@ jobs:
           ./build.sh --release --clean
         shell: bash
 
-      - name: Package macOS App
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          cd _build/stage/app
-          zip -ry UTV-macOS-arm64.zip UTV.app
-        shell: bash
-
       - name: Determine Next Semantic Version
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         id: versioning
@@ -76,6 +69,13 @@ jobs:
           fi
           echo "Next version is: $NEW_VERSION"
           echo "version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Package macOS App
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          cd _build/stage/app
+          zip -ry UTV-${{ steps.versioning.outputs.version }}-macOS-arm64.zip UTV.app
         shell: bash
 
       - name: Create and Push Tag
@@ -104,7 +104,7 @@ jobs:
           tag_name: ${{ steps.versioning.outputs.version }}
           name: UTV Release ${{ steps.versioning.outputs.version }}
           body: ${{ steps.release-notes.outputs.content }}
-          files: _build/stage/app/UTV-macOS-arm64.zip
+          files: _build/stage/app/UTV-${{ steps.versioning.outputs.version }}-macOS-arm64.zip
           draft: false
           prerelease: false
         env:
