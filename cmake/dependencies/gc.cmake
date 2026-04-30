@@ -7,7 +7,7 @@
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "${RV_DEPS_GC_VERSION}" "" "")
 
 SET(_download_url
-    "https://github.com/ivmai/bdwgc/archive/refs/tags/v${_version}.zip"
+    "https://github.com/bdwgc/bdwgc/archive/refs/tags/v${_version}.zip"
 )
 SET(_download_hash
     ${RV_DEPS_GC_DOWNLOAD_HASH}

@@ -7,7 +7,7 @@
 // DO NOT EDIT MANUALLY
 
 const char* about_Visto =
-    "<p><b>macOS arm64</b></p><p>Compiled using <b>AppleClang</b></p><p>Build identifier: Visto, HEAD=35c5db0d</p><p>Built on: April 29, "
+    "<p><b>macOS arm64</b></p><p>Compiled using <b>AppleClang</b></p><p>Build identifier: Visto, HEAD=f24ba73d</p><p>Built on: April 29, "
     "2026</p><p><hr></p><p><table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\"><tr><td colspan=\"4\"><b>VFX Reference "
     "Platform 2026</b></td></tr><tr><td><b>Description</b></td><td><b>Build Version</b></td><td><b>Runtime "
     "Version</b></td><td><b>License</b></td></tr><tr><td>Boost</td><td>Unknown</td><td>%RUNTIME_BOOST%</td><td>Boost Software "

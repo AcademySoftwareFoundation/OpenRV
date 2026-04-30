@@ -130,12 +130,12 @@ ELSE()
   MESSAGE(FATAL_ERROR "FFMPEG_8, RV_FFMPEG_7, or RV_FFMPEG_6 must be defined to select the FFMPEG version to use")
 ENDIF()
 
-# gc https://github.com/ivmai/bdwgc
+# gc https://github.com/bdwgc/bdwgc
 SET(RV_DEPS_GC_VERSION
-    "8.2.2"
+    "8.2.12"
 )
 SET(RV_DEPS_GC_DOWNLOAD_HASH
-    "2ca38d05e1026b3426cf6c24ca3a7787"
+    "0528c53e99bb7cda8e7dbb9d6e081fce"
 )
 
 # glew https://github.com/nigels-com/glew

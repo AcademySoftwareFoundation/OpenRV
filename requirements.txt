@@ -16,3 +16,4 @@ packaging
 requests
 cryptography
 pydantic
+nanobind
