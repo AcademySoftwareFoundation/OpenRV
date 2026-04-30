@@ -403,7 +403,7 @@
                <string>RV</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>RV Session</string>
             <key>CFBundleTypeOSType</key>
@@ -421,7 +421,7 @@
                <string>movieproc</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>RV Procedural Movie</string>
             <key>CFBundleTypeOSType</key>
@@ -439,7 +439,7 @@
                <string>stdinfb</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>RV stdin Movie (from frames)</string>
             <key>CFBundleTypeOSType</key>
@@ -474,7 +474,7 @@
                <string>.rvclips</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>RV Clip Bundle</string>
             <key>CFBundleTypeOSType</key>
@@ -493,7 +493,7 @@
                <string>aif</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>AIFF Audio File</string>
             <key>CFBundleTypeOSType</key>
@@ -511,7 +511,7 @@
                <string>aifc</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Apple AIFC Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -529,7 +529,7 @@
                <string>wav</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Microsoft WAVE Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -547,7 +547,7 @@
                <string>au</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>Sun Microsystems AU Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -565,7 +565,7 @@
                <string>.snd</string>
             </array>
             <key>CFBundleTypeIconFile</key>
-            <string>rvfile.icns</string>
+            <string>utvfile.icns</string>
             <key>CFBundleTypeName</key>
             <string>NeXT Sound File</string>
             <key>CFBundleTypeOSType</key>
@@ -583,7 +583,7 @@
       <key>CFBundleGetInfoString</key>
       <string>${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}, Copyright ${RV_VERSION_YEAR} Autodesk, Inc.</string>
       <key>CFBundleIconFile</key>
-      <string>RV.icns</string>
+      <string>UTV.icns</string>
       <key>CFBundleIdentifier</key>
       <string>com.autodesk.${RV_INTERNAL_APPLICATION_NAME}</string>
       <key>CFBundleName</key>

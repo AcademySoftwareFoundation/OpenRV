@@ -17,7 +17,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleIconFile</key>
-    <string>RVLinkLauncher.icns</string>
+    <string>UTVLinkLauncher.icns</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.utilities</string>
     <key>CFBundleShortVersionString</key>
