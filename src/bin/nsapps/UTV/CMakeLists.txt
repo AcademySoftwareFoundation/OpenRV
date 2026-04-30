@@ -95,3 +95,11 @@ FOREACH(
 )
   CONFIGURE_FILE(${_icns_file} ${RV_STAGE_RESOURCES_DIR} COPYONLY)
 ENDFOREACH()
+
+FILE(GLOB _png_files *.png)
+FOREACH(
+  _png_file
+  ${_png_files}
+)
+  CONFIGURE_FILE(${_png_file} ${RV_STAGE_RESOURCES_DIR} COPYONLY)
+ENDFOREACH()

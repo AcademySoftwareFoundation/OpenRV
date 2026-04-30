@@ -427,11 +427,11 @@ IF(RV_TARGET_LINUX
    OR RV_TARGET_WINDOWS
 )
   SET(_rv_icon_path_suffix_
-      "/../resources/RV.ico"
+      "/../resources/UTV.png"
   )
 ELSEIF(RV_TARGET_DARWIN)
   SET(_rv_icon_path_suffix_
-      "/../Resources/RV.ico"
+      "/../Resources/UTV.png"
   )
 ENDIF()
 
