@@ -58,13 +58,13 @@ namespace Rv
         class ScreenView : public QOpenGLWidget
         {
         public:
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* sharedCtx, Qt::WindowFlags flags);
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
-            QOpenGLContext* m_sharedCtx = nullptr;
+            QOpenGLWidget* m_glViewShare = nullptr;
         };
 
     public:

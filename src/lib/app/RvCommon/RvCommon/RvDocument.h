@@ -75,6 +75,7 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewWidget() const;
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* metalView() const;
@@ -178,6 +179,7 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* m_metalView;
 #endif
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;

@@ -149,7 +149,7 @@ namespace Rv
         , m_vsyncDisabled(false)
         , m_oldGLView(0)
         , m_glView(0)
-        , m_glViewContainer(nullptr)
+        , m_viewWidget(nullptr)
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         , m_metalView(nullptr)
 #endif
@@ -207,11 +207,8 @@ namespace Rv
         m_metalView->setAcceptDrops(true);
         m_metalView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         m_metalView->resize(m_metalView->sizeHint());
-
-        // MetalView IS the container widget — no createWindowContainer() needed.
-        m_glViewContainer = m_metalView;
-
         m_metalView->setEventWidget(m_metalView);
+        m_viewWidget = m_metalView;
 
         // Initialize the session eagerly so that doc->session() is non-null
         // immediately after construction.  On the Metal path, MetalView::initialize()
@@ -243,32 +240,12 @@ namespace Rv
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            GLView* existingView = rvDoc ? rvDoc->view() : nullptr;
-            QOpenGLContext* sharedCtx = existingView ? existingView->context() : nullptr;
-            m_glView =
-                new GLView(sharedCtx, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, // double buffer
-                           opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                  opts.vsync != 0 && !m_vsyncDisabled,
+                                  true, // double buffer
+                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
-
-        // Pre-size the QOpenGLWindow before wrapping it in a container.
-        // createWindowContainer() uses QWindow::size() (not sizeHint()) as the
-        // container's sizeHint. Without this, QWindow::size() is QSize(0,0) and
-        // the container starts at zero, ignoring GLView::sizeHint()'s 1024x576.
-        m_glView->resize(m_glView->sizeHint());
-
-        // Wrap QOpenGLWindow in a widget container for layout
-        m_glViewContainer = QWidget::createWindowContainer(m_glView, this);
-        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
-        m_glViewContainer->setMouseTracking(true);
-        m_glViewContainer->setAcceptDrops(true);
-        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-        // Set the container as the event widget for QTTranslator
-        m_glView->setEventWidget(m_glViewContainer);
-
-        // Create DiagnosticsView as a dockable widget (lazy initialization).
-        m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
+        m_viewWidget = m_glView;
 #endif // PLATFORM_DARWIN && USE_METAL
 
         // Dockable to QMainWindow, not centralwidget.
@@ -285,11 +262,11 @@ namespace Rv
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
-        m_stackedLayout->addWidget(m_glView);
+        m_stackedLayout->addWidget(m_viewWidget);
 
         setCentralWidget(m_viewContainerWidget);
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
         // #ifdef PLATFORM_DARWIN
@@ -695,7 +672,7 @@ namespace Rv
                 setBuildMenu();
             }
 #endif
-            m_glView->setFocus(Qt::OtherFocusReason);
+            m_viewWidget->setFocus(Qt::OtherFocusReason);
         }
         else if (m == IPCore::Session::audioUnavailbleMessage())
         {
@@ -833,8 +810,8 @@ namespace Rv
 #else
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));
+        m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
 #endif
-        m_glViewContainer->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     }
 
     void RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
@@ -880,20 +857,11 @@ namespace Rv
         Qt::KeyboardModifiers cur = m_glView->videoDevice()->translator().currentModifiers();
         oldGLView->stopProcessingEvents();
 
-        GLView* newGLView = new GLView(view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
-        newGLView->resize(oldGLView->width(), oldGLView->height());
-        m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
-        m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
-        m_glViewContainer->setMouseTracking(true);
-        m_glViewContainer->setAcceptDrops(true);
-        m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-        // Set the container as the event widget for QTTranslator
-        newGLView->setEventWidget(m_glViewContainer);
+        GLView* newGLView = new GLView(this, view()->context(), this, stereo, vsync, doubleBuffer, red, green, blue, alpha);
 
         newGLView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
 
-        newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        newGLView->setMinimumSize(QSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height()));
 
         bool resetGLPrefs = false;
 
@@ -903,19 +871,14 @@ namespace Rv
         if (!newGLView->isValid())
         {
             delete newGLView;
-            newGLView = new GLView(view()->context(), this);
-            m_glViewContainer = QWidget::createWindowContainer(newGLView, this);
-            m_glViewContainer->setFocusPolicy(Qt::StrongFocus);
-            m_glViewContainer->setMouseTracking(true);
-            m_glViewContainer->setAcceptDrops(true);
-            m_glViewContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            newGLView->setEventWidget(m_glViewContainer);
+            newGLView = new GLView(this, view()->context(), this);
             resetGLPrefs = true;
         }
 
         m_stackedLayout->addWidget(newGLView);
         m_stackedLayout->removeWidget(oldGLView);
         m_glView = newGLView;
+        m_viewWidget = m_glView;
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
 
@@ -1067,7 +1030,7 @@ namespace Rv
 
     GLView* RvDocument::view() const { return m_glView; }
 
-    QWidget* RvDocument::viewContainer() const { return m_glViewContainer; }
+    QWidget* RvDocument::viewWidget() const { return m_viewWidget; }
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
     MetalView* RvDocument::metalView() const { return m_metalView; }
@@ -1204,13 +1167,13 @@ namespace Rv
             const int dw = m_metalView->width() - w;
             if (dh || dw)
             {
-                m_glViewContainer->resize(w, h);
-                m_glViewContainer->updateGeometry();
+                m_metalView->resize(w, h);
+                m_metalView->updateGeometry();
                 resize(width() - dw, height() - dh);
                 m_metalView->setContentSize(w, h);
                 m_metalView->setMinimumContentSize(w, h);
-                m_glViewContainer->resize(w, h);
-                m_glViewContainer->updateGeometry();
+                m_metalView->resize(w, h);
+                m_metalView->updateGeometry();
             }
         }
         else
@@ -1218,7 +1181,7 @@ namespace Rv
         {
             m_glView->setContentSize(w, h);
             m_glView->setMinimumContentSize(w, h);
-            m_glViewContainer->updateGeometry();
+            m_glView->updateGeometry();
 
             const int dh = m_glView->height() - h;
             const int dw = m_glView->width() - w;
@@ -1228,7 +1191,7 @@ namespace Rv
                 resize(width() - dw, height() - dh);
                 m_glView->setContentSize(w, h);
                 m_glView->setMinimumContentSize(w, h);
-                m_glViewContainer->updateGeometry();
+                m_glView->updateGeometry();
             }
         }
 
@@ -1434,12 +1397,12 @@ namespace Rv
         {
             // Mirror the GL path: set content size hints and invalidate the layout,
             // then let the delta between current and desired size drive the window resize.
-            // Do NOT call m_glViewContainer->resize() before computing the delta — that
+            // Do NOT call m_glView->resize() before computing the delta — that
             // would make m_metalView->width()/height() report the target size and give
             // dw=dh=0, skipping the window resize entirely.
             m_metalView->setContentSize(int(w), int(h));
             m_metalView->setMinimumContentSize(int(w), int(h));
-            m_glViewContainer->updateGeometry();
+            m_metalView->updateGeometry();
             DB("resizeToFit resulting size w " << m_metalView->width() << " h " << m_metalView->height());
             const int dh = m_metalView->height() - int(h);
             const int dw = m_metalView->width() - int(w);
@@ -1449,7 +1412,7 @@ namespace Rv
                 resize(width() - dw, height() - dh);
                 m_metalView->setContentSize(int(w), int(h));
                 m_metalView->setMinimumContentSize(int(w), int(h));
-                m_glViewContainer->updateGeometry();
+                m_metalView->updateGeometry();
             }
             DB("resizeToFit final resulting size w " << m_metalView->width() << " h " << m_metalView->height());
         }
@@ -1458,7 +1421,7 @@ namespace Rv
         {
             m_glView->setContentSize(int(w), int(h));
             m_glView->setMinimumContentSize(int(w), int(h));
-            m_glViewContainer->updateGeometry();
+            m_glView->updateGeometry();
 
             DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
 
@@ -1476,7 +1439,7 @@ namespace Rv
                 resize(width() - dw, height() - dh);
                 m_glView->setContentSize(int(w), int(h));
                 m_glView->setMinimumContentSize(int(w), int(h));
-                m_glViewContainer->updateGeometry();
+                m_glView->updateGeometry();
             }
             DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
         }
@@ -1561,7 +1524,7 @@ namespace Rv
             }
         }
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
         activateWindow();
         raise();
         //
@@ -1574,9 +1537,7 @@ namespace Rv
     QRect RvDocument::childrenRect()
     {
         QRect mr = mb()->geometry();
-        // Use the container widget geometry — valid on both GL and Metal paths
-        // (m_glViewContainer wraps either GLView or MetalView).
-        QRect vr = m_glViewContainer ? m_glViewContainer->geometry() : QRect();
+        QRect vr = m_viewWidget->geometry();
 
         DB("RvDocument::childrenRect mb" << " shown " << menuBarShown() << " vis " << mb()->isVisible() << " w" << mr.width() << " h "
                                          << mr.height()

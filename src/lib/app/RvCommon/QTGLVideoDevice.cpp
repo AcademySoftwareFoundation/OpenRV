@@ -68,27 +68,11 @@ namespace Rv
 
     GLVideoDevice* QTGLVideoDevice::newSharedContextWorkerDevice() const
     {
-        if (m_window)
-        {
-            // Create a shared-context QOpenGLWindow for the worker.
-            // The context must be passed to the constructor so that context
-            // sharing is established before the native GL context is created.
-            QOpenGLWindow* openGLWindow = new QOpenGLWindow(m_window->context(), QOpenGLWindow::NoPartialUpdate);
-            openGLWindow->setFormat(m_window->format());
-            return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWindow);
-        }
-        else if (m_widget)
-        {
-            // Create shared context QOpenGLWidget for worker
-            QOpenGLWidget* openGLWidget = new QOpenGLWidget();
-            openGLWidget->setFormat(m_widget->format());
-            if (m_widget->context())
-            {
-                openGLWidget->context()->setShareContext(m_widget->context());
-            }
-            return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
-        }
-        return nullptr;
+        // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try
+        // to share with setShareContext.
+        QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
+        openGLWidget->context()->setShareContext(m_view->context());
+        return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
     }
 
     void QTGLVideoDevice::makeCurrent() const

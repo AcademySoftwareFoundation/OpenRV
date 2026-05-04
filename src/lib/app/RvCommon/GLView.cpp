@@ -538,10 +538,7 @@ namespace Rv
             }
             else
             {
-                QOpenGLContext* ctx = m_videoDevice->window() ? m_videoDevice->window()->context()
-                                                              : (m_videoDevice->widget() ? m_videoDevice->widget()->context() : nullptr);
-                if (ctx)
-                    ctx->swapBuffers(ctx->surface());
+                m_videoDevice->widget()->context()->swapBuffers(m_videoDevice->widget()->context()->surface());
             }
 
             trecord.swapEnd = session->profilingElapsedTime();
