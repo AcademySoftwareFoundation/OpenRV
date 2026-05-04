@@ -177,9 +177,7 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 # Disable x11 on macOS to avoid linking against Homebrew's X11 libraries, ensuring binary portability
-IF(RV_TARGET_DARWIN
-   OR RV_TARGET_APPLE_ARM64
-)
+IF(RV_TARGET_DARWIN)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-xlib")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb")
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-libxcb-shm")
@@ -297,31 +295,41 @@ LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_C_OPTIONS)
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
 LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTERNAL_LIBS)
 
-SET(_ffmpeg_preprocess_pkg_config_path
-    $ENV{PKG_CONFIG_PATH}
-)
-LIST(APPEND _ffmpeg_preprocess_pkg_config_path "${RV_DEPS_DAVID_LIB_DIR}/pkgconfig")
-IF(RV_TARGET_WINDOWS)
+# On macOS, externally-provided shared libraries may use @rpath install names. FFmpeg's configure compiles and RUNS small test binaries linked against these
+# libs; without an LC_RPATH in the test binary, dyld can't locate them at runtime (SIGABRT / Abort trap: 6). DYLD_LIBRARY_PATH cannot be used because macOS dyld
+# strips it for hardened binaries like /bin/sh before the configure script ever runs. For every -L<dir> flag we add a matching -Wl,-rpath,<dir> so that test
+# binaries can find shared libraries at runtime. The embedded rpaths are harmless: RV_STAGE_DEPENDENCY_LIBS rewrites all install names to @rpath/<basename> via
+# install_name_tool, so external package paths never reach the final staged build.
+IF(RV_TARGET_DARWIN)
+  SET(_ffmpeg_rpath_options)
   FOREACH(
-    _ffmpeg_pkg_config_path_element IN
-    LISTS _ffmpeg_preprocess_pkg_config_path
+    _opt IN
+    LISTS RV_FFMPEG_EXTRA_LIBPATH_OPTIONS
   )
-    # Changing path start from "c:/..." to "/c/..." and replacing all backslashes with slashes since PkgConfig wants a linux path
-    STRING(REPLACE "\\" "/" _ffmpeg_pkg_config_path_element "${_ffmpeg_pkg_config_path_element}")
-    STRING(REPLACE ":" "" _ffmpeg_pkg_config_path_element "${_ffmpeg_pkg_config_path_element}")
-    STRING(FIND ${_ffmpeg_pkg_config_path_element} / _ffmpeg_first_slash_index)
-    IF(_ffmpeg_first_slash_index GREATER 0)
-      STRING(PREPEND _ffmpeg_pkg_config_path_element "/")
+    STRING(REGEX MATCH "^--extra-ldflags=-L(.+)$" _match "${_opt}")
+    IF(CMAKE_MATCH_1)
+      LIST(APPEND _ffmpeg_rpath_options "--extra-ldflags=-Wl,-rpath,${CMAKE_MATCH_1}")
     ENDIF()
-    LIST(APPEND _ffmpeg_pkg_config_path ${_ffmpeg_pkg_config_path_element})
   ENDFOREACH()
-ELSE()
-  SET(_ffmpeg_pkg_config_path
-      ${_ffmpeg_preprocess_pkg_config_path}
-  )
+  IF(_ffmpeg_rpath_options)
+    LIST(APPEND RV_FFMPEG_EXTRA_LIBPATH_OPTIONS ${_ffmpeg_rpath_options})
+    LIST(REMOVE_DUPLICATES RV_FFMPEG_EXTRA_LIBPATH_OPTIONS)
+  ENDIF()
 ENDIF()
-LIST(JOIN _ffmpeg_pkg_config_path ":" _ffmpeg_pkg_config_path)
 
+# Include the Conan generators folder when available: PkgConfigDeps.generate() writes dav1d.pc and other Conan-provided .pc files there. Without this,
+# pkg-config cannot find dav1d when the Conan binary package lacks a lib/pkgconfig/ subdirectory.
+SET(_ffmpeg_extra_pkgconfig_dirs
+    "${RV_DEPS_DAV1D_LIB_DIR}/pkgconfig"
+)
+IF(RV_CONAN_CMAKE_PREFIX_PATH)
+  LIST(APPEND _ffmpeg_extra_pkgconfig_dirs "${RV_CONAN_CMAKE_PREFIX_PATH}")
+ENDIF()
+RV_BUILD_PKG_CONFIG_PATH(_ffmpeg_pkg_config_path EXTRA_DIRS ${_ffmpeg_extra_pkgconfig_dirs})
+
+# PKG_CONFIG_PATH is explicitly cleared (set to empty) in the configure environment below. pkg-config searches PKG_CONFIG_PATH *before* PKG_CONFIG_LIBDIR; if
+# the inherited env has MSYS2 MinGW paths (e.g. from Conan's msys2 package), their openssl.pc / zlib.pc shadow the Conan generators .pc files and return
+# MinGW-targeted flags incompatible with MSVC.
 SEPARATE_ARGUMENTS(RV_FFMPEG_PATCH_COMMAND_STEP)
 
 EXTERNALPROJECT_ADD(
@@ -336,8 +344,8 @@ EXTERNALPROJECT_ADD(
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
   PATCH_COMMAND ${RV_FFMPEG_PATCH_COMMAND_STEP}
   CONFIGURE_COMMAND
-    ${CMAKE_COMMAND} -E env "PKG_CONFIG_PATH=${_ffmpeg_pkg_config_path}" ${_configure_command} --prefix=${_install_dir} ${RV_FFMPEG_COMMON_CONFIG_OPTIONS}
-    ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
+    ${CMAKE_COMMAND} -E env "PKG_CONFIG_LIBDIR=${_ffmpeg_pkg_config_path}" "PKG_CONFIG_PATH=" ${_configure_command} --prefix=${_install_dir}
+    ${RV_FFMPEG_COMMON_CONFIG_OPTIONS} ${RV_FFMPEG_CONFIG_OPTIONS} ${RV_FFMPEG_EXTRA_C_OPTIONS} ${RV_FFMPEG_EXTRA_LIBPATH_OPTIONS} ${RV_FFMPEG_EXTERNAL_LIBS}
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
@@ -410,13 +418,15 @@ ADD_CUSTOM_TARGET(
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${RV_DEPS_BASE_DIR}/cmake/dependencies/${_target}-prefix
 )
 
-# Note: On Windows, FFmpeg stores both import libs and DLLs in the install bin directory, so we copy _lib_dir (which is install/bin on Windows) to both stage
-# dirs.
-IF(RV_TARGET_WINDOWS)
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} EXTRA_LIB_DIRS ${RV_STAGE_BIN_DIR} USE_FLAG_FILE)
-ELSE()
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} USE_FLAG_FILE)
-ENDIF()
+SET(_ffmpeg_targets)
+FOREACH(
+  _ffmpeg_lib
+  ${_ffmpeg_libs}
+)
+  LIST(APPEND _ffmpeg_targets ffmpeg::${_ffmpeg_lib})
+ENDFOREACH()
+
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS ${_ffmpeg_targets})
 
 SET(RV_DEPS_FFMPEG_VERSION
     ${_version}

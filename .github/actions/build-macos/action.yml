@@ -19,12 +19,6 @@ inputs:
   skip_deps_cache:
     required: false
     default: 'false'
-  qt5_modules:
-    required: false
-    default: ''
-  macos_qt5_archives:
-    required: false
-    default: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
   macos_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -72,26 +66,6 @@ runs:
       shell: bash
 
     - name: Install Qt ${{ inputs.qt-version }}
-      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '${{ inputs.qt-version }}'
-        host: 'mac'
-        target: 'desktop'
-        arch: 'clang_64'
-        dir: "${{ github.workspace }}/deps"
-        install-deps: 'false'
-        modules: ${{ inputs.qt5_modules }}
-        archives: ${{ inputs.macos_qt5_archives }}
-        cache: false
-        setup-python: 'false'
-        tools: 'tools_qtcreator'
-        set-env: 'true'
-        tools-only: 'false'
-        aqtversion: '==3.2.*'
-
-    - name: Install Qt ${{ inputs.qt-version }}
-      if: inputs.vfx-platform == 'CY2024'
       uses: jurplel/install-qt-action@v4
       with:
         version: '${{ inputs.qt-version }}'
@@ -109,15 +83,6 @@ runs:
         set-env: 'true'
         tools-only: 'false'
         aqtversion: '==3.2.*'
-
-    - name: Patch Qt ${{ inputs.qt-version }}
-      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
-      # There is an issue with Clang15 and Qt < 5.15.15.
-      run: |
-        curl -o file.zip https://codereview.qt-project.org/changes/qt%2Fqtbase~503172/revisions/3/files/mkspecs%2Ffeatures%2Ftoolchain.prf/download
-        unzip file.zip
-        cp $(unzip -l file.zip | awk 'NR==4 {print $4}') ${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/clang_64/mkspecs/features/toolchain.prf
-      shell: bash
 
     - name: Activate Python ${{ inputs.python-version }}
       uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # 5.2.0
@@ -158,19 +123,6 @@ runs:
       shell: bash
 
     - name: Set QT_HOME
-      if: inputs.arch-type == 'x86_64' && inputs.vfx-platform == 'CY2023'
-      # With aqt, the universal binaries are under clang_64 and not macos folder.
-      run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/clang_64" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Set QT_HOME
-      if: inputs.arch-type == 'arm64' && inputs.vfx-platform == 'CY2023'
-      # The path for QT_HOME is diferent for arm64 CY2023 because we have to build it in the CI.
-      run: echo "QT_HOME=${{ github.workspace }}/deps" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Set QT_HOME
-      if: inputs.vfx-platform == 'CY2024'
       run: echo "QT_HOME=${{ github.workspace }}/deps/Qt/${{ inputs.qt-version }}/macos" >> $GITHUB_ENV
       shell: bash
 
@@ -193,7 +145,7 @@ runs:
           ./_build/RV_DEPS_*
           ./_build/cmake/dependencies
           ./_build/_deps
-        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-dependencies
+        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-${{ hashFiles('cmake/defaults/CYCOMMON.cmake') }}-dependencies
 
     # Uncomment to persist ccache in Actions cache (uses repo 10GB limit).
     # - name: Setup ccache
@@ -208,15 +160,6 @@ runs:
     # or by moving some dependencies from the cache to Conan or another dependency manager.
 
     - name: Configure OpenRV
-      if: ${{ inputs.vfx-platform == 'CY2023' }}
-      run: |
-        which cmake
-        cmake --version
-        cmake -B _build -G "Ninja" -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
-      shell: bash
-
-    - name: Configure OpenRV
-      if: ${{ inputs.vfx-platform == 'CY2024' }}
       run: |
         which cmake
         cmake --version
@@ -251,4 +194,4 @@ runs:
           ./_build/RV_DEPS_*
           ./_build/cmake/dependencies
           ./_build/_deps
-        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-dependencies
+        key: macos-${{ inputs.arch-type }}-${{ inputs.vfx-platform }}-${{ hashFiles('cmake/defaults/CYCOMMON.cmake') }}-dependencies

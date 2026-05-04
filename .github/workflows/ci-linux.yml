@@ -6,8 +6,6 @@ on:
       skip_deps_cache:
         type: string
         default: 'false'
-      qt5_modules:
-        type: string
       full_matrix:
         type: string
         default: 'true'
@@ -16,7 +14,7 @@ on:
         default: 'true'
 
 jobs:
-  # Always runs — CY2024 Release only (PR scope)
+  # Always runs — CY2025 Release only (PR scope)
   rocky-linux-pr:
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
@@ -51,7 +49,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -61,7 +59,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -80,9 +78,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
-          qt5_modules: ${{ inputs.qt5_modules }}
 
-  # CY2024 Debug — runs when cmake files change or on full matrix
+  # CY2025 Debug — runs when cmake files change or on full matrix
   rocky-linux-debug:
     if: ${{ inputs.run_debug == 'true' }}
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
@@ -118,7 +115,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -128,7 +125,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -147,10 +144,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
-          qt5_modules: ${{ inputs.qt5_modules }}
 
-  # CY2023 — full matrix only (daily/push/dispatch)
-  rocky-linux-cy2023:
+  # CY2024 — full matrix only (daily/push/dispatch)
+  rocky-linux-cy2024:
     if: ${{ inputs.full_matrix == 'true' }}
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
@@ -182,40 +178,40 @@ jobs:
             image: "amd64/rockylinux:8"
             arch-type: "x86_64"
             build-type: "Release"
-            qt-version: "5.15.2"
+            qt-version: "6.5.3"
             cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
             image: "amd64/rockylinux:9"
             arch-type: "x86_64"
             build-type: "Release"
-            qt-version: "5.15.2"
+            qt-version: "6.5.3"
             cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
             extra_repo: "crb"
           - os: "ubuntu-latest"
             rocky-version: "8"
             image: "amd64/rockylinux:8"
             arch-type: "x86_64"
             build-type: "Debug"
-            qt-version: "5.15.2"
+            qt-version: "6.5.3"
             cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
             image: "amd64/rockylinux:9"
             arch-type: "x86_64"
             build-type: "Debug"
-            qt-version: "5.15.2"
+            qt-version: "6.5.3"
             cmake-version: "3.31.6"
-            python-version: "3.10"
-            vfx-platform: "CY2023"
+            python-version: "3.11.8"
+            vfx-platform: "CY2024"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -234,4 +230,3 @@ jobs:
           python-version: ${{ matrix.python-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
-          qt5_modules: ${{ inputs.qt5_modules }}

@@ -16,12 +16,6 @@ inputs:
     required: true
   msvc-compiler:
     required: true
-  qt5_modules:
-    required: false
-    default: ''
-  windows_qt5_archives:
-    required: false
-    default: 'd3dcompiler_47 opengl32sw qt3d qtactiveqt qtbase qtconnectivity qtdeclarative qtgraphicaleffects qtimageformats qtlocation qtmultimedia qtquickcontrols qtquickcontrols2 qtremoteobjects qtscxml qtsensors qtsvg qttools qttranslations qtwebchannel qtwebsockets qtwebview qtwinextras qtxmlpatterns'
   windows_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtactiveqt qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -142,26 +136,6 @@ runs:
       shell: msys2 {0}
 
     - name: Install Qt ${{ inputs.qt-version }}
-      if: ${{ inputs.vfx-platform == 'CY2023' }}
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '${{ inputs.qt-version }}'
-        host: 'windows'
-        target: 'desktop'
-        arch: 'win64_msvc2019_64'
-        dir: "c:/"
-        install-deps: 'false'
-        modules: ${{ inputs.qt5_modules }}
-        archives: ${{ inputs.windows_qt5_archives }}
-        cache: false
-        setup-python: 'false'
-        tools: 'tools_qtcreator'
-        set-env: 'true'
-        tools-only: 'false'
-        aqtversion: '==3.2.*'
-
-    - name: Install Qt ${{ inputs.qt-version }}
-      if: ${{ inputs.vfx-platform == 'CY2024' }}
       uses: jurplel/install-qt-action@v4
       with:
         version: '${{ inputs.qt-version }}'
@@ -199,15 +173,6 @@ runs:
       shell: msys2 {0}
 
     - name: Configure OpenRV
-      if: ${{ inputs.vfx-platform == 'CY2023' }}
-      run: |
-        cmake --version
-        export QT_HOME=c:/Qt/${{ inputs.qt-version }}/msvc2019_64
-        cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
-      shell: msys2 {0}
-
-    - name: Configure OpenRV
-      if: ${{ inputs.vfx-platform == 'CY2024' }}
       run: |
         cmake --version
         export QT_HOME=c:/Qt/${{ inputs.qt-version }}/msvc2019_64
