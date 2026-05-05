@@ -39,9 +39,6 @@ on:
   push:
     branches:
       - main
-      # Temporary: auto-run on the Conan-ASWF test branch while manual
-      # workflow dispatch is not available. Remove once testing is done.
-      - find-fork-test-aswf
 
   pull_request:
 
@@ -73,12 +70,36 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
+  # Validates that conan/profiles/common [replace_requires] is in sync with
+  # conan/packages.yml. Fails fast before any build jobs run.
+  # To fix: run `python3 conan/scripts/gen_profile_common.py` and commit.
+  # ---------------------------------------------------------------------------
+  check-profile-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup Python
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: python3 -m pip install --user pyyaml
+
+      - name: Validate profiles/common matches packages.yml
+        run: python3 conan/scripts/gen_profile_common.py --check
+
+  # ---------------------------------------------------------------------------
   # Reads conan/packages.yml and emits two matrices:
   #   matrix_nonwindows - excludes windows_only entries (Linux + macOS jobs)
   #   matrix_windows    - all entries, including windows_only (Windows job)
   # Optionally narrows to a single package via the `only` input.
   # ---------------------------------------------------------------------------
   prepare-matrix:
+    needs: check-profile-sync
     runs-on: ubuntu-latest
     outputs:
       matrix_nonwindows: ${{ steps.gen.outputs.matrix_nonwindows }}

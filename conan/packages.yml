@@ -1,9 +1,9 @@
-# OpenRV Conan dependencies published to the ASWF Conan remote.
+# OpenRV Conan dependencies - single source of truth for the Conan build path.
 #
-# Single source of truth consumed by .github/workflows/conan-upload-deps.yml.
-# Each entry mirrors openrvcore-conanfile.py:63-128 (name, version, options
-# on conan create). The workflow builds each on x86_64_rocky8 and uploads
-# to the ASWF Conan remote (aswftesting by default).
+# Consumed by:
+#   - .github/workflows/conan-upload-deps.yml  (CI upload)
+#   - openrvcore-conanfile.py requirements()   (reads versions + options at runtime)
+#   - conan/scripts/gen_profile_common.py      (generates profiles/common replace_requires)
 #
 # Year-specific deps (from CY2025.cmake) use channel "vfx2025";
 # year-independent deps (from CYCOMMON.cmake) use channel "common".
@@ -130,6 +130,16 @@ deps:
     options:
       "openjph/*:shared": "True"
       "openjph/*:with_tiff": "False"
+
+  - name: openssl
+    # Used to override the openssl version pulled in transitively by ffmpeg.
+    # Not used directly by OpenRV at runtime.
+    version: "3.6.2"
+    channel: vfx2025
+    cci_folder: "3.x.x"
+    options:
+      "openssl/*:shared": "True"
+      "openssl/*:no_zlib": "True"
 
   - name: pcre2
     version: "10.44"
