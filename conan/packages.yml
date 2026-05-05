@@ -18,7 +18,7 @@
 
 deps:
   - name: zlib
-    version: "1.3.1"
+    version: "1.3.2"
     cci_folder: all
     options:
       "zlib/*:shared": "True"
@@ -64,8 +64,7 @@ deps:
       "boost/*:extra_b2_flags": "-d+0 -s NO_LZMA=1"
 
   - name: imath
-    # 3.2.1 rotated; 3.2.2 is a patch bump within 3.2.x.
-    version: "3.2.2"
+    version: "3.1.12"
     cci_folder: all
     options:
       "imath/*:shared": "True"
@@ -77,10 +76,7 @@ deps:
       "libdeflate/*:shared": "True"
 
   - name: openexr
-    # 3.2.5 rotated; 3.2.8 is a patch bump within 3.2.x.
-    # Avoiding 3.3/3.4 because they would require realigning imath.
-    # openexr splits recipes by major: 2.x and 3.x (no "all").
-    version: "3.2.8"
+    version: "3.3.6"
     cci_folder: "3.x"
     options:
       "openexr/*:shared": "True"

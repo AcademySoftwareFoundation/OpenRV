@@ -61,7 +61,7 @@ class OpenRVBase:
         self.tool_requires("cmake/3.31.8")
 
     def requirements(self):
-        self.requires("zlib/1.3.1", force=True, options={"shared": True})
+        self.requires("zlib/1.3.2", force=True, options={"shared": True})
 
         self.requires("libatomic_ops/7.10.0", options={"shared": False})
 
