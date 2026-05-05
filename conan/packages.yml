@@ -1,13 +1,18 @@
-# OpenRV Conan dependencies published under @openrv/vfx2024.
+# OpenRV Conan dependencies published to the ASWF Conan remote.
 #
 # Single source of truth consumed by .github/workflows/conan-upload-deps.yml.
 # Each entry mirrors openrvcore-conanfile.py:63-128 (name, version, options
 # on conan create). The workflow builds each on x86_64_rocky8 and uploads
 # to the ASWF Conan remote (aswftesting by default).
 #
+# Year-specific deps (from CY2025.cmake) use channel "vfx2025";
+# year-independent deps (from CYCOMMON.cmake) use channel "common".
+#
 # Fields:
 #   name         - Conan package name (matches CCI recipe folder).
 #   version      - Pinned version; must be listed in CCI config.yml.
+#   channel      - Conan channel: "vfx2025" for year-specific deps,
+#                  "common" for year-independent deps.
 #   cci_folder   - Subfolder under recipes/<name>/ in conan-center-index.
 #                  Most are "all"; a few like openssl use "3.x.x".
 #   options      - Map of Conan option -> value. Passed as -o flags on
@@ -19,12 +24,14 @@
 deps:
   - name: zlib
     version: "1.3.2"
+    channel: common
     cci_folder: all
     options:
       "zlib/*:shared": "True"
 
   - name: libatomic_ops
     version: "7.10.0"
+    channel: common
     cci_folder: all
     options:
       "libatomic_ops/*:shared": "False"
@@ -34,12 +41,14 @@ deps:
     # sharpyuv and causes issues with OIIO. CCI rotated 1.2.1 out; 1.2.4
     # is the closest available that remains pre-1.3.0.
     version: "1.2.4"
+    channel: common
     cci_folder: all
     options:
       "libwebp/*:shared": "False"
 
   - name: dav1d
     version: "1.5.3"
+    channel: common
     cci_folder: all
     options:
       "dav1d/*:shared": "True"
@@ -48,6 +57,7 @@ deps:
     # 2.1.4 rotated out of CCI; 2.1.5 is the closest 2.1.x available.
     # Avoiding 3.x to prevent ABI surprises against libraw/openjph.
     version: "2.1.5"
+    channel: common
     cci_folder: all
     options:
       "libjpeg-turbo/*:shared": "True"
@@ -56,8 +66,9 @@ deps:
     # The recipe revision pin #7053477b271b8c39e046f784405b402f from
     # openrvcore-conanfile.py:87 may be unresolvable on CCI master.
     # Workflow strips any #rrev suffix before conan create; the produced
-    # @openrv/vfx2024 ref gets its own revision.
+    # @openrv/vfx2025 ref gets its own revision.
     version: "1.82.0"
+    channel: vfx2025
     cci_folder: all
     options:
       "boost/*:shared": "True"
@@ -65,18 +76,21 @@ deps:
 
   - name: imath
     version: "3.1.12"
+    channel: vfx2025
     cci_folder: all
     options:
       "imath/*:shared": "True"
 
   - name: libdeflate
     version: "1.25"
+    channel: common
     cci_folder: all
     options:
       "libdeflate/*:shared": "True"
 
   - name: openexr
     version: "3.3.6"
+    channel: vfx2025
     cci_folder: "3.x"
     options:
       "openexr/*:shared": "True"
@@ -84,12 +98,14 @@ deps:
   - name: libpng
     # 1.6.55 rotated; 1.6.58 is a patch bump within 1.6.x.
     version: "1.6.58"
+    channel: common
     cci_folder: all
     options:
       "libpng/*:shared": "True"
 
   - name: openjpeg
     version: "2.5.4"
+    channel: common
     cci_folder: all
     options:
       "openjpeg/*:shared": "True"
@@ -98,6 +114,7 @@ deps:
     # 0.21.1 rotated; 0.21.2 is a patch bump within 0.21.x.
     # 0.21.5b has a beta suffix, avoided.
     version: "0.21.2"
+    channel: common
     cci_folder: all
     options:
       "libraw/*:shared": "True"
@@ -108,6 +125,7 @@ deps:
     # 0.26.3 rotated; 0.27.0 is the only remaining version in CCI.
     # Minor bump; validate CMake target name compatibility.
     version: "0.27.0"
+    channel: common
     cci_folder: all
     options:
       "openjph/*:shared": "True"
@@ -115,6 +133,7 @@ deps:
 
   - name: pcre2
     version: "10.44"
+    channel: common
     cci_folder: all
     windows_only: true
     options:
