@@ -429,7 +429,7 @@ IF(RV_TARGET_DARWIN)
   IF(USE_METAL)
     TARGET_LINK_LIBRARIES(
       ${_target}
-      PUBLIC TwkGLFCoreGraphics TwkMTLF
+      PUBLIC TwkGLFCoreGraphics
       PRIVATE "-framework CoreVideo" "-framework QuartzCore" "-framework IOSurface" "-framework AppKit"
     )
     TARGET_COMPILE_DEFINITIONS(
