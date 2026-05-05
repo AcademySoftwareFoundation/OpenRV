@@ -268,8 +268,25 @@ jobs:
           conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
         run: |
-          conan upload "*@openrv/common" --remote "$REMOTE_NAME" --confirm
-          conan upload "*@openrv/vfx2025" --remote "$REMOTE_NAME" --confirm
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
 
       - name: Verify server-side listing of target
         run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
@@ -365,8 +382,25 @@ jobs:
           "$CONAN_EXEC" list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
         run: |
-          "$CONAN_EXEC" upload "*@openrv/common" --remote "$REMOTE_NAME" --confirm
-          "$CONAN_EXEC" upload "*@openrv/vfx2025" --remote "$REMOTE_NAME" --confirm
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
       - name: Verify server-side listing of target
         run: |
           "$CONAN_EXEC" search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
@@ -420,6 +454,17 @@ jobs:
         with:
           arch: x64
 
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Get Python install path
+        shell: powershell
+        run: |
+          $pythonDir = python -c "import sys, os; print(os.path.dirname(sys.executable))"
+          echo "WIN_PYTHON_DIR=$pythonDir" >> $env:GITHUB_ENV
+
       - name: Setup MSYS2
         uses: msys2/setup-msys2@v2
         with:
@@ -431,9 +476,6 @@ jobs:
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-make
             mingw-w64-x86_64-meson
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-pip
-            mingw-w64-x86_64-python-yaml
             autoconf
             automake
             libtool
@@ -466,16 +508,18 @@ jobs:
             echo "::error::WindowsSdkVerBinPath not set; mt.exe will be unreachable."
             exit 1
           fi
-      - name: Install Conan 2.x (inside msys2)
+          WIN_PYTHON_DIR=$(cygpath -u "$WIN_PYTHON_DIR")
+          echo "export PATH=\"$WIN_PYTHON_DIR:\$PATH\"" >> ~/.bash_profile
+          echo "Added Python to PATH: $WIN_PYTHON_DIR"
+      - name: Install Conan 2.x
         run: |
           source ~/.bash_profile
-          python -m pip install --upgrade pip
-          python -m pip install "conan>=2.0,<3.0"
-          # Expose `python3` for the helper scripts (MSYS2 only ships
-          # `python` with the mingw python package).
-          if ! command -v python3 >/dev/null; then
-            ln -sf "$(command -v python)" /usr/local/bin/python3
-          fi
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user "conan>=2.0,<3.0" pyyaml
+          PYTHON_SCRIPTS_DIR=$(python3 -c "import site, os; scripts = site.getusersitepackages(); print(os.path.join(os.path.dirname(scripts), 'Scripts'))")
+          PYTHON_SCRIPTS_MSYS=$(cygpath -u "$PYTHON_SCRIPTS_DIR")
+          echo "export PATH=\"\$PATH:$PYTHON_SCRIPTS_MSYS\"" >> ~/.bash_profile
+          source ~/.bash_profile
           python3 --version
           conan --version
       - name: Configure Conan remote and authenticate
@@ -504,8 +548,25 @@ jobs:
           conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
         run: |
-          conan upload "*@openrv/common" --remote "$REMOTE_NAME" --confirm
-          conan upload "*@openrv/vfx2025" --remote "$REMOTE_NAME" --confirm
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
 
       - name: Verify server-side listing of target
         run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"

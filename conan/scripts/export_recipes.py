@@ -26,6 +26,41 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 PACKAGES_YML = REPO_ROOT / "conan" / "packages.yml"
 
 
+def patch_conandata(recipe_path: str, dep: dict) -> None:
+    """Inject a missing version entry into the CCI recipe's conandata.yml.
+
+    When packages.yml provides source_url/source_sha256 for a version that
+    CCI's conandata.yml does not list, this adds the entry so that the
+    recipe's source() method can download the tarball.
+    """
+    source_url = dep.get("source_url")
+    source_sha256 = dep.get("source_sha256")
+    if not source_url:
+        return
+
+    conandata_path = os.path.join(recipe_path, "conandata.yml")
+    if not os.path.isfile(conandata_path):
+        return
+
+    conandata = yaml.safe_load(open(conandata_path))
+    if conandata is None:
+        conandata = {}
+
+    version = dep["version"]
+    sources = conandata.setdefault("sources", {})
+    if version in sources:
+        return
+
+    entry = {"url": source_url}
+    if source_sha256:
+        entry["sha256"] = source_sha256
+    sources[version] = entry
+
+    with open(conandata_path, "w") as f:
+        yaml.dump(conandata, f, default_flow_style=False, sort_keys=False)
+    print(f"  Patched conandata.yml: added sources entry for {dep['name']}/{version}")
+
+
 def main() -> None:
     cci_dir = os.environ.get("CCI_DIR")
     if not cci_dir:
@@ -47,6 +82,8 @@ def main() -> None:
             print(f"::error::Recipe folder not found: {recipe_path}")
             failures.append(name)
             continue
+
+        patch_conandata(recipe_path, dep)
 
         cmd = [
             conan, "export", recipe_path,

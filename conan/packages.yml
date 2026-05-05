@@ -78,6 +78,8 @@ deps:
     version: "3.1.12"
     channel: vfx2025
     cci_folder: all
+    source_url: "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v3.1.12.tar.gz"
+    source_sha256: "8a1bc258f3149b5729c2f4f8ffd337c0e57f09096e4ba9784329f40c4a9035da"
     options:
       "imath/*:shared": "True"
 
@@ -92,6 +94,8 @@ deps:
     version: "3.3.6"
     channel: vfx2025
     cci_folder: "3.x"
+    source_url: "https://github.com/AcademySoftwareFoundation/openexr/archive/refs/tags/v3.3.6.tar.gz"
+    source_sha256: "2e3c14c0fd47938819cab0a1d9e0a6dc3d276cdec556745eb7521f6add4deed9"
     options:
       "openexr/*:shared": "True"
 
