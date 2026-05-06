@@ -18,8 +18,6 @@
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/functional/hash.hpp>
 
-// Metal implementation is in ShaderFunctionMetal.mm (Objective-C++ only)
-
 namespace IPCore
 {
     namespace Shader
@@ -168,9 +166,6 @@ namespace IPCore
             , m_parameters(params)
             , m_globals(globals)
             , m_state(nullptr)
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            , m_metalFunction(nullptr)
-#endif
             , m_doc(doc)
             , m_hash(0)
             , m_inline(type == Filter || type == MorphologicalFilter)
@@ -192,9 +187,6 @@ namespace IPCore
             : m_name(name)
             , m_type(type)
             , m_state(nullptr)
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            , m_metalFunction(nullptr)
-#endif
             , m_doc(doc)
             , m_hash(0)
             , m_inline(type == Filter || type == MorphologicalFilter)
@@ -1046,9 +1038,6 @@ namespace IPCore
 
             return status == GL_TRUE;
         }
-
-        // Function::compileMetal() is implemented in ShaderFunctionMetal.mm
-        // (Objective-C++ required for Metal API calls).
 
         Function::ValidationResult Function::validate() const
         {

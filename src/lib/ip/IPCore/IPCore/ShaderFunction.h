@@ -227,21 +227,6 @@ namespace IPCore
         protected:
             static void deleteRetired();
 
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            // MSL source (pre-translated from GLSL via SPIRV-Cross at build time,
-            // OR runtime-generated for dynamic functions)
-            mutable std::string m_mslSource;
-
-            // The compiled MTLFunction (wrapped in void* to avoid ObjC in header)
-            mutable void* m_metalFunction; // id<MTLFunction>, lazily initialized
-
-            void compileMetal(void* device) const; // device is id<MTLDevice>
-
-            const std::string& mslSource() const { return m_mslSource; }
-
-            void setMSLSource(const std::string& msl) { m_mslSource = msl; }
-#endif
-
         private:
             //
             //  Function objects should not be directly deleted because pointers
