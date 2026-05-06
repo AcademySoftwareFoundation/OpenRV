@@ -64,9 +64,17 @@ def main() -> None:
         f"-pr:a", profile_path,
     ]
 
-    # Append options from packages.yml
-    for k, v in (dep.get("options") or {}).items():
-        cmd.extend(["-o", f"{k}={v}"])
+    # Append options from ALL deps in packages.yml, not just the target.
+    # The consumer (openrvcore-conanfile.py) sets options for every dep at
+    # once, so transitive deps like zlib get shared=True. We must match
+    # those options here so the built package_id is identical to what the
+    # consumer will request.
+    is_windows = os.environ.get("IS_WINDOWS_JOB") == "1"
+    for d in pkgs["deps"]:
+        if d.get("windows_only") and not is_windows:
+            continue
+        for k, v in (d.get("options") or {}).items():
+            cmd.extend(["-o", f"{k}={v}"])
 
     print(f"\n>>> {' '.join(cmd)}", flush=True)
     result = subprocess.run(cmd)

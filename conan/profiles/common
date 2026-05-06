@@ -22,7 +22,7 @@ libwebp/*: libwebp/1.2.4@openrv/common
 dav1d/*: dav1d/1.5.3@openrv/common
 libjpeg/*: libjpeg-turbo/2.1.5@openrv/common
 libjpeg-turbo/*: libjpeg-turbo/2.1.5@openrv/common
-boost/*: boost/1.82.0@openrv/vfx2025
+boost/*: boost/1.85.0@openrv/vfx2025
 imath/*: imath/3.1.12@openrv/vfx2025
 libdeflate/*: libdeflate/1.25@openrv/common
 openexr/*: openexr/3.3.6@openrv/vfx2025

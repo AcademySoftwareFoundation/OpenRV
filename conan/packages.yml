@@ -63,11 +63,7 @@ deps:
       "libjpeg-turbo/*:shared": "True"
 
   - name: boost
-    # The recipe revision pin #7053477b271b8c39e046f784405b402f from
-    # openrvcore-conanfile.py:87 may be unresolvable on CCI master.
-    # Workflow strips any #rrev suffix before conan create; the produced
-    # @openrv/vfx2025 ref gets its own revision.
-    version: "1.82.0"
+    version: "1.85.0"
     channel: vfx2025
     cci_folder: all
     options:
