@@ -20,16 +20,10 @@
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
-
 #include <QtCore/QCoreApplication>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QWheelEvent>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 
@@ -38,112 +32,23 @@
 
 namespace Rv
 {
-    using namespace boost;
     using namespace std;
     using namespace TwkApp;
     using namespace IPCore;
 
     //--------------------------------------------------------------------------
-    // SyncBufferThreadData  (same pattern as in GLView.cpp)
-    //--------------------------------------------------------------------------
-
-    namespace
-    {
-        class SyncBufferThreadData
-        {
-        public:
-            explicit SyncBufferThreadData(const VideoDevice* device)
-                : m_device(device)
-                , m_done(false)
-                , m_doSync(false)
-                , m_running(false)
-                , m_mutex()
-                , m_cond()
-            {
-            }
-
-            void run()
-            {
-                while (!m_done)
-                {
-                    boost::mutex::scoped_lock lock(m_mutex);
-                    m_running = true;
-                    m_doSync = false;
-
-                    m_cond.wait(lock);
-
-                    if (m_device && m_doSync && !m_done)
-                        m_device->syncBuffers();
-
-                    m_doSync = false;
-                }
-            }
-
-            void notify(bool finish = false)
-            {
-                {
-                    boost::mutex::scoped_lock lock(m_mutex);
-                    if (finish)
-                        m_done = true;
-                    else
-                        m_doSync = true;
-                    if (!m_running)
-                        return;
-                }
-                m_cond.notify_one();
-            }
-
-            const VideoDevice* device() const { return m_device; }
-            void setDevice(const VideoDevice* d) { m_device = d; }
-
-        private:
-            SyncBufferThreadData(const SyncBufferThreadData&) = delete;
-            void operator=(const SyncBufferThreadData&) = delete;
-
-            bool m_done;
-            bool m_doSync;
-            bool m_running;
-            boost::mutex m_mutex;
-            boost::condition_variable m_cond;
-            const VideoDevice* m_device;
-        };
-
-        class ThreadTrampoline
-        {
-        public:
-            explicit ThreadTrampoline(MetalView* view)
-                : m_view(view)
-            {
-            }
-
-            void operator()()
-            {
-                SyncBufferThreadData* closure =
-                    reinterpret_cast<SyncBufferThreadData*>(m_view->syncClosure());
-                closure->run();
-            }
-
-        private:
-            MetalView* m_view;
-        };
-
-    } // anonymous namespace
-
-    //--------------------------------------------------------------------------
     // MetalView implementation
     //--------------------------------------------------------------------------
 
-    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool vsync, int bitsPerChannel, bool noResize)
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, int bitsPerChannel, bool noResize)
         : QWidget(parent)
         , m_doc(doc)
         , m_videoDevice(nullptr)
-        , m_syncThreadData(nullptr)
         , m_initialized(false)
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
         , m_userActive(true)
-        , m_vsync(vsync)
         , m_bitsPerChannel(bitsPerChannel)
         , m_csize(1024, 576)
         , m_msize(128, 128)
@@ -175,15 +80,6 @@ namespace Rv
     MetalView::~MetalView()
     {
         delete m_videoDevice;
-
-        if (m_syncThreadData)
-        {
-            SyncBufferThreadData* closure =
-                reinterpret_cast<SyncBufferThreadData*>(m_syncThreadData);
-            closure->notify(true);
-            m_swapThread.join();
-            delete closure;
-        }
 
         // Release IOSurface
         if (m_ioSurface)
@@ -260,11 +156,6 @@ namespace Rv
         // Kick off session initialization (equivalent to GLView::initializeGL)
         if (m_doc)
             m_doc->initializeSession();
-
-        // Start the sync-buffer background thread
-        SyncBufferThreadData* closure = new SyncBufferThreadData(m_videoDevice);
-        m_syncThreadData = closure;
-        m_swapThread = boost::thread(ThreadTrampoline(this));
     }
 
     //--------------------------------------------------------------------------
@@ -445,36 +336,6 @@ namespace Rv
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
 
         QWidget::resizeEvent(event);
-    }
-
-    void MetalView::keyPressEvent(QKeyEvent* event)
-    {
-        QWidget::keyPressEvent(event);
-    }
-
-    void MetalView::keyReleaseEvent(QKeyEvent* event)
-    {
-        QWidget::keyReleaseEvent(event);
-    }
-
-    void MetalView::mousePressEvent(QMouseEvent* event)
-    {
-        QWidget::mousePressEvent(event);
-    }
-
-    void MetalView::mouseReleaseEvent(QMouseEvent* event)
-    {
-        QWidget::mouseReleaseEvent(event);
-    }
-
-    void MetalView::mouseMoveEvent(QMouseEvent* event)
-    {
-        QWidget::mouseMoveEvent(event);
-    }
-
-    void MetalView::wheelEvent(QWheelEvent* event)
-    {
-        QWidget::wheelEvent(event);
     }
 
     //--------------------------------------------------------------------------
@@ -697,15 +558,6 @@ namespace Rv
         }
 
         return false;
-    }
-
-    //--------------------------------------------------------------------------
-    // readPixels
-    //--------------------------------------------------------------------------
-
-    QImage MetalView::readPixels(int x, int y, int w, int h)
-    {
-        return QImage(0, 0, QImage::Format_RGBA8888);
     }
 
 } // namespace Rv

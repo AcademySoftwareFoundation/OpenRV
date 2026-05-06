@@ -200,7 +200,7 @@ namespace Rv
         // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
         // to its native NSView.  It can be used directly in layouts without any
         // createWindowContainer() wrapping.
-        m_metalView = new MetalView(this, m_centralWidget, opts.vsync != 0 && !m_vsyncDisabled, 10 /*bitsPerChannel*/, !m_startupResize);
+        m_metalView = new MetalView(this, m_centralWidget, 10 /*bitsPerChannel*/, !m_startupResize);
 
         m_metalView->setFocusPolicy(Qt::StrongFocus);
         m_metalView->setMouseTracking(true);

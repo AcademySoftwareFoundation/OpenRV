@@ -110,8 +110,6 @@ namespace Rv
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
-
-        mutable int m_syncLogCount{0};
     };
 
 } // namespace Rv

@@ -11,9 +11,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
-#include <QtGui/QImage>
 #include <TwkUtil/Timer.h>
-#include <boost/thread/thread.hpp>
 
 namespace Rv
 {
@@ -52,7 +50,7 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool vsync = true, int bitsPerChannel = 10, bool noResize = true);
+        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, int bitsPerChannel = 10, bool noResize = true);
         ~MetalView();
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }
@@ -75,10 +73,6 @@ namespace Rv
         QSize minimumSizeHint() const override { return m_msize; }
 
         void absolutePosition(int& x, int& y) const;
-
-        void* syncClosure() const { return m_syncThreadData; }
-
-        QImage readPixels(int x, int y, int w, int h);
 
         float devicePixelRatio() const;
 
@@ -109,25 +103,16 @@ namespace Rv
 
         void showEvent(QShowEvent* event) override;
         void resizeEvent(QResizeEvent* event) override;
-        void keyPressEvent(QKeyEvent* event) override;
-        void keyReleaseEvent(QKeyEvent* event) override;
-        void mousePressEvent(QMouseEvent* event) override;
-        void mouseReleaseEvent(QMouseEvent* event) override;
-        void mouseMoveEvent(QMouseEvent* event) override;
-        void wheelEvent(QWheelEvent* event) override;
 
     private:
         RvDocument* m_doc;
         QTMetalVideoDevice* m_videoDevice;
-        boost::thread m_swapThread;
-        void* m_syncThreadData; // SyncBufferThreadData*
 
         bool m_initialized;
         bool m_firstPaintCompleted;
         bool m_postFirstNonEmptyRender; // mirrors GLView::m_postFirstNonEmptyRender
         bool m_stopProcessingEvents;
         bool m_userActive;
-        bool m_vsync;
         int m_bitsPerChannel;
 
         QSize m_csize;

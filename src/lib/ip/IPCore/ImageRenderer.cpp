@@ -1273,8 +1273,6 @@ namespace IPCore
             Device device(d, dynamic_cast<const GLVideoDevice*>(d), 0, ringBufferSize, nviews);
             if (device.glDevice)
                 device.glDevice->makeCurrent();
-            // On the Metal path glDevice is null — context management is
-            // handled per-frame by MetalView::beginFrame() instead.
             m_controlDevice.clearFBOs();
             m_controlDevice = device;
             setOutputDevice(m_outputDevice.device ? m_outputDevice.device : d);

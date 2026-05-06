@@ -254,6 +254,11 @@ namespace Rv
             initializeGLExtensions();
             initializeOpenGLFunctions();
 
+            if (m_sharedContext)
+            {
+                context()->setShareContext(m_sharedContext);
+            }
+
             if (m_doc)
             {
                 m_doc->initializeSession();

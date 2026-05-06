@@ -308,16 +308,6 @@ namespace Rv
         const int w = static_cast<int>(fbo->width());
         const int h = static_cast<int>(fbo->height());
 
-        // Log dimensions on first few calls to aid debugging
-        if (m_syncLogCount < 5)
-        {
-            ++m_syncLogCount;
-            std::cerr << "[syncBuffers #" << m_syncLogCount << "]"
-                      << " view=" << (m_view ? m_view->width() : -1)
-                      << "x" << (m_view ? m_view->height() : -1)
-                      << " fbo=" << w << "x" << h << "\n";
-        }
-
         if (w <= 0 || h <= 0)
             return;
 
