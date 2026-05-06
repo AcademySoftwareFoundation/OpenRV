@@ -52,7 +52,7 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool vsync = true, int bitsPerChannel = 10);
+        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool vsync = true, int bitsPerChannel = 10, bool noResize = true);
         ~MetalView();
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }

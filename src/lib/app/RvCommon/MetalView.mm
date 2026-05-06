@@ -133,14 +133,14 @@ namespace Rv
     // MetalView implementation
     //--------------------------------------------------------------------------
 
-    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool vsync, int bitsPerChannel)
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool vsync, int bitsPerChannel, bool noResize)
         : QWidget(parent)
         , m_doc(doc)
         , m_videoDevice(nullptr)
         , m_syncThreadData(nullptr)
         , m_initialized(false)
         , m_firstPaintCompleted(false)
-        , m_postFirstNonEmptyRender(false)
+        , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
         , m_userActive(true)
         , m_vsync(vsync)
