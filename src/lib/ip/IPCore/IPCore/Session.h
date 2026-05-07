@@ -1090,8 +1090,6 @@ namespace IPCore
 
         bool beingDeleted() { return m_beingDeleted; }
 
-        bool beingCleared() { return m_beingCleared; }
-
         void physicalDeviceChanged(const VideoDevice*);
 
     protected:
@@ -1258,7 +1256,6 @@ namespace IPCore
         bool m_audioUnavailble;
         static float m_audioDrift;
         bool m_beingDeleted;
-        bool m_beingCleared{false};
         CacheStats m_cacheStats;
         Time m_syncOffset;
         SyncTimes m_syncTimes;

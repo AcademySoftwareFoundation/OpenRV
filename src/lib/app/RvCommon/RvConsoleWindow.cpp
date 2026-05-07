@@ -159,7 +159,7 @@ namespace Rv
         }
     }
 
-    void RvConsoleWindow::closeEvent(QCloseEvent* event)
+    void RvConsoleWindow::saveSettings()
     {
         int showIndex = m_ui.showComboBox->currentIndex();
 
@@ -169,8 +169,18 @@ namespace Rv
         settings.setValue("showOn", showIndex);
         settings.endGroup();
         settings.sync();
+    }
 
+    void RvConsoleWindow::closeEvent(QCloseEvent* event)
+    {
+        saveSettings();
         QWidget::closeEvent(event);
+    }
+
+    void RvConsoleWindow::done(int result)
+    {
+        saveSettings();
+        QDialog::done(result);
     }
 
     int RvConsoleWindow::append(const char* text, size_t n)

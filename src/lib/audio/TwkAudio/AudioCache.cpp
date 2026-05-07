@@ -19,7 +19,7 @@ namespace TwkAudio
     using namespace std;
 
     AudioCache::AudioCache()
-        : m_packetSize(512)
+        : m_packetSize(TWEAK_AUDIO_DEFAULT_PACKET_SIZE)
         , m_packetLayout(TwkAudio::Stereo_2)
         , m_count(0)
         , m_packetRate(0)

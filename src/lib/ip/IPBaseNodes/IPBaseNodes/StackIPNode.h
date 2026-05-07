@@ -104,6 +104,7 @@ namespace IPCore
         IntProperty* m_autoSize;
         IntProperty* m_interactiveSize;
         IntProperty* m_supportReversedOrderBlending;
+        FloatProperty* m_dissolveAmount;
 
     private:
         static std::string m_defaultCompType;

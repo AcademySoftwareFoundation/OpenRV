@@ -6,8 +6,15 @@
 
 FUNCTION(yacc_it)
 
-  FIND_PROGRAM(_yacc bison NO_CACHE REQUIRED)
-  FIND_PROGRAM(_sed sed NO_CACHE REQUIRED)
+  # Find the parser generator: prefer win_bison on Windows, fall back to bison
+  IF(RV_TARGET_WINDOWS)
+    FIND_PROGRAM(_yacc win_bison NO_CACHE)
+    IF(NOT _yacc)
+      FIND_PROGRAM(_yacc bison NO_CACHE REQUIRED)
+    ENDIF()
+  ELSE()
+    FIND_PROGRAM(_yacc bison NO_CACHE REQUIRED)
+  ENDIF()
 
   SET(flags)
   SET(args)

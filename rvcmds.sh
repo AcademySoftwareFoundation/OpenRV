@@ -125,6 +125,7 @@ if [ -z "$QT_HOME" ]; then
   fi
 
   if [ -n "$QT_HOME" ]; then
+    export QT_HOME
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
   else
     echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."
@@ -150,6 +151,18 @@ else
     fi
   else
     echo "Warning: Could not determine Qt version from path: $QT_HOME. Assuming it is compatible."
+  fi
+fi
+
+# If on macOS and Xcode version is 26 or higher, apply the Qt AGL fix
+if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$QT_HOME" ] && command -v xcodebuild >/dev/null 2>&1; then
+  XCODE_MAJOR_VERSION=$(xcodebuild -version | head -n 1 | awk '{print $2}' | cut -d. -f1)
+  if [[ -n "$XCODE_MAJOR_VERSION" && "$XCODE_MAJOR_VERSION" =~ ^[0-9]+$ && "$XCODE_MAJOR_VERSION" -ge 26 ]]; then
+    QT_BASE_DIR="$(dirname "$(dirname "$QT_HOME")")"
+    if [ -d "$QT_BASE_DIR" ]; then
+      echo "Xcode 26+ detected, ensuring Qt AGL fix is applied..."
+      QT_HOME="$QT_BASE_DIR" bash "$SCRIPT_HOME/apply_qt_fix.sh"
+    fi
   fi
 fi
 
