@@ -15,17 +15,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    print("error: pyyaml is required. Install with: pip install pyyaml", file=sys.stderr)
-    sys.exit(1)
+import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-PACKAGES_YML = REPO_ROOT / "conan" / "packages.yml"
+from _common import CONAN_USER, conan_exec, load_packages
 
 
-def patch_conandata(recipe_path: str, dep: dict) -> None:
+def patch_conandata(recipe_path: Path, dep: dict) -> None:
     """Inject a missing version entry into the CCI recipe's conandata.yml.
 
     When packages.yml provides source_url/source_sha256 for a version that
@@ -37,13 +32,11 @@ def patch_conandata(recipe_path: str, dep: dict) -> None:
     if not source_url:
         return
 
-    conandata_path = os.path.join(recipe_path, "conandata.yml")
-    if not os.path.isfile(conandata_path):
+    conandata_path = recipe_path / "conandata.yml"
+    if not conandata_path.is_file():
         return
 
-    conandata = yaml.safe_load(open(conandata_path))
-    if conandata is None:
-        conandata = {}
+    conandata = yaml.safe_load(conandata_path.read_text()) or {}
 
     version = dep["version"]
     sources = conandata.setdefault("sources", {})
@@ -55,7 +48,7 @@ def patch_conandata(recipe_path: str, dep: dict) -> None:
         entry["sha256"] = source_sha256
     sources[version] = entry
 
-    with open(conandata_path, "w") as f:
+    with conandata_path.open("w") as f:
         yaml.dump(conandata, f, default_flow_style=False, sort_keys=False)
     print(f"  Patched conandata.yml: added sources entry for {dep['name']}/{version}")
 
@@ -66,24 +59,25 @@ def main() -> None:
         print("error: CCI_DIR environment variable is not set.", file=sys.stderr)
         sys.exit(1)
 
-    conan = os.environ.get("CONAN_EXEC", "conan")
-    pkgs = yaml.safe_load(PACKAGES_YML.read_text())
+    conan = conan_exec()
+    pkgs = load_packages()
 
     # Intentionally exports ALL deps, including windows_only entries, on
     # every platform. Exporting is cheap (no compilation) and ensures that
     # replace_requires in profiles/common can resolve on all platforms.
     # Platform filtering happens at build time in conan_install_target.py.
-    failures = []
+    failures: list[str] = []
     for dep in pkgs["deps"]:
         name = dep["name"]
         version = dep["version"]
         channel = dep["channel"]
         cci_folder = dep["cci_folder"]
+        ref = f"{name}/{version}@{CONAN_USER}/{channel}"
 
-        recipe_path = os.path.join(cci_dir, "recipes", name, cci_folder)
-        if not os.path.isdir(recipe_path):
-            print(f"::error::Recipe folder not found: {recipe_path}")
-            failures.append(name)
+        recipe_path = Path(cci_dir) / "recipes" / name / cci_folder
+        if not recipe_path.is_dir():
+            print(f"::error::Recipe folder not found: {recipe_path}", file=sys.stderr)
+            failures.append(f"{name}/{version}")
             continue
 
         patch_conandata(recipe_path, dep)
@@ -91,19 +85,19 @@ def main() -> None:
         cmd = [
             conan,
             "export",
-            recipe_path,
+            str(recipe_path),
             "--version",
             version,
             "--user",
-            "openrv",
+            CONAN_USER,
             "--channel",
             channel,
         ]
         print(f"\n>>> {' '.join(cmd)}", flush=True)
         result = subprocess.run(cmd)
         if result.returncode != 0:
-            print(f"::error::conan export failed for {name}/{version}@openrv/{channel}")
-            failures.append(name)
+            print(f"::error::conan export failed for {ref}", file=sys.stderr)
+            failures.append(f"{name}/{version}")
 
     if failures:
         print(f"\n::error::{len(failures)} export(s) failed: {', '.join(failures)}", file=sys.stderr)

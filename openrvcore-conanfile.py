@@ -76,6 +76,9 @@ class OpenRVBase:
         pkgs = yaml.safe_load(open(packages_yml))
 
         for dep in pkgs["deps"]:
+            # Mirror of conan/scripts/_common.py:is_active_dep. Conan's
+            # recipe sandbox makes importing helper modules fragile, so
+            # the rule is duplicated here. Update both sites together.
             if dep.get("windows_only") and self.settings.os != "Windows":
                 continue
             # Strip the "name/*:" pattern prefix from option keys to get bare names.

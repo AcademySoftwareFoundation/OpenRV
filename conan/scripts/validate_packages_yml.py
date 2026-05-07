@@ -9,16 +9,10 @@ Usage:
 """
 
 import sys
-from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    print("error: pyyaml is required. Install with: pip install pyyaml", file=sys.stderr)
-    sys.exit(1)
+import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-PACKAGES_YML = REPO_ROOT / "conan" / "packages.yml"
+from _common import PACKAGES_YML
 
 REQUIRED = {"name": str, "version": str, "channel": str, "cci_folder": str}
 OPTIONAL = {"options": dict, "windows_only": bool, "source_url": str, "source_sha256": str}
@@ -26,7 +20,10 @@ VALID_CHANNELS = {"common", "vfx2025"}
 ALL_KNOWN_FIELDS = set(REQUIRED) | set(OPTIONAL)
 
 
-def validate(pkgs: dict) -> list[str]:
+def validate(pkgs) -> list[str]:
+    if not isinstance(pkgs, dict):
+        return ["packages.yml is empty or not a mapping"]
+
     errors = []
 
     if "deps" not in pkgs:
@@ -35,14 +32,17 @@ def validate(pkgs: dict) -> list[str]:
     if not isinstance(pkgs["deps"], list):
         return ["'deps' must be a list"]
 
+    seen: set[tuple[str, str]] = set()
     for i, dep in enumerate(pkgs["deps"]):
-        label = dep.get("name", f"deps[{i}]")
+        label = dep.get("name") or f"deps[{i}]"
 
         for field, typ in REQUIRED.items():
             if field not in dep:
                 errors.append(f"{label}: missing required field '{field}'")
             elif not isinstance(dep[field], typ):
                 errors.append(f"{label}: '{field}' must be {typ.__name__}, got {type(dep[field]).__name__}")
+            elif typ is str and not dep[field]:
+                errors.append(f"{label}: '{field}' must not be empty")
 
         for field, typ in OPTIONAL.items():
             if field in dep and not isinstance(dep[field], typ):
@@ -63,6 +63,14 @@ def validate(pkgs: dict) -> list[str]:
         for k in dep.get("options") or {}:
             if ":" not in k:
                 errors.append(f"{label}: option key '{k}' missing pattern prefix (expected 'pkg/*:opt')")
+
+        name = dep.get("name")
+        version = dep.get("version")
+        if isinstance(name, str) and isinstance(version, str):
+            key = (name, version)
+            if key in seen:
+                errors.append(f"{label}: duplicate (name, version) entry '{name}/{version}'")
+            seen.add(key)
 
     return errors
 

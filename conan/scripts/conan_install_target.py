@@ -11,53 +11,39 @@ Reads packages.yml to look up the dep's channel and options, then runs:
         -o <option>=<value> ...
 
 Environment variables:
-    CONAN_EXEC - Full path to the conan binary (optional; defaults to "conan").
+    CONAN_EXEC      - Full path to the conan binary (optional; defaults to "conan").
+    IS_WINDOWS_JOB  - Set to "1" to apply windows_only options too.
 """
 
+import argparse
 import os
 import subprocess
 import sys
-from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    print("error: pyyaml is required. Install with: pip install pyyaml", file=sys.stderr)
-    sys.exit(1)
-
-REPO_ROOT = Path(__file__).resolve().parents[2]
-PACKAGES_YML = REPO_ROOT / "conan" / "packages.yml"
-
-
-def find_dep(pkgs: dict, name: str, version: str) -> dict:
-    """Find the matching dep entry in packages.yml."""
-    for dep in pkgs["deps"]:
-        if dep["name"] == name and dep["version"] == version:
-            return dep
-    return None
+from _common import CONAN_USER, PROFILES_DIR, conan_exec, find_dep, is_active_dep, load_packages
 
 
 def main() -> None:
-    if len(sys.argv) != 4:
-        print(f"Usage: {sys.argv[0]} <name> <version> <profile>", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("name")
+    parser.add_argument("version")
+    parser.add_argument("profile")
+    args = parser.parse_args()
 
-    name, version, profile = sys.argv[1], sys.argv[2], sys.argv[3]
-    conan = os.environ.get("CONAN_EXEC", "conan")
-
-    pkgs = yaml.safe_load(PACKAGES_YML.read_text())
-    dep = find_dep(pkgs, name, version)
+    pkgs = load_packages()
+    dep = find_dep(pkgs, args.name, args.version)
     if dep is None:
-        print(f"::error::{name}/{version} not found in conan/packages.yml", file=sys.stderr)
+        print(f"::error::{args.name}/{args.version} not found in conan/packages.yml", file=sys.stderr)
         sys.exit(1)
 
     channel = dep["channel"]
-    profile_path = str(REPO_ROOT / "conan" / "profiles" / profile)
+    profile_path = str(PROFILES_DIR / args.profile)
+    ref = f"{args.name}/{args.version}@{CONAN_USER}/{channel}"
 
     cmd = [
-        conan,
+        conan_exec(),
         "install",
-        f"--requires={name}/{version}@openrv/{channel}",
+        f"--requires={ref}",
         "--build=missing",
         "--build=b2/*",
         "--build=meson/*",
@@ -73,7 +59,7 @@ def main() -> None:
     # consumer will request.
     is_windows = os.environ.get("IS_WINDOWS_JOB") == "1"
     for d in pkgs["deps"]:
-        if d.get("windows_only") and not is_windows:
+        if not is_active_dep(d, is_windows=is_windows):
             continue
         for k, v in (d.get("options") or {}).items():
             cmd.extend(["-o", f"{k}={v}"])
@@ -81,10 +67,10 @@ def main() -> None:
     print(f"\n>>> {' '.join(cmd)}", flush=True)
     result = subprocess.run(cmd)
     if result.returncode != 0:
-        print(f"::error::conan install failed for {name}/{version}@openrv/{channel}")
+        print(f"::error::conan install failed for {ref}", file=sys.stderr)
         sys.exit(result.returncode)
 
-    print(f"\nBuild succeeded: {name}/{version}@openrv/{channel}")
+    print(f"\nBuild succeeded: {ref}")
 
 
 if __name__ == "__main__":

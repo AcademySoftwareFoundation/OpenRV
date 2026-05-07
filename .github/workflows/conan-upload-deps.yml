@@ -124,41 +124,11 @@ jobs:
         env:
           ONLY: ${{ inputs.only || '' }}
         run: |
-          python3 - <<'PY'
-          import json, os, sys, yaml
-          cfg = yaml.safe_load(open("conan/packages.yml"))
-          only = os.environ.get("ONLY", "").strip()
-          def build_rows(include_windows_only: bool):
-              rows = []
-              for dep in cfg["deps"]:
-                  if dep.get("windows_only") and not include_windows_only:
-                      continue
-                  if only and dep["name"] != only:
-                      continue
-                  rows.append({
-                      "name":       dep["name"],
-                      "version":    dep["version"],
-                      "channel":    dep["channel"],
-                      "cci_folder": dep["cci_folder"],
-                  })
-              return rows
-          rows_nonwin = build_rows(include_windows_only=False)
-          rows_win    = build_rows(include_windows_only=True)
-          if only and not (rows_nonwin or rows_win):
-              print(f"::error::--only={only} matched no entry in conan/packages.yml", file=sys.stderr)
-              sys.exit(1)
-          print(f"matrix_nonwindows rows ({len(rows_nonwin)}):")
-          for r in rows_nonwin:
-              print(f"  {r['name']}/{r['version']}@openrv/{r['channel']} ({r['cci_folder']})")
-          print(f"matrix_windows rows ({len(rows_win)}):")
-          for r in rows_win:
-              print(f"  {r['name']}/{r['version']}@openrv/{r['channel']} ({r['cci_folder']})")
-          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              f.write(f"matrix_nonwindows={json.dumps(rows_nonwin)}\n")
-              f.write(f"matrix_windows={json.dumps(rows_win)}\n")
-              f.write(f"count_nonwindows={len(rows_nonwin)}\n")
-              f.write(f"count_windows={len(rows_win)}\n")
-          PY
+          if [ -n "$ONLY" ]; then
+            python3 conan/scripts/gen_matrix.py --only "$ONLY" >> "$GITHUB_OUTPUT"
+          else
+            python3 conan/scripts/gen_matrix.py >> "$GITHUB_OUTPUT"
+          fi
   # ---------------------------------------------------------------------------
   # Rocky Linux 8 - gcc-toolset-11, Python 3.11 from AppStream.
   # ---------------------------------------------------------------------------

@@ -16,15 +16,9 @@ import argparse
 import sys
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError:
-    print("error: pyyaml is required. Install with: pip install pyyaml", file=sys.stderr)
-    sys.exit(1)
+from _common import CONAN_USER, PROFILES_DIR, REPO_ROOT, load_packages
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-PACKAGES_YML = REPO_ROOT / "conan" / "packages.yml"
-PROFILE_COMMON = REPO_ROOT / "conan" / "profiles" / "common"
+PROFILE_COMMON = PROFILES_DIR / "common"
 
 REPLACE_REQUIRES_HEADER = "[replace_requires]"
 
@@ -36,23 +30,28 @@ def build_replace_requires(pkgs: dict) -> list[str]:
         name = dep["name"]
         version = dep["version"]
         channel = dep["channel"]
-        line = f"{name}/*: {name}/{version}@openrv/{channel}"
+        ref = f"{name}/{version}@{CONAN_USER}/{channel}"
         # libjpeg-turbo needs an extra alias so that deps that require
         # "libjpeg" (without the -turbo suffix) are also redirected.
         if name == "libjpeg-turbo":
-            lines.append(f"libjpeg/*: {name}/{version}@openrv/{channel}")
-        lines.append(line)
+            lines.append(f"libjpeg/*: {ref}")
+        lines.append(f"{name}/*: {ref}")
     return lines
 
 
 def read_profile_preamble(profile_path: Path) -> str:
-    """Return everything in profiles/common before the [replace_requires] section."""
-    text = profile_path.read_text()
-    idx = text.find(REPLACE_REQUIRES_HEADER)
-    if idx == -1:
-        # No existing section; return the whole file as preamble.
-        return text.rstrip("\n")
-    return text[:idx].rstrip("\n")
+    """Return everything in profiles/common before the [replace_requires] section.
+
+    Matches the header as a standalone line so that the literal string
+    appearing inside a comment or value cannot trigger a false split.
+    """
+    lines = profile_path.read_text().splitlines(keepends=True)
+    preamble: list[str] = []
+    for line in lines:
+        if line.strip() == REPLACE_REQUIRES_HEADER:
+            break
+        preamble.append(line)
+    return "".join(preamble).rstrip("\n")
 
 
 def main() -> None:
@@ -64,7 +63,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    pkgs = yaml.safe_load(PACKAGES_YML.read_text())
+    pkgs = load_packages()
     new_section_lines = build_replace_requires(pkgs)
     new_section = "\n".join(new_section_lines) + "\n"
 
