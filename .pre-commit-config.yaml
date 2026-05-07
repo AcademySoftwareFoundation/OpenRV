@@ -27,6 +27,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: conan-packages-yml-schema
+        name: validate conan/packages.yml schema
+        entry: python3 conan/scripts/validate_packages_yml.py
+        language: python
+        files: ^conan/packages\.yml$
+        additional_dependencies: ['pyyaml']
+        pass_filenames: false
       - id: conan-profile-sync
         name: conan profiles/common in sync with packages.yml
         entry: python3 conan/scripts/gen_profile_common.py --check
