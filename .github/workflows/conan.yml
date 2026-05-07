@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/conan.yml'
       - 'openrvcore-conanfile.py'
+      - 'cmake/dependencies/**'
 
 env:
   SKIP_DEPS_CACHE: 'false'
