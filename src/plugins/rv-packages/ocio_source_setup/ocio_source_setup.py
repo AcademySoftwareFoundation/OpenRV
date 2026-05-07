@@ -281,6 +281,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
         ocioNode = groupMemberOfType(srcPipeline, nodeType)
         if ocioNode is not None and self.readingSession:
+            if os.getenv("OCIO") is None:
+                return
             for pNode in commands.nodesInGroup(srcPipeline):
                 if commands.nodeType(pNode).startswith("OCIO"):
                     commands.ocioUpdateConfig(pNode)
@@ -329,6 +331,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         except KeyError as inst:
             print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
         if pipeline == DEFAULT_PIPE[pipeSlot]:
+            return
+
+        if os.getenv("OCIO") is None:
             return
 
         print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
