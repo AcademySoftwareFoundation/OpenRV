@@ -31,7 +31,7 @@ ADD_EXECUTABLE(
 )
 TARGET_LINK_LIBRARIES(
   ${_target_qt}
-  PRIVATE QTBundle Qt::Widgets Qt::Gui Qt::Core doctest
+  PRIVATE QTBundle Qt::Widgets Qt::Gui Qt::Core doctest::doctest
 )
 ADD_TEST(
   NAME ${_target_qt}

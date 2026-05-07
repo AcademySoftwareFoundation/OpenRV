@@ -6,8 +6,6 @@ on:
       skip_deps_cache:
         type: string
         default: 'false'
-      qt5_modules:
-        type: string
       full_matrix:
         type: string
         default: 'true'
@@ -16,7 +14,7 @@ on:
         default: 'true'
 
 jobs:
-  # Always runs — CY2024 Release only (PR scope)
+  # Always runs — CY2025 Release only (PR scope)
   windows-pr:
     name: 'Windows ${{ matrix.vfx-platform }}
       <${{ matrix.os }}
@@ -37,7 +35,7 @@ jobs:
             qt-version: "6.5.3"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
 
@@ -58,9 +56,8 @@ jobs:
           vfx-platform: ${{ matrix.vfx-platform }}
           msvc-component: ${{ matrix.msvc-component }}
           msvc-compiler: ${{ matrix.msvc-compiler }}
-          qt5_modules: ${{ inputs.qt5_modules }}
 
-  # CY2024 Debug — runs when cmake files change or on full matrix
+  # CY2025 Debug — runs when cmake files change or on full matrix
   windows-debug:
     if: ${{ inputs.run_debug == 'true' }}
     name: 'Windows ${{ matrix.vfx-platform }}
@@ -82,6 +79,59 @@ jobs:
             qt-version: "6.5.3"
             python-version: "3.11"
             cmake-version: "3.31.6"
+            vfx-platform: "CY2025"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+
+    runs-on: ${{ matrix.os }}
+    env:
+      SCCACHE_GHA_ENABLED: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-windows
+        with:
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          msvc-component: ${{ matrix.msvc-component }}
+          msvc-compiler: ${{ matrix.msvc-compiler }}
+
+  # CY2024 — full matrix only (daily/push/dispatch)
+  windows-cy2024:
+    if: ${{ inputs.full_matrix == 'true' }}
+    name: 'Windows ${{ matrix.vfx-platform }}
+      <${{ matrix.os }}
+       msvc=${{ matrix.msvc-component }},
+       qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       cmake=${{ matrix.cmake-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2024"
+            msvc-component: "14.40.17.10.x86.x64"
+            msvc-compiler: "14.40.33807"
+          - os: "windows-2022"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.5.3"
+            python-version: "3.11"
+            cmake-version: "3.31.6"
             vfx-platform: "CY2024"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
@@ -103,58 +153,3 @@ jobs:
           vfx-platform: ${{ matrix.vfx-platform }}
           msvc-component: ${{ matrix.msvc-component }}
           msvc-compiler: ${{ matrix.msvc-compiler }}
-          qt5_modules: ${{ inputs.qt5_modules }}
-
-  # CY2023 — full matrix only (daily/push/dispatch)
-  windows-cy2023:
-    if: ${{ inputs.full_matrix == 'true' }}
-    name: 'Windows ${{ matrix.vfx-platform }}
-      <${{ matrix.os }}
-       msvc=${{ matrix.msvc-component }},
-       qt=${{ matrix.qt-version }},
-       python=${{ matrix.python-version }},
-       cmake=${{ matrix.cmake-version }},
-       arch=${{ matrix.arch-type }},
-       config=${{ matrix.build-type }}>'
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Release"
-            qt-version: "5.15.2"
-            python-version: "3.10"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2023"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-          - os: "windows-2022"
-            arch-type: "x86_64"
-            build-type: "Debug"
-            qt-version: "5.15.2"
-            python-version: "3.10"
-            cmake-version: "3.31.6"
-            vfx-platform: "CY2023"
-            msvc-component: "14.40.17.10.x86.x64"
-            msvc-compiler: "14.40.33807"
-
-    runs-on: ${{ matrix.os }}
-    env:
-      SCCACHE_GHA_ENABLED: false
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
-        with:
-          submodules: recursive
-      - uses: ./.github/actions/build-windows
-        with:
-          build-type: ${{ matrix.build-type }}
-          qt-version: ${{ matrix.qt-version }}
-          python-version: ${{ matrix.python-version }}
-          cmake-version: ${{ matrix.cmake-version }}
-          vfx-platform: ${{ matrix.vfx-platform }}
-          msvc-component: ${{ matrix.msvc-component }}
-          msvc-compiler: ${{ matrix.msvc-compiler }}
-          qt5_modules: ${{ inputs.qt5_modules }}
