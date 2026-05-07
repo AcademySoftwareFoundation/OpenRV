@@ -8,7 +8,6 @@ resolve transitive deps locally during the build step.
 Environment variables:
     CCI_DIR    - Path to the cloned conan-center-index repo (required).
     CONAN_EXEC - Full path to the conan binary (optional; defaults to "conan").
-    IS_WINDOWS_JOB - Set to "1" on Windows runners to skip windows_only filtering.
 """
 
 import os
@@ -70,6 +69,10 @@ def main() -> None:
     conan = os.environ.get("CONAN_EXEC", "conan")
     pkgs = yaml.safe_load(PACKAGES_YML.read_text())
 
+    # Intentionally exports ALL deps, including windows_only entries, on
+    # every platform. Exporting is cheap (no compilation) and ensures that
+    # replace_requires in profiles/common can resolve on all platforms.
+    # Platform filtering happens at build time in conan_install_target.py.
     failures = []
     for dep in pkgs["deps"]:
         name = dep["name"]

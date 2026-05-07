@@ -18,8 +18,10 @@
 #   options      - Map of Conan option -> value. Passed as -o flags on
 #                  conan install. Pattern strings like "foo/*:shared" match
 #                  the install --requires ref.
-#   windows_only - Optional. If true, this entry is filtered out when the
-#                  workflow runs on a Linux or macOS platform.
+#   windows_only - Optional. If true, the dep is skipped at build time on
+#                  non-Windows platforms (openrvcore-conanfile.py and
+#                  conan_install_target.py). Recipes are still exported on
+#                  all platforms so that replace_requires can always resolve.
 
 deps:
   - name: zlib

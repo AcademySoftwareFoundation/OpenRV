@@ -25,5 +25,15 @@ repos:
         args: [--fix]
         description: "Lint and auto-fix markdown files"
 
+  - repo: local
+    hooks:
+      - id: conan-profile-sync
+        name: conan profiles/common in sync with packages.yml
+        entry: python3 conan/scripts/gen_profile_common.py --check
+        language: python
+        files: ^conan/packages\.yml$
+        additional_dependencies: ['pyyaml']
+        pass_filenames: false
+
 ci:
   autofix_prs: false
