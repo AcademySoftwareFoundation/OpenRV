@@ -409,6 +409,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if pipeline == DEFAULT_PIPE[groupName]:
             return
 
+        if os.getenv("OCIO") is None:
+            return
+
         device = commands.getStringProperty(group + ".device.name")[0]
         print(("INFO: using OCIODisplay for display: %s" % device))
 
