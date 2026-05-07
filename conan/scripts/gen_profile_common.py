@@ -14,7 +14,6 @@ Usage:
 
 import argparse
 import sys
-import textwrap
 from pathlib import Path
 
 try:
@@ -79,6 +78,7 @@ def main() -> None:
             sys.exit(0)
         else:
             import difflib
+
             diff = difflib.unified_diff(
                 current.splitlines(keepends=True),
                 new_content.splitlines(keepends=True),

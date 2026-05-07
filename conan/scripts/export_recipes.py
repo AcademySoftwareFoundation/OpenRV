@@ -86,10 +86,15 @@ def main() -> None:
         patch_conandata(recipe_path, dep)
 
         cmd = [
-            conan, "export", recipe_path,
-            "--version", version,
-            "--user", "openrv",
-            "--channel", channel,
+            conan,
+            "export",
+            recipe_path,
+            "--version",
+            version,
+            "--user",
+            "openrv",
+            "--channel",
+            channel,
         ]
         print(f"\n>>> {' '.join(cmd)}", flush=True)
         result = subprocess.run(cmd)

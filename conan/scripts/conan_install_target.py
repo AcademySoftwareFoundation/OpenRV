@@ -55,13 +55,15 @@ def main() -> None:
     profile_path = str(REPO_ROOT / "conan" / "profiles" / profile)
 
     cmd = [
-        conan, "install",
+        conan,
+        "install",
         f"--requires={name}/{version}@openrv/{channel}",
         "--build=missing",
         "--build=b2/*",
         "--build=meson/*",
         "--build=nasm/*",
-        f"-pr:a", profile_path,
+        "-pr:a",
+        profile_path,
     ]
 
     # Append options from ALL deps in packages.yml, not just the target.
