@@ -92,8 +92,8 @@ namespace Rv
         constexpr int sideBoxPadding = 5;
 
         buildLeft(sideBoxPadding);
-        buildCenter();
         buildRight(sideBoxPadding);
+        buildCenter();
 
         barContainer = new QWidget(this);
         barContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -101,12 +101,9 @@ namespace Rv
         grid->setContentsMargins(0, 0, 0, 0);
         grid->setSpacing(0);
 
-        // All three sections share cell (0, 0); alignment positions each within
-        // the cell so the center button stays at the toolbar's geometric center
-        // regardless of left/right widths.
         grid->addWidget(m_leftBox,   0, 0, Qt::AlignLeft   | Qt::AlignVCenter);
-        grid->addWidget(m_centerBox, 0, 0, Qt::AlignCenter);
         grid->addWidget(m_rightBox,  0, 0, Qt::AlignRight  | Qt::AlignVCenter);
+        grid->addWidget(m_centerBox, 0, 0, Qt::AlignCenter);
 
         addWidget(barContainer);
 

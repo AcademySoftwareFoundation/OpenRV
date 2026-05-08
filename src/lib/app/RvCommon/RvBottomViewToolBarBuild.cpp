@@ -31,7 +31,8 @@ namespace Rv
         constexpr std::string_view playModeDefaultTooltip = "Select playback style";
 
         ///
-        /// Make a button using an existing action and set it as the default action since we're no longer 
+        /// Make a button using an existing action and set it as the default action since
+        /// the action is not directly added to the toolbar
         ///
         QToolButton* makeBtn(QWidget* parent, QAction* action, const char* tbstyle, const char* tbsize = nullptr)
         {
@@ -63,6 +64,9 @@ namespace Rv
         return qf;
     }
 
+    ///
+    /// Add all buttons belonging to the left side of the toolbar and the actions in a single Widget
+    ///
     void RvBottomViewToolBar::buildLeft(int padding)
     {
         m_leftBox = new QWidget(this);
@@ -118,6 +122,10 @@ namespace Rv
         connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
     }
 
+
+    ///
+    /// Add all buttons belonging to the center (playback buttons) of the toolbar in a single widget
+    ///
     void RvBottomViewToolBar::buildCenter()
     {
         m_centerBox = new QWidget(this);
@@ -172,6 +180,10 @@ namespace Rv
         connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
     }
 
+
+    ///
+    /// Add all buttons belonging to the right of the toolbar in a single widget
+    ///
     void RvBottomViewToolBar::buildRight(int padding)
     {
         Options& opts = Options::sharedOptions();
