@@ -192,7 +192,7 @@ namespace Rv
         m_rightBox->setObjectName("rightBox");
         QHBoxLayout* rightLayout = new QHBoxLayout(m_rightBox);
         rightLayout->setContentsMargins(padding, 0, padding, 0);
-        rightLayout->setSpacing(0);
+        rightLayout->setSpacing(5);
 
         m_playModeAction = new QAction("", this);
         m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));

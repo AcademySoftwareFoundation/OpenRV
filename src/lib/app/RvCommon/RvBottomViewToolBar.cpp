@@ -567,12 +567,13 @@ namespace Rv
             box->setUpdatesEnabled(false);
 
             const QMargins margins = layout->contentsMargins();
+            const int spacing = layout->spacing();
             int remaining = sideBudget - margins.left() - margins.right();
             const int n = layout->count();
 
             // Subtract space taken by widgets we don't own (e.g. plugin-injected
-            // widgets). Their visibility is the plugin's responsibility; we
-            // only account for the space they occupy.
+            // widgets). 
+            int visibleCount = 0;
             for (int i = 0; i < n; ++i)
             {
                 QWidget* w = layout->itemAt(i)->widget();
@@ -580,12 +581,19 @@ namespace Rv
                     continue;
                 if (w->property("toolbarOwned").toBool())
                     continue;
-                if (w->isVisible())
-                    remaining -= w->sizeHint().width();
+                if (!w->isVisible())
+                    continue;
+                remaining -= w->sizeHint().width();
+                if (visibleCount > 0)
+                    remaining -= spacing;
+                ++visibleCount;
             }
 
             // Walk toolbar-owned buttons from the outer edge inward, hiding
-            // those that don't fit in the remaining budget.
+            // those that don't fit in the remaining budget. Once any button
+            // fails to fit, every button after it, closer to the center is
+            // not rendered. 
+            bool hideRest = false;
             for (int idx = 0; idx < n; ++idx)
             {
                 const int i = reverse ? (n - 1 - idx) : idx;
@@ -596,14 +604,23 @@ namespace Rv
                 if (!w->property("toolbarOwned").toBool())
                     continue;
 
-                const int hint = w->sizeHint().width();
-                const bool fits = hint <= remaining;
+                int cost = w->sizeHint().width();
+                if (visibleCount > 0)
+                    cost += spacing;
+
+                const bool fits = !hideRest && cost <= remaining;
+
+                if (!fits)
+                    hideRest = true;
 
                 if (w->isVisible() != fits)
                     w->setVisible(fits);
 
                 if (fits)
-                    remaining -= hint;
+                {
+                    remaining -= cost;
+                    ++visibleCount;
+                }
             }
 
             box->setUpdatesEnabled(true);
