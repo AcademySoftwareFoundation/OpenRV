@@ -87,7 +87,7 @@ namespace Rv
 
         setProperty("tbstyle", QVariant(QString("play_controls")));
 
-        constexpr int sideBoxPadding = 20;
+        constexpr int sideBoxPadding = 5;
         constexpr int sideBoxFixedWidth = 450;
 
         buildLeft(sideBoxPadding, sideBoxFixedWidth);
