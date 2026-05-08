@@ -13,6 +13,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QFrame>
 #include <TwkApp/EventNode.h>
 #include <QAction>
 #include <array>
@@ -41,6 +42,10 @@ namespace Rv
         virtual Result receiveEvent(const TwkApp::Event&);
 
         void build();
+        void buildLeft(int padding, int width);
+        void buildCenter();
+        void buildRight(int padding, int width);
+        QFrame* makeExpandingSpacer();
         void makeActive(bool);
         void makeActiveFromSettings();
 
