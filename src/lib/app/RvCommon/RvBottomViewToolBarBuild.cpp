@@ -82,13 +82,14 @@ namespace Rv
             const char* tbstyle;
             QAction** target;
         };
+
         const LeftActionDef leftDefs[] = {
-            {":/images/smanager.png",     "Toggle Session Manager",      "left",     &m_smAction},
-            {":/images/paint_48x48.png",  "Toggle Annotation tools",     "interior", &m_paintAction},
-            {":/images/about_48x48.png",  "Toggle Image Info",           "interior", &m_infoAction},
-            {":/images/ntwrk_48x48.png",  "Toggle RV Networking Dialog", "interior", &m_networkAction},
-            {":/images/timeline_mag.png", "Toggle Timeline Magnifier",   "interior", &m_timelineMagAction},
-            {":/images/timeline.png",     "Toggle Timeline",             "right",    &m_timelineAction},
+            {":/images/smanager.png", "Toggle Session Manager", "left", &m_smAction},
+            {":/images/paint_48x48.png", "Toggle Annotation tools", "interior", &m_paintAction},
+            {":/images/about_48x48.png", "Toggle Image Info", "interior", &m_infoAction},
+            {":/images/ntwrk_48x48.png", "Toggle RV Networking Dialog", "interior", &m_networkAction},
+            {":/images/timeline_mag.png", "Toggle Timeline Magnifier", "interior", &m_timelineMagAction},
+            {":/images/timeline.png", "Toggle Timeline", "right", &m_timelineAction},
         };
         for (const auto& def : leftDefs)
         {
@@ -121,7 +122,6 @@ namespace Rv
         connect(m_ghostAction, SIGNAL(triggered(bool)), this, SLOT(ghostTriggered(bool)));
         connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
     }
-
 
     ///
     /// Add all buttons belonging to the center (playback buttons) of the toolbar in a single widget
@@ -179,7 +179,6 @@ namespace Rv
         connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
         connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
     }
-
 
     ///
     /// Add all buttons belonging to the right of the toolbar in a single widget

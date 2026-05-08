@@ -101,8 +101,8 @@ namespace Rv
         grid->setContentsMargins(0, 0, 0, 0);
         grid->setSpacing(0);
 
-        grid->addWidget(m_leftBox,   0, 0, Qt::AlignLeft   | Qt::AlignVCenter);
-        grid->addWidget(m_rightBox,  0, 0, Qt::AlignRight  | Qt::AlignVCenter);
+        grid->addWidget(m_leftBox, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
+        grid->addWidget(m_rightBox, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
         grid->addWidget(m_centerBox, 0, 0, Qt::AlignCenter);
 
         addWidget(barContainer);
