@@ -78,6 +78,8 @@ namespace Rv
 
     protected:
         bool eventFilter(QObject* obj, QEvent* event) override;
+        void resizeEvent(QResizeEvent* event) override;
+        void updateOverflow();
 
     private:
         struct ActionCategoryMapping
@@ -136,6 +138,7 @@ namespace Rv
         QIcon m_volumeHighMutedIcon;
 
         std::array<ActionCategoryMapping, 11> m_actionCategoryMappings;
+        bool m_overflowUpdatePending = false;
     };
 
     template <class T> void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)

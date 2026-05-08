@@ -536,6 +536,67 @@ namespace Rv
         return QToolBar::eventFilter(obj, event);
     }
 
+    void RvBottomViewToolBar::resizeEvent(QResizeEvent* event)
+    {
+        QToolBar::resizeEvent(event);
+
+        if (!m_overflowUpdatePending)
+        {
+            m_overflowUpdatePending = true;
+
+            QTimer::singleShot(0, this, [this]() {
+                m_overflowUpdatePending = false;
+                updateOverflow();
+            });
+        }
+    }
+
+    void RvBottomViewToolBar::updateOverflow()
+    {
+        if (!m_leftBox || !m_centerBox || !m_rightBox)
+            return;
+
+        const int centerWidth = m_centerBox->sizeHint().width();
+        const int sideBudget = (width() - centerWidth) / 2;
+
+        auto applyOverflow = [&](QWidget* box, bool reverse) {
+            QLayout* layout = box->layout();
+            if (!layout)
+                return;
+
+            box->setUpdatesEnabled(false);
+
+            const QMargins margins = layout->contentsMargins();
+            int remaining = sideBudget - margins.left() - margins.right();
+
+            const int n = layout->count();
+
+            for (int idx = 0; idx < n; ++idx)
+            {
+                const int i = reverse ? (n - 1 - idx) : idx;
+
+                QWidget* w = layout->itemAt(i)->widget();
+                if (!w)
+                    continue;
+
+                const int hint = w->sizeHint().width();
+                const bool fits = hint <= remaining;
+
+                if (w->isVisible() != fits)
+                    w->setVisible(fits);
+
+                if (fits)
+                    remaining -= hint;
+            }
+
+            box->setUpdatesEnabled(true);
+            box->updateGeometry();
+        };
+
+        applyOverflow(m_leftBox, false);
+        applyOverflow(m_rightBox, true);
+    }
+
     void RvBottomViewToolBar::updateActionAvailability()
     {
         if (!m_session)
