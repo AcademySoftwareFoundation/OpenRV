@@ -5,6 +5,8 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
+#include <QtWidgets/qgridlayout.h>
+#include <QtWidgets/qsizepolicy.h>
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <RvCommon/RvApplication.h>
 #include <RvPackage/PackageManager.h>
@@ -88,13 +90,25 @@ namespace Rv
         setProperty("tbstyle", QVariant(QString("play_controls")));
 
         constexpr int sideBoxPadding = 5;
-        constexpr int sideBoxFixedWidth = 450;
 
-        buildLeft(sideBoxPadding, sideBoxFixedWidth);
-        addWidget(makeExpandingSpacer());
+        buildLeft(sideBoxPadding);
         buildCenter();
-        addWidget(makeExpandingSpacer());
-        buildRight(sideBoxPadding, sideBoxFixedWidth);
+        buildRight(sideBoxPadding);
+
+        barContainer = new QWidget(this);
+        barContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        grid = new QGridLayout(barContainer);
+        grid->setContentsMargins(0, 0, 0, 0);
+        grid->setSpacing(0);
+
+        // All three sections share cell (0, 0); alignment positions each within
+        // the cell so the center button stays at the toolbar's geometric center
+        // regardless of left/right widths.
+        grid->addWidget(m_leftBox,   0, 0, Qt::AlignLeft   | Qt::AlignVCenter);
+        grid->addWidget(m_centerBox, 0, 0, Qt::AlignCenter);
+        grid->addWidget(m_rightBox,  0, 0, Qt::AlignRight  | Qt::AlignVCenter);
+
+        addWidget(barContainer);
 
         m_actionCategoryMappings = {{
             {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},

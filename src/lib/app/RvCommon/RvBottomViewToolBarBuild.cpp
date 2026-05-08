@@ -30,6 +30,9 @@ namespace Rv
     {
         constexpr std::string_view playModeDefaultTooltip = "Select playback style";
 
+        ///
+        /// Make a button using an existing action and set it as the default action since we're no longer 
+        ///
         QToolButton* makeBtn(QWidget* parent, QAction* action, const char* tbstyle, const char* tbsize = nullptr)
         {
             QToolButton* btn = new QToolButton(parent);
@@ -60,14 +63,13 @@ namespace Rv
         return qf;
     }
 
-    void RvBottomViewToolBar::buildLeft(int padding, int width)
+    void RvBottomViewToolBar::buildLeft(int padding)
     {
         m_leftBox = new QWidget(this);
         m_leftBox->setObjectName("leftBox");
         QHBoxLayout* leftLayout = new QHBoxLayout(m_leftBox);
         leftLayout->setContentsMargins(padding, 0, padding, 0);
         leftLayout->setSpacing(0);
-        m_leftBox->setFixedWidth(width);
 
         struct LeftActionDef
         {
@@ -114,9 +116,6 @@ namespace Rv
 
         connect(m_ghostAction, SIGNAL(triggered(bool)), this, SLOT(ghostTriggered(bool)));
         connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
-
-        leftLayout->addStretch();
-        addWidget(m_leftBox);
     }
 
     void RvBottomViewToolBar::buildCenter()
@@ -171,11 +170,9 @@ namespace Rv
         connect(m_forwardPlayAction, SIGNAL(triggered()), this, SLOT(forwardPlayTriggered()));
         connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
         connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
-
-        addWidget(m_centerBox);
     }
 
-    void RvBottomViewToolBar::buildRight(int padding, int width)
+    void RvBottomViewToolBar::buildRight(int padding)
     {
         Options& opts = Options::sharedOptions();
 
@@ -184,9 +181,6 @@ namespace Rv
         QHBoxLayout* rightLayout = new QHBoxLayout(m_rightBox);
         rightLayout->setContentsMargins(padding, 0, padding, 0);
         rightLayout->setSpacing(0);
-        m_rightBox->setFixedWidth(width);
-
-        rightLayout->addStretch();
 
         m_playModeAction = new QAction("", this);
         m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));
@@ -253,8 +247,6 @@ namespace Rv
         connect(m_audioMenu, SIGNAL(aboutToShow()), this, SLOT(audioMenuTriggered()));
         connect(m_audioSlider, SIGNAL(valueChanged(int)), this, SLOT(audioSliderChanged(int)));
         connect(m_audioSlider, SIGNAL(sliderReleased()), this, SLOT(audioSliderReleased()));
-
-        addWidget(m_rightBox);
     }
 
 } // namespace Rv

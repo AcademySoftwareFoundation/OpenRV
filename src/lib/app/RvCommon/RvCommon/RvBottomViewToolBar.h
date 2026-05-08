@@ -14,6 +14,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/qgridlayout.h>
 #include <TwkApp/EventNode.h>
 #include <QAction>
 #include <array>
@@ -42,9 +43,9 @@ namespace Rv
         virtual Result receiveEvent(const TwkApp::Event&);
 
         void build();
-        void buildLeft(int padding, int width);
+        void buildLeft(int padding);
         void buildCenter();
-        void buildRight(int padding, int width);
+        void buildRight(int padding);
         QFrame* makeExpandingSpacer();
         void makeActive(bool);
         void makeActiveFromSettings();
@@ -93,6 +94,8 @@ namespace Rv
         void updatePlayModeButtonState();
 
         IPCore::Session* m_session;
+        QWidget* barContainer;
+        QGridLayout* grid;
         QString m_customCannotUseTooltip;
         QString m_customDisabledPrefix;
         QWidget* m_leftBox;
