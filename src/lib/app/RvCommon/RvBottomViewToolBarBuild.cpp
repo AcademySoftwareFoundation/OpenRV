@@ -39,6 +39,7 @@ namespace Rv
             QToolButton* btn = new QToolButton(parent);
             btn->setDefaultAction(action);
             btn->setProperty("tbstyle", QVariant(QString(tbstyle)));
+            btn->setProperty("toolbarOwned", true);
             if (tbsize)
                 btn->setProperty("tbsize", QVariant(QString(tbsize)));
             btn->setToolButtonStyle(Qt::ToolButtonIconOnly);

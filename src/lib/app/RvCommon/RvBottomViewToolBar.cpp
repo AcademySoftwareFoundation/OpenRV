@@ -568,15 +568,32 @@ namespace Rv
 
             const QMargins margins = layout->contentsMargins();
             int remaining = sideBudget - margins.left() - margins.right();
-
             const int n = layout->count();
 
+            // Subtract space taken by widgets we don't own (e.g. plugin-injected
+            // widgets). Their visibility is the plugin's responsibility; we
+            // only account for the space they occupy.
+            for (int i = 0; i < n; ++i)
+            {
+                QWidget* w = layout->itemAt(i)->widget();
+                if (!w)
+                    continue;
+                if (w->property("toolbarOwned").toBool())
+                    continue;
+                if (w->isVisible())
+                    remaining -= w->sizeHint().width();
+            }
+
+            // Walk toolbar-owned buttons from the outer edge inward, hiding
+            // those that don't fit in the remaining budget.
             for (int idx = 0; idx < n; ++idx)
             {
                 const int i = reverse ? (n - 1 - idx) : idx;
 
                 QWidget* w = layout->itemAt(i)->widget();
                 if (!w)
+                    continue;
+                if (!w->property("toolbarOwned").toBool())
                     continue;
 
                 const int hint = w->sizeHint().width();
