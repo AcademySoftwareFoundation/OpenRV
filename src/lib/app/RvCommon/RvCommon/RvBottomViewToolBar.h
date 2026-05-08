@@ -11,6 +11,8 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QWidget>
 #include <TwkApp/EventNode.h>
 #include <QAction>
 #include <array>
@@ -88,6 +90,9 @@ namespace Rv
         IPCore::Session* m_session;
         QString m_customCannotUseTooltip;
         QString m_customDisabledPrefix;
+        QWidget* m_leftBox;
+        QWidget* m_centerBox;
+        QWidget* m_rightBox;
         QAction* m_smAction;
         QAction* m_paintAction;
         QAction* m_infoAction;

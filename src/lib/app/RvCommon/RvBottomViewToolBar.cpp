@@ -16,6 +16,8 @@
 #include <QAction>
 #include <QtWidgets/QWidgetAction>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QWidget>
 #include <IPCore/Session.h>
 #include <IPCore/IPGraph.h>
 #include <IPCore/SoundTrackIPNode.h>
@@ -99,54 +101,57 @@ namespace Rv
 
         setProperty("tbstyle", QVariant(QString("play_controls")));
 
-        QAction* a;
-        QMenu* m;
-        QToolButton* b;
-        QFrame* qf;
+        constexpr int sideBoxPadding = 20;
+        constexpr int sideBoxFixedWidth = 450;
 
-        for (size_t i = 0; i < 6; i++)
+        auto makeBtn = [](QWidget* parent, QAction* action, const char* tbstyle, const char* tbsize = nullptr) {
+            QToolButton* btn = new QToolButton(parent);
+            btn->setDefaultAction(action);
+            btn->setProperty("tbstyle", QVariant(QString(tbstyle)));
+            if (tbsize)
+                btn->setProperty("tbsize", QVariant(QString(tbsize)));
+            btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            return btn;
+        };
+
+        auto makeExpandingSpacer = [this]() {
+            QFrame* qf = new QFrame(this);
+            qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+            qf->setMinimumWidth(0);
+            qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+            qf->setStyleSheet("background-color: transparent");
+            return qf;
+        };
+
+        m_leftBox = new QWidget(this);
+        m_leftBox->setObjectName("leftBox");
+        QHBoxLayout* leftLayout = new QHBoxLayout(m_leftBox);
+        leftLayout->setContentsMargins(sideBoxPadding, 0, sideBoxPadding, 0);
+        leftLayout->setSpacing(0);
+        m_leftBox->setFixedWidth(sideBoxFixedWidth);
+
+        struct LeftActionDef
         {
-            a = addAction("");
-            b = dynamic_cast<QToolButton*>(widgetForAction(a));
-            b->setIcon(m_playModeLoopIcon);
-            b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-            b->setProperty("tbstyle", QVariant(QString("interior")));
-
-            switch (i)
-            {
-            case 0:
-                b->setProperty("tbstyle", QVariant(QString("left")));
-                a->setIcon(QIcon(":/images/smanager.png"));
-                a->setToolTip("Toggle Session Manager");
-                m_smAction = a;
-                break;
-            case 1:
-                a->setIcon(QIcon(":/images/paint_48x48.png"));
-                a->setToolTip("Toggle Annotation tools");
-                m_paintAction = a;
-                break;
-            case 2:
-                a->setIcon(QIcon(":/images/about_48x48.png"));
-                a->setToolTip("Toggle Image Info");
-                m_infoAction = a;
-                break;
-            case 3:
-                a->setIcon(QIcon(":/images/ntwrk_48x48.png"));
-                a->setToolTip("Toggle RV Networking Dialog");
-                m_networkAction = a;
-                break;
-            case 4:
-                a->setIcon(QIcon(":/images/timeline_mag.png"));
-                a->setToolTip("Toggle Timeline Magnifier");
-                m_timelineMagAction = a;
-                break;
-            case 5:
-                a->setIcon(QIcon(":/images/timeline.png"));
-                a->setToolTip("Toggle Timeline");
-                b->setProperty("tbstyle", QVariant(QString("right")));
-                m_timelineAction = a;
-                break;
-            }
+            const char* iconPath;
+            const char* tooltip;
+            const char* tbstyle;
+            QAction** target;
+        };
+        const LeftActionDef leftDefs[] = {
+            {":/images/smanager.png",     "Toggle Session Manager",      "left",     &m_smAction},
+            {":/images/paint_48x48.png",  "Toggle Annotation tools",     "interior", &m_paintAction},
+            {":/images/about_48x48.png",  "Toggle Image Info",           "interior", &m_infoAction},
+            {":/images/ntwrk_48x48.png",  "Toggle RV Networking Dialog", "interior", &m_networkAction},
+            {":/images/timeline_mag.png", "Toggle Timeline Magnifier",   "interior", &m_timelineMagAction},
+            {":/images/timeline.png",     "Toggle Timeline",             "right",    &m_timelineAction},
+        };
+        for (const auto& def : leftDefs)
+        {
+            QAction* a = new QAction("", this);
+            a->setIcon(QIcon(def.iconPath));
+            a->setToolTip(def.tooltip);
+            *def.target = a;
+            leftLayout->addWidget(makeBtn(m_leftBox, a, def.tbstyle));
         }
 
         connect(m_smAction, SIGNAL(triggered(bool)), this, SLOT(smActionTriggered(bool)));
@@ -156,91 +161,69 @@ namespace Rv
         connect(m_timelineMagAction, SIGNAL(triggered(bool)), this, SLOT(timelineMagActionTriggered(bool)));
         connect(m_networkAction, SIGNAL(triggered(bool)), this, SLOT(networkActionTriggered(bool)));
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/ghost.png"));
-        a->setToolTip("Ghost");
-        a->setCheckable(true);
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        m_ghostAction = a;
+        m_ghostAction = new QAction("", this);
+        m_ghostAction->setIcon(QIcon(":/images/ghost.png"));
+        m_ghostAction->setToolTip("Ghost");
+        m_ghostAction->setCheckable(true);
+        leftLayout->addWidget(makeBtn(m_leftBox, m_ghostAction, "left"));
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/hold.png"));
-        a->setToolTip("Hold");
-        a->setCheckable(true);
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        m_holdAction = a;
+        m_holdAction = new QAction("", this);
+        m_holdAction->setIcon(QIcon(":/images/hold.png"));
+        m_holdAction->setToolTip("Hold");
+        m_holdAction->setCheckable(true);
+        leftLayout->addWidget(makeBtn(m_leftBox, m_holdAction, "right"));
 
         connect(m_ghostAction, SIGNAL(triggered(bool)), this, SLOT(ghostTriggered(bool)));
         connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
 
-        //
-        //  Add some expanding space before the play buttons
-        //
-        qf = new QFrame(this);
-        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        qf->setMinimumWidth(0);
-        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-        qf->setStyleSheet("background-color: transparent");
-        addWidget(qf);
+        leftLayout->addStretch();
+        addWidget(m_leftBox);
 
-        // play buts
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_bstep.png"));
-        a->setToolTip("Step back one frame");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setObjectName("backStepButton");
-        m_backStepAction = a;
+        addWidget(makeExpandingSpacer());
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_fstep.png"));
-        a->setToolTip("Step forward one frame");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setObjectName("forwardStepButton");
-        m_forwardStepAction = a;
+        m_centerBox = new QWidget(this);
+        m_centerBox->setObjectName("centerBox");
+        QHBoxLayout* centerLayout = new QHBoxLayout(m_centerBox);
+        centerLayout->setContentsMargins(0, 0, 0, 0);
+        centerLayout->setSpacing(0);
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_bplay.png"));
-        a->setToolTip("Play backwards");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setProperty("tbsize", QVariant(QString("double")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        m_backwardPlayAction = a;
+        m_backStepAction = new QAction("", this);
+        m_backStepAction->setIcon(QIcon(":/images/control_bstep.png"));
+        m_backStepAction->setToolTip("Step back one frame");
+        QToolButton* backStepBtn = makeBtn(m_centerBox, m_backStepAction, "left");
+        backStepBtn->setObjectName("backStepButton");
+        centerLayout->addWidget(backStepBtn);
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_play.png"));
-        a->setToolTip("Play forwards");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setProperty("tbsize", QVariant(QString("double")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        m_forwardPlayAction = a;
+        m_forwardStepAction = new QAction("", this);
+        m_forwardStepAction->setIcon(QIcon(":/images/control_fstep.png"));
+        m_forwardStepAction->setToolTip("Step forward one frame");
+        QToolButton* fwdStepBtn = makeBtn(m_centerBox, m_forwardStepAction, "right");
+        fwdStepBtn->setObjectName("forwardStepButton");
+        centerLayout->addWidget(fwdStepBtn);
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_bmark.png"));
-        a->setToolTip("Skip to start of sequence");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("left")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setObjectName("firstFrameButton");
-        m_backMarkAction = a;
+        m_backwardPlayAction = new QAction("", this);
+        m_backwardPlayAction->setIcon(QIcon(":/images/control_bplay.png"));
+        m_backwardPlayAction->setToolTip("Play backwards");
+        centerLayout->addWidget(makeBtn(m_centerBox, m_backwardPlayAction, "left", "double"));
 
-        a = addAction("");
-        a->setIcon(QIcon(":/images/control_fmark.png"));
-        a->setToolTip("Skip to end of sequence");
-        b = dynamic_cast<QToolButton*>(widgetForAction(a));
-        b->setProperty("tbstyle", QVariant(QString("right")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setObjectName("lastFrameButton");
-        m_forwardMarkAction = a;
+        m_forwardPlayAction = new QAction("", this);
+        m_forwardPlayAction->setIcon(QIcon(":/images/control_play.png"));
+        m_forwardPlayAction->setToolTip("Play forwards");
+        centerLayout->addWidget(makeBtn(m_centerBox, m_forwardPlayAction, "right", "double"));
+
+        m_backMarkAction = new QAction("", this);
+        m_backMarkAction->setIcon(QIcon(":/images/control_bmark.png"));
+        m_backMarkAction->setToolTip("Skip to start of sequence");
+        QToolButton* backMarkBtn = makeBtn(m_centerBox, m_backMarkAction, "left");
+        backMarkBtn->setObjectName("firstFrameButton");
+        centerLayout->addWidget(backMarkBtn);
+
+        m_forwardMarkAction = new QAction("", this);
+        m_forwardMarkAction->setIcon(QIcon(":/images/control_fmark.png"));
+        m_forwardMarkAction->setToolTip("Skip to end of sequence");
+        QToolButton* fwdMarkBtn = makeBtn(m_centerBox, m_forwardMarkAction, "right");
+        fwdMarkBtn->setObjectName("lastFrameButton");
+        centerLayout->addWidget(fwdMarkBtn);
 
         connect(m_backStepAction, SIGNAL(triggered()), this, SLOT(backStepTriggered()));
         connect(m_forwardStepAction, SIGNAL(triggered()), this, SLOT(forwardStepTriggered()));
@@ -249,54 +232,40 @@ namespace Rv
         connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
         connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
 
-        //
-        //  Add some expanding space after the play buttons
-        //
-        qf = new QFrame(this);
-        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        qf->setMinimumWidth(0);
-        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-        qf->setStyleSheet("background-color: transparent");
-        addWidget(qf);
+        addWidget(m_centerBox);
 
-        //
-        //  This expanding space will not go to more than 90 pixels.  It's to
-        //  "counter balance" the buttons on the other side, so the play control
-        //  buttons stay in the center of the view (roughly).
-        //
-        qf = new QFrame(this);
-        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        qf->setMinimumWidth(0);
-        qf->setMaximumWidth(90);
-        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-        qf->setStyleSheet("background-color: transparent");
-        addWidget(qf);
+        addWidget(makeExpandingSpacer());
 
-        m_playModeAction = addAction("");
+        m_rightBox = new QWidget(this);
+        m_rightBox->setObjectName("rightBox");
+        QHBoxLayout* rightLayout = new QHBoxLayout(m_rightBox);
+        rightLayout->setContentsMargins(sideBoxPadding, 0, sideBoxPadding, 0);
+        rightLayout->setSpacing(0);
+        m_rightBox->setFixedWidth(sideBoxFixedWidth);
+
+        rightLayout->addStretch();
+
+        m_playModeAction = new QAction("", this);
         m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));
-        b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction));
-
         switch (static_cast<Session::PlayMode>(opts.loopMode))
         {
         case Session::PlayOnce:
             m_playModeAction->setIcon(m_playModeOnceIcon);
             break;
-
         case Session::PlayPingPong:
             m_playModeAction->setIcon(m_playModePingPongIcon);
             break;
-
         default:
         case Session::PlayLoop:
             m_playModeAction->setIcon(m_playModeLoopIcon);
             break;
         }
 
-        b->setProperty("tbstyle", QVariant(QString("left_menu")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setPopupMode(QToolButton::InstantPopup);
+        QToolButton* playModeBtn = makeBtn(m_rightBox, m_playModeAction, "left_menu");
+        playModeBtn->setObjectName("playModeButton");
+        playModeBtn->setPopupMode(QToolButton::InstantPopup);
 
-        m_playModeMenu = new QMenu(b);
+        m_playModeMenu = new QMenu(playModeBtn);
         m_playModeMenu->addAction("Playback")->setDisabled(true);
         m_playModeOnceAction = m_playModeMenu->addAction("  Once");
         m_playModeOnceAction->setData(enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
@@ -304,47 +273,45 @@ namespace Rv
         m_playModeLoopAction->setData(enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
         m_playModePingPongAction = m_playModeMenu->addAction("  PingPong");
         m_playModePingPongAction->setData(enumCodeMap(Session::PlayPingPong, "commands.setPlayMode(PlayPingPong)"));
-        //  m_playModeMenu->addAction("  Loop with Black 0.5 Second");
-        //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
+        playModeBtn->setMenu(m_playModeMenu);
+        rightLayout->addWidget(playModeBtn);
 
-        b->setMenu(m_playModeMenu);
-
-        // Install event filter to show tooltips on disabled menu items
         m_playModeMenu->installEventFilter(this);
-
         connect(m_playModeMenu, SIGNAL(triggered(QAction*)), this, SLOT(playModeMenuTriggered(QAction*)));
         connect(m_playModeMenu, SIGNAL(aboutToShow()), this, SLOT(playModeMenuUpdate()));
 
         int volumeLevel = (int)(100.0f * IPCore::SoundTrackIPNode::defaultVolume);
-        m_audioAction = addAction("");
+        m_audioAction = new QAction("", this);
         m_audioAction->setToolTip("Audio control");
-        b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction));
-        setVolumeLevel<QToolButton>(*b, volumeLevel);
-        b->setProperty("tbstyle", QVariant(QString("right_menu")));
-        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        b->setPopupMode(QToolButton::InstantPopup);
-        m = new QMenu(b);
-        m->setProperty("menuStyle", QVariant(QString("slim")));
-        QAction* audio = m->addAction("Volume");
-        audio->setDisabled(true);
-        QWidgetAction* wa = new QWidgetAction(b);
+        setVolumeLevel<QAction>(*m_audioAction, volumeLevel);
+
+        QToolButton* audioBtn = makeBtn(m_rightBox, m_audioAction, "right_menu");
+        audioBtn->setPopupMode(QToolButton::InstantPopup);
+
+        m_audioMenu = new QMenu(audioBtn);
+        m_audioMenu->setProperty("menuStyle", QVariant(QString("slim")));
+        QAction* audioLabel = m_audioMenu->addAction("Volume");
+        audioLabel->setDisabled(true);
+        QWidgetAction* wa = new QWidgetAction(audioBtn);
         setVolumeLevel<QWidgetAction>(*wa, volumeLevel);
-        m_audioSlider = new QSlider(b);
+        m_audioSlider = new QSlider(audioBtn);
         m_audioSlider->setProperty("sliderStyle", QVariant(QString("menu")));
         m_audioSlider->setTickInterval(10);
         wa->setDefaultWidget(m_audioSlider);
-        m->addAction(wa);
-        m->addSeparator();
-        m_muteAction = m->addAction("Mute");
+        m_audioMenu->addAction(wa);
+        m_audioMenu->addSeparator();
+        m_muteAction = m_audioMenu->addAction("Mute");
         m_muteAction->setIcon(QIcon(":/images/mute_32x32.png"));
         m_muteAction->setCheckable(true);
-        b->setMenu(m);
-        m_audioMenu = m;
+        audioBtn->setMenu(m_audioMenu);
+        rightLayout->addWidget(audioBtn);
 
         connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(audioMuteTriggered(bool)));
         connect(m_audioMenu, SIGNAL(aboutToShow()), this, SLOT(audioMenuTriggered()));
         connect(m_audioSlider, SIGNAL(valueChanged(int)), this, SLOT(audioSliderChanged(int)));
         connect(m_audioSlider, SIGNAL(sliderReleased()), this, SLOT(audioSliderReleased()));
+
+        addWidget(m_rightBox);
 
         // Map toolbar actions to their corresponding event categories
         m_actionCategoryMappings = {{
@@ -418,42 +385,33 @@ namespace Rv
             }
             else if (name == "play-start")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
-                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
-
                 if (m_session->inc() == -1)
                 {
-                    bb->setIcon(QIcon(":/images/control_pause.png"));
+                    m_backwardPlayAction->setIcon(QIcon(":/images/control_pause.png"));
                 }
                 else
                 {
-                    bf->setIcon(QIcon(":/images/control_pause.png"));
+                    m_forwardPlayAction->setIcon(QIcon(":/images/control_pause.png"));
                 }
             }
             else if (name == "play-stop")
             {
-                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
-                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
-
-                bb->setIcon(QIcon(":/images/control_bplay.png"));
-                bf->setIcon(QIcon(":/images/control_play.png"));
+                m_backwardPlayAction->setIcon(QIcon(":/images/control_bplay.png"));
+                m_forwardPlayAction->setIcon(QIcon(":/images/control_play.png"));
             }
             else if (name == "play-mode-changed")
             {
-                if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
+                switch (m_session->playMode())
                 {
-                    switch (m_session->playMode())
-                    {
-                    case 0: // Session::PlayLoop
-                        b->setIcon(m_playModeLoopIcon);
-                        break;
-                    case 1: // Session::PlayOnce
-                        b->setIcon(m_playModeOnceIcon);
-                        break;
-                    case 2: // Session::PlayPingPong
-                        b->setIcon(m_playModePingPongIcon);
-                        break;
-                    }
+                case 0: // Session::PlayLoop
+                    m_playModeAction->setIcon(m_playModeLoopIcon);
+                    break;
+                case 1: // Session::PlayOnce
+                    m_playModeAction->setIcon(m_playModeOnceIcon);
+                    break;
+                case 2: // Session::PlayPingPong
+                    m_playModeAction->setIcon(m_playModePingPongIcon);
+                    break;
                 }
             }
             else if (name == "update-ghost-button")
@@ -604,20 +562,17 @@ namespace Rv
 
     void RvBottomViewToolBar::setVolumeIcon()
     {
-        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction)))
+        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
+
+        if (editor.value())
         {
-            IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
+            m_audioAction->setIcon(m_volumeHighMutedIcon);
+        }
+        else
+        {
+            int volumeLevel = m_audioSlider->value(); // 0 - 99;
 
-            if (editor.value())
-            {
-                b->setIcon(m_volumeHighMutedIcon);
-            }
-            else
-            {
-                int volumeLevel = m_audioSlider->value(); // 0 - 99;
-
-                setVolumeLevel<QToolButton>(*b, volumeLevel);
-            }
+            setVolumeLevel<QAction>(*m_audioAction, volumeLevel);
         }
     }
 
@@ -751,22 +706,19 @@ namespace Rv
 
         m_session->userGenericEvent("remote-eval", UTF8::qconvert(a->data().toMap()["code"].toString()));
 
-        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
+        switch (m_session->playMode())
         {
-            switch (m_session->playMode())
-            {
-            case Session::PlayOnce:
-                b->setIcon(m_playModeOnceIcon);
-                break;
+        case Session::PlayOnce:
+            m_playModeAction->setIcon(m_playModeOnceIcon);
+            break;
 
-            case Session::PlayLoop:
-                b->setIcon(m_playModeLoopIcon);
-                break;
+        case Session::PlayLoop:
+            m_playModeAction->setIcon(m_playModeLoopIcon);
+            break;
 
-            case Session::PlayPingPong:
-                b->setIcon(m_playModePingPongIcon);
-                break;
-            }
+        case Session::PlayPingPong:
+            m_playModeAction->setIcon(m_playModePingPongIcon);
+            break;
         }
     }
 

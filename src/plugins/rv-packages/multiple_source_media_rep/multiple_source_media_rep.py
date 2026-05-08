@@ -126,9 +126,6 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
     _media_resolution_lbl = None
     _media_extension_lbl = None
 
-    # Media representation widgets' actions
-    _media_representation_action = None
-
     # This is used to postponed received events until progressive loading
     # gets completed.
     _in_progressive_loading = False
@@ -281,13 +278,15 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # after the function call.
         self._bottomToolBar = qtutils.sessionBottomToolBar()
 
-        playback_style_action = None
-        for action in self._bottomToolBar.actions():
-            if action.toolTip() == QtCore.QObject().tr("Select playback style"):
-                playback_style_action = action
+        right_box = self._bottomToolBar.findChild(QtWidgets.QWidget, "rightBox")
+        play_mode_btn = right_box.findChild(QtWidgets.QToolButton, "playModeButton")
+        right_layout = right_box.layout()
+
+        def insert_before_play_mode(widget):
+            right_layout.insertWidget(right_layout.indexOf(play_mode_btn), widget)
 
         # Dropdown menu for the media reps.
-        self._media_representation_btn = QtWidgets.QToolButton(self._bottomToolBar)
+        self._media_representation_btn = QtWidgets.QToolButton(right_box)
         self._media_representation_btn.setToolTip("Select media playback type")
         self._media_representation_btn.setProperty("tbstyle", "solo_menu")
         self._media_representation_btn.setStyleSheet("color: gray")
@@ -298,20 +297,18 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         menu.aboutToShow.connect(self._on_media_rep_about_to_show)
         self._media_representation_btn.setMenu(menu)
 
-        self._media_representation_action = self._bottomToolBar.insertWidget(
-            playback_style_action, self._media_representation_btn
-        )
-        self._media_representation_action.setVisible(False)
+        insert_before_play_mode(self._media_representation_btn)
+        self._media_representation_btn.setVisible(False)
 
         # Media resolution.
-        self._media_resolution_lbl = QtWidgets.QLabel("", self._bottomToolBar)
+        self._media_resolution_lbl = QtWidgets.QLabel("", right_box)
         self._media_resolution_lbl.setStyleSheet("color: gray; background-color: transparent; margin-right: 5px")
-        self._bottomToolBar.insertWidget(playback_style_action, self._media_resolution_lbl)
+        insert_before_play_mode(self._media_resolution_lbl)
 
         # Media extension.
-        self._media_extension_lbl = QtWidgets.QLabel("", self._bottomToolBar)
+        self._media_extension_lbl = QtWidgets.QLabel("", right_box)
         self._media_extension_lbl.setStyleSheet("color: gray; background-color: transparent")
-        self._bottomToolBar.insertWidget(playback_style_action, self._media_extension_lbl)
+        insert_before_play_mode(self._media_extension_lbl)
 
     def _populate_media_rep_menu(self, menu, switch_nodes):
         """
@@ -388,8 +385,8 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         """
         Shows or hides the media rep drop down menu
         """
-        if self._media_representation_action.isVisible() != show:
-            self._media_representation_action.setVisible(show)
+        if self._media_representation_btn.isVisible() != show:
+            self._media_representation_btn.setVisible(show)
             self._bottomToolBar.repaint()
 
     def _update_media_representation(self):
