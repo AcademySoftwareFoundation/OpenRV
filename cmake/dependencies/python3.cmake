@@ -292,11 +292,20 @@ SET(RV_PYTHON_BUILD_DEPS
 # that don't need ABI compatibility, and packages with data files only.
 SET(RV_PYTHON_WHEEL_SAFE
     ${RV_PYTHON_BUILD_DEPS} # Include build deps in wheel-safe list
+    "cmake" # Build tool (self-contained binary wheel, no ABI dependency on Python)
     "PyOpenGL" # OpenGL bindings without acceleration (pure Python)
     "certifi" # SSL certificate bundle (just data files)
     "six" # Python 2/3 compatibility (pure Python)
     "packaging" # Version parsing (pure Python)
     "requests" # HTTP library (pure Python)
+    "setuptools-rust" # Build tool for cryptography (pure Python, calls cargo)
+    "setuptools-scm" # Version detection tool (pure Python, calls git)
+    "hatchling" # Build backend (pure Python, like setuptools)
+    "hatch-vcs" # Hatchling VCS version plugin (pure Python)
+    "pluggy" # Plugin framework (pure Python)
+    "pathspec" # Gitignore pattern matching (pure Python)
+    "trove-classifiers" # PyPI classifiers data (pure Python)
+    "vcs-versioning" # VCS version detection for setuptools-scm 10.x (pure Python)
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
 
@@ -322,10 +331,80 @@ SET(_build_deps_install_command
 SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
 )
+# On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
+# OTIO's setup.py always calls "cmake" by name from PATH; it does not read CMAKE_GENERATOR. Prepend the directory of our outer build's cmake binary (the Windows
+# cmake from Conan's tool_require) to PATH so pip's subprocess finds the correct cmake first. The Windows cmake auto-detects the Visual Studio 17 2022 generator
+# via the Windows Registry.
+#
+# Use --modify PATH=path_list_prepend rather than PATH=dir;$ENV{PATH}: $ENV{PATH} expands at cmake configure time inside msys2 (POSIX colon-separated paths).
+# When MSBuild's CUSTOMBUILD later runs the command, the semicolon splits the value and the POSIX tail is misinterpreted as the command to execute ("no such
+# file or directory"). --modify prepends at runtime instead.
+IF(RV_TARGET_WINDOWS)
+  CMAKE_PATH(GET CMAKE_COMMAND PARENT_PATH _cmake_bin_dir)
+  LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_cmake_bin_dir}")
+
+  # Also prepend the MSVC compiler directory so nested CMake invocations (e.g. from OTIO's setup.py / scikit-build) can find cl.exe. On MSVC, CMAKE_C_COMPILER
+  # and CMAKE_CXX_COMPILER both point to cl.exe in the same HostX64\x64 directory, so a single PATH prepend covers both C and C++ compilation. We use
+  # CMAKE_C_COMPILER to locate the directory; if for any reason it differs from CMAKE_CXX_COMPILER's directory, we prepend both.
+  IF(CMAKE_C_COMPILER
+     AND CMAKE_CXX_COMPILER
+  )
+    CMAKE_PATH(GET CMAKE_C_COMPILER PARENT_PATH _msvc_c_compiler_dir)
+    CMAKE_PATH(GET CMAKE_CXX_COMPILER PARENT_PATH _msvc_cxx_compiler_dir)
+    LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_msvc_c_compiler_dir}")
+    IF(NOT _msvc_c_compiler_dir STREQUAL _msvc_cxx_compiler_dir)
+      LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_msvc_cxx_compiler_dir}")
+    ENDIF()
+  ELSE()
+    MESSAGE(WARNING "CMAKE_C_COMPILER or CMAKE_CXX_COMPILER not set on Windows: opentimelineio pip build may fail to find cl.exe")
+  ENDIF()
+
+  # Override TEMP/TMP so pip builds in a short path. MSBuild's FileTracker (FTK1011) uses legacy Win32 APIs that enforce the 260-char MAX_PATH limit regardless
+  # of the LongPathsEnabled registry key. Pip + OTIO + cmake's TryCompile create ~230 chars of nested subdirectories, so the temp root must be very short. Using
+  # the drive root (e.g. C:/_t) instead of a subdirectory of CMAKE_BINARY_DIR keeps total paths under 260 chars even on workspaces with long absolute paths.
+  STRING(SUBSTRING "${CMAKE_BINARY_DIR}" 0 2 _pip_drive)
+  SET(_pip_tmp_dir
+      "${_pip_drive}/_t"
+  )
+  FILE(MAKE_DIRECTORY "${_pip_tmp_dir}")
+  LIST(APPEND _requirements_install_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
+ENDIF()
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
   LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
+ENDIF()
+
+# CMAKE_ARGS is split on whitespace by pip/setuptools/OTIO setup.py, so compiler paths containing spaces (e.g. "C:/Program Files/Microsoft Visual Studio/...")
+# cannot be passed directly. We use cygpath to get the short (8.3) path without spaces, and pass that.
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_C_COMPILER
+   AND CMAKE_CXX_COMPILER
+)
+  FIND_PROGRAM(CYGPATH_EXECUTABLE cygpath)
+  IF(CYGPATH_EXECUTABLE)
+    EXECUTE_PROCESS(
+      COMMAND ${CYGPATH_EXECUTABLE} -m -s "${CMAKE_C_COMPILER}"
+      OUTPUT_VARIABLE _msvc_c_compiler_short
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    EXECUTE_PROCESS(
+      COMMAND ${CYGPATH_EXECUTABLE} -m -s "${CMAKE_CXX_COMPILER}"
+      OUTPUT_VARIABLE _msvc_cxx_compiler_short
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    SET(_cmake_args_env
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DCMAKE_C_COMPILER=${_msvc_c_compiler_short} -DCMAKE_CXX_COMPILER=${_msvc_cxx_compiler_short}"
+    )
+  ELSE()
+    SET(_cmake_args_env
+        "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+    )
+  ENDIF()
+ELSE()
+  SET(_cmake_args_env
+      "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  )
 ENDIF()
 
 # Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
@@ -333,7 +412,8 @@ ENDIF()
 LIST(
   APPEND
   _requirements_install_command
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable}"
+  # Use old and more recent library name convention to ensure the correct library is used in the build.
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
   "${_python3_executable}"
   -s
   -E
@@ -552,10 +632,32 @@ SET_PROPERTY(
   PROPERTY IMPORTED_SONAME ${_python3_lib_name}
 )
 IF(RV_TARGET_WINDOWS)
+  # Set per-config import libs so multi-config generators (VS) pick the right one. Without this, IMPORTED_IMPLIB would be fixed to whichever CMAKE_BUILD_TYPE
+  # was set at configure time, causing LNK1104 when building a different configuration.
+  SET(_python_debug_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_d${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
+  SET(_python_release_implib
+      ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
   SET_PROPERTY(
     TARGET Python::Python
-    PROPERTY IMPORTED_IMPLIB ${_python3_implib}
+    PROPERTY IMPORTED_IMPLIB_DEBUG ${_python_debug_implib}
   )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELEASE ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_RELWITHDEBINFO ${_python_release_implib}
+  )
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB_MINSIZEREL ${_python_release_implib}
+  )
+  # Also expose the libs dir so #pragma comment(lib, "python311.lib") in Python headers can be resolved by the linker for non-debug configurations.
+  TARGET_LINK_DIRECTORIES(Python::Python INTERFACE ${_lib_dir})
 ENDIF()
 FILE(MAKE_DIRECTORY ${_include_dir})
 TARGET_INCLUDE_DIRECTORIES(

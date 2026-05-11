@@ -663,7 +663,15 @@ namespace Rv
 
         n += "wheel";
         // use pixelDelta() or angleDelta() instead of delta() (deprecated)
-        if (event->angleDelta().y() < 0)
+        // Alt key means horizontal scroll on Linux and Windows, whereas it is the Shift key on macOS
+        Qt::KeyboardModifier horizontalModifier =
+#ifdef PLATFORM_DARWIN
+            Qt::ShiftModifier;
+#else
+            Qt::AltModifier;
+#endif
+        int delta = (event->modifiers() & horizontalModifier) ? event->angleDelta().x() : event->angleDelta().y();
+        if (delta < 0)
             n += "down";
         else
             n += "up";
@@ -912,6 +920,12 @@ namespace Rv
         }
 #endif
 
+#if defined(RV_VFX_CY2023)
+            Qt::KeyboardModifiers dropEventModifiers = devent->keyboardModifiers();
+#else
+            Qt::KeyboardModifiers dropEventModifiers = devent->modifiers();
+#endif
+
             if (devent->mimeData()->hasUrls())
             {
                 QList<QUrl> urls = devent->mimeData()->urls();
@@ -954,15 +968,19 @@ namespace Rv
                     seqs = files;
                 }
                 else
-                    seqs = sequencesInFileList(files, GlobalExtensionPredicate);
+                {
+                    SequencePredicate pred = (dropEventModifiers & Qt::AltModifier) ? FalseSequencePredicate : GlobalExtensionPredicate;
+                    seqs = sequencesInFileList(files, pred);
+                }
 
+                unsigned int dropMods = modifiers(dropEventModifiers);
                 for (int i = 0; i < seqs.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->pos().x(), h - devent->pos().y() - 1, w,
-                                    h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], dropMods, devent->pos().x(),
+                                    h - devent->pos().y() - 1, w, h);
 #else
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], 0, devent->position().toPoint().x(),
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::File, seqs[i], dropMods, devent->position().toPoint().x(),
                                     h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
@@ -974,10 +992,10 @@ namespace Rv
                 for (int i = 0; i < nonfiles.size(); i++)
                 {
 #if defined(RV_VFX_CY2023)
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->pos().x(), h - devent->pos().y() - 1,
-                                    w, h);
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], dropMods, devent->pos().x(),
+                                    h - devent->pos().y() - 1, w, h);
 #else
-                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], 0, devent->position().toPoint().x(),
+                    DragDropEvent e(ename, m_node, type, DragDropEvent::URL, nonfiles[i], dropMods, devent->position().toPoint().x(),
                                     h - devent->position().toPoint().y() - 1, w, h);
 #endif
 
@@ -989,11 +1007,12 @@ namespace Rv
             else if (devent->mimeData()->hasText())
             {
 #if defined(RV_VFX_CY2023)
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
-                                devent->pos().x(), h - devent->pos().y() - 1, w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
+                                modifiers(dropEventModifiers), devent->pos().x(), h - devent->pos().y() - 1, w, h);
 #else
-                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(), 0,
-                                devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1, w, h);
+                DragDropEvent e(ename, m_node, type, DragDropEvent::Text, devent->mimeData()->text().toUtf8().constData(),
+                                modifiers(dropEventModifiers), devent->position().toPoint().x(), h - devent->position().toPoint().y() - 1,
+                                w, h);
 #endif
 
                 sendEvent(e);
