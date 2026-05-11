@@ -302,13 +302,15 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
 
         # Media resolution.
         self._media_resolution_lbl = QtWidgets.QLabel("", right_box)
-        self._media_resolution_lbl.setStyleSheet("color: gray; background-color: transparent")
+        self._media_resolution_lbl.setStyleSheet(
+            "color: gray; background-color: transparent; padding-right: 5px;"
+        )
         self._media_resolution_lbl.setVisible(False)
         insert_before_play_mode(self._media_resolution_lbl)
 
         # Media extension.
         self._media_extension_lbl = QtWidgets.QLabel("", right_box)
-        self._media_extension_lbl.setStyleSheet("color: gray; background-color: transparent")
+        self._media_extension_lbl.setStyleSheet("color: gray; background-color: transparent; padding-right: 5px")
         self._media_extension_lbl.setVisible(False)
         insert_before_play_mode(self._media_extension_lbl)
 
