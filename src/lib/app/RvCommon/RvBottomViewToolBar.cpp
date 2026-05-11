@@ -92,7 +92,6 @@ namespace Rv
 
         constexpr int buttonPadding = 5;
 
-
         buildLeft(buttonPadding);
         buildRight(buttonPadding);
         buildCenter();
@@ -547,10 +546,12 @@ namespace Rv
             m_overflowUpdatePending = true;
 
             // Only re-render once toolbar finished rendering other work
-            QTimer::singleShot(0, this, [this]() {
-                m_overflowUpdatePending = false;
-                updateOverflow();
-            });
+            QTimer::singleShot(0, this,
+                               [this]()
+                               {
+                                   m_overflowUpdatePending = false;
+                                   updateOverflow();
+                               });
         }
     }
 
@@ -562,12 +563,8 @@ namespace Rv
         const int centerWidth = m_centerBox->sizeHint().width();
         const int sideBudget = (width() - centerWidth) / 2;
 
-        qDebug() << "[overflow] toolbarW=" << width()
-                 << " centerW=" << centerWidth
-                 << " centerGeom=" << m_centerBox->geometry()
-                 << " sideBudget=" << sideBudget;
-
-        auto applyOverflow = [&](QWidget* box, bool reverse) {
+        auto applyOverflow = [&](QWidget* box, bool reverse)
+        {
             QLayout* layout = box->layout();
             if (!layout)
                 return;
@@ -579,16 +576,8 @@ namespace Rv
             int remaining = sideBudget - margins.left();
             const int n = layout->count();
 
-            qDebug() << "[overflow]" << (reverse ? "RIGHT" : "LEFT")
-                     << " boxSizeHint=" << box->sizeHint().width()
-                     << " boxGeom=" << box->geometry()
-                     << " margins=" << margins
-                     << " spacing=" << spacing
-                     << " remaining_start=" << remaining
-                     << " n=" << n;
-
             // Subtract space taken by widgets we don't own (e.g. plugin-injected
-            // widgets). 
+            // widgets).
             int visibleCount = 0;
             for (int i = 0; i < n; ++i)
             {
@@ -600,16 +589,6 @@ namespace Rv
                 if (!w->isVisible())
                     continue;
 
-                std::cout << "THIS IS BAD\n";
-                qDebug() << "[overflow preload]"
-         << (reverse ? "R" : "L")
-         << "i=" << i
-         << "name=" << w->objectName()
-         << "class=" << w->metaObject()->className()
-         << "owned=" << w->property("toolbarOwned").toBool()
-         << "visible=" << w->isVisible()
-         << "sizeHintW=" << w->sizeHint().width()
-         << "remaining_before=" << remaining;
                 remaining -= w->sizeHint().width();
                 if (visibleCount > 0)
                     remaining -= spacing;
@@ -619,7 +598,7 @@ namespace Rv
             // Walk toolbar-owned buttons from the outer edge inward, hiding
             // those that don't fit in the remaining budget. Once any button
             // fails to fit, every button after it, closer to the center is
-            // not rendered. 
+            // not rendered.
             bool hideRest = false;
             for (int idx = 0; idx < n; ++idx)
             {
@@ -636,16 +615,6 @@ namespace Rv
                     cost += spacing;
 
                 const bool fits = !hideRest && cost <= remaining;
-
-                if (reverse) {
-                qDebug() << "[overflow]  " << (reverse ? "R" : "L")
-                         << " i=" << i
-                         << " name=" << w->objectName()
-                         << " sizeHint=" << w->sizeHint().width()
-                         << " cost=" << cost
-                         << " remaining=" << remaining
-                         << " fits=" << fits;
-                }
 
                 if (!fits)
                     hideRest = true;
