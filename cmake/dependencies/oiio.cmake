@@ -84,24 +84,34 @@ IF(RV_DEPS_CMAKE_PREFIX_PATH)
   ENDIF()
   STRING(APPEND _oiio_cache_content "set(CMAKE_PREFIX_PATH \"${_oiio_clean_prefix}\" CACHE STRING \"\" FORCE)\n")
 ENDIF()
-# When deps come from a package manager (Conan), block find_package from searching the Homebrew shared prefix. OIIO's find_package(Boost) would otherwise find
-# Homebrew's Boost headers (newer version), causing ABI mismatches with Conan's Boost library. CMAKE_IGNORE_PREFIX_PATH only affects find_package, not
-# find_program (so Ninja and compilers still resolve). With Homebrew-only builds, all Boost is from the same source so no contamination occurs.
-IF(RV_CONAN_CMAKE_PREFIX_PATH
-   AND APPLE
+
+# Detect the Homebrew prefix on macOS (e.g. /opt/homebrew on arm64, /usr/local on Intel) for use by the contamination guards below.
+SET(_oiio_brew_prefix
+    ""
 )
+IF(APPLE)
   EXECUTE_PROCESS(
     COMMAND brew --prefix
     OUTPUT_VARIABLE _oiio_brew_prefix
     OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
     RESULT_VARIABLE _oiio_brew_rc
   )
-  IF(_oiio_brew_rc EQUAL 0
-     AND _oiio_brew_prefix
-  )
-    STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_brew_prefix}\" CACHE STRING \"\" FORCE)\n")
+  IF(NOT _oiio_brew_rc EQUAL 0)
+    SET(_oiio_brew_prefix
+        ""
+    )
   ENDIF()
 ENDIF()
+
+# When deps come from a package manager (Conan), block find_package from searching the Homebrew shared prefix. OIIO's find_package(Boost) would otherwise find
+# Homebrew's Boost headers (newer version), causing ABI mismatches with Conan's Boost library. CMAKE_IGNORE_PREFIX_PATH only affects find_package, not
+# find_program (so Ninja and compilers still resolve). With Homebrew-only builds, all Boost is from the same source so no contamination occurs.
+IF(RV_CONAN_CMAKE_PREFIX_PATH
+   AND _oiio_brew_prefix
+)
+  STRING(APPEND _oiio_cache_content "set(CMAKE_IGNORE_PREFIX_PATH \"${_oiio_brew_prefix}\" CACHE STRING \"\" FORCE)\n")
+ENDIF()
+
 # NOTE: CMAKE_IGNORE_PREFIX_PATH is NOT set for Homebrew-only builds (no Conan). Although RV_DEPS_IGNORE_PREFIXES contains /opt/homebrew, blocking it would
 # prevent OIIO from finding transitive deps (libdeflate, etc.) that only exist at the Homebrew prefix. The CMAKE_CXX_FLAGS -I workaround below handles Boost
 # header contamination for the Homebrew path. OIIO 3.x finds openjph via its own checked_find_package(openjph). OpenJPH's installed cmake config
@@ -180,11 +190,25 @@ LIST(APPEND _configure_options "-DTIFF_ROOT=${RV_DEPS_TIFF_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-DUSE_FFMPEG=0")
 
-# When Boost is built from source but other deps come from a shared prefix (e.g. Homebrew), their transitive -isystem includes can pull in a newer system
-# Boost's headers, causing ABI mismatches at link time. Adding Boost's include as a non-system -I flag ensures it takes precedence over any -isystem paths,
-# since compilers (GCC/Clang) always search -I before -isystem.
-IF(RV_DEPS_IGNORE_PREFIXES)
-  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=-I${RV_DEPS_BOOST_ROOT_DIR}/include")
+# When deps are built from source but others come from a shared prefix (e.g. Homebrew), CMake IMPORTED targets from Homebrew packages (libjpeg-turbo,
+# libdeflate, fmt) add /opt/homebrew/include as -isystem to OIIO's compile BEFORE our RV_DEPS_OPENEXR/RV_DEPS_IMATH -isystem paths. Per GCC, when the same path
+# is listed in both -I and -isystem, the -I is silently ignored, so a plain -I override does not take effect. Force-include the config headers from our paths
+# instead: their include guards prevent Homebrew's headers from re-defining the namespace and version macros even when found via -isystem. RV builds OpenEXR 3.3
+# (Imf_3_3, Iex_3_3, IlmThread_3_3) and Imath 3.1 (Imath_3_1); Homebrew ships OpenEXR 3.4 / Imath 3.2 with different namespaces baked into template-attribute
+# symbols, so without this, OIIO compiles against Homebrew's namespaces and fails to link against our 3.3/3.1 libs.
+IF(_oiio_brew_prefix
+   AND NOT RV_CONAN_CMAKE_PREFIX_PATH
+)
+  SET(_oiio_cxx_flags
+      ""
+  )
+  STRING(APPEND _oiio_cxx_flags " -include ${RV_DEPS_OPENEXR_ROOT_DIR}/include/OpenEXR/OpenEXRConfig.h")
+  STRING(APPEND _oiio_cxx_flags " -include ${RV_DEPS_OPENEXR_ROOT_DIR}/include/OpenEXR/IexConfig.h")
+  STRING(APPEND _oiio_cxx_flags " -include ${RV_DEPS_OPENEXR_ROOT_DIR}/include/OpenEXR/IlmThreadConfig.h")
+  STRING(APPEND _oiio_cxx_flags " -include ${RV_DEPS_IMATH_ROOT_DIR}/include/Imath/ImathConfig.h")
+  STRING(APPEND _oiio_cxx_flags " -I${RV_DEPS_BOOST_ROOT_DIR}/include")
+  LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=${_oiio_cxx_flags}")
+  LIST(APPEND _configure_options "-Dlibjpeg-turbo_DIR=${RV_DEPS_JPEGTURBO_ROOT_DIR}/lib/cmake/libjpeg-turbo")
 ENDIF()
 
 IF(RV_TARGET_LINUX)
