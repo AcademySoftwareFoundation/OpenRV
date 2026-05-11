@@ -46,7 +46,6 @@ namespace Rv
         void buildLeft(int padding);
         void buildCenter();
         void buildRight(int padding);
-        QFrame* makeExpandingSpacer();
         void makeActive(bool);
         void makeActiveFromSettings();
 

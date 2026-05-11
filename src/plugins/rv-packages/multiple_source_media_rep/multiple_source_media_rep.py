@@ -303,11 +303,13 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # Media resolution.
         self._media_resolution_lbl = QtWidgets.QLabel("", right_box)
         self._media_resolution_lbl.setStyleSheet("color: gray; background-color: transparent")
+        self._media_resolution_lbl.setVisible(False)
         insert_before_play_mode(self._media_resolution_lbl)
 
         # Media extension.
         self._media_extension_lbl = QtWidgets.QLabel("", right_box)
         self._media_extension_lbl.setStyleSheet("color: gray; background-color: transparent")
+        self._media_extension_lbl.setVisible(False)
         insert_before_play_mode(self._media_extension_lbl)
 
     def _populate_media_rep_menu(self, menu, switch_nodes):
@@ -420,7 +422,9 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         common_source_media_infos = utils.get_common_source_media_infos(self._current_sources)
 
         self._media_resolution_lbl.setText(common_source_media_infos.resolution)
+        self._media_resolution_lbl.setVisible(bool(common_source_media_infos.resolution))
         self._media_extension_lbl.setText(common_source_media_infos.extension)
+        self._media_extension_lbl.setVisible(bool(common_source_media_infos.extension))
 
     def _update_media_info(self, event):
         """

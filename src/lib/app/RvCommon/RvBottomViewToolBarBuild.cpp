@@ -1,14 +1,3 @@
-//
-//  Copyright (c) 2012 Tweak Software.
-//  All rights reserved.
-//
-//  SPDX-License-Identifier: Apache-2.0
-//
-//
-//  Builders for the three sections of the bottom toolbar (left / center /
-//  right). Split out of RvBottomViewToolBar.cpp to keep build code separate
-//  from event handling and slot implementations.
-//
 #include <RvCommon/RvBottomViewToolBar.h>
 #include <QtCore/QVariant>
 #include <QtWidgets/QToolButton>
@@ -54,16 +43,6 @@ namespace Rv
             return QVariant(m);
         }
     } // namespace
-
-    QFrame* RvBottomViewToolBar::makeExpandingSpacer()
-    {
-        QFrame* qf = new QFrame(this);
-        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-        qf->setMinimumWidth(0);
-        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-        qf->setStyleSheet("background-color: transparent");
-        return qf;
-    }
 
     ///
     /// Add all buttons belonging to the left side of the toolbar and the actions in a single Widget
@@ -191,8 +170,8 @@ namespace Rv
         m_rightBox = new QWidget(this);
         m_rightBox->setObjectName("rightBox");
         QHBoxLayout* rightLayout = new QHBoxLayout(m_rightBox);
-        rightLayout->setContentsMargins(padding, 0, padding, 0);
-        rightLayout->setSpacing(5);
+        rightLayout->setContentsMargins(0, 0, 0, 0);
+        rightLayout->setSpacing(0);
 
         m_playModeAction = new QAction("", this);
         m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));
