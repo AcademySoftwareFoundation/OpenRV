@@ -6,6 +6,7 @@
 from rv import rvtypes, commands
 import os
 import PyOpenColorIO as OCIO
+from PySide6.QtCore import QSettings
 
 #
 #   Default implementations of helper methods
@@ -282,7 +283,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         ocioNode = groupMemberOfType(srcPipeline, nodeType)
         if ocioNode is not None and self.readingSession:
             if os.getenv("OCIO") is None:
-                return
+                os.environ['OCIO'] = self.config
             for pNode in commands.nodesInGroup(srcPipeline):
                 if commands.nodeType(pNode).startswith("OCIO"):
                     commands.ocioUpdateConfig(pNode)
@@ -334,7 +335,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             return
 
         if os.getenv("OCIO") is None:
-            return
+            os.environ['OCIO'] = self.config
 
         print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
 
@@ -410,7 +411,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             return
 
         if os.getenv("OCIO") is None:
-            return
+            os.environ['OCIO'] = self.config
 
         device = commands.getStringProperty(group + ".device.name")[0]
         print(("INFO: using OCIODisplay for display: %s" % device))
