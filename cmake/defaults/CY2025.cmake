@@ -70,10 +70,10 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2025")
 
   # OpenSSL https://github.com/openssl/openssl
   SET(RV_DEPS_OPENSSL_VERSION
-      "3.4.0"
+      "3.6.2"
   )
   SET(RV_DEPS_OPENSSL_HASH
-      "34733f7be2d60ecd8bd9ddb796e182af"
+      "f27e8f53ac612bb0e3e781a45799fb90"
   )
   SET(RV_DEPS_OPENSSL_VERSION_DOT
       ".3"

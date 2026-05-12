@@ -123,6 +123,10 @@ namespace IPCore
         ImageFBO* findExistingPaintFBO(const GLFBO*, const std::string&, bool&, size_t&, size_t);
 
     private:
+        // Frees all GPU and CPU resources owned by imageFBO. Does not remove it
+        // from any vector — callers are responsible for vector bookkeeping.
+        void destroyImageFBO(ImageFBO* imageFBO);
+
         ImageFBOVector m_outputImageFBOs;
         GLFenceTextureMap m_textureFenceMap;
         // GLFenceFBOMap             m_fboFenceMap;

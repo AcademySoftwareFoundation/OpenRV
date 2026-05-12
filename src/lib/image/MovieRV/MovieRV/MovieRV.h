@@ -87,7 +87,7 @@ namespace TwkMovie
         //
 
         void open(Rv::RvSession* session, const TwkMovie::MovieInfo& as, TwkAudio::ChannelsVector audioChannels,
-                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE, size_t audioPacketSize = 512);
+                  double audioRate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE, size_t audioPacketSize = TWEAK_AUDIO_DEFAULT_PACKET_SIZE);
 
         //
         //  Movie API

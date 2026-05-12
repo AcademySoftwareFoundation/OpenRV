@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMGUI" "${RV_DEPS_IMGUI_VERSION}" "" "")
 RV_SHOW_STANDARD_DEPS_VARIABLES()
 
@@ -21,10 +18,6 @@ SET(_imgui_download_hash
 
 # There is no version suffix for imgui library name.
 RV_MAKE_STANDARD_LIB_NAME("imgui" "" "SHARED" "")
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
 
 SET(_lib_dir
     ${_install_dir}/lib
@@ -143,39 +136,22 @@ EXTERNALPROJECT_ADD(
   DEPENDS implot_download imgui_backend_qt_download imgui_node_editor_download
 )
 
-RV_COPY_LIB_BIN_FOLDERS()
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-ADD_LIBRARY(imgui::imgui SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-ADD_DEPENDENCIES(imgui::imgui ${_target})
-
-SET_PROPERTY(
-  TARGET imgui::imgui
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-
-SET_PROPERTY(
-  TARGET imgui::imgui
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET imgui::imgui
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-
-FILE(MAKE_DIRECTORY "${_include_dir}")
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   imgui::imgui
-  INTERFACE ${_include_dir}
-)
-
-LIST(APPEND RV_DEPS_LIST imgui::imgui)
-
-# Set version for about dialog
-SET(RV_DEPS_IMGUI_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
+  TYPE
+  SHARED
+  LOCATION
+  ${_libpath}
+  SONAME
+  ${_libname}
+  IMPLIB
+  ${_implibpath}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
