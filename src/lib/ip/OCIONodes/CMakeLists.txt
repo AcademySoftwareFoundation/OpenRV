@@ -29,7 +29,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC IPCore TwkFB ocio::ocio
+  PUBLIC IPCore TwkFB OpenColorIO::OpenColorIO
   PRIVATE TwkUtil Qt::Core
 )
 

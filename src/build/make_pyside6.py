@@ -23,6 +23,7 @@ from utils import (
     download_file,
     extract_7z_archive,
     verify_7z_archive,
+    update_env_path,
 )
 from make_python import get_python_interpreter_args
 
@@ -235,6 +236,17 @@ def build() -> None:
         pyside_build_args.append(f"--openssl={os.path.join(OPENSSL_OUTPUT_DIR, 'bin')}")
 
     if platform.system() == "Windows":
+        # Add Qt jom to the path to build in parallel
+        jom_path = os.path.abspath(os.path.join(QT_OUTPUT_DIR, "..", "..", "Tools", "QtCreator", "bin", "jom"))
+        if os.path.exists(os.path.join(jom_path, "jom.exe")):
+            print(f"jom.exe was successfully located at: {jom_path}")
+            update_env_path([jom_path])
+        elif shutil.which("jom"):
+            print("jom.exe found on PATH via shutil.which")
+        else:
+            print(f"Could not find jom.exe at the expected location: {jom_path}")
+            print("Build performance might be impacted")
+
         # Add the debug switch to match build type but only on Windows
         # (on other platforms, PySide6 is built in release)
         if VARIANT == "Debug":

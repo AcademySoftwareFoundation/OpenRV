@@ -54,6 +54,7 @@ ADD_COMPILE_OPTIONS(
   -Gy
   -nologo
   -Qfast_transcendentals
+  -utf-8
   -Zc:forScope
   -Zc:sizedDealloc-
   -Zi

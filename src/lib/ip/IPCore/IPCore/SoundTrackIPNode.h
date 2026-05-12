@@ -11,6 +11,7 @@
 #include <TwkMovie/Movie.h>
 #include <TwkAudio/Audio.h>
 #include <algorithm>
+#include <atomic>
 #include <limits>
 
 namespace IPCore
@@ -111,7 +112,7 @@ namespace IPCore
         GraphConfiguration m_graphConfig;
         TwkAudio::SampleTime m_sampleStart;
         TwkAudio::SampleTime m_sampleEnd;
-        TwkAudio::SampleTime m_sampleCurrent;
+        std::atomic<TwkAudio::SampleTime> m_sampleCurrent;
         FrameBuffer* m_fb;
         RangeStatsVector m_stats;
         size_t m_serialNumber;
