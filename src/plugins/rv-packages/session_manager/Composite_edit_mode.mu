@@ -22,6 +22,9 @@ class: CompositeEditMode : MinorMode
 {
     QWidget _ui;
     QComboBox _comboBox;
+    QLineEdit _dissolveLineEdit;
+    QLabel _dissolveLabel;
+    QSlider _dissolveSlider;
     
     method: auxFilePath (string; string name)
     {
@@ -36,14 +39,18 @@ class: CompositeEditMode : MinorMode
         {
             0 -> { name = "over"; }
             1 -> { name = "add"; }
-            //  2 -> { name = "dissolve"; }
-            2 -> { name = "difference"; }
-            3 -> { name = "-difference"; }
-            4 -> { name = "replace"; }
-            5 -> { name = "topmost"; }
+            2 -> { name = "dissolve"; }
+            3 -> { name = "difference"; }
+            4 -> { name = "-difference"; }
+            5 -> { name = "replace"; }
+            6 -> { name = "topmost"; }
         }
 
         set("#RVStack.composite.type", name);
+        
+        // Force UI update immediately after changing blend mode
+        updateUI();
+        
         redraw();
     }
 
@@ -52,25 +59,109 @@ class: CompositeEditMode : MinorMode
         setOp(index);
     }
 
+    method: setDissolveAmount (void;)
+    {
+        let amountText = _dissolveLineEdit.text();
+        
+        try
+        {
+            float amount = float(amountText);
+            // Clamp to valid range
+            if (amount < 0.0) amount = 0.0;
+            if (amount > 1.0) amount = 1.0;
+            
+            // Update slider to match (0.0-1.0 -> 0-100)
+            _dissolveSlider.setValue(int(amount * 100.0));
+            
+            set("#RVStack.composite.dissolveAmount", float[] {amount});
+            redraw();
+        }
+        catch (...)
+        {
+            // If parsing fails, reset to default
+            _dissolveLineEdit.setText("0.5");
+            _dissolveSlider.setValue(50);
+            set("#RVStack.composite.dissolveAmount", float[] {0.5});
+            redraw();
+        }
+    }
+
+    method: setDissolveAmountFromSlider (void; int value)
+    {
+        // Convert slider value (0-100) to float (0.0-1.0)
+        float amount = float(value) / 100.0;
+        
+        // Update text field
+        _dissolveLineEdit.setText("%g" % amount);
+        
+        set("#RVStack.composite.dissolveAmount", float[] {amount});
+        redraw();
+    }
+
     method: updateUI (void;)
     {
         if (_ui eq nil) return;
 
         int index = 0;
+        string currentType = getStringProperty("#RVStack.composite.type").front();
         
-        case (getStringProperty("#RVStack.composite.type").front())
+        case (currentType)
         {
             "over"        -> { index = 0; }
             "add"         -> { index = 1; }
-            //  "dissolve"    -> { index = 2; }
-            "difference"  -> { index = 2; }
-            "-difference" -> { index = 3; }
-            "replace"     -> { index = 4; }
-            "topmost"     -> { index = 5; }
-            _             -> { index = 6; }
+            "dissolve"    -> { index = 2; }
+            "difference"  -> { index = 3; }
+            "-difference" -> { index = 4; }
+            "replace"     -> { index = 5; }
+            "topmost"     -> { index = 6; }
+            _             -> { index = 7; }
         }
 
         _comboBox.setCurrentIndex(index);
+
+        // Show/hide dissolve amount controls based on mode
+        bool showDissolve = (currentType == "dissolve");
+        _dissolveLineEdit.setVisible(showDissolve);
+        _dissolveLabel.setVisible(showDissolve);
+        _dissolveSlider.setVisible(showDissolve);
+        
+        // Resize UI to fit the visible controls
+        if (_ui neq nil)
+        {
+            _ui.adjustSize();
+            _ui.updateGeometry();
+            
+            // Force a repaint to ensure layout updates are visible
+            _ui.update();
+            
+            // Try to trigger parent layout update
+            QWidget parent = _ui.parentWidget();
+            if (parent neq nil)
+            {
+                parent.adjustSize();
+                parent.update();
+            }
+        }
+
+        // Update dissolve amount value
+        if (showDissolve)
+        {
+            try
+            {
+                float[] amounts = getFloatProperty("#RVStack.composite.dissolveAmount");
+                if (amounts.size() > 0)
+                {
+                    float amount = amounts[0];
+                    _dissolveLineEdit.setText("%g" % amount);
+                    _dissolveSlider.setValue(int(amount * 100.0));
+                }
+            }
+            catch (...)
+            {
+                _dissolveLineEdit.setText("0.5"); // Default value
+                _dissolveSlider.setValue(50);
+            }
+        }
     }
 
     method: propertyChanged (void; Event event)
@@ -88,6 +179,7 @@ class: CompositeEditMode : MinorMode
         if (comp == "composite")
         {
             if (name == "type") updateUI();
+            else if (name == "dissolveAmount") updateUI();
         }
 
         event.reject();
@@ -106,8 +198,19 @@ class: CompositeEditMode : MinorMode
             {
                 _ui = loadUIFile(manager.auxFilePath("composite.ui"), m);
                 _comboBox = _ui.findChild("comboBox");
+                _dissolveLineEdit = _ui.findChild("dissolveLineEdit");
+                _dissolveLabel = _ui.findChild("dissolveLabel");
+                _dissolveSlider = _ui.findChild("dissolveSlider");
+                
+                // Initially hide dissolve controls
+                _dissolveLineEdit.setVisible(false);
+                _dissolveLabel.setVisible(false);
+                _dissolveSlider.setVisible(false);
+                
                 manager.addEditor("Composite Function", _ui);
                 connect(_comboBox, QComboBox.currentIndexChanged, setOp);
+                connect(_dissolveLineEdit, QLineEdit.editingFinished, setDissolveAmount);
+                connect(_dissolveSlider, QSlider.valueChanged, setDissolveAmountFromSlider);
             }
 
             updateUI();
@@ -138,10 +241,10 @@ class: CompositeEditMode : MinorMode
                      menuItem("   Over", "", "viewmode_category", setOpEvent(,0), opState("over")),
                      menuItem("   Add", "", "viewmode_category", setOpEvent(,1), opState("add")),
                      menuItem("   Dissolve", "", "viewmode_category", setOpEvent(,2), opState("dissolve")),
-                     menuItem("   Difference", "", "viewmode_category", setOpEvent(,2), opState("difference")),
-                     menuItem("   Inverted Difference", "", "viewmode_category", setOpEvent(,3), opState("-difference")),
-                     menuItem("   Replace", "", "viewmode_category", setOpEvent(,4), opState("replace")),
-                     menuItem("   Topmost", "", "viewmode_category", setOpEvent(,5), opState("topmost")),
+                     menuItem("   Difference", "", "viewmode_category", setOpEvent(,3), opState("difference")),
+                     menuItem("   Inverted Difference", "", "viewmode_category", setOpEvent(,4), opState("-difference")),
+                     menuItem("   Replace", "", "viewmode_category", setOpEvent(,5), opState("replace")),
+                     menuItem("   Topmost", "", "viewmode_category", setOpEvent(,6), opState("topmost")),
                      menuSeparator(),
                      menuItem("Cycle Forward", "", "viewmode_category", cycleStackForward, isStackMode),
                      menuItem("Cycle Backward", "", "viewmode_category", cycleStackBackward, isStackMode)

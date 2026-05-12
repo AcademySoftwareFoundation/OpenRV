@@ -77,6 +77,8 @@ namespace IPCore
 
         m_compMode = declareProperty<StringProperty>(
             "composite.type", (this->name() == "defaultStack_stack" || this->name() == "defaultLayout_stack") ? m_defaultCompType : "over");
+
+        m_dissolveAmount = declareProperty<FloatProperty>("composite.dissolveAmount", 0.5f);
     }
 
     StackIPNode::~StackIPNode() { pthread_mutex_destroy(&m_lock); }
@@ -162,6 +164,9 @@ namespace IPCore
 
             if (p == m_activeAudioInput)
                 updateChosenAudioInput();
+
+            if (p == m_dissolveAmount)
+                invalidate();
         }
 
         IPNode::propertyChanged(p);
@@ -425,7 +430,16 @@ namespace IPCore
             assembleMergeExpressions(root, images, modifiedImages, false, inExpressions);
 
             root->appendChildren(images);
-            root->mergeExpr = newBlend(root, inExpressions, mode);
+            if (mode == IPImage::Dissolve)
+            {
+                float dissolveAmount = m_dissolveAmount ? m_dissolveAmount->front() : 0.5f;
+                root->mergeExpr = newDissolveBlend(root, inExpressions, mode, dissolveAmount);
+            }
+            else
+            {
+                root->mergeExpr = newBlend(root, inExpressions, mode);
+            }
+
             root->shaderExpr = Shader::newSourceRGBA(root);
             root->recordResourceUsage();
 
@@ -472,8 +486,10 @@ namespace IPCore
         const IPImage::BlendMode mode = IPImage::getBlendModeFromString(comp);
 
         const bool topmostOnly = !strcmp(comp, "topmost");
+        const bool dissolveOnly = !strcmp(comp, "dissolve");
 
-        const bool localUseMerge = useMerge || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace);
+        const bool localUseMerge =
+            useMerge || (mode == IPImage::Replace && !topmostOnly && useMergeForReplace) || (mode == IPImage::Dissolve);
 
         IPImage* root = 0;
 
@@ -530,6 +546,12 @@ namespace IPCore
                     if (haveOneImage)
                         break;
                     haveOneImage = true;
+                }
+
+                if (dissolveOnly && images.size() >= 2)
+                {
+                    // For dissolve mode, only process the first two inputs
+                    break;
                 }
 
                 Context c = context;
@@ -679,6 +701,7 @@ namespace IPCore
         }
 
         const bool topmostOnly = (!strcmp(comp, "topmost"));
+        const bool dissolveOnly = (!strcmp(comp, "dissolve"));
         const bool strictFrameRanges = m_strictFrameRanges->front();
         const bool useCutInfo = m_useCutInfo->front();
 
@@ -715,6 +738,12 @@ namespace IPCore
                     if (haveOneImage)
                         break;
                     haveOneImage = true;
+                }
+
+                if (dissolveOnly && i >= 2)
+                {
+                    // For dissolve mode, only process the first two inputs
+                    break;
                 }
 
                 Context c = context;

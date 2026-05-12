@@ -610,7 +610,7 @@ The stack node is part of a stack group and handles control for settings like co
 | output.size | int[2] | 1 | The virtual output size of the stack. This may not match the input sizes. |
 | output.autoSize | int | 1 | Figure out a good size automatically from the input sizes if 1. Otherwise use output.size. |
 | output.chosenAudioInput | string | 1 | Name of input which becomes the audio output of the stack. If the value is .all. then all inputs are mixed. If the value is .first. then the first input is used. |
-| composite.type | string | 1 | The compositing operation to perform on the inputs. Valid values are: over, add, difference, -difference, and replace |
+| composite.type | string | 1 | The compositing operation to perform on the inputs. Valid values are: over, add, dissolve, difference, -difference, replace, and topmost |
 | mode.useCutInfo | int | 1 | Use cut information on the inputs to determine EDL timing. |
 | mode.strictFrameRanges | int | 1 | If 1 match the timeline frames to the source frames instead of retiming to frame 1. |
 | mode.alignStartFrames | int | 1 | If 1 offset all inputs so they start at same frame as the first input. |

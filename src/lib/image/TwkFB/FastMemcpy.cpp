@@ -432,13 +432,16 @@ void subsample422_10bit(size_t width, size_t height, const uint32_t* FASTMEMCPYR
     //  (hence the REV). So Y is the lowest sig bits.
     //
 
+    constexpr size_t pixelsPerGroup = 6; // v210: 6 pixels pack into 4 output words
+    const size_t tailPixels = width % pixelsPerGroup;
+
     for (size_t row = 0; row < height; row++)
     {
         uint32_t* FASTMEMCPYRESTRICT p1 = outBuf + row * outBufStride / sizeof(uint32_t);
 
         for (const uint32_t *FASTMEMCPYRESTRICT p0 = inBuf + row * inBufStride / sizeof(uint32_t),
-                                                *FASTMEMCPYRESTRICT e = p0 + inBufStride / sizeof(uint32_t) - (width % 6);
-             p0 < e; p0 += 6)
+                                                *FASTMEMCPYRESTRICT e = p0 + inBufStride / sizeof(uint32_t) - tailPixels;
+             p0 < e; p0 += pixelsPerGroup)
         {
             uint32_t A = *p0;
             uint32_t B = p0[1];
@@ -455,6 +458,46 @@ void subsample422_10bit(size_t width, size_t height, const uint32_t* FASTMEMCPYR
             p1++;
             *p1 = ((F << 20) & R10MASK) | ((D >> 10) & G10MASK) | (E & B10MASK);
             p1++;
+        }
+
+        // Handle remaining pixels that didn't fit in the 6-pixel main loop.
+        // Each case falls through to emit the output words contributed by the
+        // pixels available, following the same v210 packing as the main loop:
+        //   Word 0: Cr_A[29:20] | Y_A[19:10] | Cb_A[9:0]
+        //   Word 1: Y_C[29:20]  | Cb_B[19:10] | Y_B[9:0]
+        //   Word 2: Cb_C[29:20] | Y_D[19:10]  | Cr_B[9:0]
+        //   Word 3: 0[29:20]    | Cr_D[19:10] | Y_E[9:0]  (no Y_F)
+        if (tailPixels > 0)
+        {
+            const uint32_t* FASTMEMCPYRESTRICT t = inBuf + row * inBufStride / sizeof(uint32_t) + (width - tailPixels);
+
+            // Neutral pixel: Y=0 (black), Cb=512, Cr=512 (neutral chroma)
+            // In 2_10_10_10_INT_REV: Cr[29:20] | Cb[19:10] | Y[9:0]
+            //   Cr=512 -> 512 << 20 = 0x20000000
+            //   Cb=512 -> 512 << 10 = 0x00080000
+            //   Y=0    ->             0x00000000
+            constexpr uint32_t neutralPixel = 0x20080000;
+
+            const uint32_t A = t[0];
+            const uint32_t B = tailPixels > 1 ? t[1] : neutralPixel;
+            const uint32_t C = tailPixels > 2 ? t[2] : neutralPixel;
+            const uint32_t D = tailPixels > 3 ? t[3] : neutralPixel;
+            const uint32_t E = tailPixels > 4 ? t[4] : neutralPixel;
+
+            // Word 0: always present (pixel A)
+            *p1++ = (A & R10MASK) | ((A << 10) & G10MASK) | ((A >> 10) & B10MASK);
+
+            // Word 1: pixels B and C
+            if (tailPixels >= 2)
+                *p1++ = ((C << 20) & R10MASK) | (B & G10MASK) | (B & B10MASK);
+
+            // Word 2: pixels B, C and D
+            if (tailPixels >= 4)
+                *p1++ = ((C << 10) & R10MASK) | ((D << 10) & G10MASK) | ((B >> 20) & B10MASK);
+
+            // Word 3: pixels D and E (no F, so top bits are zero)
+            if (tailPixels >= 5)
+                *p1++ = ((D >> 10) & G10MASK) | (E & B10MASK);
         }
     }
 }
