@@ -281,8 +281,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
         ocioNode = groupMemberOfType(srcPipeline, nodeType)
         if ocioNode is not None and self.readingSession:
-            if os.getenv("OCIO") is None:
-                os.environ["OCIO"] = self.config
             for pNode in commands.nodesInGroup(srcPipeline):
                 if commands.nodeType(pNode).startswith("OCIO"):
                     commands.ocioUpdateConfig(pNode)
@@ -332,9 +330,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
         if pipeline == DEFAULT_PIPE[pipeSlot]:
             return
-
-        if os.getenv("OCIO") is None:
-            os.environ["OCIO"] = self.config
 
         print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
 
@@ -408,9 +403,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
         if pipeline == DEFAULT_PIPE[groupName]:
             return
-
-        if os.getenv("OCIO") is None:
-            os.environ["OCIO"] = self.config
 
         device = commands.getStringProperty(group + ".device.name")[0]
         print(("INFO: using OCIODisplay for display: %s" % device))
@@ -536,8 +528,10 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
             self.config = OCIO.Config.CreateFromFile(config)
+            os.environ["OCIO"] = config
             OCIO.SetCurrentConfig(self.config)
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
+            commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
             print(inst)
 
@@ -676,7 +670,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 )
             )
 
-        final = [
+        final = [("Change Config...", self.selectConfig, None, None)]
+        final += [
             ("Current Source", None, None, lambda: commands.DisabledMenuState),
             ("  File Color Space", cssList),
         ]
@@ -723,6 +718,12 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         except ImportError:
             pass
+
+
+        if os.getenv("OCIO") is None:
+            config = commands.readSettings("ocio_source_setup", "ocio_config", "")
+            if config != "":
+                os.environ["OCIO"] = config
 
         self.init(
             "OCIO Source Setup",
