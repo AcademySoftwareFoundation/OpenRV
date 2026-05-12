@@ -719,7 +719,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         except ImportError:
             pass
 
-
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "":
