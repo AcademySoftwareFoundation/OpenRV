@@ -12,9 +12,6 @@
 # Vcpkg manifest mode with cmake: https://learn.microsoft.com/en-us/vcpkg/examples/manifest-mode-cmake
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 IF(RV_TARGET_WINDOWS)
   RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_VCPKG" "2023.11.20" "" "")
   RV_SHOW_STANDARD_DEPS_VARIABLES()

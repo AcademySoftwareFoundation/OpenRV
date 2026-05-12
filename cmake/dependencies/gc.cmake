@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_GC" "${RV_DEPS_GC_VERSION}" "" "")
 
 SET(_download_url
@@ -15,20 +12,6 @@ SET(_download_url
 SET(_download_hash
     ${RV_DEPS_GC_DOWNLOAD_HASH}
 )
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
 
 SET(_gc_lib_name
     ${CMAKE_SHARED_LIBRARY_PREFIX}gc.1${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -78,11 +61,6 @@ IF(NOT RV_TARGET_WINDOWS)
   LIST(APPEND _gc_stage_outputs ${RV_STAGE_LIB_DIR}/${_cord_lib_name})
 ENDIF()
 
-SET(_include_dir
-    ${_install_dir}/include
-)
-FILE(MAKE_DIRECTORY ${_include_dir})
-
 LIST(APPEND _configure_options "-Denable_parallel_mark=ON")
 LIST(APPEND _configure_options "-Denable_cplusplus=ON")
 LIST(APPEND _configure_options "-Denable_large_config=yes")
@@ -109,55 +87,38 @@ EXTERNALPROJECT_ADD(
   BUILD_BYPRODUCTS ${_gc_byproducts}
   USES_TERMINAL_BUILD TRUE
 )
-ADD_LIBRARY(BDWGC::Gc STATIC IMPORTED GLOBAL)
-
-ADD_DEPENDENCIES(BDWGC::Gc ${_target})
-SET_PROPERTY(
-  TARGET BDWGC::Gc
-  PROPERTY IMPORTED_LOCATION ${_gc_lib}
-)
-SET_PROPERTY(
-  TARGET BDWGC::Gc
-  PROPERTY IMPORTED_SONAME ${_gc_lib_name}
-)
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   BDWGC::Gc
-  INTERFACE ${_include_dir}
+  TYPE
+  STATIC
+  LOCATION
+  ${_gc_lib}
+  SONAME
+  ${_gc_lib_name}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-LIST(APPEND RV_DEPS_LIST BDWGC::Gc)
 
 IF(NOT RV_TARGET_WINDOWS)
-  ADD_LIBRARY(BDWGC::Cord SHARED IMPORTED GLOBAL)
-  ADD_DEPENDENCIES(BDWGC::Cord ${_target})
-  SET_PROPERTY(
-    TARGET BDWGC::Cord
-    PROPERTY IMPORTED_LOCATION ${_cord_lib}
-  )
-  SET_PROPERTY(
-    TARGET BDWGC::Cord
-    PROPERTY IMPORTED_SONAME ${_cord_lib_name}
-  )
-  TARGET_INCLUDE_DIRECTORIES(
+  RV_ADD_IMPORTED_LIBRARY(
+    NAME
     BDWGC::Cord
-    INTERFACE ${_include_dir}
+    TYPE
+    SHARED
+    LOCATION
+    ${_cord_lib}
+    SONAME
+    ${_cord_lib_name}
+    INCLUDE_DIRS
+    ${_include_dir}
+    DEPENDS
+    ${_target}
+    ADD_TO_DEPS_LIST
   )
-  LIST(APPEND RV_DEPS_LIST BDWGC::Cord)
 ENDIF()
 
-ADD_CUSTOM_COMMAND(
-  COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-  OUTPUT ${_gc_stage_outputs}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-  DEPENDS ${_target}
-)
-ADD_CUSTOM_TARGET(
-  ${_target}-stage-target ALL
-  DEPENDS ${_gc_stage_outputs}
-)
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-SET(RV_DEPS_GC_VERSION
-    ${_version}
-    CACHE INTERNAL ""
-)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${_gc_stage_outputs})

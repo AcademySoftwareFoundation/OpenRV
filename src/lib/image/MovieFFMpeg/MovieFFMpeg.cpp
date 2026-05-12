@@ -58,6 +58,10 @@ extern "C"
 #include <libswscale/swscale.h>
 }
 
+#if defined(RV_USE_APPLE_PRORES_SDK)
+#include <AppleProRes.h>
+#endif
+
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
 
 namespace TwkMovie
@@ -280,6 +284,7 @@ namespace TwkMovie
             , imgConvertContext(0)
             , isOpen(false)
             , useOpenJPH(false)
+            , useAppleProRes(false)
             , rotate(false)
             , colrType("")
             , avCodecContext(0)
@@ -321,8 +326,12 @@ namespace TwkMovie
 
             name = t->name;
             useOpenJPH = t->useOpenJPH;
+            useAppleProRes = t->useAppleProRes;
             number = t->number;
             rotate = t->rotate;
+#if defined(RV_USE_APPLE_PRORES_SDK)
+            appleProResCtx = t->appleProResCtx;
+#endif
             return *this;
         }
 
@@ -333,6 +342,7 @@ namespace TwkMovie
         int lastDecodedVideo;
         int lastEncodedVideo;
         bool useOpenJPH;
+        bool useAppleProRes;
         set<int64_t> tsSet;
         FrameBuffer fb;
         struct SwsContext* imgConvertContext;
@@ -343,6 +353,9 @@ namespace TwkMovie
         string colrType;
         AVCodecContext* avCodecContext;
         struct HardwareContext hardwareContext;
+#if defined(RV_USE_APPLE_PRORES_SDK)
+        AppleProResContext appleProResCtx;
+#endif
     };
 
     //
@@ -674,7 +687,7 @@ namespace TwkMovie
                                                        "xith"sv,
                                                        "xvid"sv,
                                                        "libdav1d"sv
-#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX) || defined(RV_USE_APPLE_PRORES_SDK)
                                                        ,
                                                        "prores"sv
 #endif
@@ -2174,6 +2187,9 @@ namespace TwkMovie
         int height = 0;
         int width = 0;
         bool isJ2K = false;
+#if defined(RV_USE_APPLE_PRORES_SDK)
+        bool isProRes = false;
+#endif
         string lang = "und";
         map<string, set<int>> chLangMap;
         map<pair<int, int>, vector<int>> resTrackMap;
@@ -2204,6 +2220,12 @@ namespace TwkMovie
                 {
                     isJ2K = true;
                 }
+#if defined(RV_USE_APPLE_PRORES_SDK)
+                else if (tsStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
+                {
+                    isProRes = true;
+                }
+#endif
             }
             else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
             {
@@ -2299,6 +2321,9 @@ namespace TwkMovie
                     ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
                     track->useOpenJPH = isJ2K;
+#if defined(RV_USE_APPLE_PRORES_SDK)
+                    track->useAppleProRes = isProRes;
+#endif
                     if (isJ2K)
                     {
                         track->number = i;
@@ -2309,6 +2334,81 @@ namespace TwkMovie
                         openAVCodec(i, &track->avCodecContext, &track->hardwareContext);
                         m_videoTracks.push_back(track);
                     }
+#if defined(RV_USE_APPLE_PRORES_SDK)
+                    else if (isProRes)
+                    {
+                        if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext))
+                        {
+                            track->number = i;
+                            ostringstream trackName;
+                            trackName << "track " << m_videoTracks.size() + 1;
+                            track->name = trackName.str();
+                            track->isOpen = true;
+
+                            AVCodecContext* avctx = track->avCodecContext;
+                            AppleProResContext* appleProResCtx = &track->appleProResCtx;
+                            memset(&appleProResCtx->prpixbuf, 0, sizeof(appleProResCtx->prpixbuf));
+
+                            // Always decode to 16-bits
+                            avctx->bits_per_raw_sample = 16;
+                            switch (avctx->codec_tag)
+                            {
+                            case MKTAG('a', 'p', 'c', 'o'):
+                                avctx->profile = AV_PROFILE_PRORES_PROXY;
+                                avctx->pix_fmt = AV_PIX_FMT_YUV422P16;
+                                appleProResCtx->pixfmt = kPRFormat_v216;
+                                break;
+                            case MKTAG('a', 'p', 'c', 's'):
+                                avctx->profile = AV_PROFILE_PRORES_LT;
+                                avctx->pix_fmt = AV_PIX_FMT_YUV422P16;
+                                appleProResCtx->pixfmt = kPRFormat_v216;
+                                break;
+                            case MKTAG('a', 'p', 'c', 'n'):
+                                avctx->profile = AV_PROFILE_PRORES_STANDARD;
+                                avctx->pix_fmt = AV_PIX_FMT_YUV422P16;
+                                appleProResCtx->pixfmt = kPRFormat_v216;
+                                break;
+                            case MKTAG('a', 'p', 'c', 'h'):
+                                avctx->profile = AV_PROFILE_PRORES_HQ;
+                                avctx->pix_fmt = AV_PIX_FMT_YUV422P16;
+                                appleProResCtx->pixfmt = kPRFormat_v216;
+                                break;
+                            case MKTAG('a', 'p', '4', 'h'):
+                                avctx->profile = AV_PROFILE_PRORES_4444;
+                                avctx->pix_fmt = AV_PIX_FMT_YUVA444P16;
+                                appleProResCtx->pixfmt = kPRFormat_y416;
+                                break;
+                            case MKTAG('a', 'p', '4', 'x'):
+                                avctx->profile = AV_PROFILE_PRORES_XQ;
+                                avctx->pix_fmt = AV_PIX_FMT_YUVA444P16;
+                                appleProResCtx->pixfmt = kPRFormat_y416;
+                                break;
+                            default:
+                                avctx->profile = AV_PROFILE_UNKNOWN;
+                                av_log(avctx, AV_LOG_WARNING, "Unknown prores profile %d\n", avctx->codec_tag);
+                                delete track;
+                                track = nullptr;
+                            }
+
+                            if (track)
+                            {
+                                m_videoTracks.push_back(track);
+
+                                FBInfo::ViewInfo vinfo;
+                                vinfo.name = trackName.str();
+                                m_info.viewInfos.push_back(vinfo);
+                                m_info.views.push_back(trackName.str());
+                                ostringstream trk;
+                                trk << "Track" << i;
+
+                                snagMetadata(tsStream->metadata, trk.str(), &m_info.proxy);
+
+                                appleProResCtx->avPixelFormat = avctx->pix_fmt;
+                                avctx->sw_pix_fmt = avctx->pix_fmt;
+                            }
+                        }
+                    }
+#endif
                     else
                     {
                         if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext))
@@ -3430,9 +3530,16 @@ namespace TwkMovie
         avcodec_send_packet(track->avCodecContext, nullptr);
 
         int ret;
-        while ((ret = avcodec_receive_frame(track->avCodecContext, track->videoFrame)) != AVERROR_EOF)
+#if defined(RV_USE_APPLE_PRORES_SDK)
+        // For ProRes, because it's i-Frames only, we don't need to
+        // do this loop and also don't want to call FFmpeg's decoder
+        if (!track->useAppleProRes)
+#endif
         {
-            // Discard received frames until the end of the stream is reached
+            while ((ret = avcodec_receive_frame(track->avCodecContext, track->videoFrame)) != AVERROR_EOF)
+            {
+                // Discard received frames until the end of the stream is reached
+            }
         }
 
         avcodec_flush_buffers(track->avCodecContext);
@@ -3511,7 +3618,12 @@ namespace TwkMovie
 
     void MovieFFMpegReader::sendPacketToDecoder(VideoTrack* track)
     {
-        int ret = avcodec_send_packet(track->avCodecContext, track->videoPacket);
+        int ret =
+#if defined(RV_USE_APPLE_PRORES_SDK)
+            track->useAppleProRes ? track->appleProResCtx.decode_frame(track->avCodecContext, track->videoFrame, track->videoPacket) :
+#endif
+                                  avcodec_send_packet(track->avCodecContext, track->videoPacket);
+
         if (ret < 0)
         {
             if (ret == AVERROR(EAGAIN))
@@ -3519,12 +3631,12 @@ namespace TwkMovie
                 // This occurs when we need to read more output before sending a
                 // new one. However, since we fully drain the output in each
                 // decode call, this should never happen.
-                TWK_THROW_EXC_STREAM("avcodec_send_packet failed in video "
+                TWK_THROW_EXC_STREAM("sendPacketToDecoder failed in video "
                                      "stream: AVERROR(EAGAIN)");
             }
             else
             {
-                TWK_THROW_EXC_STREAM("avcodec_send_packet failed in video stream");
+                TWK_THROW_EXC_STREAM("sendPacketToDecoder failed in video stream");
             }
         }
     }
@@ -3558,9 +3670,11 @@ namespace TwkMovie
             readPacketFromStream(inframe, track);
 
             // Then we need to send the packet as input to the decoder.
-            // but we dont do it we are using OpenJPH, since it will
-            // handle the decode itself.
-            if (!track->useOpenJPH)
+            // but we don't do it if we are using OpenJPH or Apple's ProRes
+            // since they will handle the decode themselves and ProRes
+            // is I-frame only so doesn't need other frames for decoding
+            // so let's not waste time decoding here.
+            if (!track->useOpenJPH && !track->useAppleProRes)
             {
                 sendPacketToDecoder(track);
             }
@@ -3575,20 +3689,22 @@ namespace TwkMovie
             HOP_PROF("avcodec_receive_frame()");
             // Get frame from decoder.
             int ret = 0;
-            if (!track->useOpenJPH)
+            if (!track->useOpenJPH && !track->useAppleProRes)
             {
                 ret = avcodec_receive_frame(track->avCodecContext, track->videoFrame);
             }
             else
             {
-                // We are going to use OpenJPH to do the decoding, but we do
-                // need to set the pts and dts from the packet, to get things
-                // behaving properly.
+                // We are going to use OpenJPH or Apple's SDK  to do the decoding, but we do
+                // need to set the pts and dts from the packet, to get things behaving properly.
                 track->videoFrame->pts = track->videoPacket->pts;
                 track->videoFrame->pkt_dts = track->videoPacket->dts;
                 if (track->videoFrame->pkt_dts < goalTS)
+                {
+                    av_packet_unref(track->videoPacket);
                     ret = AVERROR(EAGAIN); // Force it to read another packet,
                                            // if we havent found the frame yet.
+                }
             }
             if (ret < 0)
             {
@@ -3600,9 +3716,9 @@ namespace TwkMovie
 
                     readPacketFromStream(inframe, track);
 
-                    // If we are using OpenJPH, we will not send the packet to
-                    // the decoder, since it will handle the decode itself.
-                    if (!track->useOpenJPH)
+                    // If we are using OpenJPH or Apple's ProRes SDK, we will not send
+                    // the packet to the decoder, since they will handle the decode themselves.
+                    if (!track->useOpenJPH && !track->useAppleProRes)
                     {
                         sendPacketToDecoder(track);
                     }
@@ -3721,6 +3837,12 @@ namespace TwkMovie
             // If we are using OpenJPH to decode JPEG-2000 frames, we decode
             // the frame here and return the FrameBuffer.
             return jpeg2000Decode(inframe, track);
+        }
+        else if (track->useAppleProRes)
+        {
+            // Decode the image now since we skipped decoding while
+            // searching for the best frame
+            sendPacketToDecoder(track);
         }
 
 #if DB_TIMING & DB_LEVEL
@@ -3994,7 +4116,7 @@ namespace TwkMovie
             track->isOpen = openAVCodec(track->number, &track->avCodecContext, &track->hardwareContext);
             if (!track->isOpen)
             {
-                cout << "ERROR: Unable to read from audio stream: " << track->number << endl;
+                cout << "ERROR: Unable to read from video stream: " << track->number << endl;
                 continue;
             }
 
@@ -4020,6 +4142,13 @@ namespace TwkMovie
 
             if (!found)
                 continue;
+#if defined(RV_USE_APPLE_PRORES_SDK)
+            if (track->useAppleProRes)
+            {
+                track->avCodecContext->sw_pix_fmt = track->appleProResCtx.avPixelFormat;
+                track->avCodecContext->pix_fmt = track->appleProResCtx.avPixelFormat;
+            }
+#endif
 
             FrameBuffer* out = decodeImageAtFrame(decodeFrame, track);
             fbs.push_back(out);

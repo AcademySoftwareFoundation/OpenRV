@@ -95,7 +95,7 @@ namespace TwkFB
         , m_session(0)
         , m_audioChannels(TwkAudio::layoutChannels(TwkAudio::Stereo_2))
         , m_audioRate(TWEAK_AUDIO_DEFAULT_SAMPLE_RATE)
-        , m_audioPacketSize(512)
+        , m_audioPacketSize(TWEAK_AUDIO_DEFAULT_PACKET_SIZE)
         , m_audioInit(true)
     // m_device(0)
     {

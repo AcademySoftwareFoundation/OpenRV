@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkFB TwkExc
-  PRIVATE Imath::Imath oiio::oiio oiio::utils TwkUtil
+  PRIVATE Imath::Imath OpenImageIO::OpenImageIO OpenImageIO::OpenImageIO_Util TwkUtil
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
