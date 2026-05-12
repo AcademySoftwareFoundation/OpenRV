@@ -207,6 +207,7 @@ namespace Rv
 
         // Dockable to QMainWindow, not centralwidget.
         m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+        m_diagnosticsDock->setObjectName("Diagnostics");
         m_diagnosticsDock->setWidget(m_diagnosticsView);
         m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
         addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);

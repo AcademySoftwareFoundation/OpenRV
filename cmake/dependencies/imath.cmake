@@ -4,29 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_IMATH" "${RV_DEPS_IMATH_VERSION}" "" "")
 
-SET(_download_url
-    "https://github.com/AcademySoftwareFoundation/Imath/archive/refs/tags/v${_version}.zip"
-)
-
-SET(_download_hash
-    "${RV_DEPS_IMATH_DOWNLOAD_HASH}"
-)
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-SET(_include_dir
-    ${_install_dir}/include/Imath
-)
-SET(RV_DEPS_IMATH_ROOT_DIR
-    ${_install_dir}
-)
-
+# --- Library naming (shared on all platforms, same filenames for find and build) ---
 IF(RV_TARGET_DARWIN)
   SET(_libname
       ${CMAKE_SHARED_LIBRARY_PREFIX}Imath-${RV_DEPS_IMATH_LIB_MAJOR}${RV_DEBUG_POSTFIX}.${RV_DEPS_IMATH_LIB_VER}${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -41,108 +21,75 @@ ELSEIF(RV_TARGET_WINDOWS)
   )
 ENDIF()
 
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
-
-SET(RV_DEPS_IMATH_CMAKE_DIR
-    ${_lib_dir}/cmake/Imath
-    CACHE STRING "Path to Imath CMake files ${_target}"
+# --- Try to find installed package ---
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  Imath
+  VERSION
+  ${RV_DEPS_IMATH_VERSION}
+  DEPS_LIST_TARGETS
+  Imath::Imath
 )
 
-SET(RV_DEPS_IMATH_CMAKE_DIR
-    ${_lib_dir}/cmake/Imath
-)
-
+# Compute paths AFTER RV_FIND_DEPENDENCY (which may override _lib_dir)
 SET(_libpath
     ${_lib_dir}/${_libname}
 )
 
-LIST(APPEND _imath_byproducts ${_libpath})
+# When found via CONFIG, use the authoritative ${Imath_DIR} set by find_package (works for any layout: vcpkg share/, Homebrew lib/cmake/, etc.). For
+# build-from-source, fall back to the conventional lib/cmake/Imath path.
+IF(${_target}_FOUND
+   AND DEFINED Imath_DIR
+)
+  SET(RV_DEPS_IMATH_CMAKE_DIR
+      "${Imath_DIR}"
+      CACHE STRING "Path to Imath CMake files ${_target}"
+  )
+  SET(RV_DEPS_IMATH_CMAKE_DIR
+      "${Imath_DIR}"
+  )
+ELSE()
+  SET(RV_DEPS_IMATH_CMAKE_DIR
+      ${_lib_dir}/cmake/Imath
+      CACHE STRING "Path to Imath CMake files ${_target}"
+  )
+  SET(RV_DEPS_IMATH_CMAKE_DIR
+      ${_lib_dir}/cmake/Imath
+  )
+ENDIF()
 
 IF(RV_TARGET_WINDOWS)
   SET(_implibpath
       ${_install_dir}/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}Imath-${RV_DEPS_IMATH_LIB_MAJOR}${RV_DEBUG_POSTFIX}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
-  LIST(APPEND _imath_byproducts ${_implibpath})
 ENDIF()
 
-EXTERNALPROJECT_ADD(
-  ${_target}
-  URL ${_download_url}
-  URL_MD5 ${_download_hash}
-  DOWNLOAD_NAME ${_target}_${_version}.zip
-  DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  INSTALL_DIR ${_install_dir}
-  CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
-  BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
-  BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS FALSE
-  BUILD_BYPRODUCTS ${_imath_byproducts}
-  USES_TERMINAL_BUILD TRUE
-)
-
-FILE(MAKE_DIRECTORY "${_include_dir}")
-
-IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/bin ${RV_STAGE_BIN_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_BIN_DIR}/${_libname}
-  )
+# --- Build from source if not found ---
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/imath.cmake)
 ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_libname}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_libname}
-  )
+  # CONFIG found: Imath::Imath target exists with proper LOCATION. For pkg-config (unlikely), create proper imported target.
+  IF(NOT TARGET Imath::Imath)
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      Imath::Imath
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      SONAME
+      ${_libname}
+      IMPLIB
+      ${_implibpath}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+    )
+  ENDIF()
 ENDIF()
 
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-ADD_LIBRARY(Imath::Imath SHARED IMPORTED GLOBAL)
-ADD_DEPENDENCIES(Imath::Imath ${_target})
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_LOCATION ${_libpath}
-)
-SET_PROPERTY(
-  TARGET Imath::Imath
-  PROPERTY IMPORTED_SONAME ${_libname}
-)
-IF(RV_TARGET_WINDOWS)
-  SET_PROPERTY(
-    TARGET Imath::Imath
-    PROPERTY IMPORTED_IMPLIB ${_implibpath}
-  )
-ENDIF()
-TARGET_INCLUDE_DIRECTORIES(
-  Imath::Imath
-  INTERFACE ${_include_dir}
-)
-LIST(APPEND RV_DEPS_LIST Imath::Imath)
-
-SET(RV_DEPS_IMATH_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
+# Staging (shared, same library name for both paths)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
