@@ -22,7 +22,7 @@ TARGET_INCLUDE_DIRECTORIES(
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/lib/base ${PROJECT_SOURCE_DIR}/src/lib/image
 )
 
-TARGET_LINK_LIBRARIES(${_target} TwkUtil doctest IPCore RvApp Mu)
+TARGET_LINK_LIBRARIES(${_target} TwkUtil doctest::doctest IPCore RvApp Mu)
 
 IF(RV_TARGET_LINUX)
   TARGET_LINK_LIBRARIES(${_target} pthread dl)

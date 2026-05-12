@@ -29,7 +29,7 @@ TARGET_LINK_LIBRARIES(
   IPBaseNodes
   TwkUtil
   dl
-  doctest
+  doctest::doctest
 )
 
 # Simply assert that the test executable actually works.

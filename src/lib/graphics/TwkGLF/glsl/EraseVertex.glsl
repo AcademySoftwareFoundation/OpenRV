@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: Apache-2.0 
 //
 #if __VERSION__ >= 150
-#version 150
 #else
 #define in attribute
 #define out varying
