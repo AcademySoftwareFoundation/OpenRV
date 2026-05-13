@@ -528,8 +528,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
             self.config = OCIO.Config.CreateFromFile(config)
-            os.environ["OCIO"] = config
             OCIO.SetCurrentConfig(self.config)
+            os.environ["OCIO"] = config
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
@@ -724,7 +724,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
-            if config != "":
+            if config != "" and os.path.isfile(config) and config.endswith("ocio"):
                 os.environ["OCIO"] = config
 
         self.init(
