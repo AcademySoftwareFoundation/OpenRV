@@ -720,6 +720,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         except ImportError:
             pass
 
+        # Restore saved OCIO config from previously loaded config
+        # An externally set OCIO env var takes precendence
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "" and os.path.isfile(config) and config.endswith("ocio"):
