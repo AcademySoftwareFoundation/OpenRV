@@ -687,9 +687,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             ("Displays", None, None, lambda: commands.DisabledMenuState),
         ]
         final += daList
-        final += [
-            ("_", None)
-        ]
+        final += [("_", None)]
         final += [("Change Config...", self.selectConfig, None, None)]
 
         return [("OCIO", final)]
