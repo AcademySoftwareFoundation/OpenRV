@@ -670,8 +670,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 )
             )
 
-        final = [("Change Config...", self.selectConfig, None, None)]
-        final += [
+        final = [
             ("Current Source", None, None, lambda: commands.DisabledMenuState),
             ("  File Color Space", cssList),
         ]
@@ -688,6 +687,10 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             ("Displays", None, None, lambda: commands.DisabledMenuState),
         ]
         final += daList
+        final += [
+            ("_", None)
+        ]
+        final += [("Change Config...", self.selectConfig, None, None)]
 
         return [("OCIO", final)]
 
