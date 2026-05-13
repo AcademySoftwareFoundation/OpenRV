@@ -4,9 +4,12 @@ name: Conan Upload Deps
 # uploads them to the ASWF Conan remote. Year-specific deps (CY2025.cmake)
 # are published under @openrv/vfx2025; year-independent deps (CYCOMMON.cmake)
 # under @openrv/common. Channel is driven by the `channel` field in
-# packages.yml. Mirrors the phase pattern already proven in
-# conan-upload-test.yml (openssl) and covers every platform in conan.yml's
-# build matrix:
+# packages.yml. On pull_request (path-filtered to conan/** and this
+# workflow), the full matrix runs but upload + verify steps are skipped
+# (build-only validation). Actual uploads happen via workflow_dispatch
+# after the PR merges.
+#
+# Covers every platform in conan.yml's build matrix:
 #
 #   rocky8   - amd64/rockylinux:8 + gcc-toolset-11      (profile x86_64_rocky8)
 #   macos    - macos-14 (arm64) + Apple clang           (profile arm64_apple_release)
@@ -36,11 +39,10 @@ name: Conan Upload Deps
 # pcre2 is windows_only and is only present in the Windows matrix.
 
 on:
-  push:
-    branches:
-      - main
-
   pull_request:
+    paths:
+      - 'conan/**'
+      - '.github/workflows/conan-upload-deps.yml'
 
   workflow_dispatch:
     inputs:
@@ -237,6 +239,7 @@ jobs:
               "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
           conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
         run: |
           upload_fail=0
           CONAN_CMD="${CONAN_EXEC:-conan}"
@@ -259,6 +262,7 @@ jobs:
           [ "$upload_fail" -eq 0 ] || exit 1
 
       - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
         run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
 
   # ---------------------------------------------------------------------------
@@ -351,6 +355,7 @@ jobs:
               "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
           "$CONAN_EXEC" list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
         run: |
           upload_fail=0
           CONAN_CMD="${CONAN_EXEC:-conan}"
@@ -372,6 +377,7 @@ jobs:
           done
           [ "$upload_fail" -eq 0 ] || exit 1
       - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
         run: |
           "$CONAN_EXEC" search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
   # ---------------------------------------------------------------------------
@@ -517,6 +523,7 @@ jobs:
               "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
           conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
       - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
         run: |
           upload_fail=0
           CONAN_CMD="${CONAN_EXEC:-conan}"
@@ -539,4 +546,5 @@ jobs:
           [ "$upload_fail" -eq 0 ] || exit 1
 
       - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
         run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
