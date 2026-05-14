@@ -10,7 +10,7 @@ elif [ -n "$KSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
   [[ $0 != "$BASH_SOURCE" ]] && SOURCED=1
   SCRIPT=${BASH_SOURCE[0]}
-elif grep -q dash /proc/$$/cmdline; then
+elif command grep -q dash /proc/$$/cmdline; then
   case $0 in *dash*) SOURCED=1 ;; esac
   x=$(lsof -p $$ -Fn0 | tail -1); SCRIPT=${x#n}
 fi
@@ -125,6 +125,7 @@ if [ -z "$QT_HOME" ]; then
   fi
 
   if [ -n "$QT_HOME" ]; then
+    export QT_HOME
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
   else
     echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."
@@ -150,6 +151,18 @@ else
     fi
   else
     echo "Warning: Could not determine Qt version from path: $QT_HOME. Assuming it is compatible."
+  fi
+fi
+
+# If on macOS and Xcode version is 26 or higher, apply the Qt AGL fix
+if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$QT_HOME" ] && command -v xcodebuild >/dev/null 2>&1; then
+  XCODE_MAJOR_VERSION=$(xcodebuild -version | head -n 1 | awk '{print $2}' | cut -d. -f1)
+  if [[ -n "$XCODE_MAJOR_VERSION" && "$XCODE_MAJOR_VERSION" =~ ^[0-9]+$ && "$XCODE_MAJOR_VERSION" -ge 26 ]]; then
+    QT_BASE_DIR="$(dirname "$(dirname "$QT_HOME")")"
+    if [ -d "$QT_BASE_DIR" ]; then
+      echo "Xcode 26+ detected, ensuring Qt AGL fix is applied..."
+      QT_HOME="$QT_BASE_DIR" bash "$SCRIPT_HOME/apply_qt_fix.sh"
+    fi
   fi
 fi
 
@@ -195,7 +208,7 @@ __rv_install_precommit_hooks() {
   fi
   
   # Check if hooks are already installed to avoid redundant messages.
-  if [ -f "${RV_HOME}/.git/hooks/pre-commit" ] && grep -q "pre-commit" "${RV_HOME}/.git/hooks/pre-commit" 2>/dev/null; then
+  if [ -f "${RV_HOME}/.git/hooks/pre-commit" ] && command grep -q "pre-commit" "${RV_HOME}/.git/hooks/pre-commit" 2>/dev/null; then
     return 0
   fi
   
@@ -363,9 +376,9 @@ __rv_build_with_errors() {
       #   - Ninja:      "FAILED:"
       #   - CMake:      "CMake Error"
       #   - Linker:     "unresolved external symbol", "undefined symbol"
-      grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
-        grep -v "warnings being treated as errors" | \
-        grep -v "0 error" | \
+      command grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
+        command grep -v "warnings being treated as errors" | \
+        command grep -v "0 error" | \
         head -50 > "${error_summary}" 2>/dev/null || true
       
       if [[ -s "${error_summary}" ]]; then
@@ -391,7 +404,7 @@ __rv_build_with_errors() {
     echo "💡 Tips:"
     echo "  • Review the error summary above"
     echo "  • Check full log: less ${build_log}"
-    echo "  • Search for specific errors: grep -i 'your_error' ${build_log}"
+    echo "  • Search for specific errors: command grep -i 'your_error' ${build_log}"
     echo "════════════════════════════════════════════════════════════════"
     echo ""
     

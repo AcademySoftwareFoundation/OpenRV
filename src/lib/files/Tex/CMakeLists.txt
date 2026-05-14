@@ -24,7 +24,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC TwkMath TwkExc
-  PRIVATE Tiff::Tiff stl_ext
+  PRIVATE TIFF::TIFF stl_ext
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
