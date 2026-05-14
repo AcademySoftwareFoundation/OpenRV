@@ -10,10 +10,10 @@ class OpenRVRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     options = {
-        "vfx_platform": ["CY2023", "CY2024"],
+        "vfx_platform": ["CY2023", "CY2024", "CY2025"],
     }
     default_options = {
-        "vfx_platform": "CY2024",
+        "vfx_platform": "CY2025",
         "openjph/*:with_tiff": False,
     }
 

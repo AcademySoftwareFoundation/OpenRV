@@ -795,12 +795,12 @@ jobs:
       - name: Build and install OpenRV dependencies
         run: |
           source ~/.bash_profile
-          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows
+          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
-          
+
       - name: Build OpenRV main executable
         run: |
-          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows
+          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Tests
