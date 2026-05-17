@@ -24,6 +24,31 @@ namespace Rv
 {
     using namespace std;
 
+    // Normalize version string to major.minor.patch format
+    // If only major.minor is provided, append .0 for patch
+    QString normalizeVersion(const QString& version)
+    {
+        QString v = version.trimmed();
+        
+        // Count the number of dots
+        int dotCount = v.count('.');
+        
+        // If we have 0 or 1 dots, we need to add patch version
+        if (dotCount == 0)
+        {
+            // major only -> major.0.0
+            return v + ".0.0";
+        }
+        else if (dotCount == 1)
+        {
+            // major.minor -> major.minor.0
+            return v + ".0";
+        }
+        
+        // Already has 2+ dots, return as-is
+        return v;
+    }
+
     QString extractFile(unzFile uf, const string& outputPath)
     {
         char filename[256];
@@ -45,7 +70,9 @@ namespace Rv
         FILE* outFile = std::fopen(fullPath.c_str(), "wb");
         if (outFile == nullptr)
         {
-            cerr << "ERROR: Unable to open output file" << endl;
+            cerr << "ERROR: Unable to open output file: " << fullPath << endl;
+            cerr << "       Directory: " << parentDir.absolutePath().toStdString() << endl;
+            cerr << "       Check permissions and disk space." << endl;
             unzCloseCurrentFile(uf);
             return "";
         }
@@ -87,11 +114,8 @@ namespace Rv
         do
         {
             QString extractedFilePath = extractFile(uf, outputPath);
-            if (extractedFilePath == "")
-            {
-                cerr << "ERROR: Unable to extract zip file" << endl;
-            }
-            else
+            // Only add .rvpkg files to the list, ignore directories and other files
+            if (!extractedFilePath.isEmpty() && extractedFilePath.endsWith(".rvpkg"))
             {
                 includedPackages.push_back(extractedFilePath);
             }
@@ -1296,7 +1320,7 @@ namespace Rv
                                 else if (pname == "contact")
                                     package.contact = v;
                                 else if (pname == "version")
-                                    package.version = v;
+                                    package.version = normalizeVersion(v);
                                 else if (pname == "requires")
                                 package.
                                     requires
@@ -1351,7 +1375,8 @@ namespace Rv
                                       });
                     }
 
-                    QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
+                    // Add support for optional packages with patch version
+                    QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+(\.[0-9]+)?\.rvpkg)");
                     QRegularExpression zipRE(R"((.*)\.zip)");
 
                     QRegularExpressionMatch match = rvpkgRE.match(finfo.fileName());
@@ -1727,8 +1752,9 @@ namespace Rv
         //  First check that package files exist and have legal names
         //
 
-        QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
-        QRegularExpression rvpkgsRE(R"(.*)-[0-9]+\.[0-9]+\.rvpkgs)"); // bundle
+        // Add support for optional packages with patch version
+        QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+(\.[0-9]+)?\.rvpkg)");
+        QRegularExpression rvpkgsRE(R"(.*)-[0-9]+\.[0-9]+(\.[0-9]+)?\.rvpkgs)"); // bundle
         QRegularExpression zipRE(R"((.*)\.zip)");
 
         for (size_t i = 0; i < files.size(); i++)

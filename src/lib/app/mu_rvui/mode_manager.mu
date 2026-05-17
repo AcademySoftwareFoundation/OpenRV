@@ -126,6 +126,7 @@ class: ModeManagerMode : MinorMode
         string  base;
         int     major;
         int     minor;
+        int     patch;
         Package existing;
     }
 
@@ -532,6 +533,7 @@ class: ModeManagerMode : MinorMode
 
         int major = 1;
         int minor = 0;
+        int patch = 0;
 
         if (ext == "rvpkg")
         {
@@ -539,8 +541,19 @@ class: ModeManagerMode : MinorMode
             try
             {
                 let vparts = name.split("-")[1].split(".");
-                major = int(vparts[0]);
-                minor = int(vparts[1]);
+                // Support both major.minor and major.minor.patch formats
+                if (vparts.size() >= 2)
+                {
+                    major = int(vparts[0]);
+                    minor = int(vparts[1]);
+
+                    if (vparts.size() > 2)
+                        patch = int(vparts[2]);
+                }
+                else
+                {
+                    error = true;
+                }
             }
             catch (...)
             {
@@ -548,12 +561,12 @@ class: ModeManagerMode : MinorMode
             }
 
             if (error) {
-                print("ERROR: bad rvpkg package name \"%s\" expecting name-X.X.rvpkg\n" % name);
+                print("ERROR: bad rvpkg package name \"%s\" expecting name-X.X.rvpkg or name-X.X.X.rvpkg\n" % name);
                 return nil;
             }
         }
 
-        _packages.push_back(Package(name, without_extension(name), base, major, minor, existing));
+        _packages.push_back(Package(name, without_extension(name), base, major, minor, patch, existing));
         return _packages.back();
     }
 
