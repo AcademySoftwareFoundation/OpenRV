@@ -57,8 +57,10 @@ namespace TwkMovie
         typedef std::vector<Movie*> Movies;
         typedef stl_ext::thread_group::thread_api ThreadAPI;
         typedef void (*InitializeFunc)();
+        using FinalizeFunc = void (*)();
 
-        ThreadedMovie(const Movies&, const Frames& frames, size_t stackMultiplier = 8, ThreadAPI* api = 0, InitializeFunc = NULL);
+        ThreadedMovie(const Movies&, const Frames& frames, size_t stackMultiplier = 8, ThreadAPI* api = nullptr, InitializeFunc = nullptr,
+                      FinalizeFunc = nullptr);
 
         virtual ~ThreadedMovie();
 
@@ -104,6 +106,7 @@ namespace TwkMovie
         int m_requestIndex;
         bool m_init;
         InitializeFunc m_initialize;
+        FinalizeFunc m_finalize;
     };
 
 } // namespace TwkMovie

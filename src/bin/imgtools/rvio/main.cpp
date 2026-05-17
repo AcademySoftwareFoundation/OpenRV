@@ -970,14 +970,8 @@ int utf8Main(int argc, char* argv[])
     setEnvVar("LC_ALL", "C");
     TwkFB::ThreadPool::initialize();
 
-    //
-    //  XXX dummyDev is leaking here.  Best would be to pass it to the App so
-    //  that it could delete it after startup, since it's no longer needed at
-    //  that point.
-    //
-
 #ifdef RVIO_HW
-    TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+    auto dummyDev = std::make_unique<TwkGLF::FBOVideoDevice>(nullptr, 10, 10, false);
 #else
     TwkGLF::OSMesaVideoDevice* dummyDev = new TwkGLF::OSMesaVideoDevice(0, 10, 10, true);
     FrameBuffer* dummyFB = new FrameBuffer(10, 10, 4, FrameBuffer::FLOAT);
@@ -1646,7 +1640,7 @@ int utf8Main(int argc, char* argv[])
         threadAPI.create = GC_pthread_create;
         threadAPI.join = GC_pthread_join;
         threadAPI.detach = GC_pthread_detach;
-        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI, threadedMovieInit);
+        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI, threadedMovieInit, MovieRV::uninit);
 #endif
 #endif
 
@@ -1739,10 +1733,6 @@ int utf8Main(int argc, char* argv[])
 
         if (!writer->write(outmov, outfile, writeRequest))
             exit(-2);
-
-        // clean up any frame buffers we allocated writing the movie
-        //
-        MovieRV::uninit();
     }
     catch (TwkExc::Exception& exc)
     {
