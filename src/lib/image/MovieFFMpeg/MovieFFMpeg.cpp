@@ -318,6 +318,9 @@ namespace TwkMovie
                 av_frame_free(&videoFrame);
             av_frame_free(&inPicture);
             av_frame_free(&outPicture);
+
+            if (hardwareContext.deviceContext)
+                av_buffer_unref(&hardwareContext.deviceContext);
         };
 
         VideoTrack& initFrom(const VideoTrack* t)
@@ -5778,7 +5781,6 @@ namespace TwkMovie
         {
             VideoTrack* track = m_videoTracks[i];
             avcodec_free_context(&track->avCodecContext);
-            av_buffer_unref(&track->hardwareContext.deviceContext);
             delete track;
         }
         if (m_audioSamples)
