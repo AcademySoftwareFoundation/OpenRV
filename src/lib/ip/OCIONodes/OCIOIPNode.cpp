@@ -25,6 +25,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <regex>
+#include <string_view>
+#include <vector>
 
 namespace IPCore
 {
@@ -279,6 +281,87 @@ namespace IPCore
             return ns;
         }
 
+        // Returns true if 'text' contains 'word' as a whole identifier token
+        // (not as a substring of a longer alphanumeric/underscore identifier).
+        bool containsWholeWord(std::string_view text, const std::string& word)
+        {
+            size_t pos = 0;
+            while ((pos = text.find(word, pos)) != std::string_view::npos)
+            {
+                bool beforeOk = (pos == 0) || !(std::isalnum((unsigned char)text[pos - 1]) || text[pos - 1] == '_');
+                bool afterOk = (pos + word.size() >= text.size())
+                               || !(std::isalnum((unsigned char)text[pos + word.size()]) || text[pos + word.size()] == '_');
+                if (beforeOk && afterOk)
+                    return true;
+                pos += word.size();
+            }
+            return false;
+        }
+
+        // Finds all functions in the given GLSL shader code that reference
+        // the given LUT sampler name in their body but not their parameters,
+        // and returns their names.
+        std::vector<std::string> functionsMissingLutAsParameter(const std::string& inout_glsl, const std::string& lutSamplerName)
+        {
+            std::vector<std::string> functions;
+            if (lutSamplerName.empty())
+                return functions;
+
+            static const std::regex functionStartRegex(R"(^([A-Za-z_][A-Za-z0-9_]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([^;{}]*)\)\s*\{)",
+                                                       std::regex_constants::multiline);
+
+            auto searchBegin = inout_glsl.cbegin();
+            std::smatch match;
+
+            while (std::regex_search(searchBegin, inout_glsl.cend(), match, functionStartRegex))
+            {
+                const char* paramStart = &(*match[3].first);
+                size_t paramLen = static_cast<size_t>(std::distance(match[3].first, match[3].second));
+                std::string_view paramsView(paramStart, paramLen);
+
+                // If the LUT is in the parameters already, skip
+                if (containsWholeWord(paramsView, lutSamplerName))
+                {
+                    searchBegin = match[0].second;
+                    continue;
+                }
+
+                // Find the end of the function body by counting braces
+                size_t bodyStart = static_cast<size_t>(std::distance(inout_glsl.cbegin(), match[0].second)) - 1;
+                size_t depth = 1;
+                size_t bodyEnd = bodyStart + 1;
+
+                while (bodyEnd < inout_glsl.size() && depth > 0)
+                {
+                    bodyEnd = inout_glsl.find_first_of("{}", bodyEnd);
+                    if (bodyEnd == std::string::npos)
+                        break;
+                    if (inout_glsl[bodyEnd] == '{')
+                        ++depth;
+                    else
+                        --depth;
+                    ++bodyEnd;
+                }
+
+                // If brace matching failed (malformed GLSL), skip this function
+                if (bodyEnd == std::string::npos || depth != 0)
+                    break;
+
+                // Finally, check if the LUT is in the function body
+                {
+                    std::string_view functionBody(inout_glsl.data() + bodyStart, bodyEnd - bodyStart);
+                    if (containsWholeWord(functionBody, lutSamplerName))
+                    {
+                        functions.push_back(match.str(2));
+                    }
+                }
+
+                searchBegin = inout_glsl.cbegin() + static_cast<std::ptrdiff_t>(bodyEnd);
+            }
+
+            return functions;
+        }
+
         // Add the 1D/3D LUT uniform as a shader function parameter to leverage
         // RV's current shader variables binding mechanism which rely on shader
         // variables being passed as function arguments for all its shaders.
@@ -289,6 +372,90 @@ namespace IPCore
             const std::string from = "vec4 inPixel";
             std::string to = from + std::string(", ") + lutSamplerType + std::string(" ") + lutSamplerName;
             inout_glsl = std::regex_replace(inout_glsl, std::regex(from), to);
+
+            struct Edit
+            {
+                size_t pos;
+                std::string text;
+            };
+
+            // Iteratively find all functions that reference the LUT sampler
+            // in their body but not their parameters, and add the LUT sampler
+            // as a parameter until no such function is left.
+            while (true)
+            {
+                std::vector<std::string> functionNames = functionsMissingLutAsParameter(inout_glsl, lutSamplerName);
+
+                if (functionNames.empty())
+                    break;
+
+                std::vector<Edit> edits;
+                for (const std::string& name : functionNames)
+                {
+                    // Find each occurrence of "name(" using a simple token-boundary regex,
+                    // then use depth-tracking to find the matching ')'.
+                    std::regex nameRegex("\\b" + name + "\\s*\\(");
+                    auto it = std::sregex_iterator(inout_glsl.begin(), inout_glsl.end(), nameRegex);
+                    auto end = std::sregex_iterator();
+
+                    for (; it != end; ++it)
+                    {
+                        std::smatch m = *it;
+                        // argsStart is the position just after the opening '('
+                        size_t argsStart = static_cast<size_t>(m.position(0)) + static_cast<size_t>(m.length(0));
+
+                        // Find the matching ')' by tracking parenthesis depth
+                        size_t depth = 1;
+                        size_t pos = argsStart;
+                        while (pos < inout_glsl.size() && depth > 0)
+                        {
+                            if (inout_glsl[pos] == '(')
+                                ++depth;
+                            else if (inout_glsl[pos] == ')')
+                                --depth;
+                            if (depth > 0)
+                                ++pos;
+                        }
+
+                        if (depth != 0)
+                            continue; // malformed, skip
+
+                        size_t closeParenPos = pos;
+
+                        std::string_view innerArgs(inout_glsl.data() + argsStart, closeParenPos - argsStart);
+                        bool hasArgs = !innerArgs.empty();
+
+                        // Check if '{' follows the ')' (i.e. this is a function definition)
+                        size_t afterParen = closeParenPos + 1;
+                        while (afterParen < inout_glsl.size() && std::isspace((unsigned char)inout_glsl[afterParen]))
+                            ++afterParen;
+                        bool isDefinition = (afterParen < inout_glsl.size() && inout_glsl[afterParen] == '{');
+
+                        std::string injection;
+                        if (isDefinition)
+                        {
+                            injection = (hasArgs ? ", " : "") + lutSamplerType + " " + lutSamplerName;
+                        }
+                        else
+                        {
+                            injection = (hasArgs ? ", " : "") + lutSamplerName;
+                        }
+
+                        edits.push_back({closeParenPos, injection});
+                    }
+                }
+
+                if (edits.empty())
+                    break;
+
+                // Sort edits in reverse order of their position
+                // to avoid affecting the positions of subsequent edits
+                std::sort(edits.begin(), edits.end(), [](const Edit& a, const Edit& b) { return a.pos > b.pos; });
+                for (const auto& edit : edits)
+                {
+                    inout_glsl.insert(edit.pos, edit.text);
+                }
+            }
         }
 
     }; // namespace
