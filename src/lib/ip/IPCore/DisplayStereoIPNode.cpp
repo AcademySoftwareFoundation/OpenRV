@@ -205,6 +205,8 @@ namespace IPCore
             }
             else
             {
+                convertBlendRenderTypeToIntermediate(images, modifiedImages);
+
                 float daspect = float(w) / float(h);
                 float iaspect = images[0]->displayAspect();
 

@@ -869,6 +869,14 @@ namespace IPCore
             }
 
             context.commandExecuted = count;
+            std::cout << " cmdExecuted=" << context.commandExecuted
+                      << " cacheUpdated=" << context.cacheUpdated
+                      << " currentFBO=" << currentFBO
+                      << " tempfbo1=" << tempfbo1
+                      << " tempfbo2=" << tempfbo2
+                      << " cachedfbo=" << context.cachedfbo
+                      << " -> fbo=" << fbo
+                      << "\n";
 
             // currentFBO contains the resulting content after rendering these
             // commands
