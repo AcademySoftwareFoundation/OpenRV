@@ -1,4 +1,5 @@
 #include <RvCommon/RvBottomViewToolBar.h>
+#include <array>
 #include <QtCore/QVariant>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
@@ -17,8 +18,6 @@ namespace Rv
 
     namespace
     {
-        constexpr std::string_view playModeDefaultTooltip = "Select playback style";
-
         ///
         /// Make a button using an existing action and set it as the default action since
         /// the action is not directly added to the toolbar
@@ -63,14 +62,14 @@ namespace Rv
             QAction** target;
         };
 
-        const LeftActionDef leftDefs[] = {
+        const std::array<LeftActionDef, 6> leftDefs = {{
             {":/images/smanager.png", "Toggle Session Manager", "left", &m_smAction},
             {":/images/paint_48x48.png", "Toggle Annotation tools", "interior", &m_paintAction},
             {":/images/about_48x48.png", "Toggle Image Info", "interior", &m_infoAction},
             {":/images/ntwrk_48x48.png", "Toggle RV Networking Dialog", "interior", &m_networkAction},
             {":/images/timeline_mag.png", "Toggle Timeline Magnifier", "interior", &m_timelineMagAction},
             {":/images/timeline.png", "Toggle Timeline", "right", &m_timelineAction},
-        };
+        }};
         for (const auto& def : leftDefs)
         {
             QAction* a = new QAction("", this);

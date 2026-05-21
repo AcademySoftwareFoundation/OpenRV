@@ -29,6 +29,8 @@ namespace IPCore
 namespace Rv
 {
 
+    static constexpr std::string_view playModeDefaultTooltip = "Select playback style";
+
     class RvBottomViewToolBar
         : public QToolBar
         , public TwkApp::EventNode

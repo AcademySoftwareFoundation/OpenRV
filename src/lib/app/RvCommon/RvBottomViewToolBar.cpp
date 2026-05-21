@@ -41,8 +41,6 @@ namespace Rv
     using namespace boost;
     using namespace TwkQtCoreUtil;
 
-    static constexpr std::string_view playModeDefaultTooltip = "Select playback style";
-
     RvBottomViewToolBar::RvBottomViewToolBar(QWidget* parent)
         : QToolBar("bottom", parent)
         , EventNode("bottomToolBar")
