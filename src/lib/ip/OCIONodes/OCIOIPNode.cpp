@@ -307,8 +307,9 @@ namespace IPCore
             if (lutSamplerName.empty())
                 return functions;
 
-            static const std::regex functionStartRegex(R"(^([A-Za-z_][A-Za-z0-9_]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([^;{}]*)\)\s*\{)",
-                                                       std::regex_constants::multiline);
+            // Regex captures: [1] return type, [2] function name, [3] parameters
+            static const std::regex functionStartRegex(
+                R"(([A-Za-z_][A-Za-z0-9_]*)\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(([^;{}]*)\)\s*\{)");
 
             auto searchBegin = inout_glsl.cbegin();
             std::smatch match;
