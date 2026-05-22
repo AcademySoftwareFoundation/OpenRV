@@ -9,7 +9,6 @@
 #include <RvCommon/RvApplication.h>
 #include <RvPackage/PackageManager.h>
 #include <QtCore/QVariant>
-#include <QtCore/QDebug>
 #include <QtGui/QMouseEvent>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QMenu>
