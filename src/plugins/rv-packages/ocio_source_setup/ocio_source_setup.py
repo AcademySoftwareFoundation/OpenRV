@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 from rv import rvtypes, commands
-from pathlib import Path
 import os
 import PyOpenColorIO as OCIO
 
@@ -530,7 +529,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
-            os.environ["OCIO"] = config
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
@@ -725,8 +723,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         # An externally set OCIO env var takes precendence
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
-            if config != "" and Path(config).is_file():
-                os.environ["OCIO"] = config
+            if config != "" and os.path.isfile(config):
+                self.config = OCIO.Config.CreateFromFile(config)
 
         self.init(
             "OCIO Source Setup",
