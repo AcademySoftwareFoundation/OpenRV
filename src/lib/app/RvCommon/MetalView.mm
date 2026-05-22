@@ -40,7 +40,7 @@ namespace Rv
     // MetalView implementation
     //--------------------------------------------------------------------------
 
-    MetalView::MetalView(RvDocument* doc, QWidget* parent, int bitsPerChannel, bool noResize)
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool noResize)
         : QWidget(parent)
         , m_doc(doc)
         , m_videoDevice(nullptr)
@@ -49,7 +49,6 @@ namespace Rv
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
         , m_userActive(true)
-        , m_bitsPerChannel(bitsPerChannel)
         , m_csize(1024, 576)
         , m_msize(128, 128)
         , m_eventWidget(nullptr)
@@ -59,7 +58,6 @@ namespace Rv
         , m_ioSurface(nullptr)
         , m_ioSurfaceWidth(0)
         , m_ioSurfaceHeight(0)
-        , m_ioSurface10bit(false)
     {
         // Ensure a native NSView is created immediately so winId() is valid
         // when initialize() is called from showEvent().
@@ -69,7 +67,7 @@ namespace Rv
 
         ostringstream str;
         str << UI_APPLICATION_NAME " Main Window (Metal)" << "/" << m_doc;
-        m_videoDevice = new QTMetalVideoDevice(nullptr, str.str(), this, nullptr, m_bitsPerChannel);
+        m_videoDevice = new QTMetalVideoDevice(nullptr, str.str(), this, nullptr);
 
         m_activityTimer.start();
 
@@ -135,7 +133,7 @@ namespace Rv
         // delivery because CAMetalLayer with BGR10A2Unorm is mishandled by the CA
         // compositor on macOS: it treats 4-byte packed pixels as 1 byte, producing
         // 4× horizontal tiling.  IOSurface + kCVPixelFormatType_ARGB2101010LEPacked
-        // is composited natively and correctly for both 10-bit and 8-bit formats.
+        // is composited natively and correctly for the 10-bit format.
         CALayer* caLayer = [CALayer layer];
         caLayer.opaque          = YES;
         caLayer.contentsGravity = kCAGravityResize;  // IOSurface fills layer exactly
@@ -162,17 +160,16 @@ namespace Rv
     // presentPixelData — called by QTMetalVideoDevice::syncBuffers()
     //--------------------------------------------------------------------------
 
-    void MetalView::presentPixelData(const void* pixels, int w, int h, bool is10bit)
+    void MetalView::presentPixelData(const void* pixels, int w, int h)
     {
         CALayer* layer = (__bridge CALayer*)m_caLayer;
         if (!layer || w <= 0 || h <= 0)
             return;
 
-        // Create/recreate IOSurface if size or format changed
+        // Create/recreate IOSurface if size changed
         if (!m_ioSurface
             || m_ioSurfaceWidth  != w
-            || m_ioSurfaceHeight != h
-            || m_ioSurface10bit  != is10bit)
+            || m_ioSurfaceHeight != h)
         {
             if (m_ioSurface)
             {
@@ -184,29 +181,23 @@ namespace Rv
             //   32-bit word, big-endian bit order: A[31:30] R[29:20] G[19:10] B[9:0]
             //   Stored little-endian in memory; CA handles this format natively
             //   for 10-bit wide-color display.
-            // kCVPixelFormatType_32BGRA = 'BGRA': standard 8-bit BGRA.
-            uint32_t pixelFormat = is10bit
-                ? kCVPixelFormatType_ARGB2101010LEPacked
-                : kCVPixelFormatType_32BGRA;
-
             NSDictionary* props = @{
                 (NSString*)kIOSurfaceWidth:           @(w),
                 (NSString*)kIOSurfaceHeight:          @(h),
                 (NSString*)kIOSurfaceBytesPerElement: @(4),
-                (NSString*)kIOSurfacePixelFormat:     @(pixelFormat),
+                (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
             };
             IOSurfaceRef surf = IOSurfaceCreate((__bridge CFDictionaryRef)props);
             if (!surf)
             {
                 std::cerr << "[MetalView::presentPixelData] IOSurfaceCreate failed "
-                          << w << "x" << h << " fmt=" << pixelFormat << "\n";
+                          << w << "x" << h << "\n";
                 return;
             }
 
             m_ioSurface       = surf;
             m_ioSurfaceWidth  = w;
             m_ioSurfaceHeight = h;
-            m_ioSurface10bit  = is10bit;
         }
 
         IOSurfaceRef surf = (IOSurfaceRef)m_ioSurface;

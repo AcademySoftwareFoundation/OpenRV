@@ -50,7 +50,7 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, int bitsPerChannel = 10, bool noResize = true);
+        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
         ~MetalView();
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }
@@ -79,17 +79,14 @@ namespace Rv
         //
         //  IOSurface presentation — called by QTMetalVideoDevice::syncBuffers().
         //
-        //  pixels: packed pixel data row-major, y=0 is TOP row (IOSurface
+        //  pixels: packed ARGB2101010LE row-major, y=0 is TOP row (IOSurface
         //          convention; caller must y-flip from GL bottom-left origin).
-        //    is10bit=true  → ARGB2101010LE: (3<<30)|(R<<20)|(G<<10)|B per pixel
-        //    is10bit=false → BGRA8:         B,G,R,A bytes per pixel
-        //  w,h: physical pixel dimensions (FBO size = view.size × DPR)
+        //  Format: (3<<30)|(R<<20)|(G<<10)|B per pixel.
+        //  w,h: physical pixel dimensions (FBO size = view.size × DPR).
         //
-        void presentPixelData(const void* pixels, int w, int h, bool is10bit);
+        void presentPixelData(const void* pixels, int w, int h);
 
         bool isInitialized() const { return m_initialized; }
-
-        int bitsPerChannel() const { return m_bitsPerChannel; }
 
     public slots:
         void eventProcessingTimeout();
@@ -113,7 +110,6 @@ namespace Rv
         bool m_postFirstNonEmptyRender; // mirrors GLView::m_postFirstNonEmptyRender
         bool m_stopProcessingEvents;
         bool m_userActive;
-        int m_bitsPerChannel;
 
         QSize m_csize;
         QSize m_msize;
@@ -130,7 +126,6 @@ namespace Rv
         void* m_ioSurface; // IOSurfaceRef
         int m_ioSurfaceWidth;
         int m_ioSurfaceHeight;
-        bool m_ioSurface10bit;
     };
 
 } // namespace Rv

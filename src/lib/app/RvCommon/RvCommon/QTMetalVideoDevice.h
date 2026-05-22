@@ -29,10 +29,9 @@ namespace Rv
     //      macOS, Qt backs QOffscreenSurface with a hidden NSView, giving the
     //      context a real native surface (required on Apple Silicon).
     //    • A GLFBO is created in this context; all IPCore rendering goes there.
-    //    • syncBuffers() reads the FBO pixels back to CPU, converts to packed
-    //      format (ARGB2101010LE for 10-bit, BGRA8 for 8-bit), and calls
-    //      MetalView::presentPixelData() which writes to an IOSurface and
-    //      assigns it to a plain CALayer for display.
+    //    • syncBuffers() reads the FBO pixels back to CPU, packs them as
+    //      ARGB2101010LE, and calls MetalView::presentPixelData() which writes
+    //      to an IOSurface and assigns it to a plain CALayer for display.
     //
     //  The IOSurface + CALayer path is used instead of CAMetalLayer because
     //  the CA compositor mishandles MTLPixelFormatBGR10A2Unorm, producing
@@ -42,7 +41,7 @@ namespace Rv
     class QTMetalVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        QTMetalVideoDevice(TwkApp::VideoModule* module, const std::string& name, MetalView* view, QWidget* eventWidget, int bitsPerChannel);
+        QTMetalVideoDevice(TwkApp::VideoModule* module, const std::string& name, MetalView* view, QWidget* eventWidget);
         virtual ~QTMetalVideoDevice();
 
         MetalView* metalView() const { return m_view; }
@@ -98,7 +97,6 @@ namespace Rv
         int m_y{0};
         float m_refresh{-1.0f};
         bool m_isOpen{false};
-        int m_bitsPerChannel;
 
         // Qt GL context + offscreen surface for GL rendering.
         // QOffscreenSurface on macOS is backed by a hidden NSView, which gives

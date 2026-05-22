@@ -34,14 +34,12 @@ namespace Rv
     QTMetalVideoDevice::QTMetalVideoDevice(VideoModule* module,
                                            const string& name,
                                            MetalView* view,
-                                           QWidget* eventWidget,
-                                           int bitsPerChannel)
+                                           QWidget* eventWidget)
         : TwkGLF::GLVideoDevice(module, name,
                                  VideoDevice::ImageOutput | VideoDevice::ProvidesSync | VideoDevice::SubWindow)
         , m_view(view)
         , m_eventWidget(eventWidget)
         , m_translator(eventWidget ? new QTTranslator(this, eventWidget) : nullptr)
-        , m_bitsPerChannel(bitsPerChannel)
     {
         assert(view);
     }
@@ -334,66 +332,37 @@ namespace Rv
 
         // --- Format conversion + y-flip ---
         //
-        // For 10-bit: ARGB2101010LE — (A<<30)|(R<<20)|(G<<10)|B
-        //   where A=3 (fully opaque, 2-bit), R/G/B are 10-bit [0..1023]
-        //   This is kCVPixelFormatType_ARGB2101010LEPacked = 'l30r' = 0x6C333072
-        //
-        // For 8-bit: BGRA8 — B,G,R,A bytes
-        //   This is kCVPixelFormatType_32BGRA = 'BGRA'
+        // Pack as ARGB2101010LE — (A<<30)|(R<<20)|(G<<10)|B
+        //   where A=3 (fully opaque, 2-bit), R/G/B are 10-bit [0..1023].
+        //   This is kCVPixelFormatType_ARGB2101010LEPacked = 'l30r' = 0x6C333072.
         //
         // GL origin is bottom-left; IOSurface/CALayer origin is top-left.
         // We y-flip by iterating src rows in reverse.
 
-        const bool is10Bit = (m_bitsPerChannel >= 10);
+        std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
 
-        if (is10Bit)
+        for (int y = 0; y < h; ++y)
         {
-            std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
+            // src row: y-flip (GL origin is bottom-left)
+            const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
+            uint32_t*    dst = packed.data()  + (size_t)y * w;
 
-            for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x, src += 4)
             {
-                // src row: y-flip (GL origin is bottom-left)
-                const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
-                uint32_t*    dst = packed.data()  + (size_t)y * w;
-
-                for (int x = 0; x < w; ++x, src += 4)
-                {
-                    const float r = std::max(0.f, std::min(1.f, src[0]));
-                    const float g = std::max(0.f, std::min(1.f, src[1]));
-                    const float b = std::max(0.f, std::min(1.f, src[2]));
-                    const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
-                    const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
-                    const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
-                    // ARGB2101010LE: bits[31:30]=A(2), bits[29:20]=R(10),
-                    //                bits[19:10]=G(10), bits[9:0]=B(10)
-                    // Alpha always opaque: A=3 (= 0b11, max 2-bit value).
-                    dst[x] = (3u << 30) | (ri << 20) | (gi << 10) | bi;
-                }
+                const float r = std::max(0.f, std::min(1.f, src[0]));
+                const float g = std::max(0.f, std::min(1.f, src[1]));
+                const float b = std::max(0.f, std::min(1.f, src[2]));
+                const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
+                const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
+                const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
+                // ARGB2101010LE: bits[31:30]=A(2), bits[29:20]=R(10),
+                //                bits[19:10]=G(10), bits[9:0]=B(10)
+                // Alpha always opaque: A=3 (= 0b11, max 2-bit value).
+                dst[x] = (3u << 30) | (ri << 20) | (gi << 10) | bi;
             }
-
-            m_view->presentPixelData(packed.data(), w, h, true);
         }
-        else
-        {
-            std::vector<uint8_t> bytes(static_cast<size_t>(w) * h * 4);
 
-            for (int y = 0; y < h; ++y)
-            {
-                const float*  src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
-                uint8_t*      dst = bytes.data()   + (size_t)y * w * 4;
-
-                for (int x = 0; x < w; ++x, src += 4, dst += 4)
-                {
-                    // BGRA8: B, G, R, A
-                    dst[0] = static_cast<uint8_t>(std::max(0.f, std::min(1.f, src[2])) * 255.f + 0.5f);
-                    dst[1] = static_cast<uint8_t>(std::max(0.f, std::min(1.f, src[1])) * 255.f + 0.5f);
-                    dst[2] = static_cast<uint8_t>(std::max(0.f, std::min(1.f, src[0])) * 255.f + 0.5f);
-                    dst[3] = 255;  // fully opaque
-                }
-            }
-
-            m_view->presentPixelData(bytes.data(), w, h, false);
-        }
+        m_view->presentPixelData(packed.data(), w, h);
     }
 
     //--------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -65,7 +65,7 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp DeepColorSupport.mm)
+  LIST(APPEND _sources DisplayLink.cpp)
   IF(USE_METAL)
     LIST(APPEND _sources MetalView.mm QTMetalVideoDevice.mm)
     SET_SOURCE_FILES_PROPERTIES(
@@ -440,7 +440,7 @@ IF(RV_TARGET_DARWIN)
     TARGET_LINK_LIBRARIES(
       ${_target}
       PUBLIC TwkGLFCoreGraphics
-      PRIVATE "-framework CoreVideo" "-framework QuartzCore"
+      PRIVATE "-framework CoreVideo"
     )
   ENDIF()
 ENDIF()
