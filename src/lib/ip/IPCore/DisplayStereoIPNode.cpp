@@ -51,6 +51,7 @@ namespace IPCore
             }
         }
 
+        // Note that each eye in stereo stores FBO separately
         void prepareForStereo(IPImage* img, bool isLeftEye, bool mirror, bool vertical, Vec3f offset, Vec3f roffset, Vec3f scale)
         {
             if (img->destination == IPImage::OutputTexture)
