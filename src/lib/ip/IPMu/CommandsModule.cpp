@@ -1333,19 +1333,6 @@ namespace IPMu
 
     static void computePixelImages(float x, float y, ImageRenderer::RenderedImagesVector& images, PixelImageVector& pixelImages)
     {
-        // Diagnostic: log once per distinct cursor position, only when the
-        // scene has multiple rendered images (e.g. stereo pair).
-        static float s_lastX = std::numeric_limits<float>::quiet_NaN();
-        static float s_lastY = std::numeric_limits<float>::quiet_NaN();
-        const bool positionChanged = (x != s_lastX) || (y != s_lastY);
-        const bool shouldLog = positionChanged && images.size() > 1;
-        if (shouldLog)
-        {
-            s_lastX = x;
-            s_lastY = y;
-            std::cout << "\n[computePixelImages] click_ndc=(" << x << "," << y << ") n=" << images.size() << "\n";
-        }
-
         for (size_t i = 0; i < images.size(); ++i)
         {
             const ImageRenderer::RenderedImage& image = images[i];
@@ -1396,13 +1383,6 @@ namespace IPMu
             const float ymax = hmin + (hmax - hmin) * image.stencilBox.max.y;
 
             const bool inside = p.x >= xmin && p.x <= xmax && p.y >= ymin && p.y <= ymax;
-
-            std::cout << "[computePixelImages] i=" << i << " src=" << image.source
-                      << " click_ndc=(" << x << "," << y << ")"
-                      << " img_coord=(" << p.x << "," << p.y << ")"
-                      << " bounds=[" << xmin << ".." << xmax << "]x[" << ymin << ".." << ymax << "]"
-                      << " inside=" << inside
-                      << "\n";
 
             if (inside)
             {

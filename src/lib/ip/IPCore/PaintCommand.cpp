@@ -869,19 +869,28 @@ namespace IPCore
             }
 
             context.commandExecuted = count;
-            std::cout << " cmdExecuted=" << context.commandExecuted
-                      << " cacheUpdated=" << context.cacheUpdated
-                      << " currentFBO=" << currentFBO
-                      << " tempfbo1=" << tempfbo1
-                      << " tempfbo2=" << tempfbo2
-                      << " cachedfbo=" << context.cachedfbo
-                      << " -> fbo=" << fbo
-                      << "\n";
 
             // currentFBO contains the resulting content after rendering these
-            // commands
+            // commands. In stereo modes that pack two eyes into one output
+            // (pair, mirror, hsqueezed, vsqueezed) restrict the blit to the
+            // eye's region of the target so the other half - which contains
+            // either nothing or stale cached pixels - cannot clobber the work
+            // of the other eye.
             if (fbo && currentFBO)
-                currentFBO->copyTo(fbo);
+            {
+                const float rx = root->paintTargetRegionX;
+                const float ry = root->paintTargetRegionY;
+                const float rw = root->paintTargetRegionW;
+                const float rh = root->paintTargetRegionH;
+                if (rx == 0.0f && ry == 0.0f && rw == 1.0f && rh == 1.0f)
+                {
+                    currentFBO->copyTo(fbo);
+                }
+                else
+                {
+                    currentFBO->copyRegionTo(fbo, rx, ry, rw, rh, rx, ry, rw, rh);
+                }
+            }
         }
 
     } // namespace Paint

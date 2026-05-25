@@ -408,6 +408,16 @@ namespace IPCore
 
         Matrix33 textureMatrix;
 
+        // Normalized [0,1] region of the target FBO this image's paint
+        // ultimately writes to. Defaults to the full FBO (0,0,1,1).
+        // Stereo modes that pack two eyes into one output (pair, mirror,
+        // hsqueezed, vsqueezed) override this so the paint blit only writes
+        // to the eye's half and does not clobber the other eye.
+        float paintTargetRegionX = 0.0f;
+        float paintTargetRegionY = 0.0f;
+        float paintTargetRegionW = 1.0f;
+        float paintTargetRegionH = 1.0f;
+
         Box2 viewport;   // viewport
         Box2 stencilBox; // box in image space
 

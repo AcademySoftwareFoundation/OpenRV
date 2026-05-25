@@ -4899,17 +4899,17 @@ namespace IPCore
                 m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);
             assert(lastCmdNum <= curCmdNum);
 
-            std::cout
-                << " dest=" << root->destination
-                << " targetFBO=" << fbo
-                << " w=" << fbo->width() << "x" << fbo->height()
-                << " curCmdNum=" << curCmdNum
-                << " foundCache=" << foundCachedFBO
-                << " lastCmdNum=" << lastCmdNum
-                << " identifier=" << newRenderID.str().substr(0, 80)
-                << " cachedFBO_ptr=" << cachedFBO
-                << " idTail=" << (newRenderID.str().size() > 80 ? newRenderID.str().substr(newRenderID.str().size() - 40) : std::string())
-                << "\n";
+            // std::cout
+            //     << " dest=" << root->destination
+            //     << " targetFBO=" << fbo
+            //     << " w=" << fbo->width() << "x" << fbo->height()
+            //     << " curCmdNum=" << curCmdNum
+            //     << " foundCache=" << foundCachedFBO
+            //     << " lastCmdNum=" << lastCmdNum
+            //     << " identifier=" << newRenderID.str().substr(0, 80)
+            //     << " cachedFBO_ptr=" << cachedFBO
+            //     << " idTail=" << (newRenderID.str().size() > 80 ? newRenderID.str().substr(newRenderID.str().size() - 40) : std::string())
+            //     << "\n";
 
             if (foundCachedFBO)
             {
