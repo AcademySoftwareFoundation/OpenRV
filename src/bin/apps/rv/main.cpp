@@ -122,7 +122,7 @@ extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
 // #error ********* NO VERSION INFORMATION ***********
 #else
 #ifndef _MSC_VER
-#warning********* NO VERSION INFORMATION ***********
+#warning ********* NO VERSION INFORMATION ***********
 #endif
 #endif
 #endif
