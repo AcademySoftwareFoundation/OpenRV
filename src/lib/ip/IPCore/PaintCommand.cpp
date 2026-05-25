@@ -871,11 +871,7 @@ namespace IPCore
             context.commandExecuted = count;
 
             // currentFBO contains the resulting content after rendering these
-            // commands. In stereo modes that pack two eyes into one output
-            // (pair, mirror, hsqueezed, vsqueezed) restrict the blit to the
-            // eye's region of the target so the other half - which contains
-            // either nothing or stale cached pixels - cannot clobber the work
-            // of the other eye.
+            // commands.
             if (fbo && currentFBO)
             {
                 const float rx = root->paintTargetRegionX;
@@ -888,6 +884,7 @@ namespace IPCore
                 }
                 else
                 {
+                    // Copy limited region for certain stereo modes (e.g. side-by-side)
                     currentFBO->copyRegionTo(fbo, rx, ry, rw, rh, rx, ry, rw, rh);
                 }
             }

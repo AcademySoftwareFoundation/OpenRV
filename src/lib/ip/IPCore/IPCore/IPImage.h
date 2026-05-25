@@ -408,11 +408,9 @@ namespace IPCore
 
         Matrix33 textureMatrix;
 
-        // Normalized [0,1] region of the target FBO this image's paint
-        // ultimately writes to. Defaults to the full FBO (0,0,1,1).
-        // Stereo modes that pack two eyes into one output (pair, mirror,
-        // hsqueezed, vsqueezed) override this so the paint blit only writes
-        // to the eye's half and does not clobber the other eye.
+        // Target regions to which we write our paint annotations to.
+        // Default is the entire view, but for certain modes (e.g. side-by-side)
+        // regions are clamped to not clobber the cache.
         float paintTargetRegionX = 0.0f;
         float paintTargetRegionY = 0.0f;
         float paintTargetRegionW = 1.0f;
@@ -473,7 +471,7 @@ namespace IPCore
         mutable HashValue m_renderIDHash; // 32 bit crc
         mutable HashValue m_fbHash;       // 32 bit crc
         mutable std::string m_renderID;
-        mutable std::string m_renderIDWithPartialPaint;
+        mutable std::string m_renderIDWithPartialPaint; // Used as cache key for painting annotations
         mutable std::string m_graphID;
         mutable size_t m_coordID;
     };

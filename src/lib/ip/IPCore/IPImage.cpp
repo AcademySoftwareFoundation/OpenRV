@@ -558,7 +558,7 @@ namespace IPCore
           << "," << M(3, 2) << "," << M(3, 3) << "]";
     }
 
-static void hashMatrix33(ostream& o, const IPImage::Matrix33& M)
+    static void hashMatrix33(ostream& o, const IPImage::Matrix33& M)
     {
         o << "[" << M(0, 0) << "," << M(0, 1) << "," << M(0, 2) << "," << M(1, 0) << "," << M(1, 1) << "," << M(1, 2) << "," << M(2, 0)
           << "," << M(2, 1) << "," << M(2, 2) << "]";

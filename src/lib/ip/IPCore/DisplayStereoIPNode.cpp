@@ -36,15 +36,19 @@ namespace IPCore
 
         // Recursively stamps the eye's paint target region on every IPImage in
         // the subtree so the renderer can find it on whichever descendant
-        // actually carries the paint commands.
+        // actually carries the paint commands. (might not be needed)
         void propagatePaintRegion(IPImage* img, float rx, float ry, float rw, float rh)
         {
-            if (!img) return;
+            if (!img)
+                return;
             img->paintTargetRegionX = rx;
             img->paintTargetRegionY = ry;
             img->paintTargetRegionW = rw;
             img->paintTargetRegionH = rh;
-            for (IPImage* c = img->children; c; c = c->next) { propagatePaintRegion(c, rx, ry, rw, rh); }
+            for (IPImage* c = img->children; c; c = c->next)
+            {
+                propagatePaintRegion(c, rx, ry, rw, rh);
+            }
         }
 
         void prepareForStereo(IPImage* img, bool isLeftEye, bool mirror, bool vertical, Vec3f offset, Vec3f roffset, Vec3f scale)
@@ -73,11 +77,7 @@ namespace IPCore
 
                 img->transformMatrix = img->transformMatrix * S * T;
 
-                // Record the [0,1] target-FBO region this eye occupies so the
-                // paint blit can be scissored to only this region. Without
-                // this, each eye's full-size painted FBO blits over the other
-                // eye's region of the target. Side-by-side modes split X;
-                // vsqueezed splits Y.
+                // Set the target paint regions for cache when rendering
                 float rx, ry, rw, rh;
                 if (vertical)
                 {
