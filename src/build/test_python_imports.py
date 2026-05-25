@@ -21,6 +21,11 @@ import os
 import re
 import sys
 
+# OpenSSL 3.x legacy provider may not be available when OpenSSL is built from
+# source or supplied by Conan without the legacy module on the search path.
+# OpenRV does not use legacy algorithms, so allow cryptography to run without it.
+os.environ.setdefault("CRYPTOGRAPHY_OPENSSL_NO_LEGACY", "1")
+
 # Packages to skip from requirements.txt.in (e.g., build dependencies that don't need import testing).
 SKIP_IMPORTS = [
     "pip",
