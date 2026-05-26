@@ -1,9 +1,8 @@
-import ctypes
 import hashlib
 import logging
 import math
 import os
-import signal
+import psutil
 import shutil
 import subprocess
 import sys
@@ -34,34 +33,16 @@ _IS_WIN32 = sys.platform == "win32"
 
 
 def _suspend_proc(proc: subprocess.Popen) -> None:
-    """Suspend a subprocess. Uses SIGSTOP on Unix, NtSuspendProcess on Windows."""
     try:
-        if _IS_WIN32:
-            handle = ctypes.windll.kernel32.OpenProcess(0x0800, False, proc.pid)  # PROCESS_SUSPEND_RESUME
-            if handle:
-                try:
-                    ctypes.windll.ntdll.NtSuspendProcess(handle)
-                finally:
-                    ctypes.windll.kernel32.CloseHandle(handle)
-        else:
-            proc.send_signal(signal.SIGSTOP)
-    except Exception:
+        psutil.Process(proc.pid).suspend()
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
         logger.warning(f"Failed to suspend process {proc.pid}")
 
 
 def _resume_proc(proc: subprocess.Popen) -> None:
-    """Resume a suspended subprocess. Uses SIGCONT on Unix, NtResumeProcess on Windows."""
     try:
-        if _IS_WIN32:
-            handle = ctypes.windll.kernel32.OpenProcess(0x0800, False, proc.pid)  # PROCESS_SUSPEND_RESUME
-            if handle:
-                try:
-                    ctypes.windll.ntdll.NtResumeProcess(handle)
-                finally:
-                    ctypes.windll.kernel32.CloseHandle(handle)
-        else:
-            proc.send_signal(signal.SIGCONT)
-    except Exception:
+        psutil.Process(proc.pid).resume()
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
         logger.warning(f"Failed to resume process {proc.pid}")
 
 
