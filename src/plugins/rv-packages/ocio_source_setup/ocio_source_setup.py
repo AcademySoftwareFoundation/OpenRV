@@ -29,7 +29,7 @@ METHODS = ["ocio_config_from_media", "ocio_node_from_media"]
 
 def ocio_config_from_media(media, attributes):
     if os.getenv("OCIO") is None:
-        raise Exception("ERROR: $OCIO environment variable unset!")
+        raise Exception
 
     return OCIO.GetCurrentConfig()
 
@@ -269,7 +269,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 OCIO.SetCurrentConfig(self.config)
                 commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             except Exception as inst:
-                print(("ERROR: Unable to retrieve OCIO context: %s" % inst))
                 return
 
         #
@@ -725,6 +724,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "" and os.path.isfile(config):
                 self.config = OCIO.Config.CreateFromFile(config)
+            else:
+                print("WARNING: $OCIO environment variable unset!")
 
         self.init(
             "OCIO Source Setup",
