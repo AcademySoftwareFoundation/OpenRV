@@ -1759,5 +1759,35 @@ int utf8Main(int argc, char* argv[])
     TwkFB::GenericIO::shutdown();    // Shutdown TwkFB::GenericIO plugins
 
     TwkFB::ThreadPool::shutdown();
+
+#ifdef PLATFORM_LINUX
+    //
+    //  Workaround for the libglvnd <-> NVIDIA driver shutdown race.
+    //
+    //  Returning normally from main() triggers libc's exit handlers, which
+    //  run _dl_fini. _dl_fini invokes each linked library's destructor,
+    //  including libGLX.so.0's __glXFini, which calls
+    //  __glXMappingTeardown -> dlclose("libGLX_nvidia.so.0").
+    //
+    //  Note: libglvnd (GL Vendor-Neutral Dispatch library) is the dispatch
+    //  layer that sits between an application's OpenGL/GLX/EGL calls
+    //  and the actual vendor driver on Linux.
+    //
+    //  The NVIDIA closed-source driver spawns internal helper threads
+    //  (idle/event loops inside libnvidia-glcore.so) that libglvnd has no
+    //  hook to join. The dlclose therefore unmaps libnvidia-glcore.so while
+    //  those threads are still running, and their next instruction fetch
+    //  lands on an unmapped page -> SIGSEGV at process exit.
+    //
+    //  Calling std::_Exit(0) instead of returning skips atexit/_dl_fini and
+    //  lets the kernel reap memory, threads, and file descriptors directly.
+    //  This is safe here: by this point rvio's own shutdown is complete
+    //  (the output movie is closed, MovieRV/GenericIO/ThreadPool have all
+    //  been torn down), so there is no remaining cleanup that the exit
+    //  handlers would have done for us.
+    //
+    std::_Exit(0);
+#endif
+
     return 0;
 }
