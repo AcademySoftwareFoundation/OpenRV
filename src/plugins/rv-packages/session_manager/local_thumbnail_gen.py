@@ -133,14 +133,9 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             (
                 "session-manager-stop-all",
                 self._suspend_all_procs,
-                "Pause thumbnail generation while thumbnails are hidden"
-
+                "Pause thumbnail generation while thumbnails are hidden",
             ),
-            (
-                "session-manager-start-all",
-                self._resume_all_procs,
-                "Resume thumbnail generation after enabling preview"
-            )
+            ("session-manager-start-all", self._resume_all_procs, "Resume thumbnail generation after enabling preview"),
         ]
 
     def _get_cached_path(self, event: Any, path_key: str) -> None:
@@ -524,7 +519,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         if self._deferred_jobs:
             source_node, cache_key, media_path, path_key = self._deferred_jobs.pop(0)
             self._submit_generation(source_node, cache_key, media_path, path_key)
-    
+
     def _on_play_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
@@ -579,6 +574,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             except Exception as e:
                 logger.warning(f"Failed to delete cache directory {self._cache_dir}: {e}")
         self._cache.clear()
+
 
 def createMode() -> LocalThumbnailGen:
     global the_mode
