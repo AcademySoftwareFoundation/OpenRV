@@ -268,7 +268,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 self.config = ocio_config_from_media(media, attrDict)
                 OCIO.SetCurrentConfig(self.config)
                 commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
-            except Exception as inst:
+            except Exception:
                 return
 
         #
