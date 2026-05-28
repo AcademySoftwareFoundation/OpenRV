@@ -130,6 +130,17 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 self._on_play_stop,
                 "Resume thumbnail generation after playback",
             ),
+            (
+                "session-manager-stop-all",
+                self._suspend_all_procs,
+                "Pause thumbnail generation while thumbnails are hidden"
+
+            ),
+            (
+                "session-manager-start-all",
+                self._resume_all_procs,
+                "Resume thumbnail generation after enabling preview"
+            )
         ]
 
     def _get_cached_path(self, event: Any, path_key: str) -> None:
@@ -424,6 +435,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
         output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
         try:
+            print("running thing?")
             self._run_suspendable(
                 [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
             )
@@ -450,6 +462,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
+            print("run ting?")
             output_width, output_height = self._write_filmstrip_session(
                 session_path, media_path, self._pick_frames(start_frame, end_frame), width, height
             )
@@ -511,7 +524,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         if self._deferred_jobs:
             source_node, cache_key, media_path, path_key = self._deferred_jobs.pop(0)
             self._submit_generation(source_node, cache_key, media_path, path_key)
-
+    
     def _on_play_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
@@ -527,6 +540,21 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
         with self._procs_lock:
             self._playback_active = False
+            for proc in self._active_procs:
+                _resume_proc(proc)
+        self._drain_one()
+
+    def _suspend_all_procs(self, event: Any) -> None:
+        event.reject()
+        with self._procs_lock:
+            for proc in self._active_procs:
+                _suspend_proc(proc)
+
+    def _resume_all_procs(self, event: Any) -> None:
+        event.reject()
+        if event.contents() != "":
+            return
+        with self._procs_lock:
             for proc in self._active_procs:
                 _resume_proc(proc)
         self._drain_one()
@@ -551,7 +579,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             except Exception as e:
                 logger.warning(f"Failed to delete cache directory {self._cache_dir}: {e}")
         self._cache.clear()
-
 
 def createMode() -> LocalThumbnailGen:
     global the_mode

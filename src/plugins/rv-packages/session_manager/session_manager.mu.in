@@ -3074,6 +3074,14 @@ class: SessionManagerMode : MinorMode
         _previewsEnabled = checked;
         use SettingsValue;
         writeSetting("SessionManager", "previewsEnabled", Bool(checked));
+        if (checked == false)
+        {
+        sendInternalEvent("session-manager-stop-all", "");
+        }
+        else
+        {
+        sendInternalEvent("session-manager-start-all", "");
+        }
         updateTree();
     }
 
