@@ -525,10 +525,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_play_start(self, event: Any) -> None:
         event.reject()
-        if not self._display_preview:
-            return
         with self._procs_lock:
             self._playback_active = True
+            if not self._display_preview:
+                return
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
@@ -538,29 +538,29 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         # play-stop/play-start internally while playback continues.
         if event.contents() != "":
             return
-        if not self._display_preview:
-            return
         with self._procs_lock:
             self._playback_active = False
+            if not self._display_preview:
+                return
             for proc in self._active_procs:
                 _resume_proc(proc)
         self._drain_one()
 
     def _suspend_all_procs(self, event: Any) -> None:
         event.reject()
+        self._display_preview = False
         if self._playback_active:
             return
         with self._procs_lock:
-            self._display_preview = False
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
     def _resume_all_procs(self, event: Any) -> None:
         event.reject()
+        self._display_preview = True
         if self._playback_active:
             return
         with self._procs_lock:
-            self._display_preview = True
             for proc in self._active_procs:
                 _resume_proc(proc)
         self._drain_one()
