@@ -134,7 +134,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             (
                 "session-manager-previews-disabled",
                 self._suspend_all_procs,
-                "Pause thumbnail generation while thumbnails are hidden",
+                "Suspend thumbnail generation after disabling preview",
             ),
             (
                 "session-manager-previews-enabled",
