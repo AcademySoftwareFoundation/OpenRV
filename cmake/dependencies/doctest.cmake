@@ -43,9 +43,9 @@ EXTERNALPROJECT_ADD(
   LOG_DOWNLOAD ON
 )
 
-ADD_LIBRARY(doctest INTERFACE)
-ADD_DEPENDENCIES(doctest ${_target})
+ADD_LIBRARY(doctest::doctest INTERFACE IMPORTED GLOBAL)
+ADD_DEPENDENCIES(doctest::doctest ${_target})
 TARGET_INCLUDE_DIRECTORIES(
-  doctest
+  doctest::doctest
   INTERFACE "${RV_DEPS_BASE_DIR}/${_target}/src/${_target}"
 )

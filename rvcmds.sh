@@ -10,7 +10,7 @@ elif [ -n "$KSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
   [[ $0 != "$BASH_SOURCE" ]] && SOURCED=1
   SCRIPT=${BASH_SOURCE[0]}
-elif grep -q dash /proc/$$/cmdline; then
+elif command grep -q dash /proc/$$/cmdline; then
   case $0 in *dash*) SOURCED=1 ;; esac
   x=$(lsof -p $$ -Fn0 | tail -1); SCRIPT=${x#n}
 fi
@@ -125,6 +125,7 @@ if [ -z "$QT_HOME" ]; then
   fi
 
   if [ -n "$QT_HOME" ]; then
+    export QT_HOME
     echo "Found Qt $QT_VERSION installation at $QT_HOME"
   else
     echo "Error: $RV_VFX_PLATFORM requires a Qt $QT_VERSION installation, but none was found."
@@ -207,7 +208,7 @@ __rv_install_precommit_hooks() {
   fi
   
   # Check if hooks are already installed to avoid redundant messages.
-  if [ -f "${RV_HOME}/.git/hooks/pre-commit" ] && grep -q "pre-commit" "${RV_HOME}/.git/hooks/pre-commit" 2>/dev/null; then
+  if [ -f "${RV_HOME}/.git/hooks/pre-commit" ] && command grep -q "pre-commit" "${RV_HOME}/.git/hooks/pre-commit" 2>/dev/null; then
     return 0
   fi
   
@@ -375,9 +376,9 @@ __rv_build_with_errors() {
       #   - Ninja:      "FAILED:"
       #   - CMake:      "CMake Error"
       #   - Linker:     "unresolved external symbol", "undefined symbol"
-      grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
-        grep -v "warnings being treated as errors" | \
-        grep -v "0 error" | \
+      command grep -E "(error C[0-9]+:|error LNK[0-9]+:|: error :|error:|fatal error:|undefined reference|undefined symbol|unresolved external symbol|FAILED:|CMake Error)" "${build_log}" | \
+        command grep -v "warnings being treated as errors" | \
+        command grep -v "0 error" | \
         head -50 > "${error_summary}" 2>/dev/null || true
       
       if [[ -s "${error_summary}" ]]; then
@@ -403,7 +404,7 @@ __rv_build_with_errors() {
     echo "💡 Tips:"
     echo "  • Review the error summary above"
     echo "  • Check full log: less ${build_log}"
-    echo "  • Search for specific errors: grep -i 'your_error' ${build_log}"
+    echo "  • Search for specific errors: command grep -i 'your_error' ${build_log}"
     echo "════════════════════════════════════════════════════════════════"
     echo ""
     
