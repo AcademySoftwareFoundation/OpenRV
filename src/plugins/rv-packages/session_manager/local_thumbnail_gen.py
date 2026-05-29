@@ -430,7 +430,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
         output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
         try:
-            print("running thing?")
             self._run_suspendable(
                 [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
             )
@@ -457,7 +456,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
-            print("run ting?")
             output_width, output_height = self._write_filmstrip_session(
                 session_path, media_path, self._pick_frames(start_frame, end_frame), width, height
             )
