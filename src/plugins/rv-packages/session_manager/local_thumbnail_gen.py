@@ -91,6 +91,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
         self._playback_active = False
+        self._display_preview = False if os.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS") == "0" else True
         self._shutting_down = False
         self._active_procs: list[subprocess.Popen] = []
         self._procs_lock = threading.Lock()
@@ -524,6 +525,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_play_start(self, event: Any) -> None:
         event.reject()
+        if not self._display_preview:
+            return
         with self._procs_lock:
             self._playback_active = True
             for proc in self._active_procs:
@@ -535,6 +538,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         # play-stop/play-start internally while playback continues.
         if event.contents() != "":
             return
+        if not self._display_preview:
+            return
         with self._procs_lock:
             self._playback_active = False
             for proc in self._active_procs:
@@ -543,15 +548,19 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _suspend_all_procs(self, event: Any) -> None:
         event.reject()
+        if self._playback_active:
+            return
         with self._procs_lock:
+            self._display_preview = False
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
     def _resume_all_procs(self, event: Any) -> None:
         event.reject()
-        if event.contents() != "":
+        if self._playback_active:
             return
         with self._procs_lock:
+            self._display_preview = True
             for proc in self._active_procs:
                 _resume_proc(proc)
         self._drain_one()
