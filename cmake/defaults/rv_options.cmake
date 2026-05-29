@@ -138,6 +138,7 @@ OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before buil
 #
 IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   OPTION(RV_ENABLE_LINUX_VULKAN_SDK "Enable Linux Vulkan SDK discovery and build linkage" OFF)
+  OPTION(USE_VULKAN_PRESENTATION "Enable Linux Vulkan presentation build plumbing (no runtime wiring yet)" OFF)
 ENDIF()
 
 #
