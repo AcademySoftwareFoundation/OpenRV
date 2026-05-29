@@ -222,7 +222,7 @@ namespace Rv
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
-        // #ifdef PLATFORM_DARWIN
+#ifdef PLATFORM_DARWIN
         //  Under macOS, for Qt6/QOpenGLWidget port,
         //  the initial display shows incorrect pixel
         //  scaling due to some sort of effect related
@@ -239,7 +239,7 @@ namespace Rv
                                resize(currentSize.width() + 1, currentSize.height());
                                resize(currentSize);
                            });
-        // #endif
+#endif
 
         m_resetPolicyTimer = new QTimer(this);
         m_resetPolicyTimer->setSingleShot(true);
@@ -255,24 +255,11 @@ namespace Rv
 
         // if (resetGLPrefs) resetGLStateAndPrefs();
 
-#ifdef PLATFORM_LINUX
-
-        int op_ret, ev_ret, er_ret;
-
-        bool haveNV = XQueryExtension(QX11Info::display(), "NV-GLX", &op_ret, &ev_ret, &er_ret);
-
-        if (!haveNV)
-        {
-            cerr << endl;
-            cerr << "ERROR:******* NV-GLX Extension Missing ***********" << endl;
-            cerr << "    If you're using an Nvidia card, please install" << endl;
-            cerr << "    the optimized NVIDIA binary driver." << endl;
-            cerr << "    If you're using an ATI card, please be aware " << endl;
-            cerr << "    that RV has not been tested with ATI cards." << endl;
-            cerr << "**************************************************" << endl;
-            cerr << endl;
-        }
-#endif
+        // NOTE: A check for the NVIDIA-only "NV-GLX" X extension used to live
+        // here and printed a misleading "RV has not been tested with ATI
+        // cards" error whenever it was absent. The result was never used to
+        // gate anything, and 10-bit display works fine on AMD/Mesa and Intel
+        // via the standard GLX/QSurfaceFormat path, so the check was removed.
 
         if (opts.noBorders)
         {
