@@ -133,12 +133,12 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             ),
             (
                 "session-manager-previews-disabled",
-                self._suspend_all_procs,
+                self._on_previews_disabled,
                 "Suspend thumbnail generation after disabling preview",
             ),
             (
                 "session-manager-previews-enabled",
-                self._resume_all_procs,
+                self._on_previews_enabled,
                 "Resume thumbnail generation after enabling preview",
             ),
         ]
@@ -546,7 +546,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 _resume_proc(proc)
         self._drain_one()
 
-    def _suspend_all_procs(self, event: Any) -> None:
+    def _on_previews_disabled(self, event: Any) -> None:
         event.reject()
         self._display_preview = False
         if self._playback_active:
@@ -555,7 +555,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
-    def _resume_all_procs(self, event: Any) -> None:
+    def _on_previews_enabled(self, event: Any) -> None:
         event.reject()
         self._display_preview = True
         if self._playback_active:
