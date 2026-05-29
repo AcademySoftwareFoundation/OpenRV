@@ -87,6 +87,14 @@ IF(RV_TARGET_LINUX
   LIST(APPEND _sources ${_filename})
 ENDIF()
 
+IF(RV_TARGET_LINUX
+   AND RV_ENABLE_LINUX_VULKAN_SDK
+)
+  MESSAGE(STATUS "RV_ENABLE_LINUX_VULKAN_SDK=ON: requiring Vulkan SDK")
+  FIND_PACKAGE(Vulkan REQUIRED)
+  LIST(APPEND _sources VulkanBuildProbe.cpp)
+ENDIF()
+
 FILE(GLOB _ui_sources ui/*.ui)
 
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
@@ -481,6 +489,13 @@ IF(RV_TARGET_LINUX)
     ${_target}
     PRIVATE X11 ${_rvcommon_link_libraries}
   )
+
+  IF(RV_ENABLE_LINUX_VULKAN_SDK)
+    TARGET_LINK_LIBRARIES(
+      ${_target}
+      PRIVATE Vulkan::Vulkan
+    )
+  ENDIF()
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)

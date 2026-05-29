@@ -23,8 +23,11 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <cstdlib>
 
 #include <QtWidgets/QMenu>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 
 namespace Rv
 {
@@ -35,6 +38,23 @@ namespace Rv
 
     namespace
     {
+        static string envOrUnset(const char* name)
+        {
+            const char* value = std::getenv(name);
+            return value ? value : "<unset>";
+        }
+
+        static string formatSummary(const QSurfaceFormat& f)
+        {
+            ostringstream out;
+            out << "rgba " << f.redBufferSize() << " " << f.greenBufferSize() << " " << f.blueBufferSize() << " "
+                << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize());
+            out << ", depth " << f.depthBufferSize() << ", stencil " << f.stencilBufferSize();
+            out << ", swapInterval " << f.swapInterval();
+            out << ", stereo " << (f.stereo() ? "true" : "false");
+            out << ", major.minor " << f.majorVersion() << "." << f.minorVersion();
+            return out.str();
+        }
 
         class SyncBufferThreadData
         {
@@ -229,6 +249,10 @@ namespace Rv
 
         fmt.setSwapInterval(vsync ? 1 : 0);
 
+#ifdef PLATFORM_LINUX
+        cout << "INFO: GLView requested QSurfaceFormat: " << formatSummary(fmt) << endl;
+#endif
+
         return fmt;
     }
 
@@ -263,6 +287,51 @@ namespace Rv
 
             // NOTE_QT6: QGLFormat is deprecated. Using QSurfaceFormat now.
             QSurfaceFormat f = context()->format();
+
+#ifdef PLATFORM_LINUX
+            static bool baselineLogged = false;
+            if (!baselineLogged)
+            {
+                baselineLogged = true;
+
+                QScreen* screen = this->screen();
+                if (!screen)
+                    screen = QGuiApplication::primaryScreen();
+
+                const GLubyte* glVendor = glGetString(GL_VENDOR);
+                const GLubyte* glRenderer = glGetString(GL_RENDERER);
+                const GLubyte* glVersion = glGetString(GL_VERSION);
+                const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+                const QSurfaceFormat widgetFormat = format();
+
+                cout << "INFO: GLView runtime baseline begin" << endl;
+                cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
+                cout << "INFO: Qt version: " << qVersion() << endl;
+                cout << "INFO: Constructor-requested color bits (GLView args): rgba " << m_red << " " << m_green << " " << m_blue
+                     << " " << m_alpha << endl;
+                cout << "INFO: QOpenGLWidget::format() (post-negotiation): " << formatSummary(widgetFormat) << endl;
+                cout << "INFO: Actual QOpenGLContext format: " << formatSummary(f) << endl;
+                if (screen)
+                {
+                    cout << "INFO: Screen name: " << screen->name().toStdString() << ", depth: " << screen->depth() << endl;
+                }
+                else
+                {
+                    cout << "INFO: Screen name: <unknown>, depth: <unknown>" << endl;
+                }
+
+                cout << "INFO: GL vendor: " << (glVendor ? reinterpret_cast<const char*>(glVendor) : "<unknown>") << endl;
+                cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
+                cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
+                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>")
+                     << endl;
+                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE")
+                     << ", WAYLAND_DISPLAY=" << envOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << envOrUnset("DISPLAY")
+                     << ", XDG_CURRENT_DESKTOP=" << envOrUnset("XDG_CURRENT_DESKTOP")
+                     << ", DESKTOP_SESSION=" << envOrUnset("DESKTOP_SESSION") << endl;
+                cout << "INFO: GLView runtime baseline end" << endl;
+            }
+#endif
 
 #ifndef PLATFORM_DARWIN
             //

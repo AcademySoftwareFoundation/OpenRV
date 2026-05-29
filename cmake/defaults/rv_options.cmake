@@ -131,6 +131,16 @@ SET_PROPERTY(
 OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before building from source" OFF)
 
 #
+# Linux Vulkan SDK opt-in.
+#
+# When ON, RV requires a discoverable Vulkan SDK/loader and enables Vulkan build probes.
+# When OFF (default), Linux build behavior is unchanged and Vulkan is not required.
+#
+IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  OPTION(RV_ENABLE_LINUX_VULKAN_SDK "Enable Linux Vulkan SDK discovery and build linkage" OFF)
+ENDIF()
+
+#
 # Version matching mode for dependency resolution.
 #
 # Controls how RV_FIND_DEPENDENCY matches versions when RV_DEPS_PREFER_INSTALLED=ON. EXACT requires the exact version specified in CY*.cmake (default,
