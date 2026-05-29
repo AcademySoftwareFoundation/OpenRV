@@ -3076,11 +3076,11 @@ class: SessionManagerMode : MinorMode
         writeSetting("SessionManager", "previewsEnabled", Bool(checked));
         if (!checked)
         {
-        sendInternalEvent("session-manager-previews-disabled", "");
+            sendInternalEvent("session-manager-previews-disabled", "");
         }
         else
         {
-        sendInternalEvent("session-manager-previews-enabled", "");
+            sendInternalEvent("session-manager-previews-enabled", "");
         }
         updateTree();
     }
