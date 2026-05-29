@@ -131,11 +131,15 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 "Resume thumbnail generation after playback",
             ),
             (
-                "session-manager-stop-all",
+                "session-manager-previews-disabled",
                 self._suspend_all_procs,
                 "Pause thumbnail generation while thumbnails are hidden",
             ),
-            ("session-manager-start-all", self._resume_all_procs, "Resume thumbnail generation after enabling preview"),
+            (
+                "session-manager-previews-enabled",
+                self._resume_all_procs,
+                "Resume thumbnail generation after enabling preview",
+            ),
         ]
 
     def _get_cached_path(self, event: Any, path_key: str) -> None:
