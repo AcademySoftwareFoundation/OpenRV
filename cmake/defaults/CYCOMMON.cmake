@@ -32,10 +32,10 @@ SET(RV_DEPS_DAV1D_VERSION_LIB
 
 # doctest https://github.com/doctest/doctest
 SET(RV_DEPS_DOCTEST_VERSION
-    "2.4.9"
+    "2.4.12"
 )
 SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH
-    "a7948b5ec1f69de6f84c7d7487aaf79b"
+    "92bcfd6352ebf6c741f9ffaa3cad8808"
 )
 
 # expat https://github.com/libexpat/libexpat
@@ -192,10 +192,10 @@ SET(RV_DEPS_OIIO_DOWNLOAD_HASH
 
 # openjpeg https://github.com/uclouvain/openjpeg
 SET(RV_DEPS_OPENJPEG_VERSION
-    "2.5.0"
+    "2.5.4"
 )
 SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH
-    "5cbb822a1203dd75b85639da4f4ecaab"
+    "6160de075bb5191e482bc0f024b375e4"
 )
 
 # openjph https://github.com/aous72/OpenJPH
