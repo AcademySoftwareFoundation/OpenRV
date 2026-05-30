@@ -3,6 +3,8 @@
 // 
 // SPDX-License-Identifier: Apache-2.0 
 //
+#extension GL_ARB_texture_rectangle : require
+
 #if __VERSION__ >= 150
 out vec4 FragColor; 
 #define FRAGCOLOR FragColor
@@ -10,8 +12,6 @@ out vec4 FragColor;
 #define FRAGCOLOR gl_FragColor
 #define in varying
 #endif
-
-#extension GL_ARB_texture_rectangle : require
 
 uniform vec4 uniformColor;
 uniform sampler2DRect texture0; /*original*/

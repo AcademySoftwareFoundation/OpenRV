@@ -230,13 +230,13 @@ SET(RV_DEPS_PNG_DOWNLOAD_HASH
 # raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
 # https://github.com/LibRaw/LibRaw/blob/0.21-stable/libraw/libraw_version.h
 SET(RV_DEPS_RAW_VERSION
-    "0.21.1"
+    "0.22.0"
 )
 SET(RV_DEPS_RAW_DOWNLOAD_HASH
-    "3ad334296a7a2c8ee841f353cc1b450b"
+    "1d2e307a1e6d7a34268fc421b17675fe"
 )
 SET(RV_DEPS_RAW_VERSION_LIB
-    "23"
+    "24"
 )
 
 # spdlog https://github.com/gabime/spdlog
@@ -249,21 +249,21 @@ SET(RV_DEPS_SPDLOG_DOWNLOAD_HASH
 
 # tiff https://gitlab.com/libtiff/libtiff
 SET(RV_DEPS_TIFF_VERSION
-    "4.6.0"
+    "4.7.1"
 )
 SET(RV_DEPS_TIFF_DOWNLOAD_HASH
-    "118a2e5fc9ed71653195b332b9715890"
+    "ec48ea6266661f4dceb8b1e923c7b838"
 )
 SET(RV_DEPS_TIFF_VERSION_LIB
-    "6.0.2"
+    "6.2.0"
 )
 
 # webp https://github.com/webmproject/libwebp
 SET(RV_DEPS_WEBP_VERSION
-    "1.2.1"
+    "1.6.0"
 )
 SET(RV_DEPS_WEBP_DOWNLOAD_HASH
-    "ef5ac6de4b800afaebeb10df9ef189b2"
+    "d498caf9323a24ce3ed40b84c22a32cd"
 )
 
 # zlib https://github.com/madler/zlib
