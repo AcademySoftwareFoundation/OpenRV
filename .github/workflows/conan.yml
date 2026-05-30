@@ -13,7 +13,6 @@ on:
 
 env:
   SKIP_DEPS_CACHE: 'false'
-
   ROCKY_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
   ROCKY_QT6_ARCHIVES: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
   MACOX_X86_64_QT6_MODULES: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -60,7 +59,8 @@ jobs:
             python-version: "3.11.8"
             vfx-platform: "CY2024"
             extra_repo: "powertools"
-            
+            conan-profile: "x86_64_rocky8"
+
           - os: "ubuntu-latest"
             rocky-version: "9"
             image: "amd64/rockylinux:9"
@@ -71,6 +71,7 @@ jobs:
             python-version: "3.11.8"
             vfx-platform: "CY2024"
             extra_repo: "crb"
+            conan-profile: "x86_64_rocky9"
             
     steps:
       - name: Display disk space
@@ -95,6 +96,13 @@ jobs:
       - name: Display disk space
         run: |
           df -h /
+
+      # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo. Pin all
+      # subsequent dnf calls in this container to the 9.7 minor release until
+      # OpenRV migrates off OSMesa. Remove this step once that's done.
+      - name: Pin Rocky 9 to 9.7 minor release
+        if: ${{ matrix.rocky-version == '9' }}
+        run: echo "9.7" > /etc/dnf/vars/releasever
 
       - name: Install system dependencies
         run: |
@@ -311,6 +319,18 @@ jobs:
           echo "Conan home path: $CONAN_HOME_OUTPUT"
           echo "CONAN_HOME=$CONAN_HOME_OUTPUT" >> $GITHUB_ENV
 
+      - name: Add ASWF Conan remote
+        # Required so conan/profiles/common [replace_requires] can resolve
+        # openssl/*@openrv/vfx2024 from the ASWF JFrog Artifactory.
+        # Anonymous read; no credentials needed for install. Uses aswftesting
+        # (aswf-conan-dev) for now; swap to the 'aswf' production remote
+        # once binaries are promoted there.
+        # Rocky 8 currently has a prebuilt binary; other profiles will
+        # build from source via the CCI recipe exported under this user/channel.
+        run: |
+          $CONAN_EXECUTABLE remote remove aswftesting 2>/dev/null || true
+          $CONAN_EXECUTABLE remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
+
       - name: Export OpenRVCore recipe to Conan's cache
         if: ${{ matrix.vfx-platform == 'CY2024' }}
         run: |
@@ -319,6 +339,11 @@ jobs:
           $CONAN_EXECUTABLE export openrvcore-conanfile.py
 
       - name: Build OpenRV dependencies
+        # openexr (and every other dep covered by [replace_requires] in
+        # conan/profiles/common) now resolves to @openrv/vfx2024 and is
+        # pulled prebuilt from the ASWF remote on Rocky 8, built on the
+        # matching toolchain. The earlier Rocky 8-specific `--build=openexr/*`
+        # workaround is no longer needed.
         run: |
           # Rocky 8: force local rebuild of select packages whose Conan Center
           # prebuilts target a newer glibc / libstdc++ than Rocky 8 provides.
@@ -339,7 +364,7 @@ jobs:
 
       - name: Build OpenRV main executable
         run: |
-          $CONAN_EXECUTABLE build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_rocky8
+          $CONAN_EXECUTABLE build conanfile.py --build=missing -pr:a ./conan/profiles/${{ matrix.conan-profile }}
 
       - name: Tests
         run: |
@@ -491,6 +516,12 @@ jobs:
 
       - name: Set Conan Home Path
         run: echo "CONAN_HOME=$(/Users/runner/Library/Python/3.11/bin/conan config home)" >> $GITHUB_ENV
+
+      - name: Add ASWF Conan remote
+        # See conan.yml Rocky step of the same name for rationale.
+        run: |
+          /Users/runner/Library/Python/3.11/bin/conan remote remove aswftesting 2>/dev/null || true
+          /Users/runner/Library/Python/3.11/bin/conan remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
 
       - name: Export OpenRVCore recipe
         if: ${{ matrix.vfx-platform == 'CY2024' }}
@@ -737,6 +768,14 @@ jobs:
           cat ~/.bash_profile | tail -5
         shell: msys2 {0}
 
+      - name: Add ASWF Conan remote
+        # See conan.yml Rocky step of the same name for rationale.
+        run: |
+          source ~/.bash_profile
+          conan remote remove aswftesting 2>/dev/null || true
+          conan remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
+        shell: msys2 {0}
+
       - name: Export OpenRVCore recipe
         if: ${{ matrix.vfx-platform == 'CY2024' }}
         run: |
@@ -763,12 +802,12 @@ jobs:
       - name: Build and install OpenRV dependencies
         run: |
           source ~/.bash_profile
-          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows
+          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
-          
+
       - name: Build OpenRV main executable
         run: |
-          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows
+          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Tests
