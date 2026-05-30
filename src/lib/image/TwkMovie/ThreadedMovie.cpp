@@ -19,7 +19,8 @@ namespace TwkMovie
         mov->threadMain();
     }
 
-    ThreadedMovie::ThreadedMovie(const Movies& movies, const Frames& frames, size_t stackMultiplier, ThreadAPI* api, InitializeFunc F)
+    ThreadedMovie::ThreadedMovie(const Movies& movies, const Frames& frames, size_t stackMultiplier, ThreadAPI* api, InitializeFunc F,
+                                 FinalizeFunc finalizeFunction)
         : m_movies(movies)
         , m_threadGroup(movies.size(), stackMultiplier, api)
         , m_frames(frames)
@@ -27,6 +28,7 @@ namespace TwkMovie
         , m_currentIndex(0)
         , m_requestIndex(0)
         , m_initialize(F)
+        , m_finalize(finalizeFunction)
     {
         // if (!m_movie->isThreadSafe()) throw runtime_exception();
         m_info = movies.front()->info();
@@ -188,7 +190,15 @@ namespace TwkMovie
 
         m_threadGroup.lock(m_runLock);
         td->running = false;
+
+        bool allFramesDone = (m_currentIndex >= m_frames.size());
+
         m_threadGroup.unlock(m_runLock);
+
+        if (allFramesDone && m_finalize != nullptr)
+        {
+            m_finalize();
+        }
 
         // cout << "thread " << td->id << " no longer running" << endl;
     }

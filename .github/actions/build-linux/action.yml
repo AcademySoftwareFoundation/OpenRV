@@ -50,6 +50,14 @@ runs:
       run: df -h /
       shell: bash
 
+    # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo. Pin all
+    # subsequent dnf calls in this container to the 9.7 minor release until
+    # OpenRV migrates off OSMesa. Remove this step once that's done.
+    - name: Pin Rocky 9 to 9.7 minor release
+      if: ${{ inputs.rocky-version == '9' }}
+      run: echo "9.7" > /etc/dnf/vars/releasever
+      shell: bash
+
     - name: Install system dependencies
       run: |
         retry_count=0
