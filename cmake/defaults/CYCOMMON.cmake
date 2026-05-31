@@ -6,12 +6,12 @@ SET(RV_DEPS_AJA_DOWNLOAD_HASH
     "dba447ddd1b0ee84cee8441c0adba06a"
 )
 
-# atomic_ops https://github.com/ivmai/libatomic_ops
+# atomic_ops https://github.com/bdwgc/libatomic_ops
 SET(RV_DEPS_ATOMIC_OPS_VERSION
-    "7.7.0"
+    "7.10.0"
 )
 SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
-    "cc7fad1e71b3064abe1ea821ae9a9a6e"
+    "35e417e4e49cd97976ef14c50e06db9b"
 )
 
 # libdeflate https://github.com/ebiggers/libdeflate
@@ -192,10 +192,10 @@ SET(RV_DEPS_OIIO_DOWNLOAD_HASH
 
 # openjpeg https://github.com/uclouvain/openjpeg
 SET(RV_DEPS_OPENJPEG_VERSION
-    "2.5.0"
+    "2.5.4"
 )
 SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH
-    "5cbb822a1203dd75b85639da4f4ecaab"
+    "6160de075bb5191e482bc0f024b375e4"
 )
 
 # openjph https://github.com/aous72/OpenJPH
