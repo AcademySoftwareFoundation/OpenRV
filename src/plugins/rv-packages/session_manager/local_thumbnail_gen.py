@@ -35,14 +35,14 @@ _IS_WIN32 = sys.platform == "win32"
 def _suspend_proc(proc: subprocess.Popen) -> None:
     try:
         psutil.Process(proc.pid).suspend()
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
+    except psutil.Error:
         logger.warning(f"Failed to suspend process {proc.pid}")
 
 
 def _resume_proc(proc: subprocess.Popen) -> None:
     try:
         psutil.Process(proc.pid).resume()
-    except (psutil.NoSuchProcess, psutil.AccessDenied):
+    except psutil.Error:
         logger.warning(f"Failed to resume process {proc.pid}")
 
 
