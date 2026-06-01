@@ -244,11 +244,7 @@ ENDIF()
 # For found packages, expose the pkgconfig directory so FFmpeg's configure can detect OpenSSL via pkg-config. This is critical on Windows where FFmpeg's
 # fallback `-lssl -lcrypto` translates to `ssl.lib`/`crypto.lib` (MSVC literal name), but vcpkg/OpenSSL 3.x ships `libssl.lib`/`libcrypto.lib`. The .pc files
 # contain the correct `-llibssl -llibcrypto` flags. On Unix this is also useful when the found package is in a non-standard prefix.
-IF(${_target}_FOUND
-   AND EXISTS "${_lib_dir}/pkgconfig"
+SET_PROPERTY(
+  GLOBAL APPEND
+  PROPERTY "RV_DEPS_PKG_CONFIG_PATH" "${_lib_dir}/pkgconfig"
 )
-  SET_PROPERTY(
-    GLOBAL APPEND
-    PROPERTY "RV_DEPS_PKG_CONFIG_PATH" "${_lib_dir}/pkgconfig"
-  )
-ENDIF()
