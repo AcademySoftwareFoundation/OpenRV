@@ -3920,7 +3920,14 @@ namespace Rv
             setSequenceEvents();
     }
 
-    void RvSession::onGraphMediaSetEmpty() { userGenericEvent("after-progressive-loading", ""); }
+    void RvSession::onGraphMediaSetEmpty()
+    {
+        // Make sure loadTotal is empty before signaling progressive loading is finished.
+        // Otherwise, incoming media will reset the signal shortly after, causing workers
+        // to stop and restart.
+        if (loadTotal() == 0)
+            userGenericEvent("after-progressive-loading", "");
+    }
 
     // connects events from the sequence IP node
     //
