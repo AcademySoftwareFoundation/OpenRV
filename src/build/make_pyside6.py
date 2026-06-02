@@ -104,8 +104,6 @@ def prepare() -> None:
                 return "15.0.0-based-macos-universal.7z"
             elif major_minor_version_str == "17.0":
                 return "17.0.1-based-macos-universal.7z"
-            elif major_minor_version_str == "21.0":
-                return "19.1.0-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
@@ -122,10 +120,7 @@ def prepare() -> None:
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
 
     # if we have a failed download, clean it up and redownload.
-    # verify_7z_archive returns True on CRC pass, False on CRC fail, None when
-    # there is no CRC or the file isn't a valid 7z (e.g. an HTML 404 page).
-    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is not True:
-        os.remove(libclang_zip)
+    os.remove(libclang_zip)
 
     # download it if necessary
     if os.path.exists(libclang_zip) is False:
