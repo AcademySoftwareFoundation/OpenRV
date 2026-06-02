@@ -410,14 +410,10 @@ ENDIF()
 # Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
 # cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
 #
-# Force default symbol visibility for the C++ extensions. OpenTimelineIO's type
-# registry relies on std::any, whose runtime type identity uses libc++'s
-# __any_imp::__unique_typeinfo weak symbols. With recent toolchains (e.g. Apple
-# Clang 21 / macOS SDK 26) the default hidden visibility prevents those weak
-# typeinfo symbols from merging to a single address, so any_cast fails at
-# runtime with "bad any cast" on every OTIO operation. Building with default
-# visibility (and without hiding inline symbols) keeps the typeinfo unique and
-# fixes the crash. These presets are no-ops on MSVC.
+# Force default symbol visibility for the C++ extensions. OpenTimelineIO's type registry relies on std::any, whose runtime type identity uses libc++'s
+# __any_imp::__unique_typeinfo weak symbols. With recent toolchains (e.g. Apple Clang 21 / macOS SDK 26) the default hidden visibility prevents those weak
+# typeinfo symbols from merging to a single address, so any_cast fails at runtime with "bad any cast" on every OTIO operation. Building with default visibility
+# (and without hiding inline symbols) keeps the typeinfo unique and fixes the crash. These presets are no-ops on MSVC.
 LIST(
   APPEND
   _requirements_install_command
