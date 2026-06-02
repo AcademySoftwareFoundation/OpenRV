@@ -15,10 +15,7 @@
 #include <QtWidgets/QToolTip>
 #include <QAction>
 #include <QtWidgets/QWidgetAction>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/qgridlayout.h>
-#include <QtWidgets/qsizepolicy.h>
+#include <QtWidgets/QFrame>
 #include <IPCore/Session.h>
 #include <IPCore/IPGraph.h>
 #include <IPCore/SoundTrackIPNode.h>
@@ -39,6 +36,8 @@ namespace Rv
     using namespace TwkContainer;
     using namespace boost;
     using namespace TwkQtCoreUtil;
+
+    static constexpr std::string_view playModeDefaultTooltip = "Select playback style";
 
     RvBottomViewToolBar::RvBottomViewToolBar(QWidget* parent)
         : QToolBar("bottom", parent)
@@ -70,11 +69,24 @@ namespace Rv
         setVisible(b);
     }
 
+    static QVariant enumCodeMap(int enumVal, QString codeVal)
+    {
+        QVariantMap m;
+
+        m["enum"] = enumVal;
+        m["code"] = codeVal;
+
+        return QVariant(m);
+    }
+
     void RvBottomViewToolBar::build()
     {
         if (m_audioMenu)
             return;
 
+        Options& opts = Options::sharedOptions();
+
+        //  Initialize QIcons
         m_playModeOnceIcon = QIcon(":/images/playmode_once_48x48.png");
         m_playModeLoopIcon = QIcon(":/images/playmode_loop_48x48.png");
         m_playModePingPongIcon = QIcon(":/images/playmode_pingpong_48x48.png");
@@ -87,24 +99,254 @@ namespace Rv
 
         setProperty("tbstyle", QVariant(QString("play_controls")));
 
-        constexpr int buttonPadding = 5;
+        QAction* a;
+        QMenu* m;
+        QToolButton* b;
+        QFrame* qf;
 
-        buildLeft(buttonPadding);
-        buildRight(buttonPadding);
-        buildCenter();
+        for (size_t i = 0; i < 6; i++)
+        {
+            a = addAction("");
+            b = dynamic_cast<QToolButton*>(widgetForAction(a));
+            b->setIcon(m_playModeLoopIcon);
+            b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            b->setProperty("tbstyle", QVariant(QString("interior")));
 
-        barContainer = new QWidget(this);
-        barContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        grid = new QGridLayout(barContainer);
-        grid->setContentsMargins(0, 0, 0, 0);
-        grid->setSpacing(0);
+            switch (i)
+            {
+            case 0:
+                b->setProperty("tbstyle", QVariant(QString("left")));
+                a->setIcon(QIcon(":/images/smanager.png"));
+                a->setToolTip("Toggle Session Manager");
+                m_smAction = a;
+                break;
+            case 1:
+                a->setIcon(QIcon(":/images/paint_48x48.png"));
+                a->setToolTip("Toggle Annotation tools");
+                m_paintAction = a;
+                break;
+            case 2:
+                a->setIcon(QIcon(":/images/about_48x48.png"));
+                a->setToolTip("Toggle Image Info");
+                m_infoAction = a;
+                break;
+            case 3:
+                a->setIcon(QIcon(":/images/ntwrk_48x48.png"));
+                a->setToolTip("Toggle RV Networking Dialog");
+                m_networkAction = a;
+                break;
+            case 4:
+                a->setIcon(QIcon(":/images/timeline_mag.png"));
+                a->setToolTip("Toggle Timeline Magnifier");
+                m_timelineMagAction = a;
+                break;
+            case 5:
+                a->setIcon(QIcon(":/images/timeline.png"));
+                a->setToolTip("Toggle Timeline");
+                b->setProperty("tbstyle", QVariant(QString("right")));
+                m_timelineAction = a;
+                break;
+            }
+        }
 
-        grid->addWidget(m_leftBox, 0, 0, Qt::AlignLeft | Qt::AlignVCenter);
-        grid->addWidget(m_rightBox, 0, 0, Qt::AlignRight | Qt::AlignVCenter);
-        grid->addWidget(m_centerBox, 0, 0, Qt::AlignCenter);
+        connect(m_smAction, SIGNAL(triggered(bool)), this, SLOT(smActionTriggered(bool)));
+        connect(m_paintAction, SIGNAL(triggered(bool)), this, SLOT(paintActionTriggered(bool)));
+        connect(m_infoAction, SIGNAL(triggered(bool)), this, SLOT(infoActionTriggered(bool)));
+        connect(m_timelineAction, SIGNAL(triggered(bool)), this, SLOT(timelineActionTriggered(bool)));
+        connect(m_timelineMagAction, SIGNAL(triggered(bool)), this, SLOT(timelineMagActionTriggered(bool)));
+        connect(m_networkAction, SIGNAL(triggered(bool)), this, SLOT(networkActionTriggered(bool)));
 
-        addWidget(barContainer);
+        a = addAction("");
+        a->setIcon(QIcon(":/images/ghost.png"));
+        a->setToolTip("Ghost");
+        a->setCheckable(true);
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("left")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        m_ghostAction = a;
 
+        a = addAction("");
+        a->setIcon(QIcon(":/images/hold.png"));
+        a->setToolTip("Hold");
+        a->setCheckable(true);
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("right")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        m_holdAction = a;
+
+        connect(m_ghostAction, SIGNAL(triggered(bool)), this, SLOT(ghostTriggered(bool)));
+        connect(m_holdAction, SIGNAL(triggered(bool)), this, SLOT(holdTriggered(bool)));
+
+        //
+        //  Add some expanding space before the play buttons
+        //
+        qf = new QFrame(this);
+        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        qf->setMinimumWidth(0);
+        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+        qf->setStyleSheet("background-color: transparent");
+        addWidget(qf);
+
+        // play buts
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_bstep.png"));
+        a->setToolTip("Step back one frame");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("left")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("backStepButton");
+        m_backStepAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_fstep.png"));
+        a->setToolTip("Step forward one frame");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("right")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("forwardStepButton");
+        m_forwardStepAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_bplay.png"));
+        a->setToolTip("Play backwards");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("left")));
+        b->setProperty("tbsize", QVariant(QString("double")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        m_backwardPlayAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_play.png"));
+        a->setToolTip("Play forwards");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("right")));
+        b->setProperty("tbsize", QVariant(QString("double")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        m_forwardPlayAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_bmark.png"));
+        a->setToolTip("Skip to start of sequence");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("left")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("firstFrameButton");
+        m_backMarkAction = a;
+
+        a = addAction("");
+        a->setIcon(QIcon(":/images/control_fmark.png"));
+        a->setToolTip("Skip to end of sequence");
+        b = dynamic_cast<QToolButton*>(widgetForAction(a));
+        b->setProperty("tbstyle", QVariant(QString("right")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setObjectName("lastFrameButton");
+        m_forwardMarkAction = a;
+
+        connect(m_backStepAction, SIGNAL(triggered()), this, SLOT(backStepTriggered()));
+        connect(m_forwardStepAction, SIGNAL(triggered()), this, SLOT(forwardStepTriggered()));
+        connect(m_backwardPlayAction, SIGNAL(triggered()), this, SLOT(backPlayTriggered()));
+        connect(m_forwardPlayAction, SIGNAL(triggered()), this, SLOT(forwardPlayTriggered()));
+        connect(m_backMarkAction, SIGNAL(triggered()), this, SLOT(backMarkTriggered()));
+        connect(m_forwardMarkAction, SIGNAL(triggered()), this, SLOT(forwardMarkTriggered()));
+
+        //
+        //  Add some expanding space after the play buttons
+        //
+        qf = new QFrame(this);
+        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        qf->setMinimumWidth(0);
+        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+        qf->setStyleSheet("background-color: transparent");
+        addWidget(qf);
+
+        //
+        //  This expanding space will not go to more than 90 pixels.  It's to
+        //  "counter balance" the buttons on the other side, so the play control
+        //  buttons stay in the center of the view (roughly).
+        //
+        qf = new QFrame(this);
+        qf->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+        qf->setMinimumWidth(0);
+        qf->setMaximumWidth(90);
+        qf->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+        qf->setStyleSheet("background-color: transparent");
+        addWidget(qf);
+
+        m_playModeAction = addAction("");
+        m_playModeAction->setToolTip(QString::fromUtf8(playModeDefaultTooltip.data(), playModeDefaultTooltip.size()));
+        b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction));
+
+        switch (static_cast<Session::PlayMode>(opts.loopMode))
+        {
+        case Session::PlayOnce:
+            m_playModeAction->setIcon(m_playModeOnceIcon);
+            break;
+
+        case Session::PlayPingPong:
+            m_playModeAction->setIcon(m_playModePingPongIcon);
+            break;
+
+        default:
+        case Session::PlayLoop:
+            m_playModeAction->setIcon(m_playModeLoopIcon);
+            break;
+        }
+
+        b->setProperty("tbstyle", QVariant(QString("left_menu")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setPopupMode(QToolButton::InstantPopup);
+
+        m_playModeMenu = new QMenu(b);
+        m_playModeMenu->addAction("Playback")->setDisabled(true);
+        m_playModeOnceAction = m_playModeMenu->addAction("  Once");
+        m_playModeOnceAction->setData(enumCodeMap(Session::PlayOnce, "commands.setPlayMode(PlayOnce)"));
+        m_playModeLoopAction = m_playModeMenu->addAction("  Loop");
+        m_playModeLoopAction->setData(enumCodeMap(Session::PlayLoop, "commands.setPlayMode(PlayLoop)"));
+        m_playModePingPongAction = m_playModeMenu->addAction("  PingPong");
+        m_playModePingPongAction->setData(enumCodeMap(Session::PlayPingPong, "commands.setPlayMode(PlayPingPong)"));
+        //  m_playModeMenu->addAction("  Loop with Black 0.5 Second");
+        //  m_playModeMenu->addAction("  Loop with Black 1.0 Second");
+
+        b->setMenu(m_playModeMenu);
+
+        // Install event filter to show tooltips on disabled menu items
+        m_playModeMenu->installEventFilter(this);
+
+        connect(m_playModeMenu, SIGNAL(triggered(QAction*)), this, SLOT(playModeMenuTriggered(QAction*)));
+        connect(m_playModeMenu, SIGNAL(aboutToShow()), this, SLOT(playModeMenuUpdate()));
+
+        int volumeLevel = (int)(100.0f * IPCore::SoundTrackIPNode::defaultVolume);
+        m_audioAction = addAction("");
+        m_audioAction->setToolTip("Audio control");
+        b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction));
+        setVolumeLevel<QToolButton>(*b, volumeLevel);
+        b->setProperty("tbstyle", QVariant(QString("right_menu")));
+        b->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        b->setPopupMode(QToolButton::InstantPopup);
+        m = new QMenu(b);
+        m->setProperty("menuStyle", QVariant(QString("slim")));
+        QAction* audio = m->addAction("Volume");
+        audio->setDisabled(true);
+        QWidgetAction* wa = new QWidgetAction(b);
+        setVolumeLevel<QWidgetAction>(*wa, volumeLevel);
+        m_audioSlider = new QSlider(b);
+        m_audioSlider->setProperty("sliderStyle", QVariant(QString("menu")));
+        m_audioSlider->setTickInterval(10);
+        wa->setDefaultWidget(m_audioSlider);
+        m->addAction(wa);
+        m->addSeparator();
+        m_muteAction = m->addAction("Mute");
+        m_muteAction->setIcon(QIcon(":/images/mute_32x32.png"));
+        m_muteAction->setCheckable(true);
+        b->setMenu(m);
+        m_audioMenu = m;
+
+        connect(m_muteAction, SIGNAL(triggered(bool)), this, SLOT(audioMuteTriggered(bool)));
+        connect(m_audioMenu, SIGNAL(aboutToShow()), this, SLOT(audioMenuTriggered()));
+        connect(m_audioSlider, SIGNAL(valueChanged(int)), this, SLOT(audioSliderChanged(int)));
+        connect(m_audioSlider, SIGNAL(sliderReleased()), this, SLOT(audioSliderReleased()));
+
+        // Map toolbar actions to their corresponding event categories
         m_actionCategoryMappings = {{
             {m_smAction, IPCore::EventCategories::sessionmanagerCategory, m_smAction->toolTip()},
             {m_paintAction, IPCore::EventCategories::annotateCategory, m_paintAction->toolTip()},
@@ -115,6 +357,7 @@ namespace Rv
             {m_backwardPlayAction, IPCore::EventCategories::backwardplayCategory, m_backwardPlayAction->toolTip()},
             {m_forwardPlayAction, IPCore::EventCategories::playcontrolCategory, m_forwardPlayAction->toolTip()},
             {m_playModeAction, IPCore::EventCategories::playcontrolCategory, m_playModeAction->toolTip()},
+
             {m_backMarkAction, IPCore::EventCategories::playcontrolCategory, m_backMarkAction->toolTip()},
             {m_forwardMarkAction, IPCore::EventCategories::playcontrolCategory, m_forwardMarkAction->toolTip()},
         }};
@@ -175,33 +418,42 @@ namespace Rv
             }
             else if (name == "play-start")
             {
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
+                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
+
                 if (m_session->inc() == -1)
                 {
-                    m_backwardPlayAction->setIcon(QIcon(":/images/control_pause.png"));
+                    bb->setIcon(QIcon(":/images/control_pause.png"));
                 }
                 else
                 {
-                    m_forwardPlayAction->setIcon(QIcon(":/images/control_pause.png"));
+                    bf->setIcon(QIcon(":/images/control_pause.png"));
                 }
             }
             else if (name == "play-stop")
             {
-                m_backwardPlayAction->setIcon(QIcon(":/images/control_bplay.png"));
-                m_forwardPlayAction->setIcon(QIcon(":/images/control_play.png"));
+                QToolButton* bb = dynamic_cast<QToolButton*>(widgetForAction(m_backwardPlayAction));
+                QToolButton* bf = dynamic_cast<QToolButton*>(widgetForAction(m_forwardPlayAction));
+
+                bb->setIcon(QIcon(":/images/control_bplay.png"));
+                bf->setIcon(QIcon(":/images/control_play.png"));
             }
             else if (name == "play-mode-changed")
             {
-                switch (m_session->playMode())
+                if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
                 {
-                case 0: // Session::PlayLoop
-                    m_playModeAction->setIcon(m_playModeLoopIcon);
-                    break;
-                case 1: // Session::PlayOnce
-                    m_playModeAction->setIcon(m_playModeOnceIcon);
-                    break;
-                case 2: // Session::PlayPingPong
-                    m_playModeAction->setIcon(m_playModePingPongIcon);
-                    break;
+                    switch (m_session->playMode())
+                    {
+                    case 0: // Session::PlayLoop
+                        b->setIcon(m_playModeLoopIcon);
+                        break;
+                    case 1: // Session::PlayOnce
+                        b->setIcon(m_playModeOnceIcon);
+                        break;
+                    case 2: // Session::PlayPingPong
+                        b->setIcon(m_playModePingPongIcon);
+                        break;
+                    }
                 }
             }
             else if (name == "update-ghost-button")
@@ -352,17 +604,20 @@ namespace Rv
 
     void RvBottomViewToolBar::setVolumeIcon()
     {
-        IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
-
-        if (editor.value())
+        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_audioAction)))
         {
-            m_audioAction->setIcon(m_volumeHighMutedIcon);
-        }
-        else
-        {
-            int volumeLevel = m_audioSlider->value(); // 0 - 99;
+            IntPropertyEditor editor(m_session->graph(), m_session->currentFrame(), "#RVSoundTrack.audio.mute");
 
-            setVolumeLevel<QAction>(*m_audioAction, volumeLevel);
+            if (editor.value())
+            {
+                b->setIcon(m_volumeHighMutedIcon);
+            }
+            else
+            {
+                int volumeLevel = m_audioSlider->value(); // 0 - 99;
+
+                setVolumeLevel<QToolButton>(*b, volumeLevel);
+            }
         }
     }
 
@@ -496,19 +751,22 @@ namespace Rv
 
         m_session->userGenericEvent("remote-eval", UTF8::qconvert(a->data().toMap()["code"].toString()));
 
-        switch (m_session->playMode())
+        if (QToolButton* b = dynamic_cast<QToolButton*>(widgetForAction(m_playModeAction)))
         {
-        case Session::PlayOnce:
-            m_playModeAction->setIcon(m_playModeOnceIcon);
-            break;
+            switch (m_session->playMode())
+            {
+            case Session::PlayOnce:
+                b->setIcon(m_playModeOnceIcon);
+                break;
 
-        case Session::PlayLoop:
-            m_playModeAction->setIcon(m_playModeLoopIcon);
-            break;
+            case Session::PlayLoop:
+                b->setIcon(m_playModeLoopIcon);
+                break;
 
-        case Session::PlayPingPong:
-            m_playModeAction->setIcon(m_playModePingPongIcon);
-            break;
+            case Session::PlayPingPong:
+                b->setIcon(m_playModePingPongIcon);
+                break;
+            }
         }
     }
 
@@ -532,106 +790,6 @@ namespace Rv
             }
         }
         return QToolBar::eventFilter(obj, event);
-    }
-
-    void RvBottomViewToolBar::resizeEvent(QResizeEvent* event)
-    {
-        QToolBar::resizeEvent(event);
-
-        if (!m_overflowUpdatePending)
-        {
-            m_overflowUpdatePending = true;
-
-            // Only re-render once toolbar finished rendering other work
-            QTimer::singleShot(0, this,
-                               [this]()
-                               {
-                                   m_overflowUpdatePending = false;
-                                   updateOverflow();
-                               });
-        }
-    }
-
-    void RvBottomViewToolBar::updateOverflow()
-    {
-        if (!m_leftBox || !m_centerBox || !m_rightBox)
-            return;
-
-        const int centerWidth = m_centerBox->sizeHint().width();
-        const int sideBudget = (width() - centerWidth) / 2;
-
-        auto applyOverflow = [&](QWidget* box, bool reverse)
-        {
-            QLayout* layout = box->layout();
-            if (!layout)
-                return;
-
-            box->setUpdatesEnabled(false);
-
-            const QMargins margins = layout->contentsMargins();
-            const int spacing = layout->spacing();
-            int remaining = sideBudget - margins.left();
-            const int n = layout->count();
-
-            // Subtract space taken by widgets we don't own (e.g. plugin-injected
-            // widgets).
-            int visibleCount = 0;
-            for (int i = 0; i < n; ++i)
-            {
-                QWidget* w = layout->itemAt(i)->widget();
-                if (!w)
-                    continue;
-                if (w->property("toolbarOwned").toBool())
-                    continue;
-                if (!w->isVisible())
-                    continue;
-
-                remaining -= w->sizeHint().width();
-                if (visibleCount > 0)
-                    remaining -= spacing;
-                ++visibleCount;
-            }
-
-            // Walk toolbar-owned buttons from the outer edge inward, hiding
-            // those that don't fit in the remaining budget. Once any button
-            // fails to fit, every button after it, closer to the center is
-            // not rendered.
-            bool hideRest = false;
-            for (int idx = 0; idx < n; ++idx)
-            {
-                const int i = reverse ? (n - 1 - idx) : idx;
-
-                QWidget* w = layout->itemAt(i)->widget();
-                if (!w)
-                    continue;
-                if (!w->property("toolbarOwned").toBool())
-                    continue;
-
-                int cost = w->sizeHint().width();
-                if (visibleCount > 0)
-                    cost += spacing;
-
-                const bool fits = !hideRest && cost <= remaining;
-
-                if (!fits)
-                    hideRest = true;
-
-                if (w->isVisible() != fits)
-                    w->setVisible(fits);
-
-                if (fits)
-                {
-                    remaining -= cost;
-                    ++visibleCount;
-                }
-            }
-
-            box->setUpdatesEnabled(true);
-            box->updateGeometry();
-        };
-
-        applyOverflow(m_leftBox, false);
-        applyOverflow(m_rightBox, true);
     }
 
     void RvBottomViewToolBar::updateActionAvailability()

@@ -11,10 +11,6 @@
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QSlider>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/qgridlayout.h>
 #include <TwkApp/EventNode.h>
 #include <QAction>
 #include <array>
@@ -28,8 +24,6 @@ namespace IPCore
 
 namespace Rv
 {
-
-    static constexpr std::string_view playModeDefaultTooltip = "Select playback style";
 
     class RvBottomViewToolBar
         : public QToolBar
@@ -45,9 +39,6 @@ namespace Rv
         virtual Result receiveEvent(const TwkApp::Event&);
 
         void build();
-        void buildLeft(int padding);
-        void buildCenter();
-        void buildRight(int padding);
         void makeActive(bool);
         void makeActiveFromSettings();
 
@@ -79,8 +70,6 @@ namespace Rv
 
     protected:
         bool eventFilter(QObject* obj, QEvent* event) override;
-        void resizeEvent(QResizeEvent* event) override;
-        void updateOverflow();
 
     private:
         struct ActionCategoryMapping
@@ -97,13 +86,8 @@ namespace Rv
         void updatePlayModeButtonState();
 
         IPCore::Session* m_session;
-        QWidget* barContainer;
-        QGridLayout* grid;
         QString m_customCannotUseTooltip;
         QString m_customDisabledPrefix;
-        QWidget* m_leftBox;
-        QWidget* m_centerBox;
-        QWidget* m_rightBox;
         QAction* m_smAction;
         QAction* m_paintAction;
         QAction* m_infoAction;
@@ -139,7 +123,6 @@ namespace Rv
         QIcon m_volumeHighMutedIcon;
 
         std::array<ActionCategoryMapping, 11> m_actionCategoryMappings;
-        bool m_overflowUpdatePending = false;
     };
 
     template <class T> void RvBottomViewToolBar::setVolumeLevel(T& inst, int level)
