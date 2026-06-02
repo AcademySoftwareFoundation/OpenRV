@@ -1025,6 +1025,7 @@ namespace Rv
 
             for (auto iter : m_executingMap)
             {
+                std::cout << "Hello, we are doing this\n";
                 HOP_PROF("RvApplication::dispatchTimeout() : Execute 1");
                 iter.second(iter.first);
             }

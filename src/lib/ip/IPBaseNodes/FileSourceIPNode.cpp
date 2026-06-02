@@ -2572,6 +2572,7 @@ namespace IPCore
             }
             else
             {
+                std::cout << "Hello world\n";
                 // We are using async loading: Dispatch to main thread
                 addDispatchJob(Application::instance()->dispatchToMainThread(
                     [this, event](Application::DispatchID dispatchID)

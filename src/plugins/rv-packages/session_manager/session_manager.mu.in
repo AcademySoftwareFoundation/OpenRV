@@ -1902,7 +1902,15 @@ class: SessionManagerMode : MinorMode
         {
             item.setText("");
             item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+            // Only build the preview widget (which requests thumbnail/filmstrip
+            // generation) when no source media is still loading. In progressive
+            // mode the tree is rebuilt repeatedly as each source resolves; gating
+            // on loadTotal() keeps rvio thumbnail jobs from decoding concurrently
+            // with RV's own loader threads (which makes loading laggy). Previews
+            // are populated once loadTotal() reaches 0 and the tree is rebuilt.
+            print("[THUMBDEBUG-MU] row node=%s loadTotal=%d\n" % (node, loadTotal()));
+            if (loadTotal() == 0)
+                _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
         }
 
         //
