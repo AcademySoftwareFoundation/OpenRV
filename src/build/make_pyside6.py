@@ -120,7 +120,9 @@ def prepare() -> None:
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
 
     # if we have a failed download, clean it up and redownload.
-    os.remove(libclang_zip)
+    # checking for False since it can return None when archive doesn't have a CRC
+    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is False:
+        os.remove(libclang_zip)
 
     # download it if necessary
     if os.path.exists(libclang_zip) is False:
