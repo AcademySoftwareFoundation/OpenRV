@@ -2,7 +2,6 @@
 
 .vscode/**
 .idea/**
-.cache/**
 
 # Qt generated
 **/*.moc
