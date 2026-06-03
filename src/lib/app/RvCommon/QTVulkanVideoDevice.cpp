@@ -26,6 +26,43 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#include <unistd.h>
+
+#ifndef GL_EXT_memory_object
+#define GL_EXT_memory_object 1
+#define GL_TEXTURE_TILING_EXT             0x9580
+#define GL_DEDICATED_MEMORY_OBJECT_EXT    0x9581
+#define GL_NUM_TILING_TYPES_EXT           0x9582
+#define GL_TILING_TYPES_EXT               0x9583
+#define GL_OPTIMAL_TILING_EXT             0x9584
+#define GL_LINEAR_TILING_EXT              0x9585
+#define GL_NUM_DEVICE_UUIDS_EXT           0x9596
+#define GL_DEVICE_UUID_EXT                0x9597
+#define GL_DRIVER_UUID_EXT                0x9598
+#define GL_UUID_SIZE_EXT                  16
+#endif
+
+#ifndef GL_EXT_memory_object_fd
+#define GL_EXT_memory_object_fd 1
+#define GL_HANDLE_TYPE_OPAQUE_FD_EXT      0x9586
+#endif
+
+#ifndef GL_EXT_semaphore
+#define GL_EXT_semaphore 1
+#define GL_NUM_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958A
+#define GL_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958B
+#define GL_NUM_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958C
+#define GL_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958D
+#define GL_LAYOUT_GENERAL_EXT             0x958D
+#define GL_LAYOUT_COLOR_ATTACHMENT_EXT    0x958E
+#define GL_LAYOUT_DEPTH_STENCIL_ATTACHMENT_EXT 0x958F
+#define GL_LAYOUT_DEPTH_STENCIL_READ_ONLY_EXT 0x9590
+#define GL_LAYOUT_SHADER_READ_ONLY_EXT    0x9591
+#define GL_LAYOUT_TRANSFER_SRC_EXT        0x9592
+#define GL_LAYOUT_TRANSFER_DST_EXT        0x9593
+#define GL_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_EXT 0x9530
+#define GL_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_EXT 0x9531
+#endif
 
 namespace Rv
 {
@@ -48,7 +85,7 @@ namespace Rv
     QTVulkanVideoDevice::~QTVulkanVideoDevice()
     {
         // Delete the FBO and its colour texture while the GL context is current.
-        if (m_glContext && (m_fbo || m_fboColorTex))
+        if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject))
         {
             m_glContext->makeCurrent(m_offscreenSurface);
             delete m_fbo;
@@ -58,6 +95,7 @@ namespace Rv
                 glDeleteTextures(1, &m_fboColorTex);
                 m_fboColorTex = 0;
             }
+            cleanupSharedGLObjects();
             m_glContext->doneCurrent();
         }
 
@@ -258,6 +296,28 @@ namespace Rv
         return "vulkan-hybrid";
     }
 
+    void QTVulkanVideoDevice::cleanupSharedGLObjects() const
+    {
+        if (m_glSharedTexture) {
+            glDeleteTextures(1, &m_glSharedTexture);
+            m_glSharedTexture = 0;
+        }
+        if (m_glMemoryObject) {
+            glDeleteMemoryObjectsEXT(1, &m_glMemoryObject);
+            m_glMemoryObject = 0;
+        }
+        if (m_glReadySemaphore) {
+            glDeleteSemaphoresEXT(1, &m_glReadySemaphore);
+            m_glReadySemaphore = 0;
+        }
+        if (m_vkReadySemaphore) {
+            glDeleteSemaphoresEXT(1, &m_vkReadySemaphore);
+            m_vkReadySemaphore = 0;
+        }
+        m_sharedWidth = 0;
+        m_sharedHeight = 0;
+    }
+
     //--------------------------------------------------------------------------
     // syncBuffers
     //--------------------------------------------------------------------------
@@ -280,39 +340,93 @@ namespace Rv
         if (!m_glContext->makeCurrent(m_offscreenSurface))
             return;
 
-        fbo->bind();
+        // Get shared image info from VulkanView
+        const VulkanView::SharedImageInfo* sharedInfo = m_view->getSharedImageInfo(w, h);
+        if (!sharedInfo) {
+            // Fallback to CPU readback if GPU interop fails
+            fbo->bind();
+            glFinish();
+            const size_t floatCount = static_cast<size_t>(w) * h * 4;
+            std::vector<float> floatPx(floatCount);
+            glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, floatPx.data());
+            fbo->unbind();
 
-        glFinish();
-
-        const size_t floatCount = static_cast<size_t>(w) * h * 4;
-        std::vector<float> floatPx(floatCount);
-        glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, floatPx.data());
-
-        fbo->unbind();
-
-        // Pack into A2B10G10R10 
-        std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
-
-        for (int y = 0; y < h; ++y)
-        {
-            // src row: y-flip (GL origin is bottom-left)
-            const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
-            uint32_t*    dst = packed.data()  + (size_t)y * w;
-
-            for (int x = 0; x < w; ++x, src += 4)
+            std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
+            for (int y = 0; y < h; ++y)
             {
-                const float r = std::max(0.f, std::min(1.f, src[0]));
-                const float g = std::max(0.f, std::min(1.f, src[1]));
-                const float b = std::max(0.f, std::min(1.f, src[2]));
-                const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
-                const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
-                const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
-                // A2B10G10R10: bits[31:30]=A(2), bits[29:20]=B(10), bits[19:10]=G(10), bits[9:0]=R(10)
-                dst[x] = (3u << 30) | (bi << 20) | (gi << 10) | ri;
+                const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
+                uint32_t*    dst = packed.data()  + (size_t)y * w;
+                for (int x = 0; x < w; ++x, src += 4)
+                {
+                    const float r = std::max(0.f, std::min(1.f, src[0]));
+                    const float g = std::max(0.f, std::min(1.f, src[1]));
+                    const float b = std::max(0.f, std::min(1.f, src[2]));
+                    const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
+                    const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
+                    const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
+                    dst[x] = (3u << 30) | (bi << 20) | (gi << 10) | ri;
+                }
             }
+            m_view->presentPixelData(packed.data(), w, h);
+            return;
         }
 
-        m_view->presentPixelData(packed.data(), w, h);
+        // Check if we need to re-import the shared objects
+        if (m_sharedWidth != w || m_sharedHeight != h || !m_glMemoryObject) {
+            cleanupSharedGLObjects();
+
+            glCreateMemoryObjectsEXT(1, &m_glMemoryObject);
+            // Duplicate the FD because glImportMemoryFdEXT takes ownership
+            int memFd = dup(sharedInfo->memoryFd);
+            glImportMemoryFdEXT(m_glMemoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_FD_EXT, memFd);
+
+            glGenTextures(1, &m_glSharedTexture);
+            glBindTexture(GL_TEXTURE_2D, m_glSharedTexture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT, GL_LINEAR_TILING_EXT);
+            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, w, h, m_glMemoryObject, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glGenSemaphoresEXT(1, &m_glReadySemaphore);
+            int glReadyFd = dup(sharedInfo->glReadySemaphoreFd);
+            glImportSemaphoreFdEXT(m_glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, glReadyFd);
+
+            glGenSemaphoresEXT(1, &m_vkReadySemaphore);
+            int vkReadyFd = dup(sharedInfo->vkReadySemaphoreFd);
+            glImportSemaphoreFdEXT(m_vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
+
+            m_sharedWidth = w;
+            m_sharedHeight = h;
+        }
+
+        // 1. Wait for Vulkan to be ready
+        GLuint waitDstLayouts[] = { GL_LAYOUT_COLOR_ATTACHMENT_EXT };
+        glWaitSemaphoreEXT(m_vkReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, waitDstLayouts);
+
+        // 2. Blit from FBO to shared texture
+        GLuint readFbo = fbo->fboID();
+        GLuint drawFbo;
+        glGenFramebuffersEXT(1, &drawFbo);
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, drawFbo);
+        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_glSharedTexture, 0);
+
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
+        
+        // Note: GL origin is bottom-left, Vulkan origin is top-left. We need to flip Y.
+        glBlitFramebufferEXT(0, 0, w, h,
+                             0, h, w, 0,
+                             GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
+        glDeleteFramebuffersEXT(1, &drawFbo);
+
+        // 3. Signal Vulkan that GL is done
+        GLuint signalSrcLayouts[] = { GL_LAYOUT_TRANSFER_SRC_EXT };
+        glSignalSemaphoreEXT(m_glReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, signalSrcLayouts);
+
+        glFlush();
+
+        // 4. Tell VulkanView to present
+        m_view->presentSharedImage();
     }
 
     //--------------------------------------------------------------------------

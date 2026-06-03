@@ -62,8 +62,21 @@ namespace Rv
         //
         //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
         //
-        //  pixels: packed A2B10G10R10 
-        //
+        
+        //  GPU Interop API
+        struct SharedImageInfo {
+            int memoryFd;
+            size_t size;
+            int width;
+            int height;
+            int glReadySemaphoreFd;
+            int vkReadySemaphoreFd;
+        };
+
+        const SharedImageInfo* getSharedImageInfo(int w, int h);
+        void presentSharedImage();
+
+        // CPU fallback API (not used when GPU interop is active)
         void presentPixelData(const void* pixels, int w, int h);
 
         bool isInitialized() const { return m_initialized; }
@@ -128,6 +141,15 @@ namespace Rv
         VkBuffer m_vkStagingBuffer{VK_NULL_HANDLE};
         VkDeviceMemory m_vkStagingBufferMemory{VK_NULL_HANDLE};
         size_t m_stagingBufferSize{0};
+
+        // Shared Image for GPU Interop
+        VkImage m_vkSharedImage{VK_NULL_HANDLE};
+        VkDeviceMemory m_vkSharedImageMemory{VK_NULL_HANDLE};
+        VkSemaphore m_vkGlReadySemaphore{VK_NULL_HANDLE};
+        VkSemaphore m_vkVkReadySemaphore{VK_NULL_HANDLE};
+        SharedImageInfo m_sharedImageInfo{-1, 0, 0, 0, -1, -1};
+
+        void cleanupSharedImage();
     };
 
 } // namespace Rv

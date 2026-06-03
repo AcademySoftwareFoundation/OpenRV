@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 namespace Rv
 {
@@ -228,7 +229,9 @@ namespace Rv
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
         std::vector<const char*> deviceExtensions = {
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
+            VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
         };
 
         VkDeviceCreateInfo createInfo = {};
@@ -391,6 +394,340 @@ namespace Rv
             }
         }
         return 0;
+    }
+
+    void VulkanView::cleanupSharedImage()
+    {
+        if (m_vkDevice)
+        {
+            vkDeviceWaitIdle(m_vkDevice);
+            
+            if (m_vkSharedImage) {
+                vkDestroyImage(m_vkDevice, m_vkSharedImage, nullptr);
+                m_vkSharedImage = VK_NULL_HANDLE;
+            }
+            if (m_vkSharedImageMemory) {
+                vkFreeMemory(m_vkDevice, m_vkSharedImageMemory, nullptr);
+                m_vkSharedImageMemory = VK_NULL_HANDLE;
+            }
+            if (m_vkGlReadySemaphore) {
+                vkDestroySemaphore(m_vkDevice, m_vkGlReadySemaphore, nullptr);
+                m_vkGlReadySemaphore = VK_NULL_HANDLE;
+            }
+            if (m_vkVkReadySemaphore) {
+                vkDestroySemaphore(m_vkDevice, m_vkVkReadySemaphore, nullptr);
+                m_vkVkReadySemaphore = VK_NULL_HANDLE;
+            }
+        }
+        
+        if (m_sharedImageInfo.memoryFd != -1) {
+            ::close(m_sharedImageInfo.memoryFd);
+            m_sharedImageInfo.memoryFd = -1;
+        }
+        if (m_sharedImageInfo.glReadySemaphoreFd != -1) {
+            ::close(m_sharedImageInfo.glReadySemaphoreFd);
+            m_sharedImageInfo.glReadySemaphoreFd = -1;
+        }
+        if (m_sharedImageInfo.vkReadySemaphoreFd != -1) {
+            ::close(m_sharedImageInfo.vkReadySemaphoreFd);
+            m_sharedImageInfo.vkReadySemaphoreFd = -1;
+        }
+        m_sharedImageInfo.width = 0;
+        m_sharedImageInfo.height = 0;
+        m_sharedImageInfo.size = 0;
+    }
+
+    const VulkanView::SharedImageInfo* VulkanView::getSharedImageInfo(int w, int h)
+    {
+        if (!m_vkDevice) return nullptr;
+
+        // If we already have a shared image of the right size, return it
+        if (m_vkSharedImage && m_sharedImageInfo.width == w && m_sharedImageInfo.height == h) {
+            return &m_sharedImageInfo;
+        }
+
+        cleanupSharedImage();
+
+        if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
+        {
+            cleanupSwapchain();
+            if (!createSwapchain()) return nullptr;
+        }
+
+        // 1. Create Shared Image
+        VkExternalMemoryImageCreateInfo extMemInfo = {};
+        extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
+        extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+
+        VkImageCreateInfo imageInfo = {};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.pNext = &extMemInfo;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.format = m_vkSwapchainFormat; // e.g., VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        imageInfo.extent = {(uint32_t)w, (uint32_t)h, 1};
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageInfo.tiling = VK_IMAGE_TILING_LINEAR; // Use linear tiling to avoid GL/Vulkan optimal swizzle mismatch
+        imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT; // Only used as transfer src in Vulkan
+        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage) != VK_SUCCESS) {
+            std::cerr << "[VulkanView] Failed to create shared image\n";
+            return nullptr;
+        }
+
+        // Guard against padded linear row pitch
+        VkImageSubresource subresource = {};
+        subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        subresource.mipLevel = 0;
+        subresource.arrayLayer = 0;
+        VkSubresourceLayout layout;
+        vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage, &subresource, &layout);
+
+        if (layout.rowPitch != (VkDeviceSize)w * 4) {
+            std::cerr << "[VulkanView] Shared image has padded row pitch (" << layout.rowPitch 
+                      << " vs expected " << w * 4 << "), falling back to CPU bridge\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        VkMemoryRequirements memReqs;
+        vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage, &memReqs);
+
+        VkExportMemoryAllocateInfo exportAllocInfo = {};
+        exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+        exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+
+        VkMemoryAllocateInfo allocInfo = {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.pNext = &exportAllocInfo;
+        allocInfo.allocationSize = memReqs.size;
+        allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS) {
+            std::cerr << "[VulkanView] Failed to allocate shared image memory\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0);
+
+        // Export Memory FD
+        auto pfnGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR");
+        if (!pfnGetMemoryFdKHR) {
+            std::cerr << "[VulkanView] vkGetMemoryFdKHR not found\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        VkMemoryGetFdInfoKHR getFdInfo = {};
+        getFdInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
+        getFdInfo.memory = m_vkSharedImageMemory;
+        getFdInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+
+        int memFd = -1;
+        if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS) {
+            std::cerr << "[VulkanView] Failed to get memory FD\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        // 2. Create Shared Semaphores
+        VkExportSemaphoreCreateInfo exportSemInfo = {};
+        exportSemInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
+        exportSemInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+
+        VkSemaphoreCreateInfo semInfo = {};
+        semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        semInfo.pNext = &exportSemInfo;
+
+        if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore) != VK_SUCCESS ||
+            vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore) != VK_SUCCESS) {
+            std::cerr << "[VulkanView] Failed to create shared semaphores\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        // Export Semaphore FDs
+        auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
+        if (!pfnGetSemaphoreFdKHR) {
+            std::cerr << "[VulkanView] vkGetSemaphoreFdKHR not found\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        VkSemaphoreGetFdInfoKHR getSemFdInfo = {};
+        getSemFdInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
+        getSemFdInfo.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+
+        int glReadyFd = -1;
+        int vkReadyFd = -1;
+
+        getSemFdInfo.semaphore = m_vkGlReadySemaphore;
+        pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd);
+
+        getSemFdInfo.semaphore = m_vkVkReadySemaphore;
+        pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd);
+
+        m_sharedImageInfo.memoryFd = memFd;
+        m_sharedImageInfo.size = memReqs.size;
+        m_sharedImageInfo.width = w;
+        m_sharedImageInfo.height = h;
+        m_sharedImageInfo.glReadySemaphoreFd = glReadyFd;
+        m_sharedImageInfo.vkReadySemaphoreFd = vkReadyFd;
+
+        // Transition the shared image to TRANSFER_SRC optimal initially
+        VkCommandBuffer cb = m_vkCommandBuffers[0];
+        vkResetCommandBuffer(cb, 0);
+
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(cb, &beginInfo);
+
+        VkImageMemoryBarrier barrier = {};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = m_vkSharedImage;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+        vkEndCommandBuffer(cb);
+
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &cb;
+
+        vkResetFences(m_vkDevice, 1, &m_vkFence);
+        vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
+
+        // Signal vkReady initially so GL can start writing to it
+        VkSubmitInfo signalInfo = {};
+        signalInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        signalInfo.signalSemaphoreCount = 1;
+        signalInfo.pSignalSemaphores = &m_vkVkReadySemaphore;
+        vkQueueSubmit(m_vkQueue, 1, &signalInfo, VK_NULL_HANDLE);
+
+        return &m_sharedImageInfo;
+    }
+
+    //--------------------------------------------------------------------------
+    // presentSharedImage
+    //--------------------------------------------------------------------------
+
+    void VulkanView::presentSharedImage()
+    {
+        if (!m_vkDevice || !m_vkSharedImage || !m_vkSwapchain) return;
+
+        // Acquire image
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            // Swapchain out of date, we'll recreate it next frame
+            return;
+        }
+
+        vkResetFences(m_vkDevice, 1, &m_vkFence);
+        
+        VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
+        vkResetCommandBuffer(cb, 0);
+
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+        vkBeginCommandBuffer(cb, &beginInfo);
+
+        // Transition swapchain image to transfer dst
+        VkImageMemoryBarrier barrier = {};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = m_vkSwapchainImages[imageIndex];
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+        // Copy shared image to swapchain image
+        VkImageCopy region = {};
+        region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.srcSubresource.layerCount = 1;
+        region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.dstSubresource.layerCount = 1;
+        region.extent = {(uint32_t)m_sharedImageInfo.width, (uint32_t)m_sharedImageInfo.height, 1};
+
+        vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                       m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                       1, &region);
+
+        // Transition swapchain image to present
+        barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = 0;
+
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+            0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+        vkEndCommandBuffer(cb);
+
+        // Submit
+        VkSubmitInfo submitInfo = {};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        
+        // Wait for GL to finish writing (glReady) AND swapchain image to be available
+        VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore, m_vkImageAvailableSemaphore};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 2;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+        
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &cb;
+        
+        // Signal render finished AND vkReady (so GL can write next frame)
+        VkSemaphore signalSemaphores[] = {m_vkRenderFinishedSemaphore, m_vkVkReadySemaphore};
+        submitInfo.signalSemaphoreCount = 2;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+
+        // Present
+        VkPresentInfoKHR presentInfo = {};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &m_vkRenderFinishedSemaphore;
+        VkSwapchainKHR swapchains[] = {m_vkSwapchain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapchains;
+        presentInfo.pImageIndices = &imageIndex;
+
+        vkQueuePresentKHR(m_vkQueue, &presentInfo);
+
+        vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
     }
 
     //--------------------------------------------------------------------------

@@ -94,6 +94,16 @@ namespace Rv
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
+
+        // GPU Interop GL objects
+        mutable GLuint m_glMemoryObject{0};
+        mutable GLuint m_glSharedTexture{0};
+        mutable GLuint m_glReadySemaphore{0};
+        mutable GLuint m_vkReadySemaphore{0};
+        mutable int m_sharedWidth{0};
+        mutable int m_sharedHeight{0};
+
+        void cleanupSharedGLObjects() const;
     };
 
 } // namespace Rv
