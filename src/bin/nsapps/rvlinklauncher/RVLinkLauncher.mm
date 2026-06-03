@@ -18,6 +18,24 @@
 - (NSMutableArray<NSURL *> *)findRVAppsUsingWorkspace:(NSString *)rvlinkURL;
 @end
 
+// Long rvlink URLs (e.g. "baked" URLs that encode an entire RV command line)
+// would otherwise grow the NSAlert taller than the screen, pushing the version
+// chooser popup and the Open button off the bottom of the visible desktop.
+// Clamp the displayed URL so the alert stays a usable size.
+static NSString *RVLinkDisplayURL(NSString *url) {
+    static const NSUInteger kMaxDisplayLength = 120;
+    if (url == nil) {
+        return @"";
+    }
+    if ([url length] <= kMaxDisplayLength) {
+        return url;
+    }
+    NSUInteger head = kMaxDisplayLength - 1;
+    return [NSString stringWithFormat:@"%@… (%lu characters)",
+                                      [url substringToIndex:head],
+                                      (unsigned long)[url length]];
+}
+
 @implementation RVLinkURLHandler
 - (instancetype)init {
     self = [super init];
@@ -61,7 +79,7 @@
 
                 if (currentAlert != nil) {
                     // Update the existing dialog in place and bring it to the front
-                    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
+                    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", RVLinkDisplayURL(latestRVLinkURL)]];
                     [[currentAlert window] makeKeyAndOrderFront:nil];
                 } else {
                     // No dialog is currently shown – process normally
@@ -229,7 +247,7 @@
     // Present chooser UI for multiple apps
     currentAlert = [[NSAlert alloc] init];
     [currentAlert setMessageText:@"Choose RV Application"];
-    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
+    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", RVLinkDisplayURL(latestRVLinkURL)]];
     [currentAlert addButtonWithTitle:@"Open"];
     [currentAlert addButtonWithTitle:@"Cancel"];
 
