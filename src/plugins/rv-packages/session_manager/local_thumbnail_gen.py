@@ -78,7 +78,9 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._loading_active = False
         self._display_preview = False if os.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS") == "0" else True
         self._shutting_down = False
-        self._active_procs: list[subprocess.Popen] = []
+        # Each entry pairs a running rvio process with the cache_key it is
+        # generating for, so a source deletion can cancel the matching proc.
+        self._active_procs: list[tuple[subprocess.Popen, str]] = []
         self._procs_lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
@@ -105,6 +107,11 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 "before-session-deletion",
                 self._on_session_deletion,
                 "Delete all cached local filmstrips and thumbnails on RV close",
+            ),
+            (
+                "before-source-delete",
+                self._on_source_delete,
+                "Cancel in-flight generation and evict cache when a media source is removed",
             ),
             (
                 "play-start",
@@ -396,7 +403,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         return output_width, output_height
 
-    def _run_suspendable(self, cmd: list[str], timeout: int = 120) -> None:
+    def _run_suspendable(self, cmd: list[str], cache_key: str, timeout: int = 120) -> None:
         """Run a subprocess that can be suspended/resumed during playback.
 
         The timeout counts only non-suspended wall-clock time: while the
@@ -427,7 +434,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         finally:
             with self._procs_lock:
                 try:
-                    self._active_procs.remove(proc)
+                    self._active_procs.remove((proc, cache_key))
                 except ValueError:
                     logger.warning(f"Process {proc.pid} was not in active processes list")
 
@@ -437,6 +444,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         try:
             self._run_suspendable(
                 [rvio_bin, media_path, "-t", str(mid_frame), "-o", str(output_path)],
+                cache_key,
             )
         except Exception as e:
             logger.error(f"Thumbnail generation failed: {e}")
@@ -477,6 +485,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     "-o",
                     str(output_path),
                 ],
+                cache_key,
             )
         except Exception as e:
             logger.error(f"Filmstrip generation failed: {e}")
@@ -531,7 +540,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._playback_active = True
             if should_defer:
                 return
-            for proc in self._active_procs:
+            for proc, _ in self._active_procs:
                 _suspend_proc(proc)
 
     def _on_play_stop(self, event: Any) -> None:
@@ -589,7 +598,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         event.reject()
         self._shutting_down = True
         with self._procs_lock:
-            for proc in self._active_procs:
+            for proc, _ in self._active_procs:
                 _resume_proc(proc)
                 try:
                     proc.terminate()
@@ -605,6 +614,51 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             except Exception as e:
                 logger.warning(f"Failed to delete cache directory {self._cache_dir}: {e}")
         self._cache.clear()
+
+    def _on_source_delete(self, event: Any) -> None:
+        """Cancel generation immediately and evict the cache for a removed media source.
+        """
+        event.reject()
+
+        source_node = event.contents()
+        media_path = self._get_media_path(source_node)
+        if not media_path:
+            return
+
+        cache_key = self._cache_key(media_path)
+
+        sources = self._cache_key_to_sources.get(cache_key)
+        if sources is not None:
+            sources.discard(source_node)
+            if sources:
+                return
+            self._cache_key_to_sources.pop(cache_key, None)
+
+        # Kill any running rvio proc generating for this media.
+        with self._procs_lock:
+            for proc, proc_cache_key in self._active_procs:
+                if proc_cache_key == cache_key:
+                    # Can't reliably kill a stopped proc, so resume before killing
+                    _resume_proc(proc)
+                    try:
+                        proc.terminate()
+                    except OSError:
+                        logger.warning(f"Failed to terminate process {proc.pid}")
+
+        self._deferred_jobs = [job for job in self._deferred_jobs if job[1] != cache_key]
+
+        self._in_flight.discard(f"{cache_key}_thumbnail_path")
+        self._in_flight.discard(f"{cache_key}_filmstrip_path")
+
+        self._deferred_sources.discard(source_node)
+
+        cached = self._cache.pop(cache_key, {})
+        for path in cached.values():
+            if path:
+                try:
+                    Path(path).unlink(missing_ok=True)
+                except Exception as e:
+                    logger.warning(f"Failed to delete cached preview {path}: {e}")
 
 
 def createMode() -> LocalThumbnailGen:
