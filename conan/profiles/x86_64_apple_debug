@@ -1,0 +1,13 @@
+include(common)
+
+# Host profile for Intel Mac (x86_64) or Rosetta 2 emulation on Apple Silicon (Debug).
+# Use that profile for -pr options.
+
+[settings]
+arch=x86_64
+build_type=Debug
+compiler=apple-clang
+compiler.cppstd=17
+compiler.libcxx=libc++
+compiler.version=14
+os=Macos

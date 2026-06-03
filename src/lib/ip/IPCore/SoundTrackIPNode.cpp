@@ -98,47 +98,61 @@ namespace IPCore
 
     IPImage* SoundTrackIPNode::evaluateAudioTexture(const Context& context)
     {
-        if (!inputs().empty() && m_fb)
-        {
-            if (m_sampleCurrent < m_sampleEnd && graph()->isAudioConfigured())
-            {
-                //
-                //  Try and render
-                //
+        // Lock only to safely read m_fb. We must not hold the lock during
+        // renderAudio() calls — renderAudio() acquires m_fblock internally
+        // and would deadlock.
+        lockFB();
+        const bool hasFB = !inputs().empty() && m_fb;
+        unlockFB();
 
-                AudioCache& cache = graph()->audioCache();
+        if (!hasFB)
+            return 0;
+
+        if (m_sampleCurrent < m_sampleEnd && graph()->isAudioConfigured())
+        {
+            //
+            //  Try and render
+            //
+
+            AudioCache& cache = graph()->audioCache();
+            cache.lock();
+            const size_t packetSize = (cache.packetSize() > 0) ? cache.packetSize() : TWEAK_AUDIO_DEFAULT_PACKET_SIZE;
+            const TwkAudio::Layout layout = cache.layout();
+            const double rate = cache.rate();
+            cache.unlock();
+
+            int channels = TwkAudio::channelsCount(layout);
+            size_t npackets = MAX_SAMPLES_PROCESSED_PER_EVAL / (packetSize * channels);
+
+            for (size_t n = 0; m_sampleCurrent < m_sampleEnd && n < npackets; m_sampleCurrent += packetSize, n++)
+            {
+                AudioBuffer buffer(packetSize, layout, rate, samplesToTime(m_sampleCurrent, rate));
+
                 cache.lock();
-                const size_t packetSize = (cache.packetSize() > 0) ? cache.packetSize() : 512;
-                const TwkAudio::Layout layout = cache.layout();
-                const double rate = cache.rate();
+                const bool found = cache.fillBuffer(buffer);
                 cache.unlock();
 
-                int channels = TwkAudio::channelsCount(layout);
-                size_t npackets = MAX_SAMPLES_PROCESSED_PER_EVAL / (packetSize * channels);
-
-                for (size_t n = 0; m_sampleCurrent < m_sampleEnd && n < npackets; m_sampleCurrent += packetSize, n++)
+                if (found)
                 {
-                    AudioBuffer buffer(packetSize, layout, rate, samplesToTime(m_sampleCurrent, rate));
-
-                    cache.lock();
-                    const bool found = cache.fillBuffer(buffer);
-                    cache.unlock();
-
-                    if (found)
-                    {
-                        AudioContext acontext(buffer, graph()->cache().displayFPS());
-                        renderAudio(acontext);
-                    }
+                    AudioContext acontext(buffer, graph()->cache().displayFPS());
+                    renderAudio(acontext);
                 }
             }
-
-            IPImage* image = new IPImage(this, IPImage::BlendRenderType, m_fb->referenceCopy(), IPImage::OutputTexture);
-
-            image->tagMap[IPImage::textureIDTagName()] = IPImage::waveformTagValue();
-            return image;
         }
 
-        return 0;
+        // Re-check m_fb under lock before dereferencing — propertyChanged() on
+        // the main thread may have cleared it since the check above.
+        lockFB();
+        if (!m_fb)
+        {
+            unlockFB();
+            return 0;
+        }
+        IPImage* image = new IPImage(this, IPImage::BlendRenderType, m_fb->referenceCopy(), IPImage::OutputTexture);
+        unlockFB();
+
+        image->tagMap[IPImage::textureIDTagName()] = IPImage::waveformTagValue();
+        return image;
     }
 
     void SoundTrackIPNode::propertyChanged(const Property* p)
@@ -157,31 +171,34 @@ namespace IPCore
 
         if (p == m_visualHeight || p == m_visualWidth)
         {
+            lockFB();
             if (!m_fb)
             {
                 m_fb = new FrameBuffer(w, h, 4, FrameBuffer::UCHAR);
                 m_fb->staticRef();
-                m_stats.clear();
             }
 
             if (m_fb && (m_fb->width() != w || m_fb->height() != h))
             {
                 m_fb->restructure(w, h, 0, 4);
-                m_stats.clear();
             }
 
-            clearFB();
+            m_stats.clear();
             m_stats.resize(h);
+            unlockFB();
+
+            clearFB();
         }
         else if (p == m_visualStartFrame || p == m_visualEndFrame)
         {
+            lockFB();
             if (!m_fb)
             {
                 m_fb = new FrameBuffer(w, h, 4, FrameBuffer::UCHAR);
                 m_fb->staticRef();
-                m_stats.clear();
             }
             m_stats.resize(h);
+            unlockFB();
 
             updateRanges();
             clearFB();
@@ -198,6 +215,7 @@ namespace IPCore
 
     void SoundTrackIPNode::clearFB()
     {
+        lockFB();
         if (m_fb)
         {
             memset(m_fb->pixels<unsigned char>(), 0, m_fb->planeSize());
@@ -207,6 +225,7 @@ namespace IPCore
             fill(m_stats.begin(), m_stats.end(), RangeStats());
             m_sampleCurrent = m_sampleStart;
         }
+        unlockFB();
     }
 
     void SoundTrackIPNode::updateRanges()

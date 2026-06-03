@@ -1,33 +1,41 @@
 # Common build dependencies for all CY20XX platforms aja https://github.com/aja-video/libajantv2
 SET(RV_DEPS_AJA_VERSION
-    "17.1.0"
+    "17.6.0.hotfix1"
 )
 SET(RV_DEPS_AJA_DOWNLOAD_HASH
-    "b9d189f77e18dbdff7c39a339b1a5dd4"
+    "dba447ddd1b0ee84cee8441c0adba06a"
 )
 
-# atomic_ops https://github.com/ivmai/libatomic_ops
+# atomic_ops https://github.com/bdwgc/libatomic_ops
 SET(RV_DEPS_ATOMIC_OPS_VERSION
-    "7.7.0"
+    "7.10.0"
 )
 SET(RV_DEPS_ATOMIC_OPS_DOWNLOAD_HASH
-    "cc7fad1e71b3064abe1ea821ae9a9a6e"
+    "35e417e4e49cd97976ef14c50e06db9b"
+)
+
+# libdeflate https://github.com/ebiggers/libdeflate
+SET(RV_DEPS_LIBDEFLATE_VERSION
+    "1.25"
 )
 
 # dav1d https://github.com/videolan/dav1d
 SET(RV_DEPS_DAV1D_VERSION
-    "1.4.3"
+    "1.5.3"
 )
 SET(RV_DEPS_DAV1D_DOWNLOAD_HASH
-    "2c62106fda87a69122dc8709243a34e8"
+    "6a195752588586acf13349a1cceedab8"
+)
+SET(RV_DEPS_DAV1D_VERSION_LIB
+    "7"
 )
 
 # doctest https://github.com/doctest/doctest
 SET(RV_DEPS_DOCTEST_VERSION
-    "2.4.9"
+    "2.4.12"
 )
 SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH
-    "a7948b5ec1f69de6f84c7d7487aaf79b"
+    "92bcfd6352ebf6c741f9ffaa3cad8808"
 )
 
 # expat https://github.com/libexpat/libexpat
@@ -132,13 +140,13 @@ SET(RV_DEPS_GC_DOWNLOAD_HASH
 
 # glew https://github.com/nigels-com/glew
 SET(RV_DEPS_GLEW_VERSION
-    "e1a80a9f12d7def202d394f46e44cfced1104bfb"
+    "2.3.1"
 )
 SET(RV_DEPS_GLEW_DOWNLOAD_HASH
-    "9bfc689dabeb4e305ce80b5b6f28bcf9"
+    "e795affc12dda3226e9ae3afcc80ceb9"
 )
 SET(RV_DEPS_GLEW_VERSION_LIB
-    "2.2.0"
+    "2.3.1"
 )
 
 # imgui https://github.com/pthom/imgui
@@ -176,26 +184,26 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB
 
 # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION
-    "2.5.19.1"
+    "3.1.12.0"
 )
 SET(RV_DEPS_OIIO_DOWNLOAD_HASH
-    "5af6de5a73c6d234eed8e2874a5aed62"
+    "4f7cb0e132117613d828439d987e187c"
 )
 
 # openjpeg https://github.com/uclouvain/openjpeg
 SET(RV_DEPS_OPENJPEG_VERSION
-    "2.5.0"
+    "2.5.4"
 )
 SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH
-    "5cbb822a1203dd75b85639da4f4ecaab"
+    "6160de075bb5191e482bc0f024b375e4"
 )
 
 # openjph https://github.com/aous72/OpenJPH
 SET(RV_DEPS_OPENJPH_VERSION
-    "0.21.3"
+    "0.23.1"
 )
 SET(RV_DEPS_OPENJPH_DOWNLOAD_HASH
-    "d0a3fb5f643a8948d5874624ff94a229"
+    "7359c6516616ff2a0440c90b784c1302"
 )
 
 # otio https://github.com/AcademySoftwareFoundation/OpenTimelineIO
@@ -205,30 +213,30 @@ SET(RV_DEPS_OTIO_VERSION
 
 # pcre2 https://github.com/PCRE2Project/pcre2
 SET(RV_DEPS_PCRE2_VERSION
-    "10.43"
+    "10.47"
 )
 SET(RV_DEPS_PCRE2_DOWNLOAD_HASH
-    "e4c3f2a24eb5c15bec8360e50b3f0137"
+    "b55ec5acca85ffddc7d81c23f22bf176"
 )
 
 # png https://github.com/glennrp/libpng
 SET(RV_DEPS_PNG_VERSION
-    "1.6.48"
+    "1.6.55"
 )
 SET(RV_DEPS_PNG_DOWNLOAD_HASH
-    "be6cc9e411c26115db3b9eab1159a1d9"
+    "933118ac208387d0727e3d5e36558022"
 )
 
 # raw https://github.com/LibRaw/LibRaw Please check the libraw_version.h file for your version number to get the LIBRAW_SHLIB_CURRENT value
 # https://github.com/LibRaw/LibRaw/blob/0.21-stable/libraw/libraw_version.h
 SET(RV_DEPS_RAW_VERSION
-    "0.21.1"
+    "0.22.0"
 )
 SET(RV_DEPS_RAW_DOWNLOAD_HASH
-    "3ad334296a7a2c8ee841f353cc1b450b"
+    "1d2e307a1e6d7a34268fc421b17675fe"
 )
 SET(RV_DEPS_RAW_VERSION_LIB
-    "23"
+    "24"
 )
 
 # spdlog https://github.com/gabime/spdlog
@@ -241,21 +249,21 @@ SET(RV_DEPS_SPDLOG_DOWNLOAD_HASH
 
 # tiff https://gitlab.com/libtiff/libtiff
 SET(RV_DEPS_TIFF_VERSION
-    "4.6.0"
+    "4.7.1"
 )
 SET(RV_DEPS_TIFF_DOWNLOAD_HASH
-    "118a2e5fc9ed71653195b332b9715890"
+    "ec48ea6266661f4dceb8b1e923c7b838"
 )
 SET(RV_DEPS_TIFF_VERSION_LIB
-    "6.0.2"
+    "6.2.0"
 )
 
 # webp https://github.com/webmproject/libwebp
 SET(RV_DEPS_WEBP_VERSION
-    "1.2.1"
+    "1.6.0"
 )
 SET(RV_DEPS_WEBP_DOWNLOAD_HASH
-    "ef5ac6de4b800afaebeb10df9ef189b2"
+    "d498caf9323a24ce3ed40b84c22a32cd"
 )
 
 # zlib https://github.com/madler/zlib

@@ -188,6 +188,9 @@ def configure() -> None:
     configure_args.append(f"--prefix={OUTPUT_DIR}")
     configure_args.append(f"--openssldir={OUTPUT_DIR}")
 
+    # Skip building the test suite
+    configure_args.append("no-tests")
+
     if platform.system() == "Linux":
         configure_args.append("-Wl,-rpath,'$$ORIGIN/../lib'")
 
@@ -200,13 +203,28 @@ def build() -> None:
     """
     Run the build step of the build. It compile every target of the project.
     """
+    build_env = None
+
     if platform.system() == "Windows":
-        build_args = ["nmake"]
+        # jom is a parallel drop-in replacement for nmake; use it when available
+        # to significantly speed up the Windows build. Falls back to nmake.
+        _has_jom = bool(shutil.which("jom"))
+        if _has_jom:
+            build_args = ["jom", f"/J{os.cpu_count() or 1}"]
+            build_env = os.environ.copy()
+            # /FS serializes PDB writes through mspdbsrv.exe as a safety net.
+            build_env["CL"] = build_env.get("CL", "") + " /FS"
+            # _CL_ is appended after all other flags, so /Z7 overrides the /Zi
+            # in OpenSSL's Makefile. This embeds debug info in each .obj instead
+            # of a shared PDB, eliminating file contention under parallel jom.
+            build_env["_CL_"] = build_env.get("_CL_", "") + " /Z7"
+        else:
+            build_args = ["nmake"]
     else:
         build_args = ["make", f"-j{os.cpu_count() or 1}"]
 
     print(f"Executing {build_args} from {SOURCE_DIR}")
-    subprocess.run(build_args, cwd=SOURCE_DIR).check_returncode()
+    subprocess.run(build_args, cwd=SOURCE_DIR, env=build_env).check_returncode()
 
 
 def install() -> None:

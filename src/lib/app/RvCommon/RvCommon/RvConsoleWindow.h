@@ -64,8 +64,12 @@ namespace Rv
     public slots:
         void processTextBuffer();
 
+    public:
+        void done(int result) override;
+
     private:
-        void closeEvent(QCloseEvent*);
+        void closeEvent(QCloseEvent*) override;
+        void saveSettings();
 
     private:
         QMutex m_lock;

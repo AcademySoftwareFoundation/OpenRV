@@ -4,9 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-INCLUDE(ProcessorCount) # require CMake 3.15+
-PROCESSORCOUNT(_cpu_count)
-
 RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_SPDLOG" "${RV_DEPS_SPDLOG_VERSION}" "" "")
 
 SET(_download_url
@@ -16,24 +13,6 @@ SET(_download_url
 SET(_download_hash
     ${RV_DEPS_SPDLOG_DOWNLOAD_HASH}
 )
-
-SET(_install_dir
-    ${RV_DEPS_BASE_DIR}/${_target}/install
-)
-
-SET(_include_dir
-    ${_install_dir}/include
-)
-
-IF(RHEL_VERBOSE)
-  SET(_lib_dir
-      ${_install_dir}/lib64
-  )
-ELSE()
-  SET(_lib_dir
-      ${_install_dir}/lib
-  )
-ENDIF()
 
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
   SET(RV_SPDLOG_DEBUG_POSTFIX
@@ -48,17 +27,6 @@ SET(_spdlog_lib_name
 SET(_spdlog_lib
     ${_lib_dir}/${_spdlog_lib_name}
 )
-
-IF(RV_TARGET_WINDOWS)
-  # MSYS2/CMake defaults to Ninja
-  SET(_make_command
-      ninja
-  )
-ELSE()
-  SET(_make_command
-      make
-  )
-ENDIF()
 
 LIST(APPEND _configure_options "-DSPDLOG_BUILD_EXAMPLE=OFF")
 
@@ -82,51 +50,20 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
-ADD_LIBRARY(spdlog::spdlog STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(spdlog::spdlog ${_target})
-SET_PROPERTY(
-  TARGET spdlog::spdlog
-  PROPERTY IMPORTED_LOCATION ${_spdlog_lib}
-)
-SET_PROPERTY(
-  TARGET spdlog::spdlog
-  PROPERTY IMPORTED_SONAME ${_spdlog_lib_name}
-)
-
-FILE(MAKE_DIRECTORY ${_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   spdlog::spdlog
-  INTERFACE ${_include_dir}
+  TYPE
+  STATIC
+  LOCATION
+  ${_spdlog_lib}
+  SONAME
+  ${_spdlog_lib_name}
+  INCLUDE_DIRS
+  ${_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-LIST(APPEND RV_DEPS_LIST spdlog::spdlog)
 
-IF(RV_TARGET_WINDOWS)
-  ADD_CUSTOM_COMMAND(
-    TARGET ${_target}
-    POST_BUILD
-    COMMENT "Installing ${_target}'s libs and bin into ${RV_STAGE_LIB_DIR} and ${RV_STAGE_BIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_install_dir}/lib ${RV_STAGE_LIB_DIR}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
-  )
-ELSE()
-  ADD_CUSTOM_COMMAND(
-    COMMENT "Installing ${_target}'s libs into ${RV_STAGE_LIB_DIR}"
-    OUTPUT ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${_lib_dir} ${RV_STAGE_LIB_DIR}
-    DEPENDS ${_target}
-  )
-  ADD_CUSTOM_TARGET(
-    ${_target}-stage-target ALL
-    DEPENDS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name}
-  )
-ENDIF()
-
-ADD_DEPENDENCIES(dependencies ${_target}-stage-target)
-
-SET(RV_DEPS_SPDLOG_VERSION
-    ${_version}
-    CACHE INTERNAL "" FORCE
-)
+RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_spdlog_lib_name})
