@@ -150,7 +150,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         """Defer thumbnail generation while playing back or while source media
         is loading."""
         return self._playback_active or self._loading_active
-    
+
     def _get_cached_path(self, event: Any, path_key: str) -> None:
         event.reject()
         source_node = event.contents()
