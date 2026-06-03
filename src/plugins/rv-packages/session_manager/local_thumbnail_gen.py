@@ -535,9 +535,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_play_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
-            if self._should_defer():
-                return
+            should_defer = self._should_defer()
             self._playback_active = True
+            if should_defer:
+                return
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
@@ -557,9 +558,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_loading_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
-            if self._should_defer():
-                return
+            should_defer = self._should_defer()
             self._loading_active = True
+            if should_defer:
+                return
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
