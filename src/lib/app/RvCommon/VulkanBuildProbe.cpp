@@ -18,10 +18,5 @@ namespace
     {
         PFN_vkVoidFunction fn = vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkCreateInstance");
         (void)fn;
-
-#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-        auto device = Rv::makeNoOpQTVulkanVideoDevice();
-        (void)device;
-#endif
     }
 } // namespace

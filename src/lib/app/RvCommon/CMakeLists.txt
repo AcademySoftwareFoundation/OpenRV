@@ -102,7 +102,7 @@ IF(RV_TARGET_LINUX
     MESSAGE(FATAL_ERROR "USE_VULKAN_PRESENTATION=ON requires RV_ENABLE_LINUX_VULKAN_SDK=ON")
   ENDIF()
   MESSAGE(STATUS "USE_VULKAN_PRESENTATION=ON: enabling Linux Vulkan presentation build plumbing")
-  LIST(APPEND _sources VulkanView.cpp QTVulkanVideoDevice.cpp)
+  LIST(APPEND _sources VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
 ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)

@@ -24,6 +24,13 @@
 #include <GL/glew.h>
 #endif
 #include <RvCommon/GLView.h> // WINDOWS: include AFTER other stuff
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+#include <RvCommon/VulkanView.h>
+#include <RvCommon/QTVulkanVideoDevice.h>
+#ifdef __glew_h_
+#error "GLEW IS DEFINED BEFORE QTGUI!"
+#endif
+#endif
 #include <RvCommon/DiagnosticsView.h>
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtGui/QtGui>
@@ -153,6 +160,9 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         , m_metalView(nullptr)
 #endif
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        , m_vulkanView(nullptr)
+#endif
         , m_diagnosticsView(nullptr)
         , m_diagnosticsDock(nullptr)
         , m_sourceEditor(0)
@@ -228,6 +238,21 @@ namespace Rv
         // inside a dock.  That compositor intercepts the CAMetalLayer content and composites
         // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
         // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        // --- Vulkan path ---
+        m_vulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
+
+        m_vulkanView->setFocusPolicy(Qt::StrongFocus);
+        m_vulkanView->setMouseTracking(true);
+        m_vulkanView->setAcceptDrops(true);
+        m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        m_vulkanView->resize(m_vulkanView->sizeHint());
+        m_vulkanView->setEventWidget(m_vulkanView);
+        m_viewWidget = m_vulkanView;
+
+        m_vulkanView->videoDevice()->makeCurrent();
+
+        initializeSession();
 #else
         // --- OpenGL path ---
         if (docs.empty())
@@ -361,6 +386,8 @@ namespace Rv
             // RvApp()->addVideoDevice(m_glView->videoDevice());
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
             m_session->setControlVideoDevice(m_metalView->videoDevice());
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+            m_session->setControlVideoDevice(m_vulkanView->videoDevice());
 #else
             m_session->setControlVideoDevice(m_glView->videoDevice());
 #endif
@@ -604,6 +631,8 @@ namespace Rv
         {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
             m_metalView->videoDevice()->redraw();
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+            m_vulkanView->videoDevice()->redraw();
 #else
             view()->videoDevice()->redraw();
 #endif
@@ -614,6 +643,12 @@ namespace Rv
             if (m_session->eventVideoDevice() && m_metalView->videoDevice())
             {
                 m_metalView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                           m_session->eventVideoDevice()->height());
+            }
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+            if (m_session->eventVideoDevice() && m_vulkanView->videoDevice())
+            {
+                m_vulkanView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
                                                                            m_session->eventVideoDevice()->height());
             }
 #else
@@ -807,6 +842,9 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         m_metalView->setMinimumContentSize(64, 64);
         m_metalView->setMinimumSize(QSize(64, 64));
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        m_vulkanView->setMinimumContentSize(64, 64);
+        m_vulkanView->setMinimumSize(QSize(64, 64));
 #else
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));
@@ -923,7 +961,7 @@ namespace Rv
 
     void RvDocument::setStereo(bool b)
     {
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#if (defined(PLATFORM_DARWIN) && defined(USE_METAL)) || (defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION))
         if (!m_glView)
             return;
 #endif
@@ -944,7 +982,7 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#if (defined(PLATFORM_DARWIN) && defined(USE_METAL)) || (defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION))
         if (!m_glView)
             return;
 #endif
@@ -963,7 +1001,7 @@ namespace Rv
 
     void RvDocument::setDoubleBuffer(bool b)
     {
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#if (defined(PLATFORM_DARWIN) && defined(USE_METAL)) || (defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION))
         if (!m_glView)
             return;
 #endif
@@ -982,7 +1020,7 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#if (defined(PLATFORM_DARWIN) && defined(USE_METAL)) || (defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION))
         if (!m_glView)
             return;
 #endif
@@ -1034,6 +1072,10 @@ namespace Rv
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
     MetalView* RvDocument::metalView() const { return m_metalView; }
+#endif
+
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+    VulkanView* RvDocument::vulkanView() const { return m_vulkanView; }
 #endif
 
     void RvDocument::center()
@@ -1174,6 +1216,25 @@ namespace Rv
                 m_metalView->setMinimumContentSize(w, h);
                 m_metalView->resize(w, h);
                 m_metalView->updateGeometry();
+            }
+        }
+        else
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        if (m_vulkanView)
+        {
+            m_vulkanView->setContentSize(w, h);
+            m_vulkanView->setMinimumContentSize(w, h);
+            const int dh = m_vulkanView->height() - h;
+            const int dw = m_vulkanView->width() - w;
+            if (dh || dw)
+            {
+                m_vulkanView->resize(w, h);
+                m_vulkanView->updateGeometry();
+                resize(width() - dw, height() - dh);
+                m_vulkanView->setContentSize(w, h);
+                m_vulkanView->setMinimumContentSize(w, h);
+                m_vulkanView->resize(w, h);
+                m_vulkanView->updateGeometry();
             }
         }
         else
@@ -1321,6 +1382,8 @@ namespace Rv
         m_session->userRenderEvent("layout");
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         Session::Margins margins = m_metalView ? m_metalView->videoDevice()->margins() : m_glView->videoDevice()->margins();
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        Session::Margins margins = m_vulkanView ? m_vulkanView->videoDevice()->margins() : m_glView->videoDevice()->margins();
 #else
         Session::Margins margins = m_glView->videoDevice()->margins();
 #endif
@@ -1415,6 +1478,26 @@ namespace Rv
                 m_metalView->updateGeometry();
             }
             DB("resizeToFit final resulting size w " << m_metalView->width() << " h " << m_metalView->height());
+        }
+        else
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        if (m_vulkanView)
+        {
+            m_vulkanView->setContentSize(int(w), int(h));
+            m_vulkanView->setMinimumContentSize(int(w), int(h));
+            m_vulkanView->updateGeometry();
+            DB("resizeToFit resulting size w " << m_vulkanView->width() << " h " << m_vulkanView->height());
+            const int dh = m_vulkanView->height() - int(h);
+            const int dw = m_vulkanView->width() - int(w);
+            DB("resizeToFit dw " << dw << " dh " << dh);
+            if (!firstTime && (dh || dw))
+            {
+                resize(width() - dw, height() - dh);
+                m_vulkanView->setContentSize(int(w), int(h));
+                m_vulkanView->setMinimumContentSize(int(w), int(h));
+                m_vulkanView->updateGeometry();
+            }
+            DB("resizeToFit final resulting size w " << m_vulkanView->width() << " h " << m_vulkanView->height());
         }
         else
 #endif
@@ -2050,6 +2133,10 @@ namespace Rv
             if (m_metalView)
                 m_session->deviceSizeChanged(m_metalView->videoDevice());
             else
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+            if (m_vulkanView)
+                m_session->deviceSizeChanged(m_vulkanView->videoDevice());
+            else
 #endif
                 if (m_glView)
                 m_session->deviceSizeChanged(m_glView->videoDevice());
@@ -2203,6 +2290,9 @@ namespace Rv
     {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         TwkApp::VideoDevice* vdev = m_metalView ? static_cast<TwkApp::VideoDevice*>(m_metalView->videoDevice())
+                                                : static_cast<TwkApp::VideoDevice*>(m_glView->videoDevice());
+#elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        TwkApp::VideoDevice* vdev = m_vulkanView ? static_cast<TwkApp::VideoDevice*>(m_vulkanView->videoDevice())
                                                 : static_cast<TwkApp::VideoDevice*>(m_glView->videoDevice());
 #else
         TwkApp::VideoDevice* vdev = m_glView->videoDevice();

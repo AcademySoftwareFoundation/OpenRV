@@ -1,0 +1,17 @@
+--- OpenRV/src/lib/app/RvCommon/RvDocument.cpp
++++ OpenRV/src/lib/app/RvCommon/RvDocument.cpp
+@@ -964,7 +964,15 @@
+     {
+ #if (defined(PLATFORM_DARWIN) && defined(USE_METAL)) || (defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION))
+         if (!m_glView)
++        {
++            FILE* f = fopen("/home/cedrik/w/rv/.cursor/debug-2dc816.log", "a");
++            if (f) {
++                fprintf(f, "{\"sessionId\":\"2dc816\",\"id\":\"log_setStereo\",\"timestamp\":0,\"location\":\"RvDocument.cpp:setStereo\",\"message\":\"m_glView is null, returning early\",\"data\":{},\"runId\":\"run1\",\"hypothesisId\":\"H1\"}\n");
++                fclose(f);
++            }
+             return;
++        }
+ #endif
+         const bool vsync = m_glView->format().swapInterval() == 1;
+         const bool stereo = m_glView->format().stereo();

@@ -33,6 +33,9 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
     class MetalView;
 #endif
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+    class VulkanView;
+#endif
     class DiagnosticsView;
     class DesktopVideoModule;
     class DesktopVideoDevice;
@@ -79,6 +82,10 @@ namespace Rv
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* metalView() const;
+#endif
+
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        VulkanView* vulkanView() const;
 #endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
@@ -178,6 +185,9 @@ namespace Rv
         GLView* m_oldGLView;
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* m_metalView;
+#endif
+#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+        VulkanView* m_vulkanView;
 #endif
         QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
