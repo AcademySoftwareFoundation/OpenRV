@@ -150,7 +150,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         """Defer thumbnail generation while playing back or while source media
         is loading."""
         return self._playback_active or self._loading_active
-
+    
     def _get_cached_path(self, event: Any, path_key: str) -> None:
         event.reject()
         source_node = event.contents()
@@ -535,6 +535,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_play_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
+            if self._should_defer():
+                return
             self._playback_active = True
             for proc in self._active_procs:
                 _suspend_proc(proc)
@@ -547,7 +549,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
         with self._procs_lock:
             self._playback_active = False
-            if not self._loading_active:
+            if not self._should_defer():
                 for proc in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
@@ -555,6 +557,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_loading_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
+            if self._should_defer():
+                return
             self._loading_active = True
             for proc in self._active_procs:
                 _suspend_proc(proc)
@@ -563,7 +567,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         event.reject()
         with self._procs_lock:
             self._loading_active = False
-            if not self._playback_active:
+            if not self._should_defer():
                 for proc in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
