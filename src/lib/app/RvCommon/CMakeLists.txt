@@ -55,7 +55,6 @@ SET(_sources
     RvWebManager.cpp
     RvTopViewToolBar.cpp
     RvBottomViewToolBar.cpp
-    RvBottomViewToolBarBuild.cpp
     RvSourceEditor.cpp
     GLSLSyntaxHighlighter.cpp
     RvProfileManager.cpp
