@@ -382,8 +382,10 @@ namespace Rv
 
             glGenTextures(1, &m_glSharedTexture);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture);
+            
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT, GL_LINEAR_TILING_EXT);
-            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, w, h, m_glMemoryObject, 0);
+            
+            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, h, m_glMemoryObject, 0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
             glGenSemaphoresEXT(1, &m_glReadySemaphore);

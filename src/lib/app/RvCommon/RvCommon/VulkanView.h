@@ -71,6 +71,7 @@ namespace Rv
             int height;
             int glReadySemaphoreFd;
             int vkReadySemaphoreFd;
+            int strideWidth;
         };
 
         const SharedImageInfo* getSharedImageInfo(int w, int h);
@@ -93,6 +94,8 @@ namespace Rv
 
         void showEvent(QShowEvent* event) override;
         void resizeEvent(QResizeEvent* event) override;
+        void paintEvent(QPaintEvent* event) override;
+        QPaintEngine* paintEngine() const override { return nullptr; }
 
     private:
         bool initVulkan();
@@ -147,7 +150,7 @@ namespace Rv
         VkDeviceMemory m_vkSharedImageMemory{VK_NULL_HANDLE};
         VkSemaphore m_vkGlReadySemaphore{VK_NULL_HANDLE};
         VkSemaphore m_vkVkReadySemaphore{VK_NULL_HANDLE};
-        SharedImageInfo m_sharedImageInfo{-1, 0, 0, 0, -1, -1};
+        SharedImageInfo m_sharedImageInfo{-1, 0, 0, 0, -1, -1, 0};
 
         void cleanupSharedImage();
     };

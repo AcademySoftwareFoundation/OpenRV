@@ -19,6 +19,7 @@
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPaintEvent>
 #include <QtGui/QWindow>
 #include <QtGui/QVulkanInstance>
 #include <QtWidgets/QMenu>
@@ -57,6 +58,8 @@ namespace Rv
         setAttribute(Qt::WA_NativeWindow);
         setAttribute(Qt::WA_NoSystemBackground);
         setAttribute(Qt::WA_OpaquePaintEvent);
+        setAttribute(Qt::WA_PaintOnScreen);
+        setAttribute(Qt::WA_TranslucentBackground);
         setAutoFillBackground(false);
 
         // Wait to configure the QWindow until it's created
@@ -478,7 +481,7 @@ namespace Rv
             return nullptr;
         }
 
-        // Guard against padded linear row pitch
+        // Handle padded linear row pitch by matching the GL texture stride to Vulkan's rowPitch.
         VkImageSubresource subresource = {};
         subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         subresource.mipLevel = 0;
@@ -486,12 +489,12 @@ namespace Rv
         VkSubresourceLayout layout;
         vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage, &subresource, &layout);
 
-        if (layout.rowPitch != (VkDeviceSize)w * 4) {
-            std::cerr << "[VulkanView] Shared image has padded row pitch (" << layout.rowPitch 
-                      << " vs expected " << w * 4 << "), falling back to CPU bridge\n";
+        if (layout.rowPitch % 4 != 0) {
+            // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
             cleanupSharedImage();
             return nullptr;
         }
+        m_sharedImageInfo.strideWidth = static_cast<int>(layout.rowPitch / 4);
 
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage, &memReqs);
@@ -952,6 +955,20 @@ namespace Rv
         if (m_doc)
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
         QWidget::resizeEvent(event);
+
+        // WA_PaintOnScreen means Qt won't repaint this native surface on resize,
+        // so drive a render now to recreate the swapchain at the new size and
+        // present immediately (instead of waiting for a mouse Enter event).
+        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+    }
+
+    void VulkanView::paintEvent(QPaintEvent* event)
+    {
+        if (m_doc && m_doc->session() && m_doc->session()->outputVideoDevice()) {
+            m_doc->session()->outputVideoDevice()->syncBuffers();
+        } else if (m_videoDevice) {
+            m_videoDevice->syncBuffers();
+        }
     }
 
     //--------------------------------------------------------------------------
