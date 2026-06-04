@@ -240,7 +240,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _source_node_of_group(self, group: str) -> str | None:
         """
-        Find the first RVFileSource or RVImageSource node in the group and return its node name.
+        RVSourceGroup nodes have at most 1 RVFileSource or RVImageSource child (as a leaf), which is the actual media source.
+        Find it and return its node name.
         """
         try:
             for node in commands.nodesInGroup(group):
