@@ -78,8 +78,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._loading_active = False
         self._display_preview = False if os.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS") == "0" else True
         self._shutting_down = False
-        # Each entry pairs a running rvio process with the cache_key it is
-        # generating for, so a source deletion can cancel the matching proc.
         self._active_procs: list[tuple[subprocess.Popen, str]] = []
         self._procs_lock = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
@@ -235,7 +233,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         try:
             return commands.getStringProperty(f"{source_node}.media.movie")[0]
         except Exception as e:
-            logger.debug(f"No media path for {source_node}: {e}")
+            logger.warning(f"Could not get media path: {e}")
             return None
 
     def _source_node_of_group(self, group: str) -> str | None:
@@ -248,7 +246,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 if commands.nodeType(node) in ("RVFileSource", "RVImageSource"):
                     return node
         except Exception as e:
-            logger.debug(f"Could not resolve source node of group {group}: {e}")
+            return
         return None
 
     def _get_source_info(self, source_node: str) -> tuple[int, int, int, int] | None:
