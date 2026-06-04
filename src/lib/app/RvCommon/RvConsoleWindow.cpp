@@ -207,17 +207,24 @@ namespace Rv
 
     void RvConsoleWindow::processTextBuffer()
     {
-        if (!m_textBuffer.str().empty())
+        std::string text;
+        {
+            QMutexLocker l(&m_lock);
+            text = m_textBuffer.str();
+            m_textBuffer.str("");
+        }
+
+        if (!text.empty())
         {
             vector<string> lines;
-            stl_ext::tokenize(lines, m_textBuffer.str(), "\n\r");
+            stl_ext::tokenize(lines, text, "\n\r");
 
             bool shouldShow = false;
 
             textEdit()->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
 
             // QTextEdit::insertHtml() is slow so we use it only when necessary
-            if (stringPotentiallyContainsHtml(m_textBuffer.str()))
+            if (stringPotentiallyContainsHtml(text))
             {
                 QString html;
 
@@ -244,8 +251,6 @@ namespace Rv
                 show();
                 raise();
             }
-
-            m_textBuffer.str("");
         }
 
         if (m_processTimerRunning)
