@@ -724,6 +724,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "" and os.path.isfile(config):
                 self.config = OCIO.Config.CreateFromFile(config)
+                OCIO.SetCurrentConfig(self.config)
             else:
                 print("WARNING: $OCIO environment variable unset!")
 
