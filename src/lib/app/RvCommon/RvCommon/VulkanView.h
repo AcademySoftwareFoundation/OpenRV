@@ -103,6 +103,11 @@ namespace Rv
         bool createSwapchain();
         void cleanupSwapchain();
 
+        // Post a coalesced UpdateRequest: at most one render is queued at a time,
+        // so a burst of resize events collapses to a single render at the latest
+        // size instead of one heavy swapchain recreate per event.
+        void requestUpdate();
+
         RvDocument* m_doc;
         QTVulkanVideoDevice* m_videoDevice;
 
@@ -111,6 +116,7 @@ namespace Rv
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
         bool m_userActive;
+        bool m_updatePending{false};
 
         QSize m_csize;
         QSize m_msize;

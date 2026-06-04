@@ -878,8 +878,21 @@ namespace Rv
 
     //--------------------------------------------------------------------------
 
+    void VulkanView::requestUpdate()
+    {
+        // Coalesce: only queue a render if one isn't already pending. The flag is
+        // cleared at the start of render(), so a resize arriving mid-render
+        // schedules exactly one follow-up render at the newest size.
+        if (m_updatePending)
+            return;
+        m_updatePending = true;
+        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+    }
+
     void VulkanView::render()
     {
+        m_updatePending = false;
+
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
             return;
@@ -946,7 +959,7 @@ namespace Rv
     {
         if (!m_initialized)
             initialize();
-        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+        requestUpdate();
         QWidget::showEvent(event);
     }
 
@@ -959,7 +972,8 @@ namespace Rv
         // WA_PaintOnScreen means Qt won't repaint this native surface on resize,
         // so drive a render now to recreate the swapchain at the new size and
         // present immediately (instead of waiting for a mouse Enter event).
-        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+        // Coalesced so a fast drag doesn't queue one heavy recreate per event.
+        requestUpdate();
     }
 
     void VulkanView::paintEvent(QPaintEvent* event)
