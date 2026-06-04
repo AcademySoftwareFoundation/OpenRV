@@ -3920,10 +3920,7 @@ namespace Rv
             setSequenceEvents();
     }
 
-    void RvSession::onGraphMediaSetEmpty()
-    {
-        userGenericEvent("after-progressive-loading", "");
-    }
+    void RvSession::onGraphMediaSetEmpty() { userGenericEvent("after-progressive-loading", ""); }
 
     // connects events from the sequence IP node
     //
