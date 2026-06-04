@@ -148,6 +148,52 @@ namespace Rv
             m_doc->initializeSession();
     }
 
+    bool VulkanView::supports10BitPresentation()
+    {
+        // Build a minimal instance (no surface) and ask each physical device
+        // whether it can use a 10-bit color format as a swapchain image, i.e.
+        // VK_FORMAT_A2B10G10R10_UNORM_PACK32 / VK_FORMAT_A2R10G10B10_UNORM_PACK32
+        // with the color-attachment + transfer-dst features the swapchain uses.
+        // This mirrors the format chosen in createSwapchain(); the actual
+        // surface-level negotiation still happens there at present time.
+        QVulkanInstance qtVkInst;
+        if (!qtVkInst.create())
+        {
+            std::cerr << "[VulkanView] supports10BitPresentation: QVulkanInstance "
+                         "create failed\n";
+            return false;
+        }
+
+        VkInstance instance = qtVkInst.vkInstance();
+        if (instance == VK_NULL_HANDLE)
+            return false;
+
+        uint32_t deviceCount = 0;
+        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+        if (deviceCount == 0)
+            return false;
+        std::vector<VkPhysicalDevice> devices(deviceCount);
+        vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+        const VkFormat tenBitFormats[] = {VK_FORMAT_A2B10G10R10_UNORM_PACK32,
+                                          VK_FORMAT_A2R10G10B10_UNORM_PACK32};
+        const VkFormatFeatureFlags needed =
+            VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+
+        for (VkPhysicalDevice dev : devices)
+        {
+            for (VkFormat fmt : tenBitFormats)
+            {
+                VkFormatProperties props = {};
+                vkGetPhysicalDeviceFormatProperties(dev, fmt, &props);
+                if ((props.optimalTilingFeatures & needed) == needed)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
     bool VulkanView::initVulkan()
     {
         // 1. Create Instance

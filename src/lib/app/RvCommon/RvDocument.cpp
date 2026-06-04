@@ -239,20 +239,68 @@ namespace Rv
         // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
         // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
 #elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-        // --- Vulkan path ---
-        m_vulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
+        // --- Backend selection: Vulkan for 10-bit, OpenGL otherwise ---
+        //
+        //  The display-depth preference is the user intent. A 10-bit request
+        //  (RGB 10 + A 2) routes to the Vulkan presentation path, which avoids
+        //  the 8-bit GLX visual truncation; everything else (8-bit, default)
+        //  stays on the legacy OpenGL GLView. If 10-bit is requested but this
+        //  machine's Vulkan cannot present 10-bit, we fall back to GLView and
+        //  log why. The choice is made once per window at construction; changing
+        //  the preference takes effect on the next launch / new window.
+        //
+        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10
+                                && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
 
-        m_vulkanView->setFocusPolicy(Qt::StrongFocus);
-        m_vulkanView->setMouseTracking(true);
-        m_vulkanView->setAcceptDrops(true);
-        m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        m_vulkanView->resize(m_vulkanView->sizeHint());
-        m_vulkanView->setEventWidget(m_vulkanView);
-        m_viewWidget = m_vulkanView;
+        bool useVulkan = false;
+        if (want10bit)
+        {
+            useVulkan = VulkanView::supports10BitPresentation();
+            if (!useVulkan)
+            {
+                cerr << "INFO: 10-bit display requested but Vulkan 10-bit "
+                        "presentation is unavailable; falling back to OpenGL."
+                     << endl;
+            }
+        }
 
-        m_vulkanView->videoDevice()->makeCurrent();
+        if (useVulkan)
+        {
+            // --- Vulkan path ---
+            m_vulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
 
-        initializeSession();
+            m_vulkanView->setFocusPolicy(Qt::StrongFocus);
+            m_vulkanView->setMouseTracking(true);
+            m_vulkanView->setAcceptDrops(true);
+            m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            m_vulkanView->resize(m_vulkanView->sizeHint());
+            m_vulkanView->setEventWidget(m_vulkanView);
+            m_viewWidget = m_vulkanView;
+
+            m_vulkanView->videoDevice()->makeCurrent();
+
+            initializeSession();
+        }
+        else
+        {
+            // --- OpenGL path ---
+            if (docs.empty())
+            {
+                m_glView = new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                      opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits,
+                                      opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            }
+            else
+            {
+                RvSession* s = static_cast<RvSession*>(docs.front());
+                RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+                m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                      opts.vsync != 0 && !m_vsyncDisabled,
+                                      true, // double buffer
+                                      opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            }
+            m_viewWidget = m_glView;
+        }
 #else
         // --- OpenGL path ---
         if (docs.empty())
@@ -387,7 +435,8 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
             m_session->setControlVideoDevice(m_metalView->videoDevice());
 #elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-            m_session->setControlVideoDevice(m_vulkanView->videoDevice());
+            m_session->setControlVideoDevice(m_vulkanView ? static_cast<TwkApp::VideoDevice*>(m_vulkanView->videoDevice())
+                                                          : static_cast<TwkApp::VideoDevice*>(m_glView->videoDevice()));
 #else
             m_session->setControlVideoDevice(m_glView->videoDevice());
 #endif
@@ -632,7 +681,10 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
             m_metalView->videoDevice()->redraw();
 #elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-            m_vulkanView->videoDevice()->redraw();
+            if (m_vulkanView)
+                m_vulkanView->videoDevice()->redraw();
+            else
+                view()->videoDevice()->redraw();
 #else
             view()->videoDevice()->redraw();
 #endif
@@ -646,10 +698,18 @@ namespace Rv
                                                                            m_session->eventVideoDevice()->height());
             }
 #elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-            if (m_session->eventVideoDevice() && m_vulkanView->videoDevice())
+            if (m_vulkanView)
             {
-                m_vulkanView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
-                                                                           m_session->eventVideoDevice()->height());
+                if (m_session->eventVideoDevice() && m_vulkanView->videoDevice())
+                {
+                    m_vulkanView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                               m_session->eventVideoDevice()->height());
+                }
+            }
+            else if (m_session->eventVideoDevice() && m_glView->videoDevice())
+            {
+                m_glView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                        m_session->eventVideoDevice()->height());
             }
 #else
             if (m_session->eventVideoDevice() && m_glView->videoDevice())
@@ -843,8 +903,17 @@ namespace Rv
         m_metalView->setMinimumContentSize(64, 64);
         m_metalView->setMinimumSize(QSize(64, 64));
 #elif defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
-        m_vulkanView->setMinimumContentSize(64, 64);
-        m_vulkanView->setMinimumSize(QSize(64, 64));
+        if (m_vulkanView)
+        {
+            m_vulkanView->setMinimumContentSize(64, 64);
+            m_vulkanView->setMinimumSize(QSize(64, 64));
+        }
+        else
+        {
+            m_glView->setMinimumContentSize(64, 64);
+            m_glView->setMinimumSize(QSize(64, 64));
+            m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+        }
 #else
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));

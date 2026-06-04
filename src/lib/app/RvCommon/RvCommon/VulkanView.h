@@ -82,6 +82,17 @@ namespace Rv
 
         bool isInitialized() const { return m_initialized; }
 
+        //
+        //  Surface-independent probe for whether this machine's Vulkan can
+        //  present a 10-bit (A2B10G10R10 / A2R10G10B10) image. Used at
+        //  RvDocument construction time to decide whether a 10-bit display
+        //  request should route to the Vulkan path or fall back to OpenGL.
+        //  Creates a throwaway QVulkanInstance and queries format support; it
+        //  does not require a window/surface and never throws — returns false
+        //  if Vulkan is unavailable for any reason.
+        //
+        static bool supports10BitPresentation();
+
     public slots:
         void eventProcessingTimeout();
 
