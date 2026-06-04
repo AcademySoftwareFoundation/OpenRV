@@ -91,6 +91,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
         self._playback_active = False
+        self._display_preview = False if os.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS") == "0" else True
         self._shutting_down = False
         self._active_procs: list[subprocess.Popen] = []
         self._procs_lock = threading.Lock()
@@ -129,6 +130,16 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 "play-stop",
                 self._on_play_stop,
                 "Resume thumbnail generation after playback",
+            ),
+            (
+                "session-manager-previews-disabled",
+                self._on_previews_disabled,
+                "Suspend thumbnail generation after disabling preview",
+            ),
+            (
+                "session-manager-previews-enabled",
+                self._on_previews_enabled,
+                "Resume thumbnail generation after enabling preview",
             ),
         ]
 
@@ -516,6 +527,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         event.reject()
         with self._procs_lock:
             self._playback_active = True
+            if not self._display_preview:
+                return
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
@@ -527,6 +540,27 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
         with self._procs_lock:
             self._playback_active = False
+            if not self._display_preview:
+                return
+            for proc in self._active_procs:
+                _resume_proc(proc)
+        self._drain_one()
+
+    def _on_previews_disabled(self, event: Any) -> None:
+        event.reject()
+        self._display_preview = False
+        if self._playback_active:
+            return
+        with self._procs_lock:
+            for proc in self._active_procs:
+                _suspend_proc(proc)
+
+    def _on_previews_enabled(self, event: Any) -> None:
+        event.reject()
+        self._display_preview = True
+        if self._playback_active:
+            return
+        with self._procs_lock:
             for proc in self._active_procs:
                 _resume_proc(proc)
         self._drain_one()
