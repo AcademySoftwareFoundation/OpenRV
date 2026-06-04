@@ -55,6 +55,10 @@ namespace Rv
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }
 
+        //  We own pixel delivery via the CALayer/IOSurface; tell Qt not to use a
+        //  backing store for this widget (see WA_PaintOnScreen in the .mm).
+        QPaintEngine* paintEngine() const override { return nullptr; }
+
         void setEventWidget(QWidget* widget);
 
         void stopProcessingEvents();
@@ -86,6 +90,12 @@ namespace Rv
         //
         void presentPixelData(const void* pixels, int w, int h);
 
+        //
+        //  Re-assign the cached IOSurface to the CALayer (a lightweight
+        //  re-present of the last frame, with no GL readback).  Used on expose.
+        //
+        void presentCachedSurface();
+
         bool isInitialized() const { return m_initialized; }
 
     public slots:
@@ -100,6 +110,7 @@ namespace Rv
 
         void showEvent(QShowEvent* event) override;
         void resizeEvent(QResizeEvent* event) override;
+        void paintEvent(QPaintEvent* event) override;
 
     private:
         RvDocument* m_doc;

@@ -24,6 +24,7 @@
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPaintEvent>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 
@@ -63,6 +64,13 @@ namespace Rv
         // when initialize() is called from showEvent().
         setAttribute(Qt::WA_NativeWindow);
         setAttribute(Qt::WA_NoSystemBackground);
+        // We deliver pixels through the CALayer/IOSurface ourselves, so take over
+        // the native surface (paintEngine() returns nullptr) and tell Qt the widget
+        // paints all of its pixels.  Without this, Qt's backing store repaints a
+        // black background over the layer on expose/alt-tab, causing a black flash
+        // until a later mouse event triggers a re-present.
+        setAttribute(Qt::WA_PaintOnScreen);
+        setAttribute(Qt::WA_OpaquePaintEvent);
         setAutoFillBackground(false);
 
         ostringstream str;
@@ -224,8 +232,23 @@ namespace Rv
 
         IOSurfaceUnlock(surf, 0, nullptr);
 
-        // Push to display: assign IOSurface as layer contents inside a
-        // CATransaction with animations disabled for immediate presentation.
+        // Push to display.
+        presentCachedSurface();
+    }
+
+    //--------------------------------------------------------------------------
+    // presentCachedSurface — (re)assign the cached IOSurface as layer contents
+    //--------------------------------------------------------------------------
+
+    void MetalView::presentCachedSurface()
+    {
+        CALayer*     layer = (__bridge CALayer*)m_caLayer;
+        IOSurfaceRef surf  = (IOSurfaceRef)m_ioSurface;
+        if (!layer || !surf)
+            return;
+
+        // Assign IOSurface as layer contents inside a CATransaction with
+        // animations disabled for immediate presentation.
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
         layer.contents = (__bridge id)surf;
@@ -327,6 +350,19 @@ namespace Rv
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
 
         QWidget::resizeEvent(event);
+    }
+
+    void MetalView::paintEvent(QPaintEvent* /*event*/)
+    {
+        // WA_PaintOnScreen means Qt won't repaint this native surface itself, so
+        // when the OS re-exposes the window (alt-tab, uncover) we must restore the
+        // image.  Re-present the last cached IOSurface — cheap, no GL readback —
+        // which is the Metal analog of VulkanView::paintEvent -> syncBuffers.  If
+        // nothing has been rendered yet, produce a frame.
+        if (m_ioSurface)
+            presentCachedSurface();
+        else
+            render();
     }
 
     //--------------------------------------------------------------------------
