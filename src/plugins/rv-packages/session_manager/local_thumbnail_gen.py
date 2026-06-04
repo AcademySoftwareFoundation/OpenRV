@@ -235,8 +235,20 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         try:
             return commands.getStringProperty(f"{source_node}.media.movie")[0]
         except Exception as e:
-            logger.warning(f"Could not get media path: {e}")
+            logger.debug(f"No media path for {source_node}: {e}")
             return None
+
+    def _source_node_of_group(self, group: str) -> str | None:
+        """
+        Find the first RVFileSource or RVImageSource node in the group and return its node name.
+        """
+        try:
+            for node in commands.nodesInGroup(group):
+                if commands.nodeType(node) in ("RVFileSource", "RVImageSource"):
+                    return node
+        except Exception as e:
+            logger.debug(f"Could not resolve source node of group {group}: {e}")
+        return None
 
     def _get_source_info(self, source_node: str) -> tuple[int, int, int, int] | None:
         # Skip inactive media representations
@@ -620,7 +632,12 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         """
         event.reject()
 
-        source_node = event.contents()
+        node = event.contents()
+
+        source_node = self._source_node_of_group(node)
+        if not source_node:
+            return
+
         media_path = self._get_media_path(source_node)
         if not media_path:
             return
