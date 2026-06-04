@@ -628,8 +628,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache.clear()
 
     def _on_source_delete(self, event: Any) -> None:
-        """Cancel generation immediately and evict the cache for a removed media source.
-        """
+        """Cancel generation immediately and evict the cache for a removed media source."""
         event.reject()
 
         node = event.contents()
