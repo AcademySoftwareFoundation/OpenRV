@@ -348,15 +348,31 @@ namespace Rv
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data());
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
+        bool found10bit = false;
         for (const auto& fmt : formats) {
             // A2B10G10R10 or A2R10G10B10
-            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || 
+            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ||
                 fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32) {
                 surfaceFormat = fmt;
+                found10bit = true;
                 break;
             }
         }
-        
+
+        // The Vulkan path was selected to deliver 10-bit. If the surface does
+        // not actually offer a 10-bit format, presentation truncates to 8-bit
+        // and Vulkan provides no quality benefit over OpenGL (only the GL<->Vulkan
+        // interop overhead). The device-level probe in supports10BitPresentation()
+        // cannot detect this surface/compositor limitation, so warn here once it
+        // is known. (Decision-time fallback to OpenGL is a possible follow-up.)
+        static bool warned8bit = false;
+        if (!found10bit && !warned8bit) {
+            warned8bit = true;
+            std::cerr << "[VulkanView] WARNING: Vulkan surface offers no 10-bit "
+                         "format; presenting 8-bit. Vulkan gives no benefit over "
+                         "OpenGL on this surface/compositor.\n";
+        }
+
         m_vkSwapchainFormat = surfaceFormat.format;
 
         m_vkSwapchainExtent = capabilities.currentExtent;

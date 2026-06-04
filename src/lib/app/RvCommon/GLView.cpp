@@ -18,6 +18,7 @@
 #include <RvCommon/InitGL.h>
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
+#include <IPCore/ImageRenderer.h>
 #include <iostream>
 #include <TwkApp/Event.h>
 #include <boost/thread/thread.hpp>
@@ -250,7 +251,8 @@ namespace Rv
         fmt.setSwapInterval(vsync ? 1 : 0);
 
 #ifdef PLATFORM_LINUX
-        cout << "INFO: GLView requested QSurfaceFormat: " << formatSummary(fmt) << endl;
+        if (ImageRenderer::reportGL())
+            cout << "INFO: GLView requested QSurfaceFormat: " << formatSummary(fmt) << endl;
 #endif
 
         return fmt;
@@ -290,7 +292,7 @@ namespace Rv
 
 #ifdef PLATFORM_LINUX
             static bool baselineLogged = false;
-            if (!baselineLogged)
+            if (ImageRenderer::reportGL() && !baselineLogged)
             {
                 baselineLogged = true;
 
