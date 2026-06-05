@@ -247,7 +247,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             for node in commands.nodesInGroup(group):
                 if commands.nodeType(node) in ("RVFileSource", "RVImageSource"):
                     return node
-        except Exception as e:
+        except Exception:
             return
         return None
 
