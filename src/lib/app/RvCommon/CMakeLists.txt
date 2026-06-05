@@ -90,8 +90,13 @@ ENDIF()
 IF(RV_TARGET_LINUX
    AND RV_ENABLE_LINUX_VULKAN_SDK
 )
-  MESSAGE(STATUS "RV_ENABLE_LINUX_VULKAN_SDK=ON: requiring Vulkan SDK")
-  FIND_PACKAGE(Vulkan REQUIRED)
+  # Vulkan (headers + libvulkan.so loader) is fetched automatically as a managed dependency
+  # (cmake/dependencies/vulkan.cmake), which exposes the Vulkan::Vulkan imported target. No
+  # VULKAN_SDK environment variable / setup-env.sh is required.
+  IF(NOT TARGET Vulkan::Vulkan)
+    MESSAGE(FATAL_ERROR "RV_ENABLE_LINUX_VULKAN_SDK=ON but the Vulkan::Vulkan target is missing; cmake/dependencies/vulkan.cmake should provide it")
+  ENDIF()
+  MESSAGE(STATUS "RV_ENABLE_LINUX_VULKAN_SDK=ON: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
   LIST(APPEND _sources VulkanBuildProbe.cpp)
 ENDIF()
 
