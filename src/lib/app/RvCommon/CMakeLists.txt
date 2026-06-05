@@ -165,6 +165,9 @@ FILE(
 IF(NOT RV_TARGET_DARWIN)
   LIST(REMOVE_ITEM _files_to_moc "RvCommon/DisplayLink.h" "RvCommon/CGDesktopVideoDevice.h" "RvCommon/MetalView.h" "RvCommon/QTMetalVideoDevice.h")
 ENDIF()
+IF(NOT RV_TARGET_LINUX)
+  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/QTVulkanVideoDevice.h")
+ENDIF()
 
 # Platform-specific defines to forward to the MOC executable so that platform-guarded Q_OBJECT declarations (e.g. MetalView.h, DisplayLink.h) are visible to
 # MOC.
