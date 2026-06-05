@@ -234,6 +234,15 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
       "vp9_v4l2m2m"
   )
 
+  # FFmpeg 8 introduced the prores_raw decoder, which (like the prores decoder) pulls in libavcodec/x86/proresdsp_init.o. That C init references the SSE2 asm
+  # symbol ff_prores_idct_put_10_sse2, but the asm that defines it (x86/proresdsp.o) is only built when CONFIG_PRORES_DECODER is enabled. Because we disable the
+  # non-free prores decoder above, leaving prores_raw enabled produces an undefined symbol in libavcodec on x86 (mio_ffmpeg fails to dlopen). Disable prores_raw
+  # too for consistency with our non-free ProRes policy. Guarded on RV_FFMPEG_8 since the decoder does not exist in FFmpeg 6/7 and --disable-decoder on an
+  # unknown decoder makes FFmpeg's configure fail.
+  IF(RV_FFMPEG_8)
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "prores_raw")
+  ENDIF()
+
   FOREACH(
     NON_FREE_DECODER_TO_DISABLE
     ${NON_FREE_DECODERS_TO_DISABLE}
