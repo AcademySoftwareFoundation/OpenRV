@@ -241,6 +241,15 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   # unknown decoder makes FFmpeg's configure fail.
   IF(RV_FFMPEG_8)
     LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "prores_raw")
+
+    # We disable the non-free ac3 decoder above, which (via eac3_decoder_select="ac3_decoder") also disables the eac3 decoder, so CONFIG_EAC3_DECODER=0. But the
+    # ac3_fixed decoder is left enabled, so libavcodec/ac3dec_fixed.c (which #includes ac3dec.c) is still compiled. With eac3 disabled, eac3dec.c -- which
+    # defines the static ff_eac3_parse_header -- is never included into that TU, yet ac3dec.c still names the symbol in its `if (CONFIG_EAC3_DECODER)` branch.
+    # GCC/Clang dead-code-eliminate the dead branch and only warn, but MSVC treats the referenced-but-undefined static as a fatal error C2129, breaking the
+    # FFmpeg 8 build on Windows. ac3_fixed is the same non-free AC3 codec, so disable it (and eac3 explicitly) to drop the offending TU. Guarded on RV_FFMPEG_8
+    # to keep the existing FFmpeg 6/7 builds unchanged.
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "ac3_fixed")
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "eac3")
   ENDIF()
 
   FOREACH(
