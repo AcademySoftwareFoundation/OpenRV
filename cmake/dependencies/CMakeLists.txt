@@ -106,10 +106,8 @@ IF(RV_TARGET_DARWIN
   INCLUDE(gc)
   INCLUDE(glew)
 ENDIF()
-# Vulkan (headers + libvulkan.so loader) is fetched only for Linux Vulkan-enabled builds.
-IF(RV_TARGET_LINUX
-   AND RV_ENABLE_LINUX_VULKAN_SDK
-)
+# Vulkan (headers + libvulkan.so loader) is always fetched on Linux.
+IF(RV_TARGET_LINUX)
   INCLUDE(vulkan)
 ENDIF()
 INCLUDE(imath)
@@ -169,9 +167,7 @@ IF(RV_TARGET_DARWIN
   MESSAGE(STATUS "Using GC:           ${RV_DEPS_GC_VERSION}")
   MESSAGE(STATUS "Using GLEW:         ${RV_DEPS_GLEW_VERSION}")
 ENDIF()
-IF(RV_TARGET_LINUX
-   AND RV_ENABLE_LINUX_VULKAN_SDK
-)
+IF(RV_TARGET_LINUX)
   MESSAGE(STATUS "Using Vulkan:       ${RV_DEPS_VULKAN_VERSION}")
 ENDIF()
 MESSAGE(STATUS "Using Imath:        ${RV_DEPS_IMATH_VERSION}")

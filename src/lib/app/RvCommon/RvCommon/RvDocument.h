@@ -33,7 +33,7 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
     class MetalView;
 #endif
-#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+#if defined(PLATFORM_LINUX)
     class VulkanView;
 #endif
     class DiagnosticsView;
@@ -84,7 +84,7 @@ namespace Rv
         MetalView* metalView() const;
 #endif
 
-#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+#if defined(PLATFORM_LINUX)
         VulkanView* vulkanView() const;
 #endif
 
@@ -186,7 +186,7 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* m_metalView;
 #endif
-#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+#if defined(PLATFORM_LINUX)
         VulkanView* m_vulkanView;
 #endif
         QWidget* m_viewWidget;

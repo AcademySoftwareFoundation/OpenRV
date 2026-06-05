@@ -87,27 +87,14 @@ IF(RV_TARGET_LINUX
   LIST(APPEND _sources ${_filename})
 ENDIF()
 
-IF(RV_TARGET_LINUX
-   AND RV_ENABLE_LINUX_VULKAN_SDK
-)
-  # Vulkan (headers + libvulkan.so loader) is fetched automatically as a managed dependency
-  # (cmake/dependencies/vulkan.cmake), which exposes the Vulkan::Vulkan imported target. No
-  # VULKAN_SDK environment variable / setup-env.sh is required.
+IF(RV_TARGET_LINUX)
+  # Vulkan is always available on Linux (fetched via cmake/dependencies/vulkan.cmake). No
+  # VULKAN_SDK environment variable or setup-env.sh is required.
   IF(NOT TARGET Vulkan::Vulkan)
-    MESSAGE(FATAL_ERROR "RV_ENABLE_LINUX_VULKAN_SDK=ON but the Vulkan::Vulkan target is missing; cmake/dependencies/vulkan.cmake should provide it")
+    MESSAGE(FATAL_ERROR "Vulkan::Vulkan target is missing on Linux; cmake/dependencies/vulkan.cmake should provide it")
   ENDIF()
-  MESSAGE(STATUS "RV_ENABLE_LINUX_VULKAN_SDK=ON: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
-  LIST(APPEND _sources VulkanBuildProbe.cpp)
-ENDIF()
-
-IF(RV_TARGET_LINUX
-   AND USE_VULKAN_PRESENTATION
-)
-  IF(NOT RV_ENABLE_LINUX_VULKAN_SDK)
-    MESSAGE(FATAL_ERROR "USE_VULKAN_PRESENTATION=ON requires RV_ENABLE_LINUX_VULKAN_SDK=ON")
-  ENDIF()
-  MESSAGE(STATUS "USE_VULKAN_PRESENTATION=ON: enabling Linux Vulkan presentation build plumbing")
-  LIST(APPEND _sources VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
+  MESSAGE(STATUS "Linux Vulkan: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
+  LIST(APPEND _sources VulkanBuildProbe.cpp VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
 ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
@@ -395,14 +382,6 @@ IF(RV_TARGET_WINDOWS
   QT_DISABLE_UNICODE_DEFINES(${_target})
 ENDIF()
 
-IF(RV_TARGET_LINUX
-   AND USE_VULKAN_PRESENTATION
-)
-  TARGET_COMPILE_DEFINITIONS(
-    ${_target}
-    PUBLIC USE_VULKAN_PRESENTATION
-  )
-ENDIF()
 
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}
@@ -514,12 +493,10 @@ IF(RV_TARGET_LINUX)
     PRIVATE X11 ${_rvcommon_link_libraries}
   )
 
-  IF(RV_ENABLE_LINUX_VULKAN_SDK)
-    TARGET_LINK_LIBRARIES(
-      ${_target}
-      PRIVATE Vulkan::Vulkan
-    )
-  ENDIF()
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE Vulkan::Vulkan
+  )
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)

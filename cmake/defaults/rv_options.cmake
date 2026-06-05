@@ -130,18 +130,6 @@ SET_PROPERTY(
 #
 OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before building from source" OFF)
 
-#
-# Linux Vulkan SDK opt-in.
-#
-# When ON, RV fetches the Vulkan headers + loader automatically as a managed dependency
-# (cmake/dependencies/vulkan.cmake) -- no VULKAN_SDK environment variable or setup-env.sh is
-# needed -- and enables the Vulkan build probes. A pre-installed/system Vulkan is used if found.
-# When OFF (default), Linux build behavior is unchanged and Vulkan is not fetched or required.
-#
-IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  OPTION(RV_ENABLE_LINUX_VULKAN_SDK "Enable Linux Vulkan auto-fetch (headers + loader) and build linkage" OFF)
-  OPTION(USE_VULKAN_PRESENTATION "Enable Linux Vulkan presentation build plumbing (no runtime wiring yet)" OFF)
-ENDIF()
 
 #
 # Version matching mode for dependency resolution.

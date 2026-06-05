@@ -150,8 +150,6 @@ SET(RV_DEPS_GLEW_VERSION_LIB
 )
 
 # vulkan https://github.com/KhronosGroup/Vulkan-Headers + https://github.com/KhronosGroup/Vulkan-Loader
-# Linux-only, fetched only when RV_ENABLE_LINUX_VULKAN_SDK=ON. Headers + Loader release in lockstep
-# under the shared vulkan-sdk-<version> git tag; keep both pinned to the same version.
 SET(RV_DEPS_VULKAN_VERSION
     "1.4.350.0"
 )

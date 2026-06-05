@@ -8,7 +8,7 @@
 # Vulkan::Vulkan; all API calls go through vkGetInstanceProcAddr/vkGetDeviceProcAddr) -- no
 # validation layers or shader tools. Modeled on glew.cmake.
 #
-# Linux-only; this file is only INCLUDE()d when RV_ENABLE_LINUX_VULKAN_SDK=ON.
+
 
 # FORCE_LIB so _lib_dir is install/lib (we also pass -DCMAKE_INSTALL_LIBDIR=lib to the loader),
 # giving a deterministic location across RHEL (lib64) and non-RHEL.

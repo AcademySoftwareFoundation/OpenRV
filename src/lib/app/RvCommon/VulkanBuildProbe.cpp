@@ -6,7 +6,7 @@
 
 #include <vulkan/vulkan.h>
 
-#if defined(PLATFORM_LINUX) && defined(USE_VULKAN_PRESENTATION)
+#if defined(PLATFORM_LINUX)
 #include <RvCommon/QTVulkanVideoDevice.h>
 #endif
 
