@@ -6,20 +6,14 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreServices/CoreServices.h>
 
-// How long the informational "Opening RV Link" popup stays on screen (seconds)
-// when there is a single RV app and we auto-launch without a confirmation click.
-static const NSTimeInterval kInfoPopupDuration = 4.0;
-
 @interface RVLinkURLHandler : NSObject {
     BOOL urlProcessed;
     NSAlert *currentAlert;
     NSString *latestRVLinkURL;
-    NSDate *keepAliveUntil;
 }
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 - (void)processRVLinkURL:(NSString *)rvlinkURL;
 - (BOOL)hasProcessedURL;
-- (NSDate *)keepAliveDeadline;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingMDFind;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingWorkspace:(NSString *)rvlinkURL;
 @end
@@ -49,7 +43,6 @@ static NSString *RVLinkDisplayURL(NSString *url) {
         urlProcessed = NO;
         currentAlert = nil;
         latestRVLinkURL = nil;
-        keepAliveUntil = nil;
     }
     return self;
 }
@@ -58,18 +51,10 @@ static NSString *RVLinkDisplayURL(NSString *url) {
     return urlProcessed;
 }
 
-- (NSDate *)keepAliveDeadline {
-    return keepAliveUntil;
-}
-
 - (void)dealloc {
     if (latestRVLinkURL != nil) {
         [latestRVLinkURL release];
         latestRVLinkURL = nil;
-    }
-    if (keepAliveUntil != nil) {
-        [keepAliveUntil release];
-        keepAliveUntil = nil;
     }
     [super dealloc];
 }
@@ -233,29 +218,12 @@ static NSString *RVLinkDisplayURL(NSString *url) {
         return;
     }
 
-    // If only one RV app found, still show a popup with the link we are
-    // connecting to, but launch automatically without requiring a click.
+    // If only one RV app found, launch it directly without showing chooser
     if ([appURLs count] == 1) {
         NSURL *selectedAppURL = [appURLs firstObject];
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:[selectedAppURL path]];
         NSLog(@"Only one RV application found, launching directly: %@", displayName);
-
-        // Display an informational popup with the link. We show it as a
-        // non-modal window (rather than runModal) so it stays visible while we
-        // launch the app instead of blocking on a button click.
-        currentAlert = [[NSAlert alloc] init];
-        [currentAlert setMessageText:@"Opening RV Link"];
-        [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", RVLinkDisplayURL(latestRVLinkURL)]];
-        [currentAlert addButtonWithTitle:@"OK"];
-        [[currentAlert window] makeKeyAndOrderFront:nil];
-
-        // Keep the process alive so the popup stays on screen briefly instead
-        // of vanishing the instant the URL is forwarded and main() returns.
-        if (keepAliveUntil != nil) {
-            [keepAliveUntil release];
-        }
-        keepAliveUntil = [[NSDate dateWithTimeIntervalSinceNow:kInfoPopupDuration] retain];
-
+        
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
             NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
@@ -420,22 +388,7 @@ int main(int argc, const char * argv[])
             // Process any pending Apple Events
             [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         }
-
-        // If a URL was processed and an informational popup is being displayed,
-        // keep the run loop alive until its deadline so the user can see it.
-        NSDate *popupDeadline = [urlHandler keepAliveDeadline];
-        while (popupDeadline != nil && [popupDeadline timeIntervalSinceNow] > 0) {
-            NSEvent *event = [[NSApplication sharedApplication]
-                nextEventMatchingMask:NSEventMaskAny
-                untilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]
-                inMode:NSDefaultRunLoopMode
-                dequeue:YES];
-            if (event) {
-                [[NSApplication sharedApplication] sendEvent:event];
-            }
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-        }
-
+        
         if (![urlHandler hasProcessedURL]) {
             // No URL was processed - this was a manual launch, show registration dialog
             NSLog(@"Manual launch detected - showing registration complete dialog");
