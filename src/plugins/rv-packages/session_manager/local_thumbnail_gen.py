@@ -68,6 +68,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._cache_dir = Path(tempfile.gettempdir()) / f"rv_thumbnails_{os.getpid()}"
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._in_flight: set[str] = set()
+        # Cache key to set of source node names
         self._cache_key_to_sources: dict[str, set[str]] = {}
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
@@ -157,14 +158,15 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
 
         cache_key = self._cache_key(media_path)
+
+        self._cache_key_to_sources.setdefault(cache_key, set()).add(source_node)
+
         cached = self._cache.get(cache_key, {})
         path = cached.get(path_key)
 
         if path:
             event.setReturnContent(str(path))
             return
-
-        self._cache_key_to_sources.setdefault(cache_key, set()).add(source_node)
 
         flight_key = f"{cache_key}_{path_key}"
         if flight_key not in self._in_flight:
