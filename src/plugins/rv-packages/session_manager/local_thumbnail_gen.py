@@ -644,6 +644,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         cache_key = self._cache_key(media_path)
 
+        self._deferred_sources.discard(source_node)
+
         sources = self._cache_key_to_sources.get(cache_key)
         if sources is not None:
             sources.discard(source_node)
@@ -666,8 +668,6 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         self._in_flight.discard(f"{cache_key}_thumbnail_path")
         self._in_flight.discard(f"{cache_key}_filmstrip_path")
-
-        self._deferred_sources.discard(source_node)
 
         cached = self._cache.pop(cache_key, {})
         for path in cached.values():
