@@ -19,10 +19,6 @@
 - (NSMutableArray<NSURL *> *)findRVAppsUsingWorkspace:(NSString *)rvlinkURL;
 @end
 
-// Long rvlink URLs (e.g. "baked" URLs that encode an entire RV command line)
-// would otherwise grow the NSAlert taller than the screen, pushing the version
-// chooser popup and the Open button off the bottom of the visible desktop.
-// Clamp the displayed URL so the alert stays a usable size.
 static NSString *RVLinkDisplayURL(NSString *url) {
     static const NSUInteger kMaxDisplayLength = 120;
     if (url == nil) {
