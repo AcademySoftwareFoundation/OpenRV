@@ -1113,6 +1113,14 @@ class: SessionManagerMode : MinorMode
     QTimer             _lazySetInputsTimer;
     QTimer             _lazyUpdateTimer;
     QTimer             _mainWinVisTimer;
+    QTimer               _thumbnailHydrationTimer;
+    string[]             _thumbnailHydrationQueue;
+    SourcePreviewWidget[] _thumbnailHydrationPreviews;
+    int                  _thumbnailHydrationIndex;
+    QTimer               _inputHydrationTimer;
+    string[]             _inputHydrationQueue;
+    SourcePreviewWidget[] _inputHydrationPreviews;
+    int                  _inputHydrationIndex;
     string             _css;
     bool               _darkUI;
     QDialog            _createImageDialog;
@@ -1485,6 +1493,10 @@ class: SessionManagerMode : MinorMode
         if (_disableUpdates || _progressiveLoadingInProgress) return;
 
         _inputOrderLock = true;
+        _inputHydrationTimer.stop();
+        _inputHydrationQueue    = string[]();
+        _inputHydrationPreviews = SourcePreviewWidget[]();
+        _inputHydrationIndex    = 0;
 
         _inputsModel.clear();
         let connections = nodeInputs(node);
@@ -1508,8 +1520,17 @@ class: SessionManagerMode : MinorMode
             _inputsModel.appendRow(item);
 
             if (isSource && _previewsEnabled)
-                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
+            {
+                let preview = SourcePreviewWidget(nil);
+                let w = displaySourceRowPreview(innode, preview);
+                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), w);
+                _inputHydrationQueue.push_back(innode);
+                _inputHydrationPreviews.push_back(preview);
+            }
         }
+
+        if (!_inputHydrationQueue.empty())
+            _inputHydrationTimer.start(0);
 
         _inputOrderLock = false;
     }
@@ -1797,54 +1818,17 @@ class: SessionManagerMode : MinorMode
         item;
     }
 
-    method: makeSourceRowWidget (QWidget; string node)
+    method: displaySourceRowPreview (QWidget; string node, SourcePreviewWidget preview)
     {
-        string sourceNode = nil;
-        try { sourceNode = sourceNodeOfGroup(node); }
-        catch (exception exc)
-        {
-            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
-        }
-
         let widget = QWidget(nil, 0),
             layout = QHBoxLayout(widget);
         widget.setObjectName("sourceRowWidget");
         layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
         layout.setSpacing(SOURCE_ROW_SPACING);
 
-        let preview = SourcePreviewWidget(widget);
+        preview.setParent(widget);
         preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
         preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
-
-        string meta = "";
-
-        if (sourceNode neq nil)
-        {
-            // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of 
-            // 10 for ordering. This means any custom plugin of higher priority will be used first.
-            // This allows users to override the local plugin with a custom plugin by making sure 
-            // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
-            let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
-            if (thumbnailPath != "" && io.path.exists(thumbnailPath))
-            {
-                preview.loadThumbnail(thumbnailPath);
-
-                let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
-                if (filmstripPath != "" && io.path.exists(filmstripPath))
-                    preview.loadStrip(filmstripPath);
-            }
-
-            let mediaPropertyPath = sourceNode + ".media.movie";
-            if (propertyExists(mediaPropertyPath))
-            {
-                let movieProperty = getStringProperty(mediaPropertyPath);
-                if (!movieProperty.empty())
-                {
-                    let parts = io.path.basename(movieProperty.front()).split(".");
-                    if (parts.size() > 1) meta = parts.back();
-                }
-            }
-        }
 
         layout.addWidget(preview);
 
@@ -1858,7 +1842,7 @@ class: SessionManagerMode : MinorMode
         nameLabel.setObjectName("sourceNameLabel");
         textLayout.addWidget(nameLabel);
 
-        let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
+        let metaLabel = QLabel("—", textWidget);
         metaLabel.setObjectName("sourceMetaLabel");
         textLayout.addWidget(metaLabel);
         textLayout.addStretch(1);
@@ -1866,6 +1850,31 @@ class: SessionManagerMode : MinorMode
         layout.addWidget(textWidget, 1);
 
         widget;
+    }
+
+    method: makeSourceRowWidget (void; string node, SourcePreviewWidget preview)
+    {
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
+        }
+        if (sourceNode eq nil) return;
+
+        // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of
+        // 10 for ordering. This means any custom plugin of higher priority will be used first.
+        // This allows users to override the local plugin with a custom plugin by making sure
+        // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
+        let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
+        if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+        {
+            preview.loadThumbnail(thumbnailPath);
+
+            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+            if (filmstripPath != "" && io.path.exists(filmstripPath))
+                preview.loadStrip(filmstripPath);
+        }
     }
 
     method: newNodeRow (void; 
@@ -1902,7 +1911,10 @@ class: SessionManagerMode : MinorMode
         {
             item.setText("");
             item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+            let preview = SourcePreviewWidget(nil);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), displaySourceRowPreview(node, preview));
+            _thumbnailHydrationQueue.push_back(node);
+            _thumbnailHydrationPreviews.push_back(preview);
         }
 
         //
@@ -2058,9 +2070,41 @@ class: SessionManagerMode : MinorMode
         }
     }
 
+    method: hydrateThumbnailQueue (void;)
+    {
+        if (_thumbnailHydrationIndex >= _thumbnailHydrationQueue.size()) return;
+
+        let node = _thumbnailHydrationQueue[_thumbnailHydrationIndex];
+        _thumbnailHydrationIndex = _thumbnailHydrationIndex + 1;
+
+        let preview = _thumbnailHydrationPreviews[_thumbnailHydrationIndex - 1];
+        makeSourceRowWidget(node, preview);
+
+        if (_thumbnailHydrationIndex < _thumbnailHydrationQueue.size())
+            _thumbnailHydrationTimer.start(0);
+    }
+
+    method: hydrateInputQueue (void;)
+    {
+        if (_inputHydrationIndex >= _inputHydrationQueue.size()) return;
+
+        let node    = _inputHydrationQueue[_inputHydrationIndex];
+        let preview = _inputHydrationPreviews[_inputHydrationIndex];
+        _inputHydrationIndex = _inputHydrationIndex + 1;
+
+        makeSourceRowWidget(node, preview);
+
+        if (_inputHydrationIndex < _inputHydrationQueue.size())
+            _inputHydrationTimer.start(0);
+    }
+
     method: updateTree (void;)
     {
         if (_disableUpdates) return;
+        _thumbnailHydrationTimer.stop();
+        _thumbnailHydrationQueue    = string[]();
+        _thumbnailHydrationPreviews = SourcePreviewWidget[]();
+        _thumbnailHydrationIndex    = 0;
         _srcNodeKeys = string[]();
         _grpNodeValues = string[]();
         _viewModel.clear();
@@ -2154,6 +2198,9 @@ class: SessionManagerMode : MinorMode
             selectViewableNode();
 
             resizeColumns(_viewTreeView, _viewModel);
+
+            if (!_thumbnailHydrationQueue.empty())
+                _thumbnailHydrationTimer.start(0);
         }
         catch (exception exc)
         {
@@ -2183,11 +2230,21 @@ class: SessionManagerMode : MinorMode
 
         let item = itemOfNode(_viewModel, node);
         if (item neq nil)
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w = displaySourceRowPreview(node, preview);
+            makeSourceRowWidget(node, preview);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
+        }
 
         let inputItem = itemOfNode(_inputsModel, node);
         if (inputItem neq nil)
-            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w = displaySourceRowPreview(node, preview);
+            makeSourceRowWidget(node, preview);
+            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), w);
+        }
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -3146,13 +3203,23 @@ class: SessionManagerMode : MinorMode
         _prevViewButton     = _baseWidget.findChild("prevViewButton");
         _nextViewButton     = _baseWidget.findChild("nextViewButton");
 
-        _lazySetInputsTimer = QTimer(_dockWidget);
-        _lazyUpdateTimer    = QTimer(_dockWidget);
-        _mainWinVisTimer    = QTimer(_dockWidget);
+        _lazySetInputsTimer      = QTimer(_dockWidget);
+        _lazyUpdateTimer         = QTimer(_dockWidget);
+        _mainWinVisTimer         = QTimer(_dockWidget);
+        _thumbnailHydrationTimer    = QTimer(_dockWidget);
+        _thumbnailHydrationQueue    = string[]();
+        _thumbnailHydrationPreviews = SourcePreviewWidget[]();
+        _thumbnailHydrationIndex    = 0;
+        _inputHydrationTimer        = QTimer(_dockWidget);
+        _inputHydrationQueue        = string[]();
+        _inputHydrationPreviews     = SourcePreviewWidget[]();
+        _inputHydrationIndex        = 0;
 
         _lazySetInputsTimer.setSingleShot(true);
         _lazyUpdateTimer.setSingleShot(true);
         _mainWinVisTimer.setSingleShot(true);
+        _thumbnailHydrationTimer.setSingleShot(true);
+        _inputHydrationTimer.setSingleShot(true);
 
         let vbox = QVBoxLayout(_treeViewBase);
         vbox.setContentsMargins(0, 0, 0, 0);
@@ -3447,6 +3514,8 @@ class: SessionManagerMode : MinorMode
         connect(_lazySetInputsTimer, QTimer.timeout, rebuildInputsFromList);
         connect(_lazyUpdateTimer, QTimer.timeout, updateTree);
         connect(_mainWinVisTimer, QTimer.timeout, mainWinVisTimeout);
+        connect(_thumbnailHydrationTimer, QTimer.timeout, hydrateThumbnailQueue);
+        connect(_inputHydrationTimer, QTimer.timeout, hydrateInputQueue);
         connect(_colorDialog, QColorDialog.currentColorChanged, newColorSlot);
         connect(_splitter, QSplitter.splitterMoved, splitterMoved);
         connect(configAlwaysOn, QAction.triggered, configSlot(,"yes",true));
