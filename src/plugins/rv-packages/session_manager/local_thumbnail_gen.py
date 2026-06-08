@@ -634,7 +634,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
         node = event.contents()
 
-        source_node = self._source_node_of_group(node)
+        if commands.nodeType(node) in ("RVFileSource", "RVImageSource"):
+            source_node = node
+        else:
+            source_node = self._source_node_of_group(node)
         if not source_node:
             return
 
