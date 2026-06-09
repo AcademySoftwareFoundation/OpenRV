@@ -134,8 +134,10 @@ class: AnnotateMinorMode : MinorMode
     QToolButton       _softEraseButton;
     QToolButton       _dodgeButton;
     QToolButton       _burnButton;
-    QToolButton       _cloneButton;
-    QToolButton       _smudgeButton;
+    QToolButton       _rectButton;
+    QToolButton       _ellipseButton;
+    QToolButton       _arrowButton;
+    QToolButton       _lineButton;
     QSlider           _sizeSlider;
     QSlider           _opacitySlider;
     QAction           _undoAct;
@@ -183,6 +185,24 @@ class: AnnotateMinorMode : MinorMode
     int             _dragLastMsec;
     Point           _dragLastPointer;
 
+    // ── Shape drawing state ──────────────────────────────────────────────
+    DrawMode          _rectDrawMode;
+    DrawMode          _ellipseDrawMode;
+    DrawMode          _arrowDrawMode;
+    DrawMode          _lineDrawMode;
+
+    // Anchor point captured on mouse-down; the shape is updated on drag.
+    bool              _shapeActive;          // true while a shape is being drawn
+    Point             _shapeAnchor;          // image-space anchor from push
+    Point             _shapeLastPei;         // most recent drag position (for shift capture)
+    float             _shapeConstraintAngle; // diagonal angle locked when shift is pressed;
+                                             // -999.0 = use standard 1:1 / 45° snap
+    // When shift is pressed/released mid-drag, RV synthesizes a release + push pair
+    // whose modifier states differ. The shift key event fires first; we set this flag
+    // to tell the synthetic release/push pair to no-op so the in-progress shape stays
+    // alive across the modifier transition.
+    bool              _shapeShiftTransition;
+
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
     method: encodedName (string; string name) { regex.replace("\.", _user, "+"); }
@@ -212,7 +232,7 @@ class: AnnotateMinorMode : MinorMode
 
     method: findStrokeByUuid (string; string node, int frame, string uuid)
     {
-        regex uuidPattern = regex("^" + regex.replace("\\.", node, "\\.") + "\\.(pen|text):[0-9]+:[0-9]+:.*\\.uuid$");
+        regex uuidPattern = regex("^" + regex.replace("\\.", node, "\\.") + "\\.(pen|text|rect|ellipse|arrow|line):[0-9]+:[0-9]+:.*\\.uuid$");
         
         for_each (property; properties(node))
         {
@@ -706,6 +726,27 @@ class: AnnotateMinorMode : MinorMode
         setIntProperty(startFrameName, int[] {startFrame}, true);
         setIntProperty(durationName, int[] {duration}, true);
 
+        // ── QFont Text fields ────────────────────────────────────────
+        // fontFamily="" means "system default"
+        let fontFamilyProp   = "%s.fontFamily" % n,
+            fontSizeProp     = "%s.fontSize" % n,
+            fontWeightProp   = "%s.fontWeight" % n,
+            fontStyleProp    = "%s.fontStyle" % n,
+            textDecorationProp = "%s.textDecoration" % n,
+            textAlignProp    = "%s.textAlign" % n;
+        newProperty(fontFamilyProp,     StringType, 1);
+        newProperty(fontSizeProp,       FloatType,  1);
+        newProperty(fontWeightProp,     StringType, 1);
+        newProperty(fontStyleProp,      StringType, 1);
+        newProperty(textDecorationProp, StringType, 1);
+        newProperty(textAlignProp,      StringType, 1);
+        setStringProperty(fontFamilyProp,     string[] {""}, true);
+        setFloatProperty(fontSizeProp,        float[] {24.0}, true);
+        setStringProperty(fontWeightProp,     string[] {"normal"}, true);
+        setStringProperty(fontStyleProp,      string[] {"normal"}, true);
+        setStringProperty(textDecorationProp, string[] {"none"}, true);
+        setStringProperty(textAlignProp,      string[] {"left"}, true);
+
         let uuid = generateUuid();
         let uuidProperty = "%s.uuid" % n;
 
@@ -974,13 +1015,408 @@ class: AnnotateMinorMode : MinorMode
             setText(_textBuffer);
         }
 
+        let wasPlacing = _textPlacementMode;
         _textPlacementMode = false;
+        if (wasPlacing) sendInternalEvent("annotate-text-committed");
     }
 
     method: commitText (void; bool reject, Event event)
     {
         commitTextInternal();
         if (reject) event.reject();
+    }
+
+    // ── Shape drawing tools ─────────────────────────────────────────────
+
+    // Create a new shape component with the given type prefix and bounding box.
+    // type must be one of: "rect", "ellipse", "arrow", "line".
+    // For rect/ellipse: anchorPei and curPei are opposite corners (min/max).
+    // For arrow/line:   anchorPei is startPos and curPei is endPos.
+    method: newShape (string;
+                      string node,
+                      int frame,
+                      string shapeType,
+                      Point anchorPei,
+                      Point curPei,
+                      Color borderColor,
+                      Color innerColor,
+                      float borderWidth,
+                      float thickness,
+                      int startFrame,
+                      int duration)
+    {
+        let n         = newUniqueName(node, shapeType, frame),
+            orderName = frameOrderName(node, frame),
+            undoName  = frameUserUndoStackName(node, frame);
+
+        beginCompoundStateChange();
+
+        let startFrameName = "%s.startFrame" % n,
+            durationName   = "%s.duration" % n,
+            eyeName        = "%s.eye" % n;
+
+        newProperty(startFrameName, IntType, 1);
+        newProperty(durationName, IntType, 1);
+        newProperty(eyeName, IntType, 1);
+        setIntProperty(startFrameName, int[] {startFrame}, true);
+        setIntProperty(durationName, int[] {duration}, true);
+        setIntProperty(eyeName, int[] {2}, true);
+
+        if (shapeType == "rect" || shapeType == "ellipse")
+        {
+            let minX = math.min(anchorPei.x, curPei.x),
+                minY = math.min(anchorPei.y, curPei.y),
+                maxX = math.max(anchorPei.x, curPei.x),
+                maxY = math.max(anchorPei.y, curPei.y);
+
+            let minName         = "%s.min" % n,
+                maxName         = "%s.max" % n,
+                innerColorName  = "%s.innerColor" % n,
+                borderColorName = "%s.borderColor" % n,
+                borderWidthName = "%s.borderWidth" % n;
+
+            newProperty(minName, FloatType, 2);
+            newProperty(maxName, FloatType, 2);
+            newProperty(innerColorName, FloatType, 4);
+            newProperty(borderColorName, FloatType, 4);
+            newProperty(borderWidthName, FloatType, 1);
+
+            setFloatProperty(minName, float[] {minX, minY}, true);
+            setFloatProperty(maxName, float[] {maxX, maxY}, true);
+            setFloatProperty(innerColorName, float[] {innerColor[0], innerColor[1], innerColor[2], innerColor[3]}, true);
+            setFloatProperty(borderColorName, float[] {borderColor[0], borderColor[1], borderColor[2], borderColor[3]}, true);
+            setFloatProperty(borderWidthName, float[] {borderWidth}, true);
+        }
+        else // arrow or line
+        {
+            let startPosName    = "%s.startPos" % n,
+                endPosName      = "%s.endPos" % n,
+                borderColorName = "%s.borderColor" % n,
+                borderWidthName = "%s.borderWidth" % n;
+
+            newProperty(startPosName, FloatType, 2);
+            newProperty(endPosName, FloatType, 2);
+            newProperty(borderColorName, FloatType, 4);
+            newProperty(borderWidthName, FloatType, 1);
+
+            setFloatProperty(startPosName, float[] {anchorPei.x, anchorPei.y}, true);
+            setFloatProperty(endPosName, float[] {curPei.x, curPei.y}, true);
+            setFloatProperty(borderColorName, float[] {borderColor[0], borderColor[1], borderColor[2], borderColor[3]}, true);
+            setFloatProperty(borderWidthName, float[] {borderWidth}, true);
+
+            if (shapeType == "arrow")
+            {
+                let innerColorName = "%s.innerColor" % n,
+                    thicknessName  = "%s.thickness" % n;
+                newProperty(innerColorName, FloatType, 4);
+                newProperty(thicknessName, FloatType, 1);
+                setFloatProperty(innerColorName, float[] {innerColor[0], innerColor[1], innerColor[2], innerColor[3]}, true);
+                setFloatProperty(thicknessName, float[] {thickness}, true);
+            }
+        }
+
+        let uuid = generateUuid();
+        let uuidProperty = "%s.uuid" % n;
+        newProperty(uuidProperty, StringType, 1);
+        setStringProperty(uuidProperty, string[] {uuid}, true);
+
+        let softDeletedProperty = "%s.softDeleted" % n;
+        newProperty(softDeletedProperty, IntType, 1);
+        setIntProperty(softDeletedProperty, int[] {0}, true);
+
+        let stroke = n.split(".").back();
+
+        if (!propertyExists(orderName))
+        {
+            newProperty(orderName, StringType, 1);
+        }
+        insertStringProperty(orderName, string[] {stroke});
+
+        if (!propertyExists(undoName))
+        {
+            newProperty(undoName, StringType, 1);
+        }
+        insertStringProperty(undoName, string[] {uuid, "create"});
+
+        let redoName = frameUserRedoStackName(node, frame);
+        if (propertyExists(redoName))
+        {
+            setStringProperty(redoName, string[] {}, true);
+        }
+
+        let clearAllUndoProperty = undoClearAllFramesName();
+        let clearAllRedoProperty = redoClearAllFramesName();
+        if (propertyExists(clearAllUndoProperty))
+            setStringProperty(clearAllUndoProperty, string[] {}, true);
+        if (propertyExists(clearAllRedoProperty))
+            setStringProperty(clearAllRedoProperty, string[] {}, true);
+
+        endCompoundStateChange();
+        return n;
+    }
+
+    // key-down--shift--shift: shift was pressed. (The double "shift" in the event name
+    // is by design — see QTTranslator::sendKeyEvent: m_modifiers gets shift added before
+    // modifierString builds the name, so both the modifier prefix and the key name are
+    // "shift".) If a shape is active, mark a transition so the synthetic release/push
+    // RV is about to fire is suppressed, and capture the current diagonal angle.
+    method: shapeShiftDown (void; Event event)
+    {
+        if (_shapeActive)
+        {
+            let dx = _shapeLastPei.x - _shapeAnchor.x,
+                dy = _shapeLastPei.y - _shapeAnchor.y;
+            _shapeConstraintAngle = atan2(dy, dx);
+            _shapeShiftTransition = true;
+        }
+    }
+
+    // key-up--shift: shift was released. Clear the constraint and (symmetric to
+    // shapeShiftDown) mark a transition for the upcoming synthetic release/push.
+    method: shapeShiftUp (void; Event event)
+    {
+        _shapeConstraintAngle = -999.0;
+        if (_shapeActive)
+        {
+            _shapeShiftTransition = true;
+        }
+    }
+
+    // pointer-1--shift--push: starts a new shape with shift held, OR is the synthetic
+    // push half of a modifier-transition pair (clears the flag set by shapeShiftDown).
+    method: shapePushShift (void; Event event)
+    {
+        if (_shapeShiftTransition)
+        {
+            _shapeShiftTransition = false;
+            return;
+        }
+        if (!_shapeActive)
+        {
+            shapePush(event);
+            _shapeConstraintAngle = -999.0;
+        }
+    }
+
+    // Apply shift-key constraint to a shape endpoint.
+    // rect/ellipse: if shift was pressed mid-drag, lock to the captured diagonal angle
+    //               (preserves the aspect ratio the user had drawn); otherwise lock to square.
+    // arrow/line:   snap to the nearest 45° increment.
+    method: constrainShapePoint (Point; string shapeType, Point anchor, Point cur)
+    {
+        let dx = cur.x - anchor.x,
+            dy = cur.y - anchor.y;
+
+        if (shapeType == "rect" || shapeType == "ellipse")
+        {
+            if (_shapeConstraintAngle != -999.0)
+            {
+                // Lock to the diagonal angle captured at shift-press.
+                let cx   = cos(_shapeConstraintAngle),
+                    cy   = sin(_shapeConstraintAngle),
+                    proj = math.max(dx * cx + dy * cy, 0.0);
+                return Point(anchor.x + proj * cx, anchor.y + proj * cy);
+            }
+            // Standard shift-from-start: lock to square / circle.
+            let side = math.min(math.abs(dx), math.abs(dy));
+            return Point(anchor.x + (if dx >= 0.0 then side else -side),
+                         anchor.y + (if dy >= 0.0 then side else -side));
+        }
+        else // arrow or line: snap to nearest 45°
+        {
+            let len = sqrt(dx * dx + dy * dy);
+            if (len < 0.0001) return cur;
+            let angle   = atan2(dy, dx),
+                snapped = floor(angle / (math.pi / 4.0) + 0.5) * (math.pi / 4.0);
+            return Point(anchor.x + len * cos(snapped),
+                         anchor.y + len * sin(snapped));
+        }
+    }
+
+    // Update the geometry of an existing shape component during drag.
+    method: updateShape (void; string node, string shapeType, Point anchorPei, Point curPei, float thickness)
+    {
+        if (_currentDrawObject eq nil) return;
+
+        beginCompoundStateChange();
+
+        if (shapeType == "rect" || shapeType == "ellipse")
+        {
+            let minX = math.min(anchorPei.x, curPei.x),
+                minY = math.min(anchorPei.y, curPei.y),
+                maxX = math.max(anchorPei.x, curPei.x),
+                maxY = math.max(anchorPei.y, curPei.y);
+
+            setFloatProperty("%s.min" % _currentDrawObject, float[] {minX, minY}, true);
+            setFloatProperty("%s.max" % _currentDrawObject, float[] {maxX, maxY}, true);
+        }
+        else // arrow or line
+        {
+            setFloatProperty("%s.endPos" % _currentDrawObject, float[] {curPei.x, curPei.y}, true);
+        }
+
+        endCompoundStateChange();
+        redraw();
+    }
+
+    // Mouse-down handler shared by all shape tools.
+    // If this is the synthetic push half of a modifier transition (flag set by
+    // shapeShiftUp), no-op so the in-progress shape continues without interruption.
+    method: shapePush (void; Event event)
+    {
+        if (_shapeShiftTransition)
+        {
+            _shapeShiftTransition = false;
+            return;
+        }
+
+        updateCurrentNode();
+        if (_currentNode eq nil) return;
+
+        let (name, ip) = pointerLocation(event);
+        if (name == "") return;
+
+        if (isPlaying()) {
+            stop();
+            setFrame(frame());
+        }
+
+        let pei = eventToImageSpace(name, ip, true);
+        _shapeAnchor = pei;
+        _shapeLastPei = pei;
+        _shapeActive = true;
+        _shapeShiftTransition = false;
+
+        let d = _currentDrawMode;
+        let shapeInnerColor = if (d.brushName == "arrow")
+                                  then d.color
+                                  else Color(d.color.x, d.color.y, d.color.z, 0.0);
+
+        try
+        {
+            _currentDrawObject = newShape(_currentNode,
+                                          _currentNodeInfo.frame,
+                                          d.brushName, // brushName reused as shapeType
+                                          pei, pei,    // zero-size shape at anchor
+                                          d.color,
+                                          shapeInnerColor,
+                                          d.size,  // borderWidth (world-space units, same as stroke radius)
+                                          d.size,  // thickness (arrow shaft half-width, world-space)
+                                          _currentNodeInfo.frame,
+                                          d.duration);
+        }
+        catch (exception exc)
+        {
+            print("annotate_mode: shapePush exception = %s\n" % exc);
+        }
+        catch (...)
+        {
+            print("annotate_mode: shapePush UNCAUGHT EXCEPTION\n");
+        }
+
+        _dragLastPointer = ip;
+        _dragLastMsec = int(QDateTime.currentMSecsSinceEpoch());
+    }
+
+    // Drag handler: update shape geometry as the user drags.
+    method: shapeDrag (void; Event event)
+    {
+        if (!_shapeActive || _currentDrawObject eq nil)
+        {
+            shapePush(event);
+            return;
+        }
+
+        let (name, ip) = pointerLocation(event);
+        if (name == "") return;
+
+        if (checkDragFilter(event, ip) == false) return;
+
+        let pei = eventToImageSpace(name, ip, true),
+            d   = _currentDrawMode;
+
+        _shapeLastPei = pei;
+        updateShape(_currentNode, d.brushName, _shapeAnchor, pei, d.size * 0.005);
+    }
+
+    // Mouse-up handler: finalise the shape geometry and commit.
+    // If this is the synthetic release half of a modifier transition (flag set by
+    // shapeShiftDown / shapeShiftUp), suppress the commit and keep the shape alive.
+    method: shapeRelease (void; Event event)
+    {
+        if (!_shapeActive || _currentDrawObject eq nil) return;
+
+        if (_shapeShiftTransition)
+        {
+            return;  // matching push will clear the flag
+        }
+
+        let (name, ip) = pointerLocation(event);
+        if (name != "")
+        {
+            let pei = eventToImageSpace(name, ip, true),
+                d   = _currentDrawMode;
+            updateShape(_currentNode, d.brushName, _shapeAnchor, pei, d.size * 0.005);
+        }
+
+        _shapeActive = false;
+        _currentDrawObject = nil;
+
+        undoRedoClearUpdate();
+        redraw();
+        sendInternalEvent("annotate-shape-released");
+    }
+
+    // Shift-constrained drag: square/circle for rect/ellipse, 45°-snap for arrow/line.
+    method: shapeDragShift (void; Event event)
+    {
+        if (!_shapeActive || _currentDrawObject eq nil)
+        {
+            shapePush(event);
+            return;
+        }
+
+        let (name, ip) = pointerLocation(event);
+        if (name == "") return;
+
+        if (checkDragFilter(event, ip) == false) return;
+
+        let pei = eventToImageSpace(name, ip, true),
+            d   = _currentDrawMode;
+        _shapeLastPei = pei;
+        updateShape(_currentNode, d.brushName, _shapeAnchor,
+                    constrainShapePoint(d.brushName, _shapeAnchor, pei),
+                    d.size * 0.005);
+    }
+
+    // Shift-constrained release: finalise with constraint applied. As with
+    // shapeRelease, suppress the commit if this is the synthetic release half of a
+    // modifier transition.
+    method: shapeReleaseShift (void; Event event)
+    {
+        if (!_shapeActive || _currentDrawObject eq nil) return;
+
+        if (_shapeShiftTransition)
+        {
+            return;
+        }
+
+        let (name, ip) = pointerLocation(event);
+        if (name != "")
+        {
+            let pei = eventToImageSpace(name, ip, true),
+                d   = _currentDrawMode;
+            updateShape(_currentNode, d.brushName, _shapeAnchor,
+                        constrainShapePoint(d.brushName, _shapeAnchor, pei),
+                        d.size * 0.005);
+        }
+
+        _shapeActive = false;
+        _currentDrawObject = nil;
+
+        undoRedoClearUpdate();
+        redraw();
+        sendInternalEvent("annotate-shape-released");
     }
 
     method: backwardDeleteChar (void; Event event)
@@ -2727,6 +3163,8 @@ class: AnnotateMinorMode : MinorMode
         _userSelectedNode   = "";
         _disabledTooltipMessage = "This tool is currently unavailable";
         _skipConfirmations = system.getenv("RV_SKIP_CONFIRMATIONS", nil) neq nil;
+        _shapeActive       = false;
+        _shapeAnchor       = Point(0.0, 0.0);
 
         let m = mainWindowWidget(),
             g = QActionGroup(m);
@@ -2764,8 +3202,10 @@ class: AnnotateMinorMode : MinorMode
             _softEraseButton   = _drawPane.findChild("softEraseButton");
             _dodgeButton       = _drawPane.findChild("dodgeButton");
             _burnButton        = _drawPane.findChild("burnButton");
-            _cloneButton       = _drawPane.findChild("cloneButton");
-            _smudgeButton      = _drawPane.findChild("smudgeButton");
+            _rectButton        = _drawPane.findChild("rectButton");
+            _ellipseButton     = _drawPane.findChild("ellipseButton");
+            _arrowButton       = _drawPane.findChild("arrowButton");
+            _lineButton        = _drawPane.findChild("lineButton");
 
             _sizeSlider        = _drawPane.findChild("sizeSlider");
             _undoButton        = _drawPane.findChild("undoButton");
@@ -2778,12 +3218,6 @@ class: AnnotateMinorMode : MinorMode
         {
             print("ERROR: ui file exception: %s\n" % exc);
         }
-
-        //
-        //   XXX hide clone / smudge for now (no icons)
-        //
-        _cloneButton.hide();
-        _smudgeButton.hide();
 
         QGroupBox cbase    = _drawPane.findChild("colorGroup");
 
@@ -3001,56 +3435,92 @@ class: AnnotateMinorMode : MinorMode
                                         "annotate_burn_category",
                                         "Burn" };
 
-        _cloneDrawMode    = DrawMode { "Clone",
-                                        "clone",
-                                        _cloneButton,
-                                        g.addAction(auxIcon("clone_64x64.png"), "Clone"),
-                                        "",
-                                        Qt.CrossCursor,
-                                        0.025,
-                                        Color(0, 0, 0, .05),
-                                        RenderAddMode,
-                                        "circle",
-                                        RoundJoin,
-                                        SquareCap,
-                                        0.044, 0.001,
-                                        1,
-                                        1,
-                                        PressureMode.None,
-                                        nil,
-                                        nil,
-                                        nil,
-                                        nil,
-                                        "annotate_clone_category",
-                                        "Clone" };
+        // ── Shape draw modes ─────────────────────────────────────────────
+        // The brushName field is repurposed to carry the shape type string so
+        // the generic shapePush/shapeDrag/shapeRelease handlers know which
+        // component prefix to use.
 
-        _smudgeDrawMode   = DrawMode { "Smudge",
-                                        "smudge",
-                                        _smudgeButton,
-                                        g.addAction(auxIcon("smudge_64x64.png"), "Smudge"),
-                                        "",
-                                        Qt.CrossCursor,
-                                        0.025,
-                                        Color(0, 0, 0, .05),
-                                        RenderAddMode,
-                                        "circle",
-                                        RoundJoin,
-                                        SquareCap,
-                                        0.044, 0.001,
-                                        1,
-                                        1,
-                                        PressureMode.None,
-                                        nil,
-                                        nil,
-                                        nil,
-                                        nil,
-                                        "annotate_smudge_category",
-                                        "Smudge" };
+        _rectDrawMode = DrawMode { "Rectangle",
+                                   "rect",
+                                   _rectButton,
+                                   g.addAction(auxIcon("rectangle.svg"), "Rect"),
+                                   "shape_rect",
+                                   Qt.CrossCursor,
+                                   0.003,
+                                   Color(1, 1, 0, 1),
+                                   RenderOverMode,
+                                   "rect",      // brushName = shapeType
+                                   RoundJoin,
+                                   SquareCap,
+                                   0.024, 0.001,
+                                   1, 1,
+                                   PressureMode.None,
+                                   nil, nil, nil, nil,
+                                   "annotate_rect_category",
+                                   "Rectangle" };
+
+        _ellipseDrawMode = DrawMode { "Ellipse",
+                                      "ellipse",
+                                      _ellipseButton,
+                                      g.addAction(auxIcon("ellipse.svg"), "Ell"),
+                                      "shape_ellipse",
+                                      Qt.CrossCursor,
+                                      0.003,
+                                      Color(1, 1, 0, 1),
+                                      RenderOverMode,
+                                      "ellipse",    // brushName = shapeType
+                                      RoundJoin,
+                                      SquareCap,
+                                      0.024, 0.001,
+                                      1, 1,
+                                      PressureMode.None,
+                                      nil, nil, nil, nil,
+                                      "annotate_ellipse_category",
+                                      "Ellipse" };
+
+        _arrowDrawMode = DrawMode { "Arrow",
+                                    "arrow",
+                                    _arrowButton,
+                                    g.addAction(auxIcon("shape_arrow.svg"), "Arr"),
+                                    "shape_arrow",
+                                    Qt.CrossCursor,
+                                    0.003,
+                                    Color(1, 1, 0, 1),
+                                    RenderOverMode,
+                                    "arrow",      // brushName = shapeType
+                                    RoundJoin,
+                                    SquareCap,
+                                    0.024, 0.001,
+                                    1, 1,
+                                    PressureMode.None,
+                                    nil, nil, nil, nil,
+                                    "annotate_arrow_category",
+                                    "Arrow" };
+
+        _lineDrawMode = DrawMode { "Line",
+                                   "line",
+                                   _lineButton,
+                                   g.addAction(auxIcon("line.svg"), "Line"),
+                                   "shape_line",
+                                   Qt.CrossCursor,
+                                   0.002,
+                                   Color(1, 1, 0, 1),
+                                   RenderOverMode,
+                                   "line",        // brushName = shapeType
+                                   RoundJoin,
+                                   SquareCap,
+                                   0.024, 0.001,
+                                   1, 1,
+                                   PressureMode.None,
+                                   nil, nil, nil, nil,
+                                   "annotate_line_category",
+                                   "Line" };
 
         _drawModes = DrawMode[] { _selectDrawMode, _penDrawMode, _airBrushDrawMode,
                                   _textDrawMode, _dropperDrawMode, _hardEraseDrawMode,
                                   _softEraseDrawMode, _dodgeDrawMode, _burnDrawMode,
-                                  _cloneDrawMode, _smudgeDrawMode };
+                                  _rectDrawMode, _ellipseDrawMode, _arrowDrawMode,
+                                  _lineDrawMode };
 
         //
         //  Load the settings
@@ -3308,7 +3778,8 @@ class: AnnotateMinorMode : MinorMode
                           ("key-down--meta--a", killLine, ""),
                           ("key-down--alt--a", killLine, ""),
                           ("key-down--space", insertChar, ""),
-                          ("key-down--enter", insertNL, ""),
+                          ("key-down--enter", commitText(false,), "Commit Text"),
+                          ("key-down--shift--enter", insertNL, "Insert Newline"),
                           ("key-down--control--enter", commitText(false,), ""),
                           ("key-down--meta--enter", commitText(false,), ""),
                           ("key-down--alt--enter", commitText(false,), ""),
@@ -3322,6 +3793,40 @@ class: AnnotateMinorMode : MinorMode
                                ("^key-up--.$", ignoreKeyUp, ""),
                                ("^key-up--.$--.$", ignoreKeyUp, "")]
                               );
+
+        // ── Shape event tables ───────────────────────────────────────────
+        // Each shape tool shares the same push/drag/release handlers.
+        // The _currentDrawMode.brushName field carries the shape type string
+        // so the handlers know which component prefix to create.
+
+        let shapeEvents = [("pointer-1--push",         shapePush,         "Start Shape"),
+                           ("pointer-1--drag",         shapeDrag,         "Resize Shape"),
+                           ("pointer-1--release",      shapeRelease,      "Commit Shape"),
+                           ("pointer-1--shift--push",  shapePushShift,    "Lock Aspect Ratio or Start Shape"),
+                           ("pointer-1--shift--drag",  shapeDragShift,    "Resize Shape (Constrained)"),
+                           ("pointer-1--shift--release", shapeReleaseShift, "Commit Shape (Constrained)"),
+                           ("key-down--shift--shift",  shapeShiftDown,    "Lock Aspect Ratio"),
+                           ("key-up--shift",           shapeShiftUp,      ""),
+                           ("pointer--shift--move", noop, ""),
+                           ("stylus-pen--push",         shapePush,         "Start Shape"),
+                           ("stylus-pen--drag",         shapeDrag,         "Resize Shape"),
+                           ("stylus-pen--shift--push",  shapePushShift,    "Lock Aspect Ratio or Start Shape"),
+                           ("stylus-pen--shift--drag",  shapeDragShift,    "Resize Shape (Constrained)"),
+                           ("stylus-pen--shift--release", shapeReleaseShift, "Commit Shape (Constrained)"),
+                           ("stylus-pen--shift--move", noop, ""),
+                           ("stylus-pen--move",         noop, ""),
+                           ("stylus-pen--release",      shapeRelease,      "Commit Shape"),
+                           ("stylus-eraser--push",    noop, ""),
+                           ("stylus-eraser--drag",    noop, ""),
+                           ("stylus-eraser--move",    noop, ""),
+                           ("stylus-eraser--shift--move", noop, ""),
+                           ("stylus-eraser--release", noop, "")
+                           ];
+
+        defineEventTable("shape_rect",    shapeEvents);
+        defineEventTable("shape_ellipse", shapeEvents);
+        defineEventTable("shape_arrow",   shapeEvents);
+        defineEventTable("shape_line",    shapeEvents);
 
         //
         //  Initialize the sync setting (has to be done after calling init)
