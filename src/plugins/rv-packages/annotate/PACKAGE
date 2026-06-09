@@ -1,12 +1,12 @@
 package: Annotation
 author: Autodesk, Inc.
 organization: Autodesk, Inc.
-version: 1.21
+version: 1.22
 rv: 2025
 openrv: 3.0.0
 requires: ''
-system: true
-hidden: true
+optional: true
+hidden: false
 
 modes: 
   - file: annotate_mode.mu
@@ -25,3 +25,9 @@ description: |
   palette consists of three sections: the tool mode, the current color and
   opacity, and history actions.
   </p>
+
+  <p> This is the legacy Mu-based annotation toolbar. It is disabled by
+  default in favor of the new "Annotate Toolbar" package. Only enable this
+  package if you need to fall back to the previous UI, and make sure to
+  disable "Annotate Toolbar" first &mdash; running both at the same time
+  causes the two toolbars to conflict. </p>
