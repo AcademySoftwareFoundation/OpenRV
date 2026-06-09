@@ -145,7 +145,9 @@ namespace Rv
         , m_vsyncDisabled(false)
         , m_oldGLView(0)
         , m_glView(0)
-        , m_diagnosticsView(0)
+        , m_viewWidget(nullptr)
+        , m_diagnosticsView(nullptr)
+        , m_diagnosticsDock(nullptr)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -186,6 +188,7 @@ namespace Rv
         //
         //
 
+        // --- OpenGL path ---
         if (docs.empty())
         {
             m_glView =
@@ -201,26 +204,30 @@ namespace Rv
                                   true, // double buffer
                                   opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
+        m_viewWidget = m_glView;
 
         // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
 
         // Dockable to QMainWindow, not centralwidget.
-        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-        m_diagnosticsDock->setObjectName("Diagnostics");
-        m_diagnosticsDock->setWidget(m_diagnosticsView);
-        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-        m_diagnosticsDock->hide();                    // Hide by default
-        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        if (m_diagnosticsView)
+        {
+            m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+            m_diagnosticsDock->setObjectName("Diagnostics");
+            m_diagnosticsDock->setWidget(m_diagnosticsView);
+            m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+            addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+            m_diagnosticsDock->hide();                    // Hide by default
+            m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        }
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
-        m_stackedLayout->addWidget(m_glView);
+        m_stackedLayout->addWidget(m_viewWidget);
 
         setCentralWidget(m_viewContainerWidget);
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
         // #ifdef PLATFORM_DARWIN
@@ -610,7 +617,7 @@ namespace Rv
                 setBuildMenu();
             }
 #endif
-            m_glView->setFocus(Qt::OtherFocusReason);
+            m_viewWidget->setFocus(Qt::OtherFocusReason);
         }
         else if (m == IPCore::Session::audioUnavailbleMessage())
         {
@@ -790,7 +797,7 @@ namespace Rv
 
         newGLView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
 
-        newGLView->setMinimumSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        newGLView->setMinimumSize(QSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height()));
 
         bool resetGLPrefs = false;
 
@@ -807,6 +814,7 @@ namespace Rv
         m_stackedLayout->addWidget(newGLView);
         m_stackedLayout->removeWidget(oldGLView);
         m_glView = newGLView;
+        m_viewWidget = m_glView;
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
 
@@ -843,7 +851,11 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
-    void RvDocument::showDiagnostics() { m_diagnosticsDock->show(); }
+    void RvDocument::showDiagnostics()
+    {
+        if (m_diagnosticsDock)
+            m_diagnosticsDock->show();
+    }
 
     void RvDocument::setStereo(bool b)
     {
@@ -937,6 +949,9 @@ namespace Rv
     }
 
     GLView* RvDocument::view() const { return m_glView; }
+
+    QWidget* RvDocument::viewWidget() const { return m_viewWidget; }
+
 
     void RvDocument::center()
     {
@@ -1055,19 +1070,21 @@ namespace Rv
         h += int(mh);
         w += int(mw);
 
-        m_glView->setContentSize(w, h);
-        m_glView->setMinimumContentSize(w, h);
-        m_glView->updateGeometry();
-
-        const int dh = m_glView->height() - h;
-        const int dw = m_glView->width() - w;
-
-        if (dh || dw)
         {
-            resize(width() - dw, height() - dh);
             m_glView->setContentSize(w, h);
             m_glView->setMinimumContentSize(w, h);
             m_glView->updateGeometry();
+
+            const int dh = m_glView->height() - h;
+            const int dw = m_glView->width() - w;
+
+            if (dh || dw)
+            {
+                resize(width() - dw, height() - dh);
+                m_glView->setContentSize(w, h);
+                m_glView->setMinimumContentSize(w, h);
+                m_glView->updateGeometry();
+            }
         }
 
         m_resetPolicyTimer->start();
@@ -1263,29 +1280,31 @@ namespace Rv
 
         DB("resizeToFit final target w " << w << " h " << h);
 
-        m_glView->setContentSize(int(w), int(h));
-        m_glView->setMinimumContentSize(int(w), int(h));
-        m_glView->updateGeometry();
-
-        DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
-
-        const int dh = m_glView->height() - int(h);
-        const int dw = m_glView->width() - int(w);
-
-        //
-        //  WHY? Dunno
-        //
-
-        DB("resizeToFit dw " << dw << " dh " << dh);
-        if (!firstTime && (dh || dw))
-        // if ((dh || dw))
         {
-            resize(width() - dw, height() - dh);
             m_glView->setContentSize(int(w), int(h));
             m_glView->setMinimumContentSize(int(w), int(h));
             m_glView->updateGeometry();
+
+            DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
+
+            const int dh = m_glView->height() - int(h);
+            const int dw = m_glView->width() - int(w);
+
+            //
+            //  WHY? Dunno
+            //
+
+            DB("resizeToFit dw " << dw << " dh " << dh);
+            if (!firstTime && (dh || dw))
+            // if ((dh || dw))
+            {
+                resize(width() - dw, height() - dh);
+                m_glView->setContentSize(int(w), int(h));
+                m_glView->setMinimumContentSize(int(w), int(h));
+                m_glView->updateGeometry();
+            }
+            DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
         }
-        DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
 
         m_resetPolicyTimer->start();
 
@@ -1367,7 +1386,7 @@ namespace Rv
             }
         }
 
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
         activateWindow();
         raise();
         //
@@ -1380,7 +1399,7 @@ namespace Rv
     QRect RvDocument::childrenRect()
     {
         QRect mr = mb()->geometry();
-        QRect vr = m_glView->geometry();
+        QRect vr = m_viewWidget->geometry();
 
         DB("RvDocument::childrenRect mb" << " shown " << menuBarShown() << " vis " << mb()->isVisible() << " w" << mr.width() << " h "
                                          << mr.height()
@@ -1889,7 +1908,8 @@ namespace Rv
         if (m_session)
         {
             m_session->userRenderEvent("view-size-changed", "");
-            m_session->deviceSizeChanged(m_glView->videoDevice());
+            if (m_glView)
+                m_session->deviceSizeChanged(m_glView->videoDevice());
         }
     }
 
@@ -2038,13 +2058,11 @@ namespace Rv
 
     void RvDocument::watchedFileChanged(const QString& path)
     {
-        TwkApp::GenericStringEvent event("file-changed", m_glView->videoDevice(), path.toUtf8().data());
-
-        // cout << m_watcher->files().size() << endl;
-        // cout << m_watcher->directories().size() << endl;
-
-        // m_glView->frameBuffer()->sendEvent(event);
-        m_glView->videoDevice()->sendEvent(event);
+        TwkApp::VideoDevice* vdev = m_glView->videoDevice();
+        if (!vdev)
+            return;
+        TwkApp::GenericStringEvent event("file-changed", vdev, path.toUtf8().data());
+        vdev->sendEvent(event);
     }
 
     bool RvDocument::queryDriverVSync() const { return false; }
