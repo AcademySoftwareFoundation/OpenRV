@@ -899,7 +899,7 @@ namespace Rv
         //
         s->userGenericEvent("session-initialized", "");
 
-//
+        //
         //  If files were requested but none of them resulted in any media to
         //  load (loadTotal() == 0), the asynchronous loading mechanism will
         //  never emit the after-progressive-loading event that closes the
