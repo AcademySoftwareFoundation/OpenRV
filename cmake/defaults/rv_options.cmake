@@ -1,15 +1,19 @@
 #
-# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
-#
 # Debugging options
 OPTION(RV_VERBOSE_INVOCATION "Show the compiler/link command invocation." OFF)
 OPTION(RV_SHOW_ALL_VARIABLES "Displays all build variables." ON)
 
-#
+# Metal rendering backend (macOS only). When ON, Open RV uses Apple Metal instead of OpenGL on macOS. This enables true 10-bit output, HDR/EDR, ProMotion, and
+# better GPU tooling. Pass -DUSE_METAL=ON to use the Metal path.
+IF(APPLE)
+  OPTION(USE_METAL "Use Metal rendering backend on macOS (replaces OpenGL)" OFF)
+ENDIF()
+
 # General build options
 SET(RV_DEPS_BASE_DIR
     "${CMAKE_BINARY_DIR}"
