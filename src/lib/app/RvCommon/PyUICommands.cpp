@@ -241,7 +241,7 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->view()->mapToGlobal(location);
+        QPoint p = rvDoc->viewWidget()->mapToGlobal(location);
 
         if (pylist)
         {
@@ -273,11 +273,11 @@ namespace Rv
 
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(event->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), rvDoc->viewWidget()->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->view()->height() - 1);
+            lp = QPoint(0, rvDoc->viewWidget()->height() - 1);
         }
 
         popupMenuInternal(pylist, lp);
@@ -299,7 +299,7 @@ namespace Rv
             return NULL;
         }
 
-        QPoint lp(x, rvDoc->view()->height() - y - 1);
+        QPoint lp(x, rvDoc->viewWidget()->height() - y - 1);
 
         popupMenuInternal(pylist, lp);
 

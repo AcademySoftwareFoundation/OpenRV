@@ -27,6 +27,11 @@ namespace TwkApp
     class Menu;
 }
 
+namespace TwkGLF
+{
+    class GLVideoDevice;
+}
+
 namespace Rv
 {
     class GLView;
@@ -72,6 +77,17 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewWidget() const;
+
+        //
+        //  Active presentation video device for whichever backend is in use
+        //  (the OpenGL GLView or, on Linux, the Vulkan VulkanView). Returns
+        //  nullptr if no view has been created yet. Prefer this over
+        //  view()->videoDevice() in backend-neutral code so the Vulkan/Metal
+        //  paths (where view() is null) stay crash-safe.
+        //
+        TwkGLF::GLVideoDevice* viewVideoDevice() const;
+
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
 
@@ -168,6 +184,7 @@ namespace Rv
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;
