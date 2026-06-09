@@ -108,6 +108,11 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 "Delete all cached local filmstrips and thumbnails on RV close",
             ),
             (
+                "before-clear-session",
+                self._on_clear_session,
+                "Cancel in-flight generation and evict cache when the session is cleared",
+            ),
+            (
                 "before-source-delete",
                 self._on_source_delete,
                 "Cancel in-flight generation and evict cache when a media source is removed",
@@ -606,6 +611,24 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 for proc in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
+
+    def _on_clear_session(self, event: Any) -> None:
+        """Cancel in-flight generation and evict all caches when the session is cleared."""
+        event.reject()
+        self._pool.shutdown(wait=False, cancel_futures=True)
+        self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+        with self._procs_lock:
+            for proc, _ in self._active_procs:
+                _resume_proc(proc)
+                try:
+                    proc.terminate()
+                except OSError:
+                    logger.warning(f"Failed to terminate process {proc}")
+        self._in_flight.clear()
+        self._deferred_jobs.clear()
+        self._cache_key_to_sources.clear()
+        self._deferred_sources.clear()
+        self._cache.clear()
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
