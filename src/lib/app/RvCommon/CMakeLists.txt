@@ -80,6 +80,16 @@ IF(RV_TARGET_LINUX
   LIST(APPEND _sources ${_filename})
 ENDIF()
 
+IF(RV_TARGET_LINUX)
+  # Vulkan is always available on Linux (fetched via cmake/dependencies/vulkan.cmake). No
+  # VULKAN_SDK environment variable or setup-env.sh is required.
+  IF(NOT TARGET Vulkan::Vulkan)
+    MESSAGE(FATAL_ERROR "Vulkan::Vulkan target is missing on Linux; cmake/dependencies/vulkan.cmake should provide it")
+  ENDIF()
+  MESSAGE(STATUS "Linux Vulkan: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
+  LIST(APPEND _sources VulkanBuildProbe.cpp VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
+ENDIF()
+
 FILE(GLOB _ui_sources ui/*.ui)
 
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
@@ -147,6 +157,9 @@ FILE(
 )
 IF(NOT RV_TARGET_DARWIN)
   LIST(REMOVE_ITEM _files_to_moc "RvCommon/DisplayLink.h" "RvCommon/CGDesktopVideoDevice.h")
+ENDIF()
+IF(NOT RV_TARGET_LINUX)
+  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/QTVulkanVideoDevice.h")
 ENDIF()
 
 FOREACH(
@@ -449,6 +462,11 @@ IF(RV_TARGET_LINUX)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PRIVATE X11 ${_rvcommon_link_libraries}
+  )
+
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE Vulkan::Vulkan
   )
 ENDIF()
 
