@@ -37,6 +37,8 @@ namespace Rv
     class GLView;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     class VulkanView;
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    class MetalView;
 #endif
     class DiagnosticsView;
     class DesktopVideoModule;
@@ -83,8 +85,8 @@ namespace Rv
         QWidget* viewWidget() const;
 
         //
-        //  Video device of the active view (GLView or VulkanView), or nullptr.
-        //  Prefer it over view()->videoDevice(): view() is null on Vulkan.
+        //  Video device of the active view (GLView, VulkanView or MetalView), or nullptr.
+        //  Prefer it over view()->videoDevice(): view() is null on Vulkan and Metal.
         //
         TwkGLF::GLVideoDevice* viewVideoDevice() const;
 
@@ -97,6 +99,8 @@ namespace Rv
 
         // Promote a live GLView to a VulkanView so a 10-bit request applies immediately.
         void swapGLViewToVulkan();
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* metalView() const;
 #endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
@@ -210,6 +214,8 @@ namespace Rv
         GLView* m_oldGLView;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         VulkanView* m_vulkanView{nullptr};
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* m_metalView{nullptr};
 #endif
         QWidget* m_viewWidget{nullptr};
         QWidget* m_viewContainerWidget;

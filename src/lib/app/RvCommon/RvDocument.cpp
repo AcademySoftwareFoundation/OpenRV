@@ -71,6 +71,10 @@
 #ifdef PLATFORM_DARWIN
 #include <RvCommon/DisplayLink.h>
 #include <RvCommon/CGDesktopVideoDevice.h>
+#if defined(USE_METAL)
+#include <RvCommon/MetalView.h>
+#include <RvCommon/QTMetalVideoDevice.h>
+#endif
 #endif
 
 #include <QDockWidget>
@@ -98,7 +102,7 @@ namespace Rv
 #define DBL(level, x)
 #endif
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
     namespace
     {
         // Input and layout settings shared by every main view widget.
@@ -210,7 +214,29 @@ namespace Rv
         //
         //
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        // --- Metal path ---
+        // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
+        // to its native NSView.  It can be used directly in layouts without any
+        // createWindowContainer() wrapping.
+        m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+
+        configureViewWidget(m_metalView);
+        m_metalView->resize(m_metalView->sizeHint());
+        m_metalView->setEventWidget(m_metalView);
+        m_viewWidget = m_metalView;
+
+        // Initialize the session eagerly so that doc->session() is non-null
+        // immediately after construction.  On the Metal path, MetalView::initialize()
+        // (which normally calls initializeSession) is triggered by showEvent() —
+        // an async Qt event — so doc->session() would be null when newSessionFromFiles()
+        // accesses it synchronously right after doc->show().  Calling it here is safe
+        // because QTMetalVideoDevice is constructed in MetalView's constructor and is
+        // already available; actual CALayer setup happens later in
+        // MetalView::initialize() (which re-calls initializeSession but hits the
+        // if (!m_session) guard and exits immediately).
+        initializeSession();
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //
         //  10-bit (RGB 10 + A 2) presents through Vulkan, since GLX/WGL
         //  pixel-format negotiation truncates to 8-bit; everything else stays
@@ -266,18 +292,30 @@ namespace Rv
         m_viewWidget = m_glView;
 #endif
 
+#if !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
         // DiagnosticsView has its own context and only needs a surface format.
+        //
+        // Not created on the Metal path: DiagnosticsView inherits from QOpenGLWidget,
+        // and any QOpenGLWidget anywhere in the top-level window hierarchy forces Qt's
+        // macOS backend to use _NSOpenGLViewBackingLayer for the entire window — even
+        // when the widget is hidden inside a dock.  That compositor intercepts the
+        // CAMetalLayer content and composites it 4× (2×2) when
+        // wantsExtendedDynamicRangeContent or DPR scaling is active.
         const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
         m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
+#endif
 
         // Dockable to QMainWindow, not centralwidget.
-        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-        m_diagnosticsDock->setObjectName("Diagnostics");
-        m_diagnosticsDock->setWidget(m_diagnosticsView);
-        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-        m_diagnosticsDock->hide();                    // Hide by default
-        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        if (m_diagnosticsView)
+        {
+            m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+            m_diagnosticsDock->setObjectName("Diagnostics");
+            m_diagnosticsDock->setWidget(m_diagnosticsView);
+            m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+            addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+            m_diagnosticsDock->hide();                    // Hide by default
+            m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
+        }
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -681,6 +719,12 @@ namespace Rv
                 if (m_vulkanView)
                 {
                     m_vulkanView->videoDevice()->translator().setRelativeDomain(w, h);
+                }
+                else
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+                if (m_metalView)
+                {
+                    m_metalView->videoDevice()->translator().setRelativeDomain(w, h);
                 }
                 else
 #endif
@@ -1142,7 +1186,7 @@ namespace Rv
 
     void RvDocument::setStereo(bool b)
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
         if (!m_glView)
         {
             return;
@@ -1165,7 +1209,7 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
         if (!m_glView)
         {
             return;
@@ -1186,7 +1230,7 @@ namespace Rv
 
     void RvDocument::setDoubleBuffer(bool b)
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
         if (!m_glView)
         {
             return;
@@ -1286,6 +1330,11 @@ namespace Rv
             fallbackVulkanToGLView();
             return;
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1337,6 +1386,12 @@ namespace Rv
             m_vulkanView->setContentSize(w, h);
             return;
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            m_metalView->setContentSize(w, h);
+            return;
+        }
 #endif
         if (m_glView)
         {
@@ -1350,6 +1405,12 @@ namespace Rv
         if (m_vulkanView)
         {
             m_vulkanView->setMinimumContentSize(w, h);
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            m_metalView->setMinimumContentSize(w, h);
             return;
         }
 #endif
@@ -1366,6 +1427,11 @@ namespace Rv
         {
             return m_vulkanView->firstPaintCompleted();
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            return m_metalView->firstPaintCompleted();
+        }
 #endif
         return m_glView && m_glView->firstPaintCompleted();
     }
@@ -1381,9 +1447,18 @@ namespace Rv
         {
             return m_vulkanView->videoDevice();
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            return m_metalView->videoDevice();
+        }
 #endif
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
+
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    MetalView* RvDocument::metalView() const { return m_metalView; }
+#endif
 
     void RvDocument::center()
     {
@@ -1504,8 +1579,9 @@ namespace Rv
 
         setActiveViewContentSize(w, h);
         setActiveViewMinimumContentSize(w, h);
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        if (m_vulkanView)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        // Vulkan or Metal view: m_glView is null.
+        if (!m_glView)
         {
             const int dh = m_viewWidget->height() - h;
             const int dw = m_viewWidget->width() - w;

@@ -29,7 +29,9 @@ namespace IPCore
         declareProperty<IntProperty>("paintEffects.ghostAfter", 5);
         setMaxInputs(0);
 
+#if !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
         ImageRenderer::queryGLIntoContainer(this);
+#endif
     }
 
     SessionIPNode::~SessionIPNode()
