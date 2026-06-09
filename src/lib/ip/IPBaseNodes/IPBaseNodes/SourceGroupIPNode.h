@@ -73,4 +73,4 @@ namespace IPCore
 
 } // namespace IPCore
 
-#endif // __IPGraph__SourceGroupIPNode_h__
+#endif // __IPGraph__SourceGroupIPNode__h__
