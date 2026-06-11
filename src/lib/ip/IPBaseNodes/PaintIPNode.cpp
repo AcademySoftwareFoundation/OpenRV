@@ -286,18 +286,7 @@ namespace IPCore
         m_tag = createComponent("tag");
     }
 
-    PaintIPNode::~PaintIPNode()
-    {
-        // Release any cached QPainter text GL textures.
-        for (auto& kv : m_textureCache)
-        {
-            if (kv.second)
-            {
-                glDeleteTextures(1, &kv.second);
-            }
-        }
-        m_textureCache.clear();
-    }
+    PaintIPNode::~PaintIPNode() {}
 
     void PaintIPNode::compilePenComponent(Component* c)
     {
@@ -435,6 +424,12 @@ namespace IPCore
         }
 
         p.built = false;
+    }
+
+    void PaintIPNode::LocalText::hash(std::ostream& o) const
+    {
+        Paint::Text::hash(o);
+        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration;
     }
 
     void PaintIPNode::compileTextComponent(Component* c)

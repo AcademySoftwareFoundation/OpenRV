@@ -5,7 +5,7 @@
 //
 #pragma once
 #include <IPCore/PaintCommand.h>
-#include <atomic>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -64,11 +64,11 @@ namespace IPCore
             ~BrushTextureManager() { clear(); }
 
             /// Parse catalogue.json and populate m_brushes metadata (no GL).
-            /// Safe to call from any thread; idempotent after first call.
+            /// Thread-safe via m_parseOnce; idempotent after first call.
             void parseCatalogue();
 
             std::unordered_map<std::string, BrushInfo> m_brushes;
-            std::atomic<bool> m_catalogueParsed{false};
+            std::once_flag m_parseOnce;
             bool m_texturesLoaded{false};
         };
 

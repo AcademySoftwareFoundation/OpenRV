@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <mutex>
 #include <vector>
 
 namespace IPCore
@@ -127,42 +128,42 @@ namespace IPCore
 
         void BrushTextureManager::parseCatalogue()
         {
-            if (m_catalogueParsed)
-                return;
-            m_catalogueParsed = true;
+            std::call_once(m_parseOnce,
+                           [this]()
+                           {
+                               const QString qdir = QString::fromStdString(catalogueDir());
+                               const QString catPath = qdir + "/catalogue.json";
 
-            const QString qdir = QString::fromStdString(catalogueDir());
-            const QString catPath = qdir + "/catalogue.json";
+                               QFile f(catPath);
+                               if (!f.open(QIODevice::ReadOnly))
+                               {
+                                   std::cerr << "[BrushTextureManager] catalogue not found: " << catPath.toStdString() << "\n";
+                                   return;
+                               }
 
-            QFile f(catPath);
-            if (!f.open(QIODevice::ReadOnly))
-            {
-                std::cerr << "[BrushTextureManager] catalogue not found: " << catPath.toStdString() << "\n";
-                return;
-            }
+                               QJsonParseError err;
+                               const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
+                               if (doc.isNull())
+                               {
+                                   std::cerr << "[BrushTextureManager] JSON parse error: " << err.errorString().toStdString() << "\n";
+                                   return;
+                               }
 
-            QJsonParseError err;
-            const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
-            if (doc.isNull())
-            {
-                std::cerr << "[BrushTextureManager] JSON parse error: " << err.errorString().toStdString() << "\n";
-                return;
-            }
+                               for (const QJsonValue& v : doc.object().value("brushes").toArray())
+                               {
+                                   const QJsonObject entry = v.toObject();
+                                   const std::string name = entry.value("name").toString().toStdString();
+                                   const QString tip = entry.value("tip").toString();
+                                   const QString blend = entry.value("blend").toString("normal");
+                                   const bool soft = entry.value("soft").toBool(false);
 
-            for (const QJsonValue& v : doc.object().value("brushes").toArray())
-            {
-                const QJsonObject entry = v.toObject();
-                const std::string name = entry.value("name").toString().toStdString();
-                const QString tip = entry.value("tip").toString();
-                const QString blend = entry.value("blend").toString("normal");
-                const bool soft = entry.value("soft").toBool(false);
-
-                BrushInfo& info = m_brushes[name];
-                info.blendMode = blendFromString(blend);
-                info.softShader = soft;
-                info.isStamp = !tip.isEmpty();
-                info.tipFile = tip.toStdString();
-            }
+                                   BrushInfo& info = m_brushes[name];
+                                   info.blendMode = blendFromString(blend);
+                                   info.softShader = soft;
+                                   info.isStamp = !tip.isEmpty();
+                                   info.tipFile = tip.toStdString();
+                               }
+                           }); // call_once
         }
 
         void BrushTextureManager::load()
@@ -196,10 +197,11 @@ namespace IPCore
         void BrushTextureManager::clear()
         {
             for (auto& kv : m_brushes)
+            {
                 if (kv.second.textureId)
                     glDeleteTextures(1, &kv.second.textureId);
-            m_brushes.clear();
-            m_catalogueParsed = false;
+                kv.second.textureId = 0;
+            }
             m_texturesLoaded = false;
         }
 

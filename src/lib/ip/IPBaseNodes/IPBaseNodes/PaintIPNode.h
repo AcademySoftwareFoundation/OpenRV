@@ -124,6 +124,8 @@ namespace IPCore
             std::string fontWeight{FontWeight::Normal};
             std::string fontStyle{FontStyle::Normal};
             std::string textDecoration{TextDecoration::None};
+
+            void hash(std::ostream& o) const override;
         };
 
         /// Axis-aligned rectangle
@@ -179,19 +181,6 @@ namespace IPCore
         using LineMap = std::map<Component*, LocalLine>;
         using FrameMap = std::map<int, Components>;
 
-        // Texture cache key for the QPainter text renderer.
-        using TextCacheKey = std::tuple<std::string, // text
-                                        std::string, // fontFamily
-                                        float,       // fontSize
-                                        std::string, // fontWeight
-                                        std::string, // fontStyle
-                                        std::string, // textDecoration
-                                        float,       // color.r
-                                        float,       // color.g
-                                        float,       // color.b
-                                        float>;      // color.a
-        using TextureCache = std::map<TextCacheKey, unsigned int>;
-
         PaintIPNode(const std::string& name, const NodeDefinition* def, IPGraph* graph, GroupIPNode* group);
         virtual ~PaintIPNode();
 
@@ -224,7 +213,7 @@ namespace IPCore
         Component* m_tag;
         std::mutex m_commandsMutex;
         PaintEffects m_paintEffects;
-        TextureCache m_textureCache; ///< QPainter text glyph cache (GL texture IDs)
+        // TODO: add per-node GL texture cache for QPainter text to avoid per-frame rasterization
     };
 
 } // namespace IPCore
