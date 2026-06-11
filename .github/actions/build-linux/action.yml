@@ -50,12 +50,22 @@ runs:
       run: df -h /
       shell: bash
 
-    # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo. Pin all
-    # subsequent dnf calls in this container to the 9.7 minor release until
-    # OpenRV migrates off OSMesa. Remove this step once that's done.
-    - name: Pin Rocky 9 to 9.7 minor release
+    # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo (Mesa upstream
+    # deprecated OSMesa in favor of llvmpipe via EGL). Pin all subsequent dnf
+    # calls in this container to the 9.7 minor release until OpenRV migrates off
+    # OSMesa. 9.7 is now a superseded minor, so the production CDN no longer
+    # serves it (the default 'extras' repo 404s); point the pinned repos at the
+    # durable vault archive (dl.rockylinux.org/vault) instead. Remove this whole
+    # step once OpenRV no longer needs OSMesa.
+    - name: Pin Rocky 9 to 9.7 minor release (vault)
       if: ${{ inputs.rocky-version == '9' }}
-      run: echo "9.7" > /etc/dnf/vars/releasever
+      run: |
+        echo "9.7" > /etc/dnf/vars/releasever
+        sed -i \
+          -e 's|^mirrorlist=|#mirrorlist=|g' \
+          -e 's|^#\?baseurl=https\?://dl.rockylinux.org/\$contentdir/|baseurl=https://dl.rockylinux.org/vault/rocky/|g' \
+          /etc/yum.repos.d/[Rr]ocky*.repo
+        dnf clean all
       shell: bash
 
     - name: Install system dependencies
