@@ -618,12 +618,13 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
         with self._procs_lock:
-            for proc, _ in self._active_procs:
-                _resume_proc(proc)
-                try:
-                    proc.terminate()
-                except OSError:
-                    logger.warning(f"Failed to terminate process {proc}")
+            procs_to_terminate = list(self._active_procs)
+        for proc, _ in procs_to_terminate:
+            _resume_proc(proc)
+            try:
+                proc.terminate()
+            except OSError:
+                logger.warning(f"Failed to terminate process {proc}")
         self._in_flight.clear()
         self._deferred_jobs.clear()
         self._cache_key_to_sources.clear()
