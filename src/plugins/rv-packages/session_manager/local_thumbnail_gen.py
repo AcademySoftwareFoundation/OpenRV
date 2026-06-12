@@ -615,21 +615,23 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_clear_session(self, event: Any) -> None:
         """Cancel in-flight generation and evict all caches when the session is cleared."""
         event.reject()
+        self._shutting_down = True
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._pool = ThreadPoolExecutor(max_workers=MAX_WORKERS)
-        with self._procs_lock:
-            procs_to_terminate = list(self._active_procs)
-        for proc, _ in procs_to_terminate:
-            _resume_proc(proc)
-            try:
-                proc.terminate()
-            except OSError:
-                logger.warning(f"Failed to terminate process {proc}")
         self._in_flight.clear()
         self._deferred_jobs.clear()
         self._cache_key_to_sources.clear()
         self._deferred_sources.clear()
         self._cache.clear()
+        with self._procs_lock:
+            procs_to_terminate = list(self._active_procs)
+        for proc, _ in procs_to_terminate:
+            _resume_proc(proc)
+            try:
+                proc.kill()
+                proc.wait()
+            except OSError:
+                logger.warning(f"Failed to kill process {proc}")
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()
