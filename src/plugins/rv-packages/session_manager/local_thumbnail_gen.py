@@ -576,6 +576,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_loading_start(self, event: Any) -> None:
         event.reject()
+        self._shutting_down = False
         with self._procs_lock:
             should_defer = self._should_defer()
             self._loading_active = True
