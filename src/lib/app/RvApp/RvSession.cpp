@@ -3920,7 +3920,37 @@ namespace Rv
             setSequenceEvents();
     }
 
-    void RvSession::onGraphMediaSetEmpty() { userGenericEvent("after-progressive-loading", ""); }
+    void RvSession::onGraphMediaSetEmpty()
+    {
+        // The media-loading set can become transiently empty *between* sources
+        // while we are still progressively adding the sources of a single load
+        // request (e.g. when dropping multiple files). continueLoading() adds
+        // one source per event-loop iteration, so source N can finish loading
+        // in the gap before source N+1 starts, momentarily emptying the set.
+        //
+        // While m_loadState is still alive, more sources are about to be added
+        // and more media will start loading, so an empty set here is only
+        // transient. Emitting after-progressive-loading in that case would
+        // produce one after-progressive-loading event per source for a single
+        // before-progressive-loading event.
+        //
+        // We therefore only emit the event once the load request has been fully
+        // consumed (m_loadState == nullptr), i.e. once every source has been
+        // added and all of their media have finished loading. This guarantees a
+        // single after-progressive-loading event matching the single
+        // before-progressive-loading event.
+        //
+        // Note: this runs on the main thread (media completion is marshalled via
+        // dispatchToMainThread), serialized with continueLoading() which deletes
+        // m_loadState before returning -- so this read of m_loadState is safe and
+        // always observes the final state.
+        if (m_loadState != nullptr)
+        {
+            return;
+        }
+
+        userGenericEvent("after-progressive-loading", "");
+    }
 
     // connects events from the sequence IP node
     //

@@ -72,6 +72,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._deferred_sources: set[str] = set()
         self._deferred_jobs: list[tuple[str, str, str, str]] = []
         self._playback_active = False
+        try:
+            self._loading_active = commands.loadTotal() != 0
+        except Exception:
+            self._loading_active = False
         self._display_preview = False if os.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS") == "0" else True
         self._shutting_down = False
         self._active_procs: list[subprocess.Popen] = []
@@ -122,7 +126,22 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 self._on_previews_enabled,
                 "Resume thumbnail generation after enabling preview",
             ),
+            (
+                "before-progressive-loading",
+                self._on_loading_start,
+                "Pause thumbnail generation while source media is loading",
+            ),
+            (
+                "after-progressive-loading",
+                self._on_loading_stop,
+                "Resume thumbnail generation once source media has loaded",
+            ),
         ]
+
+    def _should_defer(self) -> bool:
+        """Defer thumbnail generation while previews are disabled, while playing
+        back, or while source media is loading."""
+        return not self._display_preview or self._playback_active or self._loading_active
 
     def _get_cached_path(self, event: Any, path_key: str) -> None:
         event.reject()
@@ -156,7 +175,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _start_generation(self, source_node: str, cache_key: str, media_path: str, path_key: str) -> None:
         self._in_flight.add(f"{cache_key}_{path_key}")
-        if self._playback_active:
+        if self._should_defer():
             self._deferred_jobs.append((source_node, cache_key, media_path, path_key))
             return
 
@@ -388,7 +407,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=creationflags)
         with self._procs_lock:
             self._active_procs.append(proc)
-            if self._playback_active:
+            if self._should_defer():
                 _suspend_proc(proc)
         deadline = time.monotonic() + timeout
         try:
@@ -398,7 +417,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     proc.wait(timeout=remaining)
                     break
                 except subprocess.TimeoutExpired:
-                    if self._playback_active:
+                    if self._should_defer():
                         deadline = time.monotonic() + timeout
                     else:
                         raise
@@ -481,7 +500,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         self._in_flight.discard(f"{cache_key}_{path_key}")
         source_nodes = self._cache_key_to_sources.get(cache_key, set())
 
-        if self._playback_active:
+        if self._should_defer():
             self._deferred_sources.update(source_nodes)
         else:
             for source_node in source_nodes:
@@ -489,8 +508,9 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._drain_one()
 
     def _drain_one(self) -> None:
-        """Submit one deferred notification or one deferred job. Stops if playback resumes."""
-        if self._playback_active:
+        """Submit one deferred notification or one deferred job. Stops if playback
+        resumes or media starts loading again."""
+        if self._should_defer():
             return
 
         if self._deferred_sources:
@@ -507,8 +527,9 @@ class LocalThumbnailGen(rvtypes.MinorMode):
     def _on_play_start(self, event: Any) -> None:
         event.reject()
         with self._procs_lock:
+            should_defer = self._should_defer()
             self._playback_active = True
-            if not self._display_preview:
+            if should_defer:
                 return
             for proc in self._active_procs:
                 _suspend_proc(proc)
@@ -521,29 +542,47 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             return
         with self._procs_lock:
             self._playback_active = False
-            if not self._display_preview:
+            if not self._should_defer():
+                for proc in self._active_procs:
+                    _resume_proc(proc)
+        self._drain_one()
+
+    def _on_loading_start(self, event: Any) -> None:
+        event.reject()
+        with self._procs_lock:
+            should_defer = self._should_defer()
+            self._loading_active = True
+            if should_defer:
                 return
             for proc in self._active_procs:
-                _resume_proc(proc)
+                _suspend_proc(proc)
+
+    def _on_loading_stop(self, event: Any) -> None:
+        event.reject()
+        with self._procs_lock:
+            self._loading_active = False
+            if not self._should_defer():
+                for proc in self._active_procs:
+                    _resume_proc(proc)
         self._drain_one()
 
     def _on_previews_disabled(self, event: Any) -> None:
         event.reject()
-        self._display_preview = False
-        if self._playback_active:
-            return
         with self._procs_lock:
+            should_defer = self._should_defer()
+            self._display_preview = False
+            if should_defer:
+                return
             for proc in self._active_procs:
                 _suspend_proc(proc)
 
     def _on_previews_enabled(self, event: Any) -> None:
         event.reject()
-        self._display_preview = True
-        if self._playback_active:
-            return
         with self._procs_lock:
-            for proc in self._active_procs:
-                _resume_proc(proc)
+            self._display_preview = True
+            if not self._should_defer():
+                for proc in self._active_procs:
+                    _resume_proc(proc)
         self._drain_one()
 
     def _on_session_deletion(self, event: Any) -> None:
