@@ -528,6 +528,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
+            for ocioNodeType in ["OCIOFile", "OCIODisplay", "OCIOLook"]:
+                for node in commands.nodesOfType(ocioNodeType):
+                    commands.ocioUpdateConfig(node)
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
