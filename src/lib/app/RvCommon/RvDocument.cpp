@@ -209,8 +209,7 @@ namespace Rv
         //  log why. The choice is made once per window at construction; changing
         //  the preference takes effect on the next launch / new window.
         //
-        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10
-                                && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
 
         bool useVulkan = false;
         if (want10bit)
@@ -246,9 +245,9 @@ namespace Rv
             // --- OpenGL path ---
             if (docs.empty())
             {
-                m_glView = new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                      opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits,
-                                      opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+                m_glView =
+                    new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
+                               true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
             }
             else
             {
@@ -293,8 +292,7 @@ namespace Rv
         // Vulkan/Metal presentation path m_glView is null, so fall back to the global
         // default format (OpenGL 2.1, set in RV/main.cpp) which ImGui's GL2 backend
         // expects.
-        const QSurfaceFormat diagnosticsFormat =
-            m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
+        const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
         m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
 
         // Dockable to QMainWindow, not centralwidget.
@@ -613,8 +611,7 @@ namespace Rv
 
 #if defined(PLATFORM_DARWIN) && 0
         TwkGLF::GLVideoDevice* startDevice = viewVideoDevice();
-        if (CGDesktopVideoDevice* cgdevice =
-                startDevice ? dynamic_cast<CGDesktopVideoDevice*>(startDevice->physicalDevice()) : nullptr)
+        if (CGDesktopVideoDevice* cgdevice = startDevice ? dynamic_cast<CGDesktopVideoDevice*>(startDevice->physicalDevice()) : nullptr)
         {
             if (m_displayLink)
                 m_displayLink->start(m_session, cgdevice);

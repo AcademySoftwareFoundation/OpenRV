@@ -62,9 +62,10 @@ namespace Rv
         //
         //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
         //
-        
+
         //  GPU Interop API
-        struct SharedImageInfo {
+        struct SharedImageInfo
+        {
             int memoryFd;
             size_t size;
             int width;
@@ -106,6 +107,7 @@ namespace Rv
         void showEvent(QShowEvent* event) override;
         void resizeEvent(QResizeEvent* event) override;
         void paintEvent(QPaintEvent* event) override;
+
         QPaintEngine* paintEngine() const override { return nullptr; }
 
     private:
@@ -147,13 +149,13 @@ namespace Rv
         VkQueue m_vkQueue{VK_NULL_HANDLE};
         uint32_t m_queueFamilyIndex{0};
         VkCommandPool m_vkCommandPool{VK_NULL_HANDLE};
-        
+
         VkSwapchainKHR m_vkSwapchain{VK_NULL_HANDLE};
         VkFormat m_vkSwapchainFormat;
         VkExtent2D m_vkSwapchainExtent;
         std::vector<VkImage> m_vkSwapchainImages;
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
-        
+
         VkSemaphore m_vkImageAvailableSemaphore{VK_NULL_HANDLE};
         VkSemaphore m_vkRenderFinishedSemaphore{VK_NULL_HANDLE};
         VkFence m_vkFence{VK_NULL_HANDLE};

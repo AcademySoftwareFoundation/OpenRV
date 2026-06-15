@@ -309,8 +309,8 @@ namespace Rv
                 cout << "INFO: GLView runtime baseline begin" << endl;
                 cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
                 cout << "INFO: Qt version: " << qVersion() << endl;
-                cout << "INFO: Constructor-requested color bits (GLView args): rgba " << m_red << " " << m_green << " " << m_blue
-                     << " " << m_alpha << endl;
+                cout << "INFO: Constructor-requested color bits (GLView args): rgba " << m_red << " " << m_green << " " << m_blue << " "
+                     << m_alpha << endl;
                 cout << "INFO: QOpenGLWidget::format() (post-negotiation): " << formatSummary(widgetFormat) << endl;
                 cout << "INFO: Actual QOpenGLContext format: " << formatSummary(f) << endl;
                 if (screen)
@@ -325,8 +325,7 @@ namespace Rv
                 cout << "INFO: GL vendor: " << (glVendor ? reinterpret_cast<const char*>(glVendor) : "<unknown>") << endl;
                 cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
                 cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
-                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>")
-                     << endl;
+                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
                 cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE")
                      << ", WAYLAND_DISPLAY=" << envOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << envOrUnset("DISPLAY")
                      << ", XDG_CURRENT_DESKTOP=" << envOrUnset("XDG_CURRENT_DESKTOP")

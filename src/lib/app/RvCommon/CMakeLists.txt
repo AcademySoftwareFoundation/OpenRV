@@ -81,13 +81,20 @@ IF(RV_TARGET_LINUX
 ENDIF()
 
 IF(RV_TARGET_LINUX)
-  # Vulkan is always available on Linux (fetched via cmake/dependencies/vulkan.cmake). No
-  # VULKAN_SDK environment variable or setup-env.sh is required.
+  # Vulkan is always available on Linux (fetched via cmake/dependencies/vulkan.cmake). No VULKAN_SDK environment variable or setup-env.sh is required.
   IF(NOT TARGET Vulkan::Vulkan)
     MESSAGE(FATAL_ERROR "Vulkan::Vulkan target is missing on Linux; cmake/dependencies/vulkan.cmake should provide it")
   ENDIF()
   MESSAGE(STATUS "Linux Vulkan: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
-  LIST(APPEND _sources VulkanBuildProbe.cpp VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
+  LIST(
+    APPEND
+    _sources
+    VulkanBuildProbe.cpp
+    VulkanView.cpp
+    QTVulkanVideoDevice.cpp
+    RvCommon/VulkanView.h
+    RvCommon/QTVulkanVideoDevice.h
+  )
 ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)

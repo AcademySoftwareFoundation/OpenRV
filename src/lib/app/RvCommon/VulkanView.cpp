@@ -66,7 +66,7 @@ namespace Rv
         if (QWindow* w = windowHandle())
         {
             w->setSurfaceType(QSurface::VulkanSurface);
-            
+
             // Set 10-bit format
             QSurfaceFormat fmt;
             fmt.setRedBufferSize(10);
@@ -111,10 +111,7 @@ namespace Rv
         y = gp.y();
     }
 
-    float VulkanView::devicePixelRatio() const
-    {
-        return static_cast<float>(devicePixelRatioF());
-    }
+    float VulkanView::devicePixelRatio() const { return static_cast<float>(devicePixelRatioF()); }
 
     //--------------------------------------------------------------------------
     // Vulkan Initialisation
@@ -175,10 +172,8 @@ namespace Rv
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-        const VkFormat tenBitFormats[] = {VK_FORMAT_A2B10G10R10_UNORM_PACK32,
-                                          VK_FORMAT_A2R10G10B10_UNORM_PACK32};
-        const VkFormatFeatureFlags needed =
-            VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+        const VkFormat tenBitFormats[] = {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32};
+        const VkFormatFeatureFlags needed = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
 
         for (VkPhysicalDevice dev : devices)
         {
@@ -224,15 +219,16 @@ namespace Rv
                 std::cerr << "[VulkanView] QVulkanInstance create failed\n";
             }
         }
-        
+
         m_vkInstance = qtVkInst->vkInstance();
-        
+
         // 2. Create Surface
         QWindow* w = windowHandle();
-        if (!w) return false;
-        
+        if (!w)
+            return false;
+
         w->setVulkanInstance(qtVkInst);
-        
+
         m_vkSurface = qtVkInst->surfaceForWindow(w);
         if (!m_vkSurface)
         {
@@ -243,10 +239,11 @@ namespace Rv
         // 3. Pick Physical Device
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
-        if (deviceCount == 0) return false;
+        if (deviceCount == 0)
+            return false;
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
-        
+
         m_vkPhysicalDevice = devices[0]; // just pick first for now
 
         // Find queue family
@@ -257,17 +254,20 @@ namespace Rv
 
         m_queueFamilyIndex = 0;
         bool foundQueue = false;
-        for (uint32_t i = 0; i < queueFamilyCount; i++) {
+        for (uint32_t i = 0; i < queueFamilyCount; i++)
+        {
             VkBool32 presentSupport = false;
             vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, &presentSupport);
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT && presentSupport) {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT && presentSupport)
+            {
                 m_queueFamilyIndex = i;
                 foundQueue = true;
                 break;
             }
         }
 
-        if (!foundQueue) return false;
+        if (!foundQueue)
+            return false;
 
         // 4. Create Logical Device
         float queuePriority = 1.0f;
@@ -277,11 +277,8 @@ namespace Rv
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
-        std::vector<const char*> deviceExtensions = {
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
-            VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME
-        };
+        std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
+                                                     VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME};
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -320,23 +317,28 @@ namespace Rv
         if (m_vkDevice)
         {
             vkDeviceWaitIdle(m_vkDevice);
-            
-            if (m_vkImageAvailableSemaphore) vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
-            if (m_vkRenderFinishedSemaphore) vkDestroySemaphore(m_vkDevice, m_vkRenderFinishedSemaphore, nullptr);
-            if (m_vkFence) vkDestroyFence(m_vkDevice, m_vkFence, nullptr);
-            
-            if (m_vkCommandPool) vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
-            
+
+            if (m_vkImageAvailableSemaphore)
+                vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
+            if (m_vkRenderFinishedSemaphore)
+                vkDestroySemaphore(m_vkDevice, m_vkRenderFinishedSemaphore, nullptr);
+            if (m_vkFence)
+                vkDestroyFence(m_vkDevice, m_vkFence, nullptr);
+
+            if (m_vkCommandPool)
+                vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
+
             vkDestroyDevice(m_vkDevice, nullptr);
         }
-        // Surface is managed by QVulkanInstance? We shouldn't destroy it here if QVulkanInstance owns it, but wait, we got it from surfaceForWindow.
-        // Actually QVulkanWindow destroys it. We can just leave it for QVulkanInstance to clean up, or we can vkDestroySurfaceKHR if needed.
-        // For safety we don't destroy instance/surface here, they are tied to Qt.
+        // Surface is managed by QVulkanInstance? We shouldn't destroy it here if QVulkanInstance owns it, but wait, we got it from
+        // surfaceForWindow. Actually QVulkanWindow destroys it. We can just leave it for QVulkanInstance to clean up, or we can
+        // vkDestroySurfaceKHR if needed. For safety we don't destroy instance/surface here, they are tied to Qt.
     }
 
     bool VulkanView::createSwapchain()
     {
-        if (!m_vkDevice || !m_vkSurface) return false;
+        if (!m_vkDevice || !m_vkSurface)
+            return false;
 
         VkSurfaceCapabilitiesKHR capabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &capabilities);
@@ -349,10 +351,11 @@ namespace Rv
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
         bool found10bit = false;
-        for (const auto& fmt : formats) {
+        for (const auto& fmt : formats)
+        {
             // A2B10G10R10 or A2R10G10B10
-            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ||
-                fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32) {
+            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+            {
                 surfaceFormat = fmt;
                 found10bit = true;
                 break;
@@ -366,7 +369,8 @@ namespace Rv
         // cannot detect this surface/compositor limitation, so warn here once it
         // is known. (Decision-time fallback to OpenGL is a possible follow-up.)
         static bool warned8bit = false;
-        if (!found10bit && !warned8bit) {
+        if (!found10bit && !warned8bit)
+        {
             warned8bit = true;
             std::cerr << "[VulkanView] WARNING: Vulkan surface offers no 10-bit "
                          "format; presenting 8-bit. Vulkan gives no benefit over "
@@ -376,14 +380,16 @@ namespace Rv
         m_vkSwapchainFormat = surfaceFormat.format;
 
         m_vkSwapchainExtent = capabilities.currentExtent;
-        if (m_vkSwapchainExtent.width == 0xFFFFFFFF) {
+        if (m_vkSwapchainExtent.width == 0xFFFFFFFF)
+        {
             m_vkSwapchainExtent = {(uint32_t)width(), (uint32_t)height()};
         }
         if (m_vkSwapchainExtent.width == 0 || m_vkSwapchainExtent.height == 0)
             return false;
 
         uint32_t imageCount = capabilities.minImageCount + 1;
-        if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
+        if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount)
+        {
             imageCount = capabilities.maxImageCount;
         }
 
@@ -426,23 +432,27 @@ namespace Rv
         if (m_vkDevice)
         {
             vkDeviceWaitIdle(m_vkDevice);
-            
-            if (m_vkStagingBuffer) {
+
+            if (m_vkStagingBuffer)
+            {
                 vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer, nullptr);
                 m_vkStagingBuffer = VK_NULL_HANDLE;
             }
-            if (m_vkStagingBufferMemory) {
+            if (m_vkStagingBufferMemory)
+            {
                 vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory, nullptr);
                 m_vkStagingBufferMemory = VK_NULL_HANDLE;
             }
             m_stagingBufferSize = 0;
 
-            if (!m_vkCommandBuffers.empty()) {
+            if (!m_vkCommandBuffers.empty())
+            {
                 vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, m_vkCommandBuffers.size(), m_vkCommandBuffers.data());
                 m_vkCommandBuffers.clear();
             }
-            
-            if (m_vkSwapchain) {
+
+            if (m_vkSwapchain)
+            {
                 vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
                 m_vkSwapchain = VK_NULL_HANDLE;
             }
@@ -450,11 +460,14 @@ namespace Rv
     }
 
     // Helper to find memory type
-    uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+    uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
-        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+        {
+            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
                 return i;
             }
         }
@@ -466,34 +479,41 @@ namespace Rv
         if (m_vkDevice)
         {
             vkDeviceWaitIdle(m_vkDevice);
-            
-            if (m_vkSharedImage) {
+
+            if (m_vkSharedImage)
+            {
                 vkDestroyImage(m_vkDevice, m_vkSharedImage, nullptr);
                 m_vkSharedImage = VK_NULL_HANDLE;
             }
-            if (m_vkSharedImageMemory) {
+            if (m_vkSharedImageMemory)
+            {
                 vkFreeMemory(m_vkDevice, m_vkSharedImageMemory, nullptr);
                 m_vkSharedImageMemory = VK_NULL_HANDLE;
             }
-            if (m_vkGlReadySemaphore) {
+            if (m_vkGlReadySemaphore)
+            {
                 vkDestroySemaphore(m_vkDevice, m_vkGlReadySemaphore, nullptr);
                 m_vkGlReadySemaphore = VK_NULL_HANDLE;
             }
-            if (m_vkVkReadySemaphore) {
+            if (m_vkVkReadySemaphore)
+            {
                 vkDestroySemaphore(m_vkDevice, m_vkVkReadySemaphore, nullptr);
                 m_vkVkReadySemaphore = VK_NULL_HANDLE;
             }
         }
-        
-        if (m_sharedImageInfo.memoryFd != -1) {
+
+        if (m_sharedImageInfo.memoryFd != -1)
+        {
             ::close(m_sharedImageInfo.memoryFd);
             m_sharedImageInfo.memoryFd = -1;
         }
-        if (m_sharedImageInfo.glReadySemaphoreFd != -1) {
+        if (m_sharedImageInfo.glReadySemaphoreFd != -1)
+        {
             ::close(m_sharedImageInfo.glReadySemaphoreFd);
             m_sharedImageInfo.glReadySemaphoreFd = -1;
         }
-        if (m_sharedImageInfo.vkReadySemaphoreFd != -1) {
+        if (m_sharedImageInfo.vkReadySemaphoreFd != -1)
+        {
             ::close(m_sharedImageInfo.vkReadySemaphoreFd);
             m_sharedImageInfo.vkReadySemaphoreFd = -1;
         }
@@ -504,10 +524,12 @@ namespace Rv
 
     const VulkanView::SharedImageInfo* VulkanView::getSharedImageInfo(int w, int h)
     {
-        if (!m_vkDevice) return nullptr;
+        if (!m_vkDevice)
+            return nullptr;
 
         // If we already have a shared image of the right size, return it
-        if (m_vkSharedImage && m_sharedImageInfo.width == w && m_sharedImageInfo.height == h) {
+        if (m_vkSharedImage && m_sharedImageInfo.width == w && m_sharedImageInfo.height == h)
+        {
             return &m_sharedImageInfo;
         }
 
@@ -516,7 +538,8 @@ namespace Rv
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
         {
             cleanupSwapchain();
-            if (!createSwapchain()) return nullptr;
+            if (!createSwapchain())
+                return nullptr;
         }
 
         // 1. Create Shared Image
@@ -533,12 +556,13 @@ namespace Rv
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-        imageInfo.tiling = VK_IMAGE_TILING_LINEAR; // Use linear tiling to avoid GL/Vulkan optimal swizzle mismatch
+        imageInfo.tiling = VK_IMAGE_TILING_LINEAR;         // Use linear tiling to avoid GL/Vulkan optimal swizzle mismatch
         imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT; // Only used as transfer src in Vulkan
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage) != VK_SUCCESS) {
+        if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage) != VK_SUCCESS)
+        {
             std::cerr << "[VulkanView] Failed to create shared image\n";
             return nullptr;
         }
@@ -551,7 +575,8 @@ namespace Rv
         VkSubresourceLayout layout;
         vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage, &subresource, &layout);
 
-        if (layout.rowPitch % 4 != 0) {
+        if (layout.rowPitch % 4 != 0)
+        {
             // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
             cleanupSharedImage();
             return nullptr;
@@ -571,7 +596,8 @@ namespace Rv
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS) {
+        if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS)
+        {
             std::cerr << "[VulkanView] Failed to allocate shared image memory\n";
             cleanupSharedImage();
             return nullptr;
@@ -581,7 +607,8 @@ namespace Rv
 
         // Export Memory FD
         auto pfnGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR");
-        if (!pfnGetMemoryFdKHR) {
+        if (!pfnGetMemoryFdKHR)
+        {
             std::cerr << "[VulkanView] vkGetMemoryFdKHR not found\n";
             cleanupSharedImage();
             return nullptr;
@@ -593,7 +620,8 @@ namespace Rv
         getFdInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
 
         int memFd = -1;
-        if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS) {
+        if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS)
+        {
             std::cerr << "[VulkanView] Failed to get memory FD\n";
             cleanupSharedImage();
             return nullptr;
@@ -608,8 +636,9 @@ namespace Rv
         semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         semInfo.pNext = &exportSemInfo;
 
-        if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore) != VK_SUCCESS ||
-            vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore) != VK_SUCCESS) {
+        if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore) != VK_SUCCESS
+            || vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore) != VK_SUCCESS)
+        {
             std::cerr << "[VulkanView] Failed to create shared semaphores\n";
             cleanupSharedImage();
             return nullptr;
@@ -617,7 +646,8 @@ namespace Rv
 
         // Export Semaphore FDs
         auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
-        if (!pfnGetSemaphoreFdKHR) {
+        if (!pfnGetSemaphoreFdKHR)
+        {
             std::cerr << "[VulkanView] vkGetSemaphoreFdKHR not found\n";
             cleanupSharedImage();
             return nullptr;
@@ -667,8 +697,7 @@ namespace Rv
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
         vkEndCommandBuffer(cb);
 
@@ -697,18 +726,21 @@ namespace Rv
 
     void VulkanView::presentSharedImage()
     {
-        if (!m_vkDevice || !m_vkSharedImage || !m_vkSwapchain) return;
+        if (!m_vkDevice || !m_vkSharedImage || !m_vkSwapchain)
+            return;
 
         // Acquire image
         uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        VkResult result =
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
             // Swapchain out of date, we'll recreate it next frame
             return;
         }
 
         vkResetFences(m_vkDevice, 1, &m_vkFence);
-        
+
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
         vkResetCommandBuffer(cb, 0);
 
@@ -733,8 +765,7 @@ namespace Rv
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
         // Copy shared image to swapchain image
         VkImageCopy region = {};
@@ -744,9 +775,8 @@ namespace Rv
         region.dstSubresource.layerCount = 1;
         region.extent = {(uint32_t)m_sharedImageInfo.width, (uint32_t)m_sharedImageInfo.height, 1};
 
-        vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                       1, &region);
+        vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
+                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         // Transition swapchain image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -754,25 +784,25 @@ namespace Rv
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = 0;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1,
+                             &barrier);
 
         vkEndCommandBuffer(cb);
 
         // Submit
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        
+
         // Wait for GL to finish writing (glReady) AND swapchain image to be available
         VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore, m_vkImageAvailableSemaphore};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 2;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
-        
+
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cb;
-        
+
         // Signal render finished AND vkReady (so GL can write next frame)
         VkSemaphore signalSemaphores[] = {m_vkRenderFinishedSemaphore, m_vkVkReadySemaphore};
         submitInfo.signalSemaphoreCount = 2;
@@ -801,22 +831,26 @@ namespace Rv
 
     void VulkanView::presentPixelData(const void* pixels, int w, int h)
     {
-        if (!m_vkDevice) return;
-        
+        if (!m_vkDevice)
+            return;
+
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
         {
             cleanupSwapchain();
-            if (!createSwapchain()) return;
+            if (!createSwapchain())
+                return;
         }
 
         size_t size = w * h * 4;
-        
+
         // Recreate staging buffer if needed
         if (size > m_stagingBufferSize)
         {
-            if (m_vkStagingBuffer) vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer, nullptr);
-            if (m_vkStagingBufferMemory) vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory, nullptr);
-            
+            if (m_vkStagingBuffer)
+                vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer, nullptr);
+            if (m_vkStagingBufferMemory)
+                vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory, nullptr);
+
             VkBufferCreateInfo bufferInfo = {};
             bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
             bufferInfo.size = size;
@@ -830,12 +864,12 @@ namespace Rv
             VkMemoryAllocateInfo allocInfo = {};
             allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
             allocInfo.allocationSize = memRequirements.size;
-            allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memRequirements.memoryTypeBits, 
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memRequirements.memoryTypeBits,
+                                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
             vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory);
             vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer, m_vkStagingBufferMemory, 0);
-            
+
             m_stagingBufferSize = size;
         }
 
@@ -847,14 +881,16 @@ namespace Rv
 
         // Acquire image
         uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        VkResult result =
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
             cleanupSwapchain();
             return;
         }
 
         vkResetFences(m_vkDevice, 1, &m_vkFence);
-        
+
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
         vkResetCommandBuffer(cb, 0);
 
@@ -879,8 +915,7 @@ namespace Rv
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
         // Copy buffer to image
         VkBufferImageCopy region = {};
@@ -902,8 +937,8 @@ namespace Rv
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = 0;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            0, 0, nullptr, 0, nullptr, 1, &barrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1,
+                             &barrier);
 
         vkEndCommandBuffer(cb);
 
@@ -965,8 +1000,7 @@ namespace Rv
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
-                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible()
-                    && m_eventWidget && m_eventWidget->hasFocus())
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
                 {
                     TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
@@ -1040,9 +1074,12 @@ namespace Rv
 
     void VulkanView::paintEvent(QPaintEvent* event)
     {
-        if (m_doc && m_doc->session() && m_doc->session()->outputVideoDevice()) {
+        if (m_doc && m_doc->session() && m_doc->session()->outputVideoDevice())
+        {
             m_doc->session()->outputVideoDevice()->syncBuffers();
-        } else if (m_videoDevice) {
+        }
+        else if (m_videoDevice)
+        {
             m_videoDevice->syncBuffers();
         }
     }
@@ -1104,17 +1141,15 @@ namespace Rv
         {
             keyevent = true;
             if (m_lastKey == kevent->key()
-                && (m_lastKeyType == QEvent::ShortcutOverride
-                        && (kevent->type() == QEvent::KeyPress)
-                    || (m_lastKeyType == kevent->type())))
+                && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
             {
-                m_lastKey     = kevent->key();
+                m_lastKey = kevent->key();
                 m_lastKeyType = kevent->type();
                 event->accept();
                 return true;
             }
             m_lastKeyType = kevent->type();
-            m_lastKey     = kevent->key();
+            m_lastKey = kevent->key();
         }
 
         switch (event->type())
@@ -1138,8 +1173,7 @@ namespace Rv
             if (e->oldSize().width() != -1 && e->oldSize().height() != -1)
             {
                 ostringstream contents;
-                contents << e->oldSize().width() << " " << e->oldSize().height()
-                         << "|" << e->size().width() << " " << e->size().height();
+                contents << e->oldSize().width() << " " << e->oldSize().height() << "|" << e->size().width() << " " << e->size().height();
                 if (m_doc && session)
                     session->userGenericEvent("view-resized", contents.str());
             }
@@ -1156,40 +1190,37 @@ namespace Rv
             return QWidget::event(event);
 
         if (session && session->outputVideoDevice()
-            && session->outputVideoDevice()->displayMode()
-                   == TwkApp::VideoDevice::MirrorDisplayMode)
+            && session->outputVideoDevice()->displayMode() == TwkApp::VideoDevice::MirrorDisplayMode)
         {
             if (const TwkApp::VideoDevice* cdv = session->controlVideoDevice())
             {
                 const TwkApp::VideoDevice* odv = session->outputVideoDevice();
                 if (odv && cdv != odv && cdv == videoDevice())
                 {
-                    const float w  = static_cast<float>(width());
-                    const float h  = static_cast<float>(height());
+                    const float w = static_cast<float>(width());
+                    const float h = static_cast<float>(height());
                     const float ow = static_cast<float>(odv->width());
                     const float oh = static_cast<float>(odv->height());
-                    const float aspect  = w / h;
+                    const float aspect = w / h;
                     const float oaspect = ow / oh;
 
                     m_videoDevice->translator().setRelativeDomain(ow, oh);
 
                     if (aspect >= oaspect)
                     {
-                        const float yscale  = oh / h;
+                        const float yscale = oh / h;
                         const float yoffset = 0.0f;
-                        const float xscale  = yscale;
+                        const float xscale = yscale;
                         const float xoffset = -(w * yscale - ow) / 2.0f;
-                        m_videoDevice->translator().setScaleAndOffset(
-                            xoffset, yoffset, xscale, yscale);
+                        m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                     else
                     {
-                        const float xscale  = ow / w;
+                        const float xscale = ow / w;
                         const float xoffset = 0.0f;
-                        const float yscale  = xscale;
+                        const float yscale = xscale;
                         const float yoffset = -(xscale * h - oh) / 2.0f;
-                        m_videoDevice->translator().setScaleAndOffset(
-                            xoffset, yoffset, xscale, yscale);
+                        m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                 }
                 else
@@ -1230,23 +1261,22 @@ namespace Rv
 
     bool VulkanView::eventFilter(QObject* object, QEvent* event)
     {
-        if (event->type() == QEvent::KeyPress    || event->type() == QEvent::KeyRelease
-            || event->type() == QEvent::Shortcut || event->type() == QEvent::ShortcutOverride)
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
+            || event->type() == QEvent::ShortcutOverride)
         {
             if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
             {
                 if (m_lastKey == kevent->key()
-                    && (m_lastKeyType == QEvent::ShortcutOverride
-                            && (kevent->type() == QEvent::KeyPress)
+                    && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
                         || (m_lastKeyType == kevent->type())))
                 {
-                    m_lastKey     = kevent->key();
+                    m_lastKey = kevent->key();
                     m_lastKeyType = kevent->type();
                     event->accept();
                     return true;
                 }
                 m_lastKeyType = kevent->type();
-                m_lastKey     = kevent->key();
+                m_lastKey = kevent->key();
             }
 
             Session* session = m_doc ? m_doc->session() : nullptr;
