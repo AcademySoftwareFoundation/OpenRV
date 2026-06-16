@@ -431,7 +431,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         creationflags = subprocess.CREATE_NO_WINDOW if _IS_WIN32 else 0
         proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, creationflags=creationflags)
         with self._procs_lock:
-            self._active_procs.append(proc)
+            self._active_procs.append((proc, cache_key))
             if self._should_defer():
                 _suspend_proc(proc)
         deadline = time.monotonic() + timeout
@@ -570,7 +570,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         with self._procs_lock:
             self._playback_active = False
             if not self._should_defer():
-                for proc in self._active_procs:
+                for proc, _ in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
 
@@ -582,7 +582,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._loading_active = True
             if should_defer:
                 return
-            for proc in self._active_procs:
+            for proc, _ in self._active_procs:
                 _suspend_proc(proc)
 
     def _on_loading_stop(self, event: Any) -> None:
@@ -590,7 +590,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         with self._procs_lock:
             self._loading_active = False
             if not self._should_defer():
-                for proc in self._active_procs:
+                for proc, _ in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
 
@@ -601,7 +601,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             self._display_preview = False
             if should_defer:
                 return
-            for proc in self._active_procs:
+            for proc, _ in self._active_procs:
                 _suspend_proc(proc)
 
     def _on_previews_enabled(self, event: Any) -> None:
@@ -609,7 +609,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         with self._procs_lock:
             self._display_preview = True
             if not self._should_defer():
-                for proc in self._active_procs:
+                for proc, _ in self._active_procs:
                     _resume_proc(proc)
         self._drain_one()
 
@@ -638,12 +638,14 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         event.reject()
         self._shutting_down = True
         with self._procs_lock:
-            for proc, _ in self._active_procs:
-                _resume_proc(proc)
-                try:
-                    proc.terminate()
-                except OSError:
-                    logger.warning(f"Failed to terminate process {proc}")
+            procs_to_kill = list(self._active_procs)
+        for proc, _ in procs_to_kill:
+            _resume_proc(proc)
+            try:
+                proc.kill()
+                proc.wait()
+            except OSError:
+                logger.warning(f"Failed to kill process {proc}")
         self._pool.shutdown(wait=False, cancel_futures=True)
         self._in_flight.clear()
         self._cache_key_to_sources.clear()
