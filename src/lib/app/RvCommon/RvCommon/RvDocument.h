@@ -180,6 +180,10 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        void setActiveViewContentSize(int w, int h);
+        void setActiveViewMinimumContentSize(int w, int h);
+        bool activeViewFirstPaintCompleted() const;
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;

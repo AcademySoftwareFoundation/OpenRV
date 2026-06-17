@@ -854,23 +854,9 @@ namespace Rv
 
     void RvDocument::resetSizePolicy()
     {
-#if defined(PLATFORM_LINUX)
-        if (m_vulkanView)
-        {
-            m_vulkanView->setMinimumContentSize(64, 64);
-            m_vulkanView->setMinimumSize(QSize(64, 64));
-        }
-        else
-        {
-            m_glView->setMinimumContentSize(64, 64);
-            m_glView->setMinimumSize(QSize(64, 64));
-            m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
-        }
-#else
-        m_glView->setMinimumContentSize(64, 64);
-        m_glView->setMinimumSize(QSize(64, 64));
-        m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
-#endif
+        setActiveViewMinimumContentSize(64, 64);
+        m_viewWidget->setMinimumSize(QSize(64, 64));
+        m_viewWidget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
     }
 
     void RvDocument::setDocumentDisabled(bool b, bool menuBarOnly)
@@ -1096,6 +1082,47 @@ namespace Rv
         rebuildGLView(stereo, vsync, dbl, red, green, blue, alpha);
     }
 
+    void RvDocument::setActiveViewContentSize(int w, int h)
+    {
+#if defined(PLATFORM_LINUX)
+        if (m_vulkanView)
+        {
+            m_vulkanView->setContentSize(w, h);
+            return;
+        }
+#endif
+        if (m_glView)
+        {
+            m_glView->setContentSize(w, h);
+        }
+    }
+
+    void RvDocument::setActiveViewMinimumContentSize(int w, int h)
+    {
+#if defined(PLATFORM_LINUX)
+        if (m_vulkanView)
+        {
+            m_vulkanView->setMinimumContentSize(w, h);
+            return;
+        }
+#endif
+        if (m_glView)
+        {
+            m_glView->setMinimumContentSize(w, h);
+        }
+    }
+
+    bool RvDocument::activeViewFirstPaintCompleted() const
+    {
+#if defined(PLATFORM_LINUX)
+        if (m_vulkanView)
+        {
+            return m_vulkanView->firstPaintCompleted();
+        }
+#endif
+        return m_glView && m_glView->firstPaintCompleted();
+    }
+
     GLView* RvDocument::view() const { return m_glView; }
 
     QWidget* RvDocument::viewWidget() const { return m_viewWidget; }
@@ -1232,40 +1259,38 @@ namespace Rv
         h += int(mh);
         w += int(mw);
 
+        setActiveViewContentSize(w, h);
+        setActiveViewMinimumContentSize(w, h);
 #if defined(PLATFORM_LINUX)
         if (m_vulkanView)
         {
-            m_vulkanView->setContentSize(w, h);
-            m_vulkanView->setMinimumContentSize(w, h);
-            const int dh = m_vulkanView->height() - h;
-            const int dw = m_vulkanView->width() - w;
+            const int dh = m_viewWidget->height() - h;
+            const int dw = m_viewWidget->width() - w;
             if (dh || dw)
             {
-                m_vulkanView->resize(w, h);
-                m_vulkanView->updateGeometry();
+                m_viewWidget->resize(w, h);
+                m_viewWidget->updateGeometry();
                 resize(width() - dw, height() - dh);
-                m_vulkanView->setContentSize(w, h);
-                m_vulkanView->setMinimumContentSize(w, h);
-                m_vulkanView->resize(w, h);
-                m_vulkanView->updateGeometry();
+                setActiveViewContentSize(w, h);
+                setActiveViewMinimumContentSize(w, h);
+                m_viewWidget->resize(w, h);
+                m_viewWidget->updateGeometry();
             }
         }
         else
 #endif
         {
-            m_glView->setContentSize(w, h);
-            m_glView->setMinimumContentSize(w, h);
-            m_glView->updateGeometry();
+            m_viewWidget->updateGeometry();
 
-            const int dh = m_glView->height() - h;
-            const int dw = m_glView->width() - w;
+            const int dh = m_viewWidget->height() - h;
+            const int dw = m_viewWidget->width() - w;
 
             if (dh || dw)
             {
                 resize(width() - dw, height() - dh);
-                m_glView->setContentSize(w, h);
-                m_glView->setMinimumContentSize(w, h);
-                m_glView->updateGeometry();
+                setActiveViewContentSize(w, h);
+                setActiveViewMinimumContentSize(w, h);
+                m_viewWidget->updateGeometry();
             }
         }
 
@@ -1463,52 +1488,29 @@ namespace Rv
 
         DB("resizeToFit final target w " << w << " h " << h);
 
-#if defined(PLATFORM_LINUX)
-        if (m_vulkanView)
+        setActiveViewContentSize(int(w), int(h));
+        setActiveViewMinimumContentSize(int(w), int(h));
+        m_viewWidget->updateGeometry();
+
+        DB("resizeToFit resulting size w " << m_viewWidget->width() << " h " << m_viewWidget->height());
+
+        const int dh = m_viewWidget->height() - int(h);
+        const int dw = m_viewWidget->width() - int(w);
+
+        //
+        //  WHY? Dunno
+        //
+
+        DB("resizeToFit dw " << dw << " dh " << dh);
+        if (!firstTime && (dh || dw))
+        // if ((dh || dw))
         {
-            m_vulkanView->setContentSize(int(w), int(h));
-            m_vulkanView->setMinimumContentSize(int(w), int(h));
-            m_vulkanView->updateGeometry();
-            DB("resizeToFit resulting size w " << m_vulkanView->width() << " h " << m_vulkanView->height());
-            const int dh = m_vulkanView->height() - int(h);
-            const int dw = m_vulkanView->width() - int(w);
-            DB("resizeToFit dw " << dw << " dh " << dh);
-            if (!firstTime && (dh || dw))
-            {
-                resize(width() - dw, height() - dh);
-                m_vulkanView->setContentSize(int(w), int(h));
-                m_vulkanView->setMinimumContentSize(int(w), int(h));
-                m_vulkanView->updateGeometry();
-            }
-            DB("resizeToFit final resulting size w " << m_vulkanView->width() << " h " << m_vulkanView->height());
+            resize(width() - dw, height() - dh);
+            setActiveViewContentSize(int(w), int(h));
+            setActiveViewMinimumContentSize(int(w), int(h));
+            m_viewWidget->updateGeometry();
         }
-        else
-#endif
-        {
-            m_glView->setContentSize(int(w), int(h));
-            m_glView->setMinimumContentSize(int(w), int(h));
-            m_glView->updateGeometry();
-
-            DB("resizeToFit resulting size w " << m_glView->width() << " h " << m_glView->height());
-
-            const int dh = m_glView->height() - int(h);
-            const int dw = m_glView->width() - int(w);
-
-            //
-            //  WHY? Dunno
-            //
-
-            DB("resizeToFit dw " << dw << " dh " << dh);
-            if (!firstTime && (dh || dw))
-            // if ((dh || dw))
-            {
-                resize(width() - dw, height() - dh);
-                m_glView->setContentSize(int(w), int(h));
-                m_glView->setMinimumContentSize(int(w), int(h));
-                m_glView->updateGeometry();
-            }
-            DB("resizeToFit final resulting size w " << m_glView->width() << " h " << m_glView->height());
-        }
+        DB("resizeToFit final resulting size w " << m_viewWidget->width() << " h " << m_viewWidget->height());
 
         m_resetPolicyTimer->start();
 
@@ -2167,7 +2169,7 @@ namespace Rv
         //  For some reason KDE wants our main window to come up
         //  "lowered" ie beneath the other windows.  This is the
         //  only way I've found to counter that.
-        if (waitingForFirstPaint && view() && view()->firstPaintCompleted())
+        if (waitingForFirstPaint && activeViewFirstPaintCompleted())
         {
             activateWindow();
             raise();

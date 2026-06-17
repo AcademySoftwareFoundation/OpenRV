@@ -18,7 +18,6 @@
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
 #include <QOpenGLWidget>
-#include <QOpenGLContext>
 #include <QGuiApplication>
 
 namespace Rv
