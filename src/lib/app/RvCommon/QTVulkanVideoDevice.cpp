@@ -53,7 +53,6 @@
 #define GL_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958B
 #define GL_NUM_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958C
 #define GL_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958D
-#define GL_LAYOUT_GENERAL_EXT 0x958D
 #define GL_LAYOUT_COLOR_ATTACHMENT_EXT 0x958E
 #define GL_LAYOUT_DEPTH_STENCIL_ATTACHMENT_EXT 0x958F
 #define GL_LAYOUT_DEPTH_STENCIL_READ_ONLY_EXT 0x9590
@@ -124,6 +123,13 @@ namespace Rv
 
             m_glContext = new QOpenGLContext();
             m_glContext->setFormat(fmt);
+
+            // Join RV's global GL resource-sharing group (enabled via
+            // Qt::AA_ShareOpenGLContexts at startup). Without this the offscreen
+            // context is isolated and FTGL font-atlas textures created in
+            // another context have no storage here, so glyph uploads fail with
+            // GL_INVALID_OPERATION.
+            m_glContext->setShareContext(QOpenGLContext::globalShareContext());
 
             if (!m_glContext->create())
             {
@@ -396,11 +402,11 @@ namespace Rv
             m_sharedHeight = h;
         }
 
-        // 1. Wait for Vulkan to be ready
+        // Wait for Vulkan to be ready
         GLuint waitDstLayouts[] = {GL_LAYOUT_COLOR_ATTACHMENT_EXT};
         glWaitSemaphoreEXT(m_vkReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, waitDstLayouts);
 
-        // 2. Blit from FBO to shared texture
+        // Blit from FBO to shared texture
         GLuint readFbo = fbo->fboID();
         GLuint drawFbo;
         glGenFramebuffersEXT(1, &drawFbo);
@@ -415,13 +421,13 @@ namespace Rv
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
         glDeleteFramebuffersEXT(1, &drawFbo);
 
-        // 3. Signal Vulkan that GL is done
+        // Signal Vulkan that GL is done
         GLuint signalSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
         glSignalSemaphoreEXT(m_glReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, signalSrcLayouts);
 
         glFlush();
 
-        // 4. Tell VulkanView to present
+        // Tell VulkanView to present
         m_view->presentSharedImage();
     }
 
@@ -432,7 +438,9 @@ namespace Rv
     void QTVulkanVideoDevice::redraw() const
     {
         if (m_view)
+        {
             QCoreApplication::postEvent(m_view, new QEvent(QEvent::UpdateRequest));
+        }
     }
 
     void QTVulkanVideoDevice::redrawImmediately() const { redraw(); }
@@ -442,7 +450,9 @@ namespace Rv
     VideoDevice::Resolution QTVulkanVideoDevice::resolution() const
     {
         if (!m_view)
+        {
             return Resolution(0, 0, 1.0f, 1.0f);
+        }
         const float dpr = m_view->devicePixelRatio();
         return Resolution(static_cast<int>(m_view->width() * dpr + 0.5f), static_cast<int>(m_view->height() * dpr + 0.5f), 1.0f, 1.0f);
     }
@@ -454,7 +464,9 @@ namespace Rv
     VideoDevice::VideoFormat QTVulkanVideoDevice::format() const
     {
         if (!m_view)
+        {
             return VideoFormat(0, 0, 1.0, 1.0, 0.0, hardwareIdentification());
+        }
         const float dpr = m_view->devicePixelRatio();
         return VideoFormat(static_cast<int>(m_view->width() * dpr + 0.5f), static_cast<int>(m_view->height() * dpr + 0.5f), 1.0, 1.0,
                            (m_refresh != -1.0f) ? m_refresh : 0.0f, hardwareIdentification());
@@ -463,35 +475,45 @@ namespace Rv
     size_t QTVulkanVideoDevice::width() const
     {
         if (!m_view)
+        {
             return 0;
+        }
         return static_cast<size_t>(m_view->width() * m_view->devicePixelRatio() + 0.5f);
     }
 
     size_t QTVulkanVideoDevice::height() const
     {
         if (!m_view)
+        {
             return 0;
+        }
         return static_cast<size_t>(m_view->height() * m_view->devicePixelRatio() + 0.5f);
     }
 
     void QTVulkanVideoDevice::open(const StringVector& /*args*/)
     {
         if (m_view)
+        {
             m_view->show();
+        }
         m_isOpen = true;
     }
 
     void QTVulkanVideoDevice::close()
     {
         if (m_view)
+        {
             m_view->hide();
+        }
         m_isOpen = false;
     }
 
     bool QTVulkanVideoDevice::isOpen() const
     {
         if (m_view)
+        {
             return m_view->isVisible();
+        }
         return false;
     }
 

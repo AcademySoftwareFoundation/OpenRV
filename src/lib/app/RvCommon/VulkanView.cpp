@@ -99,7 +99,9 @@ namespace Rv
     {
         m_eventWidget = widget;
         if (m_videoDevice)
+        {
             m_videoDevice->setEventWidget(widget);
+        }
     }
 
     void VulkanView::stopProcessingEvents() { m_stopProcessingEvents = true; }
@@ -120,7 +122,9 @@ namespace Rv
     void VulkanView::initialize()
     {
         if (m_initialized)
+        {
             return;
+        }
 
         if (QWindow* w = windowHandle())
         {
@@ -142,7 +146,9 @@ namespace Rv
         m_initialized = true;
 
         if (m_doc)
+        {
             m_doc->initializeSession();
+        }
     }
 
     bool VulkanView::supports10BitPresentation()
@@ -163,12 +169,16 @@ namespace Rv
 
         VkInstance instance = qtVkInst.vkInstance();
         if (instance == VK_NULL_HANDLE)
+        {
             return false;
+        }
 
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
         if (deviceCount == 0)
+        {
             return false;
+        }
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -182,7 +192,9 @@ namespace Rv
                 VkFormatProperties props = {};
                 vkGetPhysicalDeviceFormatProperties(dev, fmt, &props);
                 if ((props.optimalTilingFeatures & needed) == needed)
+                {
                     return true;
+                }
             }
         }
 
@@ -191,7 +203,7 @@ namespace Rv
 
     bool VulkanView::initVulkan()
     {
-        // 1. Create Instance
+        // Create Instance
         VkApplicationInfo appInfo = {};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "RV VulkanView";
@@ -222,10 +234,12 @@ namespace Rv
 
         m_vkInstance = qtVkInst->vkInstance();
 
-        // 2. Create Surface
+        // Create Surface
         QWindow* w = windowHandle();
         if (!w)
+        {
             return false;
+        }
 
         w->setVulkanInstance(qtVkInst);
 
@@ -236,11 +250,13 @@ namespace Rv
             return false;
         }
 
-        // 3. Pick Physical Device
+        // Pick Physical Device
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
         if (deviceCount == 0)
+        {
             return false;
+        }
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
 
@@ -267,9 +283,11 @@ namespace Rv
         }
 
         if (!foundQueue)
+        {
             return false;
+        }
 
-        // 4. Create Logical Device
+        // Create Logical Device
         float queuePriority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -288,7 +306,9 @@ namespace Rv
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
         if (vkCreateDevice(m_vkPhysicalDevice, &createInfo, nullptr, &m_vkDevice) != VK_SUCCESS)
+        {
             return false;
+        }
 
         vkGetDeviceQueue(m_vkDevice, m_queueFamilyIndex, 0, &m_vkQueue);
 
@@ -338,7 +358,9 @@ namespace Rv
     bool VulkanView::createSwapchain()
     {
         if (!m_vkDevice || !m_vkSurface)
+        {
             return false;
+        }
 
         VkSurfaceCapabilitiesKHR capabilities;
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &capabilities);
@@ -385,7 +407,9 @@ namespace Rv
             m_vkSwapchainExtent = {(uint32_t)width(), (uint32_t)height()};
         }
         if (m_vkSwapchainExtent.width == 0 || m_vkSwapchainExtent.height == 0)
+        {
             return false;
+        }
 
         uint32_t imageCount = capabilities.minImageCount + 1;
         if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount)
@@ -410,7 +434,9 @@ namespace Rv
         createInfo.oldSwapchain = VK_NULL_HANDLE;
 
         if (vkCreateSwapchainKHR(m_vkDevice, &createInfo, nullptr, &m_vkSwapchain) != VK_SUCCESS)
+        {
             return false;
+        }
 
         vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &imageCount, nullptr);
         m_vkSwapchainImages.resize(imageCount);
@@ -1169,7 +1195,9 @@ namespace Rv
         {
             QResizeEvent* e = static_cast<QResizeEvent*>(event);
             if (!isVisible())
+            {
                 return true;
+            }
             if (e->oldSize().width() != -1 && e->oldSize().height() != -1)
             {
                 ostringstream contents;
@@ -1187,7 +1215,15 @@ namespace Rv
         }
 
         if (!m_videoDevice || !m_videoDevice->hasTranslator())
+        {
             return QWidget::event(event);
+        }
+
+        auto resetTranslator = [this]()
+        {
+            m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
+            m_videoDevice->translator().setRelativeDomain(width(), height());
+        };
 
         if (session && session->outputVideoDevice()
             && session->outputVideoDevice()->displayMode() == TwkApp::VideoDevice::MirrorDisplayMode)
@@ -1225,20 +1261,17 @@ namespace Rv
                 }
                 else
                 {
-                    m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
-                    m_videoDevice->translator().setRelativeDomain(width(), height());
+                    resetTranslator();
                 }
             }
             else
             {
-                m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
-                m_videoDevice->translator().setRelativeDomain(width(), height());
+                resetTranslator();
             }
         }
         else
         {
-            m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
-            m_videoDevice->translator().setRelativeDomain(width(), height());
+            resetTranslator();
         }
 
         if (session)

@@ -138,6 +138,8 @@ namespace Rv
     {
         if (!isWorkerDevice())
         {
+            // redraw() is backend-agnostic; m_view may be null when a non-GL
+            // backend (Vulkan/Metal) is active, so m_view->update() is unsafe.
             redraw();
         }
     }

@@ -368,6 +368,15 @@ int utf8Main(int argc, char* argv[])
     // (RV Preferences/Rendering/Multithread GPU Upload)
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
+    // Put every QOpenGLContext in one resource-sharing group. RV's GL contexts
+    // (GLView, video devices) already share manually via setShareContext, and
+    // shared resources like FTGL font-atlas textures rely on that invariant. On
+    // the Linux Vulkan presentation path there is no GLView to chain from, so
+    // the offscreen presentation context joins this global group instead (see
+    // QTVulkanVideoDevice::ensureGLContext). Otherwise, font glyph uploads land
+    // in a context where the atlas texture has no storage.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
     TwkUtil::MemPool::initialize();
 
     string altPrefsPath;
