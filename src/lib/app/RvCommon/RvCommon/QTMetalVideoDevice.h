@@ -89,6 +89,16 @@ namespace Rv
         // Makes the GL context current and binds the FBO on return.
         void ensureGLContext() const;
 
+        // Zero-copy present: (re)create a small ring of IOSurfaces, each bound as
+        // a GL_TEXTURE_RECTANGLE_ARB / GL_RGB10_A2 texture (via
+        // CGLTexImageIOSurface2D) wrapped in a GLFBO, so GL can render straight
+        // into IOSurface memory that CoreAnimation composites — no CPU readback.
+        // Returns false (and latches m_interopDisabled) if interop is
+        // unavailable, in which case syncBuffers() uses the CPU fallback.
+        // Assumes the GL context is already current.
+        bool ensureIOSurfaceTextures(int w, int h) const;
+        void cleanupIOSurfaceTextures() const;
+
         MetalView* m_view;
         QWidget* m_eventWidget;
         QTTranslator* m_translator;
@@ -108,6 +118,19 @@ namespace Rv
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
+
+        // IOSurface present ring (zero-copy GL->IOSurface->CALayer path).
+        // Double-buffered so the CA compositor can read the just-presented
+        // surface while GL renders the next frame into the other one.
+        // Stored as void* to keep this header free of ObjC/CoreVideo types.
+        static constexpr int kRingSize = 2;
+        mutable void* m_ioSurfaces[kRingSize]{nullptr, nullptr}; // IOSurfaceRef
+        mutable GLuint m_ioTextures[kRingSize]{0, 0};
+        mutable TwkGLF::GLFBO* m_ioFbos[kRingSize]{nullptr, nullptr};
+        mutable int m_ringIndex{0};
+        mutable int m_sharedWidth{0};
+        mutable int m_sharedHeight{0};
+        mutable bool m_interopDisabled{false}; // latched on first interop failure
     };
 
 } // namespace Rv

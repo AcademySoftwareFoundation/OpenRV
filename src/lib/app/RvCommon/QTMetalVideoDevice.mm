@@ -7,6 +7,10 @@
 #ifdef PLATFORM_DARWIN
 
 #import <AppKit/AppKit.h>
+#import <IOSurface/IOSurface.h>
+#import <CoreVideo/CoreVideo.h>
+#import <OpenGL/OpenGL.h>       // CGLGetCurrentContext, CGLError
+#import <OpenGL/CGLIOSurface.h> // CGLTexImageIOSurface2D
 
 #include <RvCommon/QTMetalVideoDevice.h>
 #include <RvCommon/MetalView.h>
@@ -49,7 +53,7 @@ namespace Rv
         // Delete the FBO and its colour texture while the GL context is current.
         // GLFBO::attachColorTexture passes owner=false so GLFBO does NOT delete
         // the colour texture — we must do it explicitly here.
-        if (m_glContext && (m_fbo || m_fboColorTex))
+        if (m_glContext && (m_fbo || m_fboColorTex || m_ioFbos[0]))
         {
             m_glContext->makeCurrent(m_offscreenSurface);
             delete m_fbo;
@@ -59,6 +63,7 @@ namespace Rv
                 glDeleteTextures(1, &m_fboColorTex);
                 m_fboColorTex = 0;
             }
+            cleanupIOSurfaceTextures();
             m_glContext->doneCurrent();
         }
 
@@ -291,7 +296,133 @@ namespace Rv
     }
 
     //--------------------------------------------------------------------------
-    // syncBuffers — GL FBO readback → CPU format conversion → IOSurface present
+    // ensureIOSurfaceTextures — (re)build the zero-copy IOSurface present ring
+    //--------------------------------------------------------------------------
+
+    bool QTMetalVideoDevice::ensureIOSurfaceTextures(int w, int h) const
+    {
+        if (m_interopDisabled)
+            return false;
+
+        if (m_sharedWidth == w && m_sharedHeight == h && m_ioFbos[0])
+            return true;  // ring already matches the current size
+
+        cleanupIOSurfaceTextures();
+
+        // The Qt context is current (caller does makeCurrent first); its native
+        // CGL context is what CGLTexImageIOSurface2D binds the IOSurface into.
+        CGLContextObj cgl = CGLGetCurrentContext();
+        if (!cgl)
+        {
+            std::cerr << "[QTMetalVideoDevice] CGLGetCurrentContext() returned null "
+                         "— falling back to CPU readback\n";
+            m_interopDisabled = true;
+            return false;
+        }
+
+        for (int i = 0; i < kRingSize; ++i)
+        {
+            // IOSurface pixel format must match the GL (format,type) below.
+            // ARGB2101010LE matches GL_BGRA + GL_UNSIGNED_INT_2_10_10_10_REV.
+            NSDictionary* props = @{
+                (NSString*)kIOSurfaceWidth:           @(w),
+                (NSString*)kIOSurfaceHeight:          @(h),
+                (NSString*)kIOSurfaceBytesPerElement: @(4),
+                (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
+            };
+            IOSurfaceRef surf = IOSurfaceCreate((__bridge CFDictionaryRef)props);
+            if (!surf)
+            {
+                std::cerr << "[QTMetalVideoDevice] IOSurfaceCreate failed "
+                          << w << "x" << h << " — CPU fallback\n";
+                cleanupIOSurfaceTextures();
+                m_interopDisabled = true;
+                return false;
+            }
+
+            GLuint tex = 0;
+            glGenTextures(1, &tex);
+            glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex);
+            glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            // Alias the IOSurface's memory as the texture's storage — GPU writes
+            // to this texture land directly in the IOSurface the CALayer shows.
+            CGLError cglErr = CGLTexImageIOSurface2D(
+                cgl, GL_TEXTURE_RECTANGLE_ARB, GL_RGB10_A2,
+                w, h, GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV,
+                surf, 0);
+            glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+            if (cglErr != kCGLNoError)
+            {
+                std::cerr << "[QTMetalVideoDevice] CGLTexImageIOSurface2D failed: "
+                          << CGLErrorString(cglErr) << " — CPU fallback\n";
+                glDeleteTextures(1, &tex);
+                CFRelease(surf);
+                cleanupIOSurfaceTextures();
+                m_interopDisabled = true;
+                return false;
+            }
+
+            // Wrap the IOSurface-backed texture in a GLFBO so we can blit into it.
+            // owner=false (attachColorTexture) — we delete the texture ourselves.
+            TwkGLF::GLFBO* iofbo = new TwkGLF::GLFBO(w, h, GL_RGB10_A2);
+            iofbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, tex);
+
+            GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            {
+                std::cerr << "[QTMetalVideoDevice] IOSurface FBO incomplete: 0x"
+                          << std::hex << status << std::dec << " — CPU fallback\n";
+                delete iofbo;
+                glDeleteTextures(1, &tex);
+                CFRelease(surf);
+                cleanupIOSurfaceTextures();
+                m_interopDisabled = true;
+                return false;
+            }
+
+            m_ioSurfaces[i] = (void*)surf;  // retained; released in cleanup
+            m_ioTextures[i] = tex;
+            m_ioFbos[i]     = iofbo;
+        }
+
+        m_sharedWidth  = w;
+        m_sharedHeight = h;
+        m_ringIndex    = 0;
+        return true;
+    }
+
+    void QTMetalVideoDevice::cleanupIOSurfaceTextures() const
+    {
+        // Must be called with the GL context current (GLFBO / glDeleteTextures).
+        for (int i = 0; i < kRingSize; ++i)
+        {
+            delete m_ioFbos[i];
+            m_ioFbos[i] = nullptr;
+
+            if (m_ioTextures[i])
+            {
+                glDeleteTextures(1, &m_ioTextures[i]);
+                m_ioTextures[i] = 0;
+            }
+            if (m_ioSurfaces[i])
+            {
+                CFRelease((IOSurfaceRef)m_ioSurfaces[i]);
+                m_ioSurfaces[i] = nullptr;
+            }
+        }
+        m_sharedWidth  = 0;
+        m_sharedHeight = 0;
+        m_ringIndex    = 0;
+    }
+
+    //--------------------------------------------------------------------------
+    // syncBuffers — zero-copy GL FBO -> IOSurface blit -> CALayer present
+    //               (CPU readback retained only as a fallback)
     //--------------------------------------------------------------------------
 
     void QTMetalVideoDevice::syncBuffers() const
@@ -313,6 +444,54 @@ namespace Rv
         if (!m_glContext->makeCurrent(m_offscreenSurface))
             return;
 
+        // --- Fast path: zero-copy GL -> IOSurface (no glFinish, no readback) ---
+        if (ensureIOSurfaceTextures(w, h))
+        {
+            const int slot = m_ringIndex;
+            TwkGLF::GLFBO* ioFbo = m_ioFbos[slot];
+
+            // GPU blit from the RGBA16F render FBO into the IOSurface-backed
+            // RGB10_A2 texture.  The GPU does the float->10-bit conversion.
+            // Swapped destination Y (h -> 0) flips GL's bottom-left origin to the
+            // IOSurface/CALayer top-left origin — no CPU y-flip needed.
+            glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, ioFbo->fboID());
+            glBlitFramebufferEXT(0, 0, w, h,
+                                 0, h, w, 0,
+                                 GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+            // Force the IOSurface alpha channel to fully opaque.  IPCore clears
+            // the viewport background with alpha 0 (ImageRenderer::
+            // clearBackgroundToBlack), and the blit copies that through; the CA
+            // compositor honours the IOSurface's per-pixel alpha (despite the
+            // layer's opaque=YES hint), so a transparent background would be
+            // blended against the gray window backdrop instead of showing black.
+            // glClear respects glColorMask, so this writes only alpha (2-bit ->
+            // 3 = opaque) and leaves the blitted RGB untouched — the GPU analog
+            // of the CPU fallback's hard-coded (3u << 30) alpha.
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+            // Restore the render FBO as the active target.
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID());
+
+            // Publish the GL writes to the CA render server.  glFlush (not
+            // glFinish) is enough — it does not stall the main thread waiting for
+            // the GPU to go idle, and IOSurface provides the cross-context
+            // synchronisation the compositor needs.  This is what removes the
+            // per-frame main-thread stall behind menus and keyboard shortcuts.
+            glFlush();
+
+            m_view->presentIOSurface(m_ioSurfaces[slot]);
+
+            m_ringIndex = (slot + 1) % kRingSize;
+            return;
+        }
+
+        // --- Fallback: GL readback -> CPU pack -> IOSurface upload ---
+        // Used only when IOSurface GL interop is unavailable on this system.
         fbo->bind();
 
         // Force the GPU to complete all pending GL commands before reading back.
@@ -321,7 +500,6 @@ namespace Rv
         // still uninitialised/zero when we sample it.
         glFinish();
 
-        // --- GL readback ---
         // Read as 32-bit float RGBA — safe regardless of the FBO's internal
         // format (GL_RGBA16F).  We do the y-flip and format conversion in CPU.
         const size_t floatCount = static_cast<size_t>(w) * h * 4;
@@ -371,8 +549,11 @@ namespace Rv
 
     void QTMetalVideoDevice::redraw() const
     {
+        // Coalesced: collapses a burst of redraw requests into a single render
+        // per event-loop cycle (the GL path gets this for free from QWidget::
+        // update()).  Without this each request ran a separate present.
         if (m_view)
-            QCoreApplication::postEvent(m_view, new QEvent(QEvent::UpdateRequest));
+            m_view->requestUpdate();
     }
 
     void QTMetalVideoDevice::redrawImmediately() const

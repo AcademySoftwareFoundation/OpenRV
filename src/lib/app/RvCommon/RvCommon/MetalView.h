@@ -91,10 +91,25 @@ namespace Rv
         void presentPixelData(const void* pixels, int w, int h);
 
         //
-        //  Re-assign the cached IOSurface to the CALayer (a lightweight
+        //  Assign an externally-owned IOSurface (the zero-copy path: the video
+        //  device renders GL straight into it) to the CALayer for display.
+        //  Records it as the last-presented surface for re-present on expose.
+        //
+        void presentIOSurface(void* ioSurfaceRef);
+
+        //
+        //  Re-assign the last-presented IOSurface to the CALayer (a lightweight
         //  re-present of the last frame, with no GL readback).  Used on expose.
         //
         void presentCachedSurface();
+
+        //
+        //  Coalesced redraw request.  Posts a single QEvent::UpdateRequest per
+        //  event-loop cycle (subsequent calls are no-ops until the pending
+        //  render runs), mirroring the implicit coalescing QWidget::update()
+        //  gets from Qt on the GL path.
+        //
+        void requestUpdate();
 
         bool isInitialized() const { return m_initialized; }
 
@@ -134,9 +149,17 @@ namespace Rv
 
         //  Presentation objects — stored as void* to keep header pure C++.
         void* m_caLayer;   // CALayer*
-        void* m_ioSurface; // IOSurfaceRef
+        void* m_ioSurface; // IOSurfaceRef — owned here only by the CPU fallback path
         int m_ioSurfaceWidth;
         int m_ioSurfaceHeight;
+
+        //  Last IOSurface assigned to the CALayer (may be device-owned in the
+        //  zero-copy path or m_ioSurface in the fallback path).  Re-presented on
+        //  expose.  Not owned here; the CALayer retains its own contents.
+        void* m_lastPresentedSurface;
+
+        //  Coalescing flag for requestUpdate(); cleared at the start of render().
+        bool m_updatePending;
     };
 
 } // namespace Rv

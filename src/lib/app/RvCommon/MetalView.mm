@@ -59,6 +59,8 @@ namespace Rv
         , m_ioSurface(nullptr)
         , m_ioSurfaceWidth(0)
         , m_ioSurfaceHeight(0)
+        , m_lastPresentedSurface(nullptr)
+        , m_updatePending(false)
     {
         // Ensure a native NSView is created immediately so winId() is valid
         // when initialize() is called from showEvent().
@@ -233,17 +235,17 @@ namespace Rv
         IOSurfaceUnlock(surf, 0, nullptr);
 
         // Push to display.
-        presentCachedSurface();
+        presentIOSurface(m_ioSurface);
     }
 
     //--------------------------------------------------------------------------
-    // presentCachedSurface — (re)assign the cached IOSurface as layer contents
+    // presentIOSurface — assign an IOSurface as the CALayer contents
     //--------------------------------------------------------------------------
 
-    void MetalView::presentCachedSurface()
+    void MetalView::presentIOSurface(void* ioSurfaceRef)
     {
         CALayer*     layer = (__bridge CALayer*)m_caLayer;
-        IOSurfaceRef surf  = (IOSurfaceRef)m_ioSurface;
+        IOSurfaceRef surf  = (IOSurfaceRef)ioSurfaceRef;
         if (!layer || !surf)
             return;
 
@@ -253,12 +255,43 @@ namespace Rv
         [CATransaction setDisableActions:YES];
         layer.contents = (__bridge id)surf;
         [CATransaction commit];
+
+        // Remember for re-present on expose.  The CALayer holds its own retain
+        // on the contents, so this raw pointer stays valid as long as the layer
+        // references it.
+        m_lastPresentedSurface = ioSurfaceRef;
+    }
+
+    //--------------------------------------------------------------------------
+    // presentCachedSurface — re-present the last IOSurface (no GL readback)
+    //--------------------------------------------------------------------------
+
+    void MetalView::presentCachedSurface()
+    {
+        if (m_lastPresentedSurface)
+            presentIOSurface(m_lastPresentedSurface);
+    }
+
+    //--------------------------------------------------------------------------
+    // requestUpdate — coalesced UpdateRequest post
+    //--------------------------------------------------------------------------
+
+    void MetalView::requestUpdate()
+    {
+        if (m_updatePending)
+            return;
+        m_updatePending = true;
+        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
     }
 
     //--------------------------------------------------------------------------
 
     void MetalView::render()
     {
+        // A render is now happening, so any coalesced UpdateRequest is satisfied;
+        // allow the next redraw() to post a fresh one.
+        m_updatePending = false;
+
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
             return;
@@ -329,7 +362,7 @@ namespace Rv
             initialize();
         // Post an UpdateRequest so the first render fires from the event loop
         // after the widget is fully laid out (same pattern as QOpenGLWindow).
-        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+        requestUpdate();
         QWidget::showEvent(event);
     }
 
@@ -359,7 +392,7 @@ namespace Rv
         // image.  Re-present the last cached IOSurface — cheap, no GL readback —
         // which is the Metal analog of VulkanView::paintEvent -> syncBuffers.  If
         // nothing has been rendered yet, produce a frame.
-        if (m_ioSurface)
+        if (m_lastPresentedSurface)
             presentCachedSurface();
         else
             render();
