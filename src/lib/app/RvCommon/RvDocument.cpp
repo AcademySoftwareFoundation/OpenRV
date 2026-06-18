@@ -165,8 +165,6 @@ namespace Rv
         setMenuBar(new QMenuBar(0));
 #endif
 
-        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
-
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
 
         Rv::Options& opts = Options::sharedOptions();
@@ -196,56 +194,70 @@ namespace Rv
         //
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        // --- Metal path ---
-        // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
-        // to its native NSView.  It can be used directly in layouts without any
-        // createWindowContainer() wrapping.
-        m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+        // --- Backend selection (mirrors the Vulkan branch) ---
+        // The 10-bit Metal path is chosen only when the user requested a 10-bit
+        // display format (the same dispRedBits/Green/Blue/Alpha signal the OpenGL
+        // 10-bit path uses) AND the hardware can present it.  Otherwise we fall
+        // back to the OpenGL (8-bit) path.  The decision is made once, here at
+        // window construction; changing the preference takes effect in a new
+        // window — same semantics as the Vulkan side.
+        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
 
-        m_metalView->setFocusPolicy(Qt::StrongFocus);
-        m_metalView->setMouseTracking(true);
-        m_metalView->setAcceptDrops(true);
-        m_metalView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        m_metalView->resize(m_metalView->sizeHint());
-        m_metalView->setEventWidget(m_metalView);
-        m_viewWidget = m_metalView;
-
-        // Initialize the session eagerly so that doc->session() is non-null
-        // immediately after construction.  On the Metal path, MetalView::initialize()
-        // (which normally calls initializeSession) is triggered by showEvent() —
-        // an async Qt event — so doc->session() would be null when newSessionFromFiles()
-        // accesses it synchronously right after doc->show().  Calling it here is safe
-        // because QTMetalVideoDevice is constructed in MetalView's constructor and is
-        // already available; actual CALayer setup happens later in
-        // MetalView::initialize() (which re-calls initializeSession but hits the
-        // if (!m_session) guard and exits immediately).
-        initializeSession();
-
-        // On the Metal path we do NOT create DiagnosticsView.
-        // DiagnosticsView inherits from QOpenGLWidget, and any QOpenGLWidget anywhere in
-        // the top-level window hierarchy forces Qt's macOS backend to use
-        // _NSOpenGLViewBackingLayer for the entire window — even when the widget is hidden
-        // inside a dock.  That compositor intercepts the CAMetalLayer content and composites
-        // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
-        // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
-#else
-        // --- OpenGL path ---
-        if (docs.empty())
+        bool useMetal = false;
+        if (want10bit)
         {
-            m_glView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            useMetal = MetalView::supports10BitPresentation();
+            if (!useMetal)
+            {
+                cerr << "INFO: 10-bit display requested but Metal 10-bit "
+                        "presentation is unavailable; falling back to OpenGL."
+                     << endl;
+            }
+        }
+
+        if (useMetal)
+        {
+            // --- Metal path ---
+            // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
+            // to its native NSView.  It can be used directly in layouts without any
+            // createWindowContainer() wrapping.
+            m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+
+            m_metalView->setFocusPolicy(Qt::StrongFocus);
+            m_metalView->setMouseTracking(true);
+            m_metalView->setAcceptDrops(true);
+            m_metalView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            m_metalView->resize(m_metalView->sizeHint());
+            m_metalView->setEventWidget(m_metalView);
+            m_viewWidget = m_metalView;
+
+            // Initialize the session eagerly so that doc->session() is non-null
+            // immediately after construction.  On the Metal path, MetalView::initialize()
+            // (which normally calls initializeSession) is triggered by showEvent() —
+            // an async Qt event — so doc->session() would be null when newSessionFromFiles()
+            // accesses it synchronously right after doc->show().  Calling it here is safe
+            // because QTMetalVideoDevice is constructed in MetalView's constructor and is
+            // already available; actual CALayer setup happens later in
+            // MetalView::initialize() (which re-calls initializeSession but hits the
+            // if (!m_session) guard and exits immediately).
+            initializeSession();
+
+            // On the Metal path we do NOT create DiagnosticsView.
+            // DiagnosticsView inherits from QOpenGLWidget, and any QOpenGLWidget anywhere in
+            // the top-level window hierarchy forces Qt's macOS backend to use
+            // _NSOpenGLViewBackingLayer for the entire window — even when the widget is hidden
+            // inside a dock.  That compositor intercepts the CAMetalLayer content and composites
+            // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
+            // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
         }
         else
         {
-            RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                  opts.vsync != 0 && !m_vsyncDisabled,
-                                  true, // double buffer
-                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+            // --- OpenGL (8-bit) fallback ---
+            createGLView();
         }
-        m_viewWidget = m_glView;
+#else
+        // --- OpenGL path ---
+        createGLView();
 #endif // PLATFORM_DARWIN && USE_METAL
 
         // Dockable to QMainWindow, not centralwidget.
@@ -345,6 +357,29 @@ namespace Rv
         m_blockingOverlay->hide();
     }
 
+    void RvDocument::createGLView()
+    {
+        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
+        Rv::Options& opts = Options::sharedOptions();
+
+        if (docs.empty())
+        {
+            m_glView =
+                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
+                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+        }
+        else
+        {
+            RvSession* s = static_cast<RvSession*>(docs.front());
+            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                  opts.vsync != 0 && !m_vsyncDisabled,
+                                  true, // double buffer
+                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+        }
+        m_viewWidget = m_glView;
+    }
+
     void RvDocument::initializeSession()
     {
         if (!m_session)
@@ -360,7 +395,8 @@ namespace Rv
 
             // RvApp()->addVideoDevice(m_glView->videoDevice());
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            m_session->setControlVideoDevice(m_metalView->videoDevice());
+            m_session->setControlVideoDevice(m_metalView ? static_cast<TwkApp::VideoDevice*>(m_metalView->videoDevice())
+                                                         : static_cast<TwkApp::VideoDevice*>(m_glView->videoDevice()));
 #else
             m_session->setControlVideoDevice(m_glView->videoDevice());
 #endif
@@ -603,7 +639,10 @@ namespace Rv
         else if (m == IPCore::Session::updateMessage())
         {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            m_metalView->videoDevice()->redraw();
+            if (m_metalView)
+                m_metalView->videoDevice()->redraw();
+            else
+                view()->videoDevice()->redraw();
 #else
             view()->videoDevice()->redraw();
 #endif
@@ -611,10 +650,18 @@ namespace Rv
         else if (m == IPCore::Session::eventDeviceChangedMessage())
         {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-            if (m_session->eventVideoDevice() && m_metalView->videoDevice())
+            if (m_metalView)
             {
-                m_metalView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
-                                                                           m_session->eventVideoDevice()->height());
+                if (m_session->eventVideoDevice() && m_metalView->videoDevice())
+                {
+                    m_metalView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                               m_session->eventVideoDevice()->height());
+                }
+            }
+            else if (m_session->eventVideoDevice() && m_glView->videoDevice())
+            {
+                m_glView->videoDevice()->translator().setRelativeDomain(m_session->eventVideoDevice()->width(),
+                                                                        m_session->eventVideoDevice()->height());
             }
 #else
             if (m_session->eventVideoDevice() && m_glView->videoDevice())
@@ -805,8 +852,17 @@ namespace Rv
     void RvDocument::resetSizePolicy()
     {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        m_metalView->setMinimumContentSize(64, 64);
-        m_metalView->setMinimumSize(QSize(64, 64));
+        if (m_metalView)
+        {
+            m_metalView->setMinimumContentSize(64, 64);
+            m_metalView->setMinimumSize(QSize(64, 64));
+        }
+        else
+        {
+            m_glView->setMinimumContentSize(64, 64);
+            m_glView->setMinimumSize(QSize(64, 64));
+            m_glView->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
+        }
 #else
         m_glView->setMinimumContentSize(64, 64);
         m_glView->setMinimumSize(QSize(64, 64));

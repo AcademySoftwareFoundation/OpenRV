@@ -55,6 +55,16 @@ namespace Rv
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }
 
+        //
+        //  Returns true when the platform can present 10-bit content through the
+        //  Metal/IOSurface path (i.e. a Metal device is available).  Static and
+        //  side-effect-free so RvDocument can query it before constructing any
+        //  view, to decide between the Metal (10-bit) and OpenGL (8-bit) backends.
+        //  Mirrors VulkanView::supports10BitPresentation() so the call site stays
+        //  backend-agnostic when the Vulkan and Metal branches merge.
+        //
+        static bool supports10BitPresentation();
+
         //  We own pixel delivery via the CALayer/IOSurface; tell Qt not to use a
         //  backing store for this widget (see WA_PaintOnScreen in the .mm).
         QPaintEngine* paintEngine() const override { return nullptr; }

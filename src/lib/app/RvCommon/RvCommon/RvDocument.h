@@ -166,6 +166,12 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        //  Constructs the OpenGL view (m_glView) and makes it the active
+        //  m_viewWidget.  This is the 8-bit display path shared by the non-Metal
+        //  build and by the Metal build's fallback when 10-bit is unavailable or
+        //  not requested.
+        void createGLView();
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;
