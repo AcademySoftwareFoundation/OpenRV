@@ -215,27 +215,57 @@ namespace Rv
         //
 
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        // --- Metal path ---
-        // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
-        // to its native NSView.  It can be used directly in layouts without any
-        // createWindowContainer() wrapping.
-        m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+        // --- Backend selection (mirrors the Vulkan branch) ---
+        // The 10-bit Metal path is chosen only when the user requested a 10-bit
+        // display format (the same dispRedBits/Green/Blue/Alpha signal the OpenGL
+        // 10-bit path uses) AND the hardware can present it.  Otherwise we fall
+        // back to the OpenGL (8-bit) path.  The decision is made once, here at
+        // window construction; changing the preference takes effect in a new
+        // window — same semantics as the Vulkan side.
+        const bool want10bit = DesktopVideoDevice::tenBitDisplayRequested();
 
-        configureViewWidget(m_metalView);
-        m_metalView->resize(m_metalView->sizeHint());
-        m_metalView->setEventWidget(m_metalView);
-        m_viewWidget = m_metalView;
+        bool useMetal = false;
+        if (want10bit)
+        {
+            useMetal = MetalView::supports10BitPresentation();
+            if (!useMetal)
+            {
+                cerr << "INFO: 10-bit display requested but Metal 10-bit "
+                        "presentation is unavailable; falling back to OpenGL."
+                     << endl;
+            }
+        }
 
-        // Initialize the session eagerly so that doc->session() is non-null
-        // immediately after construction.  On the Metal path, MetalView::initialize()
-        // (which normally calls initializeSession) is triggered by showEvent() —
-        // an async Qt event — so doc->session() would be null when newSessionFromFiles()
-        // accesses it synchronously right after doc->show().  Calling it here is safe
-        // because QTMetalVideoDevice is constructed in MetalView's constructor and is
-        // already available; actual CALayer setup happens later in
-        // MetalView::initialize() (which re-calls initializeSession but hits the
-        // if (!m_session) guard and exits immediately).
-        initializeSession();
+        if (useMetal)
+        {
+            // --- Metal path ---
+            // MetalView is a QWidget that attaches a CALayer backed by an IOSurface
+            // to its native NSView.  It can be used directly in layouts without any
+            // createWindowContainer() wrapping.
+            m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+
+            configureViewWidget(m_metalView);
+            m_metalView->resize(m_metalView->sizeHint());
+            m_metalView->setEventWidget(m_metalView);
+            m_viewWidget = m_metalView;
+
+            // Initialize the session eagerly so that doc->session() is non-null
+            // immediately after construction.  On the Metal path, MetalView::initialize()
+            // (which normally calls initializeSession) is triggered by showEvent() —
+            // an async Qt event — so doc->session() would be null when newSessionFromFiles()
+            // accesses it synchronously right after doc->show().  Calling it here is safe
+            // because QTMetalVideoDevice is constructed in MetalView's constructor and is
+            // already available; actual CALayer setup happens later in
+            // MetalView::initialize() (which re-calls initializeSession but hits the
+            // if (!m_session) guard and exits immediately).
+            initializeSession();
+        }
+        else
+        {
+            // --- OpenGL (8-bit) fallback ---
+            m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
+            m_viewWidget = m_glView;
+        }
 #elif defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //
         //  10-bit (RGB 10 + A 2) presents through Vulkan, since GLX/WGL
@@ -292,18 +322,20 @@ namespace Rv
         m_viewWidget = m_glView;
 #endif
 
-#if !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
-        // DiagnosticsView has its own context and only needs a surface format.
-        //
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
         // Not created on the Metal path: DiagnosticsView inherits from QOpenGLWidget,
         // and any QOpenGLWidget anywhere in the top-level window hierarchy forces Qt's
         // macOS backend to use _NSOpenGLViewBackingLayer for the entire window — even
         // when the widget is hidden inside a dock.  That compositor intercepts the
         // CAMetalLayer content and composites it 4× (2×2) when
         // wantsExtendedDynamicRangeContent or DPR scaling is active.
-        const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
-        m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
+        if (!m_metalView)
 #endif
+        {
+            // DiagnosticsView has its own context and only needs a surface format.
+            const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
+            m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
+        }
 
         // Dockable to QMainWindow, not centralwidget.
         if (m_diagnosticsView)

@@ -10,6 +10,7 @@
 #import <AppKit/AppKit.h>
 #import <IOSurface/IOSurface.h>
 #import <CoreVideo/CoreVideo.h>
+#import <Metal/Metal.h>
 
 #include <RvCommon/MetalView.h>
 #include <RvCommon/QTMetalVideoDevice.h>
@@ -103,6 +104,20 @@ namespace Rv
             (void)layer;
             m_caLayer = nullptr;
         }
+    }
+
+    //--------------------------------------------------------------------------
+
+    bool MetalView::supports10BitPresentation()
+    {
+        // The 10-bit presentation path renders into an IOSurface with pixel
+        // format kCVPixelFormatType_ARGB2101010LEPacked (see presentPixelData)
+        // which the window server composites correctly on every Metal-capable
+        // Mac.  A Metal device is therefore the only requirement.
+        // This file is compiled with -fobjc-arc; ARC releases the device when it
+        // goes out of scope, so no explicit release is needed.
+        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+        return device != nil;
     }
 
     //--------------------------------------------------------------------------
