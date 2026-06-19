@@ -25,6 +25,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 
+#include <climits>
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -229,6 +230,7 @@ namespace Rv
             if (!qtVkInst->create())
             {
                 std::cerr << "[VulkanView] QVulkanInstance create failed\n";
+                return false;
             }
         }
 
@@ -373,10 +375,12 @@ namespace Rv
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
         bool found10bit = false;
+        // Prefer A2B10G10R10 exclusively: GL_RGB10_A2 (used for both the GPU interop texture
+        // and the CPU fallback packing) maps to this layout. A2R10G10B10 has the opposite R/B
+        // component order, so accepting it here would swap red and blue in all rendered pixels.
         for (const auto& fmt : formats)
         {
-            // A2B10G10R10 or A2R10G10B10
-            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
             {
                 surfaceFormat = fmt;
                 found10bit = true;
@@ -394,9 +398,28 @@ namespace Rv
         if (!found10bit && !warned8bit)
         {
             warned8bit = true;
-            std::cerr << "[VulkanView] WARNING: Vulkan surface offers no 10-bit "
-                         "format; presenting 8-bit. Vulkan gives no benefit over "
-                         "OpenGL on this surface/compositor.\n";
+            // Also report if A2R10G10B10 is available but not usable.
+            bool has_a2r10g10b10 = false;
+            for (const auto& fmt : formats)
+            {
+                if (fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+                {
+                    has_a2r10g10b10 = true;
+                    break;
+                }
+            }
+            if (has_a2r10g10b10)
+            {
+                std::cerr << "[VulkanView] WARNING: Vulkan surface offers A2R10G10B10 but not "
+                             "A2B10G10R10; presenting 8-bit (channel-swapped 10-bit not yet "
+                             "supported).\n";
+            }
+            else
+            {
+                std::cerr << "[VulkanView] WARNING: Vulkan surface offers no 10-bit "
+                             "format; presenting 8-bit. Vulkan gives no benefit over "
+                             "OpenGL on this surface/compositor.\n";
+            }
         }
 
         m_vkSwapchainFormat = surfaceFormat.format;
@@ -497,7 +520,7 @@ namespace Rv
                 return i;
             }
         }
-        return 0;
+        return UINT32_MAX;
     }
 
     void VulkanView::cleanupSharedImage()
@@ -621,6 +644,12 @@ namespace Rv
         allocInfo.pNext = &exportAllocInfo;
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        if (allocInfo.memoryTypeIndex == UINT32_MAX)
+        {
+            std::cerr << "[VulkanView] No device-local memory type for shared image\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS)
         {
@@ -761,7 +790,13 @@ namespace Rv
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            // Swapchain out of date, we'll recreate it next frame
+            // Swapchain out of date; recreate it next frame. Per the Vulkan spec, after an
+            // acquire error the semaphore is in undefined state and must not be reused.
+            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
+            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+            VkSemaphoreCreateInfo semaphoreInfo = {};
+            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore);
             return;
         }
 
@@ -892,6 +927,11 @@ namespace Rv
             allocInfo.allocationSize = memRequirements.size;
             allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memRequirements.memoryTypeBits,
                                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            if (allocInfo.memoryTypeIndex == UINT32_MAX)
+            {
+                std::cerr << "[VulkanView] No host-visible memory type for staging buffer\n";
+                return;
+            }
 
             vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory);
             vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer, m_vkStagingBufferMemory, 0);
@@ -911,6 +951,12 @@ namespace Rv
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
+            // Per the Vulkan spec, after an acquire error the semaphore is in undefined state.
+            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
+            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+            VkSemaphoreCreateInfo semaphoreInfo = {};
+            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+            vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore);
             cleanupSwapchain();
             return;
         }
@@ -1054,14 +1100,20 @@ namespace Rv
         }
 
         if (m_stopProcessingEvents)
+        {
             return;
+        }
 
         if (session)
         {
-            if (session->outputVideoDevice() != videoDevice())
+            if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
+            {
                 session->outputVideoDevice()->syncBuffers();
+            }
             else
+            {
                 m_videoDevice->syncBuffers();
+            }
         }
 
         if (session)

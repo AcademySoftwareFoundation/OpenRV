@@ -23,6 +23,7 @@
 #include <QOffscreenSurface>
 
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -159,6 +160,12 @@ namespace Rv
             if (err != GLEW_OK)
             {
                 std::cerr << "[QTVulkanVideoDevice] glewInit failed: " << glewGetErrorString(err) << "\n";
+                m_glContext->doneCurrent();
+                delete m_offscreenSurface;
+                m_offscreenSurface = nullptr;
+                delete m_glContext;
+                m_glContext = nullptr;
+                return;
             }
         }
 
@@ -344,7 +351,12 @@ namespace Rv
         const VulkanView::SharedImageInfo* sharedInfo = m_view->getSharedImageInfo(w, h);
         if (!sharedInfo)
         {
-            // Fallback to CPU readback if GPU interop fails
+            // Fallback to CPU readback if GPU interop fails.
+            // Packing below assumes A2B10G10R10_UNORM_PACK32 (= GL_RGB10_A2 bit layout).
+            // createSwapchain() guarantees this format is selected when GPU interop is used;
+            // a surface offering only A2R10G10B10 falls back to 8-bit and never reaches here.
+            assert(!m_view || m_view->swapchainFormat() == VK_FORMAT_A2B10G10R10_UNORM_PACK32
+                   || m_view->swapchainFormat() == VK_FORMAT_UNDEFINED);
             fbo->bind();
             glFinish();
             const size_t floatCount = static_cast<size_t>(w) * h * 4;

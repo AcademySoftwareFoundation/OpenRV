@@ -59,6 +59,10 @@ namespace Rv
 
         float devicePixelRatio() const;
 
+        // Format of the active swapchain image (e.g. VK_FORMAT_A2B10G10R10_UNORM_PACK32).
+        // VK_FORMAT_UNDEFINED before the swapchain is created.
+        VkFormat swapchainFormat() const { return m_vkSwapchainFormat; }
+
         //
         //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
         //
@@ -151,8 +155,8 @@ namespace Rv
         VkCommandPool m_vkCommandPool{VK_NULL_HANDLE};
 
         VkSwapchainKHR m_vkSwapchain{VK_NULL_HANDLE};
-        VkFormat m_vkSwapchainFormat;
-        VkExtent2D m_vkSwapchainExtent;
+        VkFormat m_vkSwapchainFormat{VK_FORMAT_UNDEFINED};
+        VkExtent2D m_vkSwapchainExtent{};
         std::vector<VkImage> m_vkSwapchainImages;
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
 
