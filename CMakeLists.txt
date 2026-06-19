@@ -94,6 +94,7 @@ INCLUDE(rv_targets) # RV's build platform definitions
 INCLUDE(rv_compiler_cache) # RV's compiler cache (ccache/sccache) support
 INCLUDE(rv_globals) # RV's CMake-build global variables
 INCLUDE(rv_stage) # RV's local appplication packaging
+INCLUDE(rv_archive_symbols) # RV's crash-reporting symbol archive target
 INCLUDE(rv_vfx)
 INCLUDE(CTest)
 
@@ -119,3 +120,6 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(packages)
 
 ADD_SUBDIRECTORY(cmake/install)
+
+# Define the 'symbols_archive' target (run after a full build). Must come after the stage directories and version are known.
+RV_CREATE_SYMBOLS_ARCHIVE_TARGET()

@@ -63,6 +63,23 @@ FUNCTION(rv_stage)
     MESSAGE(FATAL_ERROR "The 'TYPE' parameter was not specified.")
   ENDIF()
 
+  # Must precede the Linux rename block: dump_syms needs the real ELF, not the shell wrapper.
+  SET(_rv_stage_binary_types
+      SHARED_LIBRARY
+      MAIN_EXECUTABLE
+      EXECUTABLE
+      EXECUTABLE_WITH_PLUGINS
+      MU_PLUGIN
+      PYTHON_PLUGIN
+      IMAGE_FORMAT
+      MOVIE_FORMAT
+      OIIO_PLUGIN
+      OUTPUT_PLUGIN
+  )
+  IF(arg_TYPE IN_LIST _rv_stage_binary_types)
+    RV_GENERATE_SYMBOLS(TARGET ${arg_TARGET})
+  ENDIF()
+
   IF(RV_TARGET_LINUX)
     IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${arg_TARGET}.wrapper)
 
