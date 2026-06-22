@@ -701,7 +701,7 @@ namespace Rv
             if (string(extension(infiles[i])) == "rv")
                 ++rvFileCount;
 
-        if (rvFileCount > 1)
+        if (rvFileCount && infiles.size() > 1)
             merge = true;
 
         //  PROGLOAD  this func should take tag for when called from mu
