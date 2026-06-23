@@ -66,14 +66,11 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp)
-  IF(USE_METAL)
-    LIST(APPEND _sources MetalView.mm QTMetalVideoDevice.mm)
-    SET_SOURCE_FILES_PROPERTIES(
-      MetalView.mm
-      PROPERTIES COMPILE_FLAGS "-fobjc-arc"
-    )
-  ENDIF()
+  LIST(APPEND _sources DisplayLink.cpp MetalView.mm QTMetalVideoDevice.mm)
+  SET_SOURCE_FILES_PROPERTIES(
+    MetalView.mm
+    PROPERTIES COMPILE_FLAGS "-fobjc-arc"
+  )
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
@@ -185,10 +182,7 @@ SET(_moc_platform_defines
     ""
 )
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _moc_platform_defines "-DPLATFORM_DARWIN")
-  IF(USE_METAL)
-    LIST(APPEND _moc_platform_defines "-DUSE_METAL")
-  ENDIF()
+  LIST(APPEND _moc_platform_defines "-DPLATFORM_DARWIN" "-DUSE_METAL")
 ENDIF()
 IF(NOT
    (RV_TARGET_LINUX
@@ -455,23 +449,15 @@ TARGET_LINK_LIBRARIES(
 )
 
 IF(RV_TARGET_DARWIN)
-  IF(USE_METAL)
-    TARGET_LINK_LIBRARIES(
-      ${_target}
-      PUBLIC TwkGLFCoreGraphics
-      PRIVATE "-framework CoreVideo" "-framework QuartzCore" "-framework IOSurface" "-framework AppKit" "-framework Metal"
-    )
-    TARGET_COMPILE_DEFINITIONS(
-      ${_target}
-      PUBLIC USE_METAL
-    )
-  ELSE()
-    TARGET_LINK_LIBRARIES(
-      ${_target}
-      PUBLIC TwkGLFCoreGraphics
-      PRIVATE "-framework CoreVideo"
-    )
-  ENDIF()
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PUBLIC TwkGLFCoreGraphics
+    PRIVATE "-framework CoreVideo" "-framework QuartzCore" "-framework IOSurface" "-framework AppKit" "-framework Metal"
+  )
+  TARGET_COMPILE_DEFINITIONS(
+    ${_target}
+    PUBLIC USE_METAL
+  )
 ENDIF()
 
 # https://doc.qt.io/qt-6/extras-changes-qt6.html
