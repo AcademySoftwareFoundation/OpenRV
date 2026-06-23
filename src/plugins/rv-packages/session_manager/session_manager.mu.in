@@ -1065,6 +1065,135 @@ class: EventFilter : QObject
     }
 }
 
+class: ThumbnailManager
+{
+    QTimer renderTimer;
+    string[] renderQueue;
+    SourcePreviewWidget[] progressiveRenderPreviews;
+    int renderIdx;
+    string[] progressiveRenderDeferred;
+
+    method: ThumbnailManager (ThumbnailManager;)
+    {
+        renderQueue              = string[]();
+        progressiveRenderPreviews = SourcePreviewWidget[]();
+        renderIdx                = 0;
+        progressiveRenderDeferred = string[]();
+    }
+}
+
+documentation: """
+ThumbnailRenderer keeps track of the sources and inputs to render in
+the session manager. Source and input nodes are rendered progressively
+using QT single shot timers, hence the events are placed on the QT event
+queue. 
+""";
+class: ThumbnailRenderer
+{
+    // source and input each get their own render queue/timer/state
+    ThumbnailManager     _source;
+    ThumbnailManager     _input;
+    QDockWidget        _dockWidget;
+    QIcon              _fallbackSourceIcon;
+
+
+    method: ThumbnailRenderer (ThumbnailRenderer;) {
+
+        let m = mainWindowWidget();
+        _dockWidget         = QDockWidget("Session Manager", m, Qt.Widget);
+
+        _source = ThumbnailManager();
+        _source.renderTimer              = QTimer(_dockWidget);
+        _source.renderTimer.setSingleShot(true);
+
+        _input = ThumbnailManager();
+        _input.renderTimer               = QTimer(_dockWidget);
+        _input.renderTimer.setSingleShot(true);
+    }
+
+    // Load media metadata, text and placheolder image used before loading actual media
+    method: displaySourceRowPreview (QWidget; string node, SourcePreviewWidget preview)
+    {
+        let widget = QWidget(nil, 0),
+            layout = QHBoxLayout(widget);
+        widget.setObjectName("sourceRowWidget");
+        layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
+        layout.setSpacing(SOURCE_ROW_SPACING);
+
+        preview.setParent(widget);
+        preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
+
+        layout.addWidget(preview);
+
+        string meta = "";
+        try
+        {
+            let sourceNode = sourceNodeOfGroup(node);
+            if (sourceNode neq nil)
+            {
+                let mediaPropertyPath = sourceNode + ".media.movie";
+                if (propertyExists(mediaPropertyPath))
+                {
+                    let movieProperty = getStringProperty(mediaPropertyPath);
+                    if (!movieProperty.empty())
+                    {
+                        let parts = io.path.basename(movieProperty.front()).split(".");
+                        if (parts.size() > 1) meta = parts.back();
+                    }
+                }
+            }
+        }
+        catch (...) {;}
+
+        // Text column
+        let textWidget = QWidget(widget),
+            textLayout = QVBoxLayout(textWidget);
+        textWidget.setObjectName("sourceTextWidget");
+        textLayout.setSpacing(SOURCE_TEXT_SPACING);
+
+        let nameLabel = QLabel(uiName(node), textWidget);
+        nameLabel.setObjectName("sourceNameLabel");
+        textLayout.addWidget(nameLabel);
+
+        let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
+        metaLabel.setObjectName("sourceMetaLabel");
+        textLayout.addWidget(metaLabel);
+        textLayout.addStretch(1);
+
+        layout.addWidget(textWidget, 1);
+
+        widget;
+    }
+
+    // Try to load or decode media, 
+    method: makeSourceRowWidget (void; string node, SourcePreviewWidget preview)
+    {
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
+        }
+        if (sourceNode eq nil) return;
+
+        // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of
+        // 10 for ordering. This means any custom plugin of higher priority will be used first.
+        // This allows users to override the local plugin with a custom plugin by making sure
+        // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
+        let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
+        if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+        {
+            preview.loadThumbnail(thumbnailPath);
+
+            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+            if (filmstripPath != "" && io.path.exists(filmstripPath))
+                preview.loadStrip(filmstripPath);
+        }
+    }
+
+}
+
 documentation: """
 SessionManagerMode controls UI for managing viewable nodes in the
 session and a user interface to edit the currently viewed node. New
