@@ -3409,9 +3409,9 @@ class: SessionManagerMode : MinorMode
         _prevViewButton     = _baseWidget.findChild("prevViewButton");
         _nextViewButton     = _baseWidget.findChild("nextViewButton");
 
-        _lazySetInputsTimer      = QTimer(_dockWidget);
-        _lazyUpdateTimer         = QTimer(_dockWidget);
-        _mainWinVisTimer         = QTimer(_dockWidget);
+        _lazySetInputsTimer = QTimer(_dockWidget);
+        _lazyUpdateTimer    = QTimer(_dockWidget);
+        _mainWinVisTimer    = QTimer(_dockWidget);
 
         _lazySetInputsTimer.setSingleShot(true);
         _lazyUpdateTimer.setSingleShot(true);
