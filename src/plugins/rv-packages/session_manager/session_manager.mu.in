@@ -1065,7 +1065,7 @@ class: EventFilter : QObject
     }
 }
 
-class: ThumbnailManager
+class: PreviewRenderQueue
 {
     QTimer renderTimer;
     string[] renderQueue;
@@ -1073,12 +1073,21 @@ class: ThumbnailManager
     int renderIdx;
     string[] progressiveRenderDeferred;
 
-    method: ThumbnailManager (ThumbnailManager;)
+    method: PreviewRenderQueue (PreviewRenderQueue;)
     {
-        renderQueue              = string[]();
+        renderQueue               = string[]();
         progressiveRenderPreviews = SourcePreviewWidget[]();
-        renderIdx                = 0;
+        renderIdx                 = 0;
         progressiveRenderDeferred = string[]();
+    }
+
+    method: reset (void;)
+    {
+        renderTimer.stop();
+        renderQueue               = string[]();
+        progressiveRenderDeferred = string[]();
+        progressiveRenderPreviews = SourcePreviewWidget[]();
+        renderIdx                 = 0;
     }
 }
 
@@ -1091,23 +1100,19 @@ queue.
 class: ThumbnailRenderer
 {
     // source and input each get their own render queue/timer/state
-    ThumbnailManager     _source;
-    ThumbnailManager     _input;
-    QDockWidget        _dockWidget;
-    QIcon              _fallbackSourceIcon;
+    PreviewRenderQueue   _source;
+    PreviewRenderQueue   _input;
+    QIcon                _fallbackSourceIcon;
 
 
-    method: ThumbnailRenderer (ThumbnailRenderer;) {
+    method: ThumbnailRenderer (ThumbnailRenderer; QDockWidget dockWidget) {
 
-        let m = mainWindowWidget();
-        _dockWidget         = QDockWidget("Session Manager", m, Qt.Widget);
-
-        _source = ThumbnailManager();
-        _source.renderTimer              = QTimer(_dockWidget);
+        _source = PreviewRenderQueue();
+        _source.renderTimer              = QTimer(dockWidget);
         _source.renderTimer.setSingleShot(true);
 
-        _input = ThumbnailManager();
-        _input.renderTimer               = QTimer(_dockWidget);
+        _input = PreviewRenderQueue();
+        _input.renderTimer               = QTimer(dockWidget);
         _input.renderTimer.setSingleShot(true);
     }
 
@@ -1192,6 +1197,12 @@ class: ThumbnailRenderer
         }
     }
 
+    method: resetPreviews (void;)
+    {
+        _source.reset();
+        _input.reset();
+    }
+
 }
 
 documentation: """
@@ -1250,6 +1261,8 @@ class: SessionManagerMode : MinorMode
     QAction[]          _viewContextMenuActions;
     QMenu              _createMenu;
     QMenu              _folderMenu;
+    QDockWidget        _dockWidget;
+    ThumbnailRenderer  _thumbnailRenderer;
 
     QDialog            _newNodeDialog;
     QComboBox          _nodeTypeCombo;
@@ -1614,6 +1627,7 @@ class: SessionManagerMode : MinorMode
         if (_disableUpdates || _progressiveLoadingInProgress) return;
 
         _inputOrderLock = true;
+        _thumbnailRenderer._input.reset();
 
         _inputsModel.clear();
         let connections = nodeInputs(node);
@@ -1637,8 +1651,17 @@ class: SessionManagerMode : MinorMode
             _inputsModel.appendRow(item);
 
             if (isSource && _previewsEnabled)
-                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
+            {
+                let preview = SourcePreviewWidget(nil);
+                let w = _thumbnailRenderer.displaySourceRowPreview(innode, preview);
+                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), w);
+                _thumbnailRenderer._input.renderQueue.push_back(innode);
+                _thumbnailRenderer._input.progressiveRenderPreviews.push_back(preview);
+            }
         }
+
+        if (!_thumbnailRenderer._input.renderQueue.empty())
+            _thumbnailRenderer._input.renderTimer.start(0);
 
         _inputOrderLock = false;
     }
@@ -2031,7 +2054,10 @@ class: SessionManagerMode : MinorMode
         {
             item.setText("");
             item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+            let preview = SourcePreviewWidget(nil);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), _thumbnailRenderer.displaySourceRowPreview(node, preview));
+            _thumbnailRenderer._source.renderQueue.push_back(node);
+            _thumbnailRenderer._source.progressiveRenderPreviews.push_back(preview);
         }
 
         //
@@ -2187,9 +2213,70 @@ class: SessionManagerMode : MinorMode
         }
     }
 
+    // Try to load the first thumbnail and filmstrip from _source.renderQueue or decode it first, then
+    // restart the timer to queue the next preview to be processed
+    method: processSourceQueue (void;)
+    {
+        if (_thumbnailRenderer._source.renderIdx >= _thumbnailRenderer._source.renderQueue.size()) return;
+
+        let node = _thumbnailRenderer._source.renderQueue[_thumbnailRenderer._source.renderIdx];
+        let preview = _thumbnailRenderer._source.progressiveRenderPreviews[_thumbnailRenderer._source.renderIdx];
+        _thumbnailRenderer._source.renderIdx = _thumbnailRenderer._source.renderIdx + 1;
+        _thumbnailRenderer.makeSourceRowWidget(node, preview);
+
+        if (_thumbnailRenderer._source.renderIdx < _thumbnailRenderer._source.renderQueue.size())
+        {
+            _thumbnailRenderer._source.renderTimer.start(0);
+        }
+        else if (!_thumbnailRenderer._source.progressiveRenderDeferred.empty())
+        {
+            _thumbnailRenderer._source.renderQueue    = _thumbnailRenderer._source.progressiveRenderDeferred;
+            _thumbnailRenderer._source.progressiveRenderDeferred = string[]();
+            _thumbnailRenderer._source.renderIdx    = 0;
+
+            _thumbnailRenderer._source.progressiveRenderPreviews = SourcePreviewWidget[]();
+            for_each (dnode; _thumbnailRenderer._source.renderQueue)
+            {
+                let item    = itemOfNode(_viewModel, dnode);
+                let preview = SourcePreviewWidget(nil);
+                let w       = _thumbnailRenderer.displaySourceRowPreview(dnode, preview);
+                _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
+                _thumbnailRenderer._source.progressiveRenderPreviews.push_back(preview);
+            }
+
+            _thumbnailRenderer._source.renderTimer.start(0);
+        }
+    }
+
+    // Try to load the first thumbnail and filmstrip from _input.renderQueue or decode it first, then
+    // restart the timer to queue the next preview to be processed
+    method: processInputQueue (void;)
+    {
+        if (_thumbnailRenderer._input.renderIdx >= _thumbnailRenderer._input.renderQueue.size()) return;
+
+        let node    = _thumbnailRenderer._input.renderQueue[_thumbnailRenderer._input.renderIdx];
+        let preview = _thumbnailRenderer._input.progressiveRenderPreviews[_thumbnailRenderer._input.renderIdx];
+        _thumbnailRenderer._input.renderIdx = _thumbnailRenderer._input.renderIdx + 1;
+
+        _thumbnailRenderer.makeSourceRowWidget(node, preview);
+
+        if (_thumbnailRenderer._input.renderIdx < _thumbnailRenderer._input.renderQueue.size())
+        {
+            _thumbnailRenderer._input.renderTimer.start(0);
+        }
+        else if (!_thumbnailRenderer._input.progressiveRenderDeferred.empty())
+        {
+            _thumbnailRenderer._input.renderQueue    = _thumbnailRenderer._input.progressiveRenderDeferred;
+            _thumbnailRenderer._input.progressiveRenderDeferred = string[]();
+            _thumbnailRenderer._input.renderIdx    = 0;
+            _thumbnailRenderer._input.renderTimer.start(0);
+        }
+    }
+
     method: updateTree (void;)
     {
         if (_disableUpdates) return;
+        _thumbnailRenderer._source.reset();
         _srcNodeKeys = string[]();
         _grpNodeValues = string[]();
         _viewModel.clear();
@@ -2283,6 +2370,8 @@ class: SessionManagerMode : MinorMode
             selectViewableNode();
 
             resizeColumns(_viewTreeView, _viewModel);
+
+            _thumbnailRenderer._source.renderTimer.start(0);
         }
         catch (exception exc)
         {
@@ -2310,13 +2399,32 @@ class: SessionManagerMode : MinorMode
         }
         if (node eq nil) return;
 
+        bool inThumbnailQueue = false;
+        for (int i = _thumbnailRenderer._source.renderIdx; i < _thumbnailRenderer._source.renderQueue.size(); i++)
+            if (_thumbnailRenderer._source.renderQueue[i] == node) { inThumbnailQueue = true; break; }
+        if (inThumbnailQueue)
+        {
+            _thumbnailRenderer._source.progressiveRenderDeferred.push_back(node);
+            return;
+        }
+
         let item = itemOfNode(_viewModel, node);
         if (item neq nil)
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            _thumbnailRenderer.makeSourceRowWidget(node, preview);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
+        }
 
         let inputItem = itemOfNode(_inputsModel, node);
         if (inputItem neq nil)
-            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            _thumbnailRenderer.makeSourceRowWidget(node, preview);
+            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), w);
+        }
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -3215,6 +3323,9 @@ class: SessionManagerMode : MinorMode
         _disableUpdates = false;
         _srcNodeKeys    = string[]();
         _grpNodeValues  = string[]();
+        _dockWidget         = QDockWidget("Session Manager", mainWindowWidget(), Qt.Widget);
+        _thumbnailRenderer  = ThumbnailRenderer(_dockWidget);
+        _thumbnailRenderer._fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
 
         let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
         if (previewsEnv neq nil && previewsEnv == "0")
@@ -3275,9 +3386,9 @@ class: SessionManagerMode : MinorMode
         _prevViewButton     = _baseWidget.findChild("prevViewButton");
         _nextViewButton     = _baseWidget.findChild("nextViewButton");
 
-        _lazySetInputsTimer = QTimer(_dockWidget);
-        _lazyUpdateTimer    = QTimer(_dockWidget);
-        _mainWinVisTimer    = QTimer(_dockWidget);
+        _lazySetInputsTimer      = QTimer(_dockWidget);
+        _lazyUpdateTimer         = QTimer(_dockWidget);
+        _mainWinVisTimer         = QTimer(_dockWidget);
 
         _lazySetInputsTimer.setSingleShot(true);
         _lazyUpdateTimer.setSingleShot(true);
@@ -3616,6 +3727,9 @@ class: SessionManagerMode : MinorMode
         state.sessionManager = this;
 
         connect(_dockWidget, QDockWidget.visibilityChanged, visibilityChanged);
+
+        connect(_thumbnailRenderer._source.renderTimer, QTimer.timeout, processSourceQueue);
+        connect(_thumbnailRenderer._input.renderTimer, QTimer.timeout, processInputQueue);
 
         updateNavUI();
     }
