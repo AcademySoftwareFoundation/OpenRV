@@ -2219,15 +2219,9 @@ class: SessionManagerMode : MinorMode
     method: processSourceQueue (void;) { processQueue(_thumbnailRenderer._source, _viewModel, _viewTreeView); }
     method: processInputQueue  (void;) { processQueue(_thumbnailRenderer._input,  _inputsModel, _inputsView); }
 
-    // Try to load the next thumbnail and filmstrip from the given render queue,
-    // then restart the timer for the next item. When exhausted, drain deferred.
-    method: processQueue (void; PreviewRenderQueue queue, QStandardItemModel model, QAbstractItemView view)
-    {
-        if (queue.renderIdx >= queue.renderQueue.size()) return;
-
-        let node    = queue.renderQueue[queue.renderIdx];
-        let preview = queue.progressiveRenderPreviews[queue.renderIdx];
-        queue.renderIdx = queue.renderIdx + 1;
+        let node    = _thumbnailRenderer._source.renderQueue[_thumbnailRenderer._source.renderIdx];
+        let preview = _thumbnailRenderer._source.progressiveRenderPreviews[_thumbnailRenderer._source.renderIdx];
+        _thumbnailRenderer._source.renderIdx = _thumbnailRenderer._source.renderIdx + 1;
         _thumbnailRenderer.makeSourceRowWidget(node, preview);
 
         if (queue.renderIdx < queue.renderQueue.size())
@@ -2236,9 +2230,9 @@ class: SessionManagerMode : MinorMode
         }
         else if (!queue.progressiveRenderDeferred.empty())
         {
-            queue.renderQueue               = queue.progressiveRenderDeferred;
-            queue.progressiveRenderDeferred = string[]();
-            queue.renderIdx                 = 0;
+            _thumbnailRenderer._source.renderQueue               = _thumbnailRenderer._source.progressiveRenderDeferred;
+            _thumbnailRenderer._source.progressiveRenderDeferred = string[]();
+            _thumbnailRenderer._source.renderIdx                 = 0;
 
             queue.progressiveRenderPreviews = SourcePreviewWidget[]();
             for_each (dnode; queue.renderQueue)
@@ -2253,7 +2247,32 @@ class: SessionManagerMode : MinorMode
                 }
             }
 
-            queue.renderTimer.start(0);
+            _thumbnailRenderer._source.renderTimer.start(0);
+        }
+    }
+
+    // Try to load the first thumbnail and filmstrip from _input.renderQueue or decode it first, then
+    // restart the timer to queue the next preview to be processed
+    method: processInputQueue (void;)
+    {
+        if (_thumbnailRenderer._input.renderIdx >= _thumbnailRenderer._input.renderQueue.size()) return;
+
+        let node    = _thumbnailRenderer._input.renderQueue[_thumbnailRenderer._input.renderIdx];
+        let preview = _thumbnailRenderer._input.progressiveRenderPreviews[_thumbnailRenderer._input.renderIdx];
+        _thumbnailRenderer._input.renderIdx = _thumbnailRenderer._input.renderIdx + 1;
+
+        _thumbnailRenderer.makeSourceRowWidget(node, preview);
+
+        if (_thumbnailRenderer._input.renderIdx < _thumbnailRenderer._input.renderQueue.size())
+        {
+            _thumbnailRenderer._input.renderTimer.start(0);
+        }
+        else if (!_thumbnailRenderer._input.progressiveRenderDeferred.empty())
+        {
+            _thumbnailRenderer._input.renderQueue               = _thumbnailRenderer._input.progressiveRenderDeferred;
+            _thumbnailRenderer._input.progressiveRenderDeferred = string[]();
+            _thumbnailRenderer._input.renderIdx                 = 0;
+            _thumbnailRenderer._input.renderTimer.start(0);
         }
     }
 
