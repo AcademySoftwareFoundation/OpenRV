@@ -172,6 +172,10 @@ namespace Rv
         //  not requested.
         void createGLView();
 
+        //  Returns whether the active presentation view has completed its first
+        //  paint, regardless of which backend (GLView/MetalView) is active.
+        bool activeViewFirstPaintCompleted() const;
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;

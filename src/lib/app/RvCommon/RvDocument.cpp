@@ -242,13 +242,17 @@ namespace Rv
             // if (!m_session) guard and exits immediately).
             initializeSession();
 
-            // On the Metal path we do NOT create DiagnosticsView.
-            // DiagnosticsView inherits from QOpenGLWidget, and any QOpenGLWidget anywhere in
-            // the top-level window hierarchy forces Qt's macOS backend to use
-            // _NSOpenGLViewBackingLayer for the entire window — even when the widget is hidden
-            // inside a dock.  That compositor intercepts the CAMetalLayer content and composites
-            // it 4× (2×2) when wantsExtendedDynamicRangeContent or DPR scaling is active.
-            // m_diagnosticsView stays nullptr; m_diagnosticsDock is not created.
+            // NOTE: DiagnosticsView (a QOpenGLWidget) is created below for all
+            // backends. It shares GL resources with the offscreen render context
+            // via Qt::AA_ShareOpenGLContexts (set in main).
+            //
+            // macOS caveat: historically a QOpenGLWidget anywhere in the window
+            // hierarchy could force Qt's macOS backend to use
+            // _NSOpenGLViewBackingLayer for the whole window, which would
+            // intercept the CALayer/IOSurface content and composite it 4× (2×2)
+            // when DPR scaling is active. If 10-bit presentation regresses with
+            // the docked diagnostics visible, host DiagnosticsView in a separate
+            // top-level window on the Metal path instead.
         }
         else
         {
@@ -260,11 +264,19 @@ namespace Rv
         createGLView();
 #endif // PLATFORM_DARWIN && USE_METAL
 
+        // Create DiagnosticsView as a dockable widget. With Qt::AA_ShareOpenGLContexts
+        // (set in main) its GL context shares resources with the active backend's
+        // render context — the on-screen GLView, or the offscreen GL context behind
+        // the Metal/Vulkan presentation backends — so the ImGui font atlas uploads
+        // correctly regardless of which backend is active.
+        const QSurfaceFormat diagFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
+        m_diagnosticsView = new DiagnosticsView(nullptr, diagFormat);
+
         // Dockable to QMainWindow, not centralwidget.
-        // On the Metal path m_diagnosticsView is nullptr (see comment above), so skip.
         if (m_diagnosticsView)
         {
             m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+            m_diagnosticsDock->setObjectName("Diagnostics");
             m_diagnosticsDock->setWidget(m_diagnosticsView);
             m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
             addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
@@ -372,12 +384,26 @@ namespace Rv
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            m_glView = new GLView(this, rvDoc->view()->context(), this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+            // The first document may use a non-OpenGL presentation backend
+            // (Metal/Vulkan), in which case view() (the legacy GLView) is null.
+            // Fall back to no explicit share context; Qt::AA_ShareOpenGLContexts
+            // still shares resources via the global context.
+            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
+            m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                                   opts.vsync != 0 && !m_vsyncDisabled,
                                   true, // double buffer
                                   opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
         m_viewWidget = m_glView;
+    }
+
+    bool RvDocument::activeViewFirstPaintCompleted() const
+    {
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+            return m_metalView->firstPaintCompleted();
+#endif
+        return m_glView && m_glView->firstPaintCompleted();
     }
 
     void RvDocument::initializeSession()
@@ -2160,7 +2186,7 @@ namespace Rv
         //  For some reason KDE wants our main window to come up
         //  "lowered" ie beneath the other windows.  This is the
         //  only way I've found to counter that.
-        if (waitingForFirstPaint && view() && view()->firstPaintCompleted())
+        if (waitingForFirstPaint && activeViewFirstPaintCompleted())
         {
             activateWindow();
             raise();

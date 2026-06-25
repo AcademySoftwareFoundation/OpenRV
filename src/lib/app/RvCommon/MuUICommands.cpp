@@ -1731,7 +1731,13 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
+        // Use viewWidget() (the active presentation widget) rather than view()
+        // (the legacy GLView). On the Metal/Vulkan backends m_glView is null while
+        // the active view is a MetalView/VulkanView, so view() would return null.
+        QWidget* w = doc->viewWidget();
+
+        if (w == nullptr)
+            NODE_RETURN(Pointer(0));
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 
