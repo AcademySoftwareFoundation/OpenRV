@@ -4,10 +4,12 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 #include <IPBaseNodes/PaintIPNode.h>
+#include <IPCore/BrushTextureManager.h>
 #include <IPCore/PaintCommand.h>
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/Exception.h>
 #include <IPCore/IPGraph.h>
+#include <TwkGLF/GL.h>
 #include <TwkGLText/TwkGLText.h>
 #include <exception>
 #include <mutex>
@@ -58,18 +60,14 @@ namespace
         constexpr float minOpacity = 0.075;
         float ghostOpacity = 1.0;
 
-        if (frame > startFrame) // Command starts before the current frame
-                                // (ghostBefore)
-        {
+        if (frame > startFrame)
             ghostOpacity = static_cast<float>(duration) / static_cast<float>(frame - startFrame) + minOpacity;
-        }
-        if (frame < startFrame) // Command starts after the current frame
-                                // (ghostAfter)
-        {
+        else if (frame < startFrame)
             ghostOpacity = static_cast<float>(duration) / static_cast<float>(startFrame - frame) + minOpacity;
-        }
 
-        return ghostOpacity;
+        // Clamp to [0, 1]: GL blend factors are clamped by hardware, but
+        // QPainter QColor alpha must stay in [0, 255] or it wraps to near-zero.
+        return std::min(1.0f, ghostOpacity);
     }
 
     // Loop over all commands and separate them in 3 containers:
@@ -91,10 +89,10 @@ namespace
                 continue;
             }
 
-            // Don't add polylines with 0 points
+            // Don't add polylines with 0 points (stamp strokes use stampInstances instead)
             if (auto* localPolyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(localCommand))
             {
-                if (localPolyLine != nullptr && localPolyLine->npoints <= 0)
+                if (localPolyLine != nullptr && localPolyLine->npoints <= 0 && localPolyLine->stampInstances.empty())
                 {
                     continue;
                 }
@@ -154,6 +152,22 @@ namespace
                     else if (auto* text = dynamic_cast<PaintIPNode::LocalText*>(command))
                     {
                         command->ghostColor = text->color;
+                    }
+                    else if (auto* rect = dynamic_cast<PaintIPNode::LocalRect*>(command))
+                    {
+                        command->ghostColor = rect->borderColor;
+                    }
+                    else if (auto* ellipse = dynamic_cast<PaintIPNode::LocalEllipse*>(command))
+                    {
+                        command->ghostColor = ellipse->borderColor;
+                    }
+                    else if (auto* arrow = dynamic_cast<PaintIPNode::LocalArrow*>(command))
+                    {
+                        command->ghostColor = arrow->borderColor;
+                    }
+                    else if (auto* line = dynamic_cast<PaintIPNode::LocalLine*>(command))
+                    {
+                        command->ghostColor = line->borderColor;
                     }
 
                     currentFrameCommands->push_back(command);
@@ -219,6 +233,29 @@ namespace
 
         return allCommands;
     }
+
+    // Read a property's first value, falling back to defaultVal when absent or
+    // empty.  T must be constructible from PropT::value_type — e.g. Col4f from
+    // Vec4f, or int from int.  Scalar identity and cross-type construction both
+    // work because T(expr) is the functional-cast form of the constructor call.
+    template <typename PropT, typename T> T readProp(const TwkContainer::Component* c, const char* name, T defaultVal)
+    {
+        const PropT* p = c->property<PropT>(name);
+        return (p && p->size()) ? T(p->front()) : std::move(defaultVal);
+    }
+
+    // Look up or insert an entry in a Component*-keyed map.  On first
+    // insertion the new entry is also appended to commands so the render
+    // loop picks it up without a full recompile.
+    template <typename MapT, typename CmdsT> typename MapT::mapped_type& insertOrGet(MapT& map, TwkContainer::Component* c, CmdsT& commands)
+    {
+        const size_t prevSize = map.size();
+        auto& entry = map[c];
+        if (prevSize != map.size())
+            commands.push_back(&entry);
+        return entry;
+    }
+
 } // namespace
 
 namespace IPCore
@@ -305,82 +342,172 @@ namespace IPCore
         p.startFrame = startFrame;
         p.duration = duration;
 
-        if (widthP && pointsP && widthP->size() == pointsP->size() && widthP->size() > 1)
-        {
-            p.widths.assign(static_cast<const float*>(widthP->rawData()), static_cast<const float*>(widthP->rawData()) + widthP->size());
-        }
+        // Classify the brush type once — drives all downstream data paths.
+        const bool isStampBrush = Paint::BrushTextureManager::instance().get(brush).isStamp;
+
+        // Per-point widths are present when widthP has one entry per point.
+        // Allow widthP to lag pointsP by one: the Mu layer inserts the point and
+        // width in the same compound state change, but the IPGraph may re-evaluate
+        // after the point insert before the width insert lands, leaving widthP
+        // exactly one entry short. Clamp the index when that happens.
+        const bool hasPerPointWidths = widthP && widthP->size() > 0 && pointsP && widthP->size() >= pointsP->size() - 1;
 
         if (pointsP && pointsP->size())
         {
-            p.points.assign(static_cast<const Vec2f*>(pointsP->rawData()), static_cast<const Vec2f*>(pointsP->rawData()) + pointsP->size());
-            p.npoints = pointsP->size();
+            const auto* rawPts = static_cast<const Vec2f*>(pointsP->rawData());
+            const size_t rawCount = pointsP->size();
+
+            if (isStampBrush)
+            {
+                // ── Stamp path: feed raw points through smoother → StampPlacer ─
+                if (!p.inputSmoother)
+                {
+                    p.inputSmoother = std::make_unique<TwkPaint::SmoothInterpolate2D>();
+                    p.rawPointsSmoothed = 0;
+                    p.stampPlacer = nullptr;
+                    p.stampInstances.clear();
+                }
+
+                const size_t widthsCount = hasPerPointWidths ? widthP->size() : 0;
+
+                for (size_t i = p.rawPointsSmoothed; i < rawCount; ++i)
+                {
+                    p.inputSmoother->add_point(rawPts[i]);
+
+                    const size_t wi = (hasPerPointWidths && widthsCount > 0) ? std::min(i, widthsCount - 1) : static_cast<size_t>(-1);
+                    const float w = (wi != static_cast<size_t>(-1)) ? static_cast<const float*>(widthP->rawData())[wi] : p.width;
+
+                    TwkMath::Vec2f out;
+                    while (p.inputSmoother->interpolate(out))
+                    {
+                        // Create placer lazily so p.width has its final value.
+                        if (!p.stampPlacer)
+                        {
+                            TwkPaint::BrushParams params;
+                            params.radius = p.width * 0.5f;
+                            params.opacity = p.color[3];
+                            p.stampPlacer = std::make_unique<TwkPaint::StampPath>(params);
+                        }
+                        p.stampPlacer->add_point(out, w * 0.5f);
+                        TwkPaint::StampInstance s;
+                        while (p.stampPlacer->next(s))
+                            p.stampInstances.push_back(s);
+                    }
+                }
+
+                p.rawPointsSmoothed = rawCount;
+                // npoints mirrors stampInstances so hash() changes as stamps accumulate,
+                // invalidating the IPGraph render cache mid-stroke.
+                p.npoints = p.stampInstances.size();
+            }
+            else
+            {
+                // ── Ribbon path: assign raw points directly (input smoother was introduced
+                // (for stamp brushes, let's leave ribbon brushes as they were)
+                // The smoother densifies points ~6× which causes excessive opacity
+                // accumulation from overlapping quads when rendering ribbon brushes.
+                p.points.assign(rawPts, rawPts + rawCount);
+                p.npoints = rawCount;
+
+                if (widthP && widthP->size() == rawCount)
+                    p.widths.assign(static_cast<const float*>(widthP->rawData()), static_cast<const float*>(widthP->rawData()) + rawCount);
+                else
+                    p.widths.clear();
+            }
         }
         else
         {
             p.points.clear();
+            p.widths.clear();
+            p.stampInstances.clear();
             p.npoints = 0;
         }
 
         p.built = false;
     }
 
+    void PaintIPNode::LocalText::hash(std::ostream& o) const
+    {
+        Paint::Text::hash(o);
+        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration;
+    }
+
     void PaintIPNode::compileTextComponent(Component* c)
     {
-        const size_t prevNumTexts = m_texts.size();
-        LocalText& p = m_texts[c];
+        LocalText& p = insertOrGet(m_texts, c, m_commands);
 
-        // Add newly created text boxes to the commands vector
-        if (prevNumTexts != m_texts.size())
-        {
-            m_commands.push_back(&p);
-        }
+        // ptsize and scale are retained for session-file compatibility but are no
+        // longer used for rendering (FTGL removed; all text renders via QPainter).
+        p.ptsize = readProp<FloatProperty>(c, "size", 0.01f) * 100.0f * 100.0f;
+        p.scale = readProp<FloatProperty>(c, "scale", 1.0f) / 80.0f / 10.0f;
+        p.rotation = readProp<FloatProperty>(c, "rotation", 0.0f);
+        p.spacing = readProp<FloatProperty>(c, "spacing", 1.0f);
+        p.pos = readProp<Vec2fProperty>(c, "position", Vec2f(0.0f, 0.0f));
+        p.color = readProp<Vec4fProperty>(c, "color", Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+        p.font = readProp<StringProperty>(c, "font", string(""));
+        p.text = readProp<StringProperty>(c, "text", string(""));
+        p.origin = readProp<StringProperty>(c, "origin", string(""));
+        p.eye = readProp<IntProperty>(c, "eye", 2);
+        p.startFrame = readProp<IntProperty>(c, "startFrame", 0);
+        p.duration = readProp<IntProperty>(c, "duration", 0);
 
-        const FloatProperty* sizeP = c->property<FloatProperty>("size");
-        const FloatProperty* scaleP = c->property<FloatProperty>("scale");
-        const FloatProperty* rotP = c->property<FloatProperty>("rotation");
-        const FloatProperty* spaceP = c->property<FloatProperty>("spacing");
-        const Vec2fProperty* posP = c->property<Vec2fProperty>("position");
-        const Vec4fProperty* colorP = c->property<Vec4fProperty>("color");
-        const StringProperty* fontP = c->property<StringProperty>("font");
-        const StringProperty* textP = c->property<StringProperty>("text");
-        const StringProperty* originP = c->property<StringProperty>("origin");
-        const IntProperty* debugP = c->property<IntProperty>("debug");
-        const IntProperty* eyeP = c->property<IntProperty>("eye");
+        p.fontFamily = readProp<StringProperty>(c, "fontFamily", string(""));
+        p.fontSize = readProp<FloatProperty>(c, "fontSize", 24.0f);
+        p.fontWeight = readProp<StringProperty>(c, "fontWeight", string("normal"));
+        p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
+        p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));
+    }
 
-        const IntProperty* startFrameP = c->property<IntProperty>("startFrame");
-        const IntProperty* durationP = c->property<IntProperty>("duration");
-        const IntProperty* holdP = c->property<IntProperty>("hold");
-        const IntProperty* ghostP = c->property<IntProperty>("ghost");
-        const IntProperty* ghostBeforeP = c->property<IntProperty>("ghostBefore");
-        const IntProperty* ghostAfterP = c->property<IntProperty>("ghostAfter");
+    void PaintIPNode::compileRectComponent(Component* c)
+    {
+        LocalRect& r = insertOrGet(m_rects, c, m_commands);
+        r.min = readProp<Vec2fProperty>(c, "min", Vec2f(0.0f, 0.0f));
+        r.max = readProp<Vec2fProperty>(c, "max", Vec2f(0.1f, 0.1f));
+        r.innerColor = readProp<Vec4fProperty>(c, "innerColor", Col4f(1.0f, 1.0f, 1.0f, 0.0f));
+        r.borderColor = readProp<Vec4fProperty>(c, "borderColor", Col4f(1.0f, 1.0f, 1.0f, 1.0f));
+        r.borderWidth = readProp<FloatProperty>(c, "borderWidth", 0.002f);
+        r.eye = readProp<IntProperty>(c, "eye", 2);
+        r.startFrame = readProp<IntProperty>(c, "startFrame", getStartFrame(*c));
+        r.duration = readProp<IntProperty>(c, "duration", 1);
+    }
 
-        const float size = sizeP && sizeP->size() ? sizeP->front() : 0.01f;
-        const float scale = scaleP && scaleP->size() ? scaleP->front() : 1.0f;
-        const float rot = rotP && rotP->size() ? rotP->front() : 0.0f;
-        const float space = spaceP && spaceP->size() ? spaceP->front() : 1.0f;
-        const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(1.0, 1.0, 1.0, 1.0);
-        const Vec2f pos = posP && posP->size() ? posP->front() : Vec2f(0.0, 0.0);
-        const string font = fontP && fontP->size() ? fontP->front() : string("");
-        const string origin = originP && originP->size() ? originP->front() : string("");
-        const string text = textP && textP->size() ? textP->front() : string("");
-        const int debug = debugP && debugP->size() ? debugP->front() : 0;
-        const int eye = eyeP && eyeP->size() ? eyeP->front() : 2;
+    void PaintIPNode::compileEllipseComponent(Component* c)
+    {
+        LocalEllipse& e = insertOrGet(m_ellipses, c, m_commands);
+        e.min = readProp<Vec2fProperty>(c, "min", Vec2f(0.0f, 0.0f));
+        e.max = readProp<Vec2fProperty>(c, "max", Vec2f(0.1f, 0.1f));
+        e.innerColor = readProp<Vec4fProperty>(c, "innerColor", Col4f(1.0f, 1.0f, 1.0f, 0.0f));
+        e.borderColor = readProp<Vec4fProperty>(c, "borderColor", Col4f(1.0f, 1.0f, 1.0f, 1.0f));
+        e.borderWidth = readProp<FloatProperty>(c, "borderWidth", 0.002f);
+        e.eye = readProp<IntProperty>(c, "eye", 2);
+        e.startFrame = readProp<IntProperty>(c, "startFrame", getStartFrame(*c));
+        e.duration = readProp<IntProperty>(c, "duration", 1);
+    }
 
-        const int startFrame = (startFrameP != nullptr && startFrameP->size() != 0) ? startFrameP->front() : 0;
-        const int duration = (durationP != nullptr && durationP->size() != 0) ? durationP->front() : 0;
+    void PaintIPNode::compileArrowComponent(Component* c)
+    {
+        LocalArrow& a = insertOrGet(m_arrows, c, m_commands);
+        a.startPos = readProp<Vec2fProperty>(c, "startPos", Vec2f(0.0f, 0.0f));
+        a.endPos = readProp<Vec2fProperty>(c, "endPos", Vec2f(0.1f, 0.0f));
+        a.innerColor = readProp<Vec4fProperty>(c, "innerColor", Col4f(1.0f, 1.0f, 1.0f, 1.0f));
+        a.borderColor = readProp<Vec4fProperty>(c, "borderColor", Col4f(1.0f, 1.0f, 1.0f, 1.0f));
+        a.thickness = readProp<FloatProperty>(c, "thickness", 0.005f);
+        a.borderWidth = readProp<FloatProperty>(c, "borderWidth", 0.001f);
+        a.eye = readProp<IntProperty>(c, "eye", 2);
+        a.startFrame = readProp<IntProperty>(c, "startFrame", getStartFrame(*c));
+        a.duration = readProp<IntProperty>(c, "duration", 1);
+    }
 
-        p.ptsize = size * 100.0 * 100.0;
-        p.scale = 1.0 / 80.0 / 10.0 * scale;
-        p.pos = pos;
-        p.spacing = space;
-        p.color = color;
-        p.font = font;
-        p.text = text;
-        p.origin = origin;
-        p.rotation = rot;
-        p.eye = eye;
-        p.startFrame = startFrame;
-        p.duration = duration;
+    void PaintIPNode::compileLineComponent(Component* c)
+    {
+        LocalLine& l = insertOrGet(m_lines, c, m_commands);
+        l.startPos = readProp<Vec2fProperty>(c, "startPos", Vec2f(0.0f, 0.0f));
+        l.endPos = readProp<Vec2fProperty>(c, "endPos", Vec2f(0.1f, 0.0f));
+        l.borderColor = readProp<Vec4fProperty>(c, "borderColor", Col4f(1.0f, 1.0f, 1.0f, 1.0f));
+        l.borderWidth = readProp<FloatProperty>(c, "borderWidth", 0.002f);
+        l.eye = readProp<IntProperty>(c, "eye", 2);
+        l.startFrame = readProp<IntProperty>(c, "startFrame", getStartFrame(*c));
+        l.duration = readProp<IntProperty>(c, "duration", 1);
     }
 
     void PaintIPNode::compileFrame(Component* comp)
@@ -442,26 +569,37 @@ namespace IPCore
         {
             std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
 
-            if (c->name().size() > 4)
-            {
-                string s = c->name().substr(0, 4);
-                if (s == "pen:")
-                    compilePenComponent((Component*)c);
-            }
+            const string& cname = c->name();
 
-            if (c->name().size() > 5)
+            // "pen:" is 4 chars — component name must have at least 5 chars total
+            if (cname.size() > 4 && cname.substr(0, 4) == "pen:")
+                compilePenComponent((Component*)c);
+
+            // "text:" and "rect:" and "line:" are 5 chars
+            if (cname.size() > 5)
             {
-                string s = c->name().substr(0, 5);
-                if (s == "text:")
+                const string s5 = cname.substr(0, 5);
+                if (s5 == "text:")
                     compileTextComponent((Component*)c);
+                else if (s5 == "rect:")
+                    compileRectComponent((Component*)c);
+                else if (s5 == "line:")
+                    compileLineComponent((Component*)c);
             }
 
-            if (c->name().size() > 6)
+            // "frame:" and "arrow:" are 6 chars
+            if (cname.size() > 6)
             {
-                string s = c->name().substr(0, 6);
-                if (s == "frame:")
+                const string s6 = cname.substr(0, 6);
+                if (s6 == "frame:")
                     compileFrame((Component*)c);
+                else if (s6 == "arrow:")
+                    compileArrowComponent((Component*)c);
             }
+
+            // "ellipse:" is 8 chars
+            if (cname.size() > 8 && cname.substr(0, 8) == "ellipse:")
+                compileEllipseComponent((Component*)c);
         }
 
         IPNode::propertyChanged(p);
@@ -571,27 +709,37 @@ namespace IPCore
         for (size_t i = 0; i < comps.size(); i++)
         {
             Component* c = comps[i];
+            const string& cname = c->name();
 
-            if (c->name().size() > 4)
-            {
-                string s = c->name().substr(0, 4);
-                if (s == "pen:")
-                    compilePenComponent(c);
-            }
+            // "pen:" is 4 chars
+            if (cname.size() > 4 && cname.substr(0, 4) == "pen:")
+                compilePenComponent(c);
 
-            if (c->name().size() > 5)
+            // "text:", "rect:", "line:" are 5 chars
+            if (cname.size() > 5)
             {
-                string s = c->name().substr(0, 5);
-                if (s == "text:")
+                const string s5 = cname.substr(0, 5);
+                if (s5 == "text:")
                     compileTextComponent(c);
+                else if (s5 == "rect:")
+                    compileRectComponent(c);
+                else if (s5 == "line:")
+                    compileLineComponent(c);
             }
 
-            if (c->name().size() > 6)
+            // "frame:", "arrow:" are 6 chars
+            if (cname.size() > 6)
             {
-                string s = c->name().substr(0, 6);
-                if (s == "frame:")
+                const string s6 = cname.substr(0, 6);
+                if (s6 == "frame:")
                     compileFrame(c);
+                else if (s6 == "arrow:")
+                    compileArrowComponent(c);
             }
+
+            // "ellipse:" is 8 chars
+            if (cname.size() > 8 && cname.substr(0, 8) == "ellipse:")
+                compileEllipseComponent(c);
         }
 
         IPNode::readCompleted(typeName, version);
@@ -640,6 +788,22 @@ namespace IPCore
                     {
                         frameCommands.push_back(&m_texts[frameComponent]);
                     }
+                    else if (m_rects.count(frameComponent) > 0)
+                    {
+                        frameCommands.push_back(&m_rects[frameComponent]);
+                    }
+                    else if (m_ellipses.count(frameComponent) > 0)
+                    {
+                        frameCommands.push_back(&m_ellipses[frameComponent]);
+                    }
+                    else if (m_arrows.count(frameComponent) > 0)
+                    {
+                        frameCommands.push_back(&m_arrows[frameComponent]);
+                    }
+                    else if (m_lines.count(frameComponent) > 0)
+                    {
+                        frameCommands.push_back(&m_lines[frameComponent]);
+                    }
                 }
             }
 
@@ -656,6 +820,22 @@ namespace IPCore
                 else if (auto* localText = dynamic_cast<PaintIPNode::LocalText*>(visibleCommand))
                 {
                     head->commands.push_back(localText);
+                }
+                else if (auto* localRect = dynamic_cast<PaintIPNode::LocalRect*>(visibleCommand))
+                {
+                    head->commands.push_back(localRect);
+                }
+                else if (auto* localEllipse = dynamic_cast<PaintIPNode::LocalEllipse*>(visibleCommand))
+                {
+                    head->commands.push_back(localEllipse);
+                }
+                else if (auto* localArrow = dynamic_cast<PaintIPNode::LocalArrow*>(visibleCommand))
+                {
+                    head->commands.push_back(localArrow);
+                }
+                else if (auto* localLine = dynamic_cast<PaintIPNode::LocalLine*>(visibleCommand))
+                {
+                    head->commands.push_back(localLine);
                 }
             }
         }

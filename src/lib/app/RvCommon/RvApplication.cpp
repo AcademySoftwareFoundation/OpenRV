@@ -899,11 +899,20 @@ namespace Rv
         //
         s->userGenericEvent("session-initialized", "");
 
-        if (s->loadTotal() == 0)
         //
-        //  We will not be loading media at all, so send
-        //  after-progressive-loading event.
+        //  If files were requested but none of them resulted in any media to
+        //  load (loadTotal() == 0), the asynchronous loading mechanism will
+        //  never emit the after-progressive-loading event that closes the
+        //  before-progressive-loading event emitted while processing those
+        //  files, so we emit it here.
         //
+        //  However, when no files were requested at all (e.g. launching RV with
+        //  an empty session), no before-progressive-loading event was ever
+        //  emitted, so emitting after-progressive-loading here would produce an
+        //  unmatched event. We therefore only emit it when files were actually
+        //  requested.
+        //
+        if (s->loadTotal() == 0 && !files.empty())
         {
             s->userGenericEvent("after-progressive-loading", "");
         }

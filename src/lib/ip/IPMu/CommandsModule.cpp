@@ -2539,6 +2539,11 @@ namespace IPMu
         int start = NODE_ARG(1, int);
         int num = NODE_ARG(2, int);
 
+        if (start < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "start argument must be 0 or greater");
+        if (num < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "num argument must be 0 or greater");
+
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
         Session::Property* prop = props.front();
@@ -2549,13 +2554,12 @@ namespace IPMu
             float* data = prop->empty() ? 0 : reinterpret_cast<float*>(prop->rawData());
             DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
             DynamicArray* array = new DynamicArray(type, 1);
-            size_t s = prop->size() * width;
-            array->resize(min(s, num * width));
-            int start0 = start * width;
+            size_t size = static_cast<size_t>(start) < prop->size() ? min(prop->size() - start, static_cast<size_t>(num)) * width : 0;
+            array->resize(size);
 
-            for (int i = start0; i < start0 + array->size(); i++)
+            for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<float>(i - start0) = data[i];
+                array->element<float>(i) = data[start * width + i];
             }
 
             NODE_RETURN(array);
@@ -2664,6 +2668,11 @@ namespace IPMu
         int start = NODE_ARG(1, int);
         int num = NODE_ARG(2, int);
 
+        if (start < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "start argument must be 0 or greater");
+        if (num < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "num argument must be 0 or greater");
+
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
         Session::Property* prop = props.front();
@@ -2674,13 +2683,12 @@ namespace IPMu
             half* data = prop->empty() ? 0 : reinterpret_cast<half*>(prop->rawData());
             DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
             DynamicArray* array = new DynamicArray(type, 1);
-            size_t s = prop->size() * width;
-            array->resize(min(s, num * width));
-            int start0 = start * width;
+            size_t size = static_cast<size_t>(start) < prop->size() ? min(prop->size() - start, static_cast<size_t>(num)) * width : 0;
+            array->resize(size);
 
-            for (int i = start0; i < start0 + array->size(); i++)
+            for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<half>(i - start0) = data[i];
+                array->element<half>(i) = data[start * width + i];
             }
 
             NODE_RETURN(array);
@@ -2789,6 +2797,11 @@ namespace IPMu
         int start = NODE_ARG(1, int);
         int num = NODE_ARG(2, int);
 
+        if (start < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "start argument must be 0 or greater");
+        if (num < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "num argument must be 0 or greater");
+
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
         Session::Property* prop = props.front();
@@ -2799,13 +2812,12 @@ namespace IPMu
             int* data = prop->empty() ? 0 : reinterpret_cast<int*>(prop->rawData());
             DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
             DynamicArray* array = new DynamicArray(type, 1);
-            size_t s = prop->size() * width;
-            array->resize(min(s, num * width));
-            int start0 = start * width;
+            size_t size = static_cast<size_t>(start) < prop->size() ? min(prop->size() - start, static_cast<size_t>(num)) * width : 0;
+            array->resize(size);
 
-            for (int i = start0; i < start0 + array->size(); i++)
+            for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<int>(i - start0) = data[i];
+                array->element<int>(i) = data[start * width + i];
             }
 
             NODE_RETURN(array);
@@ -2912,6 +2924,11 @@ namespace IPMu
         int start = NODE_ARG(1, int);
         int num = NODE_ARG(2, int);
 
+        if (start < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "start argument must be 0 or greater");
+        if (num < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "num argument must be 0 or greater");
+
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
         Session::Property* prop = props.front();
@@ -2922,13 +2939,12 @@ namespace IPMu
             unsigned char* data = prop->empty() ? 0 : reinterpret_cast<unsigned char*>(prop->rawData());
             DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
             DynamicArray* array = new DynamicArray(type, 1);
-            size_t s = prop->size() * width;
-            array->resize(min(s, num * width));
-            int start0 = start * width;
+            size_t size = static_cast<size_t>(start) < prop->size() ? min(prop->size() - start, static_cast<size_t>(num)) * width : 0;
+            array->resize(size);
 
-            for (int i = start0; i < start0 + array->size(); i++)
+            for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<unsigned char>(i - start0) = data[i];
+                array->element<unsigned char>(i) = data[start * width + i];
             }
 
             NODE_RETURN(array);
@@ -3036,6 +3052,11 @@ namespace IPMu
         int start = NODE_ARG(1, int);
         int num = NODE_ARG(2, int);
 
+        if (start < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "start argument must be 0 or greater");
+        if (num < 0)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "num argument must be 0 or greater");
+
         Session::PropertyVector props;
         getProperty(props, NODE_THREAD, NODE_THIS, name);
         Session::Property* prop = props.front();
@@ -3046,13 +3067,12 @@ namespace IPMu
             string* data = prop->empty() ? 0 : reinterpret_cast<string*>(prop->rawData());
             DynamicArrayType* type = (DynamicArrayType*)NODE_THIS.type();
             DynamicArray* array = new DynamicArray(type, 1);
-            size_t s = prop->size() * width;
-            array->resize(min(s, num * width));
-            int start0 = start * width;
+            size_t size = static_cast<size_t>(start) < prop->size() ? min(prop->size() - start, static_cast<size_t>(num)) * width : 0;
+            array->resize(size);
 
-            for (int i = start0; i < start0 + array->size(); i++)
+            for (size_t i = 0; i < array->size(); i++)
             {
-                array->element<StringType::String*>(i - start0) = c->stringType()->allocate(data[i]);
+                array->element<StringType::String*>(i) = c->stringType()->allocate(data[start * width + i]);
             }
 
             NODE_RETURN(array);
