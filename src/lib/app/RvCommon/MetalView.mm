@@ -398,6 +398,11 @@ namespace Rv
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
 
         QWidget::resizeEvent(event);
+
+        // QOpenGLWidget schedules a paintGL() after every resizeGL(); as a plain
+        // QWidget we must request a fresh render ourselves so the FBO/IOSurface
+        // rebuild at the new size (e.g. when dragging the Live Review panel).
+        requestUpdate();
     }
 
     void MetalView::paintEvent(QPaintEvent* /*event*/)

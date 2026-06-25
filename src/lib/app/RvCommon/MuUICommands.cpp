@@ -1735,6 +1735,9 @@ namespace Rv
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         QWidget* w = doc->viewWidget();
 
+        if (w == nullptr)
+            NODE_RETURN(Pointer(0));
+
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 
         NODE_RETURN(makeinstance(type, static_cast<QWidget*>(w)));

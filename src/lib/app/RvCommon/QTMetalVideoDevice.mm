@@ -111,6 +111,12 @@ namespace Rv
             m_glContext = new QOpenGLContext();
             m_glContext->setFormat(fmt);
 
+            // Share with the process-wide global context (enabled via
+            // Qt::AA_ShareOpenGLContexts in main) so the diagnostics
+            // QOpenGLWidget can use the textures uploaded by this offscreen
+            // render context.
+            m_glContext->setShareContext(QOpenGLContext::globalShareContext());
+
             if (!m_glContext->create())
             {
                 std::cerr << "[QTMetalVideoDevice] QOpenGLContext::create() failed\n";

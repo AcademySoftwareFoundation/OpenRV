@@ -322,32 +322,18 @@ namespace Rv
         m_viewWidget = m_glView;
 #endif
 
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        // Not created on the Metal path: DiagnosticsView inherits from QOpenGLWidget,
-        // and any QOpenGLWidget anywhere in the top-level window hierarchy forces Qt's
-        // macOS backend to use _NSOpenGLViewBackingLayer for the entire window — even
-        // when the widget is hidden inside a dock.  That compositor intercepts the
-        // CAMetalLayer content and composites it 4× (2×2) when
-        // wantsExtendedDynamicRangeContent or DPR scaling is active.
-        if (!m_metalView)
-#endif
-        {
-            // DiagnosticsView has its own context and only needs a surface format.
-            const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
-            m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
-        }
+        // DiagnosticsView has its own context and only needs a surface format.
+        const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
+        m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
 
         // Dockable to QMainWindow, not centralwidget.
-        if (m_diagnosticsView)
-        {
-            m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-            m_diagnosticsDock->setObjectName("Diagnostics");
-            m_diagnosticsDock->setWidget(m_diagnosticsView);
-            m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-            addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-            m_diagnosticsDock->hide();                    // Hide by default
-            m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
-        }
+        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+        m_diagnosticsDock->setObjectName("Diagnostics");
+        m_diagnosticsDock->setWidget(m_diagnosticsView);
+        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+        m_diagnosticsDock->hide();                    // Hide by default
+        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
