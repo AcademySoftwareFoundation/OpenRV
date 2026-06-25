@@ -1067,11 +1067,11 @@ class: EventFilter : QObject
 
 class: PreviewRenderQueue
 {
-    QTimer renderTimer;
-    string[] renderQueue;
+    QTimer                renderTimer;
+    string[]              renderQueue;
     SourcePreviewWidget[] progressiveRenderPreviews;
-    int renderIdx;
-    string[] progressiveRenderDeferred;
+    int                   renderIdx;
+    string[]              progressiveRenderDeferred;
 
     method: PreviewRenderQueue (PreviewRenderQueue;)
     {
@@ -1107,12 +1107,12 @@ class: ThumbnailRenderer
 
     method: ThumbnailRenderer (ThumbnailRenderer; QDockWidget dockWidget) {
 
-        _source = PreviewRenderQueue();
-        _source.renderTimer              = QTimer(dockWidget);
+        _source             = PreviewRenderQueue();
+        _source.renderTimer = QTimer(dockWidget);
         _source.renderTimer.setSingleShot(true);
 
-        _input = PreviewRenderQueue();
-        _input.renderTimer               = QTimer(dockWidget);
+        _input             = PreviewRenderQueue();
+        _input.renderTimer = QTimer(dockWidget);
         _input.renderTimer.setSingleShot(true);
     }
 
@@ -3316,15 +3316,15 @@ class: SessionManagerMode : MinorMode
 
     method: SessionManagerMode (SessionManagerMode; string name)
     {
-        _darkUI         = true;
-        _inputOrderLock = false;
-        _editors        = QTreeWidgetItem[]();
-        _quitting       = false;
-        _disableUpdates = false;
-        _srcNodeKeys    = string[]();
-        _grpNodeValues  = string[]();
-        _dockWidget         = QDockWidget("Session Manager", mainWindowWidget(), Qt.Widget);
-        _thumbnailRenderer  = ThumbnailRenderer(_dockWidget);
+        _darkUI            = true;
+        _inputOrderLock    = false;
+        _editors           = QTreeWidgetItem[]();
+        _quitting          = false;
+        _disableUpdates    = false;
+        _srcNodeKeys       = string[]();
+        _grpNodeValues     = string[]();
+        _dockWidget        = QDockWidget("Session Manager", mainWindowWidget(), Qt.Widget);
+        _thumbnailRenderer = ThumbnailRenderer(_dockWidget);
         _thumbnailRenderer._fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
 
         let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
