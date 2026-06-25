@@ -5958,7 +5958,8 @@ namespace TwkMovie
             {
                 poolSize = atoi(c);
             }
-            if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
+            if (poolSize > 0)
+                globalContextPool = new ContextPool(poolSize);
             else
             {
                 report("Disabling mio_ffmpeg context thread pool.", true);
