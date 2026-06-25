@@ -458,7 +458,8 @@ namespace Rv
                 m_activationTimer.stop();
         }
 
-        if (event->type() != QEvent::Paint)
+        if (event->type() != QEvent::Paint
+            && event->type() != QEvent::UpdateRequest)
         {
             m_activityTimer.stop();
             m_activityTimer.start();
