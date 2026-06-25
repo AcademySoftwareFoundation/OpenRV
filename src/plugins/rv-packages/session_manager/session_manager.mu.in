@@ -1663,7 +1663,7 @@ class: SessionManagerMode : MinorMode
             if (isSource && _previewsEnabled)
             {
                 let preview = SourcePreviewWidget(nil);
-                let w = _thumbnailRenderer.displaySourceRowPreview(innode, preview);
+                let w       = _thumbnailRenderer.displaySourceRowPreview(innode, preview);
                 _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), w);
                 _thumbnailRenderer._input.renderQueue.push_back(innode);
                 _thumbnailRenderer._input.progressiveRenderPreviews.push_back(preview);
@@ -2240,9 +2240,9 @@ class: SessionManagerMode : MinorMode
         }
         else if (!_thumbnailRenderer._source.progressiveRenderDeferred.empty())
         {
-            _thumbnailRenderer._source.renderQueue             = _thumbnailRenderer._source.progressiveRenderDeferred;
+            _thumbnailRenderer._source.renderQueue               = _thumbnailRenderer._source.progressiveRenderDeferred;
             _thumbnailRenderer._source.progressiveRenderDeferred = string[]();
-            _thumbnailRenderer._source.renderIdx               = 0;
+            _thumbnailRenderer._source.renderIdx                 = 0;
 
             _thumbnailRenderer._source.progressiveRenderPreviews = SourcePreviewWidget[]();
             for_each (dnode; _thumbnailRenderer._source.renderQueue)
@@ -2275,20 +2275,9 @@ class: SessionManagerMode : MinorMode
         }
         else if (!_thumbnailRenderer._input.progressiveRenderDeferred.empty())
         {
-            _thumbnailRenderer._input.renderQueue             = _thumbnailRenderer._input.progressiveRenderDeferred;
+            _thumbnailRenderer._input.renderQueue               = _thumbnailRenderer._input.progressiveRenderDeferred;
             _thumbnailRenderer._input.progressiveRenderDeferred = string[]();
-            _thumbnailRenderer._input.renderIdx               = 0;
-
-            _thumbnailRenderer._input.progressiveRenderPreviews = SourcePreviewWidget[]();
-            for_each (dnode; _thumbnailRenderer._input.renderQueue)
-            {
-                let item    = itemOfNode(_viewModel, dnode);
-                let preview = SourcePreviewWidget(nil);
-                let w       = _thumbnailRenderer.displaySourceRowPreview(dnode, preview);
-                _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
-                _thumbnailRenderer._input.progressiveRenderPreviews.push_back(preview);
-            }
-
+            _thumbnailRenderer._input.renderIdx                 = 0;
             _thumbnailRenderer._input.renderTimer.start(0);
         }
     }
@@ -2435,7 +2424,7 @@ class: SessionManagerMode : MinorMode
         if (item neq nil)
         {
             let preview = SourcePreviewWidget(nil);
-            let w = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            let w       = _thumbnailRenderer.displaySourceRowPreview(node, preview);
             _thumbnailRenderer.makeSourceRowWidget(node, preview);
             _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
         }
@@ -2444,7 +2433,7 @@ class: SessionManagerMode : MinorMode
         if (inputItem neq nil)
         {
             let preview = SourcePreviewWidget(nil);
-            let w = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            let w       = _thumbnailRenderer.displaySourceRowPreview(node, preview);
             _thumbnailRenderer.makeSourceRowWidget(node, preview);
             _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), w);
         }
