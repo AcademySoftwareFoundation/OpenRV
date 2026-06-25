@@ -31,6 +31,9 @@ namespace IPCore
 
 #if !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
         ImageRenderer::queryGLIntoContainer(this);
+#else
+        // Deferred: Session::queryAndStoreGLInfo() runs once the Metal path's
+        // offscreen GL context is current (first render via advanceState/render).
 #endif
     }
 
