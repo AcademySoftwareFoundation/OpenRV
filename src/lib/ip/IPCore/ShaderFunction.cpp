@@ -73,18 +73,6 @@ namespace IPCore
             {
                 if (glslMajor == 0)
                 {
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-                    // On the Metal hybrid path, GL rendering uses a GL 2.1
-                    // Compatibility context (required for legacy IPCore APIs).
-                    // Hardcode GLSL 1.20 so replaceTextureCalls() sets
-                    // useDeprecated=true and rewrites texture() → texture2DRect(),
-                    // which is available with GL_ARB_texture_rectangle.
-                    // This avoids calling glGetString before any context exists
-                    // (which would return NULL and trigger abort()).
-                    glslMajor = 1;
-                    glslMinor = 20;
-                    return;
-#endif
                     //
                     //  NOTE: its much better to have assigned
                     if (const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION))

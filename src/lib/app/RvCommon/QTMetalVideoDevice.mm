@@ -85,8 +85,10 @@ namespace Rv
 
     //--------------------------------------------------------------------------
 
-    void QTMetalVideoDevice::ensureGLContext() const
+    bool QTMetalVideoDevice::ensureGLContext() const
     {
+        m_glContextReady = false;
+
         if (!m_glContext)
         {
             //
@@ -101,8 +103,7 @@ namespace Rv
             // Use GL 2.1 Compatibility profile — the existing IPCore pipeline
             // calls legacy APIs (glPushAttrib, GL_LIGHTING, GL_MAX_TEXTURE_UNITS,
             // etc.) that are absent in Core profile.  With GL 2.1, GLSL is 1.20
-            // and ShaderFunction::initGLSLVersion() is hardcoded to 1.20 on the
-            // USE_METAL path, so replaceTextureCalls() uses texture2DRect() which
+            // and replaceTextureCalls() uses texture2DRect() which
             // is available with GL_ARB_texture_rectangle.
             fmt.setMajorVersion(2);
             fmt.setMinorVersion(1);
@@ -122,7 +123,7 @@ namespace Rv
                 std::cerr << "[QTMetalVideoDevice] QOpenGLContext::create() failed\n";
                 delete m_glContext;
                 m_glContext = nullptr;
-                return;
+                return false;
             }
 
             // Surface format MUST be set from the *actual* context format, not
@@ -138,14 +139,14 @@ namespace Rv
                 m_offscreenSurface = nullptr;
                 delete m_glContext;
                 m_glContext = nullptr;
-                return;
+                return false;
             }
         }
 
         if (!m_glContext->makeCurrent(m_offscreenSurface))
         {
             std::cerr << "[QTMetalVideoDevice] makeCurrent() failed\n";
-            return;
+            return false;
         }
 
         // Size the FBO in PHYSICAL pixels so it matches the IOSurface
@@ -191,18 +192,39 @@ namespace Rv
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
             if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            {
                 std::cerr << "[QTMetalVideoDevice] FBO incomplete: 0x"
                           << std::hex << status << std::dec << "\n";
+                delete m_fbo;
+                m_fbo = nullptr;
+                if (m_fboColorTex)
+                {
+                    glDeleteTextures(1, &m_fboColorTex);
+                    m_fboColorTex = 0;
+                }
+                m_fboWidth  = 0;
+                m_fboHeight = 0;
+                return false;
+            }
 
             m_fboWidth  = newW;
             m_fboHeight = newH;
+            // IOSurface interop ring must be rebuilt at the new size; allow a
+            // fresh attempt even if a prior transient failure latched interop off.
+            m_interopDisabled = false;
         }
+
+        if (!m_fbo)
+            return false;
 
         // Bind FBO so all GL rendering goes into it
         m_fbo->bind();
 
         // Let GLVideoDevice do its bookkeeping (GLtext context, etc.)
         GLVideoDevice::makeCurrent();
+
+        m_glContextReady = true;
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -281,18 +303,21 @@ namespace Rv
     void QTMetalVideoDevice::makeCurrent() const
     {
         // Ensure QOpenGLContext + FBO exist, make GL context current, bind FBO
-        ensureGLContext();
+        if (!ensureGLContext())
+            return;
     }
 
     TwkGLF::GLFBO* QTMetalVideoDevice::defaultFBO()
     {
-        ensureGLContext();
+        if (!ensureGLContext())
+            return nullptr;
         return m_fbo;
     }
 
     const TwkGLF::GLFBO* QTMetalVideoDevice::defaultFBO() const
     {
-        ensureGLContext();
+        if (!ensureGLContext())
+            return nullptr;
         return m_fbo;
     }
 
@@ -307,6 +332,9 @@ namespace Rv
 
     bool QTMetalVideoDevice::ensureIOSurfaceTextures(int w, int h) const
     {
+        if (m_sharedWidth != w || m_sharedHeight != h)
+            m_interopDisabled = false;
+
         if (m_interopDisabled)
             return false;
 
@@ -564,7 +592,22 @@ namespace Rv
 
     void QTMetalVideoDevice::redrawImmediately() const
     {
-        redraw();
+        if (!m_view)
+            return;
+
+        if (m_view->isVisible())
+        {
+#ifdef PLATFORM_DARWIN
+            // Keep playback alive when the window is fully occluded (mirrors
+            // QTGLVideoDevice::redrawImmediately()).
+            m_view->setAttribute(Qt::WA_Mapped);
+#endif
+            m_view->renderImmediately();
+        }
+        else
+        {
+            redraw();
+        }
     }
 
     void QTMetalVideoDevice::clearCaches() const
