@@ -35,7 +35,7 @@ namespace TwkGLF
 namespace Rv
 {
     class GLView;
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     class VulkanView;
 #endif
     class DiagnosticsView;
@@ -91,7 +91,7 @@ namespace Rv
         //
         TwkGLF::GLVideoDevice* viewVideoDevice() const;
 
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         VulkanView* vulkanView() const;
 #endif
 
@@ -194,7 +194,7 @@ namespace Rv
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         VulkanView* m_vulkanView;
 #endif
         QWidget* m_viewWidget;

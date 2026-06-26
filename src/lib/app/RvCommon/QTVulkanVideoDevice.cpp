@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 
 #include <GL/glew.h>
 #include <RvCommon/QTVulkanVideoDevice.h>
@@ -27,7 +27,17 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
+#ifdef PLATFORM_WINDOWS
+// WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
+// <winsock.h>, which otherwise collides with the <winsock2.h> already
+// pulled in transitively by Qt headers above.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 #ifndef GL_EXT_memory_object
 #define GL_EXT_memory_object 1
@@ -48,6 +58,16 @@
 #define GL_HANDLE_TYPE_OPAQUE_FD_EXT 0x9586
 #endif
 
+#ifndef GL_EXT_memory_object_win32
+#define GL_EXT_memory_object_win32 1
+#define GL_HANDLE_TYPE_OPAQUE_WIN32_EXT 0x9587
+#define GL_HANDLE_TYPE_OPAQUE_WIN32_KMT_EXT 0x9588
+#endif
+
+#ifndef GL_EXT_semaphore_win32
+#define GL_EXT_semaphore_win32 1
+#endif
+
 #ifndef GL_EXT_semaphore
 #define GL_EXT_semaphore 1
 #define GL_NUM_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958A
@@ -63,6 +83,108 @@
 #define GL_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_EXT 0x9530
 #define GL_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_EXT 0x9531
 #endif
+
+#ifdef PLATFORM_WINDOWS
+// The bundled GLEW under src/pub/glew (version 2.3.0) does not declare the
+// EXT_memory_object / EXT_semaphore (or their Win32 companions) entry points.
+// The Linux build uses a newer managed GLEW that does, so the Linux call sites
+// can resolve the symbols at link time. On Windows we declare the function
+// pointer typedefs locally and resolve them at first use via wglGetProcAddress;
+// if any are missing the GPU interop path is disabled and VulkanView falls
+// back to its CPU pack-and-upload presentation path.
+typedef void(GLAPIENTRY* PFNGLCREATEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, GLuint* memoryObjects);
+typedef void(GLAPIENTRY* PFNGLDELETEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, const GLuint* memoryObjects);
+typedef void(GLAPIENTRY* PFNGLTEXSTORAGEMEM2DEXTPROC_RV)(GLenum target, GLsizei levels, GLenum internalFormat, GLsizei width,
+                                                        GLsizei height, GLuint memory, GLuint64 offset);
+typedef void(GLAPIENTRY* PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV)(GLuint memory, GLuint64 size, GLenum handleType, void* handle);
+typedef void(GLAPIENTRY* PFNGLGENSEMAPHORESEXTPROC_RV)(GLsizei n, GLuint* semaphores);
+typedef void(GLAPIENTRY* PFNGLDELETESEMAPHORESEXTPROC_RV)(GLsizei n, const GLuint* semaphores);
+typedef void(GLAPIENTRY* PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV)(GLuint semaphore, GLenum handleType, void* handle);
+typedef void(GLAPIENTRY* PFNGLWAITSEMAPHOREEXTPROC_RV)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
+                                                      GLuint numTextureBarriers, const GLuint* textures,
+                                                      const GLenum* dstLayouts);
+typedef void(GLAPIENTRY* PFNGLSIGNALSEMAPHOREEXTPROC_RV)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
+                                                        GLuint numTextureBarriers, const GLuint* textures,
+                                                        const GLenum* srcLayouts);
+
+namespace
+{
+    PFNGLCREATEMEMORYOBJECTSEXTPROC_RV g_glCreateMemoryObjectsEXT = nullptr;
+    PFNGLDELETEMEMORYOBJECTSEXTPROC_RV g_glDeleteMemoryObjectsEXT = nullptr;
+    PFNGLTEXSTORAGEMEM2DEXTPROC_RV g_glTexStorageMem2DEXT = nullptr;
+    PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV g_glImportMemoryWin32HandleEXT = nullptr;
+    PFNGLGENSEMAPHORESEXTPROC_RV g_glGenSemaphoresEXT = nullptr;
+    PFNGLDELETESEMAPHORESEXTPROC_RV g_glDeleteSemaphoresEXT = nullptr;
+    PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV g_glImportSemaphoreWin32HandleEXT = nullptr;
+    PFNGLWAITSEMAPHOREEXTPROC_RV g_glWaitSemaphoreEXT = nullptr;
+    PFNGLSIGNALSEMAPHOREEXTPROC_RV g_glSignalSemaphoreEXT = nullptr;
+
+    bool g_glInteropProbed = false;
+    bool g_glInteropAvailable = false;
+
+    // Must be called with a current GL context.
+    bool loadGLInteropExtensions()
+    {
+        if (g_glInteropProbed)
+            return g_glInteropAvailable;
+        g_glInteropProbed = true;
+
+        g_glCreateMemoryObjectsEXT =
+            reinterpret_cast<PFNGLCREATEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glCreateMemoryObjectsEXT"));
+        g_glDeleteMemoryObjectsEXT =
+            reinterpret_cast<PFNGLDELETEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glDeleteMemoryObjectsEXT"));
+        g_glTexStorageMem2DEXT =
+            reinterpret_cast<PFNGLTEXSTORAGEMEM2DEXTPROC_RV>(wglGetProcAddress("glTexStorageMem2DEXT"));
+        g_glImportMemoryWin32HandleEXT =
+            reinterpret_cast<PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportMemoryWin32HandleEXT"));
+        g_glGenSemaphoresEXT = reinterpret_cast<PFNGLGENSEMAPHORESEXTPROC_RV>(wglGetProcAddress("glGenSemaphoresEXT"));
+        g_glDeleteSemaphoresEXT =
+            reinterpret_cast<PFNGLDELETESEMAPHORESEXTPROC_RV>(wglGetProcAddress("glDeleteSemaphoresEXT"));
+        g_glImportSemaphoreWin32HandleEXT = reinterpret_cast<PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV>(
+            wglGetProcAddress("glImportSemaphoreWin32HandleEXT"));
+        g_glWaitSemaphoreEXT = reinterpret_cast<PFNGLWAITSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glWaitSemaphoreEXT"));
+        g_glSignalSemaphoreEXT =
+            reinterpret_cast<PFNGLSIGNALSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glSignalSemaphoreEXT"));
+
+        g_glInteropAvailable = g_glCreateMemoryObjectsEXT && g_glDeleteMemoryObjectsEXT && g_glTexStorageMem2DEXT
+                               && g_glImportMemoryWin32HandleEXT && g_glGenSemaphoresEXT && g_glDeleteSemaphoresEXT
+                               && g_glImportSemaphoreWin32HandleEXT && g_glWaitSemaphoreEXT && g_glSignalSemaphoreEXT;
+
+        // Identify the GL driver alongside the interop probe result. Useful when
+        // the Windows GL context happens to be the Microsoft GDI Generic
+        // software renderer, in which case interop is expected to fail.
+        const GLubyte* vendor = glGetString(GL_VENDOR);
+        const GLubyte* renderer = glGetString(GL_RENDERER);
+        const GLubyte* version = glGetString(GL_VERSION);
+        std::cerr << "[10bit] QTVulkanVideoDevice: GL_VENDOR='" << (vendor ? reinterpret_cast<const char*>(vendor) : "?")
+                  << "' GL_RENDERER='" << (renderer ? reinterpret_cast<const char*>(renderer) : "?") << "' GL_VERSION='"
+                  << (version ? reinterpret_cast<const char*>(version) : "?") << "'\n";
+
+        if (!g_glInteropAvailable)
+        {
+            std::cerr << "[10bit] QTVulkanVideoDevice: GL_EXT_memory_object_win32 / GL_EXT_semaphore_win32 NOT available; "
+                         "falling back to CPU presentation path\n";
+        }
+        else
+        {
+            std::cerr << "[10bit] QTVulkanVideoDevice: GL interop extensions resolved (GPU-interop available)\n";
+        }
+        return g_glInteropAvailable;
+    }
+} // namespace
+
+// Redirect direct GL extension references in this translation unit to the
+// dynamically resolved pointers. Linux still uses the real GLEW symbols.
+#define glCreateMemoryObjectsEXT g_glCreateMemoryObjectsEXT
+#define glDeleteMemoryObjectsEXT g_glDeleteMemoryObjectsEXT
+#define glTexStorageMem2DEXT g_glTexStorageMem2DEXT
+#define glImportMemoryWin32HandleEXT g_glImportMemoryWin32HandleEXT
+#define glGenSemaphoresEXT g_glGenSemaphoresEXT
+#define glDeleteSemaphoresEXT g_glDeleteSemaphoresEXT
+#define glImportSemaphoreWin32HandleEXT g_glImportSemaphoreWin32HandleEXT
+#define glWaitSemaphoreEXT g_glWaitSemaphoreEXT
+#define glSignalSemaphoreEXT g_glSignalSemaphoreEXT
+#endif // PLATFORM_WINDOWS
 
 namespace Rv
 {
@@ -156,7 +278,16 @@ namespace Rv
 
             m_glContext->makeCurrent(m_offscreenSurface);
             glewExperimental = GL_TRUE;
+#ifdef PLATFORM_WINDOWS
+            // The bundled Windows GLEW (src/pub/glew) has a Tweak-modified
+            // signature: glewInit(GLEWGetProcAddress F). Pass nullptr to use
+            // the default GL entry-point loader, matching every other Windows
+            // glewInit call site (rvio main.cpp, InitGL.cpp, FBOVideoDevice.cpp,
+            // NDIModule.cpp, BlackMagicModule.cpp, AJAModule.cpp).
+            GLenum err = glewInit(nullptr);
+#else
             GLenum err = glewInit();
+#endif
             if (err != GLEW_OK)
             {
                 std::cerr << "[QTVulkanVideoDevice] glewInit failed: " << glewGetErrorString(err) << "\n";
@@ -301,6 +432,11 @@ namespace Rv
 
     void QTVulkanVideoDevice::cleanupSharedGLObjects() const
     {
+        if (m_drawFbo)
+        {
+            glDeleteFramebuffersEXT(1, &m_drawFbo);
+            m_drawFbo = 0;
+        }
         if (m_glSharedTexture)
         {
             glDeleteTextures(1, &m_glSharedTexture);
@@ -348,7 +484,31 @@ namespace Rv
             return;
 
         // Get shared image info from VulkanView
-        const VulkanView::SharedImageInfo* sharedInfo = m_view->getSharedImageInfo(w, h);
+#ifdef PLATFORM_WINDOWS
+        // Probe the EXT_memory_object/EXT_semaphore (+ _win32) entry points
+        // while the GL context is current. If the driver does not expose them,
+        // skip the Vulkan-side export work entirely and fall through to the
+        // CPU pack-and-upload path below.
+        const bool glInteropAvailable = loadGLInteropExtensions();
+        const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
+#else
+        const bool glInteropAvailable = GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
+        const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
+#endif
+
+        static bool firstFrameLogged = false;
+        if (!firstFrameLogged)
+        {
+            firstFrameLogged = true;
+            const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_UNDEFINED;
+            std::cerr << "[10bit] QTVulkanVideoDevice::syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
+                      << "  swapchainFormat=" << scFmt
+                      << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ? " (A2B10G10R10 / 10-bit)"
+                          : scFmt == VK_FORMAT_UNDEFINED              ? " (UNDEFINED -- swapchain not created yet)"
+                                                                      : " (NOT 10-bit)")
+                      << "\n";
+        }
+
         if (!sharedInfo)
         {
             // Fallback to CPU readback if GPU interop fails.
@@ -390,9 +550,26 @@ namespace Rv
             cleanupSharedGLObjects();
 
             glCreateMemoryObjectsEXT(1, &m_glMemoryObject);
+#ifdef PLATFORM_WINDOWS
+            // Windows GL import does NOT take ownership of the HANDLE; the
+            // Vulkan side and this GL side each keep their own reference.
+            // VulkanView's cleanupSharedImage() calls CloseHandle on its
+            // copy; this device's cleanupSharedGLObjects() does not need to
+            // close anything because glImportMemoryWin32HandleEXT does not
+            // create a new handle.
+            glImportMemoryWin32HandleEXT(m_glMemoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                         static_cast<HANDLE>(sharedInfo->memoryHandle));
+#else
             // Duplicate the FD because glImportMemoryFdEXT takes ownership
             int memFd = dup(sharedInfo->memoryFd);
+            if (memFd == -1)
+            {
+                std::cerr << "[10bit] QTVulkanVideoDevice: dup(memoryFd) failed.\n";
+                cleanupSharedGLObjects();
+                return;
+            }
             glImportMemoryFdEXT(m_glMemoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_FD_EXT, memFd);
+#endif
 
             glGenTextures(1, &m_glSharedTexture);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture);
@@ -403,27 +580,52 @@ namespace Rv
             glBindTexture(GL_TEXTURE_2D, 0);
 
             glGenSemaphoresEXT(1, &m_glReadySemaphore);
+            glGenSemaphoresEXT(1, &m_vkReadySemaphore);
+#ifdef PLATFORM_WINDOWS
+            glImportSemaphoreWin32HandleEXT(m_glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                            static_cast<HANDLE>(sharedInfo->glReadySemaphoreHandle));
+            glImportSemaphoreWin32HandleEXT(m_vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                            static_cast<HANDLE>(sharedInfo->vkReadySemaphoreHandle));
+#else
             int glReadyFd = dup(sharedInfo->glReadySemaphoreFd);
+            if (glReadyFd == -1)
+            {
+                std::cerr << "[10bit] QTVulkanVideoDevice: dup(glReadySemaphoreFd) failed.\n";
+                cleanupSharedGLObjects();
+                return;
+            }
             glImportSemaphoreFdEXT(m_glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, glReadyFd);
 
-            glGenSemaphoresEXT(1, &m_vkReadySemaphore);
             int vkReadyFd = dup(sharedInfo->vkReadySemaphoreFd);
+            if (vkReadyFd == -1)
+            {
+                std::cerr << "[10bit] QTVulkanVideoDevice: dup(vkReadySemaphoreFd) failed.\n";
+                cleanupSharedGLObjects();
+                return;
+            }
             glImportSemaphoreFdEXT(m_vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
+#endif
 
             m_sharedWidth = w;
             m_sharedHeight = h;
         }
 
         // Wait for Vulkan to be ready
-        GLuint waitDstLayouts[] = {GL_LAYOUT_COLOR_ATTACHMENT_EXT};
-        glWaitSemaphoreEXT(m_vkReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, waitDstLayouts);
+        GLuint waitSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
+        glWaitSemaphoreEXT(m_vkReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, waitSrcLayouts);
 
         // Blit from FBO to shared texture
         GLuint readFbo = fbo->fboID();
-        GLuint drawFbo;
-        glGenFramebuffersEXT(1, &drawFbo);
-        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, drawFbo);
-        glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_glSharedTexture, 0);
+        if (!m_drawFbo)
+        {
+            glGenFramebuffersEXT(1, &m_drawFbo);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_drawFbo);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_glSharedTexture, 0);
+        }
+        else
+        {
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_drawFbo);
+        }
 
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
 
@@ -431,11 +633,10 @@ namespace Rv
         glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
-        glDeleteFramebuffersEXT(1, &drawFbo);
 
         // Signal Vulkan that GL is done
-        GLuint signalSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
-        glSignalSemaphoreEXT(m_glReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, signalSrcLayouts);
+        GLuint signalDstLayouts[] = {GL_LAYOUT_COLOR_ATTACHMENT_EXT};
+        glSignalSemaphoreEXT(m_glReadySemaphore, 0, nullptr, 1, &m_glSharedTexture, signalDstLayouts);
 
         glFlush();
 
@@ -531,4 +732,4 @@ namespace Rv
 
 } // namespace Rv
 
-#endif // PLATFORM_LINUX
+#endif // PLATFORM_LINUX || PLATFORM_WINDOWS

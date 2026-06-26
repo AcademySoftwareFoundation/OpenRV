@@ -4,7 +4,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 
 #include <RvCommon/VulkanView.h>
 #include <RvCommon/QTVulkanVideoDevice.h>
@@ -28,7 +28,17 @@
 #include <climits>
 #include <iostream>
 #include <sstream>
+#ifdef PLATFORM_WINDOWS
+// WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
+// <winsock.h>, which otherwise collides with the <winsock2.h> already
+// pulled in transitively by Qt headers above.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 namespace Rv
 {
@@ -154,17 +164,10 @@ namespace Rv
 
     bool VulkanView::supports10BitPresentation()
     {
-        // Build a minimal instance (no surface) and ask each physical device
-        // whether it can use a 10-bit color format as a swapchain image, i.e.
-        // VK_FORMAT_A2B10G10R10_UNORM_PACK32 / VK_FORMAT_A2R10G10B10_UNORM_PACK32
-        // with the color-attachment + transfer-dst features the swapchain uses.
-        // This mirrors the format chosen in createSwapchain(); the actual
-        // surface-level negotiation still happens there at present time.
         QVulkanInstance qtVkInst;
         if (!qtVkInst.create())
         {
-            std::cerr << "[VulkanView] supports10BitPresentation: QVulkanInstance "
-                         "create failed\n";
+            std::cerr << "[VulkanView] supports10BitPresentation: QVulkanInstance create failed\n";
             return false;
         }
 
@@ -174,32 +177,64 @@ namespace Rv
             return false;
         }
 
+        QWindow dummyWindow;
+        dummyWindow.setSurfaceType(QSurface::VulkanSurface);
+        dummyWindow.create();
+        dummyWindow.setVulkanInstance(&qtVkInst);
+
+        VkSurfaceKHR dummySurface = qtVkInst.surfaceForWindow(&dummyWindow);
+        if (!dummySurface)
+        {
+            std::cerr << "[10bit] VulkanView::supports10BitPresentation: failed to create dummy surface\n";
+            return false;
+        }
+
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
         if (deviceCount == 0)
         {
+            std::cerr << "[10bit] VulkanView::supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices\n";
             return false;
         }
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-        const VkFormat tenBitFormats[] = {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32};
-        const VkFormatFeatureFlags needed = VK_FORMAT_FEATURE_COLOR_ATTACHMENT_BIT | VK_FORMAT_FEATURE_TRANSFER_DST_BIT;
+        std::cerr << "[10bit] VulkanView::supports10BitPresentation: probing " << deviceCount << " physical device(s)\n";
 
-        for (VkPhysicalDevice dev : devices)
+        bool any10bit = false;
+        for (uint32_t di = 0; di < devices.size(); ++di)
         {
-            for (VkFormat fmt : tenBitFormats)
+            VkPhysicalDevice dev = devices[di];
+
+            uint32_t formatCount = 0;
+            if (vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
             {
-                VkFormatProperties props = {};
-                vkGetPhysicalDeviceFormatProperties(dev, fmt, &props);
-                if ((props.optimalTilingFeatures & needed) == needed)
+                continue;
+            }
+            std::vector<VkSurfaceFormatKHR> formats(formatCount);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, formats.data());
+
+            bool has10bit = false;
+            for (const auto& fmt : formats)
+            {
+                if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
                 {
-                    return true;
+                    has10bit = true;
+                    any10bit = true;
+                    break;
                 }
             }
+
+            VkPhysicalDeviceProperties props = {};
+            vkGetPhysicalDeviceProperties(dev, &props);
+            std::cerr << "[10bit]   device[" << di << "] '" << props.deviceName << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << "\n";
         }
 
-        return false;
+        // The surface returned by surfaceForWindow() is owned by the platform
+        // integration and is released when dummyWindow is destroyed on return;
+        // QVulkanInstance has no destroySurface() in this Qt version.
+        std::cerr << "[10bit] VulkanView::supports10BitPresentation: returning " << (any10bit ? "true" : "false") << "\n";
+        return any10bit;
     }
 
     bool VulkanView::initVulkan()
@@ -213,7 +248,9 @@ namespace Rv
         // Need surface extensions
         std::vector<const char*> instanceExtensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
-#if defined(VK_USE_PLATFORM_XLIB_KHR)
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+#elif defined(VK_USE_PLATFORM_XLIB_KHR)
             VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
             VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
@@ -230,6 +267,8 @@ namespace Rv
             if (!qtVkInst->create())
             {
                 std::cerr << "[VulkanView] QVulkanInstance create failed\n";
+                delete qtVkInst;
+                qtVkInst = nullptr;
                 return false;
             }
         }
@@ -262,31 +301,44 @@ namespace Rv
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, devices.data());
 
-        m_vkPhysicalDevice = devices[0]; // just pick first for now
-
-        // Find queue family
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, nullptr);
-        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-        vkGetPhysicalDeviceQueueFamilyProperties(m_vkPhysicalDevice, &queueFamilyCount, queueFamilies.data());
-
-        m_queueFamilyIndex = 0;
+        m_vkPhysicalDevice = VK_NULL_HANDLE;
         bool foundQueue = false;
-        for (uint32_t i = 0; i < queueFamilyCount; i++)
+        m_queueFamilyIndex = 0;
+
+        for (VkPhysicalDevice dev : devices)
         {
-            VkBool32 presentSupport = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(m_vkPhysicalDevice, i, m_vkSurface, &presentSupport);
-            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT && presentSupport)
+            uint32_t queueFamilyCount = 0;
+            vkGetPhysicalDeviceQueueFamilyProperties(dev, &queueFamilyCount, nullptr);
+            std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+            vkGetPhysicalDeviceQueueFamilyProperties(dev, &queueFamilyCount, queueFamilies.data());
+
+            for (uint32_t i = 0; i < queueFamilyCount; i++)
             {
-                m_queueFamilyIndex = i;
-                foundQueue = true;
-                break;
+                VkBool32 presentSupport = false;
+                vkGetPhysicalDeviceSurfaceSupportKHR(dev, i, m_vkSurface, &presentSupport);
+                if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
+                {
+                    m_vkPhysicalDevice = dev;
+                    m_queueFamilyIndex = i;
+                    foundQueue = true;
+                    break;
+                }
             }
+            if (foundQueue)
+                break;
         }
 
         if (!foundQueue)
         {
+            std::cerr << "[VulkanView] initVulkan: No physical device with graphics and present support found.\n";
             return false;
+        }
+
+        {
+            VkPhysicalDeviceProperties props = {};
+            vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &props);
+            std::cerr << "[10bit] VulkanView::initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
+                      << " available)\n";
         }
 
         // Create Logical Device
@@ -297,8 +349,16 @@ namespace Rv
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
-        std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
-                                                     VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME};
+        std::vector<const char*> deviceExtensions = {
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+#ifdef PLATFORM_WINDOWS
+            VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
+            VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME,
+#else
+            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
+            VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME,
+#endif
+        };
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -319,17 +379,29 @@ namespace Rv
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
         poolInfo.queueFamilyIndex = m_queueFamilyIndex;
-        vkCreateCommandPool(m_vkDevice, &poolInfo, nullptr, &m_vkCommandPool);
+        if (vkCreateCommandPool(m_vkDevice, &poolInfo, nullptr, &m_vkCommandPool) != VK_SUCCESS)
+        {
+            return false;
+        }
 
         // Sync objects
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore);
-        vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkRenderFinishedSemaphore);
+        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore) != VK_SUCCESS)
+        {
+            return false;
+        }
+        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkRenderFinishedSemaphore) != VK_SUCCESS)
+        {
+            return false;
+        }
 
         VkFenceCreateInfo fenceInfo = {};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        vkCreateFence(m_vkDevice, &fenceInfo, nullptr, &m_vkFence);
+        if (vkCreateFence(m_vkDevice, &fenceInfo, nullptr, &m_vkFence) != VK_SUCCESS)
+        {
+            return false;
+        }
 
         return true;
     }
@@ -373,6 +445,28 @@ namespace Rv
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data());
 
+        auto formatName = [](VkFormat f) -> const char*
+        {
+            switch (f)
+            {
+            case VK_FORMAT_B8G8R8A8_UNORM: return "B8G8R8A8_UNORM";
+            case VK_FORMAT_B8G8R8A8_SRGB: return "B8G8R8A8_SRGB";
+            case VK_FORMAT_R8G8B8A8_UNORM: return "R8G8B8A8_UNORM";
+            case VK_FORMAT_R8G8B8A8_SRGB: return "R8G8B8A8_SRGB";
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32: return "A2B10G10R10_UNORM_PACK32";
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: return "A2R10G10B10_UNORM_PACK32";
+            case VK_FORMAT_R16G16B16A16_SFLOAT: return "R16G16B16A16_SFLOAT";
+            default: return "(other)";
+            }
+        };
+
+        std::cerr << "[10bit] VulkanView::createSwapchain: surface offers " << formatCount << " format(s):\n";
+        for (uint32_t i = 0; i < formats.size(); ++i)
+        {
+            std::cerr << "[10bit]   [" << i << "] format=" << formats[i].format << " (" << formatName(formats[i].format)
+                      << ")  colorSpace=" << formats[i].colorSpace << "\n";
+        }
+
         VkSurfaceFormatKHR surfaceFormat = formats[0];
         bool found10bit = false;
         // Prefer A2B10G10R10 exclusively: GL_RGB10_A2 (used for both the GPU interop texture
@@ -386,6 +480,16 @@ namespace Rv
                 found10bit = true;
                 break;
             }
+        }
+
+        if (found10bit)
+        {
+            std::cerr << "[10bit] VulkanView::createSwapchain: chose A2B10G10R10_UNORM_PACK32 (10-bit OK)\n";
+        }
+        else
+        {
+            std::cerr << "[10bit] VulkanView::createSwapchain: A2B10G10R10_UNORM_PACK32 NOT offered; falling back to format=" << surfaceFormat.format
+                      << " (" << formatName(surfaceFormat.format) << ") -- presentation will truncate to <=8-bit\n";
         }
 
         // The Vulkan path was selected to deliver 10-bit. If the surface does
@@ -551,6 +655,23 @@ namespace Rv
             }
         }
 
+#ifdef PLATFORM_WINDOWS
+        if (m_sharedImageInfo.memoryHandle)
+        {
+            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.memoryHandle));
+            m_sharedImageInfo.memoryHandle = nullptr;
+        }
+        if (m_sharedImageInfo.glReadySemaphoreHandle)
+        {
+            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.glReadySemaphoreHandle));
+            m_sharedImageInfo.glReadySemaphoreHandle = nullptr;
+        }
+        if (m_sharedImageInfo.vkReadySemaphoreHandle)
+        {
+            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.vkReadySemaphoreHandle));
+            m_sharedImageInfo.vkReadySemaphoreHandle = nullptr;
+        }
+#else
         if (m_sharedImageInfo.memoryFd != -1)
         {
             ::close(m_sharedImageInfo.memoryFd);
@@ -566,6 +687,7 @@ namespace Rv
             ::close(m_sharedImageInfo.vkReadySemaphoreFd);
             m_sharedImageInfo.vkReadySemaphoreFd = -1;
         }
+#endif
         m_sharedImageInfo.width = 0;
         m_sharedImageInfo.height = 0;
         m_sharedImageInfo.size = 0;
@@ -594,7 +716,11 @@ namespace Rv
         // 1. Create Shared Image
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
+#ifdef PLATFORM_WINDOWS
+        extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#else
         extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+#endif
 
         VkImageCreateInfo imageInfo = {};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -637,7 +763,11 @@ namespace Rv
 
         VkExportMemoryAllocateInfo exportAllocInfo = {};
         exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
+#ifdef PLATFORM_WINDOWS
+        exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#else
         exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+#endif
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -660,7 +790,33 @@ namespace Rv
 
         vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0);
 
-        // Export Memory FD
+        // Export device memory as a platform-specific external handle
+        // (opaque FD on Linux, Win32 HANDLE on Windows). The receiving GL
+        // side imports this with the matching GL_EXT_memory_object_{fd,win32}
+        // extension so writes from GL land in this Vulkan image.
+#ifdef PLATFORM_WINDOWS
+        auto pfnGetMemoryWin32HandleKHR =
+            (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR");
+        if (!pfnGetMemoryWin32HandleKHR)
+        {
+            std::cerr << "[VulkanView] vkGetMemoryWin32HandleKHR not found\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        VkMemoryGetWin32HandleInfoKHR getHandleInfo = {};
+        getHandleInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR;
+        getHandleInfo.memory = m_vkSharedImageMemory;
+        getHandleInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+
+        HANDLE memHandle = nullptr;
+        if (pfnGetMemoryWin32HandleKHR(m_vkDevice, &getHandleInfo, &memHandle) != VK_SUCCESS || !memHandle)
+        {
+            std::cerr << "[VulkanView] Failed to get memory HANDLE\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+#else
         auto pfnGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR");
         if (!pfnGetMemoryFdKHR)
         {
@@ -681,11 +837,16 @@ namespace Rv
             cleanupSharedImage();
             return nullptr;
         }
+#endif
 
         // 2. Create Shared Semaphores
         VkExportSemaphoreCreateInfo exportSemInfo = {};
         exportSemInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
+#ifdef PLATFORM_WINDOWS
+        exportSemInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#else
         exportSemInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+#endif
 
         VkSemaphoreCreateInfo semInfo = {};
         semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -699,7 +860,37 @@ namespace Rv
             return nullptr;
         }
 
-        // Export Semaphore FDs
+        // Export the GL<->Vulkan sync semaphores as external handles.
+#ifdef PLATFORM_WINDOWS
+        auto pfnGetSemaphoreWin32HandleKHR =
+            (PFN_vkGetSemaphoreWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreWin32HandleKHR");
+        if (!pfnGetSemaphoreWin32HandleKHR)
+        {
+            std::cerr << "[VulkanView] vkGetSemaphoreWin32HandleKHR not found\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
+
+        VkSemaphoreGetWin32HandleInfoKHR getSemHandleInfo = {};
+        getSemHandleInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
+        getSemHandleInfo.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+
+        HANDLE glReadyHandle = nullptr;
+        HANDLE vkReadyHandle = nullptr;
+
+        getSemHandleInfo.semaphore = m_vkGlReadySemaphore;
+        pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle);
+
+        getSemHandleInfo.semaphore = m_vkVkReadySemaphore;
+        pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle);
+
+        m_sharedImageInfo.memoryHandle = memHandle;
+        m_sharedImageInfo.size = memReqs.size;
+        m_sharedImageInfo.width = w;
+        m_sharedImageInfo.height = h;
+        m_sharedImageInfo.glReadySemaphoreHandle = glReadyHandle;
+        m_sharedImageInfo.vkReadySemaphoreHandle = vkReadyHandle;
+#else
         auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
         if (!pfnGetSemaphoreFdKHR)
         {
@@ -727,6 +918,7 @@ namespace Rv
         m_sharedImageInfo.height = h;
         m_sharedImageInfo.glReadySemaphoreFd = glReadyFd;
         m_sharedImageInfo.vkReadySemaphoreFd = vkReadyFd;
+#endif
 
         // Transition the shared image to TRANSFER_SRC optimal initially
         VkCommandBuffer cb = m_vkCommandBuffers[0];
@@ -809,6 +1001,24 @@ namespace Rv
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
+
+        // Transition shared image from COLOR_ATTACHMENT_OPTIMAL to TRANSFER_SRC_OPTIMAL
+        VkImageMemoryBarrier sharedBarrier = {};
+        sharedBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        sharedBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        sharedBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+        sharedBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        sharedBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        sharedBarrier.image = m_vkSharedImage;
+        sharedBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        sharedBarrier.subresourceRange.baseMipLevel = 0;
+        sharedBarrier.subresourceRange.levelCount = 1;
+        sharedBarrier.subresourceRange.baseArrayLayer = 0;
+        sharedBarrier.subresourceRange.layerCount = 1;
+        sharedBarrier.srcAccessMask = 0;
+        sharedBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &sharedBarrier);
 
         // Transition swapchain image to transfer dst
         VkImageMemoryBarrier barrier = {};
@@ -1384,4 +1594,4 @@ namespace Rv
 
 } // namespace Rv
 
-#endif // PLATFORM_LINUX
+#endif // PLATFORM_LINUX || PLATFORM_WINDOWS

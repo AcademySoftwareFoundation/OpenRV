@@ -68,14 +68,27 @@ namespace Rv
         //
 
         //  GPU Interop API
+        //
+        //  External handles to a Vulkan device-memory block (and its
+        //  GL<->Vulkan sync semaphores) that GL imports as a memory
+        //  object + semaphores. On Linux these are opaque file
+        //  descriptors; on Windows they are Win32 HANDLEs. Stored as
+        //  void* in the header to keep <windows.h> out of public Qt
+        //  includes; the .cpp casts to HANDLE.
         struct SharedImageInfo
         {
-            int memoryFd;
+#ifdef PLATFORM_WINDOWS
+            void* memoryHandle;             // HANDLE; nullptr when unset
+            void* glReadySemaphoreHandle;
+            void* vkReadySemaphoreHandle;
+#else
+            int memoryFd;                   // -1 when unset
+            int glReadySemaphoreFd;
+            int vkReadySemaphoreFd;
+#endif
             size_t size;
             int width;
             int height;
-            int glReadySemaphoreFd;
-            int vkReadySemaphoreFd;
             int strideWidth;
         };
 
@@ -173,7 +186,11 @@ namespace Rv
         VkDeviceMemory m_vkSharedImageMemory{VK_NULL_HANDLE};
         VkSemaphore m_vkGlReadySemaphore{VK_NULL_HANDLE};
         VkSemaphore m_vkVkReadySemaphore{VK_NULL_HANDLE};
-        SharedImageInfo m_sharedImageInfo{-1, 0, 0, 0, -1, -1, 0};
+#ifdef PLATFORM_WINDOWS
+        SharedImageInfo m_sharedImageInfo{nullptr, nullptr, nullptr, 0, 0, 0, 0};
+#else
+        SharedImageInfo m_sharedImageInfo{-1, -1, -1, 0, 0, 0, 0};
+#endif
 
         void cleanupSharedImage();
     };

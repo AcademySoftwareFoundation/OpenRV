@@ -100,6 +100,7 @@ namespace Rv
         mutable GLuint m_glSharedTexture{0};
         mutable GLuint m_glReadySemaphore{0};
         mutable GLuint m_vkReadySemaphore{0};
+        mutable GLuint m_drawFbo{0};
         mutable int m_sharedWidth{0};
         mutable int m_sharedHeight{0};
 

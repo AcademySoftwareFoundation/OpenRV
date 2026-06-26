@@ -6,14 +6,14 @@
 
 #include <vulkan/vulkan.h>
 
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #include <RvCommon/QTVulkanVideoDevice.h>
 #endif
 
 namespace
 {
     // Build-time probe only: keep one direct Vulkan symbol reference so opt-in
-    // Linux builds prove both headers and link-time loader availability.
+    // Linux/Windows builds prove both headers and link-time loader availability.
     void rvVulkanBuildProbeNoOp()
     {
         PFN_vkVoidFunction fn = vkGetInstanceProcAddr(VK_NULL_HANDLE, "vkCreateInstance");

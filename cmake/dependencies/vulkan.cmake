@@ -28,14 +28,30 @@ RV_FIND_DEPENDENCY(
 )
 
 # --- Library naming (shared between find and build paths), à la glew's _glew_lib_name. ---
-# We reference the SONAME symlink (libvulkan.so.1); the loader also installs the fully versioned real file (libvulkan.so.<version>) and the libvulkan.so dev
+# Linux: reference the SONAME symlink (libvulkan.so.1); the loader also installs the fully versioned real file (libvulkan.so.<version>) and the libvulkan.so dev
 # symlink alongside it.
-SET(_vulkan_lib_name
-    ${CMAKE_SHARED_LIBRARY_PREFIX}vulkan${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_VULKAN_VERSION_LIB}
-)
-SET(_vulkan_lib
-    ${_lib_dir}/${_vulkan_lib_name}
-)
+# Windows: loader produces vulkan-1.dll (in bin/) and the vulkan-1.lib import library (in lib/); the "-1" is RV_DEPS_VULKAN_VERSION_LIB.
+IF(RV_TARGET_WINDOWS)
+  SET(_vulkan_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}vulkan-${RV_DEPS_VULKAN_VERSION_LIB}${CMAKE_SHARED_LIBRARY_SUFFIX}
+  )
+  SET(_vulkan_lib
+      ${_bin_dir}/${_vulkan_lib_name}
+  )
+  SET(_vulkan_implib_name
+      ${CMAKE_IMPORT_LIBRARY_PREFIX}vulkan-${RV_DEPS_VULKAN_VERSION_LIB}${CMAKE_IMPORT_LIBRARY_SUFFIX}
+  )
+  SET(_vulkan_implib
+      ${_lib_dir}/${_vulkan_implib_name}
+  )
+ELSE()
+  SET(_vulkan_lib_name
+      ${CMAKE_SHARED_LIBRARY_PREFIX}vulkan${CMAKE_SHARED_LIBRARY_SUFFIX}.${RV_DEPS_VULKAN_VERSION_LIB}
+  )
+  SET(_vulkan_lib
+      ${_lib_dir}/${_vulkan_lib_name}
+  )
+ENDIF()
 
 IF(${_target}_FOUND)
   # Found via RV_FIND_DEPENDENCY (RV_DEPS_PREFER_INSTALLED=ON). FindVulkan/pkg-config usually provides the Vulkan::Vulkan target; create it only if the
@@ -48,6 +64,8 @@ IF(${_target}_FOUND)
       SHARED
       LOCATION
       ${_vulkan_lib}
+      IMPLIB
+      "${_vulkan_implib}"
       SONAME
       ${_vulkan_lib_name}
       INCLUDE_DIRS
@@ -68,5 +86,13 @@ ELSE()
   # name (repointing it at our fetched build) rather than reusing the system loader.
   INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/vulkan.cmake)
 
-  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_vulkan_lib_name})
+  IF(RV_TARGET_WINDOWS)
+    RV_STAGE_DEPENDENCY_LIBS(
+      TARGET ${_target}
+      BIN_DIR ${_bin_dir}
+      OUTPUTS ${RV_STAGE_BIN_DIR}/${_vulkan_lib_name}
+    )
+  ELSE()
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_vulkan_lib_name})
+  ENDIF()
 ENDIF()

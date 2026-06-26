@@ -9,11 +9,11 @@
 #ifdef PLATFORM_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLVBO.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLState.h>
-#endif
 #endif
 
 #include <TwkPython/PyLockObject.h>

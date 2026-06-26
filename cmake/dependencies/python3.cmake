@@ -314,14 +314,29 @@ IF(RV_TARGET_DARWIN
   )
 ENDIF()
 
+# On Windows debug builds, force Cython to compile from source. Cython's PyPI wheel ships .pyd accelerators built against release python311.dll; loading them
+# under the debug interpreter (python311_d.dll, /MDd CRT) silently fails, so cython.exe exits 1 with no stderr during numpy's pyx->c codegen. PIP_NO_BINARY is
+# an env var so it propagates to subprocess pip invocations -- including numpy's isolated build env, which installs its own Cython per pyproject.toml.
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  SET(_pip_no_binary_env
+      "PIP_NO_BINARY=Cython"
+  )
+ELSE()
+  SET(_pip_no_binary_env
+      ""
+  )
+ENDIF()
+
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_no_binary_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env} ${_pip_no_binary_env}
 )
 # On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
 # OTIO's setup.py always calls "cmake" by name from PATH; it does not read CMAKE_GENERATOR. Prepend the directory of our outer build's cmake binary (the Windows

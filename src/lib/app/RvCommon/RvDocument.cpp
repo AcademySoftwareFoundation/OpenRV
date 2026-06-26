@@ -24,11 +24,17 @@
 #include <GL/glew.h>
 #endif
 #include <RvCommon/GLView.h> // WINDOWS: include AFTER other stuff
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #include <RvCommon/VulkanView.h>
 #include <RvCommon/QTVulkanVideoDevice.h>
+// The X11/QtX11Extras includes (Linux-only, above) drag in GL headers that
+// conflict with GLEW; only assert the include-order invariant on Linux.
+// On Windows, GLEW is intentionally included first (see the
+// PLATFORM_WINDOWS block higher up) and the conflict does not apply.
+#if defined(PLATFORM_LINUX)
 #ifdef __glew_h_
 #error "GLEW IS DEFINED BEFORE QTGUI!"
+#endif
 #endif
 #endif
 #include <RvCommon/DiagnosticsView.h>
@@ -153,7 +159,7 @@ namespace Rv
         , m_oldGLView(0)
         , m_glView(0)
         , m_viewWidget(nullptr)
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         , m_vulkanView(nullptr)
 #endif
         , m_diagnosticsView(nullptr)
@@ -198,23 +204,29 @@ namespace Rv
         //
         //
 
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         // --- Backend selection: Vulkan for 10-bit, OpenGL otherwise ---
         //
         //  The display-depth preference is the user intent. A 10-bit request
         //  (RGB 10 + A 2) routes to the Vulkan presentation path, which avoids
-        //  the 8-bit GLX visual truncation; everything else (8-bit, default)
-        //  stays on the legacy OpenGL GLView. If 10-bit is requested but this
-        //  machine's Vulkan cannot present 10-bit, we fall back to GLView and
-        //  log why. The choice is made once per window at construction; changing
-        //  the preference takes effect on the next launch / new window.
+        //  the 8-bit truncation that the OpenGL+Qt path is subject to on both
+        //  Linux (GLX visual) and Windows (WGL pixel-format negotiation);
+        //  everything else (8-bit, default) stays on the legacy OpenGL GLView.
+        //  If 10-bit is requested but this machine's Vulkan cannot present
+        //  10-bit, we fall back to GLView and log why. The choice is made
+        //  once per window at construction; changing the preference takes
+        //  effect on the next launch / new window.
         //
         const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+
+        cerr << "[10bit] RvDocument: opts disp bits = R" << opts.dispRedBits << " G" << opts.dispGreenBits << " B" << opts.dispBlueBits
+             << " A" << opts.dispAlphaBits << "  -> want10bit=" << (want10bit ? "true" : "false") << endl;
 
         bool useVulkan = false;
         if (want10bit)
         {
             useVulkan = VulkanView::supports10BitPresentation();
+            cerr << "[10bit] RvDocument: VulkanView::supports10BitPresentation() returned " << (useVulkan ? "true" : "false") << endl;
             if (!useVulkan)
             {
                 cerr << "INFO: 10-bit display requested but Vulkan 10-bit "
@@ -222,6 +234,8 @@ namespace Rv
                      << endl;
             }
         }
+
+        cerr << "[10bit] RvDocument: using " << (useVulkan ? "Vulkan (10-bit)" : "OpenGL (legacy)") << " path" << endl;
 
         if (useVulkan)
         {
@@ -659,7 +673,7 @@ namespace Rv
             {
                 const int w = m_session->eventVideoDevice()->width();
                 const int h = m_session->eventVideoDevice()->height();
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
                 if (m_vulkanView)
                 {
                     m_vulkanView->videoDevice()->translator().setRelativeDomain(w, h);
@@ -975,7 +989,7 @@ namespace Rv
 
     void RvDocument::setStereo(bool b)
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         // GL-format queries below are only valid on the OpenGL path; on the
         // Vulkan presentation path m_glView is null.
         if (!m_glView)
@@ -998,7 +1012,7 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
             return;
 #endif
@@ -1017,7 +1031,7 @@ namespace Rv
 
     void RvDocument::setDoubleBuffer(bool b)
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
             return;
 #endif
@@ -1036,7 +1050,7 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
             return;
 #endif
@@ -1084,7 +1098,7 @@ namespace Rv
 
     void RvDocument::setActiveViewContentSize(int w, int h)
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (m_vulkanView)
         {
             m_vulkanView->setContentSize(w, h);
@@ -1099,7 +1113,7 @@ namespace Rv
 
     void RvDocument::setActiveViewMinimumContentSize(int w, int h)
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (m_vulkanView)
         {
             m_vulkanView->setMinimumContentSize(w, h);
@@ -1114,7 +1128,7 @@ namespace Rv
 
     bool RvDocument::activeViewFirstPaintCompleted() const
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (m_vulkanView)
         {
             return m_vulkanView->firstPaintCompleted();
@@ -1129,7 +1143,7 @@ namespace Rv
 
     TwkGLF::GLVideoDevice* RvDocument::viewVideoDevice() const
     {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (m_vulkanView)
         {
             return m_vulkanView->videoDevice();
@@ -1138,7 +1152,7 @@ namespace Rv
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
 
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     VulkanView* RvDocument::vulkanView() const { return m_vulkanView; }
 #endif
 
@@ -1261,7 +1275,7 @@ namespace Rv
 
         setActiveViewContentSize(w, h);
         setActiveViewMinimumContentSize(w, h);
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (m_vulkanView)
         {
             const int dh = m_viewWidget->height() - h;
