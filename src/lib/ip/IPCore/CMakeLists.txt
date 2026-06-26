@@ -306,14 +306,14 @@ ENDIF()
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})
 
-# Stage brush tip assets from the OpenRV-annotation submodule so that BrushTextureManager can find them at Bundle::top()/assets/brushes at runtime. On macOS,
-# Bundle::top() returns RV.app/ (one level above Contents/), so the assets must land at RV.app/assets/brushes rather than RV.app/Contents/assets/brushes.
+# Stage brush tip assets from the OpenRV-annotation submodule so that BrushTextureManager can find them at runtime. On macOS, place them under
+# Contents/Resources so codesign can seal the bundle (files at RV.app/ root outside Contents trigger "unsealed contents present in the bundle root").
 SET(_brush_assets_src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../geometry/twkpaint-src/assets/brushes
 )
 IF(RV_TARGET_DARWIN)
   SET(_brush_stage_dir
-      ${RV_STAGE_ROOT_DIR}/../assets/brushes
+      ${RV_STAGE_RESOURCES_DIR}/assets/brushes
   )
 ELSE()
   SET(_brush_stage_dir
