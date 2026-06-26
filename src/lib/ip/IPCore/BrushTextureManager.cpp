@@ -122,7 +122,14 @@ namespace IPCore
             if (const char* env = std::getenv("RV_BRUSH_DIR"))
                 return env;
             if (TwkApp::Bundle* b = TwkApp::Bundle::mainBundle())
+            {
+#if defined(PLATFORM_DARWIN)
+                // DarwinBundle::top() is RV.app/; keep brush assets under Contents/Resources for codesign.
+                return b->top() + "/Contents/Resources/assets/brushes";
+#else
                 return b->top() + "/assets/brushes";
+#endif
+            }
             return "";
         }
 
