@@ -1203,6 +1203,16 @@ class: ThumbnailRenderer
         _input.reset();
     }
 
+    // Push node to queue's deferred list. If the queue is already exhausted,
+    // restart the timer so the deferred item is not stranded.
+    method: deferNodeToQueue (void; PreviewRenderQueue queue, string node)
+    {
+        queue.progressiveRenderDeferred.push_back(node);
+
+        if (queue.renderIdx >= queue.renderQueue.size())
+            queue.renderTimer.start(0);
+    }
+
 }
 
 documentation: """
@@ -2219,7 +2229,7 @@ class: SessionManagerMode : MinorMode
     {
         if (_thumbnailRenderer._source.renderIdx >= _thumbnailRenderer._source.renderQueue.size()) return;
 
-        let node = _thumbnailRenderer._source.renderQueue[_thumbnailRenderer._source.renderIdx];
+        let node    = _thumbnailRenderer._source.renderQueue[_thumbnailRenderer._source.renderIdx];
         let preview = _thumbnailRenderer._source.progressiveRenderPreviews[_thumbnailRenderer._source.renderIdx];
         _thumbnailRenderer._source.renderIdx = _thumbnailRenderer._source.renderIdx + 1;
         _thumbnailRenderer.makeSourceRowWidget(node, preview);
@@ -2230,9 +2240,9 @@ class: SessionManagerMode : MinorMode
         }
         else if (!_thumbnailRenderer._source.progressiveRenderDeferred.empty())
         {
-            _thumbnailRenderer._source.renderQueue    = _thumbnailRenderer._source.progressiveRenderDeferred;
+            _thumbnailRenderer._source.renderQueue             = _thumbnailRenderer._source.progressiveRenderDeferred;
             _thumbnailRenderer._source.progressiveRenderDeferred = string[]();
-            _thumbnailRenderer._source.renderIdx    = 0;
+            _thumbnailRenderer._source.renderIdx               = 0;
 
             _thumbnailRenderer._source.progressiveRenderPreviews = SourcePreviewWidget[]();
             for_each (dnode; _thumbnailRenderer._source.renderQueue)
@@ -2257,7 +2267,6 @@ class: SessionManagerMode : MinorMode
         let node    = _thumbnailRenderer._input.renderQueue[_thumbnailRenderer._input.renderIdx];
         let preview = _thumbnailRenderer._input.progressiveRenderPreviews[_thumbnailRenderer._input.renderIdx];
         _thumbnailRenderer._input.renderIdx = _thumbnailRenderer._input.renderIdx + 1;
-
         _thumbnailRenderer.makeSourceRowWidget(node, preview);
 
         if (_thumbnailRenderer._input.renderIdx < _thumbnailRenderer._input.renderQueue.size())
@@ -2266,9 +2275,20 @@ class: SessionManagerMode : MinorMode
         }
         else if (!_thumbnailRenderer._input.progressiveRenderDeferred.empty())
         {
-            _thumbnailRenderer._input.renderQueue    = _thumbnailRenderer._input.progressiveRenderDeferred;
+            _thumbnailRenderer._input.renderQueue             = _thumbnailRenderer._input.progressiveRenderDeferred;
             _thumbnailRenderer._input.progressiveRenderDeferred = string[]();
-            _thumbnailRenderer._input.renderIdx    = 0;
+            _thumbnailRenderer._input.renderIdx               = 0;
+
+            _thumbnailRenderer._input.progressiveRenderPreviews = SourcePreviewWidget[]();
+            for_each (dnode; _thumbnailRenderer._input.renderQueue)
+            {
+                let item    = itemOfNode(_viewModel, dnode);
+                let preview = SourcePreviewWidget(nil);
+                let w       = _thumbnailRenderer.displaySourceRowPreview(dnode, preview);
+                _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
+                _thumbnailRenderer._input.progressiveRenderPreviews.push_back(preview);
+            }
+
             _thumbnailRenderer._input.renderTimer.start(0);
         }
     }
@@ -2399,14 +2419,17 @@ class: SessionManagerMode : MinorMode
         }
         if (node eq nil) return;
 
-        bool inThumbnailQueue = false;
+        bool inSourceQueue = false;
         for (int i = _thumbnailRenderer._source.renderIdx; i < _thumbnailRenderer._source.renderQueue.size(); i++)
-            if (_thumbnailRenderer._source.renderQueue[i] == node) { inThumbnailQueue = true; break; }
-        if (inThumbnailQueue)
-        {
-            _thumbnailRenderer._source.progressiveRenderDeferred.push_back(node);
-            return;
-        }
+            if (_thumbnailRenderer._source.renderQueue[i] == node) { inSourceQueue = true; break; }
+
+        bool inInputQueue = false;
+        for (int i = _thumbnailRenderer._input.renderIdx; i < _thumbnailRenderer._input.renderQueue.size(); i++)
+            if (_thumbnailRenderer._input.renderQueue[i] == node) { inInputQueue = true; break; }
+
+        if (inSourceQueue) _thumbnailRenderer.deferNodeToQueue(_thumbnailRenderer._source, node);
+        if (inInputQueue)  _thumbnailRenderer.deferNodeToQueue(_thumbnailRenderer._input, node);
+        if (inSourceQueue || inInputQueue) return;
 
         let item = itemOfNode(_viewModel, node);
         if (item neq nil)
