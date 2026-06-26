@@ -299,6 +299,12 @@ namespace Rv
         QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
     }
 
+    void MetalView::renderImmediately()
+    {
+        m_updatePending = false;
+        render();
+    }
+
     //--------------------------------------------------------------------------
 
     void MetalView::render()
@@ -314,6 +320,8 @@ namespace Rv
         if (m_doc && session && m_videoDevice)
         {
             m_videoDevice->makeCurrent();
+            if (!m_videoDevice->isGLContextReady())
+                return;
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {

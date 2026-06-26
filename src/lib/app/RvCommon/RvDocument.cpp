@@ -74,6 +74,7 @@
 #if defined(USE_METAL)
 #include <RvCommon/MetalView.h>
 #include <RvCommon/QTMetalVideoDevice.h>
+#include <IPCore/ShaderFunction.h>
 #endif
 #endif
 
@@ -258,6 +259,14 @@ namespace Rv
             // already available; actual CALayer setup happens later in
             // MetalView::initialize() (which re-calls initializeSession but hits the
             // if (!m_session) guard and exits immediately).
+            //
+            // GLSL version must be preset and the offscreen GL context made current
+            // before initializeSession(): session init may construct Shader::Function
+            // objects, whose initGLSLVersion() calls glGetString and aborts without a
+            // context.  Only preset on the active Metal path — main-branch IPCore keeps
+            // the normal glGetString path for all other backends.
+            IPCore::Shader::Function::useShadingLanguageVersion("1.20");
+            m_metalView->videoDevice()->makeCurrent();
             initializeSession();
         }
         else

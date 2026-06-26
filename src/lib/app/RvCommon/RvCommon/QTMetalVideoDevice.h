@@ -79,6 +79,9 @@ namespace Rv
 
         virtual void setPhysicalDevice(VideoDevice* d) override;
 
+        // True when the offscreen GL context, surface, and FBO are ready for rendering.
+        bool isGLContextReady() const { return m_glContextReady; }
+
         // GLVideoDevice API
         virtual TwkGLF::GLFBO* defaultFBO() override;
         virtual const TwkGLF::GLFBO* defaultFBO() const override;
@@ -87,7 +90,8 @@ namespace Rv
     private:
         // Ensure the NSOpenGLContext + FBO exist and match the current view size.
         // Makes the GL context current and binds the FBO on return.
-        void ensureGLContext() const;
+        // Returns false when context creation, makeCurrent, or FBO setup fails.
+        bool ensureGLContext() const;
 
         // Zero-copy present: (re)create a small ring of IOSurfaces, each bound as
         // a GL_TEXTURE_RECTANGLE_ARB / GL_RGB10_A2 texture (via
@@ -118,6 +122,7 @@ namespace Rv
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
+        mutable bool m_glContextReady{false};
 
         // IOSurface present ring (zero-copy GL->IOSurface->CALayer path).
         // Double-buffered so the CA compositor can read the just-presented

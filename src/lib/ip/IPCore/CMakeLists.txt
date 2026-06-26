@@ -300,10 +300,6 @@ ELSEIF(RV_TARGET_DARWIN)
     ${_target}
     PUBLIC OpenCL::OpenCL
   )
-  TARGET_COMPILE_DEFINITIONS(
-    ${_target}
-    PRIVATE USE_METAL
-  )
 ELSE()
   TARGET_LINK_LIBRARIES(${_target})
 ENDIF()

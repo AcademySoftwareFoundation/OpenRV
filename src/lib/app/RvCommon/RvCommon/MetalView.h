@@ -121,6 +121,9 @@ namespace Rv
         //
         void requestUpdate();
 
+        // Synchronous render (used by redrawImmediately); bypasses UpdateRequest coalescing.
+        void renderImmediately();
+
         bool isInitialized() const { return m_initialized; }
 
     public slots:
