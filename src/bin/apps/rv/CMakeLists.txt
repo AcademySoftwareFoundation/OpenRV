@@ -127,6 +127,15 @@ TARGET_COMPILE_OPTIONS(
           -DRELEASE_DESCRIPTION=\"${RV_RELEASE_DESCRIPTION}\"
 )
 
+# Generate PDB debug symbols on Windows (for crash dump symbolication)
+IF(RV_TARGET_WINDOWS)
+  TARGET_COMPILE_OPTIONS(
+    ${_target}
+    PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/Zi>
+  )
+  TARGET_LINK_OPTIONS(${_target} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/DEBUG>)
+ENDIF()
+
 GET_PROPERTY(
   RV_THIRD_PARTY_CUSTOMIZATION GLOBAL
   PROPERTY "RV_THIRD_PARTY_CUSTOMIZATION"
@@ -143,3 +152,28 @@ IF(RV_THIRD_PARTY_CUSTOMIZATION)
 ENDIF()
 
 RV_STAGE(TYPE "MAIN_EXECUTABLE" TARGET ${_target})
+
+# Install symbolication helper scripts (Linux only — macOS is handled in nsapps/RV/CMakeLists.txt)
+IF(RV_TARGET_LINUX)
+  # Breakpad symbolication helper (uses minidump_stackwalk)
+  IF(RV_DEPS_BREAKPAD_VERSION)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/symbolicate_crash.sh ${RV_STAGE_BIN_DIR}/symbolicate_crash.sh COPYONLY)
+  ENDIF()
+
+  # Crashpad handler wrapper
+  IF(RV_DEPS_CRASHPAD_VERSION)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/crashpad_handler_linux.sh.in ${RV_STAGE_BIN_DIR}/crashpad_handler_linux.sh @ONLY)
+    FILE(
+      CHMOD
+      ${RV_STAGE_BIN_DIR}/crashpad_handler_linux.sh
+      PERMISSIONS
+      OWNER_READ
+      OWNER_WRITE
+      OWNER_EXECUTE
+      GROUP_READ
+      GROUP_EXECUTE
+      WORLD_READ
+      WORLD_EXECUTE
+    )
+  ENDIF()
+ENDIF()
