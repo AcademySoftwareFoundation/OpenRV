@@ -514,6 +514,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _on_play_start(self, event: Any) -> None:
         event.reject()
+        print("DEBUG: play starting")
         with self._procs_lock:
             self._playback_active = True
             for proc in self._active_procs:
