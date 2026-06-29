@@ -16,6 +16,7 @@
 #include <TwkApp/VideoDevice.h>
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
@@ -100,6 +101,8 @@ namespace Rv
     VulkanView::~VulkanView()
     {
         delete m_videoDevice;
+        m_videoDevice = nullptr;
+        cleanupSharedImage();
         cleanupSwapchain();
         cleanupVulkan();
     }
@@ -150,7 +153,8 @@ namespace Rv
 
         if (!initVulkan())
         {
-            std::cerr << "[VulkanView] initVulkan failed\n";
+            std::cerr << "[VulkanView] initVulkan failed; falling back to OpenGL\n";
+            requestGLFallback();
             return;
         }
 
@@ -217,7 +221,7 @@ namespace Rv
             bool has10bit = false;
             for (const auto& fmt : formats)
             {
-                if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+                if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
                 {
                     has10bit = true;
                     any10bit = true;
@@ -374,6 +378,12 @@ namespace Rv
 
         vkGetDeviceQueue(m_vkDevice, m_queueFamilyIndex, 0, &m_vkQueue);
 
+        auto failInit = [this]()
+        {
+            cleanupVulkan();
+            return false;
+        };
+
         // Command pool
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -381,7 +391,7 @@ namespace Rv
         poolInfo.queueFamilyIndex = m_queueFamilyIndex;
         if (vkCreateCommandPool(m_vkDevice, &poolInfo, nullptr, &m_vkCommandPool) != VK_SUCCESS)
         {
-            return false;
+            return failInit();
         }
 
         // Sync objects
@@ -389,21 +399,81 @@ namespace Rv
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore) != VK_SUCCESS)
         {
-            return false;
+            return failInit();
         }
         if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkRenderFinishedSemaphore) != VK_SUCCESS)
         {
-            return false;
+            return failInit();
         }
 
         VkFenceCreateInfo fenceInfo = {};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         if (vkCreateFence(m_vkDevice, &fenceInfo, nullptr, &m_vkFence) != VK_SUCCESS)
         {
-            return false;
+            return failInit();
         }
 
         return true;
+    }
+
+    // Queue fallbackVulkanToGLView on the next event-loop tick (at most once).
+    void VulkanView::requestGLFallback()
+    {
+        if (m_glFallbackRequested || !m_doc || m_stopProcessingEvents || m_doc->isClosing())
+        {
+            return;
+        }
+        m_glFallbackRequested = true;
+        QTimer::singleShot(0, m_doc, [doc = m_doc]() { doc->fallbackVulkanToGLView(); });
+    }
+
+    // Skip swapchain work during close or zero-size resize.
+    bool VulkanView::presentationAllowed() const
+    {
+        if (m_stopProcessingEvents)
+        {
+            return false;
+        }
+        if (width() <= 0 || height() <= 0)
+        {
+            return false;
+        }
+        if (m_doc && m_doc->isClosing())
+        {
+            return false;
+        }
+        return true;
+    }
+
+    // Reset acquire semaphore and rebuild swapchain/shared image at the new size.
+    void VulkanView::handleSwapchainOutOfDate()
+    {
+        if (!m_vkDevice || !presentationAllowed())
+        {
+            return;
+        }
+
+        if (m_vkImageAvailableSemaphore)
+        {
+            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
+            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+        }
+
+        VkSemaphoreCreateInfo semaphoreInfo = {};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore) != VK_SUCCESS)
+        {
+            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+            requestGLFallback();
+            return;
+        }
+
+        cleanupSharedImage();
+        cleanupSwapchain();
+        if (!createSwapchain())
+        {
+            requestGLFallback();
+        }
     }
 
     void VulkanView::cleanupVulkan()
@@ -413,17 +483,31 @@ namespace Rv
             vkDeviceWaitIdle(m_vkDevice);
 
             if (m_vkImageAvailableSemaphore)
+            {
                 vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
+                m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+            }
             if (m_vkRenderFinishedSemaphore)
+            {
                 vkDestroySemaphore(m_vkDevice, m_vkRenderFinishedSemaphore, nullptr);
+                m_vkRenderFinishedSemaphore = VK_NULL_HANDLE;
+            }
             if (m_vkFence)
+            {
                 vkDestroyFence(m_vkDevice, m_vkFence, nullptr);
+                m_vkFence = VK_NULL_HANDLE;
+            }
 
             if (m_vkCommandPool)
+            {
                 vkDestroyCommandPool(m_vkDevice, m_vkCommandPool, nullptr);
+                m_vkCommandPool = VK_NULL_HANDLE;
+            }
 
             vkDestroyDevice(m_vkDevice, nullptr);
+            m_vkDevice = VK_NULL_HANDLE;
         }
+        m_vkQueue = VK_NULL_HANDLE;
         // Surface is managed by QVulkanInstance? We shouldn't destroy it here if QVulkanInstance owns it, but wait, we got it from
         // surfaceForWindow. Actually QVulkanWindow destroys it. We can just leave it for QVulkanInstance to clean up, or we can
         // vkDestroySurfaceKHR if needed. For safety we don't destroy instance/surface here, they are tied to Qt.
@@ -432,6 +516,11 @@ namespace Rv
     bool VulkanView::createSwapchain()
     {
         if (!m_vkDevice || !m_vkSurface)
+        {
+            return false;
+        }
+
+        if (!presentationAllowed())
         {
             return false;
         }
@@ -488,42 +577,9 @@ namespace Rv
         }
         else
         {
-            std::cerr << "[10bit] VulkanView::createSwapchain: A2B10G10R10_UNORM_PACK32 NOT offered; falling back to format=" << surfaceFormat.format
-                      << " (" << formatName(surfaceFormat.format) << ") -- presentation will truncate to <=8-bit\n";
-        }
-
-        // The Vulkan path was selected to deliver 10-bit. If the surface does
-        // not actually offer a 10-bit format, presentation truncates to 8-bit
-        // and Vulkan provides no quality benefit over OpenGL (only the GL<->Vulkan
-        // interop overhead). The device-level probe in supports10BitPresentation()
-        // cannot detect this surface/compositor limitation, so warn here once it
-        // is known. (Decision-time fallback to OpenGL is a possible follow-up.)
-        static bool warned8bit = false;
-        if (!found10bit && !warned8bit)
-        {
-            warned8bit = true;
-            // Also report if A2R10G10B10 is available but not usable.
-            bool has_a2r10g10b10 = false;
-            for (const auto& fmt : formats)
-            {
-                if (fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
-                {
-                    has_a2r10g10b10 = true;
-                    break;
-                }
-            }
-            if (has_a2r10g10b10)
-            {
-                std::cerr << "[VulkanView] WARNING: Vulkan surface offers A2R10G10B10 but not "
-                             "A2B10G10R10; presenting 8-bit (channel-swapped 10-bit not yet "
-                             "supported).\n";
-            }
-            else
-            {
-                std::cerr << "[VulkanView] WARNING: Vulkan surface offers no 10-bit "
-                             "format; presenting 8-bit. Vulkan gives no benefit over "
-                             "OpenGL on this surface/compositor.\n";
-            }
+            std::cerr << "[VulkanView] Real surface lacks A2B10G10R10; requesting OpenGL fallback\n";
+            requestGLFallback();
+            return false;
         }
 
         m_vkSwapchainFormat = surfaceFormat.format;
@@ -535,6 +591,7 @@ namespace Rv
         }
         if (m_vkSwapchainExtent.width == 0 || m_vkSwapchainExtent.height == 0)
         {
+            requestGLFallback();
             return false;
         }
 
@@ -562,6 +619,7 @@ namespace Rv
 
         if (vkCreateSwapchainKHR(m_vkDevice, &createInfo, nullptr, &m_vkSwapchain) != VK_SUCCESS)
         {
+            requestGLFallback();
             return false;
         }
 
@@ -575,7 +633,12 @@ namespace Rv
         allocInfo.commandPool = m_vkCommandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = (uint32_t)m_vkCommandBuffers.size();
-        vkAllocateCommandBuffers(m_vkDevice, &allocInfo, m_vkCommandBuffers.data());
+        if (vkAllocateCommandBuffers(m_vkDevice, &allocInfo, m_vkCommandBuffers.data()) != VK_SUCCESS)
+        {
+            cleanupSwapchain();
+            requestGLFallback();
+            return false;
+        }
 
         return true;
     }
@@ -788,7 +851,12 @@ namespace Rv
             return nullptr;
         }
 
-        vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0);
+        if (vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0) != VK_SUCCESS)
+        {
+            std::cerr << "[VulkanView] Failed to bind shared image memory\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         // Export device memory as a platform-specific external handle
         // (opaque FD on Linux, Win32 HANDLE on Windows). The receiving GL
@@ -879,10 +947,20 @@ namespace Rv
         HANDLE vkReadyHandle = nullptr;
 
         getSemHandleInfo.semaphore = m_vkGlReadySemaphore;
-        pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle);
+        if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle) != VK_SUCCESS || !glReadyHandle)
+        {
+            std::cerr << "[VulkanView] Failed to get glReady semaphore HANDLE\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         getSemHandleInfo.semaphore = m_vkVkReadySemaphore;
-        pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle);
+        if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle) != VK_SUCCESS || !vkReadyHandle)
+        {
+            std::cerr << "[VulkanView] Failed to get vkReady semaphore HANDLE\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         m_sharedImageInfo.memoryHandle = memHandle;
         m_sharedImageInfo.size = memReqs.size;
@@ -907,10 +985,20 @@ namespace Rv
         int vkReadyFd = -1;
 
         getSemFdInfo.semaphore = m_vkGlReadySemaphore;
-        pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd);
+        if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd) != VK_SUCCESS || glReadyFd < 0)
+        {
+            std::cerr << "[VulkanView] Failed to get glReady semaphore FD\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         getSemFdInfo.semaphore = m_vkVkReadySemaphore;
-        pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd);
+        if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd) != VK_SUCCESS || vkReadyFd < 0)
+        {
+            std::cerr << "[VulkanView] Failed to get vkReady semaphore FD\n";
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         m_sharedImageInfo.memoryFd = memFd;
         m_sharedImageInfo.size = memReqs.size;
@@ -954,7 +1042,16 @@ namespace Rv
         submitInfo.pCommandBuffers = &cb;
 
         vkResetFences(m_vkDevice, 1, &m_vkFence);
-        vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        VkResult layoutSubmitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        if (layoutSubmitResult != VK_SUCCESS)
+        {
+            if (layoutSubmitResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            cleanupSharedImage();
+            return nullptr;
+        }
         vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
 
         // Signal vkReady initially so GL can start writing to it
@@ -962,7 +1059,16 @@ namespace Rv
         signalInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         signalInfo.signalSemaphoreCount = 1;
         signalInfo.pSignalSemaphores = &m_vkVkReadySemaphore;
-        vkQueueSubmit(m_vkQueue, 1, &signalInfo, VK_NULL_HANDLE);
+        VkResult signalResult = vkQueueSubmit(m_vkQueue, 1, &signalInfo, VK_NULL_HANDLE);
+        if (signalResult != VK_SUCCESS)
+        {
+            if (signalResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            cleanupSharedImage();
+            return nullptr;
+        }
 
         return &m_sharedImageInfo;
     }
@@ -982,15 +1088,18 @@ namespace Rv
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            // Swapchain out of date; recreate it next frame. Per the Vulkan spec, after an
-            // acquire error the semaphore is in undefined state and must not be reused.
-            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
-            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
-            VkSemaphoreCreateInfo semaphoreInfo = {};
-            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore);
+            handleSwapchainOutOfDate();
             return;
         }
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            if (result == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
+        const bool swapchainSuboptimal = (result == VK_SUBOPTIMAL_KHR);
 
         vkResetFences(m_vkDevice, 1, &m_vkFence);
 
@@ -1079,7 +1188,15 @@ namespace Rv
         submitInfo.signalSemaphoreCount = 2;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        if (submitResult != VK_SUCCESS)
+        {
+            if (submitResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
 
         // Present
         VkPresentInfoKHR presentInfo = {};
@@ -1091,7 +1208,21 @@ namespace Rv
         presentInfo.pSwapchains = swapchains;
         presentInfo.pImageIndices = &imageIndex;
 
-        vkQueuePresentKHR(m_vkQueue, &presentInfo);
+        VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR || swapchainSuboptimal)
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
+            handleSwapchainOutOfDate();
+            return;
+        }
+        if (presentResult != VK_SUCCESS)
+        {
+            if (presentResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
 
         vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
     }
@@ -1161,15 +1292,18 @@ namespace Rv
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            // Per the Vulkan spec, after an acquire error the semaphore is in undefined state.
-            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
-            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
-            VkSemaphoreCreateInfo semaphoreInfo = {};
-            semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore);
-            cleanupSwapchain();
+            handleSwapchainOutOfDate();
             return;
         }
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            if (result == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
+        const bool swapchainSuboptimal = (result == VK_SUBOPTIMAL_KHR);
 
         vkResetFences(m_vkDevice, 1, &m_vkFence);
 
@@ -1238,7 +1372,15 @@ namespace Rv
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        if (submitResult != VK_SUCCESS)
+        {
+            if (submitResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
 
         // Present
         VkPresentInfoKHR presentInfo = {};
@@ -1250,7 +1392,21 @@ namespace Rv
         presentInfo.pSwapchains = swapchains;
         presentInfo.pImageIndices = &imageIndex;
 
-        vkQueuePresentKHR(m_vkQueue, &presentInfo);
+        VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR || swapchainSuboptimal)
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
+            handleSwapchainOutOfDate();
+            return;
+        }
+        if (presentResult != VK_SUCCESS)
+        {
+            if (presentResult == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return;
+        }
 
         vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
     }
@@ -1259,6 +1415,10 @@ namespace Rv
 
     void VulkanView::requestUpdate()
     {
+        if (m_stopProcessingEvents)
+        {
+            return;
+        }
         // Coalesce: only queue a render if one isn't already pending. The flag is
         // cleared at the start of render(), so a resize arriving mid-render
         // schedules exactly one follow-up render at the newest size.
@@ -1271,6 +1431,11 @@ namespace Rv
     void VulkanView::render()
     {
         m_updatePending = false;
+
+        if (m_stopProcessingEvents)
+        {
+            return;
+        }
 
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
@@ -1357,11 +1522,19 @@ namespace Rv
         // so drive a render now to recreate the swapchain at the new size and
         // present immediately (instead of waiting for a mouse Enter event).
         // Coalesced so a fast drag doesn't queue one heavy recreate per event.
-        requestUpdate();
+        if (!m_stopProcessingEvents)
+        {
+            requestUpdate();
+        }
     }
 
     void VulkanView::paintEvent(QPaintEvent* event)
     {
+        if (m_stopProcessingEvents)
+        {
+            return;
+        }
+
         if (m_doc && m_doc->session() && m_doc->session()->outputVideoDevice())
         {
             m_doc->session()->outputVideoDevice()->syncBuffers();

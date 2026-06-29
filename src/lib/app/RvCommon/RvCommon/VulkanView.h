@@ -21,7 +21,7 @@ namespace Rv
     //
     //  VulkanView
     //
-    //  A QWidget subclass that presents 10-bit Vulkan images on Linux.
+    //  A QWidget subclass that presents 10-bit Vulkan images on Linux and Windows.
     //  All IPCore image processing runs in OpenGL via a separate
     //  QOpenGLContext+QOffscreenSurface; the Vulkan path is used only for
     //  final 10-bit pixel delivery to avoid 8-bit GLX visual truncation.
@@ -102,7 +102,7 @@ namespace Rv
 
         //
         //  Surface-independent probe for whether this machine's Vulkan can
-        //  present a 10-bit (A2B10G10R10 / A2R10G10B10) image. Used at
+        //  present A2B10G10R10 (the format used by GL_RGB10_A2 interop). Used at
         //  RvDocument construction time to decide whether a 10-bit display
         //  request should route to the Vulkan path or fall back to OpenGL.
         //  Creates a throwaway QVulkanInstance and queries format support; it
@@ -193,6 +193,17 @@ namespace Rv
 #endif
 
         void cleanupSharedImage();
+
+        // Recreate swapchain (and shared image) after OUT_OF_DATE / SUBOPTIMAL.
+        void handleSwapchainOutOfDate();
+
+        // Queue a one-shot switch to GLView; no-op during shutdown.
+        void requestGLFallback();
+
+        // False while closing or when the widget has no drawable size.
+        bool presentationAllowed() const;
+
+        bool m_glFallbackRequested{false};
     };
 
 } // namespace Rv

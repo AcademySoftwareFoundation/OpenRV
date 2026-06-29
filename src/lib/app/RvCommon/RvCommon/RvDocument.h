@@ -93,6 +93,12 @@ namespace Rv
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         VulkanView* vulkanView() const;
+
+        // True once close has been accepted or the document is being destroyed.
+        bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
+
+        // Replace a live VulkanView with GLView after a runtime Vulkan failure.
+        void fallbackVulkanToGLView();
 #endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }

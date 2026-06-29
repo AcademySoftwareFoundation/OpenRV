@@ -469,6 +469,15 @@ namespace Rv
 
     RvDocument::~RvDocument()
     {
+        m_currentlyClosing = true;
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        if (m_vulkanView)
+        {
+            m_vulkanView->stopProcessingEvents();
+        }
+#endif
+
         if (IPCore::debugProfile)
         {
             Rv::Options& opts = Options::sharedOptions();
@@ -552,8 +561,6 @@ namespace Rv
         {
             d->sessionDeleted(m_session->name().c_str());
         }
-
-        m_currentlyClosing = true;
 
         if (RvApp()->isInPresentationMode())
         {
@@ -865,6 +872,94 @@ namespace Rv
         delete m_oldGLView;
         m_oldGLView = 0;
     }
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    // Hot-swap VulkanView -> GLView and rebind the live session to the GL device.
+    void RvDocument::fallbackVulkanToGLView()
+    {
+        if (!m_vulkanView || isClosing())
+        {
+            return;
+        }
+
+        cerr << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to OpenGL." << endl;
+
+        VulkanView* oldVulkanView = m_vulkanView;
+        m_vulkanView = nullptr;
+
+        oldVulkanView->stopProcessingEvents();
+
+        Rv::Options& opts = Options::sharedOptions();
+        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
+
+        GLView* newGLView = nullptr;
+        if (docs.size() <= 1)
+        {
+            newGLView =
+                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
+                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+        }
+        else
+        {
+            RvSession* s = static_cast<RvSession*>(docs.front());
+            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
+            newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                                   opts.vsync != 0 && !m_vsyncDisabled,
+                                   true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+        }
+
+        newGLView->setContentSize(oldVulkanView->sizeHint().width(), oldVulkanView->sizeHint().height());
+        newGLView->setMinimumSize(QSize(oldVulkanView->minimumSizeHint().width(), oldVulkanView->minimumSizeHint().height()));
+        newGLView->setFocusPolicy(Qt::StrongFocus);
+        newGLView->setMouseTracking(true);
+        newGLView->setAcceptDrops(true);
+        newGLView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+        m_stackedLayout->removeWidget(oldVulkanView);
+        m_stackedLayout->addWidget(newGLView);
+        oldVulkanView->hide();
+
+        m_glView = newGLView;
+        m_viewWidget = newGLView;
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+        newGLView->show();
+
+        m_topViewToolBar->setDevice(m_glView->videoDevice());
+
+        if (m_session)
+        {
+            const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+            m_session->setEventVideoDevice(0);
+            m_session->setOutputVideoDevice(0);
+            m_session->setControlVideoDevice(m_glView->videoDevice());
+            if (same)
+            {
+                m_session->setOutputVideoDevice(m_glView->videoDevice());
+            }
+
+            m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+        }
+
+        if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
+        {
+            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
+
+            for (size_t i = 0; i < devices.size(); i++)
+            {
+                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+                {
+                    d->setShareDevice(m_glView->videoDevice());
+                }
+            }
+        }
+
+        delete oldVulkanView;
+
+        newGLView->videoDevice()->makeCurrent();
+        newGLView->update();
+    }
+#endif
 
     void RvDocument::resetSizePolicy()
     {
@@ -2207,9 +2302,19 @@ namespace Rv
             string ok = m_session->userGenericEvent("before-session-deletion", "");
 
             if (ok == "")
+            {
                 event->accept();
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+                if (m_vulkanView)
+                {
+                    m_vulkanView->stopProcessingEvents();
+                }
+#endif
+            }
             else
+            {
                 event->ignore();
+            }
 
             m_closeEventReceived = true;
         }
