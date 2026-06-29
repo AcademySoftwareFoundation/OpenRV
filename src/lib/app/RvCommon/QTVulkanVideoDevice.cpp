@@ -96,17 +96,15 @@
 typedef void(GLAPIENTRY* PFNGLCREATEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, GLuint* memoryObjects);
 typedef void(GLAPIENTRY* PFNGLDELETEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, const GLuint* memoryObjects);
 typedef void(GLAPIENTRY* PFNGLTEXSTORAGEMEM2DEXTPROC_RV)(GLenum target, GLsizei levels, GLenum internalFormat, GLsizei width,
-                                                        GLsizei height, GLuint memory, GLuint64 offset);
+                                                         GLsizei height, GLuint memory, GLuint64 offset);
 typedef void(GLAPIENTRY* PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV)(GLuint memory, GLuint64 size, GLenum handleType, void* handle);
 typedef void(GLAPIENTRY* PFNGLGENSEMAPHORESEXTPROC_RV)(GLsizei n, GLuint* semaphores);
 typedef void(GLAPIENTRY* PFNGLDELETESEMAPHORESEXTPROC_RV)(GLsizei n, const GLuint* semaphores);
 typedef void(GLAPIENTRY* PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV)(GLuint semaphore, GLenum handleType, void* handle);
 typedef void(GLAPIENTRY* PFNGLWAITSEMAPHOREEXTPROC_RV)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
-                                                      GLuint numTextureBarriers, const GLuint* textures,
-                                                      const GLenum* dstLayouts);
+                                                       GLuint numTextureBarriers, const GLuint* textures, const GLenum* dstLayouts);
 typedef void(GLAPIENTRY* PFNGLSIGNALSEMAPHOREEXTPROC_RV)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
-                                                        GLuint numTextureBarriers, const GLuint* textures,
-                                                        const GLenum* srcLayouts);
+                                                         GLuint numTextureBarriers, const GLuint* textures, const GLenum* srcLayouts);
 
 namespace
 {
@@ -130,22 +128,17 @@ namespace
             return g_glInteropAvailable;
         g_glInteropProbed = true;
 
-        g_glCreateMemoryObjectsEXT =
-            reinterpret_cast<PFNGLCREATEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glCreateMemoryObjectsEXT"));
-        g_glDeleteMemoryObjectsEXT =
-            reinterpret_cast<PFNGLDELETEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glDeleteMemoryObjectsEXT"));
-        g_glTexStorageMem2DEXT =
-            reinterpret_cast<PFNGLTEXSTORAGEMEM2DEXTPROC_RV>(wglGetProcAddress("glTexStorageMem2DEXT"));
+        g_glCreateMemoryObjectsEXT = reinterpret_cast<PFNGLCREATEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glCreateMemoryObjectsEXT"));
+        g_glDeleteMemoryObjectsEXT = reinterpret_cast<PFNGLDELETEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glDeleteMemoryObjectsEXT"));
+        g_glTexStorageMem2DEXT = reinterpret_cast<PFNGLTEXSTORAGEMEM2DEXTPROC_RV>(wglGetProcAddress("glTexStorageMem2DEXT"));
         g_glImportMemoryWin32HandleEXT =
             reinterpret_cast<PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportMemoryWin32HandleEXT"));
         g_glGenSemaphoresEXT = reinterpret_cast<PFNGLGENSEMAPHORESEXTPROC_RV>(wglGetProcAddress("glGenSemaphoresEXT"));
-        g_glDeleteSemaphoresEXT =
-            reinterpret_cast<PFNGLDELETESEMAPHORESEXTPROC_RV>(wglGetProcAddress("glDeleteSemaphoresEXT"));
-        g_glImportSemaphoreWin32HandleEXT = reinterpret_cast<PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV>(
-            wglGetProcAddress("glImportSemaphoreWin32HandleEXT"));
+        g_glDeleteSemaphoresEXT = reinterpret_cast<PFNGLDELETESEMAPHORESEXTPROC_RV>(wglGetProcAddress("glDeleteSemaphoresEXT"));
+        g_glImportSemaphoreWin32HandleEXT =
+            reinterpret_cast<PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportSemaphoreWin32HandleEXT"));
         g_glWaitSemaphoreEXT = reinterpret_cast<PFNGLWAITSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glWaitSemaphoreEXT"));
-        g_glSignalSemaphoreEXT =
-            reinterpret_cast<PFNGLSIGNALSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glSignalSemaphoreEXT"));
+        g_glSignalSemaphoreEXT = reinterpret_cast<PFNGLSIGNALSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glSignalSemaphoreEXT"));
 
         g_glInteropAvailable = g_glCreateMemoryObjectsEXT && g_glDeleteMemoryObjectsEXT && g_glTexStorageMem2DEXT
                                && g_glImportMemoryWin32HandleEXT && g_glGenSemaphoresEXT && g_glDeleteSemaphoresEXT

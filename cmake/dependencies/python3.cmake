@@ -331,7 +331,8 @@ ENDIF()
 
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_no_binary_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_no_binary_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir
+    ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)

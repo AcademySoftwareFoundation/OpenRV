@@ -914,8 +914,8 @@ namespace Rv
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
             QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
             newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                   opts.vsync != 0 && !m_vsyncDisabled,
-                                   true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+                                   opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
+                                   opts.dispAlphaBits, !m_startupResize);
         }
 
         newGLView->setContentSize(oldVulkanView->sizeHint().width(), oldVulkanView->sizeHint().height());

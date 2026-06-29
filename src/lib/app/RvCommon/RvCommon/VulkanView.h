@@ -78,11 +78,11 @@ namespace Rv
         struct SharedImageInfo
         {
 #ifdef PLATFORM_WINDOWS
-            void* memoryHandle;             // HANDLE; nullptr when unset
+            void* memoryHandle; // HANDLE; nullptr when unset
             void* glReadySemaphoreHandle;
             void* vkReadySemaphoreHandle;
 #else
-            int memoryFd;                   // -1 when unset
+            int memoryFd; // -1 when unset
             int glReadySemaphoreFd;
             int vkReadySemaphoreFd;
 #endif

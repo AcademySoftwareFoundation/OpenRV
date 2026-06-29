@@ -29,8 +29,7 @@ RV_FIND_DEPENDENCY(
 
 # --- Library naming (shared between find and build paths), à la glew's _glew_lib_name. ---
 # Linux: reference the SONAME symlink (libvulkan.so.1); the loader also installs the fully versioned real file (libvulkan.so.<version>) and the libvulkan.so dev
-# symlink alongside it.
-# Windows: loader produces vulkan-1.dll (in bin/) and the vulkan-1.lib import library (in lib/); the "-1" is RV_DEPS_VULKAN_VERSION_LIB.
+# symlink alongside it. Windows: loader produces vulkan-1.dll (in bin/) and the vulkan-1.lib import library (in lib/); the "-1" is RV_DEPS_VULKAN_VERSION_LIB.
 IF(RV_TARGET_WINDOWS)
   SET(_vulkan_lib_name
       ${CMAKE_SHARED_LIBRARY_PREFIX}vulkan-${RV_DEPS_VULKAN_VERSION_LIB}${CMAKE_SHARED_LIBRARY_SUFFIX}
@@ -87,11 +86,7 @@ ELSE()
   INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/vulkan.cmake)
 
   IF(RV_TARGET_WINDOWS)
-    RV_STAGE_DEPENDENCY_LIBS(
-      TARGET ${_target}
-      BIN_DIR ${_bin_dir}
-      OUTPUTS ${RV_STAGE_BIN_DIR}/${_vulkan_lib_name}
-    )
+    RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} BIN_DIR ${_bin_dir} OUTPUTS ${RV_STAGE_BIN_DIR}/${_vulkan_lib_name})
   ELSE()
     RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} OUTPUTS ${RV_STAGE_LIB_DIR}/${_vulkan_lib_name})
   ENDIF()

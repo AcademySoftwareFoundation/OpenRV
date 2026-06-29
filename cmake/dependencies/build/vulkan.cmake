@@ -35,21 +35,22 @@ EXTERNALPROJECT_ADD(
 )
 
 # --- Vulkan-Loader: builds libvulkan.so / vulkan-1.dll against the installed headers. ---
-# Linux WSI: enable Xlib/XCB (RV is an X11 client); leave Wayland off to avoid a wayland-client build dependency.
-# Windows WSI: Vulkan-Loader defaults to WIN32 WSI on WIN32 -- no explicit flags needed.
+# Linux WSI: enable Xlib/XCB (RV is an X11 client); leave Wayland off to avoid a wayland-client build dependency. Windows WSI: Vulkan-Loader defaults to WIN32
+# WSI on WIN32 -- no explicit flags needed.
 IF(RV_TARGET_WINDOWS)
-  SET(_vulkan_wsi_args "")
+  SET(_vulkan_wsi_args
+      ""
+  )
 ELSE()
   SET(_vulkan_wsi_args
-      -DBUILD_WSI_XLIB_SUPPORT=ON
-      -DBUILD_WSI_XCB_SUPPORT=ON
-      -DBUILD_WSI_WAYLAND_SUPPORT=OFF
-      -DBUILD_WSI_XLIB_XRANDR_SUPPORT=OFF
+      -DBUILD_WSI_XLIB_SUPPORT=ON -DBUILD_WSI_XCB_SUPPORT=ON -DBUILD_WSI_WAYLAND_SUPPORT=OFF -DBUILD_WSI_XLIB_XRANDR_SUPPORT=OFF
   )
 ENDIF()
 
 # Windows also emits the .lib import library; declare it as a byproduct so downstream link steps that depend on ${_vulkan_implib} don't race the build.
-SET(_vulkan_byproducts ${_vulkan_lib})
+SET(_vulkan_byproducts
+    ${_vulkan_lib}
+)
 IF(RV_TARGET_WINDOWS)
   LIST(APPEND _vulkan_byproducts ${_vulkan_implib})
 ENDIF()
@@ -83,14 +84,13 @@ IF(TARGET Vulkan::Vulkan)
   MESSAGE(STATUS "Repointing existing Vulkan::Vulkan target at managed Vulkan ${_version}")
   ADD_DEPENDENCIES(Vulkan::Vulkan ${_target})
   FILE(MAKE_DIRECTORY ${_include_dir})
-  # On Windows, the target Qt creates via CMake's built-in FindVulkan is
-  # UNKNOWN IMPORTED. For that type the linker is fed IMPORTED_LOCATION
-  # directly and IMPORTED_IMPLIB is ignored -- so IMPORTED_LOCATION must be
-  # the .lib import library, not the .dll (otherwise LNK1107 "invalid or
-  # corrupt file"). We can't change a target's type after it's created, so
-  # detect the type and set properties accordingly.
+  # On Windows, the target Qt creates via CMake's built-in FindVulkan is UNKNOWN IMPORTED. For that type the linker is fed IMPORTED_LOCATION directly and
+  # IMPORTED_IMPLIB is ignored -- so IMPORTED_LOCATION must be the .lib import library, not the .dll (otherwise LNK1107 "invalid or corrupt file"). We can't
+  # change a target's type after it's created, so detect the type and set properties accordingly.
   GET_TARGET_PROPERTY(_vulkan_target_type Vulkan::Vulkan TYPE)
-  IF(RV_TARGET_WINDOWS AND _vulkan_target_type STREQUAL "UNKNOWN_LIBRARY")
+  IF(RV_TARGET_WINDOWS
+     AND _vulkan_target_type STREQUAL "UNKNOWN_LIBRARY"
+  )
     SET_TARGET_PROPERTIES(
       Vulkan::Vulkan
       PROPERTIES IMPORTED_LOCATION ${_vulkan_implib}
@@ -110,12 +110,9 @@ IF(TARGET Vulkan::Vulkan)
       )
     ENDIF()
   ENDIF()
-  # Qt's find_package(Qt6 Gui) -> WrapVulkanHeaders created
-  # WrapVulkanHeaders::WrapVulkanHeaders pointing at the system Vulkan SDK
-  # include dir, and Qt6::Gui links it publicly. Overwrite its include dir
-  # with our managed headers so every consumer of Qt::Gui compiles against
-  # the managed Vulkan, not the system SDK. SET (not target_include_directories)
-  # to replace, not append, the system path.
+  # Qt's find_package(Qt6 Gui) -> WrapVulkanHeaders created WrapVulkanHeaders::WrapVulkanHeaders pointing at the system Vulkan SDK include dir, and Qt6::Gui
+  # links it publicly. Overwrite its include dir with our managed headers so every consumer of Qt::Gui compiles against the managed Vulkan, not the system SDK.
+  # SET (not target_include_directories) to replace, not append, the system path.
   IF(TARGET WrapVulkanHeaders::WrapVulkanHeaders)
     MESSAGE(STATUS "Repointing WrapVulkanHeaders at managed Vulkan ${_version}")
     SET_TARGET_PROPERTIES(

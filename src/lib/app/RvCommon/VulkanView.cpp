@@ -552,14 +552,22 @@ namespace Rv
         {
             switch (f)
             {
-            case VK_FORMAT_B8G8R8A8_UNORM: return "B8G8R8A8_UNORM";
-            case VK_FORMAT_B8G8R8A8_SRGB: return "B8G8R8A8_SRGB";
-            case VK_FORMAT_R8G8B8A8_UNORM: return "R8G8B8A8_UNORM";
-            case VK_FORMAT_R8G8B8A8_SRGB: return "R8G8B8A8_SRGB";
-            case VK_FORMAT_A2B10G10R10_UNORM_PACK32: return "A2B10G10R10_UNORM_PACK32";
-            case VK_FORMAT_A2R10G10B10_UNORM_PACK32: return "A2R10G10B10_UNORM_PACK32";
-            case VK_FORMAT_R16G16B16A16_SFLOAT: return "R16G16B16A16_SFLOAT";
-            default: return "(other)";
+            case VK_FORMAT_B8G8R8A8_UNORM:
+                return "B8G8R8A8_UNORM";
+            case VK_FORMAT_B8G8R8A8_SRGB:
+                return "B8G8R8A8_SRGB";
+            case VK_FORMAT_R8G8B8A8_UNORM:
+                return "R8G8B8A8_UNORM";
+            case VK_FORMAT_R8G8B8A8_SRGB:
+                return "R8G8B8A8_SRGB";
+            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+                return "A2B10G10R10_UNORM_PACK32";
+            case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
+                return "A2R10G10B10_UNORM_PACK32";
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+                return "R16G16B16A16_SFLOAT";
+            default:
+                return "(other)";
             }
         };
 
@@ -883,8 +891,7 @@ namespace Rv
         // side imports this with the matching GL_EXT_memory_object_{fd,win32}
         // extension so writes from GL land in this Vulkan image.
 #ifdef PLATFORM_WINDOWS
-        auto pfnGetMemoryWin32HandleKHR =
-            (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR");
+        auto pfnGetMemoryWin32HandleKHR = (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR");
         if (!pfnGetMemoryWin32HandleKHR)
         {
             cerr << "ERROR: VulkanView: vkGetMemoryWin32HandleKHR not found" << endl;
@@ -1147,7 +1154,8 @@ namespace Rv
         sharedBarrier.srcAccessMask = 0;
         sharedBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &sharedBarrier);
+        vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1,
+                             &sharedBarrier);
 
         // Transition swapchain image to transfer dst
         VkImageMemoryBarrier barrier = {};
