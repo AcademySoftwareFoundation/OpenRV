@@ -12,6 +12,7 @@
 #include <RvApp/Options.h>
 #include <RvApp/RvSession.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 
@@ -153,7 +154,7 @@ namespace Rv
 
         if (!initVulkan())
         {
-            std::cerr << "[VulkanView] initVulkan failed; falling back to OpenGL\n";
+            cerr << "ERROR: VulkanView: initVulkan failed; falling back to OpenGL" << endl;
             requestGLFallback();
             return;
         }
@@ -171,7 +172,7 @@ namespace Rv
         QVulkanInstance qtVkInst;
         if (!qtVkInst.create())
         {
-            std::cerr << "[VulkanView] supports10BitPresentation: QVulkanInstance create failed\n";
+            cerr << "ERROR: VulkanView: supports10BitPresentation: QVulkanInstance create failed" << endl;
             return false;
         }
 
@@ -189,7 +190,7 @@ namespace Rv
         VkSurfaceKHR dummySurface = qtVkInst.surfaceForWindow(&dummyWindow);
         if (!dummySurface)
         {
-            std::cerr << "[10bit] VulkanView::supports10BitPresentation: failed to create dummy surface\n";
+            cerr << "ERROR: VulkanView: supports10BitPresentation: failed to create dummy surface" << endl;
             return false;
         }
 
@@ -197,13 +198,16 @@ namespace Rv
         vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
         if (deviceCount == 0)
         {
-            std::cerr << "[10bit] VulkanView::supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices\n";
+            cerr << "ERROR: VulkanView: supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices" << endl;
             return false;
         }
         std::vector<VkPhysicalDevice> devices(deviceCount);
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-        std::cerr << "[10bit] VulkanView::supports10BitPresentation: probing " << deviceCount << " physical device(s)\n";
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: VulkanView: supports10BitPresentation: probing " << deviceCount << " physical device(s)" << endl;
+        }
 
         bool any10bit = false;
         for (uint32_t di = 0; di < devices.size(); ++di)
@@ -231,13 +235,20 @@ namespace Rv
 
             VkPhysicalDeviceProperties props = {};
             vkGetPhysicalDeviceProperties(dev, &props);
-            std::cerr << "[10bit]   device[" << di << "] '" << props.deviceName << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << "\n";
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: VulkanView:   device[" << di << "] '" << props.deviceName
+                     << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
+            }
         }
 
         // The surface returned by surfaceForWindow() is owned by the platform
         // integration and is released when dummyWindow is destroyed on return;
         // QVulkanInstance has no destroySurface() in this Qt version.
-        std::cerr << "[10bit] VulkanView::supports10BitPresentation: returning " << (any10bit ? "true" : "false") << "\n";
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: VulkanView: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << endl;
+        }
         return any10bit;
     }
 
@@ -270,7 +281,7 @@ namespace Rv
             qtVkInst = new QVulkanInstance();
             if (!qtVkInst->create())
             {
-                std::cerr << "[VulkanView] QVulkanInstance create failed\n";
+                cerr << "ERROR: VulkanView: QVulkanInstance create failed" << endl;
                 delete qtVkInst;
                 qtVkInst = nullptr;
                 return false;
@@ -291,7 +302,7 @@ namespace Rv
         m_vkSurface = qtVkInst->surfaceForWindow(w);
         if (!m_vkSurface)
         {
-            std::cerr << "[VulkanView] Failed to create Vulkan surface\n";
+            cerr << "ERROR: VulkanView: Failed to create Vulkan surface" << endl;
             return false;
         }
 
@@ -334,15 +345,18 @@ namespace Rv
 
         if (!foundQueue)
         {
-            std::cerr << "[VulkanView] initVulkan: No physical device with graphics and present support found.\n";
+            cerr << "ERROR: VulkanView: initVulkan: No physical device with graphics and present support found." << endl;
             return false;
         }
 
         {
             VkPhysicalDeviceProperties props = {};
             vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &props);
-            std::cerr << "[10bit] VulkanView::initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
-                      << " available)\n";
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: VulkanView: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
+                     << " available)" << endl;
+            }
         }
 
         // Create Logical Device
@@ -549,11 +563,14 @@ namespace Rv
             }
         };
 
-        std::cerr << "[10bit] VulkanView::createSwapchain: surface offers " << formatCount << " format(s):\n";
-        for (uint32_t i = 0; i < formats.size(); ++i)
+        if (ImageRenderer::debugGpu())
         {
-            std::cerr << "[10bit]   [" << i << "] format=" << formats[i].format << " (" << formatName(formats[i].format)
-                      << ")  colorSpace=" << formats[i].colorSpace << "\n";
+            cout << "INFO: VulkanView: createSwapchain: surface offers " << formatCount << " format(s):" << endl;
+            for (uint32_t i = 0; i < formats.size(); ++i)
+            {
+                cout << "INFO: VulkanView:   [" << i << "] format=" << formats[i].format << " (" << formatName(formats[i].format)
+                     << ")  colorSpace=" << formats[i].colorSpace << endl;
+            }
         }
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
@@ -573,11 +590,14 @@ namespace Rv
 
         if (found10bit)
         {
-            std::cerr << "[10bit] VulkanView::createSwapchain: chose A2B10G10R10_UNORM_PACK32 (10-bit OK)\n";
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: VulkanView: createSwapchain: chose A2B10G10R10_UNORM_PACK32 (10-bit OK)" << endl;
+            }
         }
         else
         {
-            std::cerr << "[VulkanView] Real surface lacks A2B10G10R10; requesting OpenGL fallback\n";
+            cout << "WARNING: VulkanView: Real surface lacks A2B10G10R10; requesting OpenGL fallback" << endl;
             requestGLFallback();
             return false;
         }
@@ -801,7 +821,7 @@ namespace Rv
 
         if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage) != VK_SUCCESS)
         {
-            std::cerr << "[VulkanView] Failed to create shared image\n";
+            cerr << "ERROR: VulkanView: Failed to create shared image" << endl;
             return nullptr;
         }
 
@@ -839,21 +859,21 @@ namespace Rv
         allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
         if (allocInfo.memoryTypeIndex == UINT32_MAX)
         {
-            std::cerr << "[VulkanView] No device-local memory type for shared image\n";
+            cerr << "ERROR: VulkanView: No device-local memory type for shared image" << endl;
             cleanupSharedImage();
             return nullptr;
         }
 
         if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS)
         {
-            std::cerr << "[VulkanView] Failed to allocate shared image memory\n";
+            cerr << "ERROR: VulkanView: Failed to allocate shared image memory" << endl;
             cleanupSharedImage();
             return nullptr;
         }
 
         if (vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0) != VK_SUCCESS)
         {
-            std::cerr << "[VulkanView] Failed to bind shared image memory\n";
+            cerr << "ERROR: VulkanView: Failed to bind shared image memory" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -867,7 +887,7 @@ namespace Rv
             (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR");
         if (!pfnGetMemoryWin32HandleKHR)
         {
-            std::cerr << "[VulkanView] vkGetMemoryWin32HandleKHR not found\n";
+            cerr << "ERROR: VulkanView: vkGetMemoryWin32HandleKHR not found" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -880,7 +900,7 @@ namespace Rv
         HANDLE memHandle = nullptr;
         if (pfnGetMemoryWin32HandleKHR(m_vkDevice, &getHandleInfo, &memHandle) != VK_SUCCESS || !memHandle)
         {
-            std::cerr << "[VulkanView] Failed to get memory HANDLE\n";
+            cerr << "ERROR: VulkanView: Failed to get memory HANDLE" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -888,7 +908,7 @@ namespace Rv
         auto pfnGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR");
         if (!pfnGetMemoryFdKHR)
         {
-            std::cerr << "[VulkanView] vkGetMemoryFdKHR not found\n";
+            cerr << "ERROR: VulkanView: vkGetMemoryFdKHR not found" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -901,7 +921,7 @@ namespace Rv
         int memFd = -1;
         if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS)
         {
-            std::cerr << "[VulkanView] Failed to get memory FD\n";
+            cerr << "ERROR: VulkanView: Failed to get memory FD" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -923,7 +943,7 @@ namespace Rv
         if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore) != VK_SUCCESS
             || vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore) != VK_SUCCESS)
         {
-            std::cerr << "[VulkanView] Failed to create shared semaphores\n";
+            cerr << "ERROR: VulkanView: Failed to create shared semaphores" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -934,7 +954,7 @@ namespace Rv
             (PFN_vkGetSemaphoreWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreWin32HandleKHR");
         if (!pfnGetSemaphoreWin32HandleKHR)
         {
-            std::cerr << "[VulkanView] vkGetSemaphoreWin32HandleKHR not found\n";
+            cerr << "ERROR: VulkanView: vkGetSemaphoreWin32HandleKHR not found" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -949,7 +969,7 @@ namespace Rv
         getSemHandleInfo.semaphore = m_vkGlReadySemaphore;
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle) != VK_SUCCESS || !glReadyHandle)
         {
-            std::cerr << "[VulkanView] Failed to get glReady semaphore HANDLE\n";
+            cerr << "ERROR: VulkanView: Failed to get glReady semaphore HANDLE" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -957,7 +977,7 @@ namespace Rv
         getSemHandleInfo.semaphore = m_vkVkReadySemaphore;
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle) != VK_SUCCESS || !vkReadyHandle)
         {
-            std::cerr << "[VulkanView] Failed to get vkReady semaphore HANDLE\n";
+            cerr << "ERROR: VulkanView: Failed to get vkReady semaphore HANDLE" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -972,7 +992,7 @@ namespace Rv
         auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
         if (!pfnGetSemaphoreFdKHR)
         {
-            std::cerr << "[VulkanView] vkGetSemaphoreFdKHR not found\n";
+            cerr << "ERROR: VulkanView: vkGetSemaphoreFdKHR not found" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -987,7 +1007,7 @@ namespace Rv
         getSemFdInfo.semaphore = m_vkGlReadySemaphore;
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd) != VK_SUCCESS || glReadyFd < 0)
         {
-            std::cerr << "[VulkanView] Failed to get glReady semaphore FD\n";
+            cerr << "ERROR: VulkanView: Failed to get glReady semaphore FD" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -995,7 +1015,7 @@ namespace Rv
         getSemFdInfo.semaphore = m_vkVkReadySemaphore;
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd) != VK_SUCCESS || vkReadyFd < 0)
         {
-            std::cerr << "[VulkanView] Failed to get vkReady semaphore FD\n";
+            cerr << "ERROR: VulkanView: Failed to get vkReady semaphore FD" << endl;
             cleanupSharedImage();
             return nullptr;
         }
@@ -1270,7 +1290,7 @@ namespace Rv
                                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             if (allocInfo.memoryTypeIndex == UINT32_MAX)
             {
-                std::cerr << "[VulkanView] No host-visible memory type for staging buffer\n";
+                cerr << "ERROR: VulkanView: No host-visible memory type for staging buffer" << endl;
                 return;
             }
 

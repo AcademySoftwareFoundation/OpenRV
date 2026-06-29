@@ -741,7 +741,7 @@ namespace IPCore
             else if (name == "threads")
                 stl_ext::thread_group::debug_all(true);
             else if (name == "gpu")
-                ImageRenderer::reportGL(true);
+                ImageRenderer::debugGpu(true);
             else if (name == "audio")
                 AudioRenderer::setDebug(true);
             else if (name == "audioverbose")
@@ -4786,7 +4786,7 @@ namespace IPCore
 
     void Session::userRender(const VideoDevice* d, const char* eventName, const string& contents)
     {
-        if (ImageRenderer::reportGL())
+        if (ImageRenderer::debugGpu())
         {
             // these calls are expensive should only be called in debug mode
 
@@ -4810,7 +4810,7 @@ namespace IPCore
 
         m_currentSession = s;
 
-        if (ImageRenderer::reportGL())
+        if (ImageRenderer::debugGpu())
         {
             if (GLuint err = glGetError())
             {

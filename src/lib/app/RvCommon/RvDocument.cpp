@@ -219,23 +219,32 @@ namespace Rv
         //
         const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
 
-        cerr << "[10bit] RvDocument: opts disp bits = R" << opts.dispRedBits << " G" << opts.dispGreenBits << " B" << opts.dispBlueBits
-             << " A" << opts.dispAlphaBits << "  -> want10bit=" << (want10bit ? "true" : "false") << endl;
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: RvDocument: opts disp bits = R" << opts.dispRedBits << " G" << opts.dispGreenBits << " B" << opts.dispBlueBits
+                 << " A" << opts.dispAlphaBits << "  -> want10bit=" << (want10bit ? "true" : "false") << endl;
+        }
 
         bool useVulkan = false;
         if (want10bit)
         {
             useVulkan = VulkanView::supports10BitPresentation();
-            cerr << "[10bit] RvDocument: VulkanView::supports10BitPresentation() returned " << (useVulkan ? "true" : "false") << endl;
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: RvDocument: VulkanView::supports10BitPresentation() returned " << (useVulkan ? "true" : "false") << endl;
+            }
             if (!useVulkan)
             {
-                cerr << "INFO: 10-bit display requested but Vulkan 10-bit "
+                cout << "INFO: 10-bit display requested but Vulkan 10-bit "
                         "presentation is unavailable; falling back to OpenGL."
                      << endl;
             }
         }
 
-        cerr << "[10bit] RvDocument: using " << (useVulkan ? "Vulkan (10-bit)" : "OpenGL (legacy)") << " path" << endl;
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: RvDocument: using " << (useVulkan ? "Vulkan (10-bit)" : "OpenGL (legacy)") << " path" << endl;
+        }
 
         if (useVulkan)
         {
@@ -882,7 +891,7 @@ namespace Rv
             return;
         }
 
-        cerr << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to OpenGL." << endl;
+        cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to OpenGL." << endl;
 
         VulkanView* oldVulkanView = m_vulkanView;
         m_vulkanView = nullptr;

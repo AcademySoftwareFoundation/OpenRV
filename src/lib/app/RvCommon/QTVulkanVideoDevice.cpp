@@ -14,6 +14,7 @@
 #include <TwkApp/VideoModule.h>
 #include <TwkApp/Event.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkGLF/GLFBO.h>
 
 #include <QScreen>
@@ -156,18 +157,22 @@ namespace
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);
         const GLubyte* version = glGetString(GL_VERSION);
-        std::cerr << "[10bit] QTVulkanVideoDevice: GL_VENDOR='" << (vendor ? reinterpret_cast<const char*>(vendor) : "?")
-                  << "' GL_RENDERER='" << (renderer ? reinterpret_cast<const char*>(renderer) : "?") << "' GL_VERSION='"
-                  << (version ? reinterpret_cast<const char*>(version) : "?") << "'\n";
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            std::cout << "INFO: QTVulkanVideoDevice: GL_VENDOR='" << (vendor ? reinterpret_cast<const char*>(vendor) : "?")
+                      << "' GL_RENDERER='" << (renderer ? reinterpret_cast<const char*>(renderer) : "?") << "' GL_VERSION='"
+                      << (version ? reinterpret_cast<const char*>(version) : "?") << "'" << std::endl;
 
-        if (!g_glInteropAvailable)
-        {
-            std::cerr << "[10bit] QTVulkanVideoDevice: GL_EXT_memory_object_win32 / GL_EXT_semaphore_win32 NOT available; "
-                         "falling back to CPU presentation path\n";
-        }
-        else
-        {
-            std::cerr << "[10bit] QTVulkanVideoDevice: GL interop extensions resolved (GPU-interop available)\n";
+            if (!g_glInteropAvailable)
+            {
+                std::cout << "INFO: QTVulkanVideoDevice: GL_EXT_memory_object_win32 / GL_EXT_semaphore_win32 NOT available; "
+                             "falling back to CPU presentation path"
+                          << std::endl;
+            }
+            else
+            {
+                std::cout << "INFO: QTVulkanVideoDevice: GL interop extensions resolved (GPU-interop available)" << std::endl;
+            }
         }
         return g_glInteropAvailable;
     }
@@ -190,6 +195,7 @@ namespace Rv
 {
     using namespace std;
     using namespace TwkApp;
+    using namespace IPCore;
 
     QTVulkanVideoDevice::QTVulkanVideoDevice(VideoModule* module, const string& name, VulkanView* view, QWidget* eventWidget)
         : TwkGLF::GLVideoDevice(module, name, VideoDevice::ImageOutput | VideoDevice::ProvidesSync | VideoDevice::SubWindow)
@@ -256,7 +262,7 @@ namespace Rv
 
             if (!m_glContext->create())
             {
-                std::cerr << "[QTVulkanVideoDevice] QOpenGLContext::create() failed\n";
+                cerr << "ERROR: QTVulkanVideoDevice: QOpenGLContext::create() failed" << endl;
                 delete m_glContext;
                 m_glContext = nullptr;
                 return;
@@ -268,7 +274,7 @@ namespace Rv
 
             if (!m_offscreenSurface->isValid())
             {
-                std::cerr << "[QTVulkanVideoDevice] QOffscreenSurface::create() failed\n";
+                cerr << "ERROR: QTVulkanVideoDevice: QOffscreenSurface::create() failed" << endl;
                 delete m_offscreenSurface;
                 m_offscreenSurface = nullptr;
                 delete m_glContext;
@@ -290,7 +296,7 @@ namespace Rv
 #endif
             if (err != GLEW_OK)
             {
-                std::cerr << "[QTVulkanVideoDevice] glewInit failed: " << glewGetErrorString(err) << "\n";
+                cerr << "ERROR: QTVulkanVideoDevice: glewInit failed: " << glewGetErrorString(err) << endl;
                 m_glContext->doneCurrent();
                 delete m_offscreenSurface;
                 m_offscreenSurface = nullptr;
@@ -302,7 +308,7 @@ namespace Rv
 
         if (!m_glContext->makeCurrent(m_offscreenSurface))
         {
-            std::cerr << "[QTVulkanVideoDevice] makeCurrent() failed\n";
+            cerr << "ERROR: QTVulkanVideoDevice: makeCurrent() failed" << endl;
             return;
         }
 
@@ -334,7 +340,7 @@ namespace Rv
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
             if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
-                std::cerr << "[QTVulkanVideoDevice] FBO incomplete: 0x" << std::hex << status << std::dec << "\n";
+                cerr << "ERROR: QTVulkanVideoDevice: FBO incomplete: 0x" << hex << status << dec << endl;
 
             m_fboWidth = newW;
             m_fboHeight = newH;
@@ -500,13 +506,16 @@ namespace Rv
         if (!firstFrameLogged)
         {
             firstFrameLogged = true;
-            const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_UNDEFINED;
-            std::cerr << "[10bit] QTVulkanVideoDevice::syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
-                      << "  swapchainFormat=" << scFmt
-                      << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ? " (A2B10G10R10 / 10-bit)"
-                          : scFmt == VK_FORMAT_UNDEFINED              ? " (UNDEFINED -- swapchain not created yet)"
-                                                                      : " (NOT 10-bit)")
-                      << "\n";
+            if (ImageRenderer::debugGpu())
+            {
+                const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_UNDEFINED;
+                cout << "INFO: QTVulkanVideoDevice: syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
+                     << "  swapchainFormat=" << scFmt
+                     << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ? " (A2B10G10R10 / 10-bit)"
+                         : scFmt == VK_FORMAT_UNDEFINED              ? " (UNDEFINED -- swapchain not created yet)"
+                                                                     : " (NOT 10-bit)")
+                     << endl;
+            }
         }
 
         if (!sharedInfo)
@@ -564,7 +573,7 @@ namespace Rv
             int memFd = dup(sharedInfo->memoryFd);
             if (memFd == -1)
             {
-                std::cerr << "[10bit] QTVulkanVideoDevice: dup(memoryFd) failed.\n";
+                cerr << "ERROR: QTVulkanVideoDevice: dup(memoryFd) failed." << endl;
                 cleanupSharedGLObjects();
                 return;
             }
@@ -590,7 +599,7 @@ namespace Rv
             int glReadyFd = dup(sharedInfo->glReadySemaphoreFd);
             if (glReadyFd == -1)
             {
-                std::cerr << "[10bit] QTVulkanVideoDevice: dup(glReadySemaphoreFd) failed.\n";
+                cerr << "ERROR: QTVulkanVideoDevice: dup(glReadySemaphoreFd) failed." << endl;
                 cleanupSharedGLObjects();
                 return;
             }
@@ -599,7 +608,7 @@ namespace Rv
             int vkReadyFd = dup(sharedInfo->vkReadySemaphoreFd);
             if (vkReadyFd == -1)
             {
-                std::cerr << "[10bit] QTVulkanVideoDevice: dup(vkReadySemaphoreFd) failed.\n";
+                cerr << "ERROR: QTVulkanVideoDevice: dup(vkReadySemaphoreFd) failed." << endl;
                 cleanupSharedGLObjects();
                 return;
             }

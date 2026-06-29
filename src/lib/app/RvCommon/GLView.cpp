@@ -251,8 +251,10 @@ namespace Rv
         fmt.setSwapInterval(vsync ? 1 : 0);
 
 #ifdef PLATFORM_LINUX
-        if (ImageRenderer::reportGL())
+        if (ImageRenderer::debugGpu())
+        {
             cout << "INFO: GLView requested QSurfaceFormat: " << formatSummary(fmt) << endl;
+        }
 #endif
 
         return fmt;
@@ -292,7 +294,7 @@ namespace Rv
 
 #ifdef PLATFORM_LINUX
             static bool baselineLogged = false;
-            if (ImageRenderer::reportGL() && !baselineLogged)
+            if (ImageRenderer::debugGpu() && !baselineLogged)
             {
                 baselineLogged = true;
 
