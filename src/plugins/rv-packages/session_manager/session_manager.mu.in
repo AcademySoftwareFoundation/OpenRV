@@ -1197,12 +1197,6 @@ class: ThumbnailRenderer
         }
     }
 
-    method: resetPreviews (void;)
-    {
-        _source.reset();
-        _input.reset();
-    }
-
     // Push node to queue's deferred list. If the queue is already exhausted,
     // restart the timer so the deferred item is not stranded.
     method: deferNodeToQueue (void; PreviewRenderQueue queue, string node)
