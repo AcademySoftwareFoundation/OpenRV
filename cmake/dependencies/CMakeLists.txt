@@ -106,6 +106,13 @@ IF(RV_TARGET_DARWIN
   INCLUDE(gc)
   INCLUDE(glew)
 ENDIF()
+# Vulkan (headers + loader) is fetched on Linux and Windows for the 10-bit presentation backend. On Linux the loader is libvulkan.so; on Windows it is
+# vulkan-1.dll plus its import library.
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  INCLUDE(vulkan)
+ENDIF()
 INCLUDE(imath)
 INCLUDE(zlib)
 INCLUDE(ffmpeg)
@@ -162,6 +169,11 @@ IF(RV_TARGET_DARWIN
 )
   MESSAGE(STATUS "Using GC:           ${RV_DEPS_GC_VERSION}")
   MESSAGE(STATUS "Using GLEW:         ${RV_DEPS_GLEW_VERSION}")
+ENDIF()
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  MESSAGE(STATUS "Using Vulkan:       ${RV_DEPS_VULKAN_VERSION}")
 ENDIF()
 MESSAGE(STATUS "Using Imath:        ${RV_DEPS_IMATH_VERSION}")
 MESSAGE(STATUS "Using JpegTurbo:    ${RV_DEPS_JPEGTURBO_VERSION}")
