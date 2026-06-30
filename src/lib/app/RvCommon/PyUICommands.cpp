@@ -418,6 +418,41 @@ namespace Rv
 
 #endif
 
+    static PyObject* consoleWrite(PyObject*, PyObject* args)
+    {
+        PyLockObject locker;
+        const char* message = nullptr;
+        bool foundConsole = false;
+
+        if (!PyArg_ParseTuple(args, "s", &message))
+            return nullptr;
+
+        Py_BEGIN_ALLOW_THREADS;
+
+        if (RvApplication* app = RvApp())
+        {
+            if (RvConsoleWindow* console = app->console())
+            {
+                foundConsole = true;
+                size_t size = strlen(message);
+                console->append(message, size);
+
+                // Invoke processTextBuffer using AutoConnection to automatically
+                // use queued connection if we're not on the main thread
+                QMetaObject::invokeMethod(console, "processTextBuffer", Qt::AutoConnection);
+            }
+        }
+
+        if (!foundConsole)
+        {
+            cout << message;
+        }
+
+        Py_END_ALLOW_THREADS;
+
+        Py_RETURN_NONE;
+    }
+
     static PyMethodDef localmethods[] = {
 
         {"readSettings", readSettings, METH_VARARGS, ""},
@@ -437,6 +472,8 @@ namespace Rv
         {"sessionBottomToolBar", sessionBottomToolBar, METH_NOARGS, ""},
 
         {"javascriptExport", javascriptExport, METH_VARARGS, ""},
+
+        {"consoleWrite", consoleWrite, METH_VARARGS, "Write a message to the RV console window."},
 
         {NULL}};
 

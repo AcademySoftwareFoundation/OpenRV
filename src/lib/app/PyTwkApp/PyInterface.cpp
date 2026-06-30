@@ -453,6 +453,7 @@ namespace TwkApp
             PyModule_AddObject(pModule, "Event", reinterpret_cast<PyObject*>(pyEventType()));
         }
 
+        initPyMuSymbolType();
         if (PyType_Ready(pyMuSymbolType()) >= 0)
         {
             Py_XINCREF(pyMuSymbolType());
