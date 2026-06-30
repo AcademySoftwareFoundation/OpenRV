@@ -214,8 +214,8 @@ namespace Rv
         // Metal drawable), _NSOpenGLViewBackingLayer does not intercept or tile the
         // content — the CA render server composites IOSurface data independently.
         NSView* nsView = (__bridge NSView*)reinterpret_cast<void*>(winId());
-        [nsView setLayer:caLayer];
         [nsView setWantsLayer:YES];
+        [nsView setLayer:caLayer];
 
         CGFloat scale = static_cast<CGFloat>(devicePixelRatioF());
         if (scale < 1.0) scale = 1.0;
@@ -238,36 +238,33 @@ namespace Rv
         if (!layer || w <= 0 || h <= 0)
             return;
 
-        // Create/recreate IOSurface if size changed
+        // Create/recreate IOSurface if size changed.  Allocate the replacement
+        // before releasing the old surface so a failed recreate keeps the last
+        // good IOSurface for display.
         if (!m_ioSurface
             || m_ioSurfaceWidth  != w
             || m_ioSurfaceHeight != h)
         {
-            if (m_ioSurface)
-            {
-                CFRelease((IOSurfaceRef)m_ioSurface);
-                m_ioSurface = nullptr;
-            }
-
-            // kCVPixelFormatType_ARGB2101010LEPacked ('l30r') = 0x6C333072:
-            //   32-bit word, big-endian bit order: A[31:30] R[29:20] G[19:10] B[9:0]
-            //   Stored little-endian in memory; CA handles this format natively
-            //   for 10-bit wide-color display.
             NSDictionary* props = @{
                 (NSString*)kIOSurfaceWidth:           @(w),
                 (NSString*)kIOSurfaceHeight:          @(h),
                 (NSString*)kIOSurfaceBytesPerElement: @(4),
                 (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
             };
-            IOSurfaceRef surf = IOSurfaceCreate((__bridge CFDictionaryRef)props);
-            if (!surf)
+            IOSurfaceRef newSurf = IOSurfaceCreate((__bridge CFDictionaryRef)props);
+            if (!newSurf)
             {
                 std::cerr << "[MetalView::presentPixelData] IOSurfaceCreate failed "
                           << w << "x" << h << "\n";
                 return;
             }
 
-            m_ioSurface       = surf;
+            if (m_ioSurface)
+            {
+                CFRelease((IOSurfaceRef)m_ioSurface);
+            }
+
+            m_ioSurface       = newSurf;
             m_ioSurfaceWidth  = w;
             m_ioSurfaceHeight = h;
         }
@@ -370,10 +367,6 @@ namespace Rv
 
     void MetalView::render()
     {
-        // A render is now happening, so any coalesced UpdateRequest is satisfied;
-        // allow the next redraw() to post a fresh one.
-        m_updatePending = false;
-
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
             return;
@@ -441,10 +434,21 @@ namespace Rv
 
         if (session)
         {
-            if (session->outputVideoDevice() != videoDevice())
-                session->outputVideoDevice()->syncBuffers();
+            if (const TwkApp::VideoDevice* output = session->outputVideoDevice())
+            {
+                if (output != videoDevice())
+                {
+                    output->syncBuffers();
+                }
+                else
+                {
+                    m_videoDevice->syncBuffers();
+                }
+            }
             else
+            {
                 m_videoDevice->syncBuffers();
+            }
         }
 
         if (session)
@@ -504,7 +508,10 @@ namespace Rv
         if (m_lastPresentedSurface)
             presentCachedSurface();
         else
+        {
+            m_updatePending = false;
             render();
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -615,6 +622,7 @@ namespace Rv
 
         if (event->type() == QEvent::UpdateRequest)
         {
+            m_updatePending = false;
             render();
             return true;
         }
@@ -719,7 +727,7 @@ namespace Rv
             }
 
             Session* session = m_doc ? m_doc->session() : nullptr;
-            if (session)
+            if (session && m_videoDevice && m_videoDevice->hasTranslator())
             {
                 session->setEventVideoDevice(videoDevice());
                 if (m_videoDevice->translator().sendQTEvent(event))

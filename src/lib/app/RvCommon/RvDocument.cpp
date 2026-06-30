@@ -1234,10 +1234,22 @@ namespace Rv
         // fallbackVulkanToGLView() and reuses the device-rewiring sequence from
         // rebuildGLView().
         if (!m_metalView)
-            return; // already on the GL path
+        {
+            // Already on the GL path
+            return;
+        }
 
         if (m_currentlyClosing || m_closeEventReceived)
-            return; // document is tearing down; nothing to present
+        {
+            // Document is tearing down; nothing to present
+            return;
+        }
+
+        if (!m_session)
+        {
+            // Nothing to rewire devices on without a session
+            return;
+        }
 
         cerr << "INFO: RvDocument: switching from Metal to OpenGL presentation." << endl;
 
@@ -1302,11 +1314,34 @@ namespace Rv
         }
     }
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    namespace
+    {
+        void warnMetalDisplaySurfaceOptionIgnored()
+        {
+            static bool logged = false;
+            if (!logged)
+            {
+                cout << "INFO: OpenGL surface options (stereo, vsync, double-buffer, "
+                        "pixel format) do not apply on the Metal presentation backend."
+                     << endl;
+                logged = true;
+            }
+        }
+    } // namespace
+#endif
+
     void RvDocument::setStereo(bool b)
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
         {
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1327,9 +1362,15 @@ namespace Rv
     {
         if (m_vsyncDisabled)
             return;
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
         {
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1348,9 +1389,15 @@ namespace Rv
 
     void RvDocument::setDoubleBuffer(bool b)
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
         {
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1451,6 +1498,7 @@ namespace Rv
 #elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
         if (!m_glView)
         {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1697,9 +1745,8 @@ namespace Rv
 
         setActiveViewContentSize(w, h);
         setActiveViewMinimumContentSize(w, h);
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
-        // Vulkan or Metal view: m_glView is null.
-        if (!m_glView)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        if (m_vulkanView)
         {
             const int dh = m_viewWidget->height() - h;
             const int dw = m_viewWidget->width() - w;

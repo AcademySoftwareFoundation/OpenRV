@@ -11,7 +11,9 @@
 #include <RvCommon/QTTranslator.h>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace Rv
 {
@@ -29,9 +31,8 @@ namespace Rv
     //      macOS, Qt backs QOffscreenSurface with a hidden NSView, giving the
     //      context a real native surface (required on Apple Silicon).
     //    • A GLFBO is created in this context; all IPCore rendering goes there.
-    //    • syncBuffers() reads the FBO pixels back to CPU, packs them as
-    //      ARGB2101010LE, and calls MetalView::presentPixelData() which writes
-    //      to an IOSurface and assigns it to a plain CALayer for display.
+    //    • syncBuffers() blits the FBO into IOSurface-backed textures (zero-copy)
+    //      and presents via MetalView; CPU readback is retained only as fallback.
     //
     //  The IOSurface + CALayer path is used instead of CAMetalLayer because
     //  the CA compositor mishandles MTLPixelFormatBGR10A2Unorm, producing
@@ -62,6 +63,12 @@ namespace Rv
         virtual void redraw() const override;
         virtual void redrawImmediately() const override;
         virtual void clearCaches() const override;
+
+        // Creates a worker GLVideoDevice with its own QOpenGLContext sharing
+        // GL resources (textures, etc.) with this device's offscreen context,
+        // for ImageRenderer's threaded-upload path. Returns nullptr if the
+        // offscreen context cannot be (re)established.
+        virtual TwkGLF::GLVideoDevice* newSharedContextWorkerDevice() const override;
 
         virtual Resolution resolution() const override;
         virtual Offset offset() const override;
@@ -116,7 +123,6 @@ namespace Rv
         int m_x{0};
         int m_y{0};
         float m_refresh{-1.0f};
-        bool m_isOpen{false};
 
         // Qt GL context + offscreen surface for GL rendering.
         // QOffscreenSurface on macOS is backed by a hidden NSView, which gives
@@ -141,9 +147,14 @@ namespace Rv
         mutable int m_ringIndex{0};
         mutable int m_sharedWidth{0};
         mutable int m_sharedHeight{0};
-        mutable bool m_interopDisabled{false};   // interop currently off (with retry)
-        mutable int m_interopRetryCountdown{0};  // frames until interop is retried
-        mutable bool m_cpuFallbackLogged{false}; // one-shot CPU-fallback log guard
+        mutable bool m_interopDisabled{false};        // interop currently off (with retry)
+        mutable int m_interopRetryCountdown{0};       // frames until interop is retried
+        mutable bool m_cpuFallbackLogged{false};      // one-shot CPU-fallback log guard
+        mutable bool m_cpuReadbackAllocLogged{false}; // one-shot CPU readback alloc failure
+
+        // CPU readback fallback scratch (reused across frames; resized on dimension change).
+        mutable std::vector<float> m_cpuReadbackFloat;
+        mutable std::vector<std::uint32_t> m_cpuReadbackPacked;
 
         // Frames to wait before retrying zero-copy interop after a failure
         // (~2 seconds at 60 fps).  Bounds the cost of a permanently-broken
