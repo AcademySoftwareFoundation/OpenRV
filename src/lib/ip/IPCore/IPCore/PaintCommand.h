@@ -510,6 +510,8 @@ namespace IPCore
             size_t commandExecuted;
         };
 
+        // Add all annotations on screen if present
+        // Updates cache for annotations after rendering
         void renderPaintCommands(PaintContext&);
 
     } // namespace Paint
