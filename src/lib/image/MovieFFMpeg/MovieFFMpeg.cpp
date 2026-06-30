@@ -446,7 +446,7 @@ namespace TwkMovie
     //  Global pool object:
     //
 
-    ContextPool* globalContextPool = 0;
+    std::unique_ptr<ContextPool> globalContextPool{nullptr};
 
     void ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
     {
@@ -539,9 +539,15 @@ namespace TwkMovie
                 avcodec_free_context(&closeContext.avContext);
 
                 if (closeContext.vTrack)
+                {
+                    closeContext.vTrack->avCodecContext = nullptr;
                     closeContext.vTrack->isOpen = false;
+                }
                 if (closeContext.aTrack)
+                {
+                    closeContext.aTrack->avCodecContext = nullptr;
                     closeContext.aTrack->isOpen = false;
+                }
             }
         }
     }
@@ -1154,11 +1160,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_audioTracks.size(); i++)
         {
             AudioTrack* track = m_audioTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_audioTracks.resize(0);
@@ -1166,11 +1172,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_videoTracks.resize(0);
@@ -2741,7 +2747,8 @@ namespace TwkMovie
             audioChannels = idAudioChannels(layout, numChannels);
 
             // XXX Assume this thread will never decode audio
-            avcodec_free_context(&audioCodecContext);
+            ContextPool::flushContext(this, track->number);
+            avcodec_free_context(&track->avCodecContext);
             track->isOpen = false;
         }
 
@@ -5944,28 +5951,20 @@ namespace TwkMovie
             addType(formatsItr->first, formatsItr->second.first, formatsItr->second.second, video, audio, separams, sdparams);
         }
 
-        // Note : No longer using the global context pool (since FFmpeg 6.0)
-        // Rationale: The global context pool was based on the premise that a
-        // context could be opened and closed multiple times. However, with
-        // FFmpeg 6.0, this premise is no longer valid and was causing crashes.
-        // As per the FFmpeg 6 documentation:
-        // https://ffmpeg.org/doxygen/trunk/deprecated.html: "Opening and
-        // closing a codec context multiple times is not supported anymore – use
-        // multiple codec contexts instead."
-
-        // if (!globalContextPool)
-        // {
-        //     int poolSize = 500;
-        //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-        //     {
-        //         int poolSize = atoi(c);
-        //     }
-        //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-        //     else
-        //     {
-        //         report("Disabling mio_ffmpeg context thread pool.", true);
-        //     }
-        // }
+        if (!globalContextPool)
+        {
+            int poolSize = 500;
+            if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
+            {
+                poolSize = atoi(c);
+            }
+            if (poolSize > 0)
+                globalContextPool = std::make_unique<ContextPool>(poolSize);
+            else
+            {
+                report("Disabling mio_ffmpeg context thread pool.", true);
+            }
+        }
     }
 
     MovieFFMpegIO::~MovieFFMpegIO()
