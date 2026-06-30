@@ -72,6 +72,7 @@ namespace IPCore
         std::vector<OCIO3DLUTPtr> m_3DLUTs;
         OCIOState* m_state{nullptr};
         bool m_useRawConfig{false};
+        bool m_initialized{false};
 
         // synlinearize/syndisplay functions
         StringProperty* m_inTransformURL{nullptr};
