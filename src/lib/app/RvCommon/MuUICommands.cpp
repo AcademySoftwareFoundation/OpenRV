@@ -473,7 +473,14 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->viewWidget()->mapToGlobal(location);
+        // viewWidget() is briefly null while the presentation view is being (re)built
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        QPoint p = view->mapToGlobal(location);
 
         if (array)
         {
@@ -498,13 +505,19 @@ namespace Rv
         DynamicArray* array = NODE_ARG_OBJECT(1, DynamicArray);
         QPoint lp;
 
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(e->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->viewWidget()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), view->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->viewWidget()->height() - 1);
+            lp = QPoint(0, view->height() - 1);
         }
 
         popupMenuInternal(array, lp);
@@ -518,7 +531,13 @@ namespace Rv
         int y = NODE_ARG(1, int);
         DynamicArray* array = NODE_ARG_OBJECT(2, DynamicArray);
 
-        QPoint lp(x, rvDoc->viewWidget()->height() - y - 1);
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        QPoint lp(x, view->height() - y - 1);
 
         popupMenuInternal(array, lp);
     }

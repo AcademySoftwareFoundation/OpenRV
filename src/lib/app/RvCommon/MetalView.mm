@@ -274,12 +274,26 @@ namespace Rv
 
         IOSurfaceRef surf = (IOSurfaceRef)m_ioSurface;
 
-        // Lock the IOSurface for CPU write
-        IOSurfaceLock(surf, 0, nullptr);
+        // Lock the IOSurface for CPU write.  Bail out if the lock fails or the
+        // base address is null — writing through a null/garbage pointer would
+        // corrupt memory or crash.
+        if (IOSurfaceLock(surf, 0, nullptr) != KERN_SUCCESS)
+        {
+            std::cerr << "[MetalView::presentPixelData] IOSurfaceLock failed\n";
+            return;
+        }
 
         void*  base   = IOSurfaceGetBaseAddress(surf);
         size_t bpr    = IOSurfaceGetBytesPerRow(surf);
         size_t srcBpr = (size_t)w * 4;
+
+        if (!base)
+        {
+            std::cerr << "[MetalView::presentPixelData] IOSurface base address "
+                         "is null\n";
+            IOSurfaceUnlock(surf, 0, nullptr);
+            return;
+        }
 
         if (bpr == srcBpr)
         {
@@ -567,7 +581,13 @@ namespace Rv
         switch (event->type())
         {
         case QEvent::FocusIn:
-            m_videoDevice->translator().resetModifiers();
+            // The translator is created lazily by setEventWidget(); a focus
+            // event arriving before that would otherwise dereference a null
+            // translator (the general guard below runs only after this switch).
+            if (m_videoDevice && m_videoDevice->hasTranslator())
+            {
+                m_videoDevice->translator().resetModifiers();
+            }
             // fall-through
         case QEvent::Enter:
             if (m_eventWidget)

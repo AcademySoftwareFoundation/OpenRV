@@ -896,7 +896,13 @@ namespace Rv
         //  correct.
         //
         // Use the session's control device — valid for any presentation backend.
-        doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
+        // setPrimaryDisplayGroup() dereferences the device (->physicalDevice())
+        // with no null check, and controlVideoDevice() is briefly null while a
+        // view is being (re)built, so guard against it here.
+        if (const TwkApp::VideoDevice* controlDevice = doc->session()->controlVideoDevice())
+        {
+            doc->session()->graph().setPrimaryDisplayGroup(controlDevice);
+        }
 
         if (RvApp()->documents().size() == 1 && opts.present)
         {
