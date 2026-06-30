@@ -310,6 +310,14 @@ namespace IPCore
 
             while (std::regex_search(searchBegin, inout_glsl.cend(), match, functionStartRegex))
             {
+                // Avoid treating "else if" as a function definition by
+                // ignoring matches where the captured first word is "else".
+                if (match.str(1) == "else")
+                {
+                    searchBegin = match[0].second;
+                    continue;
+                }
+
                 const char* paramStart = &(*match[3].first);
                 size_t paramLen = static_cast<size_t>(std::distance(match[3].first, match[3].second));
                 std::string_view paramsView(paramStart, paramLen);
