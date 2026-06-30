@@ -512,15 +512,19 @@ namespace IPCore
 
     void PaintIPNode::compileFrame(Component* comp)
     {
-        const StringProperty* orderP = comp->property<StringProperty>("order");
-        size_t s = orderP->size();
-
         const string frameName = comp->name().substr(6);
         int frame = atoi(frameName.c_str());
 
         Components& fcomps = m_frameMap[frame];
         fcomps.clear();
 
+        const StringProperty* orderP = comp->property<StringProperty>("order");
+        if (!orderP || orderP->size() == 0)
+        {
+            return;
+        }
+
+        size_t s = orderP->size();
         for (size_t i = 0; i < s; i++)
         {
             const string& c = (*orderP)[i];
