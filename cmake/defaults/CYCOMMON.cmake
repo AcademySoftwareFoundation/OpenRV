@@ -200,10 +200,10 @@ SET(RV_DEPS_OPENJPEG_DOWNLOAD_HASH
 
 # openjph https://github.com/aous72/OpenJPH
 SET(RV_DEPS_OPENJPH_VERSION
-    "0.23.1"
+    "0.26.0"
 )
 SET(RV_DEPS_OPENJPH_DOWNLOAD_HASH
-    "7359c6516616ff2a0440c90b784c1302"
+    "469e12ba5e953ce7002d02f9486c8721"
 )
 
 # otio https://github.com/AcademySoftwareFoundation/OpenTimelineIO
