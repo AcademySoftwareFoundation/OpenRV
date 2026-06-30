@@ -28,7 +28,84 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
-#include <vector>
+#include <new>
+
+namespace
+{
+    //--------------------------------------------------------------------------
+    // QTMetalSharedContextWorkerDevice
+    //
+    // Minimal GLVideoDevice for ImageRenderer's threaded-upload path (see
+    // ImageRenderer::uploadThreadTrampoline()), which only ever calls
+    // makeCurrent() on the device returned by newSharedContextWorkerDevice().
+    // It owns its own QOpenGLContext + QOffscreenSurface, sharing GL resources
+    // (textures, etc.) with the QTMetalVideoDevice's offscreen context that
+    // created it, so textures uploaded on the worker thread are visible to the
+    // render thread.  Deliberately does not reuse QTMetalVideoDevice itself —
+    // that class builds a view-sized FBO/IOSurface ring that the upload thread
+    // has no use for.
+    //--------------------------------------------------------------------------
+    class QTMetalSharedContextWorkerDevice : public TwkGLF::GLVideoDevice
+    {
+    public:
+        QTMetalSharedContextWorkerDevice(const std::string& name, QOpenGLContext* shareContext)
+            : TwkGLF::GLVideoDevice(nullptr, name, TwkApp::VideoDevice::NoCapabilities)
+        {
+            if (!shareContext)
+            {
+                return;
+            }
+
+            m_context = new QOpenGLContext();
+            m_context->setFormat(shareContext->format());
+            m_context->setShareContext(shareContext);
+            if (!m_context->create())
+            {
+                std::cerr << "[QTMetalVideoDevice] worker QOpenGLContext::create() failed\n";
+                delete m_context;
+                m_context = nullptr;
+                return;
+            }
+
+            m_surface = new QOffscreenSurface();
+            m_surface->setFormat(m_context->format());
+            m_surface->create();
+            if (!m_surface->isValid())
+            {
+                std::cerr << "[QTMetalVideoDevice] worker QOffscreenSurface::create() failed\n";
+                delete m_surface;
+                m_surface = nullptr;
+                delete m_context;
+                m_context = nullptr;
+            }
+        }
+
+        ~QTMetalSharedContextWorkerDevice() override
+        {
+            delete m_surface;
+            delete m_context;
+        }
+
+        // Deliberately does NOT call GLVideoDevice::makeCurrent() (text-context
+        // bookkeeping there is not meant to be touched concurrently from a
+        // background thread) — mirrors QTGLVideoDevice's isWorkerDevice() guard.
+        void makeCurrent() const override
+        {
+            if (m_context && m_surface)
+            {
+                m_context->makeCurrent(m_surface);
+            }
+        }
+
+        size_t width() const override { return 0; }
+
+        size_t height() const override { return 0; }
+
+    private:
+        QOpenGLContext* m_context = nullptr;
+        QOffscreenSurface* m_surface = nullptr;
+    };
+} // namespace
 
 namespace Rv
 {
@@ -307,6 +384,21 @@ namespace Rv
             return;
     }
 
+    TwkGLF::GLVideoDevice* QTMetalVideoDevice::newSharedContextWorkerDevice() const
+    {
+        // Make sure our own offscreen context exists before sharing with it.
+        // ImageRenderer::setupUploadThread() calls this from the render thread
+        // before spawning the upload thread, and immediately re-establishes its
+        // own makeCurrent() afterward, so it's safe to (re)bind our context here.
+        if (!ensureGLContext())
+        {
+            std::cerr << "[QTMetalVideoDevice] newSharedContextWorkerDevice: "
+                         "offscreen GL context unavailable\n";
+            return nullptr;
+        }
+        return new QTMetalSharedContextWorkerDevice(name() + "-workerContextDevice", m_glContext);
+    }
+
     TwkGLF::GLFBO* QTMetalVideoDevice::defaultFBO()
     {
         if (!ensureGLContext())
@@ -499,6 +591,7 @@ namespace Rv
         {
             const int slot = m_ringIndex;
             TwkGLF::GLFBO* ioFbo = m_ioFbos[slot];
+            bool blitOk = true;
 
             // GPU blit from the RGBA16F render FBO into the IOSurface-backed
             // RGB10_A2 texture.  The GPU does the float->10-bit conversion.
@@ -509,44 +602,54 @@ namespace Rv
             glBlitFramebufferEXT(0, 0, w, h,
                                  0, h, w, 0,
                                  GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-            // Force the IOSurface alpha channel to fully opaque.  IPCore clears
-            // the viewport background with alpha 0 (ImageRenderer::
-            // clearBackgroundToBlack), and the blit copies that through; the CA
-            // compositor honours the IOSurface's per-pixel alpha (despite the
-            // layer's opaque=YES hint), so a transparent background would be
-            // blended against the gray window backdrop instead of showing black.
-            // glClear respects glColorMask, so this writes only alpha (2-bit ->
-            // 3 = opaque) and leaves the blitted RGB untouched — the GPU analog
-            // of the CPU fallback's hard-coded (3u << 30) alpha.
-            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-            // Restore the render FBO as the active target.
-            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID());
-
-            // Publish the GL writes to the CA render server.  glFlush (not
-            // glFinish) is enough — it does not stall the main thread waiting for
-            // the GPU to go idle, and IOSurface provides the cross-context
-            // synchronisation the compositor needs.  This is what removes the
-            // per-frame main-thread stall behind menus and keyboard shortcuts.
-            glFlush();
-
-            m_view->presentIOSurface(m_ioSurfaces[slot]);
-
-            m_ringIndex = (slot + 1) % kRingSize;
-
-            // Recovery telemetry: report once when the zero-copy path resumes
-            // after a stretch of CPU-readback presents.
-            if (m_cpuFallbackLogged)
+            if (glGetError() != GL_NO_ERROR)
             {
-                std::cerr << "INFO: [QTMetalVideoDevice] zero-copy IOSurface "
-                             "interop restored.\n";
-                m_cpuFallbackLogged = false;
+                std::cerr << "[QTMetalVideoDevice] glBlitFramebufferEXT failed — "
+                             "falling back to CPU readback\n";
+                latchInteropFailure();
+                blitOk = false;
             }
-            return;
+
+            if (blitOk)
+            {
+                // Force the IOSurface alpha channel to fully opaque.  IPCore clears
+                // the viewport background with alpha 0 (ImageRenderer::
+                // clearBackgroundToBlack), and the blit copies that through; the CA
+                // compositor honours the IOSurface's per-pixel alpha (despite the
+                // layer's opaque=YES hint), so a transparent background would be
+                // blended against the gray window backdrop instead of showing black.
+                // glClear respects glColorMask, so this writes only alpha (2-bit ->
+                // 3 = opaque) and leaves the blitted RGB untouched — the GPU analog
+                // of the CPU fallback's hard-coded (3u << 30) alpha.
+                glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+                glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT);
+                glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+                // Restore the render FBO as the active target.
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID());
+
+                // Publish the GL writes to the CA render server.  glFlush (not
+                // glFinish) is enough — it does not stall the main thread waiting for
+                // the GPU to go idle, and IOSurface provides the cross-context
+                // synchronisation the compositor needs.  This is what removes the
+                // per-frame main-thread stall behind menus and keyboard shortcuts.
+                glFlush();
+
+                m_view->presentIOSurface(m_ioSurfaces[slot]);
+
+                m_ringIndex = (slot + 1) % kRingSize;
+
+                // Recovery telemetry: report once when the zero-copy path resumes
+                // after a stretch of CPU-readback presents.
+                if (m_cpuFallbackLogged)
+                {
+                    std::cerr << "INFO: [QTMetalVideoDevice] zero-copy IOSurface "
+                                 "interop restored.\n";
+                    m_cpuFallbackLogged = false;
+                }
+                return;
+            }
         }
 
         // --- Fallback: GL readback -> CPU pack -> IOSurface upload ---
@@ -572,8 +675,30 @@ namespace Rv
         // Read as 32-bit float RGBA — safe regardless of the FBO's internal
         // format (GL_RGBA16F).  We do the y-flip and format conversion in CPU.
         const size_t floatCount = static_cast<size_t>(w) * h * 4;
-        std::vector<float> floatPx(floatCount);
-        glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, floatPx.data());
+        const size_t pixelCount = static_cast<size_t>(w) * h;
+        try
+        {
+            if (m_cpuReadbackFloat.size() != floatCount)
+            {
+                m_cpuReadbackFloat.resize(floatCount);
+            }
+            if (m_cpuReadbackPacked.size() != pixelCount)
+            {
+                m_cpuReadbackPacked.resize(pixelCount);
+            }
+        }
+        catch (const std::bad_alloc&)
+        {
+            if (!m_cpuReadbackAllocLogged)
+            {
+                std::cerr << "ERROR: [QTMetalVideoDevice] CPU readback buffer "
+                             "allocation failed for " << w << "x" << h << "\n";
+                m_cpuReadbackAllocLogged = true;
+            }
+            return;
+        }
+
+        glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, m_cpuReadbackFloat.data());
 
         fbo->unbind();
 
@@ -586,13 +711,11 @@ namespace Rv
         // GL origin is bottom-left; IOSurface/CALayer origin is top-left.
         // We y-flip by iterating src rows in reverse.
 
-        std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
-
         for (int y = 0; y < h; ++y)
         {
             // src row: y-flip (GL origin is bottom-left)
-            const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
-            uint32_t*    dst = packed.data()  + (size_t)y * w;
+            const float* src = m_cpuReadbackFloat.data() + (size_t)(h - 1 - y) * w * 4;
+            std::uint32_t* dst = m_cpuReadbackPacked.data() + (size_t)y * w;
 
             for (int x = 0; x < w; ++x, src += 4)
             {
@@ -609,7 +732,7 @@ namespace Rv
             }
         }
 
-        m_view->presentPixelData(packed.data(), w, h);
+        m_view->presentPixelData(m_cpuReadbackPacked.data(), w, h);
     }
 
     //--------------------------------------------------------------------------
@@ -647,7 +770,7 @@ namespace Rv
 
     void QTMetalVideoDevice::clearCaches() const
     {
-        // No device-level cache to clear.
+        GLVideoDevice::clearCaches();
     }
 
     VideoDevice::Resolution QTMetalVideoDevice::resolution() const
@@ -698,14 +821,12 @@ namespace Rv
     {
         if (m_view)
             m_view->show();
-        m_isOpen = true;
     }
 
     void QTMetalVideoDevice::close()
     {
         if (m_view)
             m_view->hide();
-        m_isOpen = false;
     }
 
     bool QTMetalVideoDevice::isOpen() const

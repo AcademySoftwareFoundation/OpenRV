@@ -171,7 +171,9 @@ namespace Rv
         //  expose.  Not owned here; the CALayer retains its own contents.
         void* m_lastPresentedSurface;
 
-        //  Coalescing flag for requestUpdate(); cleared at the start of render().
+        //  Coalescing flag for requestUpdate(); cleared when the pending
+        //  UpdateRequest is handled, on renderImmediately(), or when paintEvent
+        //  falls through to a full render().
         bool m_updatePending;
 
         //  Count of consecutive render() attempts where the offscreen GL context

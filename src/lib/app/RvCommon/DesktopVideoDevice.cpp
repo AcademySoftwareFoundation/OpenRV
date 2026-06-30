@@ -157,10 +157,17 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
-        QSurfaceFormat fmt = shareDevice()->widget()->format();
+        // shareDevice() is null when the primary window uses a non-OpenGL
+        // presentation backend (Metal/Vulkan), since there is no QTGLVideoDevice
+        // to share with. Fall back to the default surface format and no
+        // explicit share widget; Qt::AA_ShareOpenGLContexts (set in main) still
+        // shares GL resources via the process-wide global context, and
+        // ScreenView::initializeGL() already tolerates a null m_glViewShare.
+        QOpenGLWidget* shareWidget = shareDevice() ? shareDevice()->widget() : nullptr;
+        QSurfaceFormat fmt = shareWidget ? shareWidget->format() : QSurfaceFormat::defaultFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, 0, shareWidget, Qt::Window);
         setViewWidget(vw);
 
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);

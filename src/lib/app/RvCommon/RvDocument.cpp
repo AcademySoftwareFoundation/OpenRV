@@ -696,11 +696,18 @@ namespace Rv
         {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
             if (m_metalView)
+            {
                 m_metalView->videoDevice()->redraw();
-            else
-                view()->videoDevice()->redraw();
+            }
+            else if (m_glView)
+            {
+                m_glView->videoDevice()->redraw();
+            }
 #else
-            view()->videoDevice()->redraw();
+            if (m_glView)
+            {
+                m_glView->videoDevice()->redraw();
+            }
 #endif
         }
         else if (m == IPCore::Session::eventDeviceChangedMessage())
@@ -1037,10 +1044,22 @@ namespace Rv
         // fallbackVulkanToGLView() and reuses the device-rewiring sequence from
         // rebuildGLView().
         if (!m_metalView)
-            return; // already on the GL path
+        {
+            // Already on the GL path
+            return;
+        }
 
         if (m_currentlyClosing || m_closeEventReceived)
-            return; // document is tearing down; nothing to present
+        {
+            // Document is tearing down; nothing to present
+            return;
+        }
+
+        if (!m_session)
+        {
+            // Nothing to rewire devices on without a session
+            return;
+        }
 
         cerr << "INFO: RvDocument: switching from Metal to OpenGL presentation." << endl;
 
@@ -1097,12 +1116,34 @@ namespace Rv
             m_diagnosticsDock->show();
     }
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    namespace
+    {
+        void warnMetalDisplaySurfaceOptionIgnored()
+        {
+            static bool logged = false;
+            if (!logged)
+            {
+                cout << "INFO: OpenGL surface options (stereo, vsync, double-buffer, "
+                        "pixel format) do not apply on the Metal presentation backend."
+                     << endl;
+                logged = true;
+            }
+        }
+    } // namespace
+#endif
+
     void RvDocument::setStereo(bool b)
     {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView && !m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
+            return;
+        }
+#endif
         if (!m_glView)
             return;
-#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -1121,9 +1162,14 @@ namespace Rv
         if (m_vsyncDisabled)
             return;
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView && !m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
+            return;
+        }
+#endif
         if (!m_glView)
             return;
-#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -1140,9 +1186,14 @@ namespace Rv
     void RvDocument::setDoubleBuffer(bool b)
     {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView && !m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
+            return;
+        }
+#endif
         if (!m_glView)
             return;
-#endif
         bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         const int red = m_glView->format().redBufferSize();
@@ -1159,9 +1210,14 @@ namespace Rv
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView && !m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
+            return;
+        }
+#endif
         if (!m_glView)
             return;
-#endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
@@ -1334,21 +1390,14 @@ namespace Rv
         {
             m_metalView->setContentSize(w, h);
             m_metalView->setMinimumContentSize(w, h);
-            // Only call resize() on the container when the view is NOT already
-            // at the requested size.  resizeView() is frequently called back from
-            // viewSizeChanged() after the view has already resized itself; calling
-            // resize() in that case overrides the stacked layout and permanently
-            // locks the container at the current (possibly small) size.
+            m_metalView->updateGeometry();
             const int dh = m_metalView->height() - h;
             const int dw = m_metalView->width() - w;
             if (dh || dw)
             {
-                m_metalView->resize(w, h);
-                m_metalView->updateGeometry();
                 resize(width() - dw, height() - dh);
                 m_metalView->setContentSize(w, h);
                 m_metalView->setMinimumContentSize(w, h);
-                m_metalView->resize(w, h);
                 m_metalView->updateGeometry();
             }
         }
@@ -1573,7 +1622,7 @@ namespace Rv
         {
             // Mirror the GL path: set content size hints and invalidate the layout,
             // then let the delta between current and desired size drive the window resize.
-            // Do NOT call m_glView->resize() before computing the delta — that
+            // Do NOT call m_metalView->resize() before computing the delta — that
             // would make m_metalView->width()/height() report the target size and give
             // dw=dh=0, skipping the window resize entirely.
             m_metalView->setContentSize(int(w), int(h));

@@ -672,7 +672,10 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -795,7 +798,10 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -904,7 +910,10 @@ namespace Rv
         {
             rvDoc->setDocumentDisabled(false, true);
             bool result = dialog.exec();
-            rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
+            if (QWidget* view = rvDoc->viewWidget())
+            {
+                view->setFocus(Qt::OtherFocusReason);
+            }
             rvDoc->setDocumentDisabled(false, false);
 
             if (result)
@@ -974,7 +983,10 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-        rvDoc->viewWidget()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        }
     }
 
     NODE_IMPLEMENTATION(alertPanel, int)
@@ -1045,7 +1057,10 @@ namespace Rv
         else if (box.clickedButton() == q3 && b3)
             result = 2;
 
-        doc->viewWidget()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = doc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         NODE_RETURN(result);
     }
 
@@ -1054,6 +1069,12 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = (RvDocument*)s->opaquePointer();
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        // Hardware stereo needs a stereo QSurfaceFormat on QOpenGLWidget; the
+        // Metal path presents via CALayer/IOSurface and has no GL window surface.
+        if (doc->metalView() && !doc->view())
+            NODE_RETURN(false);
+#endif
         NODE_RETURN(true);
     }
 
