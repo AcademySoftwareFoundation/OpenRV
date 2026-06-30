@@ -141,13 +141,13 @@ namespace Rv
             if (m_view->isVisible())
             {
 #ifdef PLATFORM_DARWIN
-                // Make sure that the QGLWidget gets redrawn by updateGL() even
+                // Make sure that the view gets redrawn by update() even
                 // when completely overlapped by another window.
-                // Note that on macOS, Qt correctly detects when the QGLWidget
+                // Note that on macOS, Qt correctly detects when the view
                 // is completely overlapped by another window and in which case
                 // resets the Qt::WA_Mapped attribute. This will prevent the
                 // GLView::paintGL() operation from being called by
-                // m_view->updateGL(), which will result in automatically
+                // m_view->update(), which will result in automatically
                 // interrupting any video playback that might be in progress
                 // while the RV window is completely overlapped. This is an
                 // undesirable behaviour during a review session, especially if

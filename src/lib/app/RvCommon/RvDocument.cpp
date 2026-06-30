@@ -249,7 +249,28 @@ namespace Rv
             // the normal glGetString path for all other backends.
             IPCore::Shader::Function::useShadingLanguageVersion("1.20");
             m_metalView->videoDevice()->makeCurrent();
-            initializeSession();
+
+            if (m_metalView->videoDevice()->isGLContextReady())
+            {
+                initializeSession();
+            }
+            else
+            {
+                // The offscreen GL context / FBO that the Metal hybrid path
+                // renders into could not be created.  Rather than proceed with a
+                // view that can never paint (black window), tear the MetalView
+                // down here and fall back to the 8-bit OpenGL GLView.  The GL
+                // path initializes its session lazily from GLView::initializeGL,
+                // so we must NOT call initializeSession() ourselves here.
+                cerr << "WARNING: Metal offscreen GL context unavailable at "
+                        "startup; falling back to OpenGL."
+                     << endl;
+                m_metalView->setEventWidget(nullptr);
+                delete m_metalView;
+                m_metalView = nullptr;
+                m_viewWidget = nullptr;
+                createGLView();
+            }
 
             // NOTE: DiagnosticsView (a QOpenGLWidget) is created below for all
             // backends. It shares GL resources with the offscreen render context
@@ -1005,6 +1026,70 @@ namespace Rv
         m_oldGLView->hide();
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
+
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    void RvDocument::fallbackMetalToGLView()
+    {
+        // Swap a live MetalView for an 8-bit OpenGL GLView after a runtime Metal
+        // failure.  Invoked (queued) from MetalView::render() when the offscreen
+        // GL context cannot be (re)established, so the user gets a working window
+        // instead of a permanently black one.  Mirrors the Vulkan branch's
+        // fallbackVulkanToGLView() and reuses the device-rewiring sequence from
+        // rebuildGLView().
+        if (!m_metalView)
+            return; // already on the GL path
+
+        if (m_currentlyClosing || m_closeEventReceived)
+            return; // document is tearing down; nothing to present
+
+        cerr << "INFO: RvDocument: switching from Metal to OpenGL presentation." << endl;
+
+        MetalView* oldView = m_metalView;
+        oldView->stopProcessingEvents();
+
+        // Build the GL view; this sets m_glView and m_viewWidget = m_glView.
+        // The session already exists (it was created eagerly on the Metal path),
+        // so GLView::initializeGL's call to initializeSession() is a no-op.
+        createGLView();
+
+        m_stackedLayout->addWidget(m_glView);
+        m_stackedLayout->removeWidget(oldView);
+        m_metalView = nullptr;
+
+        m_glView->show();
+        m_glView->setFocus(Qt::OtherFocusReason);
+
+        m_topViewToolBar->setDevice(m_glView->videoDevice());
+
+        // Rewire the session's control/output devices from the (now defunct)
+        // Metal device to the GL device.
+        bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+        m_session->setEventVideoDevice(0);
+        m_session->setOutputVideoDevice(0);
+        m_session->setControlVideoDevice(m_glView->videoDevice());
+        if (same)
+            m_session->setOutputVideoDevice(m_glView->videoDevice());
+
+        m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+
+        if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
+        {
+            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
+            for (size_t i = 0; i < devices.size(); i++)
+            {
+                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+                    d->setShareDevice(m_glView->videoDevice());
+            }
+        }
+
+        // Defer deletion: avoid destroying the MetalView while it may still have
+        // queued events in this event-loop cycle (same rationale as
+        // lazyDeleteGLView()).  It has already been removed from the stacked
+        // layout above; deleteLater() detaches it from its parent on destruction.
+        oldView->hide();
+        oldView->deleteLater();
+    }
+#endif
 
     void RvDocument::showDiagnostics()
     {

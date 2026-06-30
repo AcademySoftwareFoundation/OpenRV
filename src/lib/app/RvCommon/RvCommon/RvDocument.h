@@ -150,6 +150,11 @@ namespace Rv
         void frameChanged();
         void resetSizePolicy();
         void lazyDeleteGLView();
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //  Runtime fallback: replace a failed MetalView with an OpenGL GLView.
+        //  A slot so MetalView::render() can trigger it via a queued connection.
+        void fallbackMetalToGLView();
+#endif
 
     private:
         void purgeMenus();

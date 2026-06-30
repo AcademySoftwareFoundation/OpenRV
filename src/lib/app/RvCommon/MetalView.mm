@@ -22,6 +22,7 @@
 #include <TwkApp/VideoDevice.h>
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QMetaObject>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
@@ -62,6 +63,7 @@ namespace Rv
         , m_ioSurfaceHeight(0)
         , m_lastPresentedSurface(nullptr)
         , m_updatePending(false)
+        , m_contextFailureCount(0)
     {
         // Ensure a native NSView is created immediately so winId() is valid
         // when initialize() is called from showEvent().
@@ -110,14 +112,59 @@ namespace Rv
 
     bool MetalView::supports10BitPresentation()
     {
-        // The 10-bit presentation path renders into an IOSurface with pixel
-        // format kCVPixelFormatType_ARGB2101010LEPacked (see presentPixelData)
-        // which the window server composites correctly on every Metal-capable
-        // Mac.  A Metal device is therefore the only requirement.
-        // This file is compiled with -fobjc-arc; ARC releases the device when it
-        // goes out of scope, so no explicit release is needed.
+        // Requirement 1: a Metal device must exist.  This file is compiled with
+        // -fobjc-arc; ARC releases the device when it goes out of scope, so no
+        // explicit release is needed.
         id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-        return device != nil;
+        if (device == nil)
+        {
+            std::cerr << "INFO: [MetalView] no Metal device available; 10-bit "
+                         "Metal presentation unavailable.\n";
+            return false;
+        }
+
+        // Requirement 2: the OS must actually be able to create an IOSurface in
+        // the packed 10-bit format we present through
+        // (kCVPixelFormatType_ARGB2101010LEPacked).  The window server
+        // composites this format correctly on every Metal-capable Mac, but
+        // probing a tiny surface here catches any configuration where the format
+        // is unavailable *before* we commit the window to the Metal backend
+        // (mirrors the Vulkan side, which validates the real surface format
+        // before selecting Vulkan).  Side-effect-free: the probe is released
+        // immediately.
+        NSDictionary* probeProps = @{
+            (NSString*)kIOSurfaceWidth:           @(16),
+            (NSString*)kIOSurfaceHeight:          @(16),
+            (NSString*)kIOSurfaceBytesPerElement: @(4),
+            (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
+        };
+        IOSurfaceRef probe = IOSurfaceCreate((__bridge CFDictionaryRef)probeProps);
+        if (probe == nullptr)
+        {
+            std::cerr << "INFO: [MetalView] IOSurface ARGB2101010 probe failed; "
+                         "10-bit Metal presentation unavailable.\n";
+            return false;
+        }
+        CFRelease(probe);
+
+        // Informational only: report whether the main display advertises a
+        // deep-color (>= 10 bit per component) depth.  10-bit IOSurface content
+        // is composited on every Metal-capable Mac, but on an SDR 8-bit panel
+        // the window server may dither/truncate at scanout — so this is logged,
+        // not enforced (the Vulkan side likewise presents 10-bit even on SDR
+        // displays).
+        if (NSScreen* screen = [NSScreen mainScreen])
+        {
+            const NSInteger bps = NSBitsPerSampleFromDepth([screen depth]);
+            std::cerr << "INFO: [MetalView] main display bits-per-sample = "
+                      << static_cast<long>(bps)
+                      << (bps >= 10
+                              ? " (deep color: 10-bit reaches the panel).\n"
+                              : " (SDR 8-bit: 10-bit content is composited but "
+                                "may be dithered/truncated at scanout).\n");
+        }
+
+        return true;
     }
 
     //--------------------------------------------------------------------------
@@ -321,7 +368,27 @@ namespace Rv
         {
             m_videoDevice->makeCurrent();
             if (!m_videoDevice->isGLContextReady())
+            {
+                // The offscreen GL context/FBO could not be established for this
+                // frame.  A single failure may be transient, but a persistent
+                // one means the Metal hybrid path cannot render — degrade to the
+                // 8-bit OpenGL GLView instead of leaving a permanently black
+                // view (mirrors the Vulkan branch's runtime fallback).  Defer
+                // the swap via a queued call so we never tear down this view
+                // from inside its own render().
+                if (++m_contextFailureCount == kContextFailureThreshold)
+                {
+                    std::cerr << "WARNING: [MetalView] offscreen GL context not "
+                                 "ready after " << kContextFailureThreshold
+                              << " attempts; falling back to OpenGL.\n";
+                    QMetaObject::invokeMethod(m_doc, "fallbackMetalToGLView",
+                                              Qt::QueuedConnection);
+                }
                 return;
+            }
+
+            // Context is healthy again; reset the failure streak.
+            m_contextFailureCount = 0;
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
