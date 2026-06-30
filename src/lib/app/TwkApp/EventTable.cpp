@@ -66,6 +66,34 @@ namespace TwkApp
         }
     }
 
+    void EventTable::rebind(const std::string& oldEvent, const std::string& newEvent)
+    {
+        BindingMap::iterator i = m_map.find(oldEvent);
+
+        if (i != m_map.end())
+        {
+            Action* action = i->second;
+            m_map.erase(i);
+            unbind(newEvent);
+            m_map[newEvent] = action;
+        }
+    }
+
+    void EventTable::rebindRegex(const std::string& oldEventRegex, const std::string& newEventRegex)
+    {
+        for (int i = 0; i < m_reBindings.size(); i++)
+        {
+            if (m_reBindings[i].first.pattern() == oldEventRegex)
+            {
+                Action* action = m_reBindings[i].second;
+                m_reBindings.erase(m_reBindings.begin() + i);
+                unbindRegex(newEventRegex);
+                m_reBindings.push_back(RegExBinding(newEventRegex, action));
+                break;
+            }
+        }
+    }
+
     static void deleteAction(EventTable::Binding& b) { delete b.second; }
 
     void EventTable::clear()
