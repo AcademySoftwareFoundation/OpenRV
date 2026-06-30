@@ -173,6 +173,13 @@ namespace Rv
 
         //  Coalescing flag for requestUpdate(); cleared at the start of render().
         bool m_updatePending;
+
+        //  Count of consecutive render() attempts where the offscreen GL context
+        //  was not ready.  When it reaches kContextFailureThreshold the view
+        //  requests a one-time fallback to the OpenGL GLView; reset to 0 on any
+        //  successful render.
+        int m_contextFailureCount;
+        static constexpr int kContextFailureThreshold = 30;
     };
 
 } // namespace Rv

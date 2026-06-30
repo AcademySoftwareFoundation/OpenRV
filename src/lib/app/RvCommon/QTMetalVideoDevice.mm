@@ -330,13 +330,29 @@ namespace Rv
     // ensureIOSurfaceTextures — (re)build the zero-copy IOSurface present ring
     //--------------------------------------------------------------------------
 
+    void QTMetalVideoDevice::latchInteropFailure() const
+    {
+        m_interopDisabled = true;
+        m_interopRetryCountdown = kInteropRetryFrames;
+    }
+
     bool QTMetalVideoDevice::ensureIOSurfaceTextures(int w, int h) const
     {
+        // A size change always warrants a fresh attempt (the ring is rebuilt at
+        // the new size anyway).
         if (m_sharedWidth != w || m_sharedHeight != h)
             m_interopDisabled = false;
 
         if (m_interopDisabled)
-            return false;
+        {
+            // Don't disable the zero-copy path for the lifetime of the window:
+            // the failure may have been transient.  Count down and retry once
+            // the cooldown elapses instead of falling back to CPU readback
+            // forever.
+            if (--m_interopRetryCountdown > 0)
+                return false;
+            m_interopDisabled = false;
+        }
 
         if (m_sharedWidth == w && m_sharedHeight == h && m_ioFbos[0])
             return true;  // ring already matches the current size
@@ -350,7 +366,7 @@ namespace Rv
         {
             std::cerr << "[QTMetalVideoDevice] CGLGetCurrentContext() returned null "
                          "— falling back to CPU readback\n";
-            m_interopDisabled = true;
+            latchInteropFailure();
             return false;
         }
 
@@ -370,7 +386,7 @@ namespace Rv
                 std::cerr << "[QTMetalVideoDevice] IOSurfaceCreate failed "
                           << w << "x" << h << " — CPU fallback\n";
                 cleanupIOSurfaceTextures();
-                m_interopDisabled = true;
+                latchInteropFailure();
                 return false;
             }
 
@@ -397,7 +413,7 @@ namespace Rv
                 glDeleteTextures(1, &tex);
                 CFRelease(surf);
                 cleanupIOSurfaceTextures();
-                m_interopDisabled = true;
+                latchInteropFailure();
                 return false;
             }
 
@@ -415,7 +431,7 @@ namespace Rv
                 glDeleteTextures(1, &tex);
                 CFRelease(surf);
                 cleanupIOSurfaceTextures();
-                m_interopDisabled = true;
+                latchInteropFailure();
                 return false;
             }
 
@@ -521,11 +537,30 @@ namespace Rv
             m_view->presentIOSurface(m_ioSurfaces[slot]);
 
             m_ringIndex = (slot + 1) % kRingSize;
+
+            // Recovery telemetry: report once when the zero-copy path resumes
+            // after a stretch of CPU-readback presents.
+            if (m_cpuFallbackLogged)
+            {
+                std::cerr << "INFO: [QTMetalVideoDevice] zero-copy IOSurface "
+                             "interop restored.\n";
+                m_cpuFallbackLogged = false;
+            }
             return;
         }
 
         // --- Fallback: GL readback -> CPU pack -> IOSurface upload ---
         // Used only when IOSurface GL interop is unavailable on this system.
+        // Log once on entry (not every frame) so the slow path is visible
+        // without spamming; the recovery message above closes the loop.
+        if (!m_cpuFallbackLogged)
+        {
+            std::cerr << "INFO: [QTMetalVideoDevice] presenting via CPU readback "
+                         "(" << w << "x" << h << "); zero-copy IOSurface interop "
+                         "unavailable — retrying periodically.\n";
+            m_cpuFallbackLogged = true;
+        }
+
         fbo->bind();
 
         // Force the GPU to complete all pending GL commands before reading back.

@@ -103,6 +103,12 @@ namespace Rv
         bool ensureIOSurfaceTextures(int w, int h) const;
         void cleanupIOSurfaceTextures() const;
 
+        // Latch the zero-copy IOSurface interop off after a failure, but schedule
+        // a retry (kInteropRetryFrames later) instead of disabling it for the
+        // lifetime of the window — the failure may be transient (e.g. a
+        // zero-size FBO at startup or a momentary context issue).
+        void latchInteropFailure() const;
+
         MetalView* m_view;
         QWidget* m_eventWidget;
         QTTranslator* m_translator;
@@ -135,7 +141,14 @@ namespace Rv
         mutable int m_ringIndex{0};
         mutable int m_sharedWidth{0};
         mutable int m_sharedHeight{0};
-        mutable bool m_interopDisabled{false}; // latched on first interop failure
+        mutable bool m_interopDisabled{false};   // interop currently off (with retry)
+        mutable int m_interopRetryCountdown{0};  // frames until interop is retried
+        mutable bool m_cpuFallbackLogged{false}; // one-shot CPU-fallback log guard
+
+        // Frames to wait before retrying zero-copy interop after a failure
+        // (~2 seconds at 60 fps).  Bounds the cost of a permanently-broken
+        // interop to one rebuild attempt every kInteropRetryFrames frames.
+        static constexpr int kInteropRetryFrames = 120;
     };
 
 } // namespace Rv
