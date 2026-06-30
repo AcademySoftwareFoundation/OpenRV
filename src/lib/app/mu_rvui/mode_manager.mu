@@ -751,17 +751,28 @@ class: ModeManagerMode : MinorMode
 
     method: viewChange (void; Event event, bool on)
     {
-        event.reject();
-
-        let vnode = viewNode(),
-            vtype = nodeType(vnode),
-            name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "",
-            entry = findModeEntry(name);
-
-        if (entry neq nil)
+        try 
         {
-            activateEntry(entry, on);
-            if (on) sendInternalEvent("view-edit-mode-activated");
+            event.reject();
+
+            let vnode = viewNode();
+            if (vnode eq nil || vnode == "") return;
+
+            let vtype = nodeType(vnode);
+            if (vtype eq nil || vtype == "") return;
+
+            let name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "",
+                entry = findModeEntry(name);
+
+            if (entry neq nil)
+            {
+                activateEntry(entry, on);
+                if (on) sendInternalEvent("view-edit-mode-activated");
+            }
+        } 
+        catch (exception exc) 
+        { 
+            print("ERROR: mode_manager viewChange: " + string(exc) + "\\n"); 
         }
     }
 
