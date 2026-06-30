@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
