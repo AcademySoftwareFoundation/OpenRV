@@ -218,15 +218,10 @@ namespace IPCore
         {
             m_state->linear = "";
         }
-        else if (getenv("OCIO"))
+        else
         {
             OCIO::ConstColorSpaceRcPtr linearColorSpace = m_state->config->getColorSpace(OCIO::ROLE_SCENE_LINEAR);
             m_state->linear = linearColorSpace ? linearColorSpace->getName() : "";
-        }
-        else
-        {
-            m_state->linear = "";
-            std::cerr << "ERROR: OCIO environment variable not set" << std::endl;
         }
 
         m_state->shaderID = "";
