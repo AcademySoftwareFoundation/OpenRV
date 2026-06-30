@@ -6,6 +6,7 @@
 //
 //
 #include <RvApp/CommandsModule.h>
+#include <Python.h>
 #include <RvApp/Options.h>
 #include <RvApp/RvNodeDefinitions.h>
 #include <RvApp/RvSession.h>
@@ -243,6 +244,22 @@ namespace Rv
             //          new Shader::Function -> initGLSLVersion() -> glGetString
             //          -> crashes because no context
             IPCore::Application::instance()->loadOptionNodeDefinitions();
+
+            // Set TwkMovie's blocking callbacks to release (and re-acquire) the Python GIL while it waits for its
+            // plugins to initialize in separate threads. If any of them need Python, they will try to acquire the
+            // GIL and deadlock with the main thread.
+            //
+            thread_local PyThreadState* preloadGilState = nullptr;
+            TwkMovie::GenericIO::setBlockingWaitCallbacks([]() { preloadGilState = PyGILState_Check() ? PyEval_SaveThread() : nullptr; },
+                                                          []()
+                                                          {
+                                                              if (preloadGilState)
+                                                              {
+                                                                  PyEval_RestoreThread(preloadGilState);
+                                                                  preloadGilState = nullptr;
+                                                              }
+                                                          });
+
             firstTime = false;
         }
 
