@@ -16,7 +16,7 @@ Use of RV Remote Sync is at your own risk. Although we may recommend preferred c
 
 ## 13.1 The Network Dialog
 
-Before you can use any of RV's networking features, you have to tell RV to begin listening for connections. There are two ways to do this: from the command line using the -network flag or interactively using the the Network dialog via the RV → Networking... menu item.
+Before you can use any of RV's networking features, you have to tell RV to begin listening for connections. There are two ways to do this: from the command line using the -network flag or interactively using the Network dialog via the RV → Networking... menu item.
 
 The network dialog box has three pages: Configuration for setting up your identity and the port on which RV will communicate, the Contacts page for managing permissions, and the Connections page which shows a list of the currently active connections. At the bottom of the dialog are buttons for starting and stopping the networking and for initiating a new connection.
 
