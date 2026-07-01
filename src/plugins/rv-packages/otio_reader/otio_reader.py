@@ -561,6 +561,9 @@ def _create_movieproc(time_range, kind="blank"):
 
 def _add_effects(it, last_result, context=None):
     for effect in it.effects:
+        if effect.is_unknown_schema:
+            logging.warning(f"Skipping unknown effect schema '{effect.schema_name()}'")
+            continue
         with set_context(context, effect_metadata=effect.metadata):
             result = create_rv_node_from_otio(effect, context)
 

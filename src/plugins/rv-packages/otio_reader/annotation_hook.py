@@ -235,6 +235,12 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
         logging.warning("Unable to set Hold and Ghost properties")
 
     for layer in in_timeline.layers:
+        if layer.is_unknown_schema:
+            logging.warning(
+                f"Skipping unsupported annotation layer type '{layer.schema_name()}' "
+                "(no schema registered in this version of RV)"
+            )
+            continue
         if isinstance(layer.layer_range, otio.opentime.TimeRange):
             time_range = layer.layer_range
         else:
