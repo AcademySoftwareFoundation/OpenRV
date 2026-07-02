@@ -527,43 +527,14 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
 
-            # Remember which display groups were actually using OCIO for
-            # display, and whether each was "Active", so that reloading the
-            # config doesn't silently turn OCIO display back on for a group
-            # where the user had it off.
-            displayState = {}
-            for group in commands.nodesOfType("RVDisplayGroup"):
-                wasUsingOCIO = self.usingOCIOForDisplay.get(group, False)
-                wasActive = True
-                if wasUsingOCIO:
-                    dpipeline = groupMemberOfType(group, "RVDisplayPipelineGroup")
-                    dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-                    if dOCIO is not None:
-                        wasActive = commands.getIntProperty(dOCIO + ".ocio.active")[0] != 0
-                displayState[group] = (wasUsingOCIO, wasActive)
-
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
+            OCIO_DEFAULTS.clear()
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
                 for nodeType in OCIO_ROLES.keys():
                     self.disableSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.disableDisplayOCIO(group)
-            DEFAULT_PIPE.clear()
-            for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for nodeType in OCIO_ROLES.keys():
-                    self.useSourceOCIO(source, nodeType)
-            for group in commands.nodesOfType("RVDisplayGroup"):
-                self.usingOCIOForDisplay[group] = False
-                wasUsingOCIO, wasActive = displayState.get(group, (False, True))
-                if not wasUsingOCIO:
-                    continue
-                self.useDisplayOCIO(group)
-                if not wasActive:
-                    dpipeline = groupMemberOfType(group, "RVDisplayPipelineGroup")
-                    dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-                    if dOCIO is not None:
-                        commands.setIntProperty(dOCIO + ".ocio.active", [0], True)
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
