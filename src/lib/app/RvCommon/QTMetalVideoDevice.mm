@@ -44,6 +44,11 @@ namespace
     // render thread.  Deliberately does not reuse QTMetalVideoDevice itself —
     // that class builds a view-sized FBO/IOSurface ring that the upload thread
     // has no use for.
+    //
+    // Qt requires QOffscreenSurface::create() on the GUI thread. The worker
+    // QOpenGLContext is also created there (before the upload thread starts);
+    // only makeCurrent() runs on the upload thread
+    // (AA_DontCheckOpenGLContextThreadAffinity in main.cpp).
     //--------------------------------------------------------------------------
     class QTMetalSharedContextWorkerDevice : public TwkGLF::GLVideoDevice
     {
@@ -56,6 +61,17 @@ namespace
                 return;
             }
 
+            m_surface = new QOffscreenSurface();
+            m_surface->setFormat(shareContext->format());
+            m_surface->create();
+            if (!m_surface->isValid())
+            {
+                std::cerr << "[QTMetalVideoDevice] worker QOffscreenSurface::create() failed\n";
+                delete m_surface;
+                m_surface = nullptr;
+                return;
+            }
+
             m_context = new QOpenGLContext();
             m_context->setFormat(shareContext->format());
             m_context->setShareContext(shareContext);
@@ -64,36 +80,41 @@ namespace
                 std::cerr << "[QTMetalVideoDevice] worker QOpenGLContext::create() failed\n";
                 delete m_context;
                 m_context = nullptr;
-                return;
-            }
-
-            m_surface = new QOffscreenSurface();
-            m_surface->setFormat(m_context->format());
-            m_surface->create();
-            if (!m_surface->isValid())
-            {
-                std::cerr << "[QTMetalVideoDevice] worker QOffscreenSurface::create() failed\n";
                 delete m_surface;
                 m_surface = nullptr;
-                delete m_context;
-                m_context = nullptr;
             }
         }
 
         ~QTMetalSharedContextWorkerDevice() override
         {
-            delete m_surface;
+            // Surface lifetime is tied to ImageRenderer on the GUI/render thread.
             delete m_context;
+            delete m_surface;
         }
+
+        bool isValid() const { return m_surface && m_context; }
 
         // Deliberately does NOT call GLVideoDevice::makeCurrent() (text-context
         // bookkeeping there is not meant to be touched concurrently from a
         // background thread) — mirrors QTGLVideoDevice's isWorkerDevice() guard.
         void makeCurrent() const override
         {
-            if (m_context && m_surface)
+            if (!m_context || !m_surface)
             {
-                m_context->makeCurrent(m_surface);
+                return;
+            }
+
+            m_context->makeCurrent(m_surface);
+
+            if (!m_versionChecked)
+            {
+                m_versionChecked = true;
+                const char* ver = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+                m_glValid = (ver && *ver);
+                if (!m_glValid)
+                {
+                    std::cerr << "[QTMetalVideoDevice] worker GL context has no version string\n";
+                }
             }
         }
 
@@ -102,8 +123,10 @@ namespace
         size_t height() const override { return 0; }
 
     private:
-        QOpenGLContext* m_context = nullptr;
+        mutable QOpenGLContext* m_context = nullptr;
         QOffscreenSurface* m_surface = nullptr;
+        mutable bool m_versionChecked = false;
+        mutable bool m_glValid = false;
     };
 } // namespace
 
@@ -396,7 +419,13 @@ namespace Rv
                          "offscreen GL context unavailable\n";
             return nullptr;
         }
-        return new QTMetalSharedContextWorkerDevice(name() + "-workerContextDevice", m_glContext);
+        auto* worker = new QTMetalSharedContextWorkerDevice(name() + "-workerContextDevice", m_glContext);
+        if (!worker->isValid())
+        {
+            delete worker;
+            return nullptr;
+        }
+        return worker;
     }
 
     TwkGLF::GLFBO* QTMetalVideoDevice::defaultFBO()
