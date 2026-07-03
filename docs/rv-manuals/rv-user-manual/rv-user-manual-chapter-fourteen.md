@@ -72,12 +72,12 @@ While high performance playback cannot be guaranteed, these minimum system requi
 | Component | Recommended Minimum |
 | --- | --- |
 | CPU | 64-bit, 6 cores, 12 logical processors |
+| GPPU | OpenGL support |
 | Memory (RAM) | 16 GB |
 | Memory (GPU) | 8 GB |
 | Storage | RAID or nvme |
 | Network | 1 Gb/s. |
 
-> Note: A working GPU with OpenGL support is required to launch RV or rvio. If no GPU is available (for example, on a virtual machine without GPU passthrough), RV and rvio print an "ERROR: no GPU available" message and exit rather than starting.
 
 Since RV aggressively caches its media, the network performance does not directly affect playback performance. It does affect how fast media can be cached, so a faster network allows you to start playback earlier.
 
