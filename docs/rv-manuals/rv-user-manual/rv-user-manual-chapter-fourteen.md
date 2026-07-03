@@ -72,12 +72,11 @@ While high performance playback cannot be guaranteed, these minimum system requi
 | Component | Recommended Minimum |
 | --- | --- |
 | CPU | 64-bit, 6 cores, 12 logical processors |
-| GPPU | OpenGL support |
+| GPU | OpenGL support |
 | Memory (RAM) | 16 GB |
 | Memory (GPU) | 8 GB |
 | Storage | RAID or nvme |
 | Network | 1 Gb/s. |
-
 
 Since RV aggressively caches its media, the network performance does not directly affect playback performance. It does affect how fast media can be cached, so a faster network allows you to start playback earlier.
 
