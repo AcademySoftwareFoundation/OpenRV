@@ -77,6 +77,8 @@ While high performance playback cannot be guaranteed, these minimum system requi
 | Storage | RAID or nvme |
 | Network | 1 Gb/s. |
 
+> Note: A working GPU with OpenGL support is required to launch RV or rvio. If no GPU is available (for example, on a virtual machine without GPU passthrough), RV and rvio print an "ERROR: no GPU available" message and exit rather than starting.
+
 Since RV aggressively caches its media, the network performance does not directly affect playback performance. It does affect how fast media can be cached, so a faster network allows you to start playback earlier.
 
 ## Cache Settings
