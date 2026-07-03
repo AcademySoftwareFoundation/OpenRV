@@ -787,6 +787,11 @@ int utf8Main(int argc, char* argv[])
     TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
     IPCore::ImageRenderer::queryGL();
     const char* glVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+    if (!glVersion)
+    {
+        cout << "ERROR: no GPU available: GL_SHADING_LANGUAGE_VERSION query failed" << endl;
+        exit(-1);
+    }
     IPCore::Shader::Function::useShadingLanguageVersion(glVersion);
 #endif
 
