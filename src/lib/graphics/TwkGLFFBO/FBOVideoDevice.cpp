@@ -166,8 +166,7 @@ namespace TwkGLF
 
         if (!m_imp->vis)
         {
-            cout << "ERROR: no GPU available: no matching GLX visual (this is common on "
-                    "virtual machines without GPU/OpenGL support)"
+            cout << "ERROR: no GPU available: no matching GLX visual"
                  << endl;
             exit(-1);
         }
