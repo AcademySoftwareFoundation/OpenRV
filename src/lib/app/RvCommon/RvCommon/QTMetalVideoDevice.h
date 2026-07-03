@@ -147,14 +147,22 @@ namespace Rv
         mutable int m_ringIndex{0};
         mutable int m_sharedWidth{0};
         mutable int m_sharedHeight{0};
-        mutable bool m_interopDisabled{false};        // interop currently off (with retry)
-        mutable int m_interopRetryCountdown{0};       // frames until interop is retried
-        mutable bool m_cpuFallbackLogged{false};      // one-shot CPU-fallback log guard
-        mutable bool m_cpuReadbackAllocLogged{false}; // one-shot CPU readback alloc failure
+        mutable bool m_interopDisabled{false};   // interop currently off (with retry)
+        mutable int m_interopRetryCountdown{0};  // frames until interop is retried
+        mutable bool m_cpuFallbackLogged{false}; // one-shot CPU-fallback log guard
 
-        // CPU readback fallback scratch (reused across frames; resized on dimension change).
-        mutable std::vector<float> m_cpuReadbackFloat;
-        mutable std::vector<std::uint32_t> m_cpuReadbackPacked;
+        // CPU-fallback flip FBO. A GL_RGB10_A2 blit target lets the GPU do the
+        // float→10-bit conversion and Y-flip; glReadPixels with GL_BGRA +
+        // GL_UNSIGNED_INT_2_10_10_10_REV then reads ARGB2101010LE directly —
+        // no per-pixel CPU pack loop.
+        mutable GLuint m_cpuFlipFbo{0};
+        mutable GLuint m_cpuFlipTex{0};
+        mutable int m_cpuFlipWidth{0};
+        mutable int m_cpuFlipHeight{0};
+        mutable std::vector<std::uint32_t> m_cpuPackedScratch;
+
+        void ensureCpuFallbackTarget(int w, int h) const;
+        void cleanupCpuFallbackTarget() const;
 
         // Frames to wait before retrying zero-copy interop after a failure
         // (~2 seconds at 60 fps).  Bounds the cost of a permanently-broken

@@ -153,7 +153,7 @@ namespace Rv
         // Delete the FBO and its colour texture while the GL context is current.
         // GLFBO::attachColorTexture passes owner=false so GLFBO does NOT delete
         // the colour texture — we must do it explicitly here.
-        if (m_glContext && (m_fbo || m_fboColorTex || m_ioFbos[0]))
+        if (m_glContext && (m_fbo || m_fboColorTex || m_ioFbos[0] || m_cpuFlipFbo))
         {
             m_glContext->makeCurrent(m_offscreenSurface);
             delete m_fbo;
@@ -164,6 +164,7 @@ namespace Rv
                 m_fboColorTex = 0;
             }
             cleanupIOSurfaceTextures();
+            cleanupCpuFallbackTarget();
             m_glContext->doneCurrent();
         }
 
@@ -592,6 +593,54 @@ namespace Rv
     }
 
     //--------------------------------------------------------------------------
+    // CPU-fallback flip FBO helpers
+    //--------------------------------------------------------------------------
+
+    void QTMetalVideoDevice::ensureCpuFallbackTarget(int w, int h) const
+    {
+        if (m_cpuFlipFbo && m_cpuFlipWidth == w && m_cpuFlipHeight == h)
+            return;
+
+        cleanupCpuFallbackTarget();
+
+        // GL_RGB10_A2 target: GPU Y-flip blit quantises RGBA16F → 10-bit.
+        // glReadPixels(GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV) reads
+        // ARGB2101010LE directly — matching kCVPixelFormatType_ARGB2101010LEPacked.
+        glGenTextures(1, &m_cpuFlipTex);
+        glBindTexture(GL_TEXTURE_2D, m_cpuFlipTex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, w, h, 0,
+                     GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glGenFramebuffersEXT(1, &m_cpuFlipFbo);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                  GL_TEXTURE_2D, m_cpuFlipTex, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        m_cpuFlipWidth  = w;
+        m_cpuFlipHeight = h;
+    }
+
+    void QTMetalVideoDevice::cleanupCpuFallbackTarget() const
+    {
+        if (m_cpuFlipFbo)
+        {
+            glDeleteFramebuffersEXT(1, &m_cpuFlipFbo);
+            m_cpuFlipFbo = 0;
+        }
+        if (m_cpuFlipTex)
+        {
+            glDeleteTextures(1, &m_cpuFlipTex);
+            m_cpuFlipTex = 0;
+        }
+        m_cpuFlipWidth  = 0;
+        m_cpuFlipHeight = 0;
+    }
+
+    //--------------------------------------------------------------------------
     // syncBuffers — zero-copy GL FBO -> IOSurface blit -> CALayer present
     //               (CPU readback retained only as a fallback)
     //--------------------------------------------------------------------------
@@ -693,75 +742,47 @@ namespace Rv
             m_cpuFallbackLogged = true;
         }
 
-        fbo->bind();
+        ensureCpuFallbackTarget(w, h);
 
-        // Force the GPU to complete all pending GL commands before reading back.
-        // On macOS (GL-on-Metal), glReadPixels does not implicitly synchronise
-        // the Metal command stream, so without glFinish() the FBO content is
-        // still uninitialised/zero when we sample it.
+        // Y-flip blit (GL bottom-left → IOSurface top-left) into the RGB10_A2
+        // target. The GPU does the RGBA16F → 10-bit quantisation in one pass.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glBlitFramebufferEXT(0, 0, w, h,  0, h, w, 0,  GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        // Force alpha to fully opaque (A=3, 2-bit max). IPCore clears the render
+        // FBO with alpha=0 (ImageRenderer::clearBackgroundToBlack); the blit copies
+        // that through. The CA compositor honours per-pixel alpha on IOSurface, so
+        // without this the background is transparent. Mirrors the fast path.
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+        // On macOS GL-on-Metal, glReadPixels does not implicitly synchronise the
+        // Metal command stream — glFinish() is required to commit the blit before
+        // the readback samples the flip FBO.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);
         glFinish();
 
-        // Read as 32-bit float RGBA — safe regardless of the FBO's internal
-        // format (GL_RGBA16F).  We do the y-flip and format conversion in CPU.
-        const size_t floatCount = static_cast<size_t>(w) * h * 4;
-        const size_t pixelCount = static_cast<size_t>(w) * h;
+        // GL_BGRA + GL_UNSIGNED_INT_2_10_10_10_REV packs A(31:30)|R(29:20)|G(19:10)|B(9:0)
+        // = kCVPixelFormatType_ARGB2101010LEPacked. No per-pixel CPU work.
         try
         {
-            if (m_cpuReadbackFloat.size() != floatCount)
-            {
-                m_cpuReadbackFloat.resize(floatCount);
-            }
-            if (m_cpuReadbackPacked.size() != pixelCount)
-            {
-                m_cpuReadbackPacked.resize(pixelCount);
-            }
+            m_cpuPackedScratch.resize(static_cast<size_t>(w) * h);
         }
         catch (const std::bad_alloc&)
         {
-            if (!m_cpuReadbackAllocLogged)
-            {
-                std::cerr << "ERROR: [QTMetalVideoDevice] CPU readback buffer "
-                             "allocation failed for " << w << "x" << h << "\n";
-                m_cpuReadbackAllocLogged = true;
-            }
+            std::cerr << "ERROR: [QTMetalVideoDevice] bad_alloc in CPU fallback ("
+                      << w << "x" << h << ")\n";
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID());
             return;
         }
+        glReadPixels(0, 0, w, h, GL_BGRA, GL_UNSIGNED_INT_2_10_10_10_REV,
+                     m_cpuPackedScratch.data());
 
-        glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, m_cpuReadbackFloat.data());
-
-        fbo->unbind();
-
-        // --- Format conversion + y-flip ---
-        //
-        // Pack as ARGB2101010LE — (A<<30)|(R<<20)|(G<<10)|B
-        //   where A=3 (fully opaque, 2-bit), R/G/B are 10-bit [0..1023].
-        //   This is kCVPixelFormatType_ARGB2101010LEPacked = 'l30r' = 0x6C333072.
-        //
-        // GL origin is bottom-left; IOSurface/CALayer origin is top-left.
-        // We y-flip by iterating src rows in reverse.
-
-        for (int y = 0; y < h; ++y)
-        {
-            // src row: y-flip (GL origin is bottom-left)
-            const float* src = m_cpuReadbackFloat.data() + (size_t)(h - 1 - y) * w * 4;
-            std::uint32_t* dst = m_cpuReadbackPacked.data() + (size_t)y * w;
-
-            for (int x = 0; x < w; ++x, src += 4)
-            {
-                const float r = std::max(0.f, std::min(1.f, src[0]));
-                const float g = std::max(0.f, std::min(1.f, src[1]));
-                const float b = std::max(0.f, std::min(1.f, src[2]));
-                const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
-                const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
-                const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
-                // ARGB2101010LE: bits[31:30]=A(2), bits[29:20]=R(10),
-                //                bits[19:10]=G(10), bits[9:0]=B(10)
-                // Alpha always opaque: A=3 (= 0b11, max 2-bit value).
-                dst[x] = (3u << 30) | (ri << 20) | (gi << 10) | bi;
-            }
-        }
-
-        m_view->presentPixelData(m_cpuReadbackPacked.data(), w, h);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID());
+        m_view->presentPixelData(m_cpuPackedScratch.data(), w, h);
     }
 
     //--------------------------------------------------------------------------
