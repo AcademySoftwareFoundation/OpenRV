@@ -505,20 +505,22 @@ namespace Rv
                 cout << "INFO: QTVulkanVideoDevice: syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
                      << "  swapchainFormat=" << scFmt
                      << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ? " (A2B10G10R10 / 10-bit)"
-                         : scFmt == VK_FORMAT_UNDEFINED              ? " (UNDEFINED -- swapchain not created yet)"
-                                                                     : " (NOT 10-bit)")
+                         : scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
+                         : scFmt == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
+                                                                       : " (NOT 10-bit)")
                      << endl;
             }
         }
 
         if (!sharedInfo)
         {
-            // Fallback to CPU readback if GPU interop fails.
-            // Packing below assumes A2B10G10R10_UNORM_PACK32 (= GL_RGB10_A2 bit layout).
-            // createSwapchain() guarantees this format is selected when GPU interop is used;
-            // a surface offering only A2R10G10B10 falls back to 8-bit and never reaches here.
-            assert(!m_view || m_view->swapchainFormat() == VK_FORMAT_A2B10G10R10_UNORM_PACK32
-                   || m_view->swapchainFormat() == VK_FORMAT_UNDEFINED);
+            // Fallback to CPU readback if GPU interop fails. The packed 32-bit
+            // words are copied unconverted into the swapchain image, so pack in
+            // the swapchain's own component order: A2B10G10R10 (R in low bits,
+            // == GL_RGB10_A2) or A2R10G10B10 (R in high bits). Linux/RADV
+            // surfaces commonly offer only A2R10G10B10.
+            const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+            const bool rgbOrder = (scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32);
             fbo->bind();
             glFinish();
             const size_t floatCount = static_cast<size_t>(w) * h * 4;
@@ -539,7 +541,9 @@ namespace Rv
                     const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
                     const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
                     const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
-                    dst[x] = (3u << 30) | (bi << 20) | (gi << 10) | ri;
+                    // A2R10G10B10: A|R|G|B (R high).  A2B10G10R10: A|B|G|R (R low).
+                    dst[x] = rgbOrder ? ((3u << 30) | (ri << 20) | (gi << 10) | bi)
+                                      : ((3u << 30) | (bi << 20) | (gi << 10) | ri);
                 }
             }
             m_view->presentPixelData(packed.data(), w, h);

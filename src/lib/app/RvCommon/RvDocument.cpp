@@ -231,7 +231,7 @@ namespace Rv
             useVulkan = VulkanView::supports10BitPresentation();
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: RvDocument: VulkanView::supports10BitPresentation() returned " << (useVulkan ? "true" : "false") << endl;
+                cout << "INFO: RvDocument: supports10BitPresentation()=" << (useVulkan ? "true" : "false") << endl;
             }
             if (!useVulkan)
             {

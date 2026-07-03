@@ -59,7 +59,8 @@ namespace Rv
 
         float devicePixelRatio() const;
 
-        // Format of the active swapchain image (e.g. VK_FORMAT_A2B10G10R10_UNORM_PACK32).
+        // Format of the active swapchain image: VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        // or VK_FORMAT_A2R10G10B10_UNORM_PACK32 (the two differ in R/B order).
         // VK_FORMAT_UNDEFINED before the swapchain is created.
         VkFormat swapchainFormat() const { return m_vkSwapchainFormat; }
 
@@ -101,13 +102,12 @@ namespace Rv
         bool isInitialized() const { return m_initialized; }
 
         //
-        //  Surface-independent probe for whether this machine's Vulkan can
-        //  present A2B10G10R10 (the format used by GL_RGB10_A2 interop). Used at
-        //  RvDocument construction time to decide whether a 10-bit display
-        //  request should route to the Vulkan path or fall back to OpenGL.
-        //  Creates a throwaway QVulkanInstance and queries format support; it
-        //  does not require a window/surface and never throws — returns false
-        //  if Vulkan is unavailable for any reason.
+        //  Probe for whether this machine's Vulkan can present a 10-bit format
+        //  (A2B10G10R10 or A2R10G10B10). Used at RvDocument construction time to
+        //  decide whether a 10-bit display request should route to the Vulkan
+        //  path or fall back to OpenGL. Creates a throwaway QVulkanInstance +
+        //  dummy surface and queries the advertised surface formats; it never
+        //  throws — returns false if Vulkan is unavailable for any reason.
         //
         static bool supports10BitPresentation();
 

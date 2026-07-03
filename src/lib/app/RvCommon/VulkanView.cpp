@@ -48,6 +48,40 @@ namespace Rv
     using namespace TwkApp;
     using namespace IPCore;
 
+    // Both A2B10G10R10 and A2R10G10B10 are 10-bit-per-channel packed formats;
+    // they differ only in R/B component order. Both are acceptable for 10-bit
+    // presentation -- the R/B order is handled where pixels are packed (CPU
+    // fallback) or blitted (GPU interop). A2B10G10R10 (== GL_RGB10_A2) is
+    // preferred when the surface offers it, but many Linux/RADV surfaces only
+    // advertise A2R10G10B10.
+    static bool isTenBitFormat(VkFormat f)
+    {
+        return f == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || f == VK_FORMAT_A2R10G10B10_UNORM_PACK32;
+    }
+
+    static const char* formatName(VkFormat f)
+    {
+        switch (f)
+        {
+        case VK_FORMAT_B8G8R8A8_UNORM:
+            return "B8G8R8A8_UNORM";
+        case VK_FORMAT_B8G8R8A8_SRGB:
+            return "B8G8R8A8_SRGB";
+        case VK_FORMAT_R8G8B8A8_UNORM:
+            return "R8G8B8A8_UNORM";
+        case VK_FORMAT_R8G8B8A8_SRGB:
+            return "R8G8B8A8_SRGB";
+        case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
+            return "A2B10G10R10_UNORM_PACK32";
+        case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
+            return "A2R10G10B10_UNORM_PACK32";
+        case VK_FORMAT_R16G16B16A16_SFLOAT:
+            return "R16G16B16A16_SFLOAT";
+        default:
+            return "(other)";
+        }
+    }
+
     //--------------------------------------------------------------------------
     // VulkanView implementation
     //--------------------------------------------------------------------------
@@ -225,7 +259,7 @@ namespace Rv
             bool has10bit = false;
             for (const auto& fmt : formats)
             {
-                if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
+                if (isTenBitFormat(fmt.format))
                 {
                     has10bit = true;
                     any10bit = true;
@@ -548,29 +582,6 @@ namespace Rv
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data());
 
-        auto formatName = [](VkFormat f) -> const char*
-        {
-            switch (f)
-            {
-            case VK_FORMAT_B8G8R8A8_UNORM:
-                return "B8G8R8A8_UNORM";
-            case VK_FORMAT_B8G8R8A8_SRGB:
-                return "B8G8R8A8_SRGB";
-            case VK_FORMAT_R8G8B8A8_UNORM:
-                return "R8G8B8A8_UNORM";
-            case VK_FORMAT_R8G8B8A8_SRGB:
-                return "R8G8B8A8_SRGB";
-            case VK_FORMAT_A2B10G10R10_UNORM_PACK32:
-                return "A2B10G10R10_UNORM_PACK32";
-            case VK_FORMAT_A2R10G10B10_UNORM_PACK32:
-                return "A2R10G10B10_UNORM_PACK32";
-            case VK_FORMAT_R16G16B16A16_SFLOAT:
-                return "R16G16B16A16_SFLOAT";
-            default:
-                return "(other)";
-            }
-        };
-
         if (ImageRenderer::debugGpu())
         {
             cout << "INFO: VulkanView: createSwapchain: surface offers " << formatCount << " format(s):" << endl;
@@ -583,9 +594,12 @@ namespace Rv
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
         bool found10bit = false;
-        // Prefer A2B10G10R10 exclusively: GL_RGB10_A2 (used for both the GPU interop texture
-        // and the CPU fallback packing) maps to this layout. A2R10G10B10 has the opposite R/B
-        // component order, so accepting it here would swap red and blue in all rendered pixels.
+        // Prefer A2B10G10R10 (== GL_RGB10_A2, the layout the GPU interop shared
+        // texture and CPU fallback packing produce natively) so the transfer is
+        // a plain copy. If the surface only offers A2R10G10B10 (common on
+        // Linux/RADV), accept it too: the opposite R/B order is handled where
+        // pixels are packed (CPU fallback) and by a component-wise blit (GPU
+        // interop), so red and blue are not swapped.
         for (const auto& fmt : formats)
         {
             if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
@@ -595,17 +609,30 @@ namespace Rv
                 break;
             }
         }
+        if (!found10bit)
+        {
+            for (const auto& fmt : formats)
+            {
+                if (fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+                {
+                    surfaceFormat = fmt;
+                    found10bit = true;
+                    break;
+                }
+            }
+        }
 
         if (found10bit)
         {
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: VulkanView: createSwapchain: chose A2B10G10R10_UNORM_PACK32 (10-bit OK)" << endl;
+                cout << "INFO: VulkanView: createSwapchain: chose " << formatName(surfaceFormat.format) << " (10-bit OK)" << endl;
             }
         }
         else
         {
-            cout << "WARNING: VulkanView: Real surface lacks A2B10G10R10; requesting OpenGL fallback" << endl;
+            cout << "WARNING: VulkanView: Real surface lacks a 10-bit format (A2B10G10R10/A2R10G10B10); requesting OpenGL fallback"
+                 << endl;
             requestGLFallback();
             return false;
         }
@@ -817,7 +844,12 @@ namespace Rv
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.pNext = &extMemInfo;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageInfo.format = m_vkSwapchainFormat; // e.g., VK_FORMAT_A2B10G10R10_UNORM_PACK32
+        // The shared image is imported into GL as GL_RGB10_A2, whose bit layout
+        // is A2B10G10R10, so the Vulkan side must use the matching format
+        // regardless of the swapchain format. When the swapchain is A2R10G10B10
+        // the difference is reconciled by a component-wise blit in
+        // presentSharedImage() (not a raw copy).
+        imageInfo.format = VK_FORMAT_A2B10G10R10_UNORM_PACK32; // matches GL_RGB10_A2
         imageInfo.extent = {(uint32_t)w, (uint32_t)h, 1};
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
@@ -831,6 +863,32 @@ namespace Rv
         {
             cerr << "ERROR: VulkanView: Failed to create shared image" << endl;
             return nullptr;
+        }
+
+        // When the swapchain format differs from the shared image format
+        // (A2B10G10R10), presentSharedImage() reconciles them with a blit rather
+        // than a raw copy. That requires the linear-tiled shared image to be a
+        // valid blit source and the swapchain image a valid blit destination. If
+        // the driver does not support that, refuse the GPU-interop path so
+        // syncBuffers() uses the (channel-correct) CPU fallback instead.
+        if (m_vkSwapchainFormat != VK_FORMAT_A2B10G10R10_UNORM_PACK32)
+        {
+            VkFormatProperties srcProps = {};
+            VkFormatProperties dstProps = {};
+            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, VK_FORMAT_A2B10G10R10_UNORM_PACK32, &srcProps);
+            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
+            const bool blitOk = (srcProps.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)
+                                && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
+            if (!blitOk)
+            {
+                if (ImageRenderer::debugGpu())
+                {
+                    cout << "INFO: VulkanView: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
+                         << " swapchain (blit unsupported); using CPU fallback." << endl;
+                }
+                cleanupSharedImage();
+                return nullptr;
+            }
         }
 
         // Handle padded linear row pitch by matching the GL texture stride to Vulkan's rowPitch.
@@ -1126,8 +1184,6 @@ namespace Rv
             }
             return;
         }
-        const bool swapchainSuboptimal = (result == VK_SUBOPTIMAL_KHR);
-
         vkResetFences(m_vkDevice, 1, &m_vkFence);
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
@@ -1175,16 +1231,41 @@ namespace Rv
 
         vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        // Copy shared image to swapchain image
-        VkImageCopy region = {};
-        region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.srcSubresource.layerCount = 1;
-        region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        region.dstSubresource.layerCount = 1;
-        region.extent = {(uint32_t)m_sharedImageInfo.width, (uint32_t)m_sharedImageInfo.height, 1};
+        // Transfer the shared image (always A2B10G10R10, == GL_RGB10_A2) to the
+        // swapchain image. When the swapchain is also A2B10G10R10 the layouts
+        // match and a raw copy is correct and cheapest. When the swapchain is
+        // A2R10G10B10 a raw copy would swap red and blue, so use a blit instead:
+        // vkCmdBlitImage converts per component (R->R, G->G, B->B) between the
+        // two formats. Whether the (linear-tiled) shared image can be a blit
+        // source is checked at shared-image creation; if not, that path is
+        // refused and syncBuffers() uses the CPU fallback instead.
+        if (m_vkSwapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
+        {
+            VkImageCopy region = {};
+            region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            region.srcSubresource.layerCount = 1;
+            region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            region.dstSubresource.layerCount = 1;
+            region.extent = {(uint32_t)m_sharedImageInfo.width, (uint32_t)m_sharedImageInfo.height, 1};
 
-        vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
-                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+            vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        }
+        else
+        {
+            VkImageBlit blit = {};
+            blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.srcSubresource.layerCount = 1;
+            blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.dstSubresource.layerCount = 1;
+            blit.srcOffsets[0] = {0, 0, 0};
+            blit.srcOffsets[1] = {m_sharedImageInfo.width, m_sharedImageInfo.height, 1};
+            blit.dstOffsets[0] = {0, 0, 0};
+            blit.dstOffsets[1] = {m_sharedImageInfo.width, m_sharedImageInfo.height, 1};
+
+            vkCmdBlitImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
+                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_NEAREST);
+        }
 
         // Transition swapchain image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -1237,7 +1318,11 @@ namespace Rv
         presentInfo.pImageIndices = &imageIndex;
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
-        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR || swapchainSuboptimal)
+        // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
+        // can be reported persistently by some X11/RADV compositors; recreating
+        // on it every frame caused a swapchain-recreate loop that starved the Qt
+        // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
             vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
             handleSwapchainOutOfDate();
@@ -1331,8 +1416,6 @@ namespace Rv
             }
             return;
         }
-        const bool swapchainSuboptimal = (result == VK_SUBOPTIMAL_KHR);
-
         vkResetFences(m_vkDevice, 1, &m_vkFence);
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
@@ -1421,7 +1504,11 @@ namespace Rv
         presentInfo.pImageIndices = &imageIndex;
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
-        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR || swapchainSuboptimal)
+        // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
+        // can be reported persistently by some X11/RADV compositors; recreating
+        // on it every frame caused a swapchain-recreate loop that starved the Qt
+        // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
             vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
             handleSwapchainOutOfDate();
