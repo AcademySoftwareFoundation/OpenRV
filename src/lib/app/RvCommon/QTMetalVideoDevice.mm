@@ -460,6 +460,10 @@ namespace Rv
 
     bool QTMetalVideoDevice::ensureIOSurfaceTextures(int w, int h) const
     {
+        static const bool forceCpu = getenv("RV_METAL_FORCE_CPU_PRESENT") != nullptr;
+        if (forceCpu)
+            return false;
+
         // A size change always warrants a fresh attempt (the ring is rebuilt at
         // the new size anyway).
         if (m_sharedWidth != w || m_sharedHeight != h)
