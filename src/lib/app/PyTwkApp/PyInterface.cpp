@@ -285,7 +285,7 @@ namespace TwkApp
             // is leaving Python for C++. Clear the Python context so a later crash
             // in C++ is not misattributed to a Python line that already returned.
             PyFrameObject* back = PyFrame_GetBack(frame);
-            if (back == NULL)
+            if (back == nullptr)
             {
                 TwkUtil::CrashHandler::instance().addAnnotation("py_script_file", "");
                 TwkUtil::CrashHandler::instance().addAnnotation("py_script_line", "");
@@ -365,7 +365,7 @@ namespace TwkApp
         if (TwkUtil::CrashHandler::instance().isInitialized())
         {
             PyLockObject locker;
-            PyEval_SetTrace(pythonTraceFunction, NULL);
+            PyEval_SetTrace(pythonTraceFunction, nullptr);
         }
     }
 

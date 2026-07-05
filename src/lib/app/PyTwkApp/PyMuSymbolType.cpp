@@ -229,9 +229,9 @@ namespace TwkApp
     static PyObject* MuSymbol_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     {
         PyLockObject locker;
-        PyMuSymbolObject* self;
 
-        if ((self = (PyMuSymbolObject*)type->tp_alloc(type, 0)))
+        PyMuSymbolObject* self = (PyMuSymbolObject*)type->tp_alloc(type, 0);
+        if (self)
         {
             self->symbol = 0;
             self->function = 0;

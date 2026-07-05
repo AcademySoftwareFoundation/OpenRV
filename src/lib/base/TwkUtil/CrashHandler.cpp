@@ -6,9 +6,12 @@
 //******************************************************************************
 
 #include <TwkUtil/CrashHandler.h>
+// Private, non-installed header: it lives only in this source directory and is
+// not exposed on any TwkUtil/ include path, so it is included with quotes.
 #include "CrashHandler_internal.h"
 #include <TwkUtil/EnvVar.h>
 #include <QtCore/QtCore>
+#include <array>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -203,16 +206,15 @@ namespace TwkUtil
     // Platform-specific implementation using Crashpad
     //
 
-    // Platform-specific configuration
+    // Display name recorded in the "platform" crash annotation. The single
+    // unified implementation below works on all platforms, so this only selects
+    // the label - there is no need for per-platform class names.
 #if defined(PLATFORM_DARWIN)
-#define CRASH_HANDLER_IMPL_CLASS CrashHandlerDarwinImpl
-#define PLATFORM_STRING "macOS"
+    constexpr const char* kPlatformName = "macOS";
 #elif defined(PLATFORM_WINDOWS)
-#define CRASH_HANDLER_IMPL_CLASS CrashHandlerWindowsImpl
-#define PLATFORM_STRING "Windows"
+    constexpr const char* kPlatformName = "Windows";
 #else
-#define CRASH_HANDLER_IMPL_CLASS CrashHandlerLinuxImpl
-#define PLATFORM_STRING "Linux"
+    constexpr const char* kPlatformName = "Linux";
 #endif
 
     //
@@ -223,73 +225,58 @@ namespace TwkUtil
         // Buffer size for annotations (max 1024 chars each)
         constexpr size_t kAnnotationBufferSize = 1024;
 
-        // Static annotation buffers - must have static storage duration
-        // Mu script annotations (function-level: the Mu crash observer records
-        // the function and its file, not a source line - see MuCrashObserver)
-        char g_muScriptFileBuffer[kAnnotationBufferSize];
-        char g_muFunctionBuffer[kAnnotationBufferSize];
+        // Runtime Crashpad string annotations. crashpad::StringAnnotation owns its
+        // own fixed-size storage and clamps overlong values in Set(), so there is
+        // no need to manage raw char buffers or copy into them by hand.
+        //
+        // Mu script annotations (function-level: the Mu crash observer records the
+        // function and its file, not a source line - see MuCrashObserver)
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_muScriptFile("mu_script_file");
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_muFunction("mu_function");
 
         // Python script annotations
-        char g_pyScriptFileBuffer[kAnnotationBufferSize];
-        char g_pyScriptLineBuffer[64];
-        char g_pyFunctionBuffer[kAnnotationBufferSize];
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_pyScriptFile("py_script_file");
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_pyScriptLine("py_script_line");
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_pyFunction("py_function");
 
         // GPU annotations
-        char g_gpuVendorBuffer[kAnnotationBufferSize];
-        char g_gpuRendererBuffer[kAnnotationBufferSize];
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_gpuVendor("gpu_vendor");
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_gpuRenderer("gpu_renderer");
 
         // Python interop annotations
-        char g_pythonCallerBuffer[kAnnotationBufferSize];
-
-        // Crashpad annotation objects for Mu
-        crashpad::Annotation g_muScriptFile(crashpad::Annotation::Type::kString, "mu_script_file", g_muScriptFileBuffer);
-        crashpad::Annotation g_muFunction(crashpad::Annotation::Type::kString, "mu_function", g_muFunctionBuffer);
-
-        // Crashpad annotation objects for Python
-        crashpad::Annotation g_pyScriptFile(crashpad::Annotation::Type::kString, "py_script_file", g_pyScriptFileBuffer);
-        crashpad::Annotation g_pyScriptLine(crashpad::Annotation::Type::kString, "py_script_line", g_pyScriptLineBuffer);
-        crashpad::Annotation g_pyFunction(crashpad::Annotation::Type::kString, "py_function", g_pyFunctionBuffer);
-
-        // Crashpad annotation objects for GPU
-        crashpad::Annotation g_gpuVendor(crashpad::Annotation::Type::kString, "gpu_vendor", g_gpuVendorBuffer);
-        crashpad::Annotation g_gpuRenderer(crashpad::Annotation::Type::kString, "gpu_renderer", g_gpuRendererBuffer);
-
-        // Crashpad annotation objects for Python interop
-        crashpad::Annotation g_pythonCaller(crashpad::Annotation::Type::kString, "python_caller", g_pythonCallerBuffer);
+        crashpad::StringAnnotation<kAnnotationBufferSize> g_pythonCaller("python_caller");
 
         // Map of annotation names to their Crashpad annotation objects
         struct AnnotationMapping
         {
             const char* name;
-            crashpad::Annotation* annotation;
-            char* buffer;
-            size_t buffer_size;
+            crashpad::StringAnnotation<kAnnotationBufferSize>* annotation;
         };
 
-        AnnotationMapping g_annotationMappings[] = {
-            {"mu_script_file", &g_muScriptFile, g_muScriptFileBuffer, kAnnotationBufferSize},
-            {"mu_function", &g_muFunction, g_muFunctionBuffer, kAnnotationBufferSize},
-            {"py_script_file", &g_pyScriptFile, g_pyScriptFileBuffer, kAnnotationBufferSize},
-            {"py_script_line", &g_pyScriptLine, g_pyScriptLineBuffer, 64},
-            {"py_function", &g_pyFunction, g_pyFunctionBuffer, kAnnotationBufferSize},
-            {"gpu_vendor", &g_gpuVendor, g_gpuVendorBuffer, kAnnotationBufferSize},
-            {"gpu_renderer", &g_gpuRenderer, g_gpuRendererBuffer, kAnnotationBufferSize},
-            {"python_caller", &g_pythonCaller, g_pythonCallerBuffer, kAnnotationBufferSize},
-        };
+        const std::array<AnnotationMapping, 8> g_annotationMappings = {{
+            {"mu_script_file", &g_muScriptFile},
+            {"mu_function", &g_muFunction},
+            {"py_script_file", &g_pyScriptFile},
+            {"py_script_line", &g_pyScriptLine},
+            {"py_function", &g_pyFunction},
+            {"gpu_vendor", &g_gpuVendor},
+            {"gpu_renderer", &g_gpuRenderer},
+            {"python_caller", &g_pythonCaller},
+        }};
     } // namespace
 
     //
     // Unified platform implementation (Darwin/Windows/Linux)
     //
-    class CRASH_HANDLER_IMPL_CLASS : public CrashHandlerImpl
+    class CrashHandlerPlatformImpl : public CrashHandlerImpl
     {
     public:
-        CRASH_HANDLER_IMPL_CLASS()
+        CrashHandlerPlatformImpl()
             : m_initialized(false)
         {
         }
 
-        ~CRASH_HANDLER_IMPL_CLASS() override = default;
+        ~CrashHandlerPlatformImpl() override = default;
 
         bool initialize(const std::string& appName, const std::string& appVersion, const std::string& handlerPath) override;
         void addAnnotation(const std::string& key, const std::string& value) override;
@@ -315,7 +302,7 @@ namespace TwkUtil
         bool ensureCrashDumpDirectoryExists();
     };
 
-    bool CRASH_HANDLER_IMPL_CLASS::ensureCrashDumpDirectoryExists()
+    bool CrashHandlerPlatformImpl::ensureCrashDumpDirectoryExists()
     {
         QDir dir(QString::fromStdString(m_crashDumpDir));
         if (!dir.exists())
@@ -329,7 +316,7 @@ namespace TwkUtil
         return true;
     }
 
-    bool CRASH_HANDLER_IMPL_CLASS::initialize(const std::string& appName, const std::string& appVersion, const std::string& handlerPath)
+    bool CrashHandlerPlatformImpl::initialize(const std::string& appName, const std::string& appVersion, const std::string& handlerPath)
     {
         if (m_initialized)
         {
@@ -392,7 +379,7 @@ namespace TwkUtil
         // Add initial annotations
         m_annotations["app_name"] = appName;
         m_annotations["app_version"] = appVersion;
-        m_annotations["platform"] = PLATFORM_STRING;
+        m_annotations["platform"] = kPlatformName;
         m_annotations["qt_version"] = QT_VERSION_STR;
 
         // Add system information
@@ -421,7 +408,7 @@ namespace TwkUtil
         return true;
     }
 
-    void CRASH_HANDLER_IMPL_CLASS::addAnnotation(const std::string& key, const std::string& value)
+    void CrashHandlerPlatformImpl::addAnnotation(const std::string& key, const std::string& value)
     {
         if (!m_initialized)
         {
@@ -439,13 +426,9 @@ namespace TwkUtil
         {
             if (key == mapping.name)
             {
-                // Copy value to the annotation buffer
-                size_t len = std::min(value.length(), mapping.buffer_size - 1);
-                memcpy(mapping.buffer, value.c_str(), len);
-                mapping.buffer[len] = '\0';
-
-                // Update the Crashpad annotation size so it gets included in crash reports
-                mapping.annotation->SetSize(len + 1); // +1 for NUL terminator
+                // StringAnnotation owns its storage and clamps overlong values,
+                // so we hand it the string directly.
+                mapping.annotation->Set(value);
                 matched = true;
                 break;
             }
@@ -461,7 +444,7 @@ namespace TwkUtil
 #endif
     }
 
-    void CRASH_HANDLER_IMPL_CLASS::attachLogFile(const std::string& logFilePath)
+    void CrashHandlerPlatformImpl::attachLogFile(const std::string& logFilePath)
     {
         if (!m_initialized)
         {
@@ -518,6 +501,6 @@ namespace TwkUtil
     //
     // Factory function to create platform-specific implementation
     //
-    CrashHandlerImpl* createPlatformCrashHandlerImpl() { return new CRASH_HANDLER_IMPL_CLASS(); }
+    CrashHandlerImpl* createPlatformCrashHandlerImpl() { return new CrashHandlerPlatformImpl(); }
 
 } // namespace TwkUtil

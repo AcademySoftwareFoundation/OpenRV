@@ -17,11 +17,15 @@ namespace TwkApp
         return theObserver;
     }
 
+    // Pre-reserved depth for the Mu activation stack. Chosen to cover typical Mu
+    // call depth without reallocating; the vector still grows if exceeded.
+    static constexpr size_t kInitialStackReserve = 64;
+
     MuCrashObserver::MuCrashObserver()
         : m_lastWrittenFn(nullptr)
         , m_mainThread(pthread_self()) // constructed during install on the main thread
     {
-        m_stack.reserve(64);
+        m_stack.reserve(kInitialStackReserve);
     }
 
     bool MuCrashObserver::active() const
@@ -29,7 +33,7 @@ namespace TwkApp
         return pthread_equal(pthread_self(), m_mainThread) && TwkUtil::CrashHandler::instance().isInitialized();
     }
 
-    void MuCrashObserver::onEnter(const Mu::Function* f, const Mu::Node* /*callNode*/, Mu::Thread& /*t*/)
+    void MuCrashObserver::onEnter(const Mu::Function* function, const Mu::Node* /*callNode*/, Mu::Thread& /*thread*/)
     {
         if (!active())
             return;
@@ -38,11 +42,11 @@ namespace TwkApp
         // Mu's Node hierarchy is non-polymorphic and several activation paths
         // pass plain Nodes (not AnnotatedNodes), so there is no safe way to read
         // a source line here. The function and its file are all we record.
-        m_stack.push_back(f);
+        m_stack.push_back(function);
         writeTop();
     }
 
-    void MuCrashObserver::onExit(Mu::Thread& /*t*/)
+    void MuCrashObserver::onExit(Mu::Thread& /*thread*/)
     {
         if (!active())
             return;

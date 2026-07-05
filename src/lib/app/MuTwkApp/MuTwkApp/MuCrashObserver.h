@@ -44,8 +44,8 @@ namespace TwkApp
     public:
         static MuCrashObserver& instance();
 
-        void onEnter(const Mu::Function* f, const Mu::Node* callNode, Mu::Thread& t) override;
-        void onExit(Mu::Thread& t) override;
+        void onEnter(const Mu::Function* function, const Mu::Node* callNode, Mu::Thread& thread) override;
+        void onExit(Mu::Thread& thread) override;
 
     private:
         MuCrashObserver();

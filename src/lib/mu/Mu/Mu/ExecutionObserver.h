@@ -35,12 +35,12 @@ namespace Mu
         // Called when an interpreted function begins executing. callNode is the
         // call-site node (an AnnotatedNode carrying file/line when debugging is
         // enabled) or null when entering from the external Thread::call() path.
-        virtual void onEnter(const Function* f, const Node* callNode, Thread& t) = 0;
+        virtual void onEnter(const Function* function, const Node* callNode, Thread& thread) = 0;
 
         // Called when that function finishes (normal return, Mu/C++ exception,
         // or tail-call unwind). Observers maintain their own state to know what
         // to restore.
-        virtual void onExit(Thread& t) = 0;
+        virtual void onExit(Thread& thread) = 0;
     };
 
     // The single installed observer, or null. Set by the app layer at init.
@@ -59,21 +59,21 @@ namespace Mu
 
     struct ActivationScope
     {
-        Thread& thread;
-        bool active;
+        Thread& m_thread;
+        bool m_active;
 
-        ActivationScope(const Function* f, const Node* callNode, Thread& t)
-            : thread(t)
-            , active(executionObserver != nullptr)
+        ActivationScope(const Function* function, const Node* callNode, Thread& thread)
+            : m_thread(thread)
+            , m_active(executionObserver != nullptr)
         {
-            if (active)
-                executionObserver->onEnter(f, callNode, t);
+            if (m_active)
+                executionObserver->onEnter(function, callNode, thread);
         }
 
         ~ActivationScope()
         {
-            if (active)
-                executionObserver->onExit(thread);
+            if (m_active)
+                executionObserver->onExit(m_thread);
         }
     };
 
