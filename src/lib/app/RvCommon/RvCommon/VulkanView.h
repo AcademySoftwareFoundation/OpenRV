@@ -95,6 +95,11 @@ namespace Rv
             int height{0};         // used sub-region height presented this frame
             int strideWidth{0};    // GL texture width = capacity rowPitch / 4
             int capacityHeight{0}; // allocated image height (>= height); GL texture height
+            // Non-zero when the shared image uses VK_IMAGE_TILING_OPTIMAL (the
+            // default on NVIDIA Linux, which avoids the blank large-image bug); GL
+            // must then import with GL_OPTIMAL_TILING_EXT instead of
+            // GL_LINEAR_TILING_EXT.
+            int optimalTiling{0};
         };
 
         // Number of frames the present path keeps in flight. Per-frame Vulkan

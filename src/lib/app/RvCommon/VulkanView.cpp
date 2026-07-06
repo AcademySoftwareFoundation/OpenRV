@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #ifdef PLATFORM_WINDOWS
@@ -806,6 +807,41 @@ namespace Rv
         return UINT32_MAX;
     }
 
+    namespace
+    {
+        bool isNvidiaPhysicalDevice(VkPhysicalDevice dev)
+        {
+            VkPhysicalDeviceProperties props = {};
+            vkGetPhysicalDeviceProperties(dev, &props);
+            return props.vendorID == 0x10DE;
+        }
+
+        bool nvidiaInteropWorkaroundDisabled()
+        {
+            static const bool disabled = getenv("RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND") != nullptr;
+            return disabled;
+        }
+
+        // NVIDIA Linux 550+ drivers return blank pixels to OpenGL for LINEAR shared
+        // images >= ~2 MiB (forum thread #349436). Allocating the shared image with
+        // VK_IMAGE_TILING_OPTIMAL avoids that broken linear path and restores
+        // correct zero-copy interop, so OPTIMAL is the default on NVIDIA. Both the
+        // GL and Vulkan sides here are the same NVIDIA driver/GPU, so the
+        // vendor-private optimal layout matches on import without needing explicit
+        // DRM-format-modifier negotiation. AMD/Intel keep the existing LINEAR path.
+        // Set RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND to revert NVIDIA to LINEAR
+        // (reproduces the blank-image bug, for debugging).
+        bool useOptimalTilingForInterop(VkPhysicalDevice dev)
+        {
+#if defined(PLATFORM_LINUX)
+            return !nvidiaInteropWorkaroundDisabled() && isNvidiaPhysicalDevice(dev);
+#else
+            (void)dev;
+            return false;
+#endif
+        }
+    } // namespace
+
     void VulkanView::cleanupSharedImage(uint32_t slot)
     {
         SharedImageInfo& info = m_sharedImageInfo[slot];
@@ -873,6 +909,7 @@ namespace Rv
         info.height = 0;
         info.size = 0;
         info.capacityHeight = 0;
+        info.optimalTiling = 0;
         m_sharedCapacityW[slot] = 0;
         m_sharedCapacityH[slot] = 0;
     }
@@ -957,6 +994,10 @@ namespace Rv
                  << " for request " << w << "x" << h << endl;
         }
 
+        // OPTIMAL tiling on NVIDIA (the fix for the blank large-image bug); LINEAR
+        // elsewhere. See useOptimalTilingForInterop().
+        const bool optimalTiling = useOptimalTilingForInterop(m_vkPhysicalDevice);
+
         // 1. Create Shared Image
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
@@ -982,7 +1023,7 @@ namespace Rv
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-        imageInfo.tiling = VK_IMAGE_TILING_LINEAR;         // Use linear tiling to avoid GL/Vulkan optimal swizzle mismatch
+        imageInfo.tiling = optimalTiling ? VK_IMAGE_TILING_OPTIMAL : VK_IMAGE_TILING_LINEAR;
         imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT; // Only used as transfer src in Vulkan
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -995,17 +1036,21 @@ namespace Rv
 
         // When the swapchain format differs from the shared image format
         // (A2B10G10R10), presentSharedImage() reconciles them with a blit rather
-        // than a raw copy. That requires the linear-tiled shared image to be a
-        // valid blit source and the swapchain image a valid blit destination. If
-        // the driver does not support that, refuse the GPU-interop path so
-        // syncBuffers() uses the (channel-correct) CPU fallback instead.
+        // than a raw copy. That requires the shared image to be a valid blit
+        // source and the swapchain image a valid blit destination. If the driver
+        // does not support that, refuse the GPU-interop path so syncBuffers()
+        // uses the (channel-correct) CPU fallback instead.
         if (m_vkSwapchainFormat != VK_FORMAT_A2B10G10R10_UNORM_PACK32)
         {
             VkFormatProperties srcProps = {};
             VkFormatProperties dstProps = {};
             vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, VK_FORMAT_A2B10G10R10_UNORM_PACK32, &srcProps);
             vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
-            const bool blitOk = (srcProps.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)
+            // The shared image's blit-source support depends on its actual tiling
+            // (OPTIMAL on NVIDIA, LINEAR elsewhere).
+            const VkFormatFeatureFlags srcFeatures =
+                optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
+            const bool blitOk = (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)
                                 && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
             if (!blitOk)
             {
@@ -1019,22 +1064,33 @@ namespace Rv
             }
         }
 
-        // Handle padded linear row pitch by matching the GL texture stride to Vulkan's rowPitch.
-        VkImageSubresource subresource = {};
-        subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        subresource.mipLevel = 0;
-        subresource.arrayLayer = 0;
-        VkSubresourceLayout layout;
-        vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage[slot], &subresource, &layout);
-
-        if (layout.rowPitch % 4 != 0)
+        // rowPitch is only meaningful (and vkGetImageSubresourceLayout only valid)
+        // for LINEAR tiling. For OPTIMAL tiling the GL import uses the logical
+        // capacity width and lets the driver resolve the layout.
+        if (optimalTiling)
         {
-            // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
-            cleanupSharedImage(slot);
-            return nullptr;
+            info.strideWidth = capW;
         }
-        info.strideWidth = static_cast<int>(layout.rowPitch / 4);
+        else
+        {
+            // Handle padded linear row pitch by matching the GL texture stride to Vulkan's rowPitch.
+            VkImageSubresource subresource = {};
+            subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            subresource.mipLevel = 0;
+            subresource.arrayLayer = 0;
+            VkSubresourceLayout layout;
+            vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage[slot], &subresource, &layout);
+
+            if (layout.rowPitch % 4 != 0)
+            {
+                // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
+                cleanupSharedImage(slot);
+                return nullptr;
+            }
+            info.strideWidth = static_cast<int>(layout.rowPitch / 4);
+        }
         info.capacityHeight = capH; // GL imports the texture at capacity dimensions
+        info.optimalTiling = optimalTiling ? 1 : 0;
 
         VkMemoryRequirements memReqs;
         vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage[slot], &memReqs);
