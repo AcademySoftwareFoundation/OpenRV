@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <vector>
@@ -190,6 +191,19 @@ namespace Rv
     using namespace TwkApp;
     using namespace IPCore;
 
+    namespace
+    {
+        // Forces the CPU pack-and-upload present path regardless of GPU/driver.
+        // Useful for exercising the fallback, which the NVIDIA optimal-tiling fix
+        // otherwise makes rare. Read once. Platform-neutral (unlike the Windows-only
+        // GL-interop entry-point helpers above).
+        bool forceCpuPresentation()
+        {
+            static const bool forced = getenv("RV_VULKAN_FORCE_CPU_PRESENT") != nullptr;
+            return forced;
+        }
+    } // namespace
+
     QTVulkanVideoDevice::QTVulkanVideoDevice(VideoModule* module, const string& name, VulkanView* view, QWidget* eventWidget)
         : TwkGLF::GLVideoDevice(module, name, VideoDevice::ImageOutput | VideoDevice::ProvidesSync | VideoDevice::SubWindow)
         , m_view(view)
@@ -202,7 +216,7 @@ namespace Rv
     QTVulkanVideoDevice::~QTVulkanVideoDevice()
     {
         // Delete the FBO and its colour texture while the GL context is current.
-        if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject[0]))
+        if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject[0] || m_cpuFlipFbo))
         {
             m_glContext->makeCurrent(m_offscreenSurface);
             delete m_fbo;
@@ -214,6 +228,7 @@ namespace Rv
             }
             for (uint32_t i = 0; i < VulkanView::FRAMES_IN_FLIGHT; ++i)
                 cleanupSharedGLObjects(i);
+            cleanupCpuFallbackTarget();
             m_glContext->doneCurrent();
         }
 
@@ -461,6 +476,78 @@ namespace Rv
         m_sharedHeight[slot] = 0;
     }
 
+    void QTVulkanVideoDevice::ensureCpuFallbackTarget(int w, int h) const
+    {
+        if (m_cpuFlipFbo && m_cpuFlipWidth == w && m_cpuFlipHeight == h)
+            return;
+
+        cleanupCpuFallbackTarget();
+
+        // RGB10_A2 color target so the Y-flip blit quantizes to 10-bit and the
+        // packed readback below is a direct copy (no conversion in glReadPixels).
+        glGenTextures(1, &m_cpuFlipTex);
+        glBindTexture(GL_TEXTURE_2D, m_cpuFlipTex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glGenFramebuffersEXT(1, &m_cpuFlipFbo);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_cpuFlipTex, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        m_cpuFlipWidth = w;
+        m_cpuFlipHeight = h;
+    }
+
+    void QTVulkanVideoDevice::cleanupCpuFallbackTarget() const
+    {
+        if (m_cpuFlipFbo)
+        {
+            glDeleteFramebuffersEXT(1, &m_cpuFlipFbo);
+            m_cpuFlipFbo = 0;
+        }
+        if (m_cpuFlipTex)
+        {
+            glDeleteTextures(1, &m_cpuFlipTex);
+            m_cpuFlipTex = 0;
+        }
+        m_cpuFlipWidth = 0;
+        m_cpuFlipHeight = 0;
+    }
+
+    void QTVulkanVideoDevice::presentCpuFallback(int w, int h) const
+    {
+        TwkGLF::GLFBO* fbo = m_fbo;
+
+        // Pack in the swapchain's channel order. glReadPixels with
+        // GL_UNSIGNED_INT_2_10_10_10_REV packs A2B10G10R10 (R low) for GL_RGBA and
+        // A2R10G10B10 (R high) for GL_BGRA, so the read format selects the layout
+        // directly with no CPU conversion. Linux/RADV surfaces commonly offer only
+        // A2R10G10B10.
+        const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+        const GLenum readFormat = (scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? GL_BGRA : GL_RGBA;
+
+        ensureCpuFallbackTarget(w, h);
+
+        // Y-flip blit (GL bottom-left -> Vulkan top-left) into the RGB10_A2 target,
+        // so glReadPixels below reads top-down and packs to the swapchain layout.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+
+        // GL-packed readback: glReadPixels stalls until the flip blit finishes, but
+        // the driver packs directly to the swapchain bit layout, so there is no
+        // per-pixel CPU pack loop.
+        m_cpuPackedScratch.resize(static_cast<size_t>(w) * h);
+        glReadPixels(0, 0, w, h, readFormat, GL_UNSIGNED_INT_2_10_10_10_REV, m_cpuPackedScratch.data());
+        m_view->presentPixelData(m_cpuPackedScratch.data(), w, h);
+
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID()); // restore
+    }
+
     //--------------------------------------------------------------------------
     // syncBuffers
     //--------------------------------------------------------------------------
@@ -489,16 +576,19 @@ namespace Rv
         if (!m_glContext->makeCurrent(m_offscreenSurface))
             return;
 
-        // Get shared image info from VulkanView
+        // Get shared image info from VulkanView. RV_VULKAN_FORCE_CPU_PRESENT skips
+        // interop entirely so getSharedImageInfo() never allocates a shared image
+        // and the CPU fallback below runs.
 #ifdef PLATFORM_WINDOWS
         // Probe the EXT_memory_object/EXT_semaphore (+ _win32) entry points
         // while the GL context is current. If the driver does not expose them,
         // skip the Vulkan-side export work entirely and fall through to the
         // CPU pack-and-upload path below.
-        const bool glInteropAvailable = loadGLInteropExtensions();
+        const bool glInteropAvailable = !forceCpuPresentation() && loadGLInteropExtensions();
         const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
 #else
-        const bool glInteropAvailable = GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
+        const bool glInteropAvailable =
+            !forceCpuPresentation() && GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
         const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
 #endif
 
@@ -521,38 +611,10 @@ namespace Rv
 
         if (!sharedInfo)
         {
-            // Fallback to CPU readback if GPU interop fails. The packed 32-bit
-            // words are copied unconverted into the swapchain image, so pack in
-            // the swapchain's own component order: A2B10G10R10 (R in low bits,
-            // == GL_RGB10_A2) or A2R10G10B10 (R in high bits). Linux/RADV
-            // surfaces commonly offer only A2R10G10B10.
-            const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
-            const bool rgbOrder = (scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32);
-            fbo->bind();
-            glFinish();
-            const size_t floatCount = static_cast<size_t>(w) * h * 4;
-            std::vector<float> floatPx(floatCount);
-            glReadPixels(0, 0, w, h, GL_RGBA, GL_FLOAT, floatPx.data());
-            fbo->unbind();
-
-            std::vector<uint32_t> packed(static_cast<size_t>(w) * h);
-            for (int y = 0; y < h; ++y)
-            {
-                const float* src = floatPx.data() + (size_t)(h - 1 - y) * w * 4;
-                uint32_t* dst = packed.data() + (size_t)y * w;
-                for (int x = 0; x < w; ++x, src += 4)
-                {
-                    const float r = std::max(0.f, std::min(1.f, src[0]));
-                    const float g = std::max(0.f, std::min(1.f, src[1]));
-                    const float b = std::max(0.f, std::min(1.f, src[2]));
-                    const uint32_t ri = static_cast<uint32_t>(r * 1023.f + 0.5f) & 0x3FF;
-                    const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
-                    const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
-                    // A2R10G10B10: A|R|G|B (R high).  A2B10G10R10: A|B|G|R (R low).
-                    dst[x] = rgbOrder ? ((3u << 30) | (ri << 20) | (gi << 10) | bi) : ((3u << 30) | (bi << 20) | (gi << 10) | ri);
-                }
-            }
-            m_view->presentPixelData(packed.data(), w, h);
+            // No zero-copy interop this frame: pack + present via the CPU fallback.
+            // The GL-packed RGB10_A2 readback handles the Y flip and the swapchain
+            // channel order (A2B10G10R10 / A2R10G10B10) without a per-pixel loop.
+            presentCpuFallback(w, h);
             return;
         }
 
@@ -590,8 +652,7 @@ namespace Rv
             glGenTextures(1, &m_glSharedTexture[slot]);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture[slot]);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
-                            sharedInfo->optimalTiling ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT, sharedInfo->optimalTiling ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
 
             // Allocate the imported texture at the image's capacity dimensions
             // (stride width x capacity height); the FBO blit below writes only the

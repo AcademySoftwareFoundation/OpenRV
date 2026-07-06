@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <string>
 #include <memory>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 class QOpenGLContext;
@@ -110,6 +111,26 @@ namespace Rv
         mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedHeight{};
 
         void cleanupSharedGLObjects(uint32_t slot) const;
+
+        // CPU-fallback GL state (used only when GPU interop is unavailable or
+        // refused). A flipped RGB10_A2 blit target lets GL pack the 10-bit pixels
+        // directly with glReadPixels(GL_UNSIGNED_INT_2_10_10_10_REV) and handle the
+        // Y flip, eliminating the per-pixel CPU pack loop. The readback format
+        // (GL_RGBA vs GL_BGRA) selects the swapchain's channel order
+        // (A2B10G10R10 / A2R10G10B10). Not ringed: the fallback is a synchronous
+        // readback, so a single reused target is sufficient.
+        mutable GLuint m_cpuFlipFbo{0};
+        mutable GLuint m_cpuFlipTex{0};
+        mutable int m_cpuFlipWidth{0};
+        mutable int m_cpuFlipHeight{0};
+        mutable std::vector<uint32_t> m_cpuPackedScratch;
+
+        void ensureCpuFallbackTarget(int w, int h) const;
+        void cleanupCpuFallbackTarget() const;
+
+        // Pack + present the framebuffer via the CPU fallback (GL-packed RGB10_A2
+        // readback). Used when no zero-copy interop path is available.
+        void presentCpuFallback(int w, int h) const;
     };
 
 } // namespace Rv

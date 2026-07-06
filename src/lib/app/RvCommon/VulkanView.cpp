@@ -1048,10 +1048,9 @@ namespace Rv
             vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
             // The shared image's blit-source support depends on its actual tiling
             // (OPTIMAL on NVIDIA, LINEAR elsewhere).
-            const VkFormatFeatureFlags srcFeatures =
-                optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
-            const bool blitOk = (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)
-                                && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
+            const VkFormatFeatureFlags srcFeatures = optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
+            const bool blitOk =
+                (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
             if (!blitOk)
             {
                 if (ImageRenderer::debugGpu())
