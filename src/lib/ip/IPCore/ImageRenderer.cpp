@@ -26,6 +26,7 @@
 #include <TwkFB/Operations.h>
 #include <TwkFB/FastMemcpy.h>
 #include <TwkUtil/SystemInfo.h>
+#include <TwkUtil/CrashHandler.h>
 #include <TwkMath/Function.h>
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Vec2.h>
@@ -772,6 +773,9 @@ namespace IPCore
         TWK_GLDEBUG;
         const string glren = TwkGLF::safeGLGetString(GL_RENDERER);
         TWK_GLDEBUG;
+
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_vendor", glven);
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_renderer", glren);
 
         vector<string> tokens;
         stl_ext::tokenize(tokens, glren);

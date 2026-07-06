@@ -319,6 +319,8 @@ similarly, if you want to force a mode not to be loaded:
 
 Normally, RV will compile Mu files to conserve space in memory. Unfortunately, that means loosing a lot of information like source locations when exceptions are thrown. You can tell RV to allow debugging information by adding -debug mu to the end of the RV command line. This will consume more memory but report source file information when displaying a stack trace.
 
+**Note:** When crash dumps are enabled (via `RV_CRASH_DUMPS_ENABLED` environment variable), RV automatically enables Mu debugging to ensure crash dumps contain useful Mu script source location information.
+
 #### 9.5.4 The Mu API Documentation Browser
 
 The Mu modules are documented dynamically by the documentation browser. This is available under RV's help menu “Mu API Documentation Browser”.
