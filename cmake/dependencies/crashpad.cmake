@@ -137,73 +137,76 @@ EXTERNALPROJECT_ADD(
   USES_TERMINAL_BUILD TRUE
 )
 
+# crashpad_client depends on crashpad_mpack (split out by getsentry/crashpad); create it first so consumers of crashpad::client pull it in automatically via the
+# INTERFACE_LINK_LIBRARIES set below.
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
+  crashpad::mpack
+  TYPE
+  STATIC
+  LOCATION
+  ${_crashpad_mpack_lib}
+  DEPENDS
+  ${_target}
+)
+
 # Create imported target for crashpad::client
-ADD_LIBRARY(crashpad::client STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(crashpad::client ${_target})
-SET_PROPERTY(
-  TARGET crashpad::client
-  PROPERTY IMPORTED_LOCATION ${_crashpad_client_lib}
-)
-SET_PROPERTY(
-  TARGET crashpad::client
-  PROPERTY IMPORTED_SONAME ${_crashpad_client_lib_name}
-)
-
-FILE(MAKE_DIRECTORY ${_crashpad_include_dir})
-FILE(MAKE_DIRECTORY ${_mini_chromium_include_dir})
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   crashpad::client
-  INTERFACE ${_crashpad_include_dir} ${_mini_chromium_include_dir}
+  TYPE
+  STATIC
+  LOCATION
+  ${_crashpad_client_lib}
+  SONAME
+  ${_crashpad_client_lib_name}
+  INCLUDE_DIRS
+  ${_crashpad_include_dir}
+  ${_mini_chromium_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-# crashpad_client depends on crashpad_mpack (split out by getsentry/crashpad); declare it here so consumers of crashpad::client pull it in automatically.
-ADD_LIBRARY(crashpad::mpack STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(crashpad::mpack ${_target})
-SET_PROPERTY(
-  TARGET crashpad::mpack
-  PROPERTY IMPORTED_LOCATION ${_crashpad_mpack_lib}
-)
+# RV_ADD_IMPORTED_LIBRARY does not cover INTERFACE_LINK_LIBRARIES; declare the crashpad::mpack dependency here.
 SET_PROPERTY(
   TARGET crashpad::client
   PROPERTY INTERFACE_LINK_LIBRARIES crashpad::mpack
 )
 
 # Create imported target for crashpad::util
-ADD_LIBRARY(crashpad::util STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(crashpad::util ${_target})
-SET_PROPERTY(
-  TARGET crashpad::util
-  PROPERTY IMPORTED_LOCATION ${_crashpad_util_lib}
-)
-SET_PROPERTY(
-  TARGET crashpad::util
-  PROPERTY IMPORTED_SONAME ${_crashpad_util_lib_name}
-)
-
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   crashpad::util
-  INTERFACE ${_crashpad_include_dir} ${_mini_chromium_include_dir}
+  TYPE
+  STATIC
+  LOCATION
+  ${_crashpad_util_lib}
+  SONAME
+  ${_crashpad_util_lib_name}
+  INCLUDE_DIRS
+  ${_crashpad_include_dir}
+  ${_mini_chromium_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
 
 # Create imported target for crashpad::minichromium (base library)
-ADD_LIBRARY(crashpad::minichromium STATIC IMPORTED GLOBAL)
-ADD_DEPENDENCIES(crashpad::minichromium ${_target})
-SET_PROPERTY(
-  TARGET crashpad::minichromium
-  PROPERTY IMPORTED_LOCATION ${_minichromium_lib}
-)
-SET_PROPERTY(
-  TARGET crashpad::minichromium
-  PROPERTY IMPORTED_SONAME ${_minichromium_lib_name}
-)
-
-TARGET_INCLUDE_DIRECTORIES(
+RV_ADD_IMPORTED_LIBRARY(
+  NAME
   crashpad::minichromium
-  INTERFACE ${_mini_chromium_include_dir}
+  TYPE
+  STATIC
+  LOCATION
+  ${_minichromium_lib}
+  SONAME
+  ${_minichromium_lib_name}
+  INCLUDE_DIRS
+  ${_mini_chromium_include_dir}
+  DEPENDS
+  ${_target}
+  ADD_TO_DEPS_LIST
 )
-
-# Add to deps list
-LIST(APPEND RV_DEPS_LIST crashpad::client crashpad::util crashpad::minichromium)
 
 # Stage libraries and crashpad_handler executable
 IF(RV_TARGET_WINDOWS)
