@@ -511,7 +511,7 @@ namespace Rv
                 const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_UNDEFINED;
                 cout << "INFO: QTVulkanVideoDevice: syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
                      << "  swapchainFormat=" << scFmt
-                     << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32 ? " (A2B10G10R10 / 10-bit)"
+                     << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32   ? " (A2B10G10R10 / 10-bit)"
                          : scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
                          : scFmt == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
                                                                        : " (NOT 10-bit)")
@@ -549,8 +549,7 @@ namespace Rv
                     const uint32_t gi = static_cast<uint32_t>(g * 1023.f + 0.5f) & 0x3FF;
                     const uint32_t bi = static_cast<uint32_t>(b * 1023.f + 0.5f) & 0x3FF;
                     // A2R10G10B10: A|R|G|B (R high).  A2B10G10R10: A|B|G|R (R low).
-                    dst[x] = rgbOrder ? ((3u << 30) | (ri << 20) | (gi << 10) | bi)
-                                      : ((3u << 30) | (bi << 20) | (gi << 10) | ri);
+                    dst[x] = rgbOrder ? ((3u << 30) | (ri << 20) | (gi << 10) | bi) : ((3u << 30) | (bi << 20) | (gi << 10) | ri);
                 }
             }
             m_view->presentPixelData(packed.data(), w, h);
@@ -562,8 +561,7 @@ namespace Rv
         // Vulkan side keeps the same export, so a resize does not re-import here;
         // m_sharedWidth/m_sharedHeight cache the imported capacity, not the used
         // (requested) size.
-        if (m_sharedWidth[slot] != sharedInfo->strideWidth || m_sharedHeight[slot] != sharedInfo->capacityHeight
-            || !m_glMemoryObject[slot])
+        if (m_sharedWidth[slot] != sharedInfo->strideWidth || m_sharedHeight[slot] != sharedInfo->capacityHeight || !m_glMemoryObject[slot])
         {
             cleanupSharedGLObjects(slot);
 
@@ -597,8 +595,8 @@ namespace Rv
             // Allocate the imported texture at the image's capacity dimensions
             // (stride width x capacity height); the FBO blit below writes only the
             // used w x h sub-region into its origin corner.
-            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight,
-                                 m_glMemoryObject[slot], 0);
+            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight, m_glMemoryObject[slot],
+                                 0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
             glGenSemaphoresEXT(1, &m_glReadySemaphore[slot]);

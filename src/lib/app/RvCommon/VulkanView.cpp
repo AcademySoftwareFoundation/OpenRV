@@ -57,10 +57,7 @@ namespace Rv
     // fallback) or blitted (GPU interop). A2B10G10R10 (== GL_RGB10_A2) is
     // preferred when the surface offers it, but many Linux/RADV surfaces only
     // advertise A2R10G10B10.
-    static bool isTenBitFormat(VkFormat f)
-    {
-        return f == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || f == VK_FORMAT_A2R10G10B10_UNORM_PACK32;
-    }
+    static bool isTenBitFormat(VkFormat f) { return f == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || f == VK_FORMAT_A2R10G10B10_UNORM_PACK32; }
 
     static const char* formatName(VkFormat f)
     {
@@ -643,8 +640,7 @@ namespace Rv
         }
         else
         {
-            cout << "WARNING: VulkanView: Real surface lacks a 10-bit format (A2B10G10R10/A2R10G10B10); requesting OpenGL fallback"
-                 << endl;
+            cout << "WARNING: VulkanView: Real surface lacks a 10-bit format (A2B10G10R10/A2R10G10B10); requesting OpenGL fallback" << endl;
             requestGLFallback();
             return false;
         }
@@ -702,8 +698,7 @@ namespace Rv
             vkDeviceWaitIdle(m_vkDevice);
             if (!m_vkCommandBuffers.empty())
             {
-                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, (uint32_t)m_vkCommandBuffers.size(),
-                                     m_vkCommandBuffers.data());
+                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, (uint32_t)m_vkCommandBuffers.size(), m_vkCommandBuffers.data());
                 m_vkCommandBuffers.clear();
             }
             vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
@@ -958,8 +953,8 @@ namespace Rv
 
         if (ImageRenderer::debugGpu())
         {
-            cout << "INFO: VulkanView: getSharedImageInfo: (re)allocating shared image slot " << slot
-                 << " capacity " << capW << "x" << capH << " for request " << w << "x" << h << endl;
+            cout << "INFO: VulkanView: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
+                 << " for request " << w << "x" << h << endl;
         }
 
         // 1. Create Shared Image
@@ -1641,7 +1636,8 @@ namespace Rv
         region.imageOffset = {0, 0, 0};
         region.imageExtent = {(uint32_t)w, (uint32_t)h, 1};
 
-        vkCmdCopyBufferToImage(cb, m_vkStagingBuffer[slot], m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        vkCmdCopyBufferToImage(cb, m_vkStagingBuffer[slot], m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
+                               &region);
 
         // Transition image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;

@@ -91,9 +91,9 @@ namespace Rv
             int vkReadySemaphoreFd{-1};
 #endif
             size_t size{0};
-            int width{0};       // used sub-region width presented this frame
-            int height{0};      // used sub-region height presented this frame
-            int strideWidth{0}; // GL texture width = capacity rowPitch / 4
+            int width{0};          // used sub-region width presented this frame
+            int height{0};         // used sub-region height presented this frame
+            int strideWidth{0};    // GL texture width = capacity rowPitch / 4
             int capacityHeight{0}; // allocated image height (>= height); GL texture height
         };
 
