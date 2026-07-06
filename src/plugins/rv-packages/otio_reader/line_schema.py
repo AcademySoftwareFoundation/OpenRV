@@ -8,14 +8,14 @@
 """
 OTIO schemadef for a straight line annotation shape.
 
-Lines have no fill — borderColor is the line colour. Ends are rounded (capsule).
+Lines have no fill — border_color is the line colour. Ends are rounded (capsule).
 All coordinates are in normalised image space (see position_schema.py).
 
 Example:
     line = otio.schemadef.Line.Line(
         start_position=otio.schemadef.Position.Position(x=-4.0, y=2.0),
         end_position=otio.schemadef.Position.Position(x=4.0, y=-2.0),
-        borderColor=[0.0, 1.0, 0.5, 1.0],
+        border_color=[0.0, 1.0, 0.5, 1.0],
         width=0.04,
         id="d4e5f6a7-b8c9-0123-defa-234567890123",
         visible=True,
@@ -37,7 +37,7 @@ class Line(otio.core.SerializableObject):
         self,
         start_position=None,
         end_position=None,
-        borderColor: list | None = None,
+        border_color: list | None = None,
         width: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
@@ -46,7 +46,7 @@ class Line(otio.core.SerializableObject):
         super().__init__()
         self.start_position = start_position
         self.end_position = end_position
-        self.borderColor = borderColor
+        self.border_color = border_color
         self.width = width
         self.id = id
         self.visible = visible
@@ -55,15 +55,15 @@ class Line(otio.core.SerializableObject):
     start_position = otio.core.serializable_field("start_position", doc="Start point (Position.1)")
     end_position = otio.core.serializable_field("end_position", doc="End point (Position.1)")
 
-    _borderColor = otio.core.serializable_field("borderColor", required_type=list, doc="Line colour [r, g, b, a]")
+    _border_color = otio.core.serializable_field("border_color", required_type=list, doc="Line colour [r, g, b, a]")
 
     @property
-    def borderColor(self) -> list:
-        return self._borderColor
+    def border_color(self) -> list:
+        return self._border_color
 
-    @borderColor.setter
-    def borderColor(self, val: list) -> None:
-        self._borderColor = val
+    @border_color.setter
+    def border_color(self, val: list) -> None:
+        self._border_color = val
 
     width = otio.core.serializable_field("width", required_type=float, doc="Line width in normalised units")
     id = otio.core.serializable_field("id", required_type=str, doc="UUID for undo/redo tracking")

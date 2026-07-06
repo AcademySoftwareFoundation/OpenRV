@@ -15,10 +15,10 @@ Example:
     arrow = otio.schemadef.Arrow.Arrow(
         start_position=otio.schemadef.Position.Position(x=-4.0, y=0.0),
         end_position=otio.schemadef.Position.Position(x=4.0, y=0.0),
-        innerColor=[1.0, 1.0, 0.0, 1.0],
-        borderColor=[0.8, 0.8, 0.0, 1.0],
+        inner_color=[1.0, 1.0, 0.0, 1.0],
+        border_color=[0.8, 0.8, 0.0, 1.0],
         width=0.15,
-        borderWidth=0.02,
+        border_width=0.02,
         id="c3d4e5f6-a7b8-9012-cdef-123456789012",
         visible=True,
         layer_range=otio.opentime.TimeRange(...),
@@ -39,10 +39,10 @@ class Arrow(otio.core.SerializableObject):
         self,
         start_position=None,
         end_position=None,
-        innerColor: list | None = None,
-        borderColor: list | None = None,
+        inner_color: list | None = None,
+        border_color: list | None = None,
         width: float | None = None,
-        borderWidth: float | None = None,
+        border_width: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
         layer_range: otio.opentime.TimeRange | None = None,
@@ -50,10 +50,10 @@ class Arrow(otio.core.SerializableObject):
         super().__init__()
         self.start_position = start_position
         self.end_position = end_position
-        self.innerColor = innerColor
-        self.borderColor = borderColor
+        self.inner_color = inner_color
+        self.border_color = border_color
         self.width = width
-        self.borderWidth = borderWidth
+        self.border_width = border_width
         self.id = id
         self.visible = visible
         self.layer_range = layer_range
@@ -63,31 +63,31 @@ class Arrow(otio.core.SerializableObject):
         "end_position", doc="Tip of the arrow — arrowhead points here (Position.1)"
     )
 
-    _innerColor = otio.core.serializable_field("innerColor", required_type=list, doc="Shaft fill colour [r, g, b, a]")
+    _inner_color = otio.core.serializable_field("inner_color", required_type=list, doc="Shaft fill colour [r, g, b, a]")
 
     @property
-    def innerColor(self) -> list:
-        return self._innerColor
+    def inner_color(self) -> list:
+        return self._inner_color
 
-    @innerColor.setter
-    def innerColor(self, val: list) -> None:
-        self._innerColor = val
+    @inner_color.setter
+    def inner_color(self, val: list) -> None:
+        self._inner_color = val
 
-    _borderColor = otio.core.serializable_field("borderColor", required_type=list, doc="Outline colour [r, g, b, a]")
+    _border_color = otio.core.serializable_field("border_color", required_type=list, doc="Outline colour [r, g, b, a]")
 
     @property
-    def borderColor(self) -> list:
-        return self._borderColor
+    def border_color(self) -> list:
+        return self._border_color
 
-    @borderColor.setter
-    def borderColor(self, val: list) -> None:
-        self._borderColor = val
+    @border_color.setter
+    def border_color(self, val: list) -> None:
+        self._border_color = val
 
     width = otio.core.serializable_field(
         "width", required_type=float, doc="Shaft width in normalised units; arrowhead scales proportionally"
     )
-    borderWidth = otio.core.serializable_field(
-        "borderWidth", required_type=float, doc="Outline width in normalised units"
+    border_width = otio.core.serializable_field(
+        "border_width", required_type=float, doc="Outline width in normalised units"
     )
     id = otio.core.serializable_field("id", required_type=str, doc="UUID for undo/redo tracking")
     visible = otio.core.serializable_field("visible", required_type=bool, doc="Show/hide")
