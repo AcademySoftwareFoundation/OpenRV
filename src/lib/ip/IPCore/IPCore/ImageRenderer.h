@@ -799,7 +799,7 @@ namespace IPCore
         //
 
         void renderImage(InternalRenderContext&);
-        void renderPaint(const IPImage*, const GLFBO*);
+        void renderPaint(const IPImage*, const GLFBO*, int frame);
 
         void renderExternal(InternalRenderContext&);
         void renderRootBuffer(InternalRenderContext&);
