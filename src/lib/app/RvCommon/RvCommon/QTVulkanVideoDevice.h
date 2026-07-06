@@ -7,6 +7,9 @@
 
 #include <TwkGLF/GLVideoDevice.h>
 #include <RvCommon/QTTranslator.h>
+#include <RvCommon/VulkanView.h>
+#include <array>
+#include <cstdint>
 #include <string>
 #include <memory>
 
@@ -95,16 +98,18 @@ namespace Rv
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
 
-        // GPU Interop GL objects
-        mutable GLuint m_glMemoryObject{0};
-        mutable GLuint m_glSharedTexture{0};
-        mutable GLuint m_glReadySemaphore{0};
-        mutable GLuint m_vkReadySemaphore{0};
-        mutable GLuint m_drawFbo{0};
-        mutable int m_sharedWidth{0};
-        mutable int m_sharedHeight{0};
+        // GPU Interop GL objects, ringed per in-flight slot to match VulkanView's
+        // per-slot Vulkan shared image/semaphores. Indexed by the Vulkan slot for
+        // the frame being rendered (VulkanView::currentFrame()).
+        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glMemoryObject{};
+        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glSharedTexture{};
+        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glReadySemaphore{};
+        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_vkReadySemaphore{};
+        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_drawFbo{};
+        mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedWidth{};
+        mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedHeight{};
 
-        void cleanupSharedGLObjects() const;
+        void cleanupSharedGLObjects(uint32_t slot) const;
     };
 
 } // namespace Rv

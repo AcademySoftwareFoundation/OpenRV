@@ -13,6 +13,9 @@
 
 #include <vulkan/vulkan.h>
 
+#include <array>
+#include <cstdint>
+
 namespace Rv
 {
     class RvDocument;
@@ -79,19 +82,33 @@ namespace Rv
         struct SharedImageInfo
         {
 #ifdef PLATFORM_WINDOWS
-            void* memoryHandle; // HANDLE; nullptr when unset
-            void* glReadySemaphoreHandle;
-            void* vkReadySemaphoreHandle;
+            void* memoryHandle{nullptr}; // HANDLE; nullptr when unset
+            void* glReadySemaphoreHandle{nullptr};
+            void* vkReadySemaphoreHandle{nullptr};
 #else
-            int memoryFd; // -1 when unset
-            int glReadySemaphoreFd;
-            int vkReadySemaphoreFd;
+            int memoryFd{-1}; // -1 when unset
+            int glReadySemaphoreFd{-1};
+            int vkReadySemaphoreFd{-1};
 #endif
-            size_t size;
-            int width;
-            int height;
-            int strideWidth;
+            size_t size{0};
+            int width{0};       // used sub-region width presented this frame
+            int height{0};      // used sub-region height presented this frame
+            int strideWidth{0}; // GL texture width = capacity rowPitch / 4
+            int capacityHeight{0}; // allocated image height (>= height); GL texture height
         };
+
+        // Number of frames the present path keeps in flight. Per-frame Vulkan
+        // sync objects and the GL<->Vulkan shared resources are stored in rings
+        // of this size and indexed by currentFrame(). 2 pipelines the present so
+        // a frame's GL work + submit can begin before the prior present retires;
+        // the throttle is FIFO acquire back-pressure + the start-of-frame fence
+        // wait (no per-frame end-of-frame block).
+        static constexpr uint32_t FRAMES_IN_FLIGHT = 2;
+
+        // Index of the in-flight ring slot the next/current frame uses. The GL
+        // side (QTVulkanVideoDevice) reads this to pair its own ring objects with
+        // the Vulkan slot for the frame being rendered.
+        uint32_t currentFrame() const { return m_currentFrame; }
 
         const SharedImageInfo* getSharedImageInfo(int w, int h);
         void presentSharedImage();
@@ -173,26 +190,57 @@ namespace Rv
         std::vector<VkImage> m_vkSwapchainImages;
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
 
-        VkSemaphore m_vkImageAvailableSemaphore{VK_NULL_HANDLE};
-        VkSemaphore m_vkRenderFinishedSemaphore{VK_NULL_HANDLE};
-        VkFence m_vkFence{VK_NULL_HANDLE};
+        // Per-in-flight-slot ring (indexed by m_currentFrame).
+        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkImageAvailableSemaphore{};
+        std::array<VkFence, FRAMES_IN_FLIGHT> m_vkFence{};
+        uint32_t m_currentFrame{0};
 
-        VkBuffer m_vkStagingBuffer{VK_NULL_HANDLE};
-        VkDeviceMemory m_vkStagingBufferMemory{VK_NULL_HANDLE};
-        size_t m_stagingBufferSize{0};
+        // Per-swapchain-image (indexed by imageIndex, sized to the swapchain
+        // image count, (re)built in createSwapchain / freed in cleanupSwapchain).
+        // The present-wait semaphore MUST be tied to the image, not the frame:
+        // with 2 frames in flight the same image can be re-acquired while its
+        // prior present is still pending, and reusing a per-frame semaphore there
+        // trips the present-semaphore-reuse validation error. m_imagesInFlight
+        // records which frame fence currently owns each image so a re-acquired
+        // in-flight image is waited on before reuse.
+        std::vector<VkSemaphore> m_vkRenderFinished;
+        std::vector<VkFence> m_imagesInFlight;
 
-        // Shared Image for GPU Interop
-        VkImage m_vkSharedImage{VK_NULL_HANDLE};
-        VkDeviceMemory m_vkSharedImageMemory{VK_NULL_HANDLE};
-        VkSemaphore m_vkGlReadySemaphore{VK_NULL_HANDLE};
-        VkSemaphore m_vkVkReadySemaphore{VK_NULL_HANDLE};
-#ifdef PLATFORM_WINDOWS
-        SharedImageInfo m_sharedImageInfo{nullptr, nullptr, nullptr, 0, 0, 0, 0};
-#else
-        SharedImageInfo m_sharedImageInfo{-1, -1, -1, 0, 0, 0, 0};
-#endif
+        // CPU-fallback staging buffer, ringed per in-flight slot: the frame maps
+        // and overwrites it before acquiring, so with the per-frame block removed
+        // it must not alias a buffer whose copy from a still-in-flight frame is
+        // pending. The slot's frame fence (waited at frame start) gates reuse.
+        std::array<VkBuffer, FRAMES_IN_FLIGHT> m_vkStagingBuffer{};
+        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkStagingBufferMemory{};
+        std::array<size_t, FRAMES_IN_FLIGHT> m_stagingBufferSize{};
 
-        void cleanupSharedImage();
+        // Shared Image for GPU Interop, ringed per in-flight slot (indexed by
+        // m_currentFrame). SharedImageInfo's default member initializers give the
+        // correct unset state (FDs/handles = -1/nullptr), so value-initializing
+        // the array is safe.
+        std::array<VkImage, FRAMES_IN_FLIGHT> m_vkSharedImage{};
+        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkSharedImageMemory{};
+        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkGlReadySemaphore{};
+        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkVkReadySemaphore{};
+        std::array<SharedImageInfo, FRAMES_IN_FLIGHT> m_sharedImageInfo{};
+
+        // Grow-only allocated capacity of each slot's shared image. A resize
+        // within capacity reuses the existing allocation/export (no rebuild, no
+        // FD re-export, no GL re-import); the image is only reallocated when the
+        // request exceeds capacity, at which point capacity grows to the
+        // componentwise max of the request and the screen size (monotonic).
+        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityW{};
+        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityH{};
+
+        void cleanupSharedImage(uint32_t slot);
+
+        // Rebalance a slot's glReady/vkReady binary-semaphore pair when a frame is
+        // aborted at acquire time. The GL side (syncBuffers) has already signaled
+        // glReady[slot] and waited vkReady[slot] before the acquire result is
+        // known; if the frame returns without its normal submit, this issues a
+        // minimal submit that waits glReady[slot] and signals vkReady[slot] so the
+        // pair cannot desync across the skipped frame.
+        void drainSharedSemaphores(uint32_t slot);
 
         // Recreate swapchain (and shared image) after OUT_OF_DATE / SUBOPTIMAL.
         void handleSwapchainOutOfDate();

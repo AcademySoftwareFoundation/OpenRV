@@ -24,9 +24,12 @@
 #include <QtGui/QPaintEvent>
 #include <QtGui/QWindow>
 #include <QtGui/QVulkanInstance>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 
+#include <algorithm>
 #include <climits>
 #include <iostream>
 #include <sstream>
@@ -137,7 +140,8 @@ namespace Rv
     {
         delete m_videoDevice;
         m_videoDevice = nullptr;
-        cleanupSharedImage();
+        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+            cleanupSharedImage(i);
         cleanupSwapchain();
         cleanupVulkan();
     }
@@ -442,23 +446,27 @@ namespace Rv
             return failInit();
         }
 
-        // Sync objects
+        // Sync objects. The per-swapchain-image renderFinished semaphores live
+        // in createSwapchain (sized to the image count); here we create only the
+        // per-in-flight-slot acquire semaphores and frame fences.
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore) != VK_SUCCESS)
-        {
-            return failInit();
-        }
-        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkRenderFinishedSemaphore) != VK_SUCCESS)
-        {
-            return failInit();
-        }
 
+        // Per-in-flight-slot acquire semaphore + frame fence. Fences are created
+        // signaled so the first wait on a slot passes without a prior submit.
         VkFenceCreateInfo fenceInfo = {};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        if (vkCreateFence(m_vkDevice, &fenceInfo, nullptr, &m_vkFence) != VK_SUCCESS)
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
         {
-            return failInit();
+            if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore[i]) != VK_SUCCESS)
+            {
+                return failInit();
+            }
+            if (vkCreateFence(m_vkDevice, &fenceInfo, nullptr, &m_vkFence[i]) != VK_SUCCESS)
+            {
+                return failInit();
+            }
         }
 
         return true;
@@ -501,23 +509,28 @@ namespace Rv
             return;
         }
 
-        if (m_vkImageAvailableSemaphore)
-        {
-            vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
-            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
-        }
-
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore) != VK_SUCCESS)
+        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
         {
-            m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
-            requestGLFallback();
-            return;
+            if (m_vkImageAvailableSemaphore[i])
+            {
+                vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore[i], nullptr);
+                m_vkImageAvailableSemaphore[i] = VK_NULL_HANDLE;
+            }
+            if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore[i]) != VK_SUCCESS)
+            {
+                m_vkImageAvailableSemaphore[i] = VK_NULL_HANDLE;
+                requestGLFallback();
+                return;
+            }
         }
 
-        cleanupSharedImage();
-        cleanupSwapchain();
+        // Recreate only the swapchain, not the shared image. The shared image is
+        // a content-sized TRANSFER_SRC image, independent of the window-sized
+        // swapchain; createSwapchain() reuses the old swapchain (oldSwapchain) so
+        // this is a warm recreate. The next render()'s getSharedImageInfo() will
+        // rebuild the shared image only if the content size actually changed.
         if (!createSwapchain())
         {
             requestGLFallback();
@@ -530,21 +543,20 @@ namespace Rv
         {
             vkDeviceWaitIdle(m_vkDevice);
 
-            if (m_vkImageAvailableSemaphore)
+            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
             {
-                vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore, nullptr);
-                m_vkImageAvailableSemaphore = VK_NULL_HANDLE;
+                if (m_vkImageAvailableSemaphore[i])
+                {
+                    vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore[i], nullptr);
+                    m_vkImageAvailableSemaphore[i] = VK_NULL_HANDLE;
+                }
+                if (m_vkFence[i])
+                {
+                    vkDestroyFence(m_vkDevice, m_vkFence[i], nullptr);
+                    m_vkFence[i] = VK_NULL_HANDLE;
+                }
             }
-            if (m_vkRenderFinishedSemaphore)
-            {
-                vkDestroySemaphore(m_vkDevice, m_vkRenderFinishedSemaphore, nullptr);
-                m_vkRenderFinishedSemaphore = VK_NULL_HANDLE;
-            }
-            if (m_vkFence)
-            {
-                vkDestroyFence(m_vkDevice, m_vkFence, nullptr);
-                m_vkFence = VK_NULL_HANDLE;
-            }
+            // m_vkRenderFinished are per-swapchain-image; freed in cleanupSwapchain.
 
             if (m_vkCommandPool)
             {
@@ -670,13 +682,33 @@ namespace Rv
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         createInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // VSync
         createInfo.clipped = VK_TRUE;
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        // Warm recreate: hand the retiring swapchain to the driver so it can reuse
+        // its backing resources (much cheaper than a cold create on every resize).
+        createInfo.oldSwapchain = m_vkSwapchain;
 
-        if (vkCreateSwapchainKHR(m_vkDevice, &createInfo, nullptr, &m_vkSwapchain) != VK_SUCCESS)
+        // Create into a local handle so a failed create leaves the existing
+        // swapchain and command buffers intact (the fallback paths stay valid).
+        VkSwapchainKHR newSwapchain = VK_NULL_HANDLE;
+        if (vkCreateSwapchainKHR(m_vkDevice, &createInfo, nullptr, &newSwapchain) != VK_SUCCESS)
         {
             requestGLFallback();
             return false;
         }
+
+        // New swapchain is live. Retire the old one only now: wait for its last
+        // submitted frame to finish, free its command buffers, then destroy it.
+        if (m_vkSwapchain != VK_NULL_HANDLE)
+        {
+            vkDeviceWaitIdle(m_vkDevice);
+            if (!m_vkCommandBuffers.empty())
+            {
+                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, (uint32_t)m_vkCommandBuffers.size(),
+                                     m_vkCommandBuffers.data());
+                m_vkCommandBuffers.clear();
+            }
+            vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
+        }
+        m_vkSwapchain = newSwapchain;
 
         vkGetSwapchainImagesKHR(m_vkDevice, m_vkSwapchain, &imageCount, nullptr);
         m_vkSwapchainImages.resize(imageCount);
@@ -695,6 +727,29 @@ namespace Rv
             return false;
         }
 
+        // Per-swapchain-image present-wait semaphores + in-flight fence map. The
+        // device is idle here (the retire path above waited on it), so any old
+        // renderFinished semaphores from a previous swapchain are safe to destroy.
+        for (VkSemaphore sem : m_vkRenderFinished)
+        {
+            if (sem)
+                vkDestroySemaphore(m_vkDevice, sem, nullptr);
+        }
+        m_vkRenderFinished.assign(imageCount, VK_NULL_HANDLE);
+        VkSemaphoreCreateInfo rfInfo = {};
+        rfInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        for (uint32_t i = 0; i < imageCount; ++i)
+        {
+            if (vkCreateSemaphore(m_vkDevice, &rfInfo, nullptr, &m_vkRenderFinished[i]) != VK_SUCCESS)
+            {
+                cleanupSwapchain();
+                requestGLFallback();
+                return false;
+            }
+        }
+        // Fresh swapchain images: none are in flight yet.
+        m_imagesInFlight.assign(imageCount, VK_NULL_HANDLE);
+
         return true;
     }
 
@@ -704,17 +759,28 @@ namespace Rv
         {
             vkDeviceWaitIdle(m_vkDevice);
 
-            if (m_vkStagingBuffer)
+            for (VkSemaphore sem : m_vkRenderFinished)
             {
-                vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer, nullptr);
-                m_vkStagingBuffer = VK_NULL_HANDLE;
+                if (sem)
+                    vkDestroySemaphore(m_vkDevice, sem, nullptr);
             }
-            if (m_vkStagingBufferMemory)
+            m_vkRenderFinished.clear();
+            m_imagesInFlight.clear();
+
+            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
             {
-                vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory, nullptr);
-                m_vkStagingBufferMemory = VK_NULL_HANDLE;
+                if (m_vkStagingBuffer[i])
+                {
+                    vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer[i], nullptr);
+                    m_vkStagingBuffer[i] = VK_NULL_HANDLE;
+                }
+                if (m_vkStagingBufferMemory[i])
+                {
+                    vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory[i], nullptr);
+                    m_vkStagingBufferMemory[i] = VK_NULL_HANDLE;
+                }
+                m_stagingBufferSize[i] = 0;
             }
-            m_stagingBufferSize = 0;
 
             if (!m_vkCommandBuffers.empty())
             {
@@ -745,70 +811,102 @@ namespace Rv
         return UINT32_MAX;
     }
 
-    void VulkanView::cleanupSharedImage()
+    void VulkanView::cleanupSharedImage(uint32_t slot)
     {
+        SharedImageInfo& info = m_sharedImageInfo[slot];
+
         if (m_vkDevice)
         {
             vkDeviceWaitIdle(m_vkDevice);
 
-            if (m_vkSharedImage)
+            if (m_vkSharedImage[slot])
             {
-                vkDestroyImage(m_vkDevice, m_vkSharedImage, nullptr);
-                m_vkSharedImage = VK_NULL_HANDLE;
+                vkDestroyImage(m_vkDevice, m_vkSharedImage[slot], nullptr);
+                m_vkSharedImage[slot] = VK_NULL_HANDLE;
             }
-            if (m_vkSharedImageMemory)
+            if (m_vkSharedImageMemory[slot])
             {
-                vkFreeMemory(m_vkDevice, m_vkSharedImageMemory, nullptr);
-                m_vkSharedImageMemory = VK_NULL_HANDLE;
+                vkFreeMemory(m_vkDevice, m_vkSharedImageMemory[slot], nullptr);
+                m_vkSharedImageMemory[slot] = VK_NULL_HANDLE;
             }
-            if (m_vkGlReadySemaphore)
+            if (m_vkGlReadySemaphore[slot])
             {
-                vkDestroySemaphore(m_vkDevice, m_vkGlReadySemaphore, nullptr);
-                m_vkGlReadySemaphore = VK_NULL_HANDLE;
+                vkDestroySemaphore(m_vkDevice, m_vkGlReadySemaphore[slot], nullptr);
+                m_vkGlReadySemaphore[slot] = VK_NULL_HANDLE;
             }
-            if (m_vkVkReadySemaphore)
+            if (m_vkVkReadySemaphore[slot])
             {
-                vkDestroySemaphore(m_vkDevice, m_vkVkReadySemaphore, nullptr);
-                m_vkVkReadySemaphore = VK_NULL_HANDLE;
+                vkDestroySemaphore(m_vkDevice, m_vkVkReadySemaphore[slot], nullptr);
+                m_vkVkReadySemaphore[slot] = VK_NULL_HANDLE;
             }
         }
 
 #ifdef PLATFORM_WINDOWS
-        if (m_sharedImageInfo.memoryHandle)
+        if (info.memoryHandle)
         {
-            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.memoryHandle));
-            m_sharedImageInfo.memoryHandle = nullptr;
+            ::CloseHandle(static_cast<HANDLE>(info.memoryHandle));
+            info.memoryHandle = nullptr;
         }
-        if (m_sharedImageInfo.glReadySemaphoreHandle)
+        if (info.glReadySemaphoreHandle)
         {
-            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.glReadySemaphoreHandle));
-            m_sharedImageInfo.glReadySemaphoreHandle = nullptr;
+            ::CloseHandle(static_cast<HANDLE>(info.glReadySemaphoreHandle));
+            info.glReadySemaphoreHandle = nullptr;
         }
-        if (m_sharedImageInfo.vkReadySemaphoreHandle)
+        if (info.vkReadySemaphoreHandle)
         {
-            ::CloseHandle(static_cast<HANDLE>(m_sharedImageInfo.vkReadySemaphoreHandle));
-            m_sharedImageInfo.vkReadySemaphoreHandle = nullptr;
+            ::CloseHandle(static_cast<HANDLE>(info.vkReadySemaphoreHandle));
+            info.vkReadySemaphoreHandle = nullptr;
         }
 #else
-        if (m_sharedImageInfo.memoryFd != -1)
+        if (info.memoryFd != -1)
         {
-            ::close(m_sharedImageInfo.memoryFd);
-            m_sharedImageInfo.memoryFd = -1;
+            ::close(info.memoryFd);
+            info.memoryFd = -1;
         }
-        if (m_sharedImageInfo.glReadySemaphoreFd != -1)
+        if (info.glReadySemaphoreFd != -1)
         {
-            ::close(m_sharedImageInfo.glReadySemaphoreFd);
-            m_sharedImageInfo.glReadySemaphoreFd = -1;
+            ::close(info.glReadySemaphoreFd);
+            info.glReadySemaphoreFd = -1;
         }
-        if (m_sharedImageInfo.vkReadySemaphoreFd != -1)
+        if (info.vkReadySemaphoreFd != -1)
         {
-            ::close(m_sharedImageInfo.vkReadySemaphoreFd);
-            m_sharedImageInfo.vkReadySemaphoreFd = -1;
+            ::close(info.vkReadySemaphoreFd);
+            info.vkReadySemaphoreFd = -1;
         }
 #endif
-        m_sharedImageInfo.width = 0;
-        m_sharedImageInfo.height = 0;
-        m_sharedImageInfo.size = 0;
+        info.width = 0;
+        info.height = 0;
+        info.size = 0;
+        info.capacityHeight = 0;
+        m_sharedCapacityW[slot] = 0;
+        m_sharedCapacityH[slot] = 0;
+    }
+
+    void VulkanView::drainSharedSemaphores(uint32_t slot)
+    {
+        // No shared image for this slot yet -> the GL side never signaled/waited
+        // its pair, so there is nothing to rebalance.
+        if (!m_vkDevice || !m_vkGlReadySemaphore[slot] || !m_vkVkReadySemaphore[slot])
+            return;
+
+        // Consume the pending glReady signal from the GL side and re-signal
+        // vkReady so the next use of this slot starts balanced (exactly what a
+        // normal present's submit would have done for the pair).
+        VkSubmitInfo drain = {};
+        drain.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore[slot]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT};
+        drain.waitSemaphoreCount = 1;
+        drain.pWaitSemaphores = waitSemaphores;
+        drain.pWaitDstStageMask = waitStages;
+        drain.commandBufferCount = 0;
+        VkSemaphore signalSemaphores[] = {m_vkVkReadySemaphore[slot]};
+        drain.signalSemaphoreCount = 1;
+        drain.pSignalSemaphores = signalSemaphores;
+
+        VkResult r = vkQueueSubmit(m_vkQueue, 1, &drain, VK_NULL_HANDLE);
+        if (r == VK_ERROR_DEVICE_LOST)
+            requestGLFallback();
     }
 
     const VulkanView::SharedImageInfo* VulkanView::getSharedImageInfo(int w, int h)
@@ -816,19 +914,52 @@ namespace Rv
         if (!m_vkDevice)
             return nullptr;
 
-        // If we already have a shared image of the right size, return it
-        if (m_vkSharedImage && m_sharedImageInfo.width == w && m_sharedImageInfo.height == h)
-        {
-            return &m_sharedImageInfo;
-        }
+        // Build/return the shared image for the current in-flight ring slot.
+        const uint32_t slot = m_currentFrame;
+        SharedImageInfo& info = m_sharedImageInfo[slot];
 
-        cleanupSharedImage();
-
+        // The swapchain always tracks the window size, so recreate it on any size
+        // change. This is independent of the grow-only shared image below: a drag
+        // still recreates the (warm) swapchain each step, but no longer rebuilds
+        // or re-exports the shared image.
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
         {
-            cleanupSwapchain();
+            // Warm recreate via oldSwapchain (createSwapchain retires the old one).
             if (!createSwapchain())
                 return nullptr;
+        }
+
+        // Grow-only: if the request fits the slot's current allocated capacity,
+        // reuse the existing image/export and just update the used sub-region
+        // (presentSharedImage copies/blits info.width x info.height from it).
+        if (m_vkSharedImage[slot] && w <= m_sharedCapacityW[slot] && h <= m_sharedCapacityH[slot])
+        {
+            info.width = w;
+            info.height = h;
+            return &info;
+        }
+
+        // Grow (or first allocation): rebuild at a capacity that is the
+        // componentwise max of the request, the screen size, and the current
+        // capacity, so it grows monotonically and the common drag-to-fullscreen
+        // case allocates at most once.
+        int screenW = 0;
+        int screenH = 0;
+        if (QScreen* scr = QGuiApplication::primaryScreen())
+        {
+            const qreal dpr = scr->devicePixelRatio();
+            screenW = static_cast<int>(scr->geometry().width() * dpr);
+            screenH = static_cast<int>(scr->geometry().height() * dpr);
+        }
+        const int capW = std::max({w, screenW, m_sharedCapacityW[slot]});
+        const int capH = std::max({h, screenH, m_sharedCapacityH[slot]});
+
+        cleanupSharedImage(slot);
+
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: VulkanView: getSharedImageInfo: (re)allocating shared image slot " << slot
+                 << " capacity " << capW << "x" << capH << " for request " << w << "x" << h << endl;
         }
 
         // 1. Create Shared Image
@@ -850,7 +981,9 @@ namespace Rv
         // the difference is reconciled by a component-wise blit in
         // presentSharedImage() (not a raw copy).
         imageInfo.format = VK_FORMAT_A2B10G10R10_UNORM_PACK32; // matches GL_RGB10_A2
-        imageInfo.extent = {(uint32_t)w, (uint32_t)h, 1};
+        // Allocate at capacity; presentSharedImage transfers only the used
+        // info.width x info.height sub-region (anchored at origin 0,0).
+        imageInfo.extent = {(uint32_t)capW, (uint32_t)capH, 1};
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -859,7 +992,7 @@ namespace Rv
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage) != VK_SUCCESS)
+        if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_vkSharedImage[slot]) != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanView: Failed to create shared image" << endl;
             return nullptr;
@@ -886,7 +1019,7 @@ namespace Rv
                     cout << "INFO: VulkanView: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
                          << " swapchain (blit unsupported); using CPU fallback." << endl;
                 }
-                cleanupSharedImage();
+                cleanupSharedImage(slot);
                 return nullptr;
             }
         }
@@ -897,18 +1030,19 @@ namespace Rv
         subresource.mipLevel = 0;
         subresource.arrayLayer = 0;
         VkSubresourceLayout layout;
-        vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage, &subresource, &layout);
+        vkGetImageSubresourceLayout(m_vkDevice, m_vkSharedImage[slot], &subresource, &layout);
 
         if (layout.rowPitch % 4 != 0)
         {
             // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
-        m_sharedImageInfo.strideWidth = static_cast<int>(layout.rowPitch / 4);
+        info.strideWidth = static_cast<int>(layout.rowPitch / 4);
+        info.capacityHeight = capH; // GL imports the texture at capacity dimensions
 
         VkMemoryRequirements memReqs;
-        vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage, &memReqs);
+        vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage[slot], &memReqs);
 
         VkExportMemoryAllocateInfo exportAllocInfo = {};
         exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
@@ -926,21 +1060,21 @@ namespace Rv
         if (allocInfo.memoryTypeIndex == UINT32_MAX)
         {
             cerr << "ERROR: VulkanView: No device-local memory type for shared image" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory) != VK_SUCCESS)
+        if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkSharedImageMemory[slot]) != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanView: Failed to allocate shared image memory" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        if (vkBindImageMemory(m_vkDevice, m_vkSharedImage, m_vkSharedImageMemory, 0) != VK_SUCCESS)
+        if (vkBindImageMemory(m_vkDevice, m_vkSharedImage[slot], m_vkSharedImageMemory[slot], 0) != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanView: Failed to bind shared image memory" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
@@ -953,20 +1087,20 @@ namespace Rv
         if (!pfnGetMemoryWin32HandleKHR)
         {
             cerr << "ERROR: VulkanView: vkGetMemoryWin32HandleKHR not found" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
         VkMemoryGetWin32HandleInfoKHR getHandleInfo = {};
         getHandleInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR;
-        getHandleInfo.memory = m_vkSharedImageMemory;
+        getHandleInfo.memory = m_vkSharedImageMemory[slot];
         getHandleInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
 
         HANDLE memHandle = nullptr;
         if (pfnGetMemoryWin32HandleKHR(m_vkDevice, &getHandleInfo, &memHandle) != VK_SUCCESS || !memHandle)
         {
             cerr << "ERROR: VulkanView: Failed to get memory HANDLE" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 #else
@@ -974,20 +1108,20 @@ namespace Rv
         if (!pfnGetMemoryFdKHR)
         {
             cerr << "ERROR: VulkanView: vkGetMemoryFdKHR not found" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
         VkMemoryGetFdInfoKHR getFdInfo = {};
         getFdInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
-        getFdInfo.memory = m_vkSharedImageMemory;
+        getFdInfo.memory = m_vkSharedImageMemory[slot];
         getFdInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
 
         int memFd = -1;
         if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanView: Failed to get memory FD" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 #endif
@@ -1005,11 +1139,11 @@ namespace Rv
         semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         semInfo.pNext = &exportSemInfo;
 
-        if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore) != VK_SUCCESS
-            || vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore) != VK_SUCCESS)
+        if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkGlReadySemaphore[slot]) != VK_SUCCESS
+            || vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_vkVkReadySemaphore[slot]) != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanView: Failed to create shared semaphores" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
@@ -1020,7 +1154,7 @@ namespace Rv
         if (!pfnGetSemaphoreWin32HandleKHR)
         {
             cerr << "ERROR: VulkanView: vkGetSemaphoreWin32HandleKHR not found" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
@@ -1031,34 +1165,34 @@ namespace Rv
         HANDLE glReadyHandle = nullptr;
         HANDLE vkReadyHandle = nullptr;
 
-        getSemHandleInfo.semaphore = m_vkGlReadySemaphore;
+        getSemHandleInfo.semaphore = m_vkGlReadySemaphore[slot];
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle) != VK_SUCCESS || !glReadyHandle)
         {
             cerr << "ERROR: VulkanView: Failed to get glReady semaphore HANDLE" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        getSemHandleInfo.semaphore = m_vkVkReadySemaphore;
+        getSemHandleInfo.semaphore = m_vkVkReadySemaphore[slot];
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle) != VK_SUCCESS || !vkReadyHandle)
         {
             cerr << "ERROR: VulkanView: Failed to get vkReady semaphore HANDLE" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        m_sharedImageInfo.memoryHandle = memHandle;
-        m_sharedImageInfo.size = memReqs.size;
-        m_sharedImageInfo.width = w;
-        m_sharedImageInfo.height = h;
-        m_sharedImageInfo.glReadySemaphoreHandle = glReadyHandle;
-        m_sharedImageInfo.vkReadySemaphoreHandle = vkReadyHandle;
+        info.memoryHandle = memHandle;
+        info.size = memReqs.size;
+        info.width = w;
+        info.height = h;
+        info.glReadySemaphoreHandle = glReadyHandle;
+        info.vkReadySemaphoreHandle = vkReadyHandle;
 #else
         auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
         if (!pfnGetSemaphoreFdKHR)
         {
             cerr << "ERROR: VulkanView: vkGetSemaphoreFdKHR not found" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
@@ -1069,28 +1203,28 @@ namespace Rv
         int glReadyFd = -1;
         int vkReadyFd = -1;
 
-        getSemFdInfo.semaphore = m_vkGlReadySemaphore;
+        getSemFdInfo.semaphore = m_vkGlReadySemaphore[slot];
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd) != VK_SUCCESS || glReadyFd < 0)
         {
             cerr << "ERROR: VulkanView: Failed to get glReady semaphore FD" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        getSemFdInfo.semaphore = m_vkVkReadySemaphore;
+        getSemFdInfo.semaphore = m_vkVkReadySemaphore[slot];
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd) != VK_SUCCESS || vkReadyFd < 0)
         {
             cerr << "ERROR: VulkanView: Failed to get vkReady semaphore FD" << endl;
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        m_sharedImageInfo.memoryFd = memFd;
-        m_sharedImageInfo.size = memReqs.size;
-        m_sharedImageInfo.width = w;
-        m_sharedImageInfo.height = h;
-        m_sharedImageInfo.glReadySemaphoreFd = glReadyFd;
-        m_sharedImageInfo.vkReadySemaphoreFd = vkReadyFd;
+        info.memoryFd = memFd;
+        info.size = memReqs.size;
+        info.width = w;
+        info.height = h;
+        info.glReadySemaphoreFd = glReadyFd;
+        info.vkReadySemaphoreFd = vkReadyFd;
 #endif
 
         // Transition the shared image to TRANSFER_SRC optimal initially
@@ -1108,7 +1242,7 @@ namespace Rv
         barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        barrier.image = m_vkSharedImage;
+        barrier.image = m_vkSharedImage[slot];
         barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         barrier.subresourceRange.baseMipLevel = 0;
         barrier.subresourceRange.levelCount = 1;
@@ -1126,24 +1260,24 @@ namespace Rv
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cb;
 
-        vkResetFences(m_vkDevice, 1, &m_vkFence);
-        VkResult layoutSubmitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        vkResetFences(m_vkDevice, 1, &m_vkFence[slot]);
+        VkResult layoutSubmitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (layoutSubmitResult != VK_SUCCESS)
         {
             if (layoutSubmitResult == VK_ERROR_DEVICE_LOST)
             {
                 requestGLFallback();
             }
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
-        vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
 
         // Signal vkReady initially so GL can start writing to it
         VkSubmitInfo signalInfo = {};
         signalInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         signalInfo.signalSemaphoreCount = 1;
-        signalInfo.pSignalSemaphores = &m_vkVkReadySemaphore;
+        signalInfo.pSignalSemaphores = &m_vkVkReadySemaphore[slot];
         VkResult signalResult = vkQueueSubmit(m_vkQueue, 1, &signalInfo, VK_NULL_HANDLE);
         if (signalResult != VK_SUCCESS)
         {
@@ -1151,11 +1285,15 @@ namespace Rv
             {
                 requestGLFallback();
             }
-            cleanupSharedImage();
+            cleanupSharedImage(slot);
             return nullptr;
         }
 
-        return &m_sharedImageInfo;
+        // Commit the new capacity only now that the (re)build fully succeeded.
+        m_sharedCapacityW[slot] = capW;
+        m_sharedCapacityH[slot] = capH;
+
+        return &info;
     }
 
     //--------------------------------------------------------------------------
@@ -1164,27 +1302,53 @@ namespace Rv
 
     void VulkanView::presentSharedImage()
     {
-        if (!m_vkDevice || !m_vkSharedImage || !m_vkSwapchain)
+        const uint32_t slot = m_currentFrame;
+        const SharedImageInfo& info = m_sharedImageInfo[slot];
+
+        if (!m_vkDevice || !m_vkSharedImage[slot] || !m_vkSwapchain)
             return;
+
+        // Start-of-frame throttle: wait for this slot's previous frame to finish
+        // before reusing its acquire semaphore and per-frame resources. This
+        // replaces the old end-of-frame block; with FIFO acquire back-pressure it
+        // is what paces the loop to display refresh while still allowing
+        // FRAMES_IN_FLIGHT frames outstanding.
+        vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
 
         // Acquire image
         uint32_t imageIndex;
         VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
+            // The GL side already signaled glReady[slot]/waited vkReady[slot] this
+            // frame; rebalance the pair before bailing so the next frame on this
+            // slot can't desync.
+            drainSharedSemaphores(slot);
             handleSwapchainOutOfDate();
             return;
         }
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
         {
+            drainSharedSemaphores(slot);
             if (result == VK_ERROR_DEVICE_LOST)
             {
                 requestGLFallback();
             }
             return;
         }
-        vkResetFences(m_vkDevice, 1, &m_vkFence);
+
+        // If this swapchain image is still owned by another in-flight frame, wait
+        // for that frame's fence before rendering into it, then mark the image as
+        // now owned by this frame.
+        if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+        }
+        m_imagesInFlight[imageIndex] = m_vkFence[slot];
+
+        // Reset the frame fence only now, right before the submit that re-signals it.
+        vkResetFences(m_vkDevice, 1, &m_vkFence[slot]);
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
         vkResetCommandBuffer(cb, 0);
@@ -1201,7 +1365,7 @@ namespace Rv
         sharedBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         sharedBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
         sharedBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        sharedBarrier.image = m_vkSharedImage;
+        sharedBarrier.image = m_vkSharedImage[slot];
         sharedBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         sharedBarrier.subresourceRange.baseMipLevel = 0;
         sharedBarrier.subresourceRange.levelCount = 1;
@@ -1246,9 +1410,9 @@ namespace Rv
             region.srcSubresource.layerCount = 1;
             region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             region.dstSubresource.layerCount = 1;
-            region.extent = {(uint32_t)m_sharedImageInfo.width, (uint32_t)m_sharedImageInfo.height, 1};
+            region.extent = {(uint32_t)info.width, (uint32_t)info.height, 1};
 
-            vkCmdCopyImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
+            vkCmdCopyImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
         }
         else
@@ -1259,11 +1423,11 @@ namespace Rv
             blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             blit.dstSubresource.layerCount = 1;
             blit.srcOffsets[0] = {0, 0, 0};
-            blit.srcOffsets[1] = {m_sharedImageInfo.width, m_sharedImageInfo.height, 1};
+            blit.srcOffsets[1] = {info.width, info.height, 1};
             blit.dstOffsets[0] = {0, 0, 0};
-            blit.dstOffsets[1] = {m_sharedImageInfo.width, m_sharedImageInfo.height, 1};
+            blit.dstOffsets[1] = {info.width, info.height, 1};
 
-            vkCmdBlitImage(cb, m_vkSharedImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
+            vkCmdBlitImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_NEAREST);
         }
 
@@ -1283,7 +1447,7 @@ namespace Rv
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
         // Wait for GL to finish writing (glReady) AND swapchain image to be available
-        VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore, m_vkImageAvailableSemaphore};
+        VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore[slot], m_vkImageAvailableSemaphore[slot]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 2;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -1292,12 +1456,13 @@ namespace Rv
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cb;
 
-        // Signal render finished AND vkReady (so GL can write next frame)
-        VkSemaphore signalSemaphores[] = {m_vkRenderFinishedSemaphore, m_vkVkReadySemaphore};
+        // Signal the image's renderFinished (present waits on it) AND vkReady (so
+        // GL can write the next frame into this slot's shared image).
+        VkSemaphore signalSemaphores[] = {m_vkRenderFinished[imageIndex], m_vkVkReadySemaphore[slot]};
         submitInfo.signalSemaphoreCount = 2;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (submitResult != VK_SUCCESS)
         {
             if (submitResult == VK_ERROR_DEVICE_LOST)
@@ -1307,11 +1472,16 @@ namespace Rv
             return;
         }
 
-        // Present
+        // The frame is committed to the GPU; advance the ring now so the next
+        // frame uses the other slot. imageIndex/slot below are locals, so this is
+        // safe before the present call.
+        m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
+
+        // Present, waiting on the image's own renderFinished semaphore.
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_vkRenderFinishedSemaphore;
+        presentInfo.pWaitSemaphores = &m_vkRenderFinished[imageIndex];
         VkSwapchainKHR swapchains[] = {m_vkSwapchain};
         presentInfo.swapchainCount = 1;
         presentInfo.pSwapchains = swapchains;
@@ -1322,9 +1492,10 @@ namespace Rv
         // can be reported persistently by some X11/RADV compositors; recreating
         // on it every frame caused a swapchain-recreate loop that starved the Qt
         // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
+        // The submit above is tracked by m_vkFence[slot] (waited at the start of
+        // the next use of this slot), so no end-of-frame block is needed here.
         if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
             handleSwapchainOutOfDate();
             return;
         }
@@ -1336,8 +1507,6 @@ namespace Rv
             }
             return;
         }
-
-        vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
     }
 
     //--------------------------------------------------------------------------
@@ -1346,35 +1515,42 @@ namespace Rv
 
     void VulkanView::presentPixelData(const void* pixels, int w, int h)
     {
+        const uint32_t slot = m_currentFrame;
+
         if (!m_vkDevice)
             return;
 
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
         {
-            cleanupSwapchain();
+            // Warm recreate via oldSwapchain (createSwapchain retires the old one).
             if (!createSwapchain())
                 return;
         }
 
+        // Start-of-frame throttle (matches presentSharedImage): wait for this
+        // slot's previous frame to finish before reusing its staging buffer,
+        // acquire semaphore and command resources.
+        vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+
         size_t size = w * h * 4;
 
-        // Recreate staging buffer if needed
-        if (size > m_stagingBufferSize)
+        // Recreate this slot's staging buffer if needed
+        if (size > m_stagingBufferSize[slot])
         {
-            if (m_vkStagingBuffer)
-                vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer, nullptr);
-            if (m_vkStagingBufferMemory)
-                vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory, nullptr);
+            if (m_vkStagingBuffer[slot])
+                vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer[slot], nullptr);
+            if (m_vkStagingBufferMemory[slot])
+                vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory[slot], nullptr);
 
             VkBufferCreateInfo bufferInfo = {};
             bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
             bufferInfo.size = size;
             bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
             bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            vkCreateBuffer(m_vkDevice, &bufferInfo, nullptr, &m_vkStagingBuffer);
+            vkCreateBuffer(m_vkDevice, &bufferInfo, nullptr, &m_vkStagingBuffer[slot]);
 
             VkMemoryRequirements memRequirements;
-            vkGetBufferMemoryRequirements(m_vkDevice, m_vkStagingBuffer, &memRequirements);
+            vkGetBufferMemoryRequirements(m_vkDevice, m_vkStagingBuffer[slot], &memRequirements);
 
             VkMemoryAllocateInfo allocInfo = {};
             allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -1387,22 +1563,22 @@ namespace Rv
                 return;
             }
 
-            vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory);
-            vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer, m_vkStagingBufferMemory, 0);
+            vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory[slot]);
+            vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer[slot], m_vkStagingBufferMemory[slot], 0);
 
-            m_stagingBufferSize = size;
+            m_stagingBufferSize[slot] = size;
         }
 
         // Copy to staging buffer
         void* data;
-        vkMapMemory(m_vkDevice, m_vkStagingBufferMemory, 0, size, 0, &data);
+        vkMapMemory(m_vkDevice, m_vkStagingBufferMemory[slot], 0, size, 0, &data);
         memcpy(data, pixels, size);
-        vkUnmapMemory(m_vkDevice, m_vkStagingBufferMemory);
+        vkUnmapMemory(m_vkDevice, m_vkStagingBufferMemory[slot]);
 
         // Acquire image
         uint32_t imageIndex;
         VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
             handleSwapchainOutOfDate();
@@ -1416,7 +1592,16 @@ namespace Rv
             }
             return;
         }
-        vkResetFences(m_vkDevice, 1, &m_vkFence);
+
+        // If this swapchain image is still owned by another in-flight frame, wait
+        // for its fence, then mark it owned by this frame.
+        if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+        }
+        m_imagesInFlight[imageIndex] = m_vkFence[slot];
+
+        vkResetFences(m_vkDevice, 1, &m_vkFence[slot]);
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
         vkResetCommandBuffer(cb, 0);
@@ -1456,7 +1641,7 @@ namespace Rv
         region.imageOffset = {0, 0, 0};
         region.imageExtent = {(uint32_t)w, (uint32_t)h, 1};
 
-        vkCmdCopyBufferToImage(cb, m_vkStagingBuffer, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        vkCmdCopyBufferToImage(cb, m_vkStagingBuffer[slot], m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         // Transition image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
@@ -1472,18 +1657,18 @@ namespace Rv
         // Submit
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        VkSemaphore waitSemaphores[] = {m_vkImageAvailableSemaphore};
+        VkSemaphore waitSemaphores[] = {m_vkImageAvailableSemaphore[slot]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cb;
-        VkSemaphore signalSemaphores[] = {m_vkRenderFinishedSemaphore};
+        VkSemaphore signalSemaphores[] = {m_vkRenderFinished[imageIndex]};
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence);
+        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (submitResult != VK_SUCCESS)
         {
             if (submitResult == VK_ERROR_DEVICE_LOST)
@@ -1493,7 +1678,10 @@ namespace Rv
             return;
         }
 
-        // Present
+        // Frame committed; advance the ring (imageIndex/slot below are locals).
+        m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
+
+        // Present, waiting on the image's own renderFinished semaphore.
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
@@ -1508,9 +1696,10 @@ namespace Rv
         // can be reported persistently by some X11/RADV compositors; recreating
         // on it every frame caused a swapchain-recreate loop that starved the Qt
         // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
+        // The submit is tracked by m_vkFence[slot] (waited at the next use of this
+        // slot), so no end-of-frame block is needed here.
         if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
             handleSwapchainOutOfDate();
             return;
         }
@@ -1522,8 +1711,6 @@ namespace Rv
             }
             return;
         }
-
-        vkWaitForFences(m_vkDevice, 1, &m_vkFence, VK_TRUE, UINT64_MAX);
     }
 
     //--------------------------------------------------------------------------
