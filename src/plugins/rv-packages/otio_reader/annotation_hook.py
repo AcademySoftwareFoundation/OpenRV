@@ -82,6 +82,166 @@ def _transform_otio_to_world_coordinate(point):
     return (world_coordinate_x, world_coordinate_y, world_coordinate_width)
 
 
+def _get_source_image_height() -> float:
+    """Return the pixel height of the first media source. Falls back to 1080."""
+    try:
+        media_switch = commands.nodeConnections("MediaTrack")[0][0]
+        media_source_group = commands.nodeConnections(media_switch)[0][0]
+        first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
+        media_info = commands.sourceMediaInfo(first_source_node)
+        h = float(media_info.get("height", 0))
+        if h > 1:
+            return h
+    except Exception:
+        pass
+    return 1080.0
+
+
+def _transform_pos(x, y):
+    """Transform a 2D OTIO position to RV WCS. Returns (wcs_x, wcs_y) or None."""
+    result = _transform_otio_to_world_coordinate(otio.schemadef.Point.Point(x=x, y=y, width=0.0))
+    if result is None:
+        return None
+    return result[0], result[1]
+
+
+def _transform_scalar(w):
+    """Scale a scalar OTIO distance to RV WCS via the x-axis scale, or return the raw value."""
+    result = _transform_otio_to_world_coordinate(otio.schemadef.Point.Point(x=0.0, y=0.0, width=float(w)))
+    return result[2] if result is not None else float(w)
+
+
+def _add_shape_to_frame_order(paint_node, stroke_id, frame, prefix):
+    """Insert a shape into the frame draw-order list."""
+    frame_component = f"{paint_node}.frame:{frame}"
+    if not commands.propertyExists(f"{frame_component}.order"):
+        commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
+    commands.insertStringProperty(f"{frame_component}.order", [f"{prefix}:{stroke_id}:{frame}:annotation"])
+
+
+def _create_bbox_shape(layer, paint_node, stroke_id, frame, shape_type):
+    """Create an RVPaint rect: or ellipse: node from a shape layer."""
+    prefix = "rect" if shape_type.startswith("Rectangle.") else "ellipse"
+    shape_component = f"{paint_node}.{prefix}:{stroke_id}:{frame}:annotation"
+
+    min_pos = _transform_pos(layer.min.x, layer.min.y)
+    max_pos = _transform_pos(layer.max.x, layer.max.y)
+    if min_pos is None or max_pos is None:
+        logging.warning(f"annotation_hook: could not transform bbox coords for {shape_component} — skipping")
+        return
+
+    border_width = float(layer.border_width) if layer.border_width is not None else 0.0
+    wcs_border_width = _transform_scalar(border_width)
+
+    corner_radius = getattr(layer, "corner_radius", None)
+    wcs_corner_radius = float(corner_radius) if corner_radius is not None else 0.0
+
+    effectHook.add_rv_effect_props(
+        shape_component,
+        {
+            "min": list(min_pos),
+            "max": list(max_pos),
+            "innerColor": [float(c) for c in layer.inner_color],
+            "borderColor": [float(c) for c in layer.border_color],
+            "borderWidth": [wcs_border_width],
+            "cornerRadius": [wcs_corner_radius],
+            "startFrame": frame,
+            "duration": 1,
+            "eye": 2,
+            "softDeleted": layer.visible is False,
+            "uuid": [layer.id],
+        },
+    )
+
+    if layer.visible is not False:
+        _add_shape_to_frame_order(paint_node, stroke_id, frame, prefix)
+
+
+def _create_point_pair_shape(layer, paint_node, stroke_id, frame, shape_type):
+    """Create an RVPaint arrow: or line: node from a shape layer."""
+    prefix = "arrow" if shape_type.startswith("Arrow.") else "line"
+    shape_component = f"{paint_node}.{prefix}:{stroke_id}:{frame}:annotation"
+
+    start_pos = _transform_pos(layer.start_position.x, layer.start_position.y)
+    end_pos = _transform_pos(layer.end_position.x, layer.end_position.y)
+    if start_pos is None or end_pos is None:
+        logging.warning(f"annotation_hook: could not transform point-pair coords for {shape_component} — skipping")
+        return
+
+    raw_bw = float(layer.width if shape_type.startswith("Line.") else layer.border_width)
+    wcs_border_width = _transform_scalar(raw_bw)
+
+    props = {
+        "startPos": list(start_pos),
+        "endPos": list(end_pos),
+        "borderColor": [float(c) for c in layer.border_color],
+        "borderWidth": [wcs_border_width],
+        "startFrame": frame,
+        "duration": 1,
+        "eye": 2,
+        "softDeleted": layer.visible is False,
+        "uuid": [layer.id],
+    }
+
+    if shape_type.startswith("Arrow."):
+        wcs_thickness = _transform_scalar(float(layer.width))
+        props["innerColor"] = [float(c) for c in layer.inner_color]
+        props["thickness"] = [wcs_thickness]
+
+    effectHook.add_rv_effect_props(shape_component, props)
+
+    if layer.visible is not False:
+        _add_shape_to_frame_order(paint_node, stroke_id, frame, prefix)
+
+
+def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
+    """Create an RVPaint text: node from a shape layer."""
+    shape_component = f"{paint_node}.text:{stroke_id}:{frame}:annotation"
+
+    anchor = layer.anchor
+    anchor_pos = _transform_pos(anchor.x, anchor.y)
+    if anchor_pos is None:
+        logging.warning(f"annotation_hook: could not transform text anchor for {shape_component} — skipping")
+        return
+
+    # font_size in OTIO is in OTIO-space units (same coordinate space as
+    # border_width). Convert to RVPaint logical pixels: OTIO → WCS via
+    # _transform_scalar, then WCS → pixels by multiplying by image height.
+    # Use the media track's source for height — the annotation source group
+    # is a blank node whose sourceMediaInfo returns height=1, not the real
+    # image dimensions.
+    image_h = _get_source_image_height()
+    font_size_wcs = _transform_scalar(float(layer.font_size))
+    font_size_rv = font_size_wcs * image_h
+
+    # RVPaint .position is the BOTTOM of the text quad (y-up). The OTIO anchor
+    # is the typographic baseline. Descent ≈ 0.2 × em, so the bottom of the
+    # quad is ~0.2 × em below the baseline → shift position DOWN by 0.2 × em.
+    anchor_pos = (anchor_pos[0], anchor_pos[1] - font_size_wcs * 0.2)
+
+    effectHook.add_rv_effect_props(
+        shape_component,
+        {
+            "text": [layer.text],
+            "fontFamily": [layer.font_family],
+            "fontWeight": [layer.font_weight],
+            "fontStyle": [layer.font_style],
+            "textDecoration": [layer.text_decoration],
+            "textAlign": [layer.text_align],
+            "position": list(anchor_pos),
+            "fontSize": [font_size_rv],
+            "color": [float(c) for c in layer.inner_color],
+            "startFrame": frame,
+            "duration": 1,
+            "softDeleted": layer.visible is False,
+            "uuid": [layer.id],
+        },
+    )
+
+    if layer.visible is not False:
+        _add_shape_to_frame_order(paint_node, stroke_id, frame, "text")
+
+
 def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_map: dict | None = None) -> None:
     """A hook for the annotation schema"""
     try:
@@ -106,54 +266,71 @@ def hook_function(in_timeline: otio.schemadef.Annotation.Annotation, argument_ma
         paint_node = extra_commands.nodesInGroupOfType(source_node, "RVPaint")[0]
         paint_component = f"{paint_node}.paint"
         stroke_id = commands.getIntProperty(f"{paint_component}.nextId")[0] + 1
-        pen_component = f"{paint_node}.pen:{stroke_id}:{frame}:annotation"
         frame_component = f"{paint_node}.frame:{frame}"
 
         # Set properties on the paint component of the RVPaint node
         effectHook.set_rv_effect_props(paint_component, {"nextId": stroke_id})
 
-        start_time = int(time_range.start_time.value)
-        end_time = int(start_time + time_range.duration.value)
+        shape_label = getattr(layer, "_serializable_label", "")
 
-        duration = end_time - start_time
+        if isinstance(layer, otio.schemadef.Paint.Paint):
+            pen_component = f"{paint_node}.pen:{stroke_id}:{frame}:annotation"
 
-        # Add and set properties on the pen component of the RVPaint node
-        effectHook.add_rv_effect_props(
-            pen_component,
-            {
-                "color": list(map(float, layer.rgba)),
-                "brush": [layer.brush],
-                "debug": 1,
-                "join": 3,
-                "cap": 1,
-                "splat": 0,
-                "mode": 0 if layer.type == "COLOR" else 1,
-                "startFrame": start_time,
-                "duration": duration,
-                "softDeleted": layer.soft_deleted,
-                "uuid": [layer.id],
-            },
-        )
+            start_time = int(time_range.start_time.value)
+            end_time = int(start_time + time_range.duration.value)
+            duration = end_time - start_time
 
-        points_property = f"{pen_component}.points"
-        width_property = f"{pen_component}.width"
-
-        if not commands.propertyExists(points_property):
-            commands.newProperty(points_property, commands.FloatType, 2)
-        if not commands.propertyExists(width_property):
-            commands.newProperty(width_property, commands.FloatType, 1)
-
-        for point in layer.points:
-            world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(point)
-
-            commands.insertFloatProperty(
-                points_property,
-                [world_coordinate_x, world_coordinate_y],
+            # Add and set properties on the pen component of the RVPaint node
+            effectHook.add_rv_effect_props(
+                pen_component,
+                {
+                    "color": list(map(float, layer.rgba)),
+                    "brush": [layer.brush],
+                    "debug": 1,
+                    "join": 3,
+                    "cap": 1,
+                    "splat": 0,
+                    "mode": 0 if layer.type == "COLOR" else 1,
+                    "startFrame": start_time,
+                    "duration": duration,
+                    "softDeleted": layer.soft_deleted,
+                    "uuid": [layer.id],
+                },
             )
-            commands.insertFloatProperty(width_property, [world_coordinate_width])
 
-        if not layer.soft_deleted:
-            if not commands.propertyExists(f"{frame_component}.order"):
-                commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
+            points_property = f"{pen_component}.points"
+            width_property = f"{pen_component}.width"
 
-            commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
+            if not commands.propertyExists(points_property):
+                commands.newProperty(points_property, commands.FloatType, 2)
+            if not commands.propertyExists(width_property):
+                commands.newProperty(width_property, commands.FloatType, 1)
+
+            for point in layer.points:
+                world_coordinate_x, world_coordinate_y, world_coordinate_width = _transform_otio_to_world_coordinate(
+                    point
+                )
+
+                commands.insertFloatProperty(
+                    points_property,
+                    [world_coordinate_x, world_coordinate_y],
+                )
+                commands.insertFloatProperty(width_property, [world_coordinate_width])
+
+            if not layer.soft_deleted:
+                if not commands.propertyExists(f"{frame_component}.order"):
+                    commands.newProperty(f"{frame_component}.order", commands.StringType, 1)
+
+                commands.insertStringProperty(f"{frame_component}.order", [f"pen:{stroke_id}:{frame}:annotation"])
+
+        elif shape_label.startswith(("Rectangle.", "Ellipse.")):
+            _create_bbox_shape(layer, paint_node, stroke_id, frame, shape_label)
+
+        elif shape_label.startswith(("Arrow.", "Line.")):
+            _create_point_pair_shape(layer, paint_node, stroke_id, frame, shape_label)
+
+        elif shape_label.startswith("Text."):
+            _create_text_shape(layer, paint_node, stroke_id, frame, source_node)
+
+        else:
+            logging.warning(f"annotation_hook: unrecognised layer type {shape_label!r} — skipping")
