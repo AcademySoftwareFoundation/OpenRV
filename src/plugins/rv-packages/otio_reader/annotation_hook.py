@@ -82,21 +82,6 @@ def _transform_otio_to_world_coordinate(point):
     return (world_coordinate_x, world_coordinate_y, world_coordinate_width)
 
 
-def _get_source_image_height() -> float:
-    """Return the pixel height of the first media source. Falls back to 1080."""
-    try:
-        media_switch = commands.nodeConnections("MediaTrack")[0][0]
-        media_source_group = commands.nodeConnections(media_switch)[0][0]
-        first_source_node = extra_commands.nodesInGroupOfType(media_source_group, "RVFileSource")[0]
-        media_info = commands.sourceMediaInfo(first_source_node)
-        h = float(media_info.get("height", 0))
-        if h > 1:
-            return h
-    except Exception:
-        pass
-    return 1080.0
-
-
 def _transform_pos(x, y):
     """Transform a 2D OTIO position to RV WCS. Returns (wcs_x, wcs_y) or None."""
     result = _transform_otio_to_world_coordinate(otio.schemadef.Point.Point(x=x, y=y, width=0.0))
@@ -205,14 +190,10 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
         return
 
     # font_size in OTIO is in OTIO-space units (same coordinate space as
-    # border_width). Convert to RVPaint logical pixels: OTIO → WCS via
-    # _transform_scalar, then WCS → pixels by multiplying by image height.
-    # Use the media track's source for height — the annotation source group
-    # is a blank node whose sourceMediaInfo returns height=1, not the real
-    # image dimensions.
-    image_h = _get_source_image_height()
+    # border_width). RVPaint's fontSize is a WCS fraction (image-height-
+    # normalised) — the renderer multiplies by framebuffer height at draw
+    # time (see PaintCommand.cpp) — so no pixel conversion happens here.
     font_size_wcs = _transform_scalar(float(layer.font_size))
-    font_size_rv = font_size_wcs * image_h
 
     # RVPaint .position is the BOTTOM of the text quad (y-up). The OTIO anchor
     # is the typographic baseline. Descent ≈ 0.2 × em, so the bottom of the
@@ -229,7 +210,7 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
             "textDecoration": [layer.text_decoration],
             "textAlign": [layer.text_align],
             "position": list(anchor_pos),
-            "fontSize": [font_size_rv],
+            "fontSize": [font_size_wcs],
             "color": [float(c) for c in layer.inner_color],
             "startFrame": frame,
             "duration": 1,
