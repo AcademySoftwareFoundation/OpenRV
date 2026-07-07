@@ -741,7 +741,7 @@ class: AnnotateMinorMode : MinorMode
         newProperty(textDecorationProp, StringType, 1);
         newProperty(textAlignProp,      StringType, 1);
         setStringProperty(fontFamilyProp,     string[] {""}, true);
-        setFloatProperty(fontSizeProp,        float[] {24.0}, true);
+        setFloatProperty(fontSizeProp,        float[] {size * scale}, true);
         setStringProperty(fontWeightProp,     string[] {"normal"}, true);
         setStringProperty(fontStyleProp,      string[] {"normal"}, true);
         setStringProperty(textDecorationProp, string[] {"none"}, true);
@@ -3276,13 +3276,16 @@ class: AnnotateMinorMode : MinorMode
                                      g.addAction(auxIcon("A_48x48.png"), "Text"),
                                      "textplacement",
                                      Qt.IBeamCursor,
-                                     0,
+                                     48.0 / 1080.0,
                                      Color(0,0,0,1),
                                      RenderOverMode,
                                      "",
                                      RoundJoin,
                                      SquareCap,
-                                     0.01, 0.0015,
+                                     // Range matches the legacy FTGL renderer's calibrated
+                                     // ptsize (size * 10000), reinterpreted as "pixels at a
+                                     // 1080p reference image" 
+                                     100.0 / 1080.0, 15.0 / 1080.0,
                                      1,
                                      1,
                                      PressureMode.None,

@@ -19,6 +19,7 @@
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Frustum.h>
 #include <TwkGLText/TwkGLText.h>
+#include <TwkGLText/defaultFont.h>
 #include <stl_ext/string_algo.h>
 #include <QString>
 #include <QFont>
@@ -28,6 +29,7 @@
 #include <QPainter>
 #include <functional>
 #include <iostream>
+#include <mutex>
 
 // Shader source strings embedded at compile time via quote_file() in
 // IPCore/CMakeLists.txt.  Defined at global scope by the generated .cpp files.
@@ -804,6 +806,32 @@ namespace IPCore
             fbo->unbind();
         }
 
+        namespace
+        {
+
+            // Text annotations pre-date the QFont-based renderer and were originally
+            // drawn with TwkGLText, which always used this embedded Luxi Sans Regular
+            // TTF (see TwkGLText/defaultFont.cpp) regardless of platform. Load it into
+            // Qt's font database once so "system default" (fontFamily == "") keeps
+            // matching that look instead of silently falling back to the system default font
+            const QString& defaultTextFontFamily()
+            {
+                static std::once_flag once;
+                static QString family;
+                std::call_once(once,
+                               []
+                               {
+                                   const QByteArray fontData(reinterpret_cast<const char*>(default_font), default_fontSize);
+                                   const int id = QFontDatabase::addApplicationFontFromData(fontData);
+                                   const QStringList families = id != -1 ? QFontDatabase::applicationFontFamilies(id) : QStringList();
+                                   if (!families.isEmpty())
+                                       family = families.front();
+                               });
+                return family;
+            }
+
+        } // namespace
+
         void Text::execute(CommandContext& context) const
         {
             // Determine effective text colour (ghost mode support)
@@ -842,13 +870,13 @@ namespace IPCore
                 const float proj_scale_x = std::max(std::abs(transform.m00), 0.001f);
                 const float proj_scale_y = std::max(std::abs(transform.m11), 0.001f);
 
-                // Render the font at the screen pixel size that corresponds to
-                // effectiveFontSize natural image pixels at the current display
-                // resolution. Dividing by imageHeight normalises the font size to
-                // a fraction of the image so text always occupies the same
-                // proportion of the image regardless of screen size or DPI.
-                const float imageH = (context.imageHeight > 0) ? static_cast<float>(context.imageHeight) : fbH;
-                const float renderFontSize = std::max(1.0f, effectiveFontSize * proj_scale_y * fbH / (2.0f * imageH));
+                // fontSize is a WCS fraction (image-height-normalised), exactly
+                // like stroke border_width. Multiplying by fbH converts it to
+                // device pixels for rasterisation; th = imgH/fbH then recovers
+                // the WCS fraction for the quad. The projection matrix scales
+                // the quad with zoom — text behaves identically to strokes:
+                // a fixed WCS size that grows on screen as you zoom in.
+                const float renderFontSize = std::max(1.0f, effectiveFontSize * fbH);
 
                 // ── Build QFont ───────────────────────────────────────────────
                 QFont qfont;
@@ -858,10 +886,21 @@ namespace IPCore
                 {
                     qfont.setFamily(qfamily);
                 }
-                qfont.setPixelSize(static_cast<int>(renderFontSize));
+                else if (qfamily.isEmpty())
+                {
+                    const QString& defaultFamily = defaultTextFontFamily();
+                    if (!defaultFamily.isEmpty())
+                        qfont.setFamily(defaultFamily);
+                }
+                // Truncating here (rather than rounding) systematically undersizes
+                // text -- proportionally worse at small sizes, e.g. 4.93px would
+                // truncate to 4px, an ~19% height loss.
+                qfont.setPixelSize(static_cast<int>(std::lround(renderFontSize)));
                 qfont.setWeight(effectiveFontWeight == PaintIPNode::FontWeight::Bold ? QFont::Bold : QFont::Normal);
                 qfont.setStyle(effectiveFontStyle == PaintIPNode::FontStyle::Italic ? QFont::StyleItalic : QFont::StyleNormal);
                 qfont.setUnderline(effectiveTextDecor == PaintIPNode::TextDecoration::Underline);
+                qfont.setKerning(false);
+                qfont.setHintingPreference(QFont::PreferVerticalHinting);
 
                 // ── Measure text ──────────────────────────────────────────────
                 const QString qtext = QString::fromStdString(text);
@@ -933,14 +972,15 @@ namespace IPCore
                 // Texture origin is bottom-left in GL, image origin top-left in Qt
                 // so we flip the T coordinate.
                 //
-                // tw/th convert texture pixels → image-space units. Dividing by
-                // (proj_scale × fbDim) cancels the projection scale so the
-                // on-screen quad is exactly imgW×imgH screen pixels — matching
-                // the texture resolution and ensuring crisp text at any display size.
+                // tw/th are the quad dimensions in WCS. Dividing by fbDim alone
+                // (not by proj_scale) gives a FIXED WCS size so the quad—and
+                // therefore the rendered text—scales proportionally with viewport
+                // zoom, matching the behaviour of pen strokes and shapes.
+                //
                 const float qx = pos.x;
                 const float qy = pos.y;
-                const float tw = (fbW > 0) ? imgW * 2.0f / (proj_scale_x * fbW) : 0.001f;
-                const float th = (fbH > 0) ? imgH * 2.0f / (proj_scale_y * fbH) : 0.001f;
+                const float tw = (fbH > 0) ? imgW / fbH : 0.001f;
+                const float th = (fbH > 0) ? imgH / fbH : 0.001f;
 
                 // Vertices: (x,y, u,v) quads — position + texcoord
                 float data[] = {
