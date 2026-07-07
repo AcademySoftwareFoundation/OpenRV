@@ -17,8 +17,9 @@ use a top-left origin (e.g. RVPaint) must offset upward by one em (font_size).
 font_size is in OTIO normalised coordinate units (same space as border_width
 and all other scalar dimensions). For standard 16:9 content the OTIO y-range
 is 9 units, so small ≈ 0.15, medium ≈ 0.25, large ≈ 0.5.
-To get RVPaint's logical fontSize: divide by bounds_size to reach WCS, then
-multiply by image_height_pixels.
+RVPaint's fontSize is a WCS fraction, exactly like border_width: divide by
+bounds_size to reach WCS and store that directly — no pixel conversion.
+The renderer multiplies by framebuffer height at draw time (PaintCommand.cpp).
 
 All coordinates are in normalised image space (see position_schema.py).
 
