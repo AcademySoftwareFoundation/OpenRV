@@ -26,6 +26,7 @@
 #include <TwkFB/Operations.h>
 #include <TwkFB/FastMemcpy.h>
 #include <TwkUtil/SystemInfo.h>
+#include <TwkUtil/CrashHandler.h>
 #include <TwkMath/Function.h>
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Vec2.h>
@@ -772,6 +773,9 @@ namespace IPCore
         TWK_GLDEBUG;
         const string glren = TwkGLF::safeGLGetString(GL_RENDERER);
         TWK_GLDEBUG;
+
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_vendor", glven);
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_renderer", glren);
 
         vector<string> tokens;
         stl_ext::tokenize(tokens, glren);
@@ -1895,7 +1899,7 @@ namespace IPCore
 
         renderImage(context);
         if (!context.norender)
-            renderPaint(context.image, context.targetFBO);
+            renderPaint(context.image, context.targetFBO, context.frame);
     }
 
     void ImageRenderer::renderAllChildren(InternalRenderContext& context)
@@ -4815,7 +4819,7 @@ namespace IPCore
         return hasErase;
     }
 
-    void ImageRenderer::renderPaint(const IPImage* root, const GLFBO* fbo)
+    void ImageRenderer::renderPaint(const IPImage* root, const GLFBO* fbo, int frame)
     {
         //
         // if this image has overlay commands, such as matts, these commands
@@ -4891,9 +4895,20 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
+            // If we have erase commands that allow us to see underlying sources, we must consider the
+            // frame number in the cache key. If we do not and we composite a frame-invariant source
+            // (gap, colour source, etc) on top of source media, we will generate the same cache key across
+            // all frames. Thus if we are holding frames, we will re-use first held frame from the cache
+            // across all frames in the held sequence, rendering only the erased strokes on top of a static
+            // cached image.
+            const bool hasEraseCommands = imageHasEraseCommands(root);
+
             ostringstream newRenderID;
             newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
-                        << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+                        << fbo->width() << "x" << fbo->height();
+            if (hasEraseCommands)
+                newRenderID << " frame" << frame;
+            newRenderID << " paintCmdNo" << curCmdNum - 1;
 
             cachedFBO =
                 m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);

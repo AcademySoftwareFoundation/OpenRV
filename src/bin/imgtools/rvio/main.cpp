@@ -24,6 +24,7 @@
 #include <IOproxy/IOproxy.h>
 #include <MovieProxy/MovieProxy.h>
 #include <ImfThreading.h>
+#include <MuTwkApp/CrashHandlerInit.h>
 #include <MuTwkApp/MuInterface.h>
 #include <PyTwkApp/PyInterface.h>
 #include <RvApp/CommandsModule.h>
@@ -1011,6 +1012,17 @@ int utf8Main(int argc, char* argv[])
     QApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
+
+    qapp.setOrganizationName(INTERNAL_ORGANIZATION_NAME);
+    qapp.setOrganizationDomain(INTERNAL_ORGANIZATION_DOMAIN);
+
+    //
+    // Initialize crash handler early to catch crashes during startup
+    // (Must be after QCoreApplication is created to use QCoreApplication::applicationDirPath)
+    //
+    {
+        TwkApp::initializeCrashHandler("RVIO", QCoreApplication::applicationDirPath().toStdString());
+    }
 
     Rv::Options& opts = Rv::Options::sharedOptions();
 

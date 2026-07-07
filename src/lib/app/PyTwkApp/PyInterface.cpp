@@ -20,6 +20,7 @@
 #include <TwkPython/PyLockObject.h>
 #include <Python.h>
 #include <TwkUtil/File.h>
+#include <TwkUtil/CrashHandler.h>
 
 #include <QByteArray>
 // TODO_QT: Remove if everything works.
@@ -248,6 +249,53 @@ namespace TwkApp
         PyRun_SimpleString(text);
     }
 
+    //
+    //  Python trace function to capture execution context for crash dumps
+    //
+    static int pythonTraceFunction(PyObject* obj, PyFrameObject* frame, int what, PyObject* arg)
+    {
+        // Track the current Python source location on line events, and clear it
+        // when execution leaves Python for C++ (handled below).
+        if (what == PyTrace_LINE && TwkUtil::CrashHandler::instance().isInitialized())
+        {
+            PyCodeObject* code = PyFrame_GetCode(frame);
+            if (code)
+            {
+                const char* filename = PyUnicode_AsUTF8(code->co_filename);
+                const char* funcname = PyUnicode_AsUTF8(code->co_name);
+                int lineno = PyFrame_GetLineNumber(frame);
+
+                if (filename)
+                {
+                    TwkUtil::CrashHandler::instance().addAnnotation("py_script_file", std::string(filename));
+                    TwkUtil::CrashHandler::instance().addAnnotation("py_script_line", std::to_string(lineno));
+                }
+
+                if (funcname)
+                {
+                    TwkUtil::CrashHandler::instance().addAnnotation("py_function", std::string(funcname));
+                }
+
+                Py_DECREF(code);
+            }
+        }
+        else if (what == PyTrace_RETURN && TwkUtil::CrashHandler::instance().isInitialized())
+        {
+            // When the outermost Python frame returns (no caller frame), control
+            // is leaving Python for C++. Clear the Python context so a later crash
+            // in C++ is not misattributed to a Python line that already returned.
+            PyFrameObject* back = PyFrame_GetBack(frame);
+            if (back == nullptr)
+            {
+                TwkUtil::CrashHandler::instance().addAnnotation("py_script_file", "");
+                TwkUtil::CrashHandler::instance().addAnnotation("py_script_line", "");
+                TwkUtil::CrashHandler::instance().addAnnotation("py_function", "");
+            }
+            Py_XDECREF(back);
+        }
+        return 0;
+    }
+
     void initPython(int argc, char** argv)
     {
         // PreInitialize Python
@@ -306,6 +354,19 @@ namespace TwkApp
                    "    multiprocessing.set_executable(python_exe)\n"
                    "    break\n"
                    "");
+
+        //
+        //  Install the Python trace function for crash-dump context, but only
+        //  when crash reporting is active. Installing a trace hook forces CPython
+        //  off its fast per-line eval path, so gating this avoids imposing that
+        //  overhead when crash dumps are disabled (RV_CRASH_DUMPS_ENABLED=0) or
+        //  the handler failed to initialize.
+        //
+        if (TwkUtil::CrashHandler::instance().isInitialized())
+        {
+            PyLockObject locker;
+            PyEval_SetTrace(pythonTraceFunction, nullptr);
+        }
     }
 
     void finalizePython()

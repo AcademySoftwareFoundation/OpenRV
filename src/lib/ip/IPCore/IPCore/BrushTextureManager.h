@@ -55,7 +55,7 @@ namespace IPCore
             bool isLoaded() const { return m_texturesLoaded; }
 
             /// Resolve the brush catalogue directory: RV_BRUSH_DIR env var, or the
-            /// assets/brushes directory inside the application bundle.
+            /// assets/brushes directory inside the application bundle (Contents/Resources on macOS).
             static std::string catalogueDir();
 
         private:
