@@ -458,6 +458,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _generate_thumbnail(self, cache_key: str, rvio_bin: str, media_path: str, mid_frame: int) -> None:
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
+        if self._shutting_down:
+            return
         output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
         try:
             self._run_suspendable(
@@ -484,6 +486,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         height: int,
     ) -> None:
         """Runs rvio to generate a filmstrip image in a worker thread."""
+        if self._shutting_down:
+            return
         output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
