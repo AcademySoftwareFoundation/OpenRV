@@ -219,14 +219,16 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
     # quad is ~0.2 × em below the baseline → shift position DOWN by 0.2 × em.
     anchor_pos = (anchor_pos[0], anchor_pos[1] - font_size_wcs * 0.2)
 
+    # Wire/OTIO values are upper-case ("BOLD", "ITALIC", "UNDERLINE"); RVPaint's
+    # properties and PaintCommand.cpp's comparisons are lower-case ("bold", ...).
     effectHook.add_rv_effect_props(
         shape_component,
         {
             "text": [layer.text],
             "fontFamily": [layer.font_family],
-            "fontWeight": [layer.font_weight],
-            "fontStyle": [layer.font_style],
-            "textDecoration": [layer.text_decoration],
+            "fontWeight": [(layer.font_weight or "normal").lower()],
+            "fontStyle": [(layer.font_style or "normal").lower()],
+            "textDecoration": [(layer.text_decoration or "none").lower()],
             "textAlign": [layer.text_align],
             "position": list(anchor_pos),
             "fontSize": [font_size_rv],
