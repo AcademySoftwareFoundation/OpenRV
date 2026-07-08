@@ -979,16 +979,25 @@ namespace IPCore
                 // zoom, matching the behaviour of pen strokes and shapes.
                 //
                 const float qx = pos.x;
-                const float qy = pos.y;
                 const float tw = (fbH > 0) ? imgW / fbH : 0.001f;
                 const float th = (fbH > 0) ? imgH / fbH : 0.001f;
 
+                // pos anchors the bottom of the FIRST line, not the bottom of the
+                // whole (possibly multi-line) block. qyTop only depends on the
+                // single-line image height, so it stays fixed as more lines are
+                // appended -- already-typed lines hold their position and new
+                // lines extend the block downward, instead of the whole block
+                // (and every existing line) sliding upward off pos as it grows.
+                const int imgHOneLine = static_cast<int>(std::ceil(fm.lineSpacing())) + 4;
+                const float qyTop = pos.y + ((fbH > 0) ? imgHOneLine / fbH : 0.001f);
+                const float qy = qyTop - th;
+
                 // Vertices: (x,y, u,v) quads — position + texcoord
                 float data[] = {
-                    qx,      qy,      0.0f, 1.0f, // BL
-                    qx + tw, qy,      1.0f, 1.0f, // BR
-                    qx + tw, qy + th, 1.0f, 0.0f, // TR
-                    qx,      qy + th, 0.0f, 0.0f, // TL
+                    qx,      qy,    0.0f, 1.0f, // BL
+                    qx + tw, qy,    1.0f, 1.0f, // BR
+                    qx + tw, qyTop, 1.0f, 0.0f, // TR
+                    qx,      qyTop, 0.0f, 0.0f, // TL
                 };
 
                 // Texture is Format_ARGB32_Premultiplied so use premul blend:
