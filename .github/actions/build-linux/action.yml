@@ -32,8 +32,8 @@ runs:
 
     - name: Clear up some spaces on disk
       run: |
-        # Delete files from host through the volumes
-        # It will have some "cannot remove" message, but but atleast 10GB will be cleared.
+        # Delete files from host through the volumes.
+        # It will have some "cannot remove" messages, but at least 20GB will be cleared.
         rm -rf /github/home/android || true
         rm -rf /github/home/dotnet || true
         rm -rf /github/home/ghc || true
@@ -42,8 +42,13 @@ runs:
         rm -rf /github/home/powershell || true
         rm -rf /github/home/chromium || true
         rm -rf /github/home/node_modules || true
-        rm -rf /github/home/CodeQL || true
+        rm -rf /github/home/hostedtoolcache || true
         rm -rf /github/home/boost || true
+        rm -rf /github/home/swift || true
+        rm -rf /github/home/miniconda || true
+        rm -rf /github/home/vcpkg || true
+        rm -rf /github/home/.cargo || true
+        rm -rf /github/home/.rustup || true
       shell: bash
 
     - name: Display disk space
