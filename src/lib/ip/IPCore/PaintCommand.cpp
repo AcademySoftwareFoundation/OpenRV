@@ -876,7 +876,8 @@ namespace IPCore
                 // the WCS fraction for the quad. The projection matrix scales
                 // the quad with zoom — text behaves identically to strokes:
                 // a fixed WCS size that grows on screen as you zoom in.
-                const float renderFontSize = std::max(1.0f, effectiveFontSize * fbH);
+                // Clamp against corrupt  session data to avoid loading a value too large
+                const float renderFontSize = std::min(2000.0f, std::max(1.0f, effectiveFontSize * fbH));
 
                 // ── Build QFont ───────────────────────────────────────────────
                 QFont qfont;

@@ -452,7 +452,12 @@ namespace IPCore
         p.duration = readProp<IntProperty>(c, "duration", 0);
 
         p.fontFamily = readProp<StringProperty>(c, "fontFamily", string(""));
-        p.fontSize = readProp<FloatProperty>(c, "fontSize", 24.0f);
+        // Legacy (pre-QFont) sessions have no fontSize property, fontSize is a WCS
+        // fraction of image height, the old size prop was a point value normalized
+        // for a 1080p image
+        const FloatProperty* fontSizeProp = c->property<FloatProperty>("fontSize");
+        p.fontSize = (fontSizeProp && fontSizeProp->size()) ? fontSizeProp->front()
+                                                            : (p.ptsize / 1080.0f) * readProp<FloatProperty>(c, "scale", 1.0f);
         p.fontWeight = readProp<StringProperty>(c, "fontWeight", string("normal"));
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));
