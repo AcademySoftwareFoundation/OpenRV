@@ -982,14 +982,14 @@ namespace IPCore
                 const float tw = (fbH > 0) ? imgW / fbH : 0.001f;
                 const float th = (fbH > 0) ? imgH / fbH : 0.001f;
 
-                // pos anchors the bottom of the FIRST line, not the bottom of the
-                // whole (possibly multi-line) block. qyTop only depends on the
-                // single-line image height, so it stays fixed as more lines are
+                // pos anchors the BASELINE of the first line (top of the image is
+                // one ascent above pos), not the bottom of the whole (possibly
+                // multi-line) block. Anchoring on ascent() rather than the full
+                // line-spacing box also means qyTop stays fixed as more lines are
                 // appended -- already-typed lines hold their position and new
                 // lines extend the block downward, instead of the whole block
                 // (and every existing line) sliding upward off pos as it grows.
-                const int imgHOneLine = static_cast<int>(std::ceil(fm.lineSpacing())) + 4;
-                const float qyTop = pos.y + ((fbH > 0) ? imgHOneLine / fbH : 0.001f);
+                const float qyTop = pos.y + ((fbH > 0) ? static_cast<float>(fm.ascent()) / fbH : 0.001f);
                 const float qy = qyTop - th;
 
                 // Vertices: (x,y, u,v) quads — position + texcoord
