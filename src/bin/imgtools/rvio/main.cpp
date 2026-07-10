@@ -88,6 +88,8 @@
 #include <gl/glew.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QApplication>
+#else
+#include <QtGui/QGuiApplication>
 #endif
 
 #include <QtCore/QtCore>
@@ -998,13 +1000,27 @@ int utf8Main(int argc, char* argv[])
     pthread_win32_process_attach_np();
 #endif
 
+#ifndef PLATFORM_WINDOWS
+    //
+    // Paint/text annotation rendering (PaintCommand.cpp) uses Qt's font
+    // stack (QFont, QFontDatabase, QPainter), which requires a
+    // QGuiApplication rather than a QCoreApplication. rvio has no UI, so
+    // force the offscreen QPA platform plugin unless the caller already
+    // requested a specific one, avoiding any dependency on a real display.
+    //
+    if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+    {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+    }
+#endif
+
 #ifdef PLATFORM_DARWIN
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
 #ifdef PLATFORM_LINUX
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
