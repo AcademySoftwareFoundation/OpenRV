@@ -1486,6 +1486,13 @@ class: SessionManagerMode : MinorMode
 
         _inputOrderLock = true;
 
+        string topNode = nil;
+        let topIndex = _inputsView.indexAt(QPoint(0, 0));
+        if (topIndex.isValid())
+        {
+            topNode = nodeFromIndex(topIndex, _inputsModel);
+        }
+
         _inputsModel.clear();
         let connections = nodeInputs(node);
 
@@ -1512,6 +1519,15 @@ class: SessionManagerMode : MinorMode
         }
 
         _inputOrderLock = false;
+
+        if (topNode neq nil)
+        {
+            let topItem = itemOfNode(_inputsModel, topNode);
+            if (topItem neq nil)
+            {
+                _inputsView.scrollTo(_inputsModel.indexFromItem(topItem), QAbstractItemView.PositionAtTop);
+            }
+        }
     }
 
     method: selectViewableNode (void;)
@@ -3074,6 +3090,14 @@ class: SessionManagerMode : MinorMode
         _previewsEnabled = checked;
         use SettingsValue;
         writeSetting("SessionManager", "previewsEnabled", Bool(checked));
+        if (!checked)
+        {
+            sendInternalEvent("session-manager-previews-disabled", "");
+        }
+        else
+        {
+            sendInternalEvent("session-manager-previews-enabled", "");
+        }
         updateTree();
     }
 

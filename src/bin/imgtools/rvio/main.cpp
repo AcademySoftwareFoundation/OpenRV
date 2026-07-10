@@ -24,6 +24,7 @@
 #include <IOproxy/IOproxy.h>
 #include <MovieProxy/MovieProxy.h>
 #include <ImfThreading.h>
+#include <MuTwkApp/CrashHandlerInit.h>
 #include <MuTwkApp/MuInterface.h>
 #include <PyTwkApp/PyInterface.h>
 #include <RvApp/CommandsModule.h>
@@ -87,6 +88,8 @@
 #include <gl/glew.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QApplication>
+#else
+#include <QtGui/QGuiApplication>
 #endif
 
 #include <QtCore/QtCore>
@@ -970,14 +973,8 @@ int utf8Main(int argc, char* argv[])
     setEnvVar("LC_ALL", "C");
     TwkFB::ThreadPool::initialize();
 
-    //
-    //  XXX dummyDev is leaking here.  Best would be to pass it to the App so
-    //  that it could delete it after startup, since it's no longer needed at
-    //  that point.
-    //
-
 #ifdef RVIO_HW
-    TwkGLF::FBOVideoDevice* dummyDev = new TwkGLF::FBOVideoDevice(0, 10, 10, false);
+    auto dummyDev = std::make_unique<TwkGLF::FBOVideoDevice>(nullptr, 10, 10, false);
 #else
     TwkGLF::OSMesaVideoDevice* dummyDev = new TwkGLF::OSMesaVideoDevice(0, 10, 10, true);
     FrameBuffer* dummyFB = new FrameBuffer(10, 10, 4, FrameBuffer::FLOAT);
@@ -1003,13 +1000,27 @@ int utf8Main(int argc, char* argv[])
     pthread_win32_process_attach_np();
 #endif
 
+#ifndef PLATFORM_WINDOWS
+    //
+    // Paint/text annotation rendering (PaintCommand.cpp) uses Qt's font
+    // stack (QFont, QFontDatabase, QPainter), which requires a
+    // QGuiApplication rather than a QCoreApplication. rvio has no UI, so
+    // force the offscreen QPA platform plugin unless the caller already
+    // requested a specific one, avoiding any dependency on a real display.
+    //
+    if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+    {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+    }
+#endif
+
 #ifdef PLATFORM_DARWIN
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
 #ifdef PLATFORM_LINUX
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
@@ -1017,6 +1028,17 @@ int utf8Main(int argc, char* argv[])
     QApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
+
+    qapp.setOrganizationName(INTERNAL_ORGANIZATION_NAME);
+    qapp.setOrganizationDomain(INTERNAL_ORGANIZATION_DOMAIN);
+
+    //
+    // Initialize crash handler early to catch crashes during startup
+    // (Must be after QCoreApplication is created to use QCoreApplication::applicationDirPath)
+    //
+    {
+        TwkApp::initializeCrashHandler("RVIO", QCoreApplication::applicationDirPath().toStdString());
+    }
 
     Rv::Options& opts = Rv::Options::sharedOptions();
 
@@ -1646,7 +1668,7 @@ int utf8Main(int argc, char* argv[])
         threadAPI.create = GC_pthread_create;
         threadAPI.join = GC_pthread_join;
         threadAPI.detach = GC_pthread_detach;
-        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI, threadedMovieInit);
+        outmov = new ThreadedMovie(inputMovies, outFrames, 8, &threadAPI, threadedMovieInit, MovieRV::uninit);
 #endif
 #endif
 
@@ -1739,10 +1761,6 @@ int utf8Main(int argc, char* argv[])
 
         if (!writer->write(outmov, outfile, writeRequest))
             exit(-2);
-
-        // clean up any frame buffers we allocated writing the movie
-        //
-        MovieRV::uninit();
     }
     catch (TwkExc::Exception& exc)
     {
@@ -1769,5 +1787,35 @@ int utf8Main(int argc, char* argv[])
     TwkFB::GenericIO::shutdown();    // Shutdown TwkFB::GenericIO plugins
 
     TwkFB::ThreadPool::shutdown();
+
+#ifdef PLATFORM_LINUX
+    //
+    //  Workaround for the libglvnd <-> NVIDIA driver shutdown race.
+    //
+    //  Returning normally from main() triggers libc's exit handlers, which
+    //  run _dl_fini. _dl_fini invokes each linked library's destructor,
+    //  including libGLX.so.0's __glXFini, which calls
+    //  __glXMappingTeardown -> dlclose("libGLX_nvidia.so.0").
+    //
+    //  Note: libglvnd (GL Vendor-Neutral Dispatch library) is the dispatch
+    //  layer that sits between an application's OpenGL/GLX/EGL calls
+    //  and the actual vendor driver on Linux.
+    //
+    //  The NVIDIA closed-source driver spawns internal helper threads
+    //  (idle/event loops inside libnvidia-glcore.so) that libglvnd has no
+    //  hook to join. The dlclose therefore unmaps libnvidia-glcore.so while
+    //  those threads are still running, and their next instruction fetch
+    //  lands on an unmapped page -> SIGSEGV at process exit.
+    //
+    //  Calling std::_Exit(0) instead of returning skips atexit/_dl_fini and
+    //  lets the kernel reap memory, threads, and file descriptors directly.
+    //  This is safe here: by this point rvio's own shutdown is complete
+    //  (the output movie is closed, MovieRV/GenericIO/ThreadPool have all
+    //  been torn down), so there is no remaining cleanup that the exit
+    //  handlers would have done for us.
+    //
+    std::_Exit(0);
+#endif
+
     return 0;
 }

@@ -15,6 +15,7 @@
 #include <Mu/GarbageCollector.h>
 #include <MuGL/GLModule.h>
 #include <MuIO/IOModule.h>
+#include <MuTwkApp/CrashHandlerInit.h>
 #include <MuTwkApp/MuInterface.h>
 #include <PyTwkApp/PyInterface.h>
 #include <QtGui/QtGui>
@@ -571,6 +572,14 @@ int main(int argc, char* argv[])
 
     // remove handler
     qInstallMessageHandler(nullptr);
+
+    //
+    // Initialize crash handler early to catch crashes during startup
+    // (Must be after QApplication is created to use QCoreApplication::applicationDirPath)
+    //
+    {
+        TwkApp::initializeCrashHandler("RV", QCoreApplication::applicationDirPath().toStdString());
+    }
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));

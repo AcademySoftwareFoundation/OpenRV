@@ -507,8 +507,8 @@ rv.extra_commands.displayFeedbackQueue = _displayFeedbackQueue_wrapper
 if "RV_NO_CONSOLE_REDIRECT" not in os.environ:
 
     class RVStdOut:
-        def __init__(self):
-            self.write = MuSymbol("extra_commands._print")
+        def write(self, s):
+            rv.commands.consoleWrite(s)
 
         def flush(self):
             pass
