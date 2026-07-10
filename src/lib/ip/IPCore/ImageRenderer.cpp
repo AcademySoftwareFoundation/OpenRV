@@ -4819,6 +4819,16 @@ namespace IPCore
         return hasErase;
     }
 
+    bool ImageRenderer::imageHasFrameDependentCommands(const IPImage* root) const
+    {
+        for (size_t i = 0; i < root->commands.size(); ++i)
+        {
+            if (root->commands[i]->frameDependent)
+                return true;
+        }
+        return false;
+    }
+
     void ImageRenderer::renderPaint(const IPImage* root, const GLFBO* fbo, int frame)
     {
         //
@@ -4895,18 +4905,20 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
-            // If we have erase commands that allow us to see underlying sources, we must consider the
-            // frame number in the cache key. If we do not and we composite a frame-invariant source
-            // (gap, colour source, etc) on top of source media, we will generate the same cache key across
-            // all frames. Thus if we are holding frames, we will re-use first held frame from the cache
-            // across all frames in the held sequence, rendering only the erased strokes on top of a static
-            // cached image.
-            const bool hasEraseCommands = imageHasEraseCommands(root);
+            // If we have erase commands that allow us to see underlying sources, or commands whose
+            // effective rendering varies by frame (e.g. Hold & Ghost, which keep reusing the same
+            // command objects across many frames), we must consider the frame number in the cache
+            // key. If we do not and we composite a frame-invariant source (gap, colour source, etc)
+            // on top of source media, we will generate the same cache key across all frames. Thus if
+            // we are holding or ghosting frames, we will re-use the first cached frame across all
+            // frames in the sequence, rendering on top of a static cached backdrop instead of the
+            // current frame's actual composited image.
+            const bool needsFrameInCacheKey = imageHasFrameDependentCommands(root) || imageHasEraseCommands(root);
 
             ostringstream newRenderID;
             newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
                         << fbo->width() << "x" << fbo->height();
-            if (hasEraseCommands)
+            if (needsFrameInCacheKey)
                 newRenderID << " frame" << frame;
             newRenderID << " paintCmdNo" << curCmdNum - 1;
 

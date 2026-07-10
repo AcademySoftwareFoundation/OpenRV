@@ -930,6 +930,7 @@ namespace IPCore
         FastPath findFastPath(const FrameBuffer*) const;
         std::string imageToFBOIdentifier(const IPImage* image) const;
         bool imageHasEraseCommands(const IPImage* image) const;
+        bool imageHasFrameDependentCommands(const IPImage* image) const;
 
         void createGLContexts();
 

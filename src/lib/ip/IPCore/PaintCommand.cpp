@@ -1565,9 +1565,9 @@ namespace IPCore
                 }
                 // Update the cache AFTER command execution
                 // We cache up to the second-to-last command in the batch (not the very last, which might still be dragging)
-                // count is the number of commands rendered so far (1-indexed after increment)
-                // Cache after rendering the second-to-last command: count == curCmdNum - 1
-                bool shouldCache = context.updateCache && context.cachedfbo && (curCmdNum > 1) && (count == curCmdNum - 1);
+                // count is 0-indexed at this point (incremented by the for-loop after this body runs), so it equals the
+                // index of the command just executed. The second-to-last index is curCmdNum - 2.
+                bool shouldCache = context.updateCache && context.cachedfbo && (curCmdNum > 1) && (count == curCmdNum - 2);
 
                 if (shouldCache)
                 {
