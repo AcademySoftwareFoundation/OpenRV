@@ -195,11 +195,6 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
     # time (see PaintCommand.cpp) — so no pixel conversion happens here.
     font_size_wcs = _transform_scalar(float(layer.font_size))
 
-    # RVPaint .position is the BOTTOM of the text quad (y-up). The OTIO anchor
-    # is the typographic baseline. Descent ≈ 0.2 × em, so the bottom of the
-    # quad is ~0.2 × em below the baseline → shift position DOWN by 0.2 × em.
-    anchor_pos = (anchor_pos[0], anchor_pos[1] - font_size_wcs * 0.2)
-
     effectHook.add_rv_effect_props(
         shape_component,
         {

@@ -452,7 +452,18 @@ namespace IPCore
         p.duration = readProp<IntProperty>(c, "duration", 0);
 
         p.fontFamily = readProp<StringProperty>(c, "fontFamily", string(""));
-        p.fontSize = readProp<FloatProperty>(c, "fontSize", 24.0f);
+        // Legacy (pre-QFont) sessions have no fontSize property. fontSize is a WCS
+        // fraction of image height (see PaintCommand::Text::execute), whereas the
+        // old FTGL renderer drew glyphs sized by ptsize (computed above) directly
+        // in font-design units, then placed them via modelviewMatrix*S*T where
+        // S = makeScale(p.scale). Composing S*T shows a font-space vertex of
+        // magnitude g lands at a WCS-space offset of g * p.scale -- the same WCS
+        // space fontSize/border_width live in -- so ptsize * p.scale is exactly
+        // the legacy visual height already expressed as a WCS fraction. (p.scale
+        // itself already folds in the raw "scale" property's /800 legacy divisor,
+        // set just above.)
+        const FloatProperty* fontSizeProp = c->property<FloatProperty>("fontSize");
+        p.fontSize = (fontSizeProp && fontSizeProp->size()) ? fontSizeProp->front() : p.ptsize * p.scale;
         p.fontWeight = readProp<StringProperty>(c, "fontWeight", string("normal"));
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));

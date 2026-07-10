@@ -876,7 +876,8 @@ namespace IPCore
                 // the WCS fraction for the quad. The projection matrix scales
                 // the quad with zoom — text behaves identically to strokes:
                 // a fixed WCS size that grows on screen as you zoom in.
-                const float renderFontSize = std::max(1.0f, effectiveFontSize * fbH);
+                // Clamp against corrupt  session data to avoid loading a value too large
+                const float renderFontSize = std::min(2000.0f, std::max(1.0f, effectiveFontSize * fbH));
 
                 // ── Build QFont ───────────────────────────────────────────────
                 QFont qfont;
@@ -978,16 +979,25 @@ namespace IPCore
                 // zoom, matching the behaviour of pen strokes and shapes.
                 //
                 const float qx = pos.x;
-                const float qy = pos.y;
                 const float tw = (fbH > 0) ? imgW / fbH : 0.001f;
                 const float th = (fbH > 0) ? imgH / fbH : 0.001f;
 
+                // pos anchors the BASELINE of the first line (top of the image is
+                // one ascent above pos), not the bottom of the whole (possibly
+                // multi-line) block. Anchoring on ascent() rather than the full
+                // line-spacing box also means qyTop stays fixed as more lines are
+                // appended -- already-typed lines hold their position and new
+                // lines extend the block downward, instead of the whole block
+                // (and every existing line) sliding upward off pos as it grows.
+                const float qyTop = pos.y + ((fbH > 0) ? static_cast<float>(fm.ascent()) / fbH : 0.001f);
+                const float qy = qyTop - th;
+
                 // Vertices: (x,y, u,v) quads — position + texcoord
                 float data[] = {
-                    qx,      qy,      0.0f, 1.0f, // BL
-                    qx + tw, qy,      1.0f, 1.0f, // BR
-                    qx + tw, qy + th, 1.0f, 0.0f, // TR
-                    qx,      qy + th, 0.0f, 0.0f, // TL
+                    qx,      qy,    0.0f, 1.0f, // BL
+                    qx + tw, qy,    1.0f, 1.0f, // BR
+                    qx + tw, qyTop, 1.0f, 0.0f, // TR
+                    qx,      qyTop, 0.0f, 0.0f, // TL
                 };
 
                 // Texture is Format_ARGB32_Premultiplied so use premul blend:
