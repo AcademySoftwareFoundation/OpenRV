@@ -72,6 +72,18 @@ namespace
         return ghostOpacity;
     }
 
+    // This should be set if the paint command depends on the frame content
+    // and as such cannot be cached independently of it -- such as holding or
+    // ghosting, where the underlying frame needs to change even though the
+    // annotation geometry remains the same.
+    void setFrameDependent(PaintIPNode::LocalCommand* command, bool value)
+    {
+        if (auto* baseCommand = dynamic_cast<Paint::Command*>(command))
+        {
+            baseCommand->frameDependent = value;
+        }
+    }
+
     // Loop over all commands and separate them in 3 containers:
     // 1. Commands that are visible on the current frame (based only on their
     // visibility range settings)
@@ -146,6 +158,7 @@ namespace
                 {
                     isHoldedCommandsInFirstLevel = true;
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
 
                     if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(command))
                     {
@@ -162,6 +175,7 @@ namespace
                 if (paintEffects.ghost != 0 && paintEffects.ghostBefore >= ghostLevel)
                 {
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
                     command->ghostColor = PaintIPNode::Color(1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
                                                                                   // are drawn in green
                     command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
@@ -184,6 +198,7 @@ namespace
                 if (paintEffects.ghost != 0 && paintEffects.ghostAfter >= levelIndex)
                 {
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
                     command->ghostColor = PaintIPNode::Color(0.0, 1.0, 0.0,
                                                              1.0); // Ghosted "After" commands are drawn in red
                     command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
@@ -210,6 +225,12 @@ namespace
         PaintIPNode::LocalCommands currentFrameCommands; // visible commands, excluding hold and ghost
         PerFramePaintCommands beforeCommands;
         PerFramePaintCommands afterCommands;
+
+        // Reset frameDependent up front since LocalCommand objects persist across frames
+        for (auto* command : commands)
+        {
+            setFrameDependent(command, false);
+        }
 
         std::tie(currentFrameCommands, beforeCommands, afterCommands) = separateCommandsByFrameGroup(commands, frame, eye);
 

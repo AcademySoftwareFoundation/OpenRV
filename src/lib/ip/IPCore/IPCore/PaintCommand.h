@@ -136,6 +136,8 @@ namespace IPCore
             unsigned int version;
             Color color;
 
+            bool frameDependent{false};
+
             virtual void execute(CommandContext& context) const = 0;
             virtual void hash(std::ostream& ostream) const = 0;
             [[nodiscard]] virtual size_t getType() const = 0;
