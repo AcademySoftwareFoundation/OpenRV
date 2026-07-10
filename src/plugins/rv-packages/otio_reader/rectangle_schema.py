@@ -46,7 +46,7 @@ class Rectangle(otio.core.SerializableObject):
         corner_radius: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
-        soft_deleted: bool | None = None,
+        soft_deleted: bool = False,
         layer_range: otio.opentime.TimeRange | None = None,
     ) -> None:
         super().__init__()
