@@ -121,6 +121,8 @@ def _create_bbox_shape(layer, paint_node, stroke_id, frame, shape_type):
     corner_radius = getattr(layer, "corner_radius", None)
     wcs_corner_radius = float(corner_radius) if corner_radius is not None else 0.0
 
+    is_deleted = layer.visible is False or bool(layer.soft_deleted)
+
     effectHook.add_rv_effect_props(
         shape_component,
         {
@@ -133,12 +135,12 @@ def _create_bbox_shape(layer, paint_node, stroke_id, frame, shape_type):
             "startFrame": frame,
             "duration": 1,
             "eye": 2,
-            "softDeleted": layer.visible is False,
+            "softDeleted": is_deleted,
             "uuid": [layer.id],
         },
     )
 
-    if layer.visible is not False:
+    if not is_deleted:
         _add_shape_to_frame_order(paint_node, stroke_id, frame, prefix)
 
 
@@ -156,6 +158,8 @@ def _create_point_pair_shape(layer, paint_node, stroke_id, frame, shape_type):
     raw_bw = float(layer.width if shape_type.startswith("Line.") else layer.border_width)
     wcs_border_width = _transform_scalar(raw_bw)
 
+    is_deleted = layer.visible is False or bool(layer.soft_deleted)
+
     props = {
         "startPos": list(start_pos),
         "endPos": list(end_pos),
@@ -164,7 +168,7 @@ def _create_point_pair_shape(layer, paint_node, stroke_id, frame, shape_type):
         "startFrame": frame,
         "duration": 1,
         "eye": 2,
-        "softDeleted": layer.visible is False,
+        "softDeleted": is_deleted,
         "uuid": [layer.id],
     }
 
@@ -175,7 +179,7 @@ def _create_point_pair_shape(layer, paint_node, stroke_id, frame, shape_type):
 
     effectHook.add_rv_effect_props(shape_component, props)
 
-    if layer.visible is not False:
+    if not is_deleted:
         _add_shape_to_frame_order(paint_node, stroke_id, frame, prefix)
 
 
@@ -195,6 +199,8 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
     # time (see PaintCommand.cpp) — so no pixel conversion happens here.
     font_size_wcs = _transform_scalar(float(layer.font_size))
 
+    is_deleted = layer.visible is False or bool(layer.soft_deleted)
+
     # Wire/OTIO values are upper-case ("BOLD", "ITALIC", "UNDERLINE"); RVPaint's
     # properties and PaintCommand.cpp's comparisons are lower-case ("bold", ...).
     effectHook.add_rv_effect_props(
@@ -211,12 +217,12 @@ def _create_text_shape(layer, paint_node, stroke_id, frame, source_node=None):
             "color": [float(c) for c in layer.inner_color],
             "startFrame": frame,
             "duration": 1,
-            "softDeleted": layer.visible is False,
+            "softDeleted": is_deleted,
             "uuid": [layer.id],
         },
     )
 
-    if layer.visible is not False:
+    if not is_deleted:
         _add_shape_to_frame_order(paint_node, stroke_id, frame, "text")
 
 
