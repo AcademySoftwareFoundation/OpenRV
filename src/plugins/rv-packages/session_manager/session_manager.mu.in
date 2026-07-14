@@ -1067,6 +1067,150 @@ class: EventFilter : QObject
     }
 }
 
+class: PreviewRenderQueue
+{
+    QTimer                renderTimer;
+    string[]              renderQueue;
+    SourcePreviewWidget[] progressiveRenderPreviews;
+    int                   renderIdx;
+    string[]              progressiveRenderDeferred;
+
+    method: PreviewRenderQueue (PreviewRenderQueue;)
+    {
+        renderQueue               = string[]();
+        progressiveRenderPreviews = SourcePreviewWidget[]();
+        renderIdx                 = 0;
+        progressiveRenderDeferred = string[]();
+    }
+
+    method: reset (void;)
+    {
+        renderTimer.stop();
+        renderQueue               = string[]();
+        progressiveRenderDeferred = string[]();
+        progressiveRenderPreviews = SourcePreviewWidget[]();
+        renderIdx                 = 0;
+    }
+}
+
+documentation: """
+ThumbnailRenderer keeps track of the sources and inputs to render in
+the session manager. Source and input nodes are rendered progressively
+using QT single shot timers, hence the events are placed on the QT event
+queue. 
+""";
+class: ThumbnailRenderer
+{
+    // source and input each get their own render queue/timer/state
+    PreviewRenderQueue   _source;
+    PreviewRenderQueue   _input;
+    QIcon                _fallbackSourceIcon;
+
+
+    method: ThumbnailRenderer (ThumbnailRenderer; QDockWidget dockWidget) {
+
+        _source             = PreviewRenderQueue();
+        _source.renderTimer = QTimer(dockWidget);
+        _source.renderTimer.setSingleShot(true);
+
+        _input             = PreviewRenderQueue();
+        _input.renderTimer = QTimer(dockWidget);
+        _input.renderTimer.setSingleShot(true);
+    }
+
+    // Load media metadata, text and placheolder image used before loading actual media
+    method: displaySourceRowPreview (QWidget; string node, SourcePreviewWidget preview)
+    {
+        let widget = QWidget(nil, 0),
+            layout = QHBoxLayout(widget);
+        widget.setObjectName("sourceRowWidget");
+        layout.setContentsMargins(SOURCE_ROW_MARGIN, 0, SOURCE_ROW_MARGIN, 0);
+        layout.setSpacing(SOURCE_ROW_SPACING);
+
+        preview.setParent(widget);
+        preview.setFixedSize(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT));
+        preview.setFallback(_fallbackSourceIcon.pixmap(QSize(SOURCE_PREVIEW_WIDTH, SOURCE_PREVIEW_HEIGHT)));
+
+        layout.addWidget(preview);
+
+        string meta = "";
+        try
+        {
+            let sourceNode = sourceNodeOfGroup(node);
+            if (sourceNode neq nil)
+            {
+                let mediaPropertyPath = sourceNode + ".media.movie";
+                if (propertyExists(mediaPropertyPath))
+                {
+                    let movieProperty = getStringProperty(mediaPropertyPath);
+                    if (!movieProperty.empty())
+                    {
+                        let parts = io.path.basename(movieProperty.front()).split(".");
+                        if (parts.size() > 1) meta = parts.back();
+                    }
+                }
+            }
+        }
+        catch (...) {;}
+
+        // Text column
+        let textWidget = QWidget(widget),
+            textLayout = QVBoxLayout(textWidget);
+        textWidget.setObjectName("sourceTextWidget");
+        textLayout.setSpacing(SOURCE_TEXT_SPACING);
+
+        let nameLabel = QLabel(uiName(node), textWidget);
+        nameLabel.setObjectName("sourceNameLabel");
+        textLayout.addWidget(nameLabel);
+
+        let metaLabel = QLabel(if meta == "" then "—" else meta, textWidget);
+        metaLabel.setObjectName("sourceMetaLabel");
+        textLayout.addWidget(metaLabel);
+        textLayout.addStretch(1);
+
+        layout.addWidget(textWidget, 1);
+
+        widget;
+    }
+
+    // Try to load or decode media, 
+    method: makeSourceRowWidget (void; string node, SourcePreviewWidget preview)
+    {
+        string sourceNode = nil;
+        try { sourceNode = sourceNodeOfGroup(node); }
+        catch (exception exc)
+        {
+            print("WARNING: Could not get source node for %s - %s\n" % (uiName(node), exc));
+        }
+        if (sourceNode eq nil) return;
+
+        // Fetch filmstrip/thumbnail paths. The local plugin has a lower priority of
+        // 10 for ordering. This means any custom plugin of higher priority will be used first.
+        // This allows users to override the local plugin with a custom plugin by making sure
+        // the ordering is less than 10 and using event.accept() to prevent the local plugin from running.
+        let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
+        if (thumbnailPath != "" && io.path.exists(thumbnailPath))
+        {
+            preview.loadThumbnail(thumbnailPath);
+
+            let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
+            if (filmstripPath != "" && io.path.exists(filmstripPath))
+                preview.loadStrip(filmstripPath);
+        }
+    }
+
+    // Push node to queue's deferred list. If the queue is already exhausted,
+    // restart the timer so the deferred item is not stranded.
+    method: deferNodeToQueue (void; PreviewRenderQueue queue, string node)
+    {
+        queue.progressiveRenderDeferred.push_back(node);
+
+        if (queue.renderIdx >= queue.renderQueue.size())
+            queue.renderTimer.start(0);
+    }
+
+}
+
 documentation: """
 SessionManagerMode controls UI for managing viewable nodes in the
 session and a user interface to edit the currently viewed node. New
@@ -1124,6 +1268,7 @@ class: SessionManagerMode : MinorMode
     QAction[]          _viewContextMenuActions;
     QMenu              _createMenu;
     QMenu              _folderMenu;
+    ThumbnailRenderer  _thumbnailRenderer;
 
     QDialog            _newNodeDialog;
     QComboBox          _nodeTypeCombo;
@@ -1488,6 +1633,7 @@ class: SessionManagerMode : MinorMode
         if (_disableUpdates || _progressiveLoadingInProgress) return;
 
         _inputOrderLock = true;
+        _thumbnailRenderer._input.reset();
 
         string topNode = nil;
         let topIndex = _inputsView.indexAt(QPoint(0, 0));
@@ -1518,8 +1664,17 @@ class: SessionManagerMode : MinorMode
             _inputsModel.appendRow(item);
 
             if (isSource && _previewsEnabled)
-                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), makeSourceRowWidget(innode));
+            {
+                let preview = SourcePreviewWidget(nil);
+                let w       = _thumbnailRenderer.displaySourceRowPreview(innode, preview);
+                _inputsView.setIndexWidget(_inputsModel.indexFromItem(item), w);
+                _thumbnailRenderer._input.renderQueue.push_back(innode);
+                _thumbnailRenderer._input.progressiveRenderPreviews.push_back(preview);
+            }
         }
+
+        if (!_thumbnailRenderer._input.renderQueue.empty())
+            _thumbnailRenderer._input.renderTimer.start(0);
 
         _inputOrderLock = false;
 
@@ -1956,7 +2111,10 @@ class: SessionManagerMode : MinorMode
         {
             item.setText("");
             item.setSizeHint(QSize(-1, SOURCE_ROW_HEIGHT));
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+            let preview = SourcePreviewWidget(nil);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), _thumbnailRenderer.displaySourceRowPreview(node, preview));
+            _thumbnailRenderer._source.renderQueue.push_back(node);
+            _thumbnailRenderer._source.progressiveRenderPreviews.push_back(preview);
         }
 
         //
@@ -2112,9 +2270,51 @@ class: SessionManagerMode : MinorMode
         }
     }
 
+    method: processSourceQueue (void;) { processQueue(_thumbnailRenderer._source, _viewModel, _viewTreeView); }
+    method: processInputQueue  (void;) { processQueue(_thumbnailRenderer._input,  _inputsModel, _inputsView); }
+
+    // Try to load the next thumbnail and filmstrip from the given render queue,
+    // then restart the timer for the next item. When exhausted, drain deferred.
+    method: processQueue (void; PreviewRenderQueue queue, QStandardItemModel model, QAbstractItemView view)
+    {
+        if (queue.renderIdx >= queue.renderQueue.size()) return;
+
+        let node    = queue.renderQueue[queue.renderIdx];
+        let preview = queue.progressiveRenderPreviews[queue.renderIdx];
+        queue.renderIdx = queue.renderIdx + 1;
+        _thumbnailRenderer.makeSourceRowWidget(node, preview);
+
+        if (queue.renderIdx < queue.renderQueue.size())
+        {
+            queue.renderTimer.start(0);
+        }
+        else if (!queue.progressiveRenderDeferred.empty())
+        {
+            queue.renderQueue               = queue.progressiveRenderDeferred;
+            queue.progressiveRenderDeferred = string[]();
+            queue.renderIdx                 = 0;
+
+            queue.progressiveRenderPreviews = SourcePreviewWidget[]();
+            for_each (dnode; queue.renderQueue)
+            {
+                let item    = itemOfNode(model, dnode);
+                if (item neq nil)
+                {
+                    let preview = SourcePreviewWidget(nil);
+                    let w       = _thumbnailRenderer.displaySourceRowPreview(dnode, preview);
+                    view.setIndexWidget(model.indexFromItem(item), w);
+                    queue.progressiveRenderPreviews.push_back(preview);
+                }
+            }
+
+            queue.renderTimer.start(0);
+        }
+    }
+
     method: updateTree (void;)
     {
         if (_disableUpdates) return;
+        _thumbnailRenderer._source.reset();
         _srcNodeKeys = string[]();
         _grpNodeValues = string[]();
         _viewModel.clear();
@@ -2208,6 +2408,8 @@ class: SessionManagerMode : MinorMode
             selectViewableNode();
 
             resizeColumns(_viewTreeView, _viewModel);
+
+            _thumbnailRenderer._source.renderTimer.start(0);
         }
         catch (exception exc)
         {
@@ -2241,13 +2443,35 @@ class: SessionManagerMode : MinorMode
         let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
         dropPreviewFromCache(filmstripPath);
 
+        bool inSourceQueue = false;
+        for (int i = _thumbnailRenderer._source.renderIdx; i < _thumbnailRenderer._source.renderQueue.size(); i++)
+            if (_thumbnailRenderer._source.renderQueue[i] == node) { inSourceQueue = true; break; }
+
+        bool inInputQueue = false;
+        for (int i = _thumbnailRenderer._input.renderIdx; i < _thumbnailRenderer._input.renderQueue.size(); i++)
+            if (_thumbnailRenderer._input.renderQueue[i] == node) { inInputQueue = true; break; }
+
+        if (inSourceQueue) _thumbnailRenderer.deferNodeToQueue(_thumbnailRenderer._source, node);
+        if (inInputQueue)  _thumbnailRenderer.deferNodeToQueue(_thumbnailRenderer._input, node);
+        if (inSourceQueue || inInputQueue) return;
+
         let item = itemOfNode(_viewModel, node);
         if (item neq nil)
-            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w       = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            _thumbnailRenderer.makeSourceRowWidget(node, preview);
+            _viewTreeView.setIndexWidget(_viewModel.indexFromItem(item), w);
+        }
 
         let inputItem = itemOfNode(_inputsModel, node);
         if (inputItem neq nil)
-            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), makeSourceRowWidget(node));
+        {
+            let preview = SourcePreviewWidget(nil);
+            let w       = _thumbnailRenderer.displaySourceRowPreview(node, preview);
+            _thumbnailRenderer.makeSourceRowWidget(node, preview);
+            _inputsView.setIndexWidget(_inputsModel.indexFromItem(inputItem), w);
+        }
     }
 
     method: beforeProgressiveLoading (void; Event event)
@@ -3147,13 +3371,13 @@ class: SessionManagerMode : MinorMode
 
     method: SessionManagerMode (SessionManagerMode; string name)
     {
-        _darkUI         = true;
-        _inputOrderLock = false;
-        _editors        = QTreeWidgetItem[]();
-        _quitting       = false;
-        _disableUpdates = false;
-        _srcNodeKeys    = string[]();
-        _grpNodeValues  = string[]();
+        _darkUI            = true;
+        _inputOrderLock    = false;
+        _editors           = QTreeWidgetItem[]();
+        _quitting          = false;
+        _disableUpdates    = false;
+        _srcNodeKeys       = string[]();
+        _grpNodeValues     = string[]();
 
         let previewsEnv = system.getenv("RV_SESSION_MANAGER_USE_THUMBNAILS", nil);
         if (previewsEnv neq nil && previewsEnv == "0")
@@ -3192,7 +3416,10 @@ class: SessionManagerMode : MinorMode
 
         let m = mainWindowWidget();
 
-        _dockWidget         = QDockWidget("Session Manager", m, Qt.Widget);
+        _dockWidget        = QDockWidget("Session Manager", m, Qt.Widget);
+        _thumbnailRenderer = ThumbnailRenderer(_dockWidget);
+        _thumbnailRenderer._fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
+
         _baseWidget         = loadUIFile(auxFilePath("session_manager.ui"), m);
         _treeViewBase       = _baseWidget.findChild("treeView");
         _addButton          = _baseWidget.findChild("addButton");
@@ -3557,6 +3784,9 @@ class: SessionManagerMode : MinorMode
         state.sessionManager = this;
 
         connect(_dockWidget, QDockWidget.visibilityChanged, visibilityChanged);
+
+        connect(_thumbnailRenderer._source.renderTimer, QTimer.timeout, processSourceQueue);
+        connect(_thumbnailRenderer._input.renderTimer, QTimer.timeout, processInputQueue);
 
         updateNavUI();
     }
