@@ -247,7 +247,7 @@ namespace Rv
     private:
         void addDataFormatAtDepth(size_t depth, DesktopStereoMode m);
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_DARWIN)
         virtual ColorProfile colorProfile() const;
 #endif
 
