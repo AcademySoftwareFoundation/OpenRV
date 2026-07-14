@@ -441,7 +441,10 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
             return
 
         # Important: Skip update if same sources as current.
-        sources = rvc.sourcesAtFrame(rvc.frame())
+        try:
+            sources = rvc.sourcesAtFrame(rvc.frame())
+        except Exception:
+            sources = []
         if sources == self._current_sources and not self._force_update_media_info:
             return
 
