@@ -21,6 +21,10 @@
 #include <IPCore/Profile.h>
 #include <IPCore/NodeManager.h>
 #include <IPCore/FBCache.h>
+#if defined(PLATFORM_DARWIN)
+#include <TwkGLF/GL.h>
+#include <TwkGLF/GLVideoDevice.h>
+#endif
 #include <TwkApp/Event.h>
 #include <TwkContainer/GTOReader.h>
 #include <TwkContainer/GTOWriter.h>
@@ -3100,6 +3104,23 @@ namespace IPCore
 
     void Session::queryAndStoreGLInfo()
     {
+#if defined(PLATFORM_DARWIN)
+        // Darwin Metal hybrid path: IPCore renders through an offscreen GL context
+        // owned by QTMetalVideoDevice.  Make the control device's context current
+        // when available; defer until the first render if it is not ready yet
+        // (queryGLFinished() stays false).
+        if (const TwkGLF::GLVideoDevice* glDev = dynamic_cast<const TwkGLF::GLVideoDevice*>(controlVideoDevice()))
+        {
+            glDev->makeCurrent();
+        }
+        else
+        {
+            return;
+        }
+
+        if (TwkGLF::safeGLGetString(GL_VERSION).empty())
+            return;
+#endif
         ImageRenderer::queryGL();
         ImageRenderer::queryGLIntoContainer(graph().sessionNode());
     }

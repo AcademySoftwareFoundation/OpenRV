@@ -473,7 +473,14 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->view()->mapToGlobal(location);
+        // viewWidget() is briefly null while the presentation view is being (re)built
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        QPoint p = view->mapToGlobal(location);
 
         if (array)
         {
@@ -498,13 +505,19 @@ namespace Rv
         DynamicArray* array = NODE_ARG_OBJECT(1, DynamicArray);
         QPoint lp;
 
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(e->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), view->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->view()->height() - 1);
+            lp = QPoint(0, view->height() - 1);
         }
 
         popupMenuInternal(array, lp);
@@ -518,7 +531,13 @@ namespace Rv
         int y = NODE_ARG(1, int);
         DynamicArray* array = NODE_ARG_OBJECT(2, DynamicArray);
 
-        QPoint lp(x, rvDoc->view()->height() - y - 1);
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        QPoint lp(x, view->height() - y - 1);
 
         popupMenuInternal(array, lp);
     }
@@ -653,7 +672,10 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -776,7 +798,10 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -885,7 +910,10 @@ namespace Rv
         {
             rvDoc->setDocumentDisabled(false, true);
             bool result = dialog.exec();
-            rvDoc->view()->setFocus(Qt::OtherFocusReason);
+            if (QWidget* view = rvDoc->viewWidget())
+            {
+                view->setFocus(Qt::OtherFocusReason);
+            }
             rvDoc->setDocumentDisabled(false, false);
 
             if (result)
@@ -955,7 +983,10 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-        rvDoc->view()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        if (QWidget* view = rvDoc->viewWidget())
+        {
+            view->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        }
     }
 
     NODE_IMPLEMENTATION(alertPanel, int)
@@ -1026,7 +1057,10 @@ namespace Rv
         else if (box.clickedButton() == q3 && b3)
             result = 2;
 
-        doc->view()->setFocus(Qt::OtherFocusReason);
+        if (QWidget* view = doc->viewWidget())
+        {
+            view->setFocus(Qt::OtherFocusReason);
+        }
         NODE_RETURN(result);
     }
 
@@ -1035,6 +1069,12 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = (RvDocument*)s->opaquePointer();
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        // Hardware stereo needs a stereo QSurfaceFormat on QOpenGLWidget; the
+        // Metal path presents via CALayer/IOSurface and has no GL window surface.
+        if (doc->metalView() && !doc->view())
+            NODE_RETURN(false);
+#endif
         NODE_RETURN(true);
     }
 
@@ -1731,7 +1771,13 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
+        // Use viewWidget() (the active presentation widget) rather than view()
+        // (the legacy GLView). On the Metal/Vulkan backends m_glView is null while
+        // the active view is a MetalView/VulkanView, so view() would return null.
+        QWidget* w = doc->viewWidget();
+
+        if (w == nullptr)
+            NODE_RETURN(Pointer(0));
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 
@@ -2154,9 +2200,9 @@ namespace Rv
         const Session* s = Session::currentSession();
         const RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
-        if (doc != nullptr && doc->view() != nullptr)
+        if (doc != nullptr && doc->viewWidget() != nullptr)
         {
-            devicePixelRatio = doc->view()->devicePixelRatio();
+            devicePixelRatio = static_cast<float>(doc->viewWidget()->devicePixelRatioF());
         }
 
         NODE_RETURN(devicePixelRatio);

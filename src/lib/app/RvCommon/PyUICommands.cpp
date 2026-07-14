@@ -241,7 +241,14 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->view()->mapToGlobal(location);
+        // viewWidget() is briefly null while the presentation view is being (re)built
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        QPoint p = view->mapToGlobal(location);
 
         if (pylist)
         {
@@ -271,13 +278,20 @@ namespace Rv
 
         QPoint lp;
 
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            Py_XINCREF(Py_None);
+            return Py_None;
+        }
+
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(event->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), view->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->view()->height() - 1);
+            lp = QPoint(0, view->height() - 1);
         }
 
         popupMenuInternal(pylist, lp);
@@ -299,7 +313,14 @@ namespace Rv
             return NULL;
         }
 
-        QPoint lp(x, rvDoc->view()->height() - y - 1);
+        QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            Py_XINCREF(Py_None);
+            return Py_None;
+        }
+
+        QPoint lp(x, view->height() - y - 1);
 
         popupMenuInternal(pylist, lp);
 

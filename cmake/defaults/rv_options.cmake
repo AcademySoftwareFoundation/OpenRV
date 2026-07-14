@@ -1,15 +1,13 @@
 #
-# Copyright (C) 2022  Autodesk, Inc. All Rights Reserved.
+# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
-#
 # Debugging options
 OPTION(RV_VERBOSE_INVOCATION "Show the compiler/link command invocation." OFF)
 OPTION(RV_SHOW_ALL_VARIABLES "Displays all build variables." ON)
 
-#
 # General build options
 SET(RV_DEPS_BASE_DIR
     "${CMAKE_BINARY_DIR}"

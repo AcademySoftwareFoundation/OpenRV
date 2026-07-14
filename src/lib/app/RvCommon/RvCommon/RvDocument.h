@@ -30,6 +30,9 @@ namespace TwkApp
 namespace Rv
 {
     class GLView;
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    class MetalView;
+#endif
     class DiagnosticsView;
     class DesktopVideoModule;
     class DesktopVideoDevice;
@@ -72,6 +75,11 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewWidget() const;
+
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* metalView() const;
+#endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
 
@@ -142,6 +150,11 @@ namespace Rv
         void frameChanged();
         void resetSizePolicy();
         void lazyDeleteGLView();
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //  Runtime fallback: replace a failed MetalView with an OpenGL GLView.
+        //  A slot so MetalView::render() can trigger it via a queued connection.
+        void fallbackMetalToGLView();
+#endif
 
     private:
         void purgeMenus();
@@ -158,6 +171,16 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        //  Constructs the OpenGL view (m_glView) and makes it the active
+        //  m_viewWidget.  This is the 8-bit display path shared by the non-Metal
+        //  build and by the Metal build's fallback when 10-bit is unavailable or
+        //  not requested.
+        void createGLView();
+
+        //  Returns whether the active presentation view has completed its first
+        //  paint, regardless of which backend (GLView/MetalView) is active.
+        bool activeViewFirstPaintCompleted() const;
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;
@@ -168,6 +191,10 @@ namespace Rv
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* m_metalView;
+#endif
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;

@@ -1752,7 +1752,7 @@ httpPut(...)
 """
 
 mainWindowWidget "Returns the main window Qt widget"
-mainViewWidget "Returns a qt.QWidget corresponding to the session's QGLWidget"
+mainViewWidget "Returns a qt.QWidget corresponding to the session's main view widget"
 prefTabWidget "Returns the preferences tab Qt widget"
 sessionBottomToolBar "Returns the QToolBar for the current RV session bottom tool bar"
 networkAccessManager "Returns Qt network access manager object"

@@ -1,0 +1,749 @@
+//
+//  Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
+//
+//  SPDX-License-Identifier: Apache-2.0
+//
+
+#ifdef PLATFORM_DARWIN
+
+#import <QuartzCore/QuartzCore.h>
+#import <AppKit/AppKit.h>
+#import <IOSurface/IOSurface.h>
+#import <CoreVideo/CoreVideo.h>
+#import <Metal/Metal.h>
+
+#include <RvCommon/MetalView.h>
+#include <RvCommon/QTMetalVideoDevice.h>
+#include <RvCommon/RvDocument.h>
+#include <RvApp/Options.h>
+#include <RvApp/RvSession.h>
+#include <IPCore/Session.h>
+#include <TwkApp/Event.h>
+#include <TwkApp/VideoDevice.h>
+
+#include <QtCore/QCoreApplication>
+#include <QtCore/QMetaObject>
+#include <QtGui/QResizeEvent>
+#include <QtGui/QShowEvent>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QPaintEvent>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QWidget>
+
+#include <iostream>
+#include <sstream>
+
+namespace Rv
+{
+    using namespace std;
+    using namespace TwkApp;
+    using namespace IPCore;
+
+    //--------------------------------------------------------------------------
+    // MetalView implementation
+    //--------------------------------------------------------------------------
+
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool noResize)
+        : QWidget(parent)
+        , m_doc(doc)
+        , m_videoDevice(nullptr)
+        , m_initialized(false)
+        , m_firstPaintCompleted(false)
+        , m_postFirstNonEmptyRender(noResize)
+        , m_stopProcessingEvents(false)
+        , m_userActive(true)
+        , m_csize(1024, 576)
+        , m_msize(128, 128)
+        , m_eventWidget(nullptr)
+        , m_lastKey(0)
+        , m_lastKeyType(QEvent::None)
+        , m_caLayer(nullptr)
+        , m_ioSurface(nullptr)
+        , m_ioSurfaceWidth(0)
+        , m_ioSurfaceHeight(0)
+        , m_lastPresentedSurface(nullptr)
+        , m_updatePending(false)
+        , m_contextFailureCount(0)
+    {
+        // Ensure a native NSView is created immediately so winId() is valid
+        // when initialize() is called from showEvent().
+        setAttribute(Qt::WA_NativeWindow);
+        setAttribute(Qt::WA_NoSystemBackground);
+        // We deliver pixels through the CALayer/IOSurface ourselves, so take over
+        // the native surface (paintEngine() returns nullptr) and tell Qt the widget
+        // paints all of its pixels.  Without this, Qt's backing store repaints a
+        // black background over the layer on expose/alt-tab, causing a black flash
+        // until a later mouse event triggers a re-present.
+        setAttribute(Qt::WA_PaintOnScreen);
+        setAttribute(Qt::WA_OpaquePaintEvent);
+        setAutoFillBackground(false);
+
+        ostringstream str;
+        str << UI_APPLICATION_NAME " Main Window (Metal)" << "/" << m_doc;
+        m_videoDevice = new QTMetalVideoDevice(nullptr, str.str(), this, nullptr);
+
+        m_activityTimer.start();
+
+        m_eventProcessingTimer.setSingleShot(true);
+        connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
+    }
+
+    MetalView::~MetalView()
+    {
+        delete m_videoDevice;
+
+        // Release IOSurface
+        if (m_ioSurface)
+        {
+            CFRelease((IOSurfaceRef)m_ioSurface);
+            m_ioSurface = nullptr;
+        }
+
+        // Release CALayer (balance the __bridge_retained in initialize())
+        if (m_caLayer)
+        {
+            CALayer* layer = (__bridge_transfer CALayer*)m_caLayer;
+            (void)layer;
+            m_caLayer = nullptr;
+        }
+    }
+
+    //--------------------------------------------------------------------------
+
+    bool MetalView::supports10BitPresentation()
+    {
+        // Requirement 1: a Metal device must exist.  This file is compiled with
+        // -fobjc-arc; ARC releases the device when it goes out of scope, so no
+        // explicit release is needed.
+        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+        if (device == nil)
+        {
+            std::cerr << "INFO: [MetalView] no Metal device available; 10-bit "
+                         "Metal presentation unavailable.\n";
+            return false;
+        }
+
+        // Requirement 2: the OS must actually be able to create an IOSurface in
+        // the packed 10-bit format we present through
+        // (kCVPixelFormatType_ARGB2101010LEPacked).  The window server
+        // composites this format correctly on every Metal-capable Mac, but
+        // probing a tiny surface here catches any configuration where the format
+        // is unavailable *before* we commit the window to the Metal backend
+        // (mirrors the Vulkan side, which validates the real surface format
+        // before selecting Vulkan).  Side-effect-free: the probe is released
+        // immediately.
+        NSDictionary* probeProps = @{
+            (NSString*)kIOSurfaceWidth:           @(16),
+            (NSString*)kIOSurfaceHeight:          @(16),
+            (NSString*)kIOSurfaceBytesPerElement: @(4),
+            (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
+        };
+        IOSurfaceRef probe = IOSurfaceCreate((__bridge CFDictionaryRef)probeProps);
+        if (probe == nullptr)
+        {
+            std::cerr << "INFO: [MetalView] IOSurface ARGB2101010 probe failed; "
+                         "10-bit Metal presentation unavailable.\n";
+            return false;
+        }
+        CFRelease(probe);
+
+        // Informational only: report whether the main display advertises a
+        // deep-color (>= 10 bit per component) depth.  10-bit IOSurface content
+        // is composited on every Metal-capable Mac, but on an SDR 8-bit panel
+        // the window server may dither/truncate at scanout — so this is logged,
+        // not enforced (the Vulkan side likewise presents 10-bit even on SDR
+        // displays).
+        if (NSScreen* screen = [NSScreen mainScreen])
+        {
+            const NSInteger bps = NSBitsPerSampleFromDepth([screen depth]);
+            std::cerr << "INFO: [MetalView] main display bits-per-sample = "
+                      << static_cast<long>(bps)
+                      << (bps >= 10
+                              ? " (deep color: 10-bit reaches the panel).\n"
+                              : " (SDR 8-bit: 10-bit content is composited but "
+                                "may be dithered/truncated at scanout).\n");
+        }
+
+        return true;
+    }
+
+    //--------------------------------------------------------------------------
+
+    void MetalView::setEventWidget(QWidget* widget)
+    {
+        m_eventWidget = widget;
+        if (m_videoDevice)
+            m_videoDevice->setEventWidget(widget);
+    }
+
+    void MetalView::stopProcessingEvents() { m_stopProcessingEvents = true; }
+
+    void MetalView::absolutePosition(int& x, int& y) const
+    {
+        QPoint gp = mapToGlobal(QPoint(0, 0));
+        x = gp.x();
+        y = gp.y();
+    }
+
+    float MetalView::devicePixelRatio() const
+    {
+        return static_cast<float>(devicePixelRatioF());
+    }
+
+    //--------------------------------------------------------------------------
+    // Initialisation
+    //--------------------------------------------------------------------------
+
+    void MetalView::initialize()
+    {
+        if (m_initialized)
+            return;
+        m_initialized = true;
+
+        // Create a plain CALayer — IOSurface content is uploaded to it each frame
+        // by presentPixelData().  We use IOSurface (not CAMetalLayer) for pixel
+        // delivery because CAMetalLayer with BGR10A2Unorm is mishandled by the CA
+        // compositor on macOS: it treats 4-byte packed pixels as 1 byte, producing
+        // 4× horizontal tiling.  IOSurface + kCVPixelFormatType_ARGB2101010LEPacked
+        // is composited natively and correctly for the 10-bit format.
+        CALayer* caLayer = [CALayer layer];
+        caLayer.opaque          = YES;
+        caLayer.contentsGravity = kCAGravityResize;  // IOSurface fills layer exactly
+
+        // Attach directly to the widget's NSView.  Since we use IOSurface (not a
+        // Metal drawable), _NSOpenGLViewBackingLayer does not intercept or tile the
+        // content — the CA render server composites IOSurface data independently.
+        NSView* nsView = (__bridge NSView*)reinterpret_cast<void*>(winId());
+        [nsView setWantsLayer:YES];
+        [nsView setLayer:caLayer];
+
+        CGFloat scale = static_cast<CGFloat>(devicePixelRatioF());
+        if (scale < 1.0) scale = 1.0;
+        caLayer.contentsScale = scale;
+
+        m_caLayer = (__bridge_retained void*)caLayer;
+
+        // Kick off session initialization (equivalent to GLView::initializeGL)
+        if (m_doc)
+            m_doc->initializeSession();
+    }
+
+    //--------------------------------------------------------------------------
+    // presentPixelData — called by QTMetalVideoDevice::syncBuffers()
+    //--------------------------------------------------------------------------
+
+    void MetalView::presentPixelData(const void* pixels, int w, int h)
+    {
+        CALayer* layer = (__bridge CALayer*)m_caLayer;
+        if (!layer || w <= 0 || h <= 0)
+            return;
+
+        // Create/recreate IOSurface if size changed.  Allocate the replacement
+        // before releasing the old surface so a failed recreate keeps the last
+        // good IOSurface for display.
+        if (!m_ioSurface
+            || m_ioSurfaceWidth  != w
+            || m_ioSurfaceHeight != h)
+        {
+            NSDictionary* props = @{
+                (NSString*)kIOSurfaceWidth:           @(w),
+                (NSString*)kIOSurfaceHeight:          @(h),
+                (NSString*)kIOSurfaceBytesPerElement: @(4),
+                (NSString*)kIOSurfacePixelFormat:     @(kCVPixelFormatType_ARGB2101010LEPacked),
+            };
+            IOSurfaceRef newSurf = IOSurfaceCreate((__bridge CFDictionaryRef)props);
+            if (!newSurf)
+            {
+                std::cerr << "[MetalView::presentPixelData] IOSurfaceCreate failed "
+                          << w << "x" << h << "\n";
+                return;
+            }
+
+            if (m_ioSurface)
+            {
+                CFRelease((IOSurfaceRef)m_ioSurface);
+            }
+
+            m_ioSurface       = newSurf;
+            m_ioSurfaceWidth  = w;
+            m_ioSurfaceHeight = h;
+        }
+
+        IOSurfaceRef surf = (IOSurfaceRef)m_ioSurface;
+
+        // Lock the IOSurface for CPU write.  Bail out if the lock fails or the
+        // base address is null — writing through a null/garbage pointer would
+        // corrupt memory or crash.
+        if (IOSurfaceLock(surf, 0, nullptr) != KERN_SUCCESS)
+        {
+            std::cerr << "[MetalView::presentPixelData] IOSurfaceLock failed\n";
+            return;
+        }
+
+        void*  base   = IOSurfaceGetBaseAddress(surf);
+        size_t bpr    = IOSurfaceGetBytesPerRow(surf);
+        size_t srcBpr = (size_t)w * 4;
+
+        if (!base)
+        {
+            std::cerr << "[MetalView::presentPixelData] IOSurface base address "
+                         "is null\n";
+            IOSurfaceUnlock(surf, 0, nullptr);
+            return;
+        }
+
+        if (bpr == srcBpr)
+        {
+            memcpy(base, pixels, (size_t)h * bpr);
+        }
+        else
+        {
+            // IOSurface may add row padding — copy row by row
+            const uint8_t* src = static_cast<const uint8_t*>(pixels);
+            uint8_t*       dst = static_cast<uint8_t*>(base);
+            for (int row = 0; row < h; ++row, src += srcBpr, dst += bpr)
+                memcpy(dst, src, srcBpr);
+        }
+
+        IOSurfaceUnlock(surf, 0, nullptr);
+
+        // Push to display.
+        presentIOSurface(m_ioSurface);
+    }
+
+    //--------------------------------------------------------------------------
+    // presentIOSurface — assign an IOSurface as the CALayer contents
+    //--------------------------------------------------------------------------
+
+    void MetalView::presentIOSurface(void* ioSurfaceRef)
+    {
+        CALayer*     layer = (__bridge CALayer*)m_caLayer;
+        IOSurfaceRef surf  = (IOSurfaceRef)ioSurfaceRef;
+        if (!layer || !surf)
+            return;
+
+        // Assign IOSurface as layer contents inside a CATransaction with
+        // animations disabled for immediate presentation.
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        layer.contents = (__bridge id)surf;
+        [CATransaction commit];
+
+        // Remember for re-present on expose.  The CALayer holds its own retain
+        // on the contents, so this raw pointer stays valid as long as the layer
+        // references it.
+        m_lastPresentedSurface = ioSurfaceRef;
+    }
+
+    //--------------------------------------------------------------------------
+    // presentCachedSurface — re-present the last IOSurface (no GL readback)
+    //--------------------------------------------------------------------------
+
+    void MetalView::presentCachedSurface()
+    {
+        if (m_lastPresentedSurface)
+            presentIOSurface(m_lastPresentedSurface);
+    }
+
+    //--------------------------------------------------------------------------
+    // requestUpdate — coalesced UpdateRequest post
+    //--------------------------------------------------------------------------
+
+    void MetalView::requestUpdate()
+    {
+        if (m_updatePending)
+            return;
+        m_updatePending = true;
+        QCoreApplication::postEvent(this, new QEvent(QEvent::UpdateRequest));
+    }
+
+    void MetalView::renderImmediately()
+    {
+        m_updatePending = false;
+        render();
+    }
+
+    //--------------------------------------------------------------------------
+
+    void MetalView::render()
+    {
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (!session)
+            return;
+
+        if (m_doc && session && m_videoDevice)
+        {
+            m_videoDevice->makeCurrent();
+            if (!m_videoDevice->isGLContextReady())
+            {
+                // The offscreen GL context/FBO could not be established for this
+                // frame.  A single failure may be transient, but a persistent
+                // one means the Metal hybrid path cannot render — degrade to the
+                // 8-bit OpenGL GLView instead of leaving a permanently black
+                // view (mirrors the Vulkan branch's runtime fallback).  Defer
+                // the swap via a queued call so we never tear down this view
+                // from inside its own render().
+                if (++m_contextFailureCount == kContextFailureThreshold)
+                {
+                    std::cerr << "WARNING: [MetalView] offscreen GL context not "
+                                 "ready after " << kContextFailureThreshold
+                              << " attempts; falling back to OpenGL.\n";
+                    QMetaObject::invokeMethod(m_doc, "fallbackMetalToGLView",
+                                              Qt::QueuedConnection);
+                }
+                return;
+            }
+
+            // Context is healthy again; reset the failure streak.
+            m_contextFailureCount = 0;
+
+            if (m_userActive && m_activityTimer.elapsed() > 1.0)
+            {
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible()
+                    && m_eventWidget && m_eventWidget->hasFocus())
+                {
+                    TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
+                    m_videoDevice->sendEvent(aevent);
+                    m_userActive = false;
+                }
+            }
+
+            int x = 0, y = 0;
+            absolutePosition(x, y);
+            m_videoDevice->setAbsolutePosition(x, y);
+
+            session->render();
+
+            // Mirror GLView::paintGL(): on the first non-empty render, resize the
+            // window to fit the media content and center it on screen.
+            if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
+            {
+                m_postFirstNonEmptyRender = true;
+                if (!session->isFullScreen())
+                {
+                    m_doc->resizeToFit(false, false);
+                    m_doc->center();
+                }
+            }
+
+            m_firstPaintCompleted = true;
+        }
+
+        if (m_stopProcessingEvents)
+            return;
+
+        if (session)
+        {
+            if (const TwkApp::VideoDevice* output = session->outputVideoDevice())
+            {
+                if (output != videoDevice())
+                {
+                    output->syncBuffers();
+                }
+                else
+                {
+                    m_videoDevice->syncBuffers();
+                }
+            }
+            else
+            {
+                m_videoDevice->syncBuffers();
+            }
+        }
+
+        if (session)
+        {
+            session->addSyncSample();
+            session->postRender();
+        }
+
+        m_eventProcessingTimer.start();
+    }
+
+    //--------------------------------------------------------------------------
+    // QWidget overrides
+    //--------------------------------------------------------------------------
+
+    void MetalView::showEvent(QShowEvent* event)
+    {
+        if (!m_initialized)
+            initialize();
+        // Post an UpdateRequest so the first render fires from the event loop
+        // after the widget is fully laid out (same pattern as QOpenGLWindow).
+        requestUpdate();
+        QWidget::showEvent(event);
+    }
+
+    void MetalView::resizeEvent(QResizeEvent* event)
+    {
+        // Update the layer's contentsScale to match the current DPR.
+        // The NSView layer frame is managed automatically by AppKit as the
+        // widget is resized — no manual frame update required.
+        CALayer* layer = (__bridge CALayer*)m_caLayer;
+        if (layer)
+        {
+            CGFloat scale = static_cast<CGFloat>(devicePixelRatioF());
+            if (scale < 1.0) scale = 1.0;
+            layer.contentsScale = scale;
+        }
+
+        if (m_doc)
+            m_doc->viewSizeChanged(event->size().width(), event->size().height());
+
+        QWidget::resizeEvent(event);
+
+        // QOpenGLWidget schedules a paintGL() after every resizeGL(); as a plain
+        // QWidget we must request a fresh render ourselves so the FBO/IOSurface
+        // rebuild at the new size (e.g. when dragging the Live Review panel).
+        requestUpdate();
+    }
+
+    void MetalView::paintEvent(QPaintEvent* /*event*/)
+    {
+        // WA_PaintOnScreen means Qt won't repaint this native surface itself, so
+        // when the OS re-exposes the window (alt-tab, uncover) we must restore the
+        // image.  Re-present the last cached IOSurface — cheap, no GL readback —
+        // which is the Metal analog of VulkanView::paintEvent -> syncBuffers.  If
+        // nothing has been rendered yet, produce a frame.
+        if (m_lastPresentedSurface)
+            presentCachedSurface();
+        else
+        {
+            m_updatePending = false;
+            render();
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // eventProcessingTimeout slot
+    //--------------------------------------------------------------------------
+
+    void MetalView::eventProcessingTimeout()
+    {
+        if (m_doc && m_doc->session())
+            m_doc->session()->userGenericEvent("per-render-event-processing", "");
+    }
+
+    //--------------------------------------------------------------------------
+    // event() — mirrors GLView::event() exactly
+    //--------------------------------------------------------------------------
+
+    bool MetalView::event(QEvent* event)
+    {
+        bool keyevent = false;
+        Rv::Session* session = m_doc ? m_doc->session() : nullptr;
+
+        if (m_stopProcessingEvents)
+        {
+            event->accept();
+            return true;
+        }
+
+        if (event->type() == QEvent::WindowActivate)
+            m_activationTimer.start();
+
+        float activationTime = 0.0f;
+        if (m_activationTimer.isRunning())
+        {
+            if (event->type() == QEvent::MouseButtonPress)
+            {
+                activationTime = m_activationTimer.elapsed();
+                m_activationTimer.stop();
+            }
+            if (event->type() == QEvent::MouseMove)
+                m_activationTimer.stop();
+        }
+
+        if (event->type() != QEvent::Paint
+            && event->type() != QEvent::UpdateRequest)
+        {
+            m_activityTimer.stop();
+            m_activityTimer.start();
+
+            if (!m_userActive)
+            {
+                TwkApp::ActivityChangeEvent aevent("user-active", m_videoDevice);
+                m_userActive = true;
+                m_videoDevice->sendEvent(aevent);
+            }
+        }
+
+        if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+        {
+            keyevent = true;
+            if (m_lastKey == kevent->key()
+                && (m_lastKeyType == QEvent::ShortcutOverride
+                        && (kevent->type() == QEvent::KeyPress)
+                    || (m_lastKeyType == kevent->type())))
+            {
+                m_lastKey     = kevent->key();
+                m_lastKeyType = kevent->type();
+                event->accept();
+                return true;
+            }
+            m_lastKeyType = kevent->type();
+            m_lastKey     = kevent->key();
+        }
+
+        switch (event->type())
+        {
+        case QEvent::FocusIn:
+            // The translator is created lazily by setEventWidget(); a focus
+            // event arriving before that would otherwise dereference a null
+            // translator (the general guard below runs only after this switch).
+            if (m_videoDevice && m_videoDevice->hasTranslator())
+            {
+                m_videoDevice->translator().resetModifiers();
+            }
+            // fall-through
+        case QEvent::Enter:
+            if (m_eventWidget)
+                m_eventWidget->setFocus(Qt::MouseFocusReason);
+            break;
+        default:
+            break;
+        }
+
+        if (event->type() == QEvent::Resize)
+        {
+            QResizeEvent* e = static_cast<QResizeEvent*>(event);
+            if (!isVisible())
+                return true;
+            if (e->oldSize().width() != -1 && e->oldSize().height() != -1)
+            {
+                ostringstream contents;
+                contents << e->oldSize().width() << " " << e->oldSize().height()
+                         << "|" << e->size().width() << " " << e->size().height();
+                if (m_doc && session)
+                    session->userGenericEvent("view-resized", contents.str());
+            }
+            return QWidget::event(event);
+        }
+
+        if (event->type() == QEvent::UpdateRequest)
+        {
+            m_updatePending = false;
+            render();
+            return true;
+        }
+
+        // Guard: translator may not be initialized yet (e.g. events fired
+        // during construction before setEventWidget() is called).
+        if (!m_videoDevice || !m_videoDevice->hasTranslator())
+            return QWidget::event(event);
+
+        if (session && session->outputVideoDevice()
+            && session->outputVideoDevice()->displayMode()
+                   == TwkApp::VideoDevice::MirrorDisplayMode)
+        {
+            if (const TwkApp::VideoDevice* cdv = session->controlVideoDevice())
+            {
+                const TwkApp::VideoDevice* odv = session->outputVideoDevice();
+                if (odv && cdv != odv && cdv == videoDevice())
+                {
+                    const float w  = static_cast<float>(width());
+                    const float h  = static_cast<float>(height());
+                    const float ow = static_cast<float>(odv->width());
+                    const float oh = static_cast<float>(odv->height());
+                    const float aspect  = w / h;
+                    const float oaspect = ow / oh;
+
+                    m_videoDevice->translator().setRelativeDomain(ow, oh);
+
+                    if (aspect >= oaspect)
+                    {
+                        const float yscale  = oh / h;
+                        const float yoffset = 0.0f;
+                        const float xscale  = yscale;
+                        const float xoffset = -(w * yscale - ow) / 2.0f;
+                        m_videoDevice->translator().setScaleAndOffset(
+                            xoffset, yoffset, xscale, yscale);
+                    }
+                    else
+                    {
+                        const float xscale  = ow / w;
+                        const float xoffset = 0.0f;
+                        const float yscale  = xscale;
+                        const float yoffset = -(xscale * h - oh) / 2.0f;
+                        m_videoDevice->translator().setScaleAndOffset(
+                            xoffset, yoffset, xscale, yscale);
+                    }
+                }
+                else
+                {
+                    m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
+                    m_videoDevice->translator().setRelativeDomain(width(), height());
+                }
+            }
+            else
+            {
+                m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
+                m_videoDevice->translator().setRelativeDomain(width(), height());
+            }
+        }
+        else
+        {
+            m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0f, 1.0f);
+            m_videoDevice->translator().setRelativeDomain(width(), height());
+        }
+
+        if (session)
+            session->setEventVideoDevice(videoDevice());
+
+        if (m_videoDevice->translator().sendQTEvent(event, activationTime))
+        {
+            event->accept();
+            return true;
+        }
+        else
+        {
+            return QWidget::event(event);
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // eventFilter() — mirrors GLView::eventFilter()
+    //--------------------------------------------------------------------------
+
+    bool MetalView::eventFilter(QObject* object, QEvent* event)
+    {
+        if (event->type() == QEvent::KeyPress    || event->type() == QEvent::KeyRelease
+            || event->type() == QEvent::Shortcut || event->type() == QEvent::ShortcutOverride)
+        {
+            if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+            {
+                if (m_lastKey == kevent->key()
+                    && (m_lastKeyType == QEvent::ShortcutOverride
+                            && (kevent->type() == QEvent::KeyPress)
+                        || (m_lastKeyType == kevent->type())))
+                {
+                    m_lastKey     = kevent->key();
+                    m_lastKeyType = kevent->type();
+                    event->accept();
+                    return true;
+                }
+                m_lastKeyType = kevent->type();
+                m_lastKey     = kevent->key();
+            }
+
+            Session* session = m_doc ? m_doc->session() : nullptr;
+            if (session && m_videoDevice && m_videoDevice->hasTranslator())
+            {
+                session->setEventVideoDevice(videoDevice());
+                if (m_videoDevice->translator().sendQTEvent(event))
+                {
+                    event->accept();
+                    return true;
+                }
+            }
+
+            event->accept();
+            return true;
+        }
+
+        return false;
+    }
+
+} // namespace Rv
+
+#endif // PLATFORM_DARWIN
