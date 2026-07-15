@@ -17,6 +17,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
 
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
@@ -414,6 +415,21 @@ namespace TwkMovie
         static void init();
 
         ///
+        ///  Optional callbacks invoked in Preloader::waitForFinishedLoading
+        ///  immediately before and after the blocking condition variable wait.
+        ///
+        ///  Applications that hold resouces they shared with workers (e.g. Python's
+        ///  GIL) should set these to release their lock before the wait and reacquire
+        ///  it afterward, so that background threads can avoid deadlocking the main thread
+        ///  when they access the shared resources.
+        ///
+        ///  Both callbacks default to nullptr (no-op).
+        ///
+
+        using WaitCallback = std::function<void()>;
+        static void setBlockingWaitCallbacks(WaitCallback onRelease, WaitCallback onAcquire);
+
+        ///
         ///  Shutdown and free generic movieio plugins.
         ///  This needs to be called in the application main thread in main.
         ///
@@ -539,6 +555,8 @@ namespace TwkMovie
         static bool m_loadedAll;
         static bool m_dnxhdDecodingAllowed;
         static Preloader m_preloader;
+        static WaitCallback m_onBlockingWaitRelease;
+        static WaitCallback m_onBlockingWaitAcquire;
     };
 
 } // namespace TwkMovie

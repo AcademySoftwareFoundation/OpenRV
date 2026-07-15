@@ -212,8 +212,14 @@ namespace TwkMovie
         if (reader->isFinishedLoading())
             return;
 
+        if (GenericIO::m_onBlockingWaitRelease)
+            GenericIO::m_onBlockingWaitRelease();
+
         std::unique_lock<std::mutex> lock(m_mainThread_mutex);
         m_mainThread_cv.wait(lock, [&reader] { return reader->isFinishedLoading(); });
+
+        if (GenericIO::m_onBlockingWaitAcquire)
+            GenericIO::m_onBlockingWaitAcquire();
     }
 
     MovieReader* GenericIO::Preloader::getReader(std::string_view filename, const MovieInfo& info, Movie::ReadRequest& request)
@@ -534,6 +540,14 @@ namespace TwkMovie
     bool GenericIO::m_loadedAll = false;
     bool GenericIO::m_dnxhdDecodingAllowed = true;
     GenericIO::Preloader GenericIO::m_preloader;
+    GenericIO::WaitCallback GenericIO::m_onBlockingWaitRelease;
+    GenericIO::WaitCallback GenericIO::m_onBlockingWaitAcquire;
+
+    void GenericIO::setBlockingWaitCallbacks(WaitCallback onRelease, WaitCallback onAcquire)
+    {
+        m_onBlockingWaitRelease = std::move(onRelease);
+        m_onBlockingWaitAcquire = std::move(onAcquire);
+    }
 
     void GenericIO::init()
     {
