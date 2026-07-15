@@ -293,6 +293,18 @@ Removes the regular expression event binding from the given mode's
 event table.
 """
 
+rebind """
+Reassign an existing event binding to a new event in the given mode's
+event table.
+"""
+
+rebindRegex """
+Reassign an existing regular expression event binding to a new event
+in the given mode's event table.
+
+See also: rebind()
+"""
+
 setEventTableBBox """
 Set the bounding box for the given mode's event table.
 """
