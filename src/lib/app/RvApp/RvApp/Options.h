@@ -360,6 +360,17 @@ namespace Rv
     int parseSendEvents(int, char**);
     const char* getDebugCategories();
 
+    //
+    //  The OpenEXR global thread-pool size to use when the "Automatic" EXR
+    //  thread count is selected (opts.exrcpus == 0). All but one logical core
+    //  up to 16 cores, then growing by one thread per four extra cores, so
+    //  decode threads cannot starve the main/UI, audio and caching threads
+    //  (which caused dropped frames, especially with slow DWA/DWAB frames).
+    //  Overridable via the RV_EXR_AUTO_MAX_THREADS environment variable.
+    //
+
+    int automaticExrThreadCount();
+
 } // namespace Rv
 
 //
