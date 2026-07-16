@@ -360,10 +360,22 @@ namespace IPCore
         {
             TestEvaluationResult()
                 : poorRandomAccessPerformance(false)
+                , hasFastVideoSource(false)
             {
             }
 
+            //  Set true if any source contributing to this frame has slow
+            //  random-access video (e.g. a long-GOP MOV). Historically this
+            //  alone forced single-threaded block caching for the whole frame.
             bool poorRandomAccessPerformance;
+
+            //  Set true if any source contributing to this frame supplies fast
+            //  random-access video (e.g. an EXR image sequence). When a frame
+            //  composites a slow movie (often present only for its audio/
+            //  reference track) together with a fast image sequence, the fast
+            //  images can still be decoded in parallel across caching threads,
+            //  so the slow flag should not serialize the whole frame.
+            bool hasFastVideoSource;
         };
 
         //
