@@ -164,10 +164,45 @@ namespace IPCore
 
     void Application::timerCB()
     {
+        //
+        //  Optional redraw-request throttle.
+        //
+        //  The heartbeat fires at 120Hz and, by default (minElapsedTime=0),
+        //  every beat posts a repaint (Session::update -> redrawImmediately ->
+        //  QWidget::update). On the Qt6 QOpenGLWidget path each posted repaint
+        //  drives a full FBO composite + present through the top-level window's
+        //  backing store, and posting at ~2x the display refresh can back up
+        //  the compositor's present queue -- causing the main thread to block
+        //  in swapBuffers for several vsync intervals (the ~68ms display
+        //  stalls seen in the playback diagnostics).
+        //
+        //  RV_REDRAW_MIN_INTERVAL_MS sets a minimum wall-clock spacing (in ms)
+        //  between posted redraws so we post at most ~once per display refresh.
+        //  A value slightly below the refresh period but above one heartbeat
+        //  (e.g. 12 for a 60Hz display driven by a 120Hz heartbeat) yields one
+        //  redraw per refresh. Default 0 preserves the original behavior.
+        //
+        static double s_minRedrawSecs = -1.0;
+        if (s_minRedrawSecs < 0.0)
+        {
+            s_minRedrawSecs = 0.0;
+            // Env var is developer-controlled tuning, not untrusted input; it is
+            // parsed only as a numeric interval and never used in file/command
+            // paths, so it does not fall under the user-input file-path rule.
+            if (const char* v = getenv("RV_REDRAW_MIN_INTERVAL_MS"))
+            {
+                s_minRedrawSecs = atof(v) / 1000.0;
+                if (s_minRedrawSecs < 0.0)
+                    s_minRedrawSecs = 0.0;
+                cerr << "INFO: RV_REDRAW_MIN_INTERVAL_MS " << (s_minRedrawSecs * 1000.0) << " ms (min spacing between posted redraws)"
+                     << endl;
+            }
+        }
+
         for (int i = 0; i < documents().size(); i++)
         {
             Session* s = static_cast<Session*>(documents()[i]);
-            s->update();
+            s->update(s_minRedrawSecs);
         }
     }
 

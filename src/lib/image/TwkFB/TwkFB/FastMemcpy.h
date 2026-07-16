@@ -67,6 +67,33 @@ extern "C"
     TWKFB_EXPORT void swap_bytes_32bit_MP(size_t width, size_t height, const uint32_t* FASTMEMCPYRESTRICT inBuf,
                                           uint32_t* FASTMEMCPYRESTRICT outBuf);
 
+    /// @brief Expand packed 3-component RGB to packed 4-component RGBA by
+    /// inserting an opaque alpha, for 16-bit components (half float).
+    ///
+    /// GPUs have no fast DMA path for 3-component float uploads (GL_RGB16F);
+    /// the driver expands RGB->RGBA per pixel on upload. Doing the expansion on
+    /// the CPU here lets the texture use the native GL_RGBA16F transfer path.
+    ///
+    /// @param width Pixels per row.
+    /// @param height Number of rows.
+    /// @param inBuf Source RGB buffer.
+    /// @param inRowBytes Source scanline stride in bytes (>= width*3*2).
+    /// @param outBuf Destination RGBA buffer (tightly packed, width*4*2 bytes/row).
+    /// @param alpha Raw 16-bit alpha value to insert (0x3C00 == half 1.0).
+    TWKFB_EXPORT void expand_rgb_to_rgba_16bit(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                               uint16_t* FASTMEMCPYRESTRICT outBuf, uint16_t alpha);
+    TWKFB_EXPORT void expand_rgb_to_rgba_16bit_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                                  uint16_t* FASTMEMCPYRESTRICT outBuf, uint16_t alpha);
+
+    /// @brief Expand packed 3-component RGB to packed 4-component RGBA for
+    /// 32-bit components (full float). @see expand_rgb_to_rgba_16bit.
+    ///
+    /// @param alpha Raw 32-bit alpha value to insert (0x3F800000 == 1.0f).
+    TWKFB_EXPORT void expand_rgb_to_rgba_32bit(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                               uint32_t* FASTMEMCPYRESTRICT outBuf, uint32_t alpha);
+    TWKFB_EXPORT void expand_rgb_to_rgba_32bit_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                                  uint32_t* FASTMEMCPYRESTRICT outBuf, uint32_t alpha);
+
 #ifdef __cplusplus
 }
 #endif
