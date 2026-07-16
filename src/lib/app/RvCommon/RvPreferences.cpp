@@ -38,6 +38,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <TwkQtCoreUtil/QtConvert.h>
+#include <RvApp/Options.h>
 #include <RvApp/RvSession.h>
 #include <TwkApp/Bundle.h>
 #include <TwkApp/VideoDevice.h>
@@ -1870,7 +1871,7 @@ namespace Rv
     {
         if (m_ui.exrNumThreadsEdit->text() == "0")
         {
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+            Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
         }
         else
         {
@@ -1885,7 +1886,7 @@ namespace Rv
             m_ui.exrNumThreadsEdit->setText("0");
             m_ui.exrNumThreadsEdit->setEnabled(false);
             m_ui.exrThreadsLabel->setEnabled(false);
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+            Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
         }
         else
         {
