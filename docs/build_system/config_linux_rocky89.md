@@ -116,6 +116,15 @@ sudo dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel 
 sudo dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
 ```
 
+````{tabs}
+```{code-tab} bash Rocky 8
+sudo dnf install -y mesa-libOSMesa mesa-libOSMesa-devel
+```
+```{code-tab} bash Rocky 9
+sudo dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel
+```
+````
+
 ```bash
 sudo dnf clean all
 ```

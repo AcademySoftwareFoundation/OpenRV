@@ -43,6 +43,7 @@ class Ellipse(otio.core.SerializableObject):
         border_width: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
+        soft_deleted: bool = False,
         layer_range: otio.opentime.TimeRange | None = None,
     ) -> None:
         super().__init__()
@@ -53,6 +54,7 @@ class Ellipse(otio.core.SerializableObject):
         self.border_width = border_width
         self.id = id
         self.visible = visible
+        self.soft_deleted = soft_deleted
         self.layer_range = layer_range
 
     min = otio.core.serializable_field("min", doc="Top-left corner of bounding box (Position.1)")
@@ -83,6 +85,9 @@ class Ellipse(otio.core.SerializableObject):
     )
     id = otio.core.serializable_field("id", required_type=str, doc="UUID for undo/redo tracking")
     visible = otio.core.serializable_field("visible", required_type=bool, doc="Show/hide")
+    soft_deleted = otio.core.serializable_field(
+        "soft_deleted", required_type=bool, doc="Undo/redo soft-delete flag, consistent with Paint.2"
+    )
 
     _layer_range = otio.core.serializable_field(
         "layer_range",
