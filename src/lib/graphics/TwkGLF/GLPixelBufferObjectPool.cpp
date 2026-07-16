@@ -121,8 +121,26 @@ namespace TwkGLF
     RV_MAKE_STATIC(s, size_t, 1024UL, prefetchPoolMB);
     RV_MAKE_STATIC(RV_PREFETCH_POOL_MAX_NB_BUFFERS, unsigned, 7U, prefetchPoolMaxNbBuffers);
     RV_MAKE_STATIC(RV_PREFETCH_USE_FIXED_SIZE_PBOS, bool, true, prefetchUseFixedSizePBOs);
-    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MAX_SIZE, size_t, 4032 * 4536 * 6, prefetchFixedSizePBOsMaxSize);
-    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_SIZE, size_t, 1920 * 1080 * 6, prefetchFixedSizePBOsMinSize);
+    //
+    //  These two express "resolution x bytes-per-pixel". The bytes-per-pixel
+    //  term is 8 (4-channel half) rather than 6 (3-channel half) because the
+    //  upload path expands 3-channel half/float frames to RGBA before upload:
+    //  GL_RGB16F/RGB32F have no native DMA path, so the driver would otherwise
+    //  expand per-pixel during the transfer (see the expandRGBToRGBA path in
+    //  ImageRenderer). Leaving the term at 6 would silently lower the maximum
+    //  workable resolution by ~25%, and a frame over the max makes pop() return
+    //  NULL, which falls back to the slow non-PBO upload -- the very stall the
+    //  transient-PBO work removed. Keep this in step with the widest format the
+    //  upload path can produce.
+    //
+    //  MAX_SIZE = 4032x4536 at RGBA16 -> 18.3 Mpx ceiling, 140 MiB per buffer.
+    //  Note the fixed-size pool pre-allocates ceil(MAX_NB_BUFFERS * 1.05)
+    //  buffers of this size, so raising it raises the pre-allocated footprint
+    //  proportionally; the pool purges against its soft caps and refuses only
+    //  when free physical memory runs low.
+    //
+    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MAX_SIZE, size_t, 4032 * 4536 * 8, prefetchFixedSizePBOsMaxSize);
+    RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_SIZE, size_t, 1920 * 1080 * 8, prefetchFixedSizePBOsMinSize);
     RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_NB_BUFFERS, unsigned, 3U, prefetchFixedSizePBOsMinNbBuffers);
     RV_MAKE_STATIC(RV_WRITE_BEHIND_USE_PBOS, bool, false, writeBehindUsePBOs);
     RV_MAKE_STATIC(RV_WRITE_BEHIND_QUEUE_LENGTH, unsigned, 3U, asyncOutputQueueLength);

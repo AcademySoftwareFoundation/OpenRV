@@ -9,7 +9,21 @@
 #define __IOexr__FileStreamIStream__h__
 #include <iostream>
 #include <ImfStdIO.h>
+#include <OpenEXRConfig.h>
 #include <TwkUtil/FileStream.h>
+
+//
+//  OpenEXR 3.3 rewired the C++ API onto the OpenEXRCore reader. Streams that
+//  do not report their size() or support stateless (offset-based, thread-safe)
+//  reads fall onto a much slower read path and cannot have their scanlines
+//  decompressed concurrently. Since the whole file is already resident in one
+//  buffer (see TwkUtil::FileStream), we can implement both cheaply. Guard the
+//  overrides so the class still builds against pre-3.3 OpenEXR (which lacks
+//  these virtuals).
+//
+#if OPENEXR_VERSION_MAJOR > 3 || (OPENEXR_VERSION_MAJOR == 3 && OPENEXR_VERSION_MINOR >= 3)
+#define IOEXR_HAS_STATELESS_ISTREAM 1
+#endif
 
 namespace TwkFB
 {
@@ -44,6 +58,18 @@ namespace TwkFB
         virtual uint64_t tellg();
         virtual void seekg(uint64_t pos);
         virtual void clear();
+
+#ifdef IOEXR_HAS_STATELESS_ISTREAM
+        //
+        //  The complete file is already in a single contiguous buffer, so we
+        //  can report its size and service concurrent, offset-based reads
+        //  directly from that buffer without touching any shared state. This
+        //  restores the fast/parallel reader path in OpenEXR >= 3.3.
+        //
+        virtual int64_t size();
+        virtual bool isStatelessRead() const;
+        virtual int64_t read(void* buf, uint64_t sz, uint64_t offset);
+#endif
 
     private:
         FileStream m_stream;
