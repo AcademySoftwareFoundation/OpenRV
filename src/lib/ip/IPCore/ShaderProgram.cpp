@@ -11,6 +11,8 @@
 #include <IPCore/IPImage.h>
 #include <TwkGLF/GL.h>
 #include <TwkUtil/Timer.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
+#include <TwkUtil/Clock.h>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -1096,7 +1098,23 @@ namespace IPCore::Shader
             Expression* Aunbound = A->copyUnbound();
             Program* p = new Program(Aunbound);
 
-            if (p->compile())
+            //  Programs are compiled lazily on first use, on the render
+            //  thread. Log the cost so source-switch hitches can be
+            //  attributed to shader compile/link.
+            const bool diag = TwkUtil::PlaybackDiagnostics::enabled();
+            const double diagStart = diag ? TwkUtil::SystemClock().now() : 0.0;
+
+            const bool compiled = p->compile();
+
+            if (diag)
+            {
+                const double ms = (TwkUtil::SystemClock().now() - diagStart) * 1000.0;
+                std::ostringstream extra;
+                extra << "ok=" << (compiled ? 1 : 0) << ";cached=" << m_programCache.size();
+                TwkUtil::PlaybackDiagnostics::instance().record("shadercompile", -1, -1, ms, extra.str());
+            }
+
+            if (compiled)
             {
                 m_programCache[Aunbound] = p;
             }

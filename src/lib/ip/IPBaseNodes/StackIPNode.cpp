@@ -784,19 +784,65 @@ namespace IPCore
     void StackIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
         lazyUpdateRanges();
-        IPNodes ins = inputs();
-        int ninputs = inputs().size();
-        int frame = context.frame;
-        IPImage* img = 0;
 
-        for (unsigned int i = 0; i < ninputs; i++)
+        //
+        //  Only test the inputs that evaluate() actually decodes, using the same
+        //  selection rules. In "topmost" mode only the first in-range input is
+        //  rendered, so a hidden slow-random-access input underneath (e.g. a
+        //  long-GOP edit MOV stacked under an EXR shot) must not force the
+        //  frame onto single-threaded caching. Keep this in sync with evaluate().
+        //
+
+        const IPNodes& nodes = inputs();
+        const int ninputs = nodes.size();
+        const int frame = context.frame;
+
+        const char* comp = "";
+
+        if (StringProperty* sp = m_compMode)
         {
-            int f = frame;
+            if (sp->size())
+                comp = sp->front().c_str();
+        }
+
+        const bool topmostOnly = !strcmp(comp, "topmost");
+        const bool dissolveOnly = !strcmp(comp, "dissolve");
+        const bool strictFrameRanges = m_strictFrameRanges->front();
+        const bool useCutInfo = m_useCutInfo->front();
+
+        int numTested = 0;
+
+        for (int i = 0; i < ninputs; i++)
+        {
+            if (strictFrameRanges)
+            {
+                const int inF = inputFrame(i, frame, true);
+                const ImageRangeInfo& info = m_rangeInfos[i];
+
+                if (useCutInfo)
+                {
+                    if (inF < info.cutIn || inF > info.cutOut)
+                        continue;
+                }
+                else
+                {
+                    if (inF < info.start || inF > info.end)
+                        continue;
+                }
+            }
+
+            if (topmostOnly && numTested >= 1)
+                break;
+
+            if (dissolveOnly && numTested >= 2)
+                break;
+
             Context c = context;
-            const ImageRangeInfo& info = m_rangeInfos[i];
+            c.fps = m_outputFPS->front();
             c.frame = inputFrame(i, frame);
 
-            ins[i]->testEvaluate(context, result);
+            nodes[i]->testEvaluate(c, result);
+            numTested++;
         }
     }
 
