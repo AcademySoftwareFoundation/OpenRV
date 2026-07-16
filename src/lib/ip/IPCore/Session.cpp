@@ -35,6 +35,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 #include <TwkUtil/Clock.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
 #include <Mu/GarbageCollector.h>
 #include <algorithm>
 #include <iostream>
@@ -394,6 +395,7 @@ namespace IPCore
         , m_waitingOnSync(false)
         , m_avPlaybackVersion(DEFAULT_AVPLAYBACK_VERSION)
         , m_lastDrawingTime(0)
+        , m_diagRedrawRequests(0)
     {
         if (!m_graph)
             m_graph = new IPGraph(App()->nodeManager());
@@ -1870,6 +1872,13 @@ namespace IPCore
             m_framePatternFailCount = 0;
         }
 
+        //  Resuming from a buffering pause: pairs with the "buffering" stop
+        //  above so the diagnostic log shows how long each pause lasted.
+        if (eventData == "buffering" && isBuffering() && TwkUtil::PlaybackDiagnostics::enabled())
+        {
+            TwkUtil::PlaybackDiagnostics::instance().record("resume", -1, m_frame, m_cacheStats.lookAheadSeconds * 1000.0);
+        }
+
         if (m_avPlaybackVersion == 2)
         {
             return play_v2(eventData);
@@ -2073,6 +2082,15 @@ namespace IPCore
     {
         if (!isPlaying() && !isBuffering())
             return;
+
+        //  A stop triggered with the "buffering" reason means the look-ahead
+        //  cache under-ran and playback is pausing to let it refill. Frequent
+        //  buffering events indicate image (e.g. EXR) decode throughput can't
+        //  keep up. Captured under RV_PLAYBACK_DIAG regardless of -debug flags.
+        if (eventData == "buffering" && TwkUtil::PlaybackDiagnostics::enabled())
+        {
+            TwkUtil::PlaybackDiagnostics::instance().record("buffering", -1, m_frame, m_cacheStats.lookAheadSeconds * 1000.0);
+        }
 
         m_timer.stop();
         m_stopTimer.start();
@@ -3236,6 +3254,13 @@ namespace IPCore
                 double now = TwkUtil::SystemClock().now();
                 if (now >= (m_lastDrawingTime + minElapsedTime))
                 {
+                    //  Count each posted redraw request so render_v2 can report
+                    //  how many requests were coalesced into a single actual
+                    //  paint (see m_diagRedrawRequests). update() posts an async
+                    //  QWidget::update(); the paint itself lands whenever Qt's
+                    //  event loop / compositor gets to it.
+                    if (isPlaying())
+                        ++m_diagRedrawRequests;
                     d->redrawImmediately();
                     m_lastDrawingTime = now;
                 }
@@ -3366,6 +3391,11 @@ namespace IPCore
                     m_skipped = (newFrame - nextFrame) / inc();
                     if (inc() * m_skipped < 0)
                         m_skipped = 0;
+
+                    //  Realtime playback dropped one or more frames to stay in
+                    //  sync: another symptom of image decode not keeping up.
+                    if (m_skipped != 0 && TwkUtil::PlaybackDiagnostics::enabled())
+                        TwkUtil::PlaybackDiagnostics::instance().record("skip", -1, m_frame, double(m_skipped));
                 }
                 else if (outDeviceClock)
                 {
@@ -3895,6 +3925,52 @@ namespace IPCore
         int currentFrame = m_frame;
         m_skipped = 0;
 
+        //
+        //  Playback pacing diagnostics.
+        //
+        //  The display work (evaluate + GPU render) is measured separately in
+        //  the "display" event below. What that cannot show is the *cadence*:
+        //  how much wall-clock time actually elapses between successive
+        //  displayed frames. If decode keeps up and there is no buffering yet
+        //  the achieved fps is still below target, the time is being spent in
+        //  the display loop itself (heartbeat throttle / vsync swap / Qt event
+        //  loop) rather than in decode. Capture the entry-to-entry interval on
+        //  the main thread here so the "display" record can report the true
+        //  frame cadence and whether the frame number is actually advancing
+        //  1:1 (vs repeating or being skipped).
+        //
+        static double s_diagPrevRenderTime = 0.0;
+        static int s_diagPrevFrame = 0;
+        //  Snapshot of m_diagRedrawRequests at the previous paint, so we can
+        //  report how many heartbeat redraw requests were coalesced into this
+        //  one actual paint. During a stall: many requests -> Qt deferred the
+        //  paint (compositor); ~1 request -> the heartbeat/event loop starved.
+        static long long s_diagPrevRedrawReqs = 0;
+        //  Counts how many redraws (vsync intervals) the currently-displayed
+        //  frame has been held for. At 60Hz redraw / 24fps content a healthy
+        //  cadence alternates 2,3,2,3... (avg 2.5). A bias toward 3 drags the
+        //  perceived fps below target even when frames are cached and ready --
+        //  this is the play-all-frames vsync-quantization signature.
+        static int s_diagRefreshCount = 0;
+        //  Wall-clock at the end of the previous render_v2, so we can isolate
+        //  time spent OUTSIDE render_v2 (paintGL rest + Qt composite +
+        //  swapBuffers/vsync + event loop) from time INSIDE it (eval + render +
+        //  frameChangeEvent). This localizes a main-thread stall to either the
+        //  present path or in-graph work (e.g. the synchronous frame-changed
+        //  UI/Mu/Python handlers, which run only on new frames).
+        static double s_diagRenderV2EndTime = 0.0;
+        double diagPaceInterval = 0.0;
+        double diagOutsideGap = 0.0;
+        if (playing && TwkUtil::PlaybackDiagnostics::enabled())
+        {
+            const double nowSecs = TwkUtil::SystemClock().now();
+            if (s_diagPrevRenderTime > 0.0)
+                diagPaceInterval = (nowSecs - s_diagPrevRenderTime) * 1000.0;
+            if (s_diagRenderV2EndTime > 0.0)
+                diagOutsideGap = (nowSecs - s_diagRenderV2EndTime) * 1000.0;
+            s_diagPrevRenderTime = nowSecs;
+        }
+
         bool outDeviceClock = m_realtimeOverride && multipleVideoDevices() && outputVideoDevice()->hasClock();
 
         // if (m_outputVideoDevice)  cerr << "ovd timing " <<
@@ -3954,6 +4030,11 @@ namespace IPCore
                     m_skipped = (newFrame - nextFrame) / inc();
                     if (inc() * m_skipped < 0)
                         m_skipped = 0;
+
+                    //  Realtime playback dropped one or more frames to stay in
+                    //  sync: another symptom of image decode not keeping up.
+                    if (m_skipped != 0 && TwkUtil::PlaybackDiagnostics::enabled())
+                        TwkUtil::PlaybackDiagnostics::instance().record("skip", -1, m_frame, double(m_skipped));
                 }
                 else if (outDeviceClock)
                 {
@@ -4150,6 +4231,15 @@ namespace IPCore
                 graph().beginProfilingSample();
             }
 
+            //  Time how long it takes to pull the frame for display from the
+            //  cache. In Play-All-Frames this should be tiny for cached frames;
+            //  if it isn't, the display is stalling on evaluation rather than
+            //  on the GPU render below.
+            const bool diagDisplay = TwkUtil::PlaybackDiagnostics::enabled();
+            TwkUtil::Timer diagEvalTimer;
+            if (diagDisplay)
+                diagEvalTimer.start();
+
             try
             {
                 HOP_CALL(glFinish();)
@@ -4202,6 +4292,8 @@ namespace IPCore
                 trecord.evaluateEnd = profilingElapsedTime();
                 graph().endProfilingSample();
             }
+
+            const double diagEvalMs = diagDisplay ? diagEvalTimer.elapsed() * 1000.0 : 0.0;
 
             const float clockMult = fps() / currentTargetFPS();
 
@@ -4270,6 +4362,15 @@ namespace IPCore
                 AuxUserRender auxRender(this);
                 AuxAudioRenderer auxAudio(this);
 
+                //  Time the GPU-side work (texture upload + shaders + present)
+                //  for this displayed frame. In Play-All-Frames the achieved
+                //  fps is 1 / (evaluate + this render), so if this dominates the
+                //  frame budget the stall is on the render path (e.g. large
+                //  synchronous texture uploads), not on decode/cache.
+                TwkUtil::Timer diagRenderTimer;
+                if (diagDisplay)
+                    diagRenderTimer.start();
+
                 waitForUploadToFinish();
                 m_waitForUploadThreadPrefetch = m_preEval && useThreadedUpload();
 
@@ -4288,6 +4389,42 @@ namespace IPCore
                 else
                 {
                     m_renderer->render(m_frame, m_displayImage, &auxRender, &auxAudio);
+                }
+
+                if (diagDisplay)
+                {
+                    const double diagRenderMs = diagRenderTimer.elapsed() * 1000.0;
+
+                    //  Frame delta since the previous displayed frame: +1 is a
+                    //  clean advance, 0 means the same frame was displayed again
+                    //  (the elapsed clock said "stay"), >1 means frames were
+                    //  skipped. Combined with the interval this shows whether we
+                    //  are dropping to a lower cadence or repeating frames.
+                    const int diagDFrame = m_frame - s_diagPrevFrame;
+                    s_diagPrevFrame = m_frame;
+
+                    //  Every display pass is one redraw/vsync interval. When a
+                    //  new frame finally appears (dframe != 0), refreshes holds
+                    //  how many redraws the *previous* frame was shown for -- the
+                    //  2-vs-3 hold count we want to prove the pacing bias.
+                    s_diagRefreshCount++;
+                    int diagRefreshes = 0;
+                    if (diagDFrame != 0)
+                    {
+                        diagRefreshes = s_diagRefreshCount;
+                        s_diagRefreshCount = 0;
+                    }
+
+                    //  Heartbeat redraw requests coalesced into this paint.
+                    const long long diagReqs = m_diagRedrawRequests - s_diagPrevRedrawReqs;
+                    s_diagPrevRedrawReqs = m_diagRedrawRequests;
+
+                    std::ostringstream extra;
+                    extra << "eval=" << diagEvalMs << ";render=" << diagRenderMs << ";threadedUpload=" << (useThreadedUpload() ? 1 : 0)
+                          << ";interval=" << diagPaceInterval << ";dframe=" << diagDFrame << ";skipped=" << m_skipped
+                          << ";refreshes=" << diagRefreshes << ";shift=" << m_shift << ";elapsed=" << elapsed << ";reqs=" << diagReqs
+                          << ";outsideGap=" << diagOutsideGap;
+                    TwkUtil::PlaybackDiagnostics::instance().record("display", 0, m_frame, diagEvalMs + diagRenderMs, extra.str());
                 }
 
                 if (debugProfile)
@@ -4421,6 +4558,11 @@ namespace IPCore
 
         m_lastFrame = m_frame;
         m_rendering = false;
+
+        //  Mark when render_v2 returns so the next entry can measure the time
+        //  spent outside render_v2 (present/composite/swap + event loop).
+        if (playing && TwkUtil::PlaybackDiagnostics::enabled())
+            s_diagRenderV2EndTime = TwkUtil::SystemClock().now();
     }
 
     void Session::waitForUploadToFinish()
