@@ -109,8 +109,13 @@ class LocalThumbnailGen(rvtypes.MinorMode):
             ),
             (
                 "before-clear-session",
-                self._on_clear_session,
+                self._on_before_clear_session,
                 "Cancel in-flight generation and evict cache when the session is cleared",
+            ),
+            (
+                "after-clear-session",
+                self._on_after_clear_session,
+                "Re-enable thumbnail generation once the session has been cleared",
             ),
             (
                 "before-source-delete",
@@ -458,6 +463,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
 
     def _generate_thumbnail(self, cache_key: str, rvio_bin: str, media_path: str, mid_frame: int) -> None:
         """Runs rvio to generate a single-frame thumbnail in a worker thread."""
+        if self._shutting_down:
+            return
         output_path = self._cache_dir / f"{cache_key}_thumbnail.jpg"
         try:
             self._run_suspendable(
@@ -484,6 +491,8 @@ class LocalThumbnailGen(rvtypes.MinorMode):
         height: int,
     ) -> None:
         """Runs rvio to generate a filmstrip image in a worker thread."""
+        if self._shutting_down:
+            return
         output_path = self._cache_dir / f"{cache_key}_filmstrip.jpg"
         session_path = self._cache_dir / f"filmstrip_{cache_key}.rv"
         try:
@@ -613,7 +622,7 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                     _resume_proc(proc)
         self._drain_one()
 
-    def _on_clear_session(self, event: Any) -> None:
+    def _on_before_clear_session(self, event: Any) -> None:
         """Cancel in-flight generation and evict all caches when the session is cleared."""
         event.reject()
         self._shutting_down = True
@@ -633,6 +642,10 @@ class LocalThumbnailGen(rvtypes.MinorMode):
                 proc.wait()
             except OSError:
                 logger.warning(f"Failed to kill process {proc}")
+
+    def _on_after_clear_session(self, event: Any) -> None:
+        event.reject()
+        self._shutting_down = False
 
     def _on_session_deletion(self, event: Any) -> None:
         event.reject()

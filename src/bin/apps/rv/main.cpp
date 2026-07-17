@@ -47,6 +47,7 @@
 #include <MovieProcedural/MovieProcedural.h>
 #include <MuGL/GLModule.h>
 #include <MuIO/IOModule.h>
+#include <MuTwkApp/CrashHandlerInit.h>
 #include <MuTwkApp/MuInterface.h>
 #include <PyTwkApp/PyInterface.h>
 #include <IPCore/Application.h>
@@ -602,6 +603,14 @@ int utf8Main(int argc, char* argv[])
     //
 
     QApplication* app = new QApplication(argc, argv);
+
+    //
+    // Initialize crash handler early to catch crashes during startup
+    // (Must be after QApplication is created to use QCoreApplication::applicationDirPath)
+    //
+    {
+        TwkApp::initializeCrashHandler("RV", QCoreApplication::applicationDirPath().toStdString());
+    }
 
     QTranslator* translator = new QTranslator();
     QLocale locale = QLocale(getenv("ORIGINALLOCAL"));

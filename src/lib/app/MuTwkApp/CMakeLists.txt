@@ -13,6 +13,8 @@ SET(_target
 SET(_sources
     CommandsModule.cpp
     MuInterface.cpp
+    MuCrashObserver.cpp
+    CrashHandlerInit.cpp
     EventType.cpp
     FunctionAction.cpp
     MenuItem.cpp

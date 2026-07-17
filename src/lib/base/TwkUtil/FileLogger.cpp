@@ -6,6 +6,7 @@
 //******************************************************************************
 
 #include <TwkUtil/FileLogger.h>
+#include <TwkUtil/CrashHandler.h>
 #include <TwkUtil/EnvVar.h>
 #include <QtCore/QtCore>
 #include <spdlog/async.h>
@@ -25,35 +26,41 @@ namespace TwkUtil
     FileLogger::FileLogger()
     {
 #if defined(PLATFORM_DARWIN)
-        std::string logFilePath =
+        std::string logFileDir =
             QDir::homePath().toStdString() + "/Library/Logs/" + QCoreApplication::organizationName().toStdString() + "/";
 #else
-        std::string logFilePath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/";
+        std::string logFileDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/";
 #endif
-        std::cout << "INFO: File logger path: " << logFilePath << '\n';
+        std::cout << "INFO: File logger path: " << logFileDir << '\n';
 
         std::string name = QCoreApplication::applicationName().toStdString();
+        std::string logFilePath = logFileDir + name + ".log";
 
         if (evFileLogSynchronous.getValue())
         {
-            m_logger =
-                spdlog::rotating_logger_mt(name, logFilePath.append(name + ".log"), evFileLogSize.getValue(), evFileLogNumFiles.getValue())
-                    .get();
+            m_logger = spdlog::rotating_logger_mt(name, logFilePath, evFileLogSize.getValue(), evFileLogNumFiles.getValue()).get();
 
             m_logger->flush_on(spdlog::level::trace); // All message levels will
                                                       // be flush to disk
         }
         else
         {
-            m_logger = spdlog::rotating_logger_mt<spdlog::async_factory>(name, logFilePath.append(name + ".log"), evFileLogSize.getValue(),
-                                                                         evFileLogNumFiles.getValue())
-                           .get();
+            m_logger =
+                spdlog::rotating_logger_mt<spdlog::async_factory>(name, logFilePath, evFileLogSize.getValue(), evFileLogNumFiles.getValue())
+                    .get();
             m_logger->flush_on(spdlog::level::err);
         }
 
         setLogLevel(evFileLogLevel.getValue());
 
         m_logger->info("============ SESSION START ============\n");
+
+        // Attach log file to crash dumps
+        TwkUtil::CrashHandler& crashHandler = TwkUtil::CrashHandler::instance();
+        if (crashHandler.isInitialized())
+        {
+            crashHandler.attachLogFile(logFilePath);
+        }
     }
 
     FileLogger::~FileLogger() { m_logger->info("============  SESSION END  ============\n"); }

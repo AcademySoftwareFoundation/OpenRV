@@ -70,6 +70,18 @@ namespace
         return std::min(1.0f, ghostOpacity);
     }
 
+    // This should be set if the paint command depends on the frame content
+    // and as such cannot be cached independently of it -- such as holding or
+    // ghosting, where the underlying frame needs to change even though the
+    // annotation geometry remains the same.
+    void setFrameDependent(PaintIPNode::LocalCommand* command, bool value)
+    {
+        if (auto* baseCommand = dynamic_cast<Paint::Command*>(command))
+        {
+            baseCommand->frameDependent = value;
+        }
+    }
+
     // Loop over all commands and separate them in 3 containers:
     // 1. Commands that are visible on the current frame (based only on their
     // visibility range settings)
@@ -144,6 +156,7 @@ namespace
                 {
                     isHoldedCommandsInFirstLevel = true;
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
 
                     if (auto* polyLine = dynamic_cast<PaintIPNode::LocalPolyLine*>(command))
                     {
@@ -176,6 +189,7 @@ namespace
                 if (paintEffects.ghost != 0 && paintEffects.ghostBefore >= ghostLevel)
                 {
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
                     command->ghostColor = PaintIPNode::Color(1.0, 0.0, 0.0, 1.0); // Ghosted "Before" commands
                                                                                   // are drawn in green
                     command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
@@ -198,6 +212,7 @@ namespace
                 if (paintEffects.ghost != 0 && paintEffects.ghostAfter >= levelIndex)
                 {
                     command->ghostOn = true;
+                    setFrameDependent(command, true);
                     command->ghostColor = PaintIPNode::Color(0.0, 1.0, 0.0,
                                                              1.0); // Ghosted "After" commands are drawn in red
                     command->ghostColor[3] = getGhostOpacity(frame, command->startFrame, command->duration);
@@ -224,6 +239,12 @@ namespace
         PaintIPNode::LocalCommands currentFrameCommands; // visible commands, excluding hold and ghost
         PerFramePaintCommands beforeCommands;
         PerFramePaintCommands afterCommands;
+
+        // Reset frameDependent up front since LocalCommand objects persist across frames
+        for (auto* command : commands)
+        {
+            setFrameDependent(command, false);
+        }
 
         std::tie(currentFrameCommands, beforeCommands, afterCommands) = separateCommandsByFrameGroup(commands, frame, eye);
 
@@ -452,7 +473,18 @@ namespace IPCore
         p.duration = readProp<IntProperty>(c, "duration", 0);
 
         p.fontFamily = readProp<StringProperty>(c, "fontFamily", string(""));
-        p.fontSize = readProp<FloatProperty>(c, "fontSize", 24.0f);
+        // Legacy (pre-QFont) sessions have no fontSize property. fontSize is a WCS
+        // fraction of image height (see PaintCommand::Text::execute), whereas the
+        // old FTGL renderer drew glyphs sized by ptsize (computed above) directly
+        // in font-design units, then placed them via modelviewMatrix*S*T where
+        // S = makeScale(p.scale). Composing S*T shows a font-space vertex of
+        // magnitude g lands at a WCS-space offset of g * p.scale -- the same WCS
+        // space fontSize/border_width live in -- so ptsize * p.scale is exactly
+        // the legacy visual height already expressed as a WCS fraction. (p.scale
+        // itself already folds in the raw "scale" property's /800 legacy divisor,
+        // set just above.)
+        const FloatProperty* fontSizeProp = c->property<FloatProperty>("fontSize");
+        p.fontSize = (fontSizeProp && fontSizeProp->size()) ? fontSizeProp->front() : p.ptsize * p.scale;
         p.fontWeight = readProp<StringProperty>(c, "fontWeight", string("normal"));
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));

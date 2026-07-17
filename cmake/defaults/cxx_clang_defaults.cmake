@@ -28,7 +28,9 @@ ADD_COMPILE_OPTIONS(${_verbose_invocation} ${_compiler_options__} -Wnonportable-
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options
-  ADD_COMPILE_OPTIONS(-DNDEBUG -O3 # Maximum optimization
+  ADD_COMPILE_OPTIONS(
+    -DNDEBUG -O3 # Maximum optimization
+    -g # Debug info for crash dump symbolication (dsymutil reads it; does not affect runtime performance)
   )
 ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
   # Debug build specific options

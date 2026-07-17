@@ -26,6 +26,7 @@
 #include <sstream>
 #include <regex>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 namespace IPCore
@@ -308,8 +309,21 @@ namespace IPCore
             auto searchBegin = inout_glsl.cbegin();
             std::smatch match;
 
+            // A real function's name can never be a GLSL reserved keyword.
+            // The regex can spuriously match control-flow statements such
+            // as "else if (...) {" (returnType="else", name="if"); skip any
+            // match whose captured name is a keyword.
+            static const std::unordered_set<std::string> glslKeywords = {"if",   "else",   "for",   "while",    "do",      "switch",
+                                                                         "case", "return", "break", "continue", "discard", "struct"};
+
             while (std::regex_search(searchBegin, inout_glsl.cend(), match, functionStartRegex))
             {
+                if (glslKeywords.count(match.str(2)))
+                {
+                    searchBegin = match[0].second;
+                    continue;
+                }
+
                 const char* paramStart = &(*match[3].first);
                 size_t paramLen = static_cast<size_t>(std::distance(match[3].first, match[3].second));
                 std::string_view paramsView(paramStart, paramLen);

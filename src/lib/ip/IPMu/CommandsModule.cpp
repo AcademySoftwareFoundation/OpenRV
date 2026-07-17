@@ -5236,6 +5236,11 @@ namespace IPMu
 
     // Helper command to crash so that the breakpad minidump can be tested
     // Note: DO NOT DOCUMENT in commands.mud
+    //
+    // TEST-ONLY trigger: this must contain no production logic. Mu execution
+    // context (mu_function / mu_script_file) is captured continuously by
+    // MuCrashObserver, so a real crash carries the same annotations with no
+    // work here. See docs/crash-reporting.md (contract C1).
     NODE_IMPLEMENTATION(crash, void)
     {
         volatile int* a = (int*)(NULL);

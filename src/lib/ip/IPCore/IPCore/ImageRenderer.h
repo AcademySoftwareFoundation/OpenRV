@@ -804,7 +804,7 @@ namespace IPCore
         //
 
         void renderImage(InternalRenderContext&);
-        void renderPaint(const IPImage*, const GLFBO*);
+        void renderPaint(const IPImage*, const GLFBO*, int frame);
 
         void renderExternal(InternalRenderContext&);
         void renderRootBuffer(InternalRenderContext&);
@@ -935,6 +935,7 @@ namespace IPCore
         FastPath findFastPath(const FrameBuffer*) const;
         std::string imageToFBOIdentifier(const IPImage* image) const;
         bool imageHasEraseCommands(const IPImage* image) const;
+        bool imageHasFrameDependentCommands(const IPImage* image) const;
 
         void createGLContexts();
 

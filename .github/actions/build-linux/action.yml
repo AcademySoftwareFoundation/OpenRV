@@ -32,8 +32,8 @@ runs:
 
     - name: Clear up some spaces on disk
       run: |
-        # Delete files from host through the volumes
-        # It will have some "cannot remove" message, but but atleast 10GB will be cleared.
+        # Delete files from host through the volumes.
+        # It will have some "cannot remove" messages, but at least 20GB will be cleared.
         rm -rf /github/home/android || true
         rm -rf /github/home/dotnet || true
         rm -rf /github/home/ghc || true
@@ -42,30 +42,17 @@ runs:
         rm -rf /github/home/powershell || true
         rm -rf /github/home/chromium || true
         rm -rf /github/home/node_modules || true
-        rm -rf /github/home/CodeQL || true
+        rm -rf /github/home/hostedtoolcache || true
         rm -rf /github/home/boost || true
+        rm -rf /github/home/swift || true
+        rm -rf /github/home/miniconda || true
+        rm -rf /github/home/vcpkg || true
+        rm -rf /github/home/.cargo || true
+        rm -rf /github/home/.rustup || true
       shell: bash
 
     - name: Display disk space
       run: df -h /
-      shell: bash
-
-    # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo (Mesa upstream
-    # deprecated OSMesa in favor of llvmpipe via EGL). Pin all subsequent dnf
-    # calls in this container to the 9.7 minor release until OpenRV migrates off
-    # OSMesa. 9.7 is now a superseded minor, so the production CDN no longer
-    # serves it (the default 'extras' repo 404s); point the pinned repos at the
-    # durable vault archive (dl.rockylinux.org/vault) instead. Remove this whole
-    # step once OpenRV no longer needs OSMesa.
-    - name: Pin Rocky 9 to 9.7 minor release (vault)
-      if: ${{ inputs.rocky-version == '9' }}
-      run: |
-        echo "9.7" > /etc/dnf/vars/releasever
-        sed -i \
-          -e 's|^mirrorlist=|#mirrorlist=|g' \
-          -e 's|^#\?baseurl=https\?://dl.rockylinux.org/\$contentdir/|baseurl=https://dl.rockylinux.org/vault/rocky/|g' \
-          /etc/yum.repos.d/[Rr]ocky*.repo
-        dnf clean all
       shell: bash
 
     - name: Install system dependencies
@@ -79,9 +66,14 @@ runs:
           if dnf install -y epel-release && \
              dnf config-manager --set-enabled ${{ inputs.extra_repo }} devel && \
              dnf groupinstall "Development Tools" -y && \
-             dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Time-Piece && \
+             dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Time-Piece && \
              dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel && \
              dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel && \
+             if [ "${{ inputs.rocky-version }}" = "9" ]; then \
+               dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel; \
+             else \
+               dnf install -y mesa-libOSMesa mesa-libOSMesa-devel; \
+             fi && \
              dnf clean all; then
             echo "Dependencies installed successfully"
             break

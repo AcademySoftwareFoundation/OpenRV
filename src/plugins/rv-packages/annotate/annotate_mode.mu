@@ -713,9 +713,20 @@ class: AnnotateMinorMode : MinorMode
         newProperty(modeName, IntType, 1);
         setIntProperty(modeName, int[] {mode}, true);
 
+        // The legacy "size" property is consumed by pre-QFont RV builds as
+        // ptsize = size * 10000 font-design-units, placed via a modelview scale
+        // of (scale / 800) -- so the resulting on-screen WCS height old RV
+        // produces is size * 10000 * (scale / 800) = size * scale * 12.5 (see
+        // PaintIPNode::compileTextComponent's fontSize fallback for the matching
+        // forward conversion). We want that to equal this text's actual fontSize
+        // (size * scale, set below), so back-convert with legacySize = size /
+        // 12.5. This is purely for forward compatibility with older RV versions;
+        // current RV only reads the fontSize property below.
+        let legacySize = size / 12.5;
+
         setFloatProperty(posName, float[] {pos.x, pos.y}, true);
         setFloatProperty(colorName, float[] {color[0], color[1], color[2], color[3]}, true);
-        setFloatProperty(sizeName, float[] {size}, true);
+        setFloatProperty(sizeName, float[] {legacySize}, true);
         setFloatProperty(scaleName, float[] {scale}, true);
         setFloatProperty(rotName, float[] {rot}, true);
         setFloatProperty(spacingName, float[] {0.8}, true);
@@ -741,7 +752,7 @@ class: AnnotateMinorMode : MinorMode
         newProperty(textDecorationProp, StringType, 1);
         newProperty(textAlignProp,      StringType, 1);
         setStringProperty(fontFamilyProp,     string[] {""}, true);
-        setFloatProperty(fontSizeProp,        float[] {24.0}, true);
+        setFloatProperty(fontSizeProp,        float[] {size * scale}, true);
         setStringProperty(fontWeightProp,     string[] {"normal"}, true);
         setStringProperty(fontStyleProp,      string[] {"normal"}, true);
         setStringProperty(textDecorationProp, string[] {"none"}, true);
@@ -3276,13 +3287,16 @@ class: AnnotateMinorMode : MinorMode
                                      g.addAction(auxIcon("A_48x48.png"), "Text"),
                                      "textplacement",
                                      Qt.IBeamCursor,
-                                     0,
+                                     48.0 / 1080.0,
                                      Color(0,0,0,1),
                                      RenderOverMode,
                                      "",
                                      RoundJoin,
                                      SquareCap,
-                                     0.01, 0.0015,
+                                     // Range matches the legacy FTGL renderer's calibrated
+                                     // ptsize (size * 10000), reinterpreted as "pixels at a
+                                     // 1080p reference image" 
+                                     100.0 / 1080.0, 15.0 / 1080.0,
                                      1,
                                      1,
                                      PressureMode.None,
