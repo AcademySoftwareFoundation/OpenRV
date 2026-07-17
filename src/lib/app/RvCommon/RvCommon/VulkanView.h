@@ -45,8 +45,8 @@ namespace Rv
 
         void stopProcessingEvents();
 
-        virtual bool event(QEvent* event) override;
-        virtual bool eventFilter(QObject* object, QEvent* event) override;
+        bool event(QEvent* event) override;
+        bool eventFilter(QObject* object, QEvent* event) override;
 
         bool firstPaintCompleted() const { return m_firstPaintCompleted; }
 

@@ -11,7 +11,6 @@
 #include <array>
 #include <cstdint>
 #include <string>
-#include <memory>
 #include <vector>
 
 QT_BEGIN_NAMESPACE
@@ -50,32 +49,32 @@ namespace Rv
         void setAbsolutePosition(int x, int y);
 
         // VideoDevice API
-        virtual void makeCurrent() const override;
-        virtual void syncBuffers() const override;
-        virtual void redraw() const override;
-        virtual void redrawImmediately() const override;
-        virtual void clearCaches() const override;
+        void makeCurrent() const override;
+        void syncBuffers() const override;
+        void redraw() const override;
+        void redrawImmediately() const override;
+        void clearCaches() const override;
 
-        virtual Resolution resolution() const override;
-        virtual Offset offset() const override;
-        virtual Timing timing() const override;
-        virtual VideoFormat format() const override;
+        Resolution resolution() const override;
+        Offset offset() const override;
+        Timing timing() const override;
+        VideoFormat format() const override;
 
-        virtual size_t width() const override;
-        virtual size_t height() const override;
+        size_t width() const override;
+        size_t height() const override;
 
-        virtual void open(const StringVector& args) override;
-        virtual void close() override;
-        virtual bool isOpen() const override;
+        void open(const StringVector& args) override;
+        void close() override;
+        bool isOpen() const override;
 
-        virtual float devicePixelRatio() const override;
+        float devicePixelRatio() const override;
 
-        virtual void setPhysicalDevice(VideoDevice* d) override;
+        void setPhysicalDevice(VideoDevice* d) override;
 
         // GLVideoDevice API
-        virtual TwkGLF::GLFBO* defaultFBO() override;
-        virtual const TwkGLF::GLFBO* defaultFBO() const override;
-        virtual std::string hardwareIdentification() const override;
+        TwkGLF::GLFBO* defaultFBO() override;
+        const TwkGLF::GLFBO* defaultFBO() const override;
+        std::string hardwareIdentification() const override;
 
     private:
         // Ensure the QOpenGLContext + FBO exist and match the current view size.

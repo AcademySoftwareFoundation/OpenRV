@@ -860,7 +860,9 @@ namespace Rv
             // With a non-OpenGL presentation backend view() returns null — no
             // GL context to make current; presentation handles it per-frame.
             if (doc->view())
+            {
                 doc->view()->makeCurrent();
+            }
 
             try
             {
@@ -939,7 +941,9 @@ namespace Rv
             // With a non-OpenGL presentation backend view() is null — no GL
             // context to make current.
             if (doc->view())
+            {
                 doc->view()->makeCurrent();
+            }
             m->open();
             //
             //  The open() may have added video devices, so make sure each
@@ -1686,7 +1690,9 @@ namespace Rv
                 string optionArgs = setVideoDeviceStateFromSettings(d);
                 // With a non-OpenGL presentation backend view() is null — skip GL makeCurrent.
                 if (rvDoc->view())
+                {
                     rvDoc->view()->videoDevice()->makeCurrent();
+                }
 
                 try
                 {

@@ -23,12 +23,10 @@
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 
-#include <algorithm>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <vector>
 #ifdef PLATFORM_WINDOWS
 // WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
 // <winsock.h>, which otherwise collides with the <winsock2.h> already
