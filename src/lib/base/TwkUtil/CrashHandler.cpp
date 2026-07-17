@@ -26,10 +26,6 @@ namespace TwkUtil
 
     // Environment variables for crash handler configuration
     //
-    // NOTE: When RV_CRASH_DUMPS_ENABLED is set, RV automatically enables Mu debugging
-    // (equivalent to -debug mu flag) to include Mu script source file information in
-    // crash dumps. This helps identify which Mu script caused a crash.
-    //
     ENVVAR_BOOL(evCrashDumpsEnabled, "RV_CRASH_DUMPS_ENABLED", true);
     ENVVAR_STRING(evCrashDumpsDir, "RV_CRASH_DUMPS_DIR", "");
     ENVVAR_INT(evCrashDumpsMaxCount, "RV_CRASH_DUMPS_MAX_COUNT", 10);

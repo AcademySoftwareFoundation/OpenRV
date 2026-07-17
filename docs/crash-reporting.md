@@ -239,12 +239,12 @@ violates. This list is a remediation tracker, not part of the permanent design.
       entry points (values are set correctly at init via `StartHandler`).
 - [x] **C1 — three diverging init paths** for `rv` / `RV` / `rvio` (violated C4). Fixed: all three
       now call one shared helper, `TwkApp::initializeCrashHandler(appName, version, executableDir)`
-      (`src/lib/app/MuTwkApp/CrashHandlerInit.{h,cpp}`), which resolves the handler, initializes, and
-      enables Mu debugging. The per-`main.cpp` `#ifdef` path blocks are gone.
-- [x] **C2 — `rvio` used the bare `crashpad_handler`** (violated C5) and never called
-      `setDebugging(true)`. Fixed by C1's shared helper: every binary now uses the platform wrapper
-      (`crashpad_handler_{macos,linux}.sh` / `.exe`) and enables Mu debugging. The leftover
-      `rvio` `addAnnotation("platform", …)` dead write (B3) was removed in the same change.
+      (`src/lib/app/MuTwkApp/CrashHandlerInit.{h,cpp}`), which resolves the handler and initializes
+      it. The per-`main.cpp` `#ifdef` path blocks are gone. (Automatic Mu debugging was later
+      removed — the `mu_function` annotation carries the script context without it.)
+- [x] **C2 — `rvio` used the bare `crashpad_handler`** (violated C5). Fixed by C1's shared helper:
+      every binary now uses the platform wrapper (`crashpad_handler_{macos,linux}.sh` / `.exe`). The
+      leftover `rvio` `addAnnotation("platform", …)` dead write (B3) was removed in the same change.
 - [x] **D1 — Crashpad wrapper install guarded on `RV_DEPS_BREAKPAD_VERSION`** in
       `src/bin/nsapps/RV/CMakeLists.txt` (violated C6). Fixed: split by tool ownership — the Crashpad
       wrapper is now guarded on `RV_DEPS_CRASHPAD_VERSION`, `symbolicate_crash.sh` on the Breakpad var.
