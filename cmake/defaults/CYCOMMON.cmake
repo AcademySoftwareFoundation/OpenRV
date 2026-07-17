@@ -163,6 +163,21 @@ SET(RV_DEPS_GLEW_VERSION_LIB
     "2.3.1"
 )
 
+# vulkan https://github.com/KhronosGroup/Vulkan-Headers + https://github.com/KhronosGroup/Vulkan-Loader
+SET(RV_DEPS_VULKAN_VERSION
+    "1.4.350.0"
+)
+SET(RV_DEPS_VULKAN_HEADERS_DOWNLOAD_HASH
+    "74d68465ca2ef442397dc159edaa3b9c"
+)
+SET(RV_DEPS_VULKAN_LOADER_DOWNLOAD_HASH
+    "6ec91c673b48bbdffc923cce9d6a1a85"
+)
+# libvulkan.so SONAME major (libvulkan.so.1)
+SET(RV_DEPS_VULKAN_VERSION_LIB
+    "1"
+)
+
 # imgui https://github.com/pthom/imgui
 #
 # Note this also depends on the following repositories: https://github.com/pthom/implot.git https://github.com/dpaulat/imgui-backend-qt.git
