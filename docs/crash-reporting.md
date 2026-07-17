@@ -184,6 +184,15 @@ key: Mu context is function-level (see C2 for why line-level cannot be captured 
    them from Release installs — the macOS/Linux `symbols/` tree and the Windows `.pdb` files. (Debug
    installs keep them for local debugging; the strip is gated on `CMAKE_INSTALL_CONFIG_NAME`.)
    Customers never symbolicate, so shipping symbols only bloats the package.
+
+   In addition, the *staged binaries themselves* must not embed DWARF. Release compiles with `-g`
+   (so `dump_syms` can extract the `.sym` above), but on Linux the shipped artifact is the `stage`
+   tree itself — not a `cmake --install` output — so the install-time strip never runs on it.
+   Therefore `rv_stage.cmake` runs `strip --strip-debug` on each staged Linux binary in Release,
+   *after* `dump_syms` has read the DWARF and *before* the `.bin` rename. This keeps `.symtab` and
+   the GNU build-id (the key for the `symbols/` tree), so the DWARF lives only in the
+   `symbols_archive` zip while the shipped binaries carry none. macOS Mach-O binaries do not embed
+   DWARF (it stays in the dSYM), so no equivalent strip is needed there.
 3. The `symbols_archive` build target (`rv_archive_symbols.cmake`) instead packages a versioned,
    per-platform `RV-<version>-<os>-<arch>-symbols.zip` under `stage/packages/`:
    - macOS/Linux: the Breakpad `symbols/` tree plus the symbolication tools (`minidump_stackwalk`,
