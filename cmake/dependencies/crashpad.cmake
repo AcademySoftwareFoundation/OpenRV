@@ -72,6 +72,16 @@ SET(_crashpad_handler
 LIST(APPEND _configure_options "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
 LIST(APPEND _configure_options "-DCRASHPAD_BUILD_TESTS=OFF")
 
+# Pin the MSVC toolset to match the parent build. Without this, cmake auto-selects the newest installed toolset (e.g. 14.44) while the main build uses a pinned
+# version (e.g. 14.40). The mismatch causes LNK2019 for __std_find_end_1 and similar CRT symbols added only in newer toolsets. Only applies to Visual Studio
+# generators; the crashpad build dir must be clean.
+IF(CMAKE_GENERATOR MATCHES "Visual Studio"
+   AND CMAKE_GENERATOR_TOOLSET
+)
+  LIST(APPEND _configure_options "-T")
+  LIST(APPEND _configure_options "${CMAKE_GENERATOR_TOOLSET}")
+ENDIF()
+
 # Disable deprecation warnings on macOS — mini_chromium uses deprecated Security APIs
 IF(RV_TARGET_DARWIN)
   LIST(APPEND _configure_options "-DCMAKE_CXX_FLAGS=-Wno-error=deprecated-declarations -Wno-deprecated-declarations")
