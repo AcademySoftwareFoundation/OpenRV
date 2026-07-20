@@ -116,7 +116,7 @@ def ocio_node_from_media(config, node, default, media=None, attributes={}):
 def isOCIOManaged(nodeType):
     def F():
         try:
-            managed = commands.getIntProperty("#" + nodeType + ".ocio.active")[0] != 0
+            managed = commands.getIntProperty(f"#{nodeType}.ocio.active")[0] != 0
             return commands.CheckedMenuState if managed else commands.UncheckedMenuState
         except Exception:
             return commands.UncheckedMenuState
@@ -130,7 +130,7 @@ def isOCIODisplayManaged(group):
             groupName = "RVDisplayPipelineGroup"
             dpipeline = groupMemberOfType(group, groupName)
             dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-            managed = commands.getIntProperty(dOCIO + ".ocio.active")[0] != 0
+            managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
             return commands.CheckedMenuState if managed else commands.UncheckedMenuState
         except Exception:
             return commands.UncheckedMenuState
@@ -141,7 +141,7 @@ def isOCIODisplayManaged(group):
 def ocioMenuCheck(nodeType, prop, value):
     def F():
         try:
-            current = commands.getStringProperty("#" + nodeType + "." + prop)[0]
+            current = commands.getStringProperty(f"#{nodeType}.{prop}")[0]
             managed = isOCIOManaged(nodeType)() == commands.CheckedMenuState
             checked = current == value and managed
             return commands.CheckedMenuState if checked else commands.NeutralMenuState
@@ -157,8 +157,8 @@ def ocioDisplayMenuCheck(group, display, view):
             groupName = "RVDisplayPipelineGroup"
             dpipeline = groupMemberOfType(group, groupName)
             dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-            d = commands.getStringProperty(dOCIO + ".ocio_display.display")[0]
-            v = commands.getStringProperty(dOCIO + ".ocio_display.view")[0]
+            d = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
+            v = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
             if d == display and v == view:
                 return commands.CheckedMenuState
             return commands.UncheckedMenuState
@@ -172,7 +172,7 @@ def ocioEvent(nodeType, prop, value):
     "This function will apply its change on the current node of nodeType in the evaluation path"
 
     def F(event):
-        commands.setStringProperty("#" + nodeType + "." + prop, [value], True)
+        commands.setStringProperty(f"#{nodeType}.{prop}", [value], True)
         commands.redraw()
 
     return F
@@ -183,7 +183,7 @@ def ocioEventOnAllOfType(nodeType, prop, value):
 
     def F(event):
         for node in commands.nodesOfType(nodeType):
-            commands.setStringProperty(node + "." + prop, [value], True)
+            commands.setStringProperty(f"{node}.{prop}", [value], True)
         commands.redraw()
 
     return F
@@ -197,10 +197,10 @@ def ocioDisplayEvent(group, display, view):
         # Both 'display' and 'view' must be set together.
         # Disable the OCIONode during display/view propety changes.
         # Prevents node from rebuilding shaders while it may be in an invalid state.
-        commands.setIntProperty(dOCIO + ".ocio.active", [0], True)
-        commands.setStringProperty(dOCIO + ".ocio_display.display", [display], True)
-        commands.setStringProperty(dOCIO + ".ocio_display.view", [view], True)
-        commands.setIntProperty(dOCIO + ".ocio.active", [1], True)
+        commands.setIntProperty(f"{dOCIO}.ocio.active", [0], True)
+        commands.setStringProperty(f"{dOCIO}.ocio_display.display", [display], True)
+        commands.setStringProperty(f"{dOCIO}.ocio_display.view", [view], True)
+        commands.setIntProperty(f"{dOCIO}.ocio.active", [1], True)
         commands.redraw()
 
     return F
@@ -215,9 +215,9 @@ def groupMemberOfType(node, memberType):
 
 def applyProps(node, contextProps, propertiesProps):
     for pprop, avalue in propertiesProps.items():
-        commands.setStringProperty(node + "." + pprop, [avalue], True)
+        commands.setStringProperty(f"{node}.{pprop}", [avalue], True)
     for cprop, cvalue in contextProps.items():
-        prop = node + ".ocio_context." + cprop
+        prop = f"{node}.ocio_context.{cprop}"
         if not commands.propertyExists(prop):
             commands.newProperty(prop, commands.StringType, 1)
         commands.setStringProperty(prop, [cvalue], True)
@@ -262,7 +262,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         the source.
         """
 
-        medias = commands.getStringProperty("%s.media.movie" % source)
+        medias = commands.getStringProperty(f"{source}.media.movie")
         media = medias[0]
 
         try:
@@ -316,7 +316,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         try:
             if pipeSlot not in DEFAULT_PIPE:
-                currentPipelineNodes = commands.getStringProperty(srcPipeline + ".pipeline.nodes")
+                currentPipelineNodes = commands.getStringProperty(f"{srcPipeline}.pipeline.nodes")
 
                 # We need to handle the following special case here:
                 # We might be in the process of reloading an RV session that
@@ -342,7 +342,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         package_logger.info("using %s node for %s %s", nodeType, source, pipeSlot)
 
-        commands.setStringProperty(srcPipeline + ".pipeline.nodes", pipeline, True)
+        commands.setStringProperty(f"{srcPipeline}.pipeline.nodes", pipeline, True)
         pipeNodes = commands.nodesInGroup(srcPipeline)
         pipeNodes.sort()
         for index, pNode in enumerate(pipelineList):
@@ -362,7 +362,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         pipeSlot = OCIO_ROLES[nodeType]
         srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
-        nodesProp = srcPipeline + ".pipeline.nodes"
+        nodesProp = f"{srcPipeline}.pipeline.nodes"
         current = commands.getStringProperty(nodesProp)
 
         if pipeSlot not in DEFAULT_PIPE or current == DEFAULT_PIPE[pipeSlot]:
@@ -370,7 +370,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         package_logger.info("resetting %s for %s", pipeSlot, source)
 
-        commands.setStringProperty(srcPipeline + ".pipeline.nodes", DEFAULT_PIPE[pipeSlot], True)
+        commands.setStringProperty(f"{srcPipeline}.pipeline.nodes", DEFAULT_PIPE[pipeSlot], True)
         commands.redraw()
 
     def useDisplayOCIO(self, group):
@@ -390,7 +390,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             dpipeline = groupMemberOfType(group, groupName)
             if groupName not in DEFAULT_PIPE:
-                currentPipelineNodes = commands.getStringProperty(dpipeline + ".pipeline.nodes")
+                currentPipelineNodes = commands.getStringProperty(f"{dpipeline}.pipeline.nodes")
 
                 # We need to handle the following special case here:
                 # We might be in the process of reloading an RV session that
@@ -413,11 +413,11 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if pipeline == DEFAULT_PIPE[groupName]:
             return
 
-        device = commands.getStringProperty(group + ".device.name")[0]
+        device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using OCIODisplay for display: %s", device)
 
         dpipeline = groupMemberOfType(group, groupName)
-        commands.setStringProperty(dpipeline + ".pipeline.nodes", pipeline, True)
+        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", pipeline, True)
 
         pipeNodes = commands.nodesInGroup(dpipeline)
         pipeNodes.sort()
@@ -439,15 +439,15 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
-        nodesProp = dpipeline + ".pipeline.nodes"
+        nodesProp = f"{dpipeline}.pipeline.nodes"
         current = commands.getStringProperty(nodesProp)
 
         if groupName not in DEFAULT_PIPE or current == DEFAULT_PIPE[groupName]:
             return
 
-        commands.setStringProperty(dpipeline + ".pipeline.nodes", DEFAULT_PIPE[groupName], True)
+        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", DEFAULT_PIPE[groupName], True)
 
-        device = commands.getStringProperty(group + ".device.name")[0]
+        device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using RVDisplayColor for display: %s", device)
 
         self.usingOCIOForDisplay[group] = False
@@ -594,7 +594,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                         )
                     )
                 dList.append((d, vList))
-            device = "  " + commands.getStringProperty(display + ".device.name")[0]
+            device_name = commands.getStringProperty(f"{display}.device.name")[0]
+            device = f"  {device_name}"
             daList.append((device, dList))
 
         #
@@ -730,7 +731,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             inherited = []
             for method in METHODS:
                 try:
-                    exec("global %s; %s = rv_ocio_setup.%s" % (method, method, method))
+                    exec(f"global {method}; {method} = rv_ocio_setup.{method}")
                     inherited.append(method)
                 except AttributeError:
                     pass
