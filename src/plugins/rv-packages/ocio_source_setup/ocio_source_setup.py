@@ -7,6 +7,7 @@ from rv import rvtypes, commands
 import os
 import logging
 import PyOpenColorIO as OCIO
+from functools import partial
 
 logging.basicConfig(format="%(levelname)s: %(message)s")
 
@@ -113,97 +114,129 @@ def ocio_node_from_media(config, node, default, media=None, attributes={}):
 #
 
 
+def _is_ocio_managed(nodeType):
+    try:
+        managed = commands.getIntProperty(f"#{nodeType}.ocio.active")[0] != 0
+        return commands.CheckedMenuState if managed else commands.UncheckedMenuState
+    except Exception:
+        return commands.UncheckedMenuState
+
+
 def isOCIOManaged(nodeType):
-    def F():
-        try:
-            managed = commands.getIntProperty(f"#{nodeType}.ocio.active")[0] != 0
-            return commands.CheckedMenuState if managed else commands.UncheckedMenuState
-        except Exception:
-            return commands.UncheckedMenuState
-
-    return F
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_is_ocio_managed, nodeType=...)`.
+    """
+    return partial(_is_ocio_managed, nodeType=nodeType)
 
 
-def isOCIODisplayManaged(group):
-    def F():
-        try:
-            groupName = "RVDisplayPipelineGroup"
-            dpipeline = groupMemberOfType(group, groupName)
-            dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-            managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
-            return commands.CheckedMenuState if managed else commands.UncheckedMenuState
-        except Exception:
-            return commands.UncheckedMenuState
-
-    return F
-
-
-def ocioMenuCheck(nodeType, prop, value):
-    def F():
-        try:
-            current = commands.getStringProperty(f"#{nodeType}.{prop}")[0]
-            managed = isOCIOManaged(nodeType)() == commands.CheckedMenuState
-            checked = current == value and managed
-            return commands.CheckedMenuState if checked else commands.NeutralMenuState
-        except Exception:
-            return commands.DisabledMenuState
-
-    return F
-
-
-def ocioDisplayMenuCheck(group, display, view):
-    def F():
-        try:
-            groupName = "RVDisplayPipelineGroup"
-            dpipeline = groupMemberOfType(group, groupName)
-            dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-            d = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
-            v = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
-            if d == display and v == view:
-                return commands.CheckedMenuState
-            return commands.UncheckedMenuState
-        except Exception:
-            return commands.DisabledMenuState
-
-    return F
-
-
-def ocioEvent(nodeType, prop, value):
-    "This function will apply its change on the current node of nodeType in the evaluation path"
-
-    def F(event):
-        commands.setStringProperty(f"#{nodeType}.{prop}", [value], True)
-        commands.redraw()
-
-    return F
-
-
-def ocioEventOnAllOfType(nodeType, prop, value):
-    "This function will apply its change on all nodes of nodeType"
-
-    def F(event):
-        for node in commands.nodesOfType(nodeType):
-            commands.setStringProperty(f"{node}.{prop}", [value], True)
-        commands.redraw()
-
-    return F
-
-
-def ocioDisplayEvent(group, display, view):
-    def F(event):
+def _is_ocio_display_managed(group):
+    try:
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
         dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-        # Both 'display' and 'view' must be set together.
-        # Disable the OCIONode during display/view propety changes.
-        # Prevents node from rebuilding shaders while it may be in an invalid state.
-        commands.setIntProperty(f"{dOCIO}.ocio.active", [0], True)
-        commands.setStringProperty(f"{dOCIO}.ocio_display.display", [display], True)
-        commands.setStringProperty(f"{dOCIO}.ocio_display.view", [view], True)
-        commands.setIntProperty(f"{dOCIO}.ocio.active", [1], True)
-        commands.redraw()
+        managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
+        return commands.CheckedMenuState if managed else commands.UncheckedMenuState
+    except Exception:
+        return commands.UncheckedMenuState
 
-    return F
+
+def isOCIODisplayManaged(group):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_is_ocio_display_managed, group=...)`.
+    """
+    return partial(_is_ocio_display_managed, group=group)
+
+
+def _ocio_menu_check(nodeType, prop, value):
+    try:
+        current = commands.getStringProperty(f"#{nodeType}.{prop}")[0]
+        managed = _is_ocio_managed(nodeType) == commands.CheckedMenuState
+        checked = current == value and managed
+        return commands.CheckedMenuState if checked else commands.NeutralMenuState
+    except Exception:
+        return commands.DisabledMenuState
+
+
+def ocioMenuCheck(nodeType, prop, value):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_ocio_menu_check, nodeType=..., prop=..., value=...)`.
+    """
+    return partial(_ocio_menu_check, nodeType=nodeType, prop=prop, value=value)
+
+
+def _ocio_display_menu_check(group, display, view):
+    try:
+        groupName = "RVDisplayPipelineGroup"
+        dpipeline = groupMemberOfType(group, groupName)
+        dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+        d = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
+        v = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
+        if d == display and v == view:
+            return commands.CheckedMenuState
+        return commands.UncheckedMenuState
+    except Exception:
+        return commands.DisabledMenuState
+
+
+def ocioDisplayMenuCheck(group, display, view):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_ocio_display_menu_check, group=..., display=..., view=...)`.
+    """
+    return partial(_ocio_display_menu_check, group=group, display=display, view=view)
+
+
+def _ocio_event(event, nodeType, prop, value):
+    commands.setStringProperty(f"#{nodeType}.{prop}", [value], True)
+    commands.redraw()
+
+
+def ocioEvent(nodeType, prop, value):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_ocio_event, nodeType=..., prop=..., value=...)`.
+    Note: The internal `_ocio_event` accepts `event` as its first parameter to allow kwargs binding.
+    """
+    return partial(_ocio_event, nodeType=nodeType, prop=prop, value=value)
+
+
+def _ocio_event_on_all_of_type(event, nodeType, prop, value):
+    for node in commands.nodesOfType(nodeType):
+        commands.setStringProperty(f"{node}.{prop}", [value], True)
+    commands.redraw()
+
+
+def ocioEventOnAllOfType(nodeType, prop, value):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_ocio_event_on_all_of_type, nodeType=..., prop=..., value=...)`.
+    """
+    return partial(_ocio_event_on_all_of_type, nodeType=nodeType, prop=prop, value=value)
+
+
+def _ocio_display_event(event, group, display, view):
+    groupName = "RVDisplayPipelineGroup"
+    dpipeline = groupMemberOfType(group, groupName)
+    dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+    # Both 'display' and 'view' must be set together.
+    # Disable the OCIONode during display/view propety changes.
+    # Prevents node from rebuilding shaders while it may be in an invalid state.
+    commands.setIntProperty(f"{dOCIO}.ocio.active", [0], True)
+    commands.setStringProperty(f"{dOCIO}.ocio_display.display", [display], True)
+    commands.setStringProperty(f"{dOCIO}.ocio_display.view", [view], True)
+    commands.setIntProperty(f"{dOCIO}.ocio.active", [1], True)
+    commands.redraw()
+
+
+def ocioDisplayEvent(group, display, view):
+    """
+    Deprecated: Public API maintained for backward compatibility.
+    Internal code should use `functools.partial(_ocio_display_event, group=..., display=..., view=...)`.
+    """
+    return partial(_ocio_display_event, group=group, display=display, view=view)
 
 
 def groupMemberOfType(node, memberType):
@@ -495,28 +528,32 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 if not self.usingOCIOForDisplay.get(group, False):
                     self.useDisplayOCIO(group)
 
-    def ocioActiveEvent(self, nodeType):
-        def F(event):
-            if nodeType not in ["OCIOFile", "OCIOLook"]:
-                if isOCIODisplayManaged(nodeType)() == commands.CheckedMenuState:
-                    self.disableDisplayOCIO(nodeType)
-                else:
-                    self.useDisplayOCIO(nodeType)
-                return
-
-            evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVFileSource", None)
-            if len(evalInfo) == 0:
-                evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVImageSource", None)
-            if len(evalInfo) == 0:
-                return
-            source = evalInfo[0]["node"]
-
-            if isOCIOManaged(nodeType)() == commands.CheckedMenuState:
-                self.disableSourceOCIO(source, nodeType)
+    def _ocio_active_event(self, event, nodeType):
+        if nodeType not in ["OCIOFile", "OCIOLook"]:
+            if _is_ocio_display_managed(nodeType) == commands.CheckedMenuState:
+                self.disableDisplayOCIO(nodeType)
             else:
-                self.useSourceOCIO(source, nodeType, OCIO_DEFAULTS[nodeType])
+                self.useDisplayOCIO(nodeType)
+            return
 
-        return F
+        evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVFileSource", None)
+        if len(evalInfo) == 0:
+            evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVImageSource", None)
+        if len(evalInfo) == 0:
+            return
+        source = evalInfo[0]["node"]
+
+        if _is_ocio_managed(nodeType) == commands.CheckedMenuState:
+            self.disableSourceOCIO(source, nodeType)
+        else:
+            self.useSourceOCIO(source, nodeType, OCIO_DEFAULTS[nodeType])
+
+    def ocioActiveEvent(self, nodeType):
+        """
+        Deprecated: Public API maintained for backward compatibility.
+        Internal code should use `functools.partial(self._ocio_active_event, nodeType=...)`.
+        """
+        return partial(self._ocio_active_event, nodeType=nodeType)
 
     def checkForDisplayGroup(self, event):
         event.reject()
@@ -576,9 +613,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             dList = [
                 (
                     "Active",
-                    self.ocioActiveEvent(display),
+                    partial(self._ocio_active_event, nodeType=display),
                     None,
-                    isOCIODisplayManaged(display),
+                    partial(_is_ocio_display_managed, group=display),
                 ),
                 ("_", None),
             ]
@@ -588,9 +625,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     vList.append(
                         (
                             v,
-                            ocioDisplayEvent(display, d, v),
+                            partial(_ocio_display_event, group=display, display=d, view=v),
                             None,
-                            ocioDisplayMenuCheck(display, d, v),
+                            partial(_ocio_display_menu_check, group=display, display=d, view=v),
                         )
                     )
                 dList.append((d, vList))
@@ -605,9 +642,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         cssList = [
             (
                 "Active",
-                self.ocioActiveEvent("OCIOFile"),
+                partial(self._ocio_active_event, nodeType="OCIOFile"),
                 None,
-                isOCIOManaged("OCIOFile"),
+                partial(_is_ocio_managed, nodeType="OCIOFile"),
             ),
             ("_", None),
         ]
@@ -634,18 +671,18 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     return [
                         (
                             name,
-                            ocioEvent("OCIOFile", "ocio.inColorSpace", name),
+                            partial(_ocio_event, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                             None,
-                            ocioMenuCheck("OCIOFile", "ocio.inColorSpace", name),
+                            partial(_ocio_menu_check, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                         )
                     ]
                 else:
                     return [
                         (
                             name,
-                            ocioEventOnAllOfType("OCIOFile", "ocio.inColorSpace", name),
+                            partial(_ocio_event_on_all_of_type, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                             None,
-                            ocioMenuCheck("OCIOFile", "ocio.inColorSpace", name),
+                            partial(_ocio_menu_check, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                         )
                     ]
             else:
@@ -665,9 +702,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         lsList = [
             (
                 "Active",
-                self.ocioActiveEvent("OCIOLook"),
+                partial(self._ocio_active_event, nodeType="OCIOLook"),
                 None,
-                isOCIOManaged("OCIOLook"),
+                partial(_is_ocio_managed, nodeType="OCIOLook"),
             ),
             ("_", None),
         ]
@@ -677,17 +714,17 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             lsList.append(
                 (
                     look.getName(),
-                    ocioEvent("OCIOLook", "ocio_look.look", look.getName()),
+                    partial(_ocio_event, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                     None,
-                    ocioMenuCheck("OCIOLook", "ocio_look.look", look.getName()),
+                    partial(_ocio_menu_check, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                 )
             )
             laList.append(
                 (
                     look.getName(),
-                    ocioEventOnAllOfType("OCIOLook", "ocio_look.look", look.getName()),
+                    partial(_ocio_event_on_all_of_type, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                     None,
-                    ocioMenuCheck("OCIOLook", "ocio_look.look", look.getName()),
+                    partial(_ocio_menu_check, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                 )
             )
 
