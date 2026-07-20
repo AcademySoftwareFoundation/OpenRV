@@ -78,6 +78,28 @@ FUNCTION(rv_stage)
   )
   IF(arg_TYPE IN_LIST _rv_stage_binary_types)
     RV_GENERATE_SYMBOLS(TARGET ${arg_TARGET})
+
+    # Release builds compile with -g so dump_syms can extract Breakpad .sym files (see docs/crash-reporting.md section 7). On Linux the shipped artifact is the
+    # stage tree itself, so leaving the DWARF in the staged ELF would ship full debug info to customers. Strip it here -- AFTER RV_GENERATE_SYMBOLS has run
+    # dump_syms on the real ELF, and BEFORE the .bin rename below -- so the shipped binaries carry no DWARF while the symbols live only in the symbols_archive
+    # zip. --strip-debug keeps .symtab and, crucially, the GNU build-id that the .sym directory tree is keyed on, so offline symbolication still matches. This
+    # is gated on Release + Linux only (not on the Breakpad version, per contract C6): macOS Mach-O binaries do not embed DWARF (it stays in the dSYM, which
+    # rv_generate_symbols.cmake produces then deletes), so they are not bloated and need no strip.
+    #
+    # strip_debug_safe.sh (not a bare `strip`) guards against a GNU strip bug that corrupts binaries whose layout triggers the "'.dynstr' not in segment"
+    # warning: it strips to a temp copy and only replaces the original when strip is warning- and error-free, otherwise it leaves the binary unstripped. RV's
+    # own compiled targets strip cleanly; the guard protects any that do not.
+    IF(RV_TARGET_LINUX
+       AND CMAKE_BUILD_TYPE STREQUAL "Release"
+    )
+      ADD_CUSTOM_COMMAND(
+        TARGET ${arg_TARGET}
+        POST_BUILD
+        COMMENT "Stripping DWARF debug info from ${arg_TARGET} (symbols archived separately)"
+        COMMAND bash ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/strip_debug_safe.sh "$<TARGET_FILE:${arg_TARGET}>"
+        VERBATIM
+      )
+    ENDIF()
   ENDIF()
 
   IF(RV_TARGET_LINUX)
