@@ -5,7 +5,17 @@
 #
 from rv import rvtypes, commands
 import os
+import logging
 import PyOpenColorIO as OCIO
+
+logging.basicConfig(format="%(levelname)s: %(message)s")
+
+package_logger = logging.getLogger("OCIOSourceSetup")
+
+if "RV_OCIO_SOURCE_SETUP_DEBUG" in os.environ:
+    package_logger.setLevel(logging.DEBUG)
+else:
+    package_logger.setLevel(logging.INFO)
 
 #
 #   Default implementations of helper methods
@@ -284,7 +294,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 if commands.nodeType(pNode).startswith("OCIO"):
                     commands.ocioUpdateConfig(pNode)
 
-            print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
+            package_logger.info("using %s node for %s %s", nodeType, source, pipeSlot)
             return
 
         #
@@ -320,17 +330,17 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     DEFAULT_PIPE[pipeSlot] = currentPipelineNodes
             pipelineList = ocio_node_from_media(self.config, srcPipeline, DEFAULT_PIPE[pipeSlot], media, attrDict)
         except Exception as inst:
-            print(("ERROR: Problem occurred while loading OCIO settings for %s: %s" % (nodeType, inst)))
+            package_logger.error("Problem occurred while loading OCIO settings for %s: %s", nodeType, inst)
             return
 
         try:
             pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
-            print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
+            package_logger.error("Unable to make use of ocio_node_from_media return: %s", inst)
         if pipeline == DEFAULT_PIPE[pipeSlot]:
             return
 
-        print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
+        package_logger.info("using %s node for %s %s", nodeType, source, pipeSlot)
 
         commands.setStringProperty(srcPipeline + ".pipeline.nodes", pipeline, True)
         pipeNodes = commands.nodesInGroup(srcPipeline)
@@ -340,7 +350,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             try:
                 applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                print(("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst)))
+                package_logger.error("Unable to apply properties to %s: %s", stageOCIO, inst)
 
         commands.redraw()
 
@@ -358,7 +368,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if pipeSlot not in DEFAULT_PIPE or current == DEFAULT_PIPE[pipeSlot]:
             return
 
-        print(("INFO: resetting %s for %s" % (pipeSlot, source)))
+        package_logger.info("resetting %s for %s", pipeSlot, source)
 
         commands.setStringProperty(srcPipeline + ".pipeline.nodes", DEFAULT_PIPE[pipeSlot], True)
         commands.redraw()
@@ -393,18 +403,18 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     DEFAULT_PIPE[groupName] = currentPipelineNodes
             pipelineList = ocio_node_from_media(self.config, dpipeline, DEFAULT_PIPE[groupName])
         except Exception as inst:
-            print(("ERROR: Problem occurred while loading OCIO settings for OCIODisplay: %s" % inst))
+            package_logger.error("Problem occurred while loading OCIO settings for OCIODisplay: %s", inst)
             return
 
         try:
             pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
-            print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
+            package_logger.error("Unable to make use of ocio_node_from_media return: %s", inst)
         if pipeline == DEFAULT_PIPE[groupName]:
             return
 
         device = commands.getStringProperty(group + ".device.name")[0]
-        print(("INFO: using OCIODisplay for display: %s" % device))
+        package_logger.info("using OCIODisplay for display: %s", device)
 
         dpipeline = groupMemberOfType(group, groupName)
         commands.setStringProperty(dpipeline + ".pipeline.nodes", pipeline, True)
@@ -416,7 +426,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             try:
                 applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                print(("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst)))
+                package_logger.error("Unable to apply properties to %s: %s", stageOCIO, inst)
 
         self.usingOCIOForDisplay[group] = True
         commands.redraw()
@@ -438,7 +448,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         commands.setStringProperty(dpipeline + ".pipeline.nodes", DEFAULT_PIPE[groupName], True)
 
         device = commands.getStringProperty(group + ".device.name")[0]
-        print(("INFO: using RVDisplayColor for display: %s" % device))
+        package_logger.info("using RVDisplayColor for display: %s", device)
 
         self.usingOCIOForDisplay[group] = False
         commands.redraw()
@@ -516,7 +526,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 self.usingOCIOForDisplay[node] = False
                 commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
         except Exception as inst:
-            print((str(inst), node))
+            package_logger.error("%s %s", inst, node)
 
     def maybeUpdateViews(self, event):
         event.reject()
@@ -543,7 +553,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
         except Exception as inst:
-            print(inst)
+            package_logger.error(inst)
 
     def buildOCIOMenu(self):
         #
@@ -725,7 +735,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 except AttributeError:
                     pass
 
-            print(("INFO: Using %s for OCIO setup methods: %s" % (rv_ocio_setup.__file__, " ".join(inherited))))
+            package_logger.info("Using %s for OCIO setup methods: %s", rv_ocio_setup.__file__, " ".join(inherited))
 
         except ImportError:
             pass
@@ -738,7 +748,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 self.config = OCIO.Config.CreateFromFile(config)
                 OCIO.SetCurrentConfig(self.config)
             else:
-                print("WARNING: $OCIO environment variable unset!")
+                package_logger.warning("$OCIO environment variable unset!")
 
         self.init(
             "OCIO Source Setup",
