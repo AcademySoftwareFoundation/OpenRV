@@ -710,23 +710,23 @@ namespace IPCore
             // leftMatteWidth       widthVisible      rightMatteWidth
             //  ____/\_____  ___________/\____________  ____/\_____
             // /           \/                         \/           \
-        // ------------------------[0.5]------------------------
+            // ------------------------[0.5]------------------------
             // |                                                   |\
-        // |                 topMatte (m_top)                  | }
+            // |                 topMatte (m_top)                  | }
             // topMatteHeight
             // |(leftSideOfImage,topMatteVPosition)                |/
             // *---------------------------------------------------|
             // |           |                          |            |\
-        // |           |                          |            | \
-        // | leftMatte |      Visible Image       | rightMatte |  \
-        // |  (m_left) |                          | (m_right)  |   }
+            // |           |                          |            | \
+            // | leftMatte |      Visible Image       | rightMatte |  \
+            // |  (m_left) |                          | (m_right)  |   }
             // heightVisible |           |                          | |  / | |
             // |            | /
             // |(leftSideOfImage,sideMattesVPosition)
             // |(rightMatteHPosition,sideMattesVPosition)
             // *--------------------------------------*------------|
             // |                                                   |\
-        // |              bottomMatte (m_bottom)               | }
+            // |              bottomMatte (m_bottom)               | }
             // bottomMatteHeight
             // |(leftSideOfImage,-0.5)                             |/
             // *----------------------[-0.5]------------------------
