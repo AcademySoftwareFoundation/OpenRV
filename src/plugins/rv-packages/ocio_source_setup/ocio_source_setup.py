@@ -60,7 +60,7 @@ def ocio_config_from_media(media: str | None, attributes: dict[str, Any] | None)
 
 
 def ocio_node_from_media(
-    config: OCIO.Config, node: str, default: list[str], media: str | None = None, attributes: dict[str, Any] = {}
+    config: OCIO.Config, node: str, default: list[str], media: str | None = None, attributes: dict[str, Any] | None = None
 ) -> list[dict[str, Any]]:
     """
     Generate the OCIO node pipeline configuration based on the media and context.
@@ -76,6 +76,9 @@ def ocio_node_from_media(
         A list of dictionaries representing the node types, contexts, and properties
         required to build the OCIO pipeline.
     """
+    if attributes is None:
+        attributes = {}
+
     result = [{"nodeType": d, "context": {}, "properties": {}} for d in default]
 
     nodeType = commands.nodeType(node)
@@ -96,7 +99,7 @@ def ocio_node_from_media(
         ]
 
     elif nodeType == "RVLinearizePipelineGroup":
-        inspace = config.parseColorSpaceFromString(media) if media else ""
+        inspace = config.parseColorSpaceFromString(media)
         if inspace == "":
             inspace = attributes.get("default_setting", "")
         if inspace != "":
@@ -183,8 +186,6 @@ def _is_ocio_display_managed(group: str) -> int:
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
         dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-        if not dOCIO:
-            return commands.UncheckedMenuState
         managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
         return commands.CheckedMenuState if managed else commands.UncheckedMenuState
     except Exception:
@@ -244,8 +245,6 @@ def _ocio_display_menu_check(group: str, display: str, view: str) -> int:
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
         dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-        if not dOCIO:
-            return commands.UncheckedMenuState
         d = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
         v = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
         if d == display and v == view:
@@ -322,8 +321,6 @@ def _ocio_display_event(event: Any, group: str, display: str, view: str) -> None
     groupName = "RVDisplayPipelineGroup"
     dpipeline = groupMemberOfType(group, groupName)
     dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-    if not dOCIO:
-        return
     # Both 'display' and 'view' must be set together.
     # Disable the OCIONode during display/view propety changes.
     # Prevents node from rebuilding shaders while it may be in an invalid state.
@@ -447,9 +444,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         pipeSlot = OCIO_ROLES[nodeType]
         srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
-        if not srcPipeline:
-            return
-            
         ocioNode = groupMemberOfType(srcPipeline, nodeType)
         if ocioNode is not None and self.readingSession:
             for pNode in commands.nodesInGroup(srcPipeline):
@@ -530,9 +524,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         pipeSlot = OCIO_ROLES[nodeType]
         srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
-        if not srcPipeline:
-            return
-            
         nodesProp = f"{srcPipeline}.pipeline.nodes"
         current = commands.getStringProperty(nodesProp)
 
@@ -563,9 +554,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         groupName = "RVDisplayPipelineGroup"
         try:
             dpipeline = groupMemberOfType(group, groupName)
-            if not dpipeline:
-                return
-                
             if groupName not in DEFAULT_PIPE:
                 currentPipelineNodes = commands.getStringProperty(f"{dpipeline}.pipeline.nodes")
 
@@ -620,9 +608,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         groupName = "RVDisplayPipelineGroup"
         dpipeline = groupMemberOfType(group, groupName)
-        if not dpipeline:
-            return
-            
         nodesProp = f"{dpipeline}.pipeline.nodes"
         current = commands.getStringProperty(nodesProp)
 
@@ -655,9 +640,6 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         fileSource = groupMemberOfType(group, "RVFileSource")
         imageSource = groupMemberOfType(group, "RVImageSource")
         source = fileSource if imageSource is None else imageSource
-
-        if not source:
-            return
 
         for nodeType in OCIO_ROLES.keys():
             self.useSourceOCIO(source, nodeType)
@@ -854,11 +836,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             for f in family:
                 for t in tree:
                     if f in t:
-                        addPath(family[1:], t)
-                        return
+                        return addPath(family[1:], t)
                 tree.append([f])
-                addPath(family, tree)
-                return
+                return addPath(family, tree)
 
         families = [(cs.getFamily().split("/") + [cs.getName()]) for cs in self.config.getColorSpaces()]
         root: list[list[str]] = []
