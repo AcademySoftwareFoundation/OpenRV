@@ -81,9 +81,9 @@ def ocio_node_from_media(
 
     result = [{"nodeType": d, "context": {}, "properties": {}} for d in default]
 
-    node_type = commands.nodeType(node)
+    nodeType = commands.nodeType(node)
 
-    if node_type == "RVDisplayPipelineGroup":
+    if nodeType == "RVDisplayPipelineGroup":
         display = config.getDefaultDisplay()
         result = [
             {
@@ -98,25 +98,25 @@ def ocio_node_from_media(
             }
         ]
 
-    elif node_type == "RVLinearizePipelineGroup":
-        in_space = config.parseColorSpaceFromString(media)
-        if in_space == "":
-            in_space = attributes.get("default_setting", "")
-        if in_space != "":
+    elif nodeType == "RVLinearizePipelineGroup":
+        inspace = config.parseColorSpaceFromString(media) if media else ""
+        if inspace == "":
+            inspace = attributes.get("default_setting", "")
+        if inspace != "":
             result = [
                 {
                     "nodeType": "OCIOFile",
                     "context": {},
                     "properties": {
                         "ocio.function": "color",
-                        "ocio.inColorSpace": in_space,
+                        "ocio.inColorSpace": inspace,
                         "ocio_color.outColorSpace": OCIO.ROLE_SCENE_LINEAR,
                     },
                 },
                 {"nodeType": "RVLensWarp", "context": {}, "properties": {}},
             ]
 
-    elif node_type == "RVLookPipelineGroup":
+    elif nodeType == "RVLookPipelineGroup":
         # If our config has a Look named "shot_specific_look" and uses the
         # environment/context variable "$SHOT" to locate any required files
         # on disk, then this is what that would likely look like:
@@ -147,29 +147,29 @@ def ocio_node_from_media(
 #
 
 
-def _is_ocio_managed(node_type: str) -> int:
+def _is_ocio_managed(nodeType: str) -> int:
     """
     Internal callback logic to determine if a specific node type is currently managed by OCIO.
 
     Args:
-        node_type: The node type to check.
+        nodeType: The node type to check.
 
     Returns:
         The RV menu state (CheckedMenuState if managed, UncheckedMenuState otherwise).
     """
     try:
-        managed = commands.getIntProperty(f"#{node_type}.ocio.active")[0] != 0
+        managed = commands.getIntProperty(f"#{nodeType}.ocio.active")[0] != 0
         return commands.CheckedMenuState if managed else commands.UncheckedMenuState
     except Exception:
         return commands.UncheckedMenuState
 
 
-def isOCIOManaged(node_type: str) -> Callable[[], int]:
+def isOCIOManaged(nodeType: str) -> Callable[[], int]:
     """
     Deprecated: Public API maintained for backward compatibility.
-    Internal code should use `functools.partial(_is_ocio_managed, node_type=...)`.
+    Internal code should use `functools.partial(_is_ocio_managed, nodeType=...)`.
     """
-    return partial(_is_ocio_managed, node_type=node_type)
+    return partial(_is_ocio_managed, nodeType=nodeType)
 
 
 def _is_ocio_display_managed(group: str) -> int:
@@ -183,10 +183,10 @@ def _is_ocio_display_managed(group: str) -> int:
         The RV menu state (CheckedMenuState if managed, UncheckedMenuState otherwise).
     """
     try:
-        group_name = "RVDisplayPipelineGroup"
-        d_pipeline = groupMemberOfType(group, group_name)
-        d_ocio = groupMemberOfType(d_pipeline, "OCIODisplay")
-        managed = commands.getIntProperty(f"{d_ocio}.ocio.active")[0] != 0
+        groupName = "RVDisplayPipelineGroup"
+        dpipeline = groupMemberOfType(group, groupName)
+        dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+        managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
         return commands.CheckedMenuState if managed else commands.UncheckedMenuState
     except Exception:
         return commands.UncheckedMenuState
@@ -200,12 +200,12 @@ def isOCIODisplayManaged(group: str) -> Callable[[], int]:
     return partial(_is_ocio_display_managed, group=group)
 
 
-def _ocio_menu_check(node_type: str, prop: str, value: str) -> int:
+def _ocio_menu_check(nodeType: str, prop: str, value: str) -> int:
     """
     Internal callback logic to determine the menu check state for a specific OCIO property.
 
     Args:
-        node_type: The OCIO node type.
+        nodeType: The OCIO node type.
         prop: The property name to check.
         value: The value to compare against the current property value.
 
@@ -213,20 +213,20 @@ def _ocio_menu_check(node_type: str, prop: str, value: str) -> int:
         The RV menu state (Checked, Neutral, or Disabled).
     """
     try:
-        current = commands.getStringProperty(f"#{node_type}.{prop}")[0]
-        managed = _is_ocio_managed(node_type) == commands.CheckedMenuState
+        current = commands.getStringProperty(f"#{nodeType}.{prop}")[0]
+        managed = _is_ocio_managed(nodeType) == commands.CheckedMenuState
         checked = current == value and managed
         return commands.CheckedMenuState if checked else commands.NeutralMenuState
     except Exception:
         return commands.DisabledMenuState
 
 
-def ocioMenuCheck(node_type: str, prop: str, value: str) -> Callable[[], int]:
+def ocioMenuCheck(nodeType: str, prop: str, value: str) -> Callable[[], int]:
     """
     Deprecated: Public API maintained for backward compatibility.
-    Internal code should use `functools.partial(_ocio_menu_check, node_type=..., prop=..., value=...)`.
+    Internal code should use `functools.partial(_ocio_menu_check, nodeType=..., prop=..., value=...)`.
     """
-    return partial(_ocio_menu_check, node_type=node_type, prop=prop, value=value)
+    return partial(_ocio_menu_check, nodeType=nodeType, prop=prop, value=value)
 
 
 def _ocio_display_menu_check(group: str, display: str, view: str) -> int:
@@ -242,12 +242,12 @@ def _ocio_display_menu_check(group: str, display: str, view: str) -> int:
         The RV menu state (Checked, Unchecked, or Disabled).
     """
     try:
-        group_name = "RVDisplayPipelineGroup"
-        d_pipeline = groupMemberOfType(group, group_name)
-        d_ocio = groupMemberOfType(d_pipeline, "OCIODisplay")
-        d = commands.getStringProperty(f"{d_ocio}.ocio_display.display")[0]
-        v = commands.getStringProperty(f"{d_ocio}.ocio_display.view")[0]
-        if d == display and v == view:
+        groupName = "RVDisplayPipelineGroup"
+        dpipeline = groupMemberOfType(group, groupName)
+        dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+        currentDisplay = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
+        currentView = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
+        if currentDisplay == display and currentView == view:
             return commands.CheckedMenuState
         return commands.UncheckedMenuState
     except Exception:
@@ -262,50 +262,50 @@ def ocioDisplayMenuCheck(group: str, display: str, view: str) -> Callable[[], in
     return partial(_ocio_display_menu_check, group=group, display=display, view=view)
 
 
-def _ocio_event(event: Any, node_type: str, prop: str, value: str) -> None:
+def _ocio_event(event: Any, nodeType: str, prop: str, value: str) -> None:
     """
-    Internal callback logic to set a property on the current node of node_type in the evaluation path.
+    Internal callback logic to set a property on the current node of nodeType in the evaluation path.
 
     Args:
         event: The RV event object.
-        node_type: The OCIO node type.
+        nodeType: The OCIO node type.
         prop: The property name to set.
         value: The value to assign to the property.
     """
-    commands.setStringProperty(f"#{node_type}.{prop}", [value], True)
+    commands.setStringProperty(f"#{nodeType}.{prop}", [value], True)
     commands.redraw()
 
 
-def ocioEvent(node_type: str, prop: str, value: str) -> Callable[[Any], None]:
+def ocioEvent(nodeType: str, prop: str, value: str) -> Callable[[Any], None]:
     """
     Deprecated: Public API maintained for backward compatibility.
-    Internal code should use `functools.partial(_ocio_event, node_type=..., prop=..., value=...)`.
+    Internal code should use `functools.partial(_ocio_event, nodeType=..., prop=..., value=...)`.
     Note: The internal `_ocio_event` accepts `event` as its first parameter to allow kwargs binding.
     """
-    return partial(_ocio_event, node_type=node_type, prop=prop, value=value)
+    return partial(_ocio_event, nodeType=nodeType, prop=prop, value=value)
 
 
-def _ocio_event_on_all_of_type(event: Any, node_type: str, prop: str, value: str) -> None:
+def _ocio_event_on_all_of_type(event: Any, nodeType: str, prop: str, value: str) -> None:
     """
-    Internal callback logic to set a property on all nodes of node_type.
+    Internal callback logic to set a property on all nodes of nodeType.
 
     Args:
         event: The RV event object.
-        node_type: The OCIO node type.
+        nodeType: The OCIO node type.
         prop: The property name to set.
         value: The value to assign to the property.
     """
-    for node in commands.nodesOfType(node_type):
+    for node in commands.nodesOfType(nodeType):
         commands.setStringProperty(f"{node}.{prop}", [value], True)
     commands.redraw()
 
 
-def ocioEventOnAllOfType(node_type: str, prop: str, value: str) -> Callable[[Any], None]:
+def ocioEventOnAllOfType(nodeType: str, prop: str, value: str) -> Callable[[Any], None]:
     """
     Deprecated: Public API maintained for backward compatibility.
-    Internal code should use `functools.partial(_ocio_event_on_all_of_type, node_type=..., prop=..., value=...)`.
+    Internal code should use `functools.partial(_ocio_event_on_all_of_type, nodeType=..., prop=..., value=...)`.
     """
-    return partial(_ocio_event_on_all_of_type, node_type=node_type, prop=prop, value=value)
+    return partial(_ocio_event_on_all_of_type, nodeType=nodeType, prop=prop, value=value)
 
 
 def _ocio_display_event(event: Any, group: str, display: str, view: str) -> None:
@@ -318,16 +318,16 @@ def _ocio_display_event(event: Any, group: str, display: str, view: str) -> None
         display: The OCIO display name.
         view: The OCIO view name.
     """
-    group_name = "RVDisplayPipelineGroup"
-    d_pipeline = groupMemberOfType(group, group_name)
-    d_ocio = groupMemberOfType(d_pipeline, "OCIODisplay")
+    groupName = "RVDisplayPipelineGroup"
+    dpipeline = groupMemberOfType(group, groupName)
+    dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
     # Both 'display' and 'view' must be set together.
     # Disable the OCIONode during display/view propety changes.
     # Prevents node from rebuilding shaders while it may be in an invalid state.
-    commands.setIntProperty(f"{d_ocio}.ocio.active", [0], True)
-    commands.setStringProperty(f"{d_ocio}.ocio_display.display", [display], True)
-    commands.setStringProperty(f"{d_ocio}.ocio_display.view", [view], True)
-    commands.setIntProperty(f"{d_ocio}.ocio.active", [1], True)
+    commands.setIntProperty(f"{dOCIO}.ocio.active", [0], True)
+    commands.setStringProperty(f"{dOCIO}.ocio_display.display", [display], True)
+    commands.setStringProperty(f"{dOCIO}.ocio_display.view", [view], True)
+    commands.setIntProperty(f"{dOCIO}.ocio.active", [1], True)
     commands.redraw()
 
 
@@ -339,39 +339,39 @@ def ocioDisplayEvent(group: str, display: str, view: str) -> Callable[[Any], Non
     return partial(_ocio_display_event, group=group, display=display, view=view)
 
 
-def groupMemberOfType(node: str, member_type: str) -> str | None:
+def groupMemberOfType(node: str, memberType: str) -> str | None:
     """
     Find the first member of a group node that matches a specific node type.
 
     Args:
         node: The parent group node name.
-        member_type: The node type to search for.
+        memberType: The node type to search for.
 
     Returns:
         The name of the child node if found, otherwise None.
     """
     for n in commands.nodesInGroup(node):
-        if commands.nodeType(n) == member_type:
+        if commands.nodeType(n) == memberType:
             return n
     return None
 
 
-def applyProps(node: str, context_props: dict[str, str], properties_props: dict[str, str]) -> None:
+def applyProps(node: str, contextProps: dict[str, str], propertiesProps: dict[str, str]) -> None:
     """
     Apply standard and context properties to an OCIO node.
 
     Args:
         node: The target node name.
-        context_props: A dictionary of context variables and their values.
-        properties_props: A dictionary of standard properties and their values.
+        contextProps: A dictionary of context variables and their values.
+        propertiesProps: A dictionary of standard properties and their values.
     """
-    for p_prop, a_value in properties_props.items():
-        commands.setStringProperty(f"{node}.{p_prop}", [a_value], True)
-    for c_prop, c_value in context_props.items():
-        prop = f"{node}.ocio_context.{c_prop}"
+    for pprop, avalue in propertiesProps.items():
+        commands.setStringProperty(f"{node}.{pprop}", [avalue], True)
+    for cprop, cvalue in contextProps.items():
+        prop = f"{node}.ocio_context.{cprop}"
         if not commands.propertyExists(prop):
             commands.newProperty(prop, commands.StringType, 1)
-        commands.setStringProperty(prop, [c_value], True)
+        commands.setStringProperty(prop, [cvalue], True)
 
 
 #
@@ -404,7 +404,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
     between 0 and 10).
     """
 
-    def useSourceOCIO(self, source: str, node_type: str, default_setting: str = "") -> None:
+    def useSourceOCIO(self, source: str, nodeType: str, defaultSetting: str = "") -> None:
         """
         This tells the source group to use OCIO instead of the RV
         linearize node. There is also ocio.look and ocio.preCache
@@ -414,25 +414,25 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         Args:
             source: The name of the source group node.
-            node_type: The OCIO node type to activate (e.g., 'OCIOFile').
-            default_setting: The default fallback setting for color space or look.
+            nodeType: The OCIO node type to activate (e.g., 'OCIOFile').
+            defaultSetting: The default fallback setting for color space or look.
         """
 
         medias = commands.getStringProperty(f"{source}.media.movie")
         media = medias[0]
 
         try:
-            src_attrs = commands.sourceAttributes(source, media)
-            attr_dict = dict(zip([i[0] for i in src_attrs], [j[1] for j in src_attrs]))
-            attr_dict["source_node"] = source
-            attr_dict["default_setting"] = default_setting
+            srcAttrs = commands.sourceAttributes(source, media)
+            attrDict = dict(zip([i[0] for i in srcAttrs], [j[1] for j in srcAttrs]))
+            attrDict["source_node"] = source
+            attrDict["default_setting"] = defaultSetting
         except Exception:
-            attr_dict = {}
+            attrDict = {}
 
-        if self._config is None:
+        if self.config is None:
             try:
-                self._config = ocio_config_from_media(media, attr_dict)
-                OCIO.SetCurrentConfig(self._config)
+                self.config = ocio_config_from_media(media, attrDict)
+                OCIO.SetCurrentConfig(self.config)
                 commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             except Exception:
                 return
@@ -442,15 +442,15 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         # then use the one we have and return
         #
 
-        pipe_slot = OCIO_ROLES[node_type]
-        src_pipeline = groupMemberOfType(commands.nodeGroup(source), pipe_slot)
-        ocio_node = groupMemberOfType(src_pipeline, node_type)
-        if ocio_node is not None and self._reading_session:
-            for p_node in commands.nodesInGroup(src_pipeline):
-                if commands.nodeType(p_node).startswith("OCIO"):
-                    commands.ocioUpdateConfig(p_node)
+        pipeSlot = OCIO_ROLES[nodeType]
+        srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
+        ocioNode = groupMemberOfType(srcPipeline, nodeType)
+        if ocioNode is not None and self.readingSession:
+            for pNode in commands.nodesInGroup(srcPipeline):
+                if commands.nodeType(pNode).startswith("OCIO"):
+                    commands.ocioUpdateConfig(pNode)
 
-            package_logger.info("using %s node for %s %s", node_type, source, pipe_slot)
+            package_logger.info("using %s node for %s %s", nodeType, source, pipeSlot)
             return
 
         #
@@ -471,8 +471,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         #
 
         try:
-            if pipe_slot not in DEFAULT_PIPE:
-                current_pipeline_nodes = commands.getStringProperty(f"{src_pipeline}.pipeline.nodes")
+            if pipeSlot not in DEFAULT_PIPE:
+                currentPipelineNodes = commands.getStringProperty(f"{srcPipeline}.pipeline.nodes")
 
                 # We need to handle the following special case here:
                 # We might be in the process of reloading an RV session that
@@ -480,59 +480,59 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 # want this pipeline to be considered the default (non OCIO).
                 # Example: srcPipelineNodes = [ "OCIOFile" "RVLensWarp" ]
                 # We will use the RV default instead in that special case.
-                if node_type in current_pipeline_nodes and pipe_slot in DEFAULT_RV_PIPE:
-                    DEFAULT_PIPE[pipe_slot] = DEFAULT_RV_PIPE[pipe_slot]
+                if nodeType in currentPipelineNodes and pipeSlot in DEFAULT_RV_PIPE:
+                    DEFAULT_PIPE[pipeSlot] = DEFAULT_RV_PIPE[pipeSlot]
                 else:
-                    DEFAULT_PIPE[pipe_slot] = current_pipeline_nodes
-            pipeline_list = ocio_node_from_media(self._config, src_pipeline, DEFAULT_PIPE[pipe_slot], media, attr_dict)
+                    DEFAULT_PIPE[pipeSlot] = currentPipelineNodes
+            pipelineList = ocio_node_from_media(self.config, srcPipeline, DEFAULT_PIPE[pipeSlot], media, attrDict)
         except Exception as inst:
-            package_logger.error("Problem occurred while loading OCIO settings for %s: %s", node_type, inst)
+            package_logger.error("Problem occurred while loading OCIO settings for %s: %s", nodeType, inst)
             return
 
         try:
-            pipeline = [p["nodeType"] for p in pipeline_list]
+            pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
             package_logger.error("Unable to make use of ocio_node_from_media return: %s", inst)
             return
             
-        if pipeline == DEFAULT_PIPE[pipe_slot]:
+        if pipeline == DEFAULT_PIPE[pipeSlot]:
             return
 
-        package_logger.info("using %s node for %s %s", node_type, source, pipe_slot)
+        package_logger.info("using %s node for %s %s", nodeType, source, pipeSlot)
 
-        commands.setStringProperty(f"{src_pipeline}.pipeline.nodes", pipeline, True)
-        pipe_nodes = commands.nodesInGroup(src_pipeline)
-        pipe_nodes.sort()
-        for index, p_node in enumerate(pipeline_list):
-            stage_ocio = pipe_nodes[index]
+        commands.setStringProperty(f"{srcPipeline}.pipeline.nodes", pipeline, True)
+        pipeNodes = commands.nodesInGroup(srcPipeline)
+        pipeNodes.sort()
+        for index, pNode in enumerate(pipelineList):
+            stageOCIO = pipeNodes[index]
             try:
-                applyProps(stage_ocio, p_node["context"], p_node["properties"])
+                applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                package_logger.error("Unable to apply properties to %s: %s", stage_ocio, inst)
+                package_logger.error("Unable to apply properties to %s: %s", stageOCIO, inst)
 
         commands.redraw()
 
-    def disableSourceOCIO(self, source: str, node_type: str) -> None:
+    def disableSourceOCIO(self, source: str, nodeType: str) -> None:
         """
         This reverts the source group's linearize node back to using
         a native RVLinearize node.
 
         Args:
             source: The name of the source group node.
-            node_type: The OCIO node type being disabled.
+            nodeType: The OCIO node type being disabled.
         """
 
-        pipe_slot = OCIO_ROLES[node_type]
-        src_pipeline = groupMemberOfType(commands.nodeGroup(source), pipe_slot)
-        nodes_prop = f"{src_pipeline}.pipeline.nodes"
-        current = commands.getStringProperty(nodes_prop)
+        pipeSlot = OCIO_ROLES[nodeType]
+        srcPipeline = groupMemberOfType(commands.nodeGroup(source), pipeSlot)
+        nodesProp = f"{srcPipeline}.pipeline.nodes"
+        current = commands.getStringProperty(nodesProp)
 
-        if pipe_slot not in DEFAULT_PIPE or current == DEFAULT_PIPE[pipe_slot]:
+        if pipeSlot not in DEFAULT_PIPE or current == DEFAULT_PIPE[pipeSlot]:
             return
 
-        package_logger.info("resetting %s for %s", pipe_slot, source)
+        package_logger.info("resetting %s for %s", pipeSlot, source)
 
-        commands.setStringProperty(f"{src_pipeline}.pipeline.nodes", DEFAULT_PIPE[pipe_slot], True)
+        commands.setStringProperty(f"{srcPipeline}.pipeline.nodes", DEFAULT_PIPE[pipeSlot], True)
         commands.redraw()
 
     def useDisplayOCIO(self, group: str) -> None:
@@ -548,53 +548,53 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             group: The display group node name.
         """
 
-        if self._using_ocio_for_display.get(group, False) or self._config is None:
+        if self.usingOCIOForDisplay.get(group, False) or self.config is None:
             return
 
-        group_name = "RVDisplayPipelineGroup"
+        groupName = "RVDisplayPipelineGroup"
         try:
-            d_pipeline = groupMemberOfType(group, group_name)
-            if group_name not in DEFAULT_PIPE:
-                current_pipeline_nodes = commands.getStringProperty(f"{d_pipeline}.pipeline.nodes")
+            dpipeline = groupMemberOfType(group, groupName)
+            if groupName not in DEFAULT_PIPE:
+                currentPipelineNodes = commands.getStringProperty(f"{dpipeline}.pipeline.nodes")
 
                 # We need to handle the following special case here:
                 # We might be in the process of reloading an RV session that
                 # is already OCIO color corrected in which case we do not
                 # want this pipeline to be considered the default (non OCIO).
                 # We will use the RV default instead in that special case.
-                if "OCIODisplay" in current_pipeline_nodes and group_name in DEFAULT_RV_PIPE:
-                    DEFAULT_PIPE[group_name] = DEFAULT_RV_PIPE[group_name]
+                if "OCIODisplay" in currentPipelineNodes and groupName in DEFAULT_RV_PIPE:
+                    DEFAULT_PIPE[groupName] = DEFAULT_RV_PIPE[groupName]
                 else:
-                    DEFAULT_PIPE[group_name] = current_pipeline_nodes
-            pipeline_list = ocio_node_from_media(self._config, d_pipeline, DEFAULT_PIPE[group_name])
+                    DEFAULT_PIPE[groupName] = currentPipelineNodes
+            pipelineList = ocio_node_from_media(self.config, dpipeline, DEFAULT_PIPE[groupName])
         except Exception as inst:
             package_logger.error("Problem occurred while loading OCIO settings for OCIODisplay: %s", inst)
             return
 
         try:
-            pipeline = [p["nodeType"] for p in pipeline_list]
+            pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
             package_logger.error("Unable to make use of ocio_node_from_media return: %s", inst)
             return
             
-        if pipeline == DEFAULT_PIPE[group_name]:
+        if pipeline == DEFAULT_PIPE[groupName]:
             return
 
         device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using OCIODisplay for display: %s", device)
 
-        commands.setStringProperty(f"{d_pipeline}.pipeline.nodes", pipeline, True)
+        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", pipeline, True)
 
-        pipe_nodes = commands.nodesInGroup(d_pipeline)
-        pipe_nodes.sort()
-        for index, p_node in enumerate(pipeline_list):
-            stage_ocio = pipe_nodes[index]
+        pipeNodes = commands.nodesInGroup(dpipeline)
+        pipeNodes.sort()
+        for index, pNode in enumerate(pipelineList):
+            stageOCIO = pipeNodes[index]
             try:
-                applyProps(stage_ocio, p_node["context"], p_node["properties"])
+                applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                package_logger.error("Unable to apply properties to %s: %s", stage_ocio, inst)
+                package_logger.error("Unable to apply properties to %s: %s", stageOCIO, inst)
 
-        self._using_ocio_for_display[group] = True
+        self.usingOCIOForDisplay[group] = True
         commands.redraw()
 
     def disableDisplayOCIO(self, group: str) -> None:
@@ -606,20 +606,20 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             group: The display group node name.
         """
 
-        group_name = "RVDisplayPipelineGroup"
-        d_pipeline = groupMemberOfType(group, group_name)
-        nodes_prop = f"{d_pipeline}.pipeline.nodes"
-        current = commands.getStringProperty(nodes_prop)
+        groupName = "RVDisplayPipelineGroup"
+        dpipeline = groupMemberOfType(group, groupName)
+        nodesProp = f"{dpipeline}.pipeline.nodes"
+        current = commands.getStringProperty(nodesProp)
 
-        if group_name not in DEFAULT_PIPE or current == DEFAULT_PIPE[group_name]:
+        if groupName not in DEFAULT_PIPE or current == DEFAULT_PIPE[groupName]:
             return
 
-        commands.setStringProperty(f"{d_pipeline}.pipeline.nodes", DEFAULT_PIPE[group_name], True)
+        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", DEFAULT_PIPE[groupName], True)
 
         device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using RVDisplayColor for display: %s", device)
 
-        self._using_ocio_for_display[group] = False
+        self.usingOCIOForDisplay[group] = False
         commands.redraw()
 
     def sourceSetup(self, event: Any) -> None:
@@ -637,12 +637,12 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         args = event.contents().split(";;")
         group = args[0]
-        file_source = groupMemberOfType(group, "RVFileSource")
-        image_source = groupMemberOfType(group, "RVImageSource")
-        source = file_source if image_source is None else image_source
+        fileSource = groupMemberOfType(group, "RVFileSource")
+        imageSource = groupMemberOfType(group, "RVImageSource")
+        source = fileSource if imageSource is None else imageSource
 
-        for node_type in OCIO_ROLES.keys():
-            self.useSourceOCIO(source, node_type)
+        for nodeType in OCIO_ROLES.keys():
+            self.useSourceOCIO(source, nodeType)
 
         #
         #   If this is the first OCIO color pipeline for a source assume
@@ -651,9 +651,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         #
 
         if len(commands.nodesOfType("OCIOFile")) == 1:
-            for d_group in commands.nodesOfType("RVDisplayGroup"):
-                if not self._using_ocio_for_display.get(d_group, False):
-                    self.useDisplayOCIO(d_group)
+            for dgroup in commands.nodesOfType("RVDisplayGroup"):
+                if not self.usingOCIOForDisplay.get(dgroup, False):
+                    self.useDisplayOCIO(dgroup)
 
     def beforeSessionRead(self, event: Any) -> None:
         """
@@ -663,7 +663,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             event: The RV event object.
         """
         event.reject()
-        self._reading_session = True
+        self.readingSession = True
 
     def afterSessionRead(self, event: Any) -> None:
         """
@@ -673,45 +673,45 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             event: The RV event object.
         """
         event.reject()
-        self._reading_session = False
+        self.readingSession = False
         if len(commands.nodesOfType("OCIOFile")) > 1:
             for group in commands.nodesOfType("RVDisplayGroup"):
-                if not self._using_ocio_for_display.get(group, False):
+                if not self.usingOCIOForDisplay.get(group, False):
                     self.useDisplayOCIO(group)
 
-    def _ocio_active_event(self, event: Any, node_type: str) -> None:
+    def _ocio_active_event(self, event: Any, nodeType: str) -> None:
         """
         Toggle the active state of an OCIO node or display group.
 
         Args:
             event: The RV event object.
-            node_type: The OCIO node type or display group to toggle.
+            nodeType: The OCIO node type or display group to toggle.
         """
-        if node_type not in ["OCIOFile", "OCIOLook"]:
-            if _is_ocio_display_managed(node_type) == commands.CheckedMenuState:
-                self.disableDisplayOCIO(node_type)
+        if nodeType not in ["OCIOFile", "OCIOLook"]:
+            if _is_ocio_display_managed(nodeType) == commands.CheckedMenuState:
+                self.disableDisplayOCIO(nodeType)
             else:
-                self.useDisplayOCIO(node_type)
+                self.useDisplayOCIO(nodeType)
             return
 
-        eval_info = commands.metaEvaluateClosestByType(commands.frame(), "RVFileSource", None)
-        if len(eval_info) == 0:
-            eval_info = commands.metaEvaluateClosestByType(commands.frame(), "RVImageSource", None)
-        if len(eval_info) == 0:
+        evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVFileSource", None)
+        if len(evalInfo) == 0:
+            evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVImageSource", None)
+        if len(evalInfo) == 0:
             return
-        source = eval_info[0]["node"]
+        source = evalInfo[0]["node"]
 
-        if _is_ocio_managed(node_type) == commands.CheckedMenuState:
-            self.disableSourceOCIO(source, node_type)
+        if _is_ocio_managed(nodeType) == commands.CheckedMenuState:
+            self.disableSourceOCIO(source, nodeType)
         else:
-            self.useSourceOCIO(source, node_type, OCIO_DEFAULTS[node_type])
+            self.useSourceOCIO(source, nodeType, OCIO_DEFAULTS[nodeType])
 
-    def ocioActiveEvent(self, node_type: str) -> Callable[[Any], None]:
+    def ocioActiveEvent(self, nodeType: str) -> Callable[[Any], None]:
         """
         Deprecated: Public API maintained for backward compatibility.
-        Internal code should use `functools.partial(self._ocio_active_event, node_type=...)`.
+        Internal code should use `functools.partial(self._ocio_active_event, nodeType=...)`.
         """
-        return partial(self._ocio_active_event, node_type=node_type)
+        return partial(self._ocio_active_event, nodeType=nodeType)
 
     def checkForDisplayGroup(self, event: Any) -> None:
         """
@@ -724,7 +724,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         try:
             node = event.contents()
             if commands.nodeType(node) == "RVDisplayGroup":
-                self._using_ocio_for_display[node] = False
+                self.usingOCIOForDisplay[node] = False
                 commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
         except Exception as inst:
             package_logger.error("%s %s", inst, node)
@@ -749,19 +749,19 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         """
         try:
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
-            self._config = OCIO.Config.CreateFromFile(config)
-            OCIO.SetCurrentConfig(self._config)
+            self.config = OCIO.Config.CreateFromFile(config)
+            OCIO.SetCurrentConfig(self.config)
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for node_type in OCIO_ROLES.keys():
-                    self.disableSourceOCIO(source, node_type)
+                for nodeType in OCIO_ROLES.keys():
+                    self.disableSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.disableDisplayOCIO(group)
             DEFAULT_PIPE.clear()
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for node_type in OCIO_ROLES.keys():
-                    self.useSourceOCIO(source, node_type)
+                for nodeType in OCIO_ROLES.keys():
+                    self.useSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
-                self._using_ocio_for_display[group] = False
+                self.usingOCIOForDisplay[group] = False
                 self.useDisplayOCIO(group)
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
@@ -779,10 +779,10 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         #   Try to acquire OCIO config to populate the display menu
         #
 
-        if self._config is None:
+        if self.config is None:
             try:
-                self._config = ocio_config_from_media(None, None)
-                OCIO.SetCurrentConfig(self._config)
+                self.config = ocio_config_from_media(None, None)
+                OCIO.SetCurrentConfig(self.config)
             except Exception:
                 return [("OCIO", [("Choose Config...", self.selectConfig, None, None)])]
 
@@ -790,21 +790,21 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         #   Make a unique entry for each device's display group
         #
 
-        da_list = []
+        daList = []
         for display in commands.nodesOfType("RVDisplayGroup"):
-            d_list = [
+            dList = [
                 (
                     "Active",
-                    partial(self._ocio_active_event, node_type=display),
+                    partial(self._ocio_active_event, nodeType=display),
                     None,
                     partial(_is_ocio_display_managed, group=display),
                 ),
                 ("_", None),
             ]
-            for d in self._config.getDisplays():
-                v_list = []
-                for v in self._config.getViews(d):
-                    v_list.append(
+            for d in self.config.getDisplays():
+                vList = []
+                for v in self.config.getViews(d):
+                    vList.append(
                         (
                             v,
                             partial(_ocio_display_event, group=display, display=d, view=v),
@@ -812,121 +812,123 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                             partial(_ocio_display_menu_check, group=display, display=d, view=v),
                         )
                     )
-                d_list.append((d, v_list))
+                dList.append((d, vList))
             device_name = commands.getStringProperty(f"{display}.device.name")[0]
             device = f"  {device_name}"
-            da_list.append((device, d_list))
+            daList.append((device, dList))
 
         #
         #   Apply file space changes only to the visible source
         #
 
-        css_list: list[Any] = [
+        cssList: list[Any] = [
             (
                 "Active",
-                partial(self._ocio_active_event, node_type="OCIOFile"),
+                partial(self._ocio_active_event, nodeType="OCIOFile"),
                 None,
-                partial(_is_ocio_managed, node_type="OCIOFile"),
+                partial(_is_ocio_managed, nodeType="OCIOFile"),
             ),
             ("_", None),
         ]
-        csa_list: list[Any] = []
+        csaList: list[Any] = []
 
         def addPath(family: list[str], tree: list[list[str]]) -> None:
             for f in family:
                 for t in tree:
                     if f in t:
-                        return addPath(family[1:], t)
+                        addPath(family[1:], t)
+                        return
                 tree.append([f])
-                return addPath(family, tree)
+                addPath(family, tree)
+                return
 
-        families = [(cs.getFamily().split("/") + [cs.getName()]) for cs in self._config.getColorSpaces()]
+        families = [(cs.getFamily().split("/") + [cs.getName()]) for cs in self.config.getColorSpaces()]
         root: list[list[str]] = []
         for family in families:
             addPath(family, root)
 
-        def addMenu(root_node: list[Any], is_single: bool) -> list[Any]:
+        def addMenu(root_node: list[Any], isSingle: bool) -> list[Any]:
             if len(root_node) == 1:
                 name = root_node[0]
-                if is_single:
+                if isSingle:
                     OCIO_DEFAULTS.setdefault("OCIOFile", name)
                     return [
                         (
                             name,
-                            partial(_ocio_event, node_type="OCIOFile", prop="ocio.inColorSpace", value=name),
+                            partial(_ocio_event, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                             None,
-                            partial(_ocio_menu_check, node_type="OCIOFile", prop="ocio.inColorSpace", value=name),
+                            partial(_ocio_menu_check, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                         )
                     ]
                 else:
                     return [
                         (
                             name,
-                            partial(_ocio_event_on_all_of_type, node_type="OCIOFile", prop="ocio.inColorSpace", value=name),
+                            partial(_ocio_event_on_all_of_type, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                             None,
-                            partial(_ocio_menu_check, node_type="OCIOFile", prop="ocio.inColorSpace", value=name),
+                            partial(_ocio_menu_check, nodeType="OCIOFile", prop="ocio.inColorSpace", value=name),
                         )
                     ]
             else:
                 menu = []
                 for r in root_node[1:]:
-                    menu += addMenu(r, is_single)
+                    menu += addMenu(r, isSingle)
                 return [(root_node[0], menu)]
 
         for r in root:
-            css_list += addMenu(r, True)
-            csa_list += addMenu(r, False)
+            cssList += addMenu(r, True)
+            csaList += addMenu(r, False)
 
         #
         #   Apply file look changes only to the visible source
         #
 
-        ls_list: list[Any] = [
+        lsList: list[Any] = [
             (
                 "Active",
-                partial(self._ocio_active_event, node_type="OCIOLook"),
+                partial(self._ocio_active_event, nodeType="OCIOLook"),
                 None,
-                partial(_is_ocio_managed, node_type="OCIOLook"),
+                partial(_is_ocio_managed, nodeType="OCIOLook"),
             ),
             ("_", None),
         ]
-        la_list: list[Any] = []
-        for look in self._config.getLooks():
+        laList: list[Any] = []
+        for look in self.config.getLooks():
             OCIO_DEFAULTS.setdefault("OCIOLook", look.getName())
-            ls_list.append(
+            lsList.append(
                 (
                     look.getName(),
-                    partial(_ocio_event, node_type="OCIOLook", prop="ocio_look.look", value=look.getName()),
+                    partial(_ocio_event, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                     None,
-                    partial(_ocio_menu_check, node_type="OCIOLook", prop="ocio_look.look", value=look.getName()),
+                    partial(_ocio_menu_check, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                 )
             )
-            la_list.append(
+            laList.append(
                 (
                     look.getName(),
-                    partial(_ocio_event_on_all_of_type, node_type="OCIOLook", prop="ocio_look.look", value=look.getName()),
+                    partial(_ocio_event_on_all_of_type, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                     None,
-                    partial(_ocio_menu_check, node_type="OCIOLook", prop="ocio_look.look", value=look.getName()),
+                    partial(_ocio_menu_check, nodeType="OCIOLook", prop="ocio_look.look", value=look.getName()),
                 )
             )
 
         final: list[Any] = [
             ("Current Source", None, None, lambda: commands.DisabledMenuState),
-            ("  File Color Space", css_list),
+            ("  File Color Space", cssList),
         ]
-        if len(ls_list) > 2:
-            final += [("  Look", ls_list)]
+        if len(lsList) > 2:
+            final += [("  Look", lsList)]
         final += [
             ("All Sources", None, None, lambda: commands.DisabledMenuState),
-            ("  File Color Space", csa_list),
+            ("  File Color Space", csaList),
         ]
-        if len(la_list) > 0:
-            final += [("  Look", la_list)]
+        if len(laList) > 0:
+            final += [("  Look", laList)]
         final += [
             ("_", None),
             ("Displays", None, None, lambda: commands.DisabledMenuState),
         ]
-        final += da_list
+        final += daList
         final += [("_", None)]
         final += [("Change Config...", self.selectConfig, None, None)]
 
@@ -939,9 +941,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         """
         super().__init__()
 
-        self._using_ocio_for_display: dict[str, bool] = {}
-        self._reading_session: bool = False
-        self._config: OCIO.Config | None = None
+        self.usingOCIOForDisplay: dict[str, bool] = {}
+        self.readingSession: bool = False
+        self.config: OCIO.Config | None = None
 
         #
         #   Look for an implementation of the OCIOHelper on the PATH.
@@ -970,8 +972,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "" and os.path.isfile(config):
-                self._config = OCIO.Config.CreateFromFile(config)
-                OCIO.SetCurrentConfig(self._config)
+                self.config = OCIO.Config.CreateFromFile(config)
+                OCIO.SetCurrentConfig(self.config)
             else:
                 package_logger.warning("$OCIO environment variable unset!")
 
