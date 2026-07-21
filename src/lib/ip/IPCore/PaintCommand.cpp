@@ -1585,9 +1585,23 @@ namespace IPCore
             context.commandExecuted = count;
 
             // currentFBO contains the resulting content after rendering these
-            // commands
+            // commands.
             if (fbo && currentFBO)
-                currentFBO->copyTo(fbo);
+            {
+                const float rx = root->paintTargetRegionX;
+                const float ry = root->paintTargetRegionY;
+                const float rw = root->paintTargetRegionW;
+                const float rh = root->paintTargetRegionH;
+                if (rx == 0.0f && ry == 0.0f && rw == 1.0f && rh == 1.0f)
+                {
+                    currentFBO->copyTo(fbo);
+                }
+                else
+                {
+                    // Copy limited region for certain stereo modes (e.g. side-by-side)
+                    currentFBO->copyRegionTo(fbo, rx, ry, rw, rh, rx, ry, rw, rh);
+                }
+            }
         }
 
     } // namespace Paint
