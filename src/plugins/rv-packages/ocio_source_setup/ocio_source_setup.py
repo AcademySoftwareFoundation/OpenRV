@@ -100,9 +100,9 @@ def ocio_node_from_media(
 
     elif nodeType == "RVLinearizePipelineGroup":
         inspace = config.parseColorSpaceFromString(media) if media else ""
-        if inspace == "":
+        if not inspace:
             inspace = attributes.get("default_setting", "")
-        if inspace != "":
+        if inspace:
             result = [
                 {
                     "nodeType": "OCIOFile",
@@ -130,7 +130,7 @@ def ocio_node_from_media(
         #          "ocio_look.look"    : "shot_specific_look"}}]
 
         look = attributes.get("default_setting", "")
-        if look != "":
+        if look:
             result = [
                 {
                     "nodeType": "OCIOLook",
@@ -184,9 +184,9 @@ def _is_ocio_display_managed(group: str) -> int:
     """
     try:
         groupName = "RVDisplayPipelineGroup"
-        dpipeline = groupMemberOfType(group, groupName)
-        dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-        managed = commands.getIntProperty(f"{dOCIO}.ocio.active")[0] != 0
+        display_pipeline = groupMemberOfType(group, groupName)
+        display_ocio = groupMemberOfType(display_pipeline, "OCIODisplay")
+        managed = commands.getIntProperty(f"{display_ocio}.ocio.active")[0] != 0
         return commands.CheckedMenuState if managed else commands.UncheckedMenuState
     except Exception:
         return commands.UncheckedMenuState
@@ -243,10 +243,10 @@ def _ocio_display_menu_check(group: str, display: str, view: str) -> int:
     """
     try:
         groupName = "RVDisplayPipelineGroup"
-        dpipeline = groupMemberOfType(group, groupName)
-        dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
-        currentDisplay = commands.getStringProperty(f"{dOCIO}.ocio_display.display")[0]
-        currentView = commands.getStringProperty(f"{dOCIO}.ocio_display.view")[0]
+        display_pipeline = groupMemberOfType(group, groupName)
+        display_ocio = groupMemberOfType(display_pipeline, "OCIODisplay")
+        currentDisplay = commands.getStringProperty(f"{display_ocio}.ocio_display.display")[0]
+        currentView = commands.getStringProperty(f"{display_ocio}.ocio_display.view")[0]
         if currentDisplay == display and currentView == view:
             return commands.CheckedMenuState
         return commands.UncheckedMenuState
@@ -319,15 +319,15 @@ def _ocio_display_event(event: Any, group: str, display: str, view: str) -> None
         view: The OCIO view name.
     """
     groupName = "RVDisplayPipelineGroup"
-    dpipeline = groupMemberOfType(group, groupName)
-    dOCIO = groupMemberOfType(dpipeline, "OCIODisplay")
+    display_pipeline = groupMemberOfType(group, groupName)
+    display_ocio = groupMemberOfType(display_pipeline, "OCIODisplay")
     # Both 'display' and 'view' must be set together.
     # Disable the OCIONode during display/view propety changes.
     # Prevents node from rebuilding shaders while it may be in an invalid state.
-    commands.setIntProperty(f"{dOCIO}.ocio.active", [0], True)
-    commands.setStringProperty(f"{dOCIO}.ocio_display.display", [display], True)
-    commands.setStringProperty(f"{dOCIO}.ocio_display.view", [view], True)
-    commands.setIntProperty(f"{dOCIO}.ocio.active", [1], True)
+    commands.setIntProperty(f"{display_ocio}.ocio.active", [0], True)
+    commands.setStringProperty(f"{display_ocio}.ocio_display.display", [display], True)
+    commands.setStringProperty(f"{display_ocio}.ocio_display.view", [view], True)
+    commands.setIntProperty(f"{display_ocio}.ocio.active", [1], True)
     commands.redraw()
 
 
@@ -423,7 +423,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         try:
             srcAttrs = commands.sourceAttributes(source, media)
-            attrDict = dict(zip([i[0] for i in srcAttrs], [j[1] for j in srcAttrs]))
+            attrDict = {attr[0]: attr[1] for attr in srcAttrs}
             attrDict["source_node"] = source
             attrDict["default_setting"] = defaultSetting
         except Exception:
@@ -553,9 +553,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
 
         groupName = "RVDisplayPipelineGroup"
         try:
-            dpipeline = groupMemberOfType(group, groupName)
+            display_pipeline = groupMemberOfType(group, groupName)
             if groupName not in DEFAULT_PIPE:
-                currentPipelineNodes = commands.getStringProperty(f"{dpipeline}.pipeline.nodes")
+                currentPipelineNodes = commands.getStringProperty(f"{display_pipeline}.pipeline.nodes")
 
                 # We need to handle the following special case here:
                 # We might be in the process of reloading an RV session that
@@ -566,7 +566,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     DEFAULT_PIPE[groupName] = DEFAULT_RV_PIPE[groupName]
                 else:
                     DEFAULT_PIPE[groupName] = currentPipelineNodes
-            pipelineList = ocio_node_from_media(self.config, dpipeline, DEFAULT_PIPE[groupName])
+            pipelineList = ocio_node_from_media(self.config, display_pipeline, DEFAULT_PIPE[groupName])
         except Exception as inst:
             package_logger.error("Problem occurred while loading OCIO settings for OCIODisplay: %s", inst)
             return
@@ -583,9 +583,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using OCIODisplay for display: %s", device)
 
-        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", pipeline, True)
+        commands.setStringProperty(f"{display_pipeline}.pipeline.nodes", pipeline, True)
 
-        pipeNodes = commands.nodesInGroup(dpipeline)
+        pipeNodes = commands.nodesInGroup(display_pipeline)
         pipeNodes.sort()
         for index, pNode in enumerate(pipelineList):
             stageOCIO = pipeNodes[index]
@@ -607,14 +607,14 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         """
 
         groupName = "RVDisplayPipelineGroup"
-        dpipeline = groupMemberOfType(group, groupName)
-        nodesProp = f"{dpipeline}.pipeline.nodes"
+        display_pipeline = groupMemberOfType(group, groupName)
+        nodesProp = f"{display_pipeline}.pipeline.nodes"
         current = commands.getStringProperty(nodesProp)
 
         if groupName not in DEFAULT_PIPE or current == DEFAULT_PIPE[groupName]:
             return
 
-        commands.setStringProperty(f"{dpipeline}.pipeline.nodes", DEFAULT_PIPE[groupName], True)
+        commands.setStringProperty(f"{display_pipeline}.pipeline.nodes", DEFAULT_PIPE[groupName], True)
 
         device = commands.getStringProperty(f"{group}.device.name")[0]
         package_logger.info("using RVDisplayColor for display: %s", device)
@@ -639,9 +639,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         group = args[0]
         fileSource = groupMemberOfType(group, "RVFileSource")
         imageSource = groupMemberOfType(group, "RVImageSource")
-        source = fileSource if imageSource is None else imageSource
+        source = imageSource or fileSource
 
-        for nodeType in OCIO_ROLES.keys():
+        for nodeType in OCIO_ROLES:
             self.useSourceOCIO(source, nodeType)
 
         #
@@ -695,9 +695,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             return
 
         evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVFileSource", None)
-        if len(evalInfo) == 0:
+        if not evalInfo:
             evalInfo = commands.metaEvaluateClosestByType(commands.frame(), "RVImageSource", None)
-        if len(evalInfo) == 0:
+        if not evalInfo:
             return
         source = evalInfo[0]["node"]
 
@@ -752,13 +752,13 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for nodeType in OCIO_ROLES.keys():
+                for nodeType in OCIO_ROLES:
                     self.disableSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.disableDisplayOCIO(group)
             DEFAULT_PIPE.clear()
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for nodeType in OCIO_ROLES.keys():
+                for nodeType in OCIO_ROLES:
                     self.useSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.usingOCIOForDisplay[group] = False
@@ -971,7 +971,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         # An externally set OCIO env var takes precendence
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
-            if config != "" and os.path.isfile(config):
+            if config and os.path.isfile(config):
                 self.config = OCIO.Config.CreateFromFile(config)
                 OCIO.SetCurrentConfig(self.config)
             else:
