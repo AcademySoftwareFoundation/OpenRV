@@ -836,9 +836,11 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             for f in family:
                 for t in tree:
                     if f in t:
-                        return addPath(family[1:], t)
+                        addPath(family[1:], t)
+                        return
                 tree.append([f])
-                return addPath(family, tree)
+                addPath(family, tree)
+                return
 
         families = [(cs.getFamily().split("/") + [cs.getName()]) for cs in self.config.getColorSpaces()]
         root: list[list[str]] = []
@@ -954,7 +956,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             inherited = []
             for method in METHODS:
                 try:
-                    exec(f"global {method}; {method} = rv_ocio_setup.{method}")
+                    override_method = getattr(rv_ocio_setup, method)
+                    globals()[method] = override_method
                     inherited.append(method)
                 except AttributeError:
                     pass
