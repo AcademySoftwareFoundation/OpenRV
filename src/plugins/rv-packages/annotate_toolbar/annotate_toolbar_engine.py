@@ -147,12 +147,17 @@ class AnnotateDrawEngine:
             ("key-down--backspace", self.on_text_backspace, "Delete char"),
             ("key-down--delete", self.on_text_backspace, "Delete char"),
             ("key-down--space", self.on_text_space, "Insert space"),
-            ("key-down--return", self.on_text_commit, "Commit text"),
-            ("key-down--enter", self.on_text_commit, "Commit text"),
-            ("key-down--keypad-enter", self.on_text_commit, "Commit text"),
+            ("key-down--return", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
+            ("key-down--enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
+            ("key-down--keypad-enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
+            # Session events
+            ("frame-changed", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-session-write", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-session-write-copy", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-play-start", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-session-read", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-graph-view-changed", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("key-down--escape", self.on_text_cancel, "Cancel text"),
-            # Commit when frame changes so text isn't left open during playback
-            ("frame-changed", self.on_frame_changed, "Commit text on frame change"),
         ]
 
     @property
@@ -1034,10 +1039,14 @@ class AnnotateDrawEngine:
             self._text_buffer = self._text_buffer[:-1]
         self._update_text_display(cursor=True)
 
-    def on_text_commit(self, event):
+    def on_text_commit(self, event, reject):
         if not self._text_active:
             event.reject()
             return
+
+        if reject:
+            event.reject()
+
         self._commit_text()
 
     def on_text_cancel(self, event):
@@ -1050,11 +1059,6 @@ class AnnotateDrawEngine:
         # Consume key-up events during text input so they don't propagate
         if not self._text_active:
             event.reject()
-
-    def on_frame_changed(self, event):
-        if self._text_active:
-            self._commit_text()
-        event.reject()  # let normal frame-change handling continue
 
     # ------------------------------------------------------------------
     # Undo / redo / clear
