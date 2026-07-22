@@ -10,6 +10,7 @@
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLFBO.h>
 #include <TwkExc/Exception.h>
+#include <cstdlib>
 #include <iostream>
 
 #ifdef PLATFORM_LINUX
@@ -154,8 +155,21 @@ namespace TwkGLF
         int attrs[] = {GLX_BUFFER_SIZE, 32, GLX_RGBA, 0, GLX_STENCIL_SIZE, 1};
 
         m_imp->display = XOpenDisplay(0);
+        if (!m_imp->display)
+        {
+            cout << "ERROR: no GPU available: could not open X display" << endl;
+            exit(-1);
+        }
+
         m_imp->root = DefaultRootWindow(m_imp->display);
         m_imp->vis = glXChooseVisual(m_imp->display, DefaultScreen(m_imp->display), attrs);
+
+        if (!m_imp->vis)
+        {
+            cout << "ERROR: no GPU available: no matching GLX visual"
+                 << endl;
+            exit(-1);
+        }
 
         swa.colormap = XCreateColormap(m_imp->display, m_imp->root, m_imp->vis->visual, AllocNone);
 
@@ -165,6 +179,12 @@ namespace TwkGLF
                                     CWColormap | CWEventMask, &swa);
 
         m_imp->ctx = glXCreateContext(m_imp->display, m_imp->vis, 0, True);
+
+        if (!m_imp->ctx)
+        {
+            cout << "ERROR: no GPU available: could not create GLX context" << endl;
+            exit(-1);
+        }
 
         glXMakeCurrent(m_imp->display, m_imp->tiny, m_imp->ctx);
 #endif
@@ -241,10 +261,18 @@ namespace TwkGLF
         SetPixelFormat(m_imp->deviceContext, result, &m_imp->format);
 
         m_imp->glContext = wglCreateContext(m_imp->deviceContext);
-        assert(m_imp->glContext != NULL);
+        if (!m_imp->glContext)
+        {
+            cout << "ERROR: no GPU available: could not create WGL context" << endl;
+            exit(-1);
+        }
 
         wglMakeCurrent(m_imp->deviceContext, m_imp->glContext);
-        assert(wglGetCurrentContext() != NULL);
+        if (!wglGetCurrentContext())
+        {
+            cout << "ERROR: no GPU available: could not activate WGL context" << endl;
+            exit(-1);
+        }
         glewInit(NULL);
 #endif
 

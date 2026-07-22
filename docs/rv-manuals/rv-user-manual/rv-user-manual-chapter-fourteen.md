@@ -72,6 +72,7 @@ While high performance playback cannot be guaranteed, these minimum system requi
 | Component | Recommended Minimum |
 | --- | --- |
 | CPU | 64-bit, 6 cores, 12 logical processors |
+| GPU | OpenGL support |
 | Memory (RAM) | 16 GB |
 | Memory (GPU) | 8 GB |
 | Storage | RAID or nvme |
