@@ -177,8 +177,8 @@ namespace IPCore
                 TessellateMode // each triangle can have its own color
             };
 
-            // Blend mode for stamp brushes — resolved from the brush catalogue
-            // by BrushTextureManager and stored here so PaintCommand::execute()
+            // Blend mode for stamp brushes — set from the stroke's own "blendMode"
+            // property (see PaintIPNode::compilePenComponent) so PaintCommand::execute()
             // can set the correct glBlendFunc without inspecting the brush name.
             enum StampBlendMode
             {
@@ -264,10 +264,10 @@ namespace IPCore
             int debug;
             bool ownPoints;
 
-            // Resolved from the brush catalogue at stroke-creation time.
+            // Stamp brush properties, set directly from the stroke's own properties
             StampBlendMode stampBlendMode{BlendNormal};
-            bool stampSoftShader{false};
-            unsigned int stampTexture{0}; ///< GL texture name; 0 = procedural
+            float hardness{100.0f};   ///< edge hardness 0-100; drives the `hardness` uniform in soft_stamp_frag.glsl
+            std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time; empty = procedural
 
             mutable HashValue idhash;
 
