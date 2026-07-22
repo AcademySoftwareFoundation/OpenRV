@@ -491,7 +491,7 @@ namespace Rv
 
     void RvBottomViewToolBar::smActionTriggered(bool b) { m_session->userGenericEvent("mode-manager-toggle-mode", "session_manager"); }
 
-    void RvBottomViewToolBar::paintActionTriggered(bool) { m_session->userGenericEvent("mode-manager-toggle-mode", "annotate_mode"); }
+    void RvBottomViewToolBar::paintActionTriggered(bool) { m_session->userGenericEvent("toggle-annotate-toolbar", ""); }
 
     void RvBottomViewToolBar::infoActionTriggered(bool) { m_session->userGenericEvent("toggle-hud-info-widget", ""); }
 

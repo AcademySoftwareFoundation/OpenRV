@@ -21,6 +21,9 @@
 #include <TwkGLText/TwkGLText.h>
 #include <TwkGLText/defaultFont.h>
 #include <stl_ext/string_algo.h>
+#include <QGuiApplication>
+#include <QScreen>
+#include <QWindow>
 #include <QString>
 #include <QFont>
 #include <QFontDatabase>
@@ -385,24 +388,32 @@ namespace IPCore
 
             if (isStamp)
             {
-                // Resolve brush properties at render time — the manager is
-                // guaranteed loaded by renderPaintCommands() before execute().
-                const BrushInfo info = BrushTextureManager::instance().get(brush);
+                // Brush properties come straight from the stroke's own properties
+                // (see PaintIPNode::compilePenComponent) — resolve the tip texture,
+                // if any, at render time since that's the only place with a GL context.
+                const unsigned int textureId = tipTexture.empty() ? 0 : BrushTextureManager::instance().getTexture(tipTexture);
 
-                const GLProgram* stampProg = info.textureId ? texturePaintReplaceGLProgram()
-                                                            : (info.softShader ? softPaintReplaceGLProgram() : paintReplaceGLProgram());
+                const GLProgram* stampProg = textureId ? texturePaintReplaceGLProgram() : softPaintReplaceGLProgram();
                 GLPipeline* stampPipeline = glState->useGLProgram(stampProg);
                 stampPipeline->setProjection(context.projMatrix);
                 stampPipeline->setModelview(context.modelviewMatrix);
                 stampPipeline->setViewport(0, 0, w, h);
                 stampPipeline->setUniformFloat("uniformColor", 4, &(pcolor[0]));
 
-                if (info.textureId)
+                if (textureId)
                 {
                     int tipUnit = 1;
                     stampPipeline->setUniformInt("brushTip", 1, &tipUnit);
                     glActiveTexture(GL_TEXTURE0 + 1);
-                    glBindTexture(GL_TEXTURE_2D, info.textureId);
+                    glBindTexture(GL_TEXTURE_2D, textureId);
+                }
+                else
+                {
+                    // Procedural (tip-less) brushes get a continuously variable
+                    // edge from the `hardness` uniform instead of a hard cutover
+                    // between two shaders — see soft_stamp_frag.glsl.
+                    const float normalizedHardness = hardness / 100.0f;
+                    stampPipeline->setUniformFloat("hardness", 1, (float*)&normalizedHardness);
                 }
 
                 if (context.hasStencil)
@@ -417,7 +428,7 @@ namespace IPCore
                 // BlendMarker and ghost mode both use two-pass isolation: GL_MAX into
                 // a cleared currentFBO (prevents intra-stroke opacity accumulation),
                 // then composite the background under the result via ONE_MINUS_DST_ALPHA.
-                if (info.blendMode == BlendMarker || isGhostOn)
+                if (stampBlendMode == BlendMarker || isGhostOn)
                 {
 
                     // Pass 1: stamps into cleared currentFBO
@@ -453,7 +464,7 @@ namespace IPCore
                 else
                 {
                     glEnable(GL_BLEND);
-                    if (info.blendMode == BlendAdditive)
+                    if (stampBlendMode == BlendAdditive)
                         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
                     else
                         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -1479,9 +1490,6 @@ namespace IPCore
 
             if (context.commands.empty())
                 return;
-
-            if (!BrushTextureManager::instance().isLoaded())
-                BrushTextureManager::instance().load();
 
             // fbo contains the render of the current image, only used by erase
             // strokes
