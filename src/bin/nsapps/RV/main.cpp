@@ -542,7 +542,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+        Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
     }
 
     //
