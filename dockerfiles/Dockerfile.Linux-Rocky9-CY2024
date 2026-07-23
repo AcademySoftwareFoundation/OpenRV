@@ -63,8 +63,8 @@ RUN dnf groupinstall "Development Tools" -y \
     libxkbfile \
     mesa-libGLU \
     mesa-libGLU-devel \
-    mesa-libOSMesa \
-    mesa-libOSMesa-devel \
+    mesa-compat-libOSMesa \
+    mesa-compat-libOSMesa-devel \
     meson \
     nasm \
     ncurses-devel \
@@ -92,6 +92,8 @@ RUN dnf groupinstall "Development Tools" -y \
     yasm \
     zip \
     zlib-devel \
+    rust \
+    cargo \
     && dnf clean all
 
 # Disable the devel repo afterwards since dnf will warn about it

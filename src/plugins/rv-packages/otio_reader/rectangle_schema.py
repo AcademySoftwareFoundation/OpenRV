@@ -16,10 +16,10 @@ Example:
     rect = otio.schemadef.Rectangle.Rectangle(
         min=otio.schemadef.Position.Position(x=-2.0, y=-1.0),
         max=otio.schemadef.Position.Position(x=2.0, y=1.0),
-        innerColor=[1.0, 0.0, 0.0, 0.3],
-        borderColor=[1.0, 0.0, 0.0, 1.0],
-        borderWidth=0.05,
-        cornerRadius=0.0,
+        inner_color=[1.0, 0.0, 0.0, 0.3],
+        border_color=[1.0, 0.0, 0.0, 1.0],
+        border_width=0.05,
+        corner_radius=0.0,
         id="a1b2c3d4-e5f6-7890-abcd-ef1234567890",
         visible=True,
         layer_range=otio.opentime.TimeRange(...),
@@ -40,57 +40,62 @@ class Rectangle(otio.core.SerializableObject):
         self,
         min=None,
         max=None,
-        innerColor: list | None = None,
-        borderColor: list | None = None,
-        borderWidth: float | None = None,
-        cornerRadius: float | None = None,
+        inner_color: list | None = None,
+        border_color: list | None = None,
+        border_width: float | None = None,
+        corner_radius: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
+        soft_deleted: bool = False,
         layer_range: otio.opentime.TimeRange | None = None,
     ) -> None:
         super().__init__()
         self.min = min
         self.max = max
-        self.innerColor = innerColor
-        self.borderColor = borderColor
-        self.borderWidth = borderWidth
-        self.cornerRadius = cornerRadius
+        self.inner_color = inner_color
+        self.border_color = border_color
+        self.border_width = border_width
+        self.corner_radius = corner_radius
         self.id = id
         self.visible = visible
+        self.soft_deleted = soft_deleted
         self.layer_range = layer_range
 
     # Position.1 objects — required_type omitted to avoid load-order dependency
     min = otio.core.serializable_field("min", doc="Top-left corner (Position.1)")
     max = otio.core.serializable_field("max", doc="Bottom-right corner (Position.1)")
 
-    _innerColor = otio.core.serializable_field("innerColor", required_type=list, doc="Fill colour [r, g, b, a]")
+    _inner_color = otio.core.serializable_field("inner_color", required_type=list, doc="Fill colour [r, g, b, a]")
 
     @property
-    def innerColor(self) -> list:
-        return self._innerColor
+    def inner_color(self) -> list:
+        return self._inner_color
 
-    @innerColor.setter
-    def innerColor(self, val: list) -> None:
-        self._innerColor = val
+    @inner_color.setter
+    def inner_color(self, val: list) -> None:
+        self._inner_color = val
 
-    _borderColor = otio.core.serializable_field("borderColor", required_type=list, doc="Outline colour [r, g, b, a]")
+    _border_color = otio.core.serializable_field("border_color", required_type=list, doc="Outline colour [r, g, b, a]")
 
     @property
-    def borderColor(self) -> list:
-        return self._borderColor
+    def border_color(self) -> list:
+        return self._border_color
 
-    @borderColor.setter
-    def borderColor(self, val: list) -> None:
-        self._borderColor = val
+    @border_color.setter
+    def border_color(self, val: list) -> None:
+        self._border_color = val
 
-    borderWidth = otio.core.serializable_field(
-        "borderWidth", required_type=float, doc="Outline width in normalised units"
+    border_width = otio.core.serializable_field(
+        "border_width", required_type=float, doc="Outline width in normalised units"
     )
-    cornerRadius = otio.core.serializable_field(
-        "cornerRadius", required_type=float, doc="Corner radius in normalised units; 0.0 = sharp"
+    corner_radius = otio.core.serializable_field(
+        "corner_radius", required_type=float, doc="Corner radius in normalised units; 0.0 = sharp"
     )
     id = otio.core.serializable_field("id", required_type=str, doc="UUID for undo/redo tracking")
     visible = otio.core.serializable_field("visible", required_type=bool, doc="Show/hide")
+    soft_deleted = otio.core.serializable_field(
+        "soft_deleted", required_type=bool, doc="Undo/redo soft-delete flag, consistent with Paint.2"
+    )
 
     _layer_range = otio.core.serializable_field(
         "layer_range",
@@ -113,5 +118,5 @@ class Rectangle(otio.core.SerializableObject):
         return (
             f"otio.schemadef.Rectangle.Rectangle("
             f"id={self.id!r}, min={self.min!r}, max={self.max!r}, "
-            f"borderWidth={self.borderWidth!r}, cornerRadius={self.cornerRadius!r})"
+            f"border_width={self.border_width!r}, corner_radius={self.corner_radius!r})"
         )

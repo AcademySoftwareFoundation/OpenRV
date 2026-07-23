@@ -24,6 +24,7 @@
 #include <IOproxy/IOproxy.h>
 #include <MovieProxy/MovieProxy.h>
 #include <ImfThreading.h>
+#include <MuTwkApp/CrashHandlerInit.h>
 #include <MuTwkApp/MuInterface.h>
 #include <PyTwkApp/PyInterface.h>
 #include <RvApp/CommandsModule.h>
@@ -87,6 +88,8 @@
 #include <gl/glew.h>
 #include <QtGui/QtGui>
 #include <QtWidgets/QApplication>
+#else
+#include <QtGui/QGuiApplication>
 #endif
 
 #include <QtCore/QtCore>
@@ -997,13 +1000,27 @@ int utf8Main(int argc, char* argv[])
     pthread_win32_process_attach_np();
 #endif
 
+#ifndef PLATFORM_WINDOWS
+    //
+    // Paint/text annotation rendering (PaintCommand.cpp) uses Qt's font
+    // stack (QFont, QFontDatabase, QPainter), which requires a
+    // QGuiApplication rather than a QCoreApplication. rvio has no UI, so
+    // force the offscreen QPA platform plugin unless the caller already
+    // requested a specific one, avoiding any dependency on a real display.
+    //
+    if (!qEnvironmentVariableIsSet("QT_QPA_PLATFORM"))
+    {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+    }
+#endif
+
 #ifdef PLATFORM_DARWIN
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::DarwinBundle bundle("RV", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
 #ifdef PLATFORM_LINUX
-    QCoreApplication qapp(argc, argv);
+    QGuiApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
 
@@ -1011,6 +1028,17 @@ int utf8Main(int argc, char* argv[])
     QApplication qapp(argc, argv);
     TwkApp::QTBundle bundle("rv", MAJOR_VERSION, MINOR_VERSION, REVISION_NUMBER);
 #endif
+
+    qapp.setOrganizationName(INTERNAL_ORGANIZATION_NAME);
+    qapp.setOrganizationDomain(INTERNAL_ORGANIZATION_DOMAIN);
+
+    //
+    // Initialize crash handler early to catch crashes during startup
+    // (Must be after QCoreApplication is created to use QCoreApplication::applicationDirPath)
+    //
+    {
+        TwkApp::initializeCrashHandler("RVIO", QCoreApplication::applicationDirPath().toStdString());
+    }
 
     Rv::Options& opts = Rv::Options::sharedOptions();
 
