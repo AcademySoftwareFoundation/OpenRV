@@ -386,9 +386,6 @@ namespace Rv
 
         static std::string m_initEval;
         static std::string m_pyInitEval;
-
-    public:
-        static Session* m_currentSession;
     };
 
 } // namespace Rv

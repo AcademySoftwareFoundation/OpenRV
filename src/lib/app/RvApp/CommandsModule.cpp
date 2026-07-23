@@ -190,6 +190,8 @@ namespace Rv
             throwBadArgumentException(node, thread, "node name is nil");
 
         Session* session = Session::currentSession();
+        if (!session)
+            throwBadArgumentException(node, thread, "no current session");
         session->findProperty(props, name->c_str());
         if (props.empty())
             throwBadProperty(thread, node, name->c_str());
@@ -243,6 +245,10 @@ namespace Rv
     NODE_IMPLEMENTATION(getCurrentImageSize, Mu::Vector2f)
     {
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        }
         Vector2f v;
 
         FrameBufferFinder finder;
@@ -287,6 +293,9 @@ namespace Rv
         const StringType* stype = c->stringType();
         const StringType::String* tname = NODE_ARG_OBJECT(0, StringType::String);
 
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+
         if (!tname)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil tname");
 
@@ -316,6 +325,11 @@ namespace Rv
         const StringType* stype = static_cast<const StringType*>(ttype->tupleFieldTypes()[0]);
         const DynamicArrayType* atype = static_cast<const DynamicArrayType*>(ttype->tupleFieldTypes()[1]);
         const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (!s)
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        }
 
         if (!name)
         {
@@ -386,6 +400,9 @@ namespace Rv
     NODE_IMPLEMENTATION(startTimer, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+
         if (s->userTimer().isRunning())
             s->userTimer().stop();
         s->userTimer().start();
@@ -394,6 +411,8 @@ namespace Rv
     NODE_IMPLEMENTATION(elapsedTime, float)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(float(s->userTimer().elapsed()));
     }
 
@@ -402,18 +421,24 @@ namespace Rv
     NODE_IMPLEMENTATION(stopTimer, float)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(float(s->userTimer().stop()));
     }
 
     NODE_IMPLEMENTATION(isTimerRunning, bool)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(s->userTimer().isRunning());
     }
 
     NODE_IMPLEMENTATION(setSessionType, void)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         int type = NODE_ARG(0, int);
         s->setSessionType((Session::SessionType)type);
     }
@@ -421,6 +446,8 @@ namespace Rv
     NODE_IMPLEMENTATION(getSessionType, int)
     {
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         NODE_RETURN(int(s->getSessionType()));
     }
 
@@ -441,8 +468,11 @@ namespace Rv
         if (!node)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node");
 
-        IPGraph::GraphEdit edit(RvSession::currentRvSession()->graph());
-        RvSession::currentRvSession()->readCDL(name->c_str(), node->c_str(), activate);
+        RvSession* s = RvSession::currentRvSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        IPGraph::GraphEdit edit(s->graph());
+        s->readCDL(name->c_str(), node->c_str(), activate);
     }
 
     NODE_IMPLEMENTATION(readLUT, void)
@@ -457,8 +487,11 @@ namespace Rv
         if (!node)
             throwBadArgumentException(NODE_THIS, NODE_THREAD, "nil node");
 
-        IPGraph::GraphEdit edit(RvSession::currentRvSession()->graph());
-        RvSession::currentRvSession()->readLUT(name->c_str(), node->c_str(), activate);
+        RvSession* s = RvSession::currentRvSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+        IPGraph::GraphEdit edit(s->graph());
+        s->readLUT(name->c_str(), node->c_str(), activate);
     }
 
     NODE_IMPLEMENTATION(updateLUT, void)
@@ -470,6 +503,10 @@ namespace Rv
     {
         RvSession* s = RvSession::currentRvSession();
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
+
         const TwkFB::FrameBuffer* fb = s->currentFB();
 
         const TwkFB::FrameBuffer* outfb = fb;
@@ -508,7 +545,11 @@ namespace Rv
     {
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
         Session* s = Session::currentSession();
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
         ImageRenderer* renderer = s->renderer();
+        if (!renderer)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no renderer");
         const TwkGLF::GLVideoDevice* d = renderer->controlDevice().glDevice;
 
         if (!name)
@@ -681,8 +722,8 @@ namespace Rv
                         cout << "pixel block x,y = "
                              << pe->x()
                              << ", " << pe->y()
-                             << "  w,h = " << pe->width() 
-                             << ", " << pe->height() 
+                             << "  w,h = " << pe->width()
+                             << ", " << pe->height()
                              << "  view = " << pe->view()
                              << endl;
 #endif
@@ -1774,6 +1815,8 @@ namespace Rv
         StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
 
         IPNode* node = 0;
+        if (!s)
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "no current session");
 
         if (name)
         {
