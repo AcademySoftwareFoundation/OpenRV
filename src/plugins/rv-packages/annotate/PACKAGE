@@ -5,7 +5,7 @@ version: 1.22
 rv: 2025
 openrv: 3.0.0
 requires: ''
-optional: true
+optional: false
 hidden: false
 
 modes: 
@@ -26,8 +26,7 @@ description: |
   opacity, and history actions.
   </p>
 
-  <p> This is the legacy Mu-based annotation toolbar. It is disabled by
-  default in favor of the new "Annotate Toolbar" package. Only enable this
-  package if you need to fall back to the previous UI, and make sure to
-  disable "Annotate Toolbar" first &mdash; running both at the same time
-  causes the two toolbars to conflict. </p>
+  <p> This is the default annotation toolbar. A newer, experimental
+  Python-based "Annotate Toolbar" package is also available; the two cannot
+  run at the same time, so enabling "Annotate Toolbar" automatically disables
+  this package. </p>
