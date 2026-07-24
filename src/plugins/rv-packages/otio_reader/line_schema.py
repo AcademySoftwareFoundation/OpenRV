@@ -41,6 +41,7 @@ class Line(otio.core.SerializableObject):
         width: float | None = None,
         id: str | None = None,
         visible: bool | None = None,
+        soft_deleted: bool = False,
         layer_range: otio.opentime.TimeRange | None = None,
     ) -> None:
         super().__init__()
@@ -50,6 +51,7 @@ class Line(otio.core.SerializableObject):
         self.width = width
         self.id = id
         self.visible = visible
+        self.soft_deleted = soft_deleted
         self.layer_range = layer_range
 
     start_position = otio.core.serializable_field("start_position", doc="Start point (Position.1)")
@@ -68,6 +70,9 @@ class Line(otio.core.SerializableObject):
     width = otio.core.serializable_field("width", required_type=float, doc="Line width in normalised units")
     id = otio.core.serializable_field("id", required_type=str, doc="UUID for undo/redo tracking")
     visible = otio.core.serializable_field("visible", required_type=bool, doc="Show/hide")
+    soft_deleted = otio.core.serializable_field(
+        "soft_deleted", required_type=bool, doc="Undo/redo soft-delete flag, consistent with Paint.2"
+    )
 
     _layer_range = otio.core.serializable_field(
         "layer_range",

@@ -713,9 +713,20 @@ class: AnnotateMinorMode : MinorMode
         newProperty(modeName, IntType, 1);
         setIntProperty(modeName, int[] {mode}, true);
 
+        // The legacy "size" property is consumed by pre-QFont RV builds as
+        // ptsize = size * 10000 font-design-units, placed via a modelview scale
+        // of (scale / 800) -- so the resulting on-screen WCS height old RV
+        // produces is size * 10000 * (scale / 800) = size * scale * 12.5 (see
+        // PaintIPNode::compileTextComponent's fontSize fallback for the matching
+        // forward conversion). We want that to equal this text's actual fontSize
+        // (size * scale, set below), so back-convert with legacySize = size /
+        // 12.5. This is purely for forward compatibility with older RV versions;
+        // current RV only reads the fontSize property below.
+        let legacySize = size / 12.5;
+
         setFloatProperty(posName, float[] {pos.x, pos.y}, true);
         setFloatProperty(colorName, float[] {color[0], color[1], color[2], color[3]}, true);
-        setFloatProperty(sizeName, float[] {size}, true);
+        setFloatProperty(sizeName, float[] {legacySize}, true);
         setFloatProperty(scaleName, float[] {scale}, true);
         setFloatProperty(rotName, float[] {rot}, true);
         setFloatProperty(spacingName, float[] {0.8}, true);

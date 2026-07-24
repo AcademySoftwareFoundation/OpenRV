@@ -97,34 +97,27 @@ jobs:
         run: |
           df -h /
 
-      # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo. Pin all
-      # subsequent dnf calls in this container to the 9.7 minor release until
-      # OpenRV migrates off OSMesa. Remove this step once that's done.
-      - name: Pin Rocky 9 to 9.7 minor release (vault)
-        if: ${{ matrix.rocky-version == '9' }}
-        run: |
-          echo "9.7" > /etc/dnf/vars/releasever
-          sed -i \
-            -e 's|^mirrorlist=|#mirrorlist=|g' \
-            -e 's|^#\?baseurl=https\?://dl.rockylinux.org/\$contentdir/|baseurl=https://dl.rockylinux.org/vault/rocky/|g' \
-            /etc/yum.repos.d/[Rr]ocky*.repo
-          dnf clean all
-
       - name: Install system dependencies
         run: |
           dnf install -y epel-release
           dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
           dnf install -y which findutils
           dnf groupinstall "Development Tools" -y
-          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Digest-SHA
+          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Digest-SHA
           dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel
           dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+          if [ "${{ matrix.rocky-version }}" = "9" ]; then \
+            dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel; \
+          else \
+            dnf install -y mesa-libOSMesa mesa-libOSMesa-devel; \
+          fi && \
           dnf clean all
 
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}
         run: |
           dnf install -y perl-CPAN
+
           cpan FindBin
 
       - name: Install GCC 11 toolchain for Rocky Linux 8
