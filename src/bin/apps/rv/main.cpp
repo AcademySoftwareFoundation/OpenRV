@@ -356,7 +356,14 @@ int utf8Main(int argc, char* argv[])
     // Qt 5.12.1 specific
     // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
     // QGLWidget
-    setEnvVar("QT_QUICK_BACKEND", "software");
+    //
+    // Direction C: the RV viewport is now a native GL window (GLWindow) hosted
+    // via createWindowContainer, not a QOpenGLWidget. The main window no longer
+    // forces the OpenGL RHI backend, so QtWebEngine's QQuickWidget can composite
+    // on the platform default backend at hardware speed. The old software Qt
+    // Quick workaround (which caused the ~77 ms per-frame web-view composite) is
+    // therefore no longer needed.
+    // setEnvVar("QT_QUICK_BACKEND", "software");
 
 #if defined(PLATFORM_LINUX)
     // Work around for Wacom Tablet issue on linux
@@ -368,6 +375,14 @@ int utf8Main(int argc, char* argv[])
     // Prevent crash at startup when multithreaded upload is enabled
     // (RV Preferences/Rendering/Multithread GPU Upload)
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+
+    // Share GL resources across every QOpenGLContext in the process. This is a
+    // documented QtWebEngine requirement, and it lets RV's auxiliary GL
+    // surfaces -- the second-output ScreenView and the multithreaded-upload
+    // worker device -- share textures/FBOs with the main viewport context
+    // without an explicit, ordering-sensitive setShareContext() call. Must be
+    // set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     TwkUtil::MemPool::initialize();
 

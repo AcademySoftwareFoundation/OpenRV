@@ -148,6 +148,12 @@ namespace Rv
         void mergeMenu(const TwkApp::Menu*, bool shortcuts = true);
         void convert(QMenu*, const TwkApp::Menu*, bool shortcuts);
 
+        // Position the UI blocking overlay over the main window's client area.
+        // The overlay is a frameless top-level window (not a child widget) so
+        // it can cover the native GL viewport window, which renders above
+        // sibling raster widgets and so cannot be dimmed by a child overlay.
+        void positionBlockingOverlay();
+
         void closeEvent(QCloseEvent*) override;
         void changeEvent(QEvent*) override;
         bool event(QEvent*) override;
