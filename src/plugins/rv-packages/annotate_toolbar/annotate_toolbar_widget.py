@@ -686,10 +686,10 @@ def _load_icon(name):
     """Load a named SVG icon from the package's support files.
 
     Python files land in PlugIns/Python/ while package support files
-    land in PlugIns/SupportFiles/annotate_toolbar/.
+    land in PlugIns/SupportFiles/annotate_beta/.
     """
     python_dir = os.path.dirname(os.path.abspath(__file__))
-    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_toolbar")
+    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_beta")
     path = os.path.join(support_dir, f"icon_{name}.svg")
     if os.path.exists(path):
         return QtGui.QIcon(path)
@@ -708,7 +708,7 @@ def _apply_icon(btn, name, size=16):
 def _load_png_icon(filename):
     """Load a PNG icon by filename from the package's support files."""
     python_dir = os.path.dirname(os.path.abspath(__file__))
-    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_toolbar")
+    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_beta")
     path = os.path.join(support_dir, filename)
     if os.path.exists(path):
         return QtGui.QIcon(path)
@@ -722,7 +722,7 @@ def _load_png_icon(filename):
 def _apply_combo_style(combo):
     """Apply per-widget combo QSS with runtime-resolved caret arrow images."""
     python_dir = os.path.dirname(os.path.abspath(__file__))
-    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_toolbar")
+    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_beta")
     caret = os.path.join(support_dir, "icon_caret_down.svg").replace("\\", "/")
     if os.path.exists(caret):
         combo.setStyleSheet(f"""
@@ -735,7 +735,7 @@ def _apply_combo_style(combo):
 def _apply_check_icon(checkbox):
     """Apply Figma-spec checkbox stylesheet with runtime checkmark image path."""
     python_dir = os.path.dirname(os.path.abspath(__file__))
-    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_toolbar")
+    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_beta")
     path = os.path.join(support_dir, "icon_check.svg").replace("\\", "/")
     img = f'image: url("{path}");' if os.path.exists(path) else ""
     checkbox.setStyleSheet(f"""
