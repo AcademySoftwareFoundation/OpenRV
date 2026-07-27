@@ -5,7 +5,7 @@
 #
 
 SET(_target
-    "annotate_toolbar"
+    "annotate_beta"
 )
 
 RV_STAGE(TYPE "RVPKG" TARGET ${_target})

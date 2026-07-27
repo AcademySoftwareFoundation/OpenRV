@@ -7,7 +7,7 @@ import uuid
 
 from rv import commands
 
-from annotate_toolbar_widget import (
+from annotate_beta_widget import (
     TOOL_PEN,
     TOOL_AIRBRUSH,
     TOOL_ERASER,
@@ -21,7 +21,7 @@ from annotate_toolbar_widget import (
 _SHAPE_TOOLS = {TOOL_RECT, TOOL_CIRCLE, TOOL_ARROW, TOOL_LINE}
 _DRAWING_TOOLS = _SHAPE_TOOLS | {TOOL_TEXT, TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER}
 
-TABLE_NAME = "annotate_toolbar_shape"
+TABLE_NAME = "annotate_beta_shape"
 
 _PREFIX = {
     TOOL_RECT: "rect",
@@ -188,7 +188,7 @@ class AnnotateDrawEngine:
             commands.setStringProperty(f"{self._text_node}.textDecoration", [text_deco], True)
             commands.redraw()
         except Exception as e:
-            print(f"[annotate_toolbar] update_text_style error: {e}")
+            print(f"[annotate_beta] update_text_style error: {e}")
 
     def commit_text_if_active(self):
         if self._text_active:
@@ -371,7 +371,7 @@ class AnnotateDrawEngine:
         except Exception as e:
             import traceback
 
-            print(f"[annotate_toolbar] _pointer_location error: {e}")
+            print(f"[annotate_beta] _pointer_location error: {e}")
             traceback.print_exc()
             return "", None
 
@@ -435,7 +435,7 @@ class AnnotateDrawEngine:
         except Exception as e:
             import traceback
 
-            print(f"[annotate_toolbar] _new_shape error: {e}")
+            print(f"[annotate_beta] _new_shape error: {e}")
             traceback.print_exc()
             return None
 
@@ -450,7 +450,7 @@ class AnnotateDrawEngine:
                 commands.setFloatProperty(f"{shape_node}.endPos", [cur.x, cur.y], True)
             commands.redraw()
         except Exception as e:
-            print(f"[annotate_toolbar] _update_shape error: {e}")
+            print(f"[annotate_beta] _update_shape error: {e}")
 
     # ------------------------------------------------------------------
     # Text node creation / update
@@ -536,7 +536,7 @@ class AnnotateDrawEngine:
         except Exception as e:
             import traceback
 
-            print(f"[annotate_toolbar] _new_text_node error: {e}")
+            print(f"[annotate_beta] _new_text_node error: {e}")
             traceback.print_exc()
             self._end_sync()
             return None
@@ -562,7 +562,7 @@ class AnnotateDrawEngine:
             commands.setStringProperty(f"{self._text_node}.text", [display], True)
             commands.redraw()
         except Exception as e:
-            print(f"[annotate_toolbar] _update_text_display error: {e}")
+            print(f"[annotate_beta] _update_text_display error: {e}")
 
     def _commit_text(self):
         # Nothing typed — clean up the placeholder node rather than leaving an empty annotation
@@ -694,7 +694,7 @@ class AnnotateDrawEngine:
         except Exception as e:
             import traceback as _tb
 
-            print(f"[annotate_toolbar] _new_stroke error: {e}")
+            print(f"[annotate_beta] _new_stroke error: {e}")
             _tb.print_exc()
             return None
 
@@ -754,7 +754,7 @@ class AnnotateDrawEngine:
                 self._end_sync(force=True)
                 self._begin_sync()
         except Exception as e:
-            print(f"[annotate_toolbar] _pen_drag error: {e}")
+            print(f"[annotate_beta] _pen_drag error: {e}")
 
     def _pen_release(self, event):
         if not self._pen_stroke:
@@ -1117,7 +1117,7 @@ class AnnotateDrawEngine:
             commands.setIntProperty(f"{node_name}.softDeleted", [1], True)
             commands.redraw()
         except Exception as e:
-            print(f"[annotate_toolbar] undo error: {e}")
+            print(f"[annotate_beta] undo error: {e}")
         self._end_sync(force=True)
         self._redo_stack.append((paint_node, frame, node_name))
         self._notify_buttons()
@@ -1133,7 +1133,7 @@ class AnnotateDrawEngine:
             commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
             commands.redraw()
         except Exception as e:
-            print(f"[annotate_toolbar] redo error: {e}")
+            print(f"[annotate_beta] redo error: {e}")
         self._end_sync(force=True)
         self._undo_stack.append((paint_node, frame, node_name))
         self._notify_buttons()

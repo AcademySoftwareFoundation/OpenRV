@@ -8,7 +8,7 @@ try:
 except ImportError:
     from PySide6 import QtCore, QtWidgets, QtGui
 
-from annotate_toolbar_widget import (
+from annotate_beta_widget import (
     AnnotateToolbarDockWidget,
     TOOL_PEN,
     TOOL_TEXT,
@@ -18,17 +18,17 @@ from annotate_toolbar_widget import (
     COLOR_MOD_ADDITIVE,
     COLOR_MOD_DARKEN,
 )
-from annotate_toolbar_engine import AnnotateDrawEngine, TABLE_NAME, _DRAWING_TOOLS
+from annotate_beta_engine import AnnotateDrawEngine, TABLE_NAME, _DRAWING_TOOLS
 
 _DEFAULT_COLOUR_HEX = "#ffdc00"
 _DEFAULT_SIZE = 32
 _DEFAULT_OPACITY = 50
 
-_SETTINGS_GROUP = "AnnotateToolbar"
+_SETTINGS_GROUP = "AnnotateBeta"
 _ALL_TOOLS = ("cursor", "pen", "airbrush", "eraser", "rect", "circle", "arrow", "line", "text", "eyedropper")
 
 
-class AnnotateToolbarMode(rvtypes.MinorMode):
+class AnnotateBetaMode(rvtypes.MinorMode):
     def __init__(self):
         rvtypes.MinorMode.__init__(self)
 
@@ -87,7 +87,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
         self._engine = AnnotateDrawEngine(self)
 
         self.init(
-            "annotate_toolbar_mode",
+            "annotate_beta_mode",
             self.global_bindings,
             [],  # no global pointer bindings — only the named table below
             self.menu,
@@ -207,7 +207,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
             commands.writeSettings(g, f"{tool}_opacity", self._tool_opacities.get(tool, _DEFAULT_OPACITY))
             commands.writeSettings(g, f"{tool}_color_modifier", self._tool_color_modifiers.get(tool, "normal"))
         except Exception as e:
-            print(f"[annotate_toolbar] settings write error: {e}")
+            print(f"[annotate_beta] settings write error: {e}")
 
     def _save_configure_settings(self):
         """Persist Configure submenu settings."""
@@ -220,7 +220,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
             commands.writeSettings(g, "cfg_scale_brush", self._scale_brush)
             commands.writeSettings(g, "cfg_auto_save_settings", self._auto_save_settings)
         except Exception as e:
-            print(f"[annotate_toolbar] configure settings write error: {e}")
+            print(f"[annotate_beta] configure settings write error: {e}")
 
     def _read_sync_auto_start(self):
         """Return True if this mode is in the Sync extraModes list."""
@@ -228,7 +228,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
             modes = self._read("Sync", "extraModes", [])
             if isinstance(modes, str):
                 modes = [modes] if modes else []
-            return "annotate_toolbar_mode" in modes
+            return "annotate_beta_mode" in modes
         except Exception:
             return False
 
@@ -240,7 +240,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
                 modes = [modes] if modes else []
             else:
                 modes = list(modes)
-            name = "annotate_toolbar_mode"
+            name = "annotate_beta_mode"
             if name in modes:
                 modes.remove(name)
                 self._sync_auto_start = False
@@ -249,7 +249,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
                 self._sync_auto_start = True
             commands.writeSettings("Sync", "extraModes", modes)
         except Exception as e:
-            print(f"[annotate_toolbar] sync auto-start toggle error: {e}")
+            print(f"[annotate_beta] sync auto-start toggle error: {e}")
 
     # ------------------------------------------------------------------
     # Dock creation
@@ -381,7 +381,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
         try:
             commands.writeSettings(_SETTINGS_GROUP, "eraser_brush", brush)
         except Exception as e:
-            print(f"[annotate_toolbar] settings write error: {e}")
+            print(f"[annotate_beta] settings write error: {e}")
 
     def _on_filled_changed(self, v):
         self._filled = v
@@ -687,7 +687,7 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
                 self._dock.toolbar_widget.set_colour(qcol)
                 self._save_tool_state(self._tool)
         except Exception as e:
-            print(f"[annotate_toolbar] eyedropper error: {e}")
+            print(f"[annotate_beta] eyedropper error: {e}")
 
     def _toggle_toolbar(self, event=None):
         if not self._dock:
@@ -782,4 +782,4 @@ class AnnotateToolbarMode(rvtypes.MinorMode):
 
 
 def createMode():
-    return AnnotateToolbarMode()
+    return AnnotateBetaMode()
