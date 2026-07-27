@@ -3,19 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from __future__ import print_function
+
+import os
+import platform
+import re
+import select
+import subprocess
+import sys
+import threading
+import time
 
 import nuke
 import nukescripts
-import os
-import re
-import platform
-import subprocess
 import rvNetwork
-import time
-import sys
-import select
-import threading
 
 protocolVersion = 115
 
@@ -786,7 +786,7 @@ class RvMonitor:
             # lasts.append  (node["last"].value())
             firsts.append(node.firstFrame())
             lasts.append(node.lastFrame())
-            spaces.append(re.sub("default \((.*)\)", "\g<1>", node["colorspace"].value()))
+            spaces.append(re.sub(r"default \((.*)\)", r"\g<1>", node["colorspace"].value()))
             labels.append(encodeNL(node["label"].value()))
             classes.append(node.Class())
             ro = "0"

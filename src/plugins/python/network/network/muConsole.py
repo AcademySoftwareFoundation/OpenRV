@@ -5,9 +5,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import rvNetwork
 import sys
 import time
+
+import rvNetwork
 
 
 class MuConsoleException(Exception):
@@ -42,5 +43,5 @@ if __name__ == "__main__":
         mu = MuConsole()
         mu.run()
     except MuConsoleException as inst:
-        print((str(inst)))
+        print(str(inst))
         sys.exit(-1)

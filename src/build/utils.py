@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # *****************************************************************************
 # Copyright 2020 Autodesk, Inc. All rights reserved.
 #
@@ -10,14 +8,13 @@
 import itertools
 import os
 import platform
-import requests
 import shutil
 import subprocess
 import sys
-
-from py7zr import SevenZipFile, exceptions
-from typing import List
 from zipfile import ZipFile
+
+import requests
+from py7zr import SevenZipFile, exceptions
 
 
 def _windows_zip_impl(input_folder: str, output_zip: str) -> None:
@@ -297,7 +294,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
         def validate_pair(ob):
             try:
                 if not (len(ob) == 2):
-                    print("Unexpected result: {}".format(ob))
+                    print(f"Unexpected result: {ob}")
                     raise ValueError
             except Exception:
                 return False
@@ -317,7 +314,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
         # create a tag so we can tell in the output when the proc is done
         tag = "Done running command"
         # construct a cmd.exe command to do accomplish this
-        cmd = 'cmd.exe /E:ON /V:ON /s /c "{} && echo "{}" && set"'.format(env_cmd, tag)
+        cmd = f'cmd.exe /E:ON /V:ON /s /c "{env_cmd} && echo "{tag}" && set"'
         # launch the process
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=initial)
         # parse the output sent to stdout
@@ -393,7 +390,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
 
 
 def get_mingw64_path_on_windows(winpath: str) -> str:
-    """
+    r"""
     On Windows: returns the mingw64 path corresponding to the windows passed as parameter.
     On other platforms: simply returns the path passed as parameter
     :param string winpath: winpath to be translated. Example: C:\git\OpenRV\_build
@@ -408,7 +405,7 @@ def get_mingw64_path_on_windows(winpath: str) -> str:
     )
 
 
-def get_mingw64_args(cmd_args: List[str]) -> List[str]:
+def get_mingw64_args(cmd_args: list[str]) -> list[str]:
     updated_cmd_args = cmd_args
     updated_cmd_args.append(";sleep 10")
 
