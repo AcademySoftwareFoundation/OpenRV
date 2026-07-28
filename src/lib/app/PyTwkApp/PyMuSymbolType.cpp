@@ -9,6 +9,7 @@
 #include <PyTwkApp/PyEventType.h>
 
 #include <TwkPython/PyLockObject.h>
+#include <TwkUtil/CrashHandler.h>
 #include <Python.h>
 
 #include <Mu/ClassInstance.h>
@@ -45,8 +46,8 @@
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/MuInterface.h>
 #include <boost/algorithm/string.hpp>
-#include <boost/thread.hpp>
 #include <half.h>
+#include <thread>
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
@@ -57,24 +58,7 @@ namespace TwkApp
 
     // Thread safety tracking
     // Default constructor creates "not-a-thread" ID
-    static boost::thread::id s_mainThreadId;
-
-    // Helper function for direct cout printing
-    static PyObject* unsafe_mu_print(PyObject* args)
-    {
-        size_t nargs = PyTuple_Size(args);
-        if (nargs >= 1)
-        {
-            PyObject* arg = PyTuple_GetItem(args, 0);
-            if (PyUnicode_Check(arg))
-            {
-                const char* str = PyUnicode_AsUTF8(arg);
-                if (str)
-                    cout << str;
-            }
-        }
-        Py_RETURN_NONE;
-    }
+    static std::thread::id s_mainThreadId;
 
     Mu::FunctionObject* createFunctionObjectFromPyObject(const Mu::FunctionType* t, PyObject* pyobj)
     {
@@ -228,9 +212,9 @@ namespace TwkApp
     static PyObject* MuSymbol_new(PyTypeObject* type, PyObject* args, PyObject* kwds)
     {
         PyLockObject locker;
-        PyMuSymbolObject* self;
 
-        if (self = (PyMuSymbolObject*)type->tp_alloc(type, 0))
+        PyMuSymbolObject* self = (PyMuSymbolObject*)type->tp_alloc(type, 0);
+        if (self)
         {
             self->symbol = 0;
             self->function = 0;
@@ -302,30 +286,12 @@ namespace TwkApp
             return NULL;
         }
 
-        // Thread safety check - initialize main thread ID on first call
-        boost::thread::id currentThreadId = boost::this_thread::get_id();
-        if (s_mainThreadId == boost::thread::id()) // Check if uninitialized
-                                                   // (default constructed)
+        // Thread safety check
+        if (std::this_thread::get_id() != s_mainThreadId)
         {
-            s_mainThreadId = currentThreadId;
-        }
+            PyErr_SetString(PyExc_RuntimeError, "Mu is not thread-safe. Mu functions must be called from the main thread");
 
-        if (currentThreadId != s_mainThreadId)
-        {
-            // fix mu print commands from python to at least not crash from
-            // non-main thread
-            //  (because python print is often used to debug python code, so
-            //  we'll tolerate this because print is likely redirected to the RV
-            //  console)
-            if (self->function->fullyQualifiedName() == "extra_commands._print")
-            {
-                return unsafe_mu_print(args);
-            }
-
-            // this cout will probably get redirected to the RV console, or go
-            // to the terminal window.
-            cout << "WARNING: Mu " << self->function->fullyQualifiedName() << "() called from non-main thread, will eventually crash "
-                 << "(Mu isn't thread-safe)." << endl;
+            return nullptr;
         }
 
         size_t nargs = PyTuple_Size(args);
@@ -384,8 +350,52 @@ namespace TwkApp
             muargs[i] = p->defaultValue();
         }
 
+        // RAII: clear the python_caller annotation on every exit path (normal
+        // return or exception) so a Python frame that has returned never lingers
+        // in a later crash report.
+        struct PythonCallerScope
+        {
+            ~PythonCallerScope()
+            {
+                if (TwkUtil::CrashHandler::instance().isInitialized())
+                    TwkUtil::CrashHandler::instance().addAnnotation("python_caller", "");
+            }
+        } pythonCallerScope;
+
         try
         {
+            // Add crash context annotations before executing Mu function
+            if (TwkUtil::CrashHandler::instance().isInitialized())
+            {
+                // mu_function / mu_script_file are now kept current by the Mu
+                // execution observer (MuCrashObserver), which fires on the
+                // Thread::call() into Mu below. Here we only record the Python
+                // frame that is calling into Mu.
+
+                // Get Python calling context (Python 3.11+ opaque frame API)
+                PyFrameObject* frame = PyEval_GetFrame();
+                if (frame)
+                {
+                    PyCodeObject* code = PyFrame_GetCode(frame);
+                    if (code)
+                    {
+                        const char* filename = PyUnicode_AsUTF8(code->co_filename);
+                        const char* funcname = PyUnicode_AsUTF8(code->co_name);
+                        int lineno = PyFrame_GetLineNumber(frame);
+
+                        if (filename)
+                        {
+                            ostringstream pyContext;
+                            pyContext << filename << ":" << lineno;
+                            if (funcname)
+                                pyContext << " in " << funcname << "()";
+                            TwkUtil::CrashHandler::instance().addAnnotation("python_caller", pyContext.str());
+                        }
+                        Py_DECREF(code);
+                    }
+                }
+            }
+
             const Mu::Value v = muAppThread()->call(self->function, muargs, false);
 
             if (muAppThread()->uncaughtException())
@@ -485,9 +495,6 @@ namespace TwkApp
 
     PyTypeObject* pyMuSymbolType() { return &type; }
 
-    void initPyMuSymbolType()
-    {
-        //
-    }
+    void initPyMuSymbolType() { s_mainThreadId = std::this_thread::get_id(); }
 
 } // namespace TwkApp

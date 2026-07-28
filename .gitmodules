@@ -4,3 +4,6 @@
 [submodule "src/pub"]
 	path = src/pub
 	url = https://github.com/shotgunsoftware/openrv-pub.git
+[submodule "src/lib/geometry/twkpaint-src"]
+	path = src/lib/geometry/twkpaint-src
+	url = https://github.com/AcademySoftwareFoundation/OpenRV-annotation.git

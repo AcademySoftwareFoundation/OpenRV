@@ -52,6 +52,18 @@ files:
     location: SupportFiles/$PACKAGE
   - file: point_schema.py
     location: SupportFiles/$PACKAGE
+  - file: position_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: rectangle_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: ellipse_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: arrow_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: line_schema.py
+    location: SupportFiles/$PACKAGE
+  - file: text_schema.py
+    location: SupportFiles/$PACKAGE
 
 description: |
     <p>

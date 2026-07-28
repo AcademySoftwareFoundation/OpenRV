@@ -15,6 +15,7 @@ numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySi
 opentimelineio @ git+https://github.com/cedrik-fuoco-adsk/OpenTimelineIO.git@fix-windows-debug-crash # License: Other/Proprietary License (Modified Apache 2.0 License)
 PyOpenGL==3.1.7         # License: BSD License (BSD)
 PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
+psutil==7.2.2           # License: BSD License (BSD-3-Clause)
 
 # Additional packages required by RV and for testing the Python distribution
 

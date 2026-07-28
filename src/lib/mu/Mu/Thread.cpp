@@ -7,6 +7,7 @@
 
 #include <Mu/Context.h>
 #include <Mu/Exception.h>
+#include <Mu/ExecutionObserver.h>
 #include <Mu/MuProcess.h>
 #include <Mu/Thread.h>
 #include <Mu/MachineRep.h>
@@ -338,6 +339,10 @@ namespace Mu
 
         if (f->body())
         {
+            // Observe this outermost (C++ -> Mu) activation. functionActivationFunc
+            // only fires for nested calls within Mu, not for the body invoked here.
+            Mu::ActivationScope _muActivationScope(f, nullptr, *this);
+
             size_t s = f->stackSize();
             Thread::StackRecord record(*this);
             record.beginActivation(s);

@@ -95,7 +95,7 @@ SET(RV_FFMPEG_SUPPORTED_OPTIONS
 )
 # Default option
 SET(_RV_FFMPEG
-    "6"
+    "8"
 )
 
 IF(DEFINED RV_FFMPEG)

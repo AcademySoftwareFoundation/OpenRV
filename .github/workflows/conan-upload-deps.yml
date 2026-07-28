@@ -1,0 +1,550 @@
+name: Conan Upload Deps
+
+# Batch-builds OpenRV's Conan deps declared in conan/packages.yml and
+# uploads them to the ASWF Conan remote. Year-specific deps (CY2025.cmake)
+# are published under @openrv/vfx2025; year-independent deps (CYCOMMON.cmake)
+# under @openrv/common. Channel is driven by the `channel` field in
+# packages.yml. On pull_request (path-filtered to conan/** and this
+# workflow), the full matrix runs but upload + verify steps are skipped
+# (build-only validation). Actual uploads happen via workflow_dispatch
+# after the PR merges.
+#
+# Covers every platform in conan.yml's build matrix:
+#
+#   rocky8   - amd64/rockylinux:8 + gcc-toolset-11      (profile x86_64_rocky8)
+#   macos    - macos-14 (arm64) + Apple clang           (profile arm64_apple_release)
+#   windows  - windows-2022 + MSVC + MSYS2              (profile x86_64_windows)
+#
+# Rocky 9 is intentionally NOT uploaded. Its Conan profile is identical
+# to Rocky 8's (os=Linux, compiler=gcc/11/libstdc++11), so binaries
+# uploaded from a Rocky 9 runner share the same package_id as Rocky 8
+# but carry newer glibc / libstdc++ symbol requirements and break Rocky
+# 8 consumers at link time. VFX CY2025 defines one Linux target (glibc
+# 2.28 = Rocky 8); Rocky 9 consumes the Rocky 8 binaries, which are
+# forward-compatible.
+#
+# Platform binaries live under the same @openrv/<channel> ref; Conan keeps
+# them separate by package_id derived from settings.
+#
+# Each matrix cell:
+#   1. Exports every packages.yml recipe under @openrv/<channel> so that
+#      replace_requires in conan/profiles/common can resolve transitive
+#      deps locally.
+#   2. Runs `conan install --requires=<target>@openrv/<channel> --build=missing`
+#      with the full option union across packages.yml, plus forced local
+#      rebuild of glibc-sensitive host tools (b2, meson, nasm) to defend
+#      against CCI prebuilts built on newer hosts.
+#   3. Uploads every @openrv/* ref in cache (target + transitives).
+#
+# pcre2 is windows_only and is only present in the Windows matrix.
+
+on:
+  pull_request:
+    paths:
+      - 'conan/**'
+      - '.github/workflows/conan-upload-deps.yml'
+
+  workflow_dispatch:
+    inputs:
+      remote:
+        description: "Target Conan remote"
+        required: true
+        default: "aswftesting"
+        type: choice
+        options:
+          - aswftesting
+          - aswf
+      only:
+        description: "Single package name to run (empty = all)"
+        required: false
+        default: ""
+      platforms:
+        description: "Comma-separated subset of rocky8,macos,windows (empty = all)"
+        required: false
+        default: "rocky8,macos,windows"
+
+env:
+  REMOTE_NAME: ${{ inputs.remote || 'aswftesting' }}
+  REMOTE_URL: ${{ inputs.remote == 'aswf' && 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan' || 'https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev' }}
+  CMAKE_VERSION: "3.31.6"
+  PYTHON_VERSION: "3.11"
+  PLATFORMS: ${{ inputs.platforms || 'rocky8,macos,windows' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Validates that conan/profiles/common [replace_requires] is in sync with
+  # conan/packages.yml. Fails fast before any build jobs run.
+  # To fix: run `python3 conan/scripts/gen_profile_common.py` and commit.
+  # ---------------------------------------------------------------------------
+  check-profile-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup Python
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: python3 -m pip install --user pyyaml
+
+      - name: Validate profiles/common matches packages.yml
+        run: python3 conan/scripts/gen_profile_common.py --check
+
+  # ---------------------------------------------------------------------------
+  # Reads conan/packages.yml and emits two matrices:
+  #   matrix_nonwindows - excludes windows_only entries (Linux + macOS jobs)
+  #   matrix_windows    - all entries, including windows_only (Windows job)
+  # Optionally narrows to a single package via the `only` input.
+  # ---------------------------------------------------------------------------
+  prepare-matrix:
+    needs: check-profile-sync
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_nonwindows: ${{ steps.gen.outputs.matrix_nonwindows }}
+      matrix_windows: ${{ steps.gen.outputs.matrix_windows }}
+      count_nonwindows: ${{ steps.gen.outputs.count_nonwindows }}
+      count_windows: ${{ steps.gen.outputs.count_windows }}
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup Python
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: python3 -m pip install --user pyyaml
+
+      - name: Generate matrix from conan/packages.yml
+        id: gen
+        env:
+          ONLY: ${{ inputs.only || '' }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            python3 conan/scripts/gen_matrix.py --only "$ONLY" >> "$GITHUB_OUTPUT"
+          else
+            python3 conan/scripts/gen_matrix.py >> "$GITHUB_OUTPUT"
+          fi
+  # ---------------------------------------------------------------------------
+  # Rocky Linux 8 - gcc-toolset-11, Python 3.11 from AppStream.
+  # ---------------------------------------------------------------------------
+  rocky8:
+    name: "rocky8: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
+    needs: prepare-matrix
+    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',rocky8,')
+    runs-on: ubuntu-latest
+    container:
+      image: amd64/rockylinux:8
+
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix_nonwindows) }}
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      CONAN_PROFILE: x86_64_rocky8
+      IS_WINDOWS_JOB: "0"
+      CCI_DIR: /tmp/cci
+
+    steps:
+      - name: Verify secrets are set
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set on this repo."
+            exit 1
+          fi
+      - name: Install base system packages
+        # VFX Reference Platform CY2025 mandates Python 3.11. Rocky 8's
+        # default python3 is 3.6.8, too old for meson (>=3.7). Install
+        # python3.11 from AppStream and expose it as the default `python3`
+        # via /usr/local/bin so every subsequent step picks it up.
+        run: |
+          dnf install -y epel-release
+          dnf config-manager --set-enabled powertools devel
+          dnf groupinstall "Development Tools" -y
+          dnf install -y which findutils git python3.11 python3.11-pip perl perl-IPC-Cmd perl-Digest-SHA nasm make
+          ln -sf /usr/bin/python3.11 /usr/local/bin/python3
+          ln -sf /usr/bin/pip3.11 /usr/local/bin/pip3
+          python3 --version
+          dnf clean all
+      - name: Install gcc-toolset-11
+        run: |
+          for i in 1 2 3 4 5; do
+            dnf install -y gcc-toolset-11-toolchain && break
+            echo "attempt $i failed, retrying in 5s"; sleep 5
+          done
+      - name: Enable gcc-toolset-11
+        run: |
+          source /opt/rh/gcc-toolset-11/enable
+          echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
+          echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
+          echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
+          gcc --version
+      - name: Install CMake
+        # Install under /opt so the subsequent actions/checkout step does
+        # not wipe it, then symlink into /usr/local/bin so Conan's
+        # buildenv-isolated PATH can still find cmake.
+        run: |
+          curl -SL -o /tmp/cmake.tar.gz "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz"
+          mkdir -p /opt
+          tar -xzf /tmp/cmake.tar.gz -C /opt
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/cmake" /usr/local/bin/cmake
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/ctest" /usr/local/bin/ctest
+          ln -sf "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/cpack" /usr/local/bin/cpack
+          echo "/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin" >> $GITHUB_PATH
+          cmake --version
+      - name: Install Conan 2.x + PyYAML
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install "conan>=2.0,<3.0" pyyaml
+          conan --version
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Mark repo as safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+      - name: Detect default Conan profile
+        run: conan profile detect --force
+
+      - name: Clone conan-center-index
+        run: git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git "$CCI_DIR"
+
+      - name: Export every packages.yml recipe
+        run: python3 ./conan/scripts/export_recipes.py
+
+      - name: Build ${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}
+        run: |
+          # Windows-only: pick up the MSVC bin dir that the earlier
+          # "Add MSVC cl.exe to msys2 PATH" step appended to bash_profile.
+          # Harmless no-op on Linux/macOS where the file does not exist.
+          [ -f ~/.bash_profile ] && source ~/.bash_profile || true
+          python3 ./conan/scripts/conan_install_target.py \
+              "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
+          conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
+      - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
+        run: |
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
+
+      - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
+        run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
+
+  # ---------------------------------------------------------------------------
+  # macOS arm64 - macos-14 native runner, Apple clang, Python 3.11 via setup-python.
+  # ---------------------------------------------------------------------------
+  macos:
+    name: "macos-arm64: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
+    needs: prepare-matrix
+    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',macos,')
+    runs-on: macos-14
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix_nonwindows) }}
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      CONAN_PROFILE: arm64_apple_release
+      IS_WINDOWS_JOB: "0"
+      CCI_DIR: /tmp/cci
+      # Matches conan.yml's pattern: actions/setup-python + `pip install
+      # --user` on macOS puts the conan CLI in ~/Library/Python/3.11/bin,
+      # which is NOT on PATH by default. Hardcode the full path so every
+      # step (and the helper scripts via $CONAN_EXEC) calls the right
+      # binary without relying on GITHUB_PATH ordering.
+      CONAN_EXEC: /Users/runner/Library/Python/3.11/bin/conan
+
+    steps:
+      - name: Verify secrets are set
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set."
+            exit 1
+          fi
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@802fa1a2c4e212495c05bf94dba2704a92a472be # v2
+        with:
+          cmake-version: "${{ env.CMAKE_VERSION }}"
+
+      - name: Setup Python
+        # Runs BEFORE `brew install` so setup-python's PATH prepend wins
+        # the resolution race. `brew install meson` pulls python@3.x as a
+        # dep; if brew runs first its python can end up winning `python3`
+        # for later steps, breaking the `import yaml` the helper scripts
+        # rely on.
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Conan 2.x + PyYAML
+        # --user lands the CLI in $CONAN_EXEC (see job env). The import
+        # sanity check fails the step early if the Python that will run
+        # the helper scripts cannot see the packages we just installed.
+        run: |
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user "conan>=2.0,<3.0" pyyaml
+          python3 -c "import yaml, conan; print(f'yaml {yaml.__version__}, conan {conan.__version__}')"
+          "$CONAN_EXEC" --version
+      - name: Install Homebrew build tools
+        # nasm, meson: needed as fallbacks for recipes that do not
+        # tool_require them on macos. autoconf/automake/libtool: GNU
+        # autotools recipes need these. pkg-config: shared across recipes.
+        run: brew install nasm meson autoconf automake libtool pkg-config
+
+      - name: Configure Conan remote and authenticate
+        run: |
+          "$CONAN_EXEC" remote remove "$REMOTE_NAME" 2>/dev/null || true
+          "$CONAN_EXEC" remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          "$CONAN_EXEC" remote list
+          "$CONAN_EXEC" remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+      - name: Detect default Conan profile
+        run: |
+          "$CONAN_EXEC" profile detect --force
+      - name: Clone conan-center-index
+        run: git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git "$CCI_DIR"
+
+      - name: Export every packages.yml recipe
+        run: python3 ./conan/scripts/export_recipes.py
+
+      - name: Build ${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}
+        run: |
+          python3 ./conan/scripts/conan_install_target.py \
+              "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
+          "$CONAN_EXEC" list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
+      - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
+        run: |
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
+      - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
+        run: |
+          "$CONAN_EXEC" search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
+  # ---------------------------------------------------------------------------
+  # Windows x86_64 - windows-2022, MSVC 2022, MSYS2 shell.
+  # Includes the windows_only entry (pcre2).
+  # ---------------------------------------------------------------------------
+  windows:
+    name: "windows-x86_64: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
+    needs: prepare-matrix
+    if: needs.prepare-matrix.outputs.count_windows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',windows,')
+    runs-on: windows-2022
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include: ${{ fromJSON(needs.prepare-matrix.outputs.matrix_windows) }}
+
+    env:
+      CONAN_LOGIN_USERNAME: ${{ secrets.ARTIFACTORY_USER }}
+      CONAN_PASSWORD: ${{ secrets.ARTIFACTORY_TOKEN }}
+      CONAN_PROFILE: x86_64_windows
+      IS_WINDOWS_JOB: "1"
+      # Use a native Windows path; mingw Python and MSYS2 bash both
+      # agree on drive-letter paths, but disagree on /tmp.
+      CCI_DIR: "D:/cci"
+      # Tell MSYS2 to leave these Windows-style path lists alone.
+      # Without this, MSYS2 rewrites "C:\Foo;C:\Bar" to "/c/Foo:/c/Bar"
+      # and MSVC's cl.exe loses track of its headers / libs.
+      MSYS2_ENV_CONV_EXCL: "INCLUDE;LIB;LIBPATH"
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Verify secrets are set
+        shell: bash
+        run: |
+          if [ -z "$CONAN_LOGIN_USERNAME" ] || [ -z "$CONAN_PASSWORD" ]; then
+            echo "::error::ARTIFACTORY_USER or ARTIFACTORY_TOKEN secret is not set."
+            exit 1
+          fi
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          submodules: false
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+        with:
+          python-version: "${{ env.PYTHON_VERSION }}"
+
+      - name: Get Python install path
+        shell: powershell
+        run: |
+          $pythonDir = python -c "import sys, os; print(os.path.dirname(sys.executable))"
+          echo "WIN_PYTHON_DIR=$pythonDir" >> $env:GITHUB_ENV
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          cache: false
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-meson
+            autoconf
+            automake
+            libtool
+            nasm
+            perl
+            make
+            git
+      - name: Add MSVC + Windows SDK to msys2 PATH
+        # ilammy/msvc-dev-cmd puts cl.exe AND Windows SDK bins (mt.exe,
+        # rc.exe, signtool.exe, ...) on the runner's Windows PATH, but
+        # msys2 bash launches with its own PATH. Translate both roots to
+        # POSIX paths and persist them via ~/.bash_profile so every
+        # subsequent `msys2 {0}` step can invoke cl + mt (b2's bootstrap
+        # and the MSVC linker need both).
+        run: |
+          if [ -z "$VCToolsInstallDir" ]; then
+            echo "::error::VCToolsInstallDir not set; Setup MSVC step did not run."
+            exit 1
+          fi
+          MSVC_BIN=$(cygpath -u "$VCToolsInstallDir/bin/Hostx64/x64")
+          echo "export PATH=\"$MSVC_BIN:\$PATH\"" >> ~/.bash_profile
+          echo "Added MSVC bin to PATH: $MSVC_BIN"
+          if [ -n "$WindowsSdkVerBinPath" ]; then
+            # $WindowsSdkVerBinPath ends with a trailing backslash; cygpath
+            # normalises and we append /x64 for the arch-specific tools.
+            WINSDK_BIN=$(cygpath -u "$WindowsSdkVerBinPath")
+            echo "export PATH=\"$WINSDK_BIN/x64:\$PATH\"" >> ~/.bash_profile
+            echo "Added Windows SDK bin to PATH: $WINSDK_BIN/x64"
+          else
+            echo "::error::WindowsSdkVerBinPath not set; mt.exe will be unreachable."
+            exit 1
+          fi
+          WIN_PYTHON_DIR=$(cygpath -u "$WIN_PYTHON_DIR")
+          echo "export PATH=\"$WIN_PYTHON_DIR:\$PATH\"" >> ~/.bash_profile
+          echo "Added Python to PATH: $WIN_PYTHON_DIR"
+      - name: Install Conan 2.x
+        run: |
+          source ~/.bash_profile
+          python3 -m pip install --user --upgrade pip
+          python3 -m pip install --user "conan>=2.0,<3.0" pyyaml
+          PYTHON_SCRIPTS_DIR=$(python3 -c "import site, os; scripts = site.getusersitepackages(); print(os.path.join(os.path.dirname(scripts), 'Scripts'))")
+          PYTHON_SCRIPTS_MSYS=$(cygpath -u "$PYTHON_SCRIPTS_DIR")
+          echo "export PATH=\"\$PATH:$PYTHON_SCRIPTS_MSYS\"" >> ~/.bash_profile
+          source ~/.bash_profile
+          python3 --version
+          conan --version
+      - name: Configure Conan remote and authenticate
+        run: |
+          conan remote remove "$REMOTE_NAME" 2>/dev/null || true
+          conan remote add "$REMOTE_NAME" "$REMOTE_URL" --index 0
+          conan remote list
+          conan remote login "$REMOTE_NAME" "$CONAN_LOGIN_USERNAME" -p "$CONAN_PASSWORD"
+      - name: Detect default Conan profile
+        run: conan profile detect --force
+
+      - name: Clone conan-center-index
+        run: git clone --depth 1 --branch master https://github.com/conan-io/conan-center-index.git "$CCI_DIR"
+
+      - name: Export every packages.yml recipe
+        run: python3 ./conan/scripts/export_recipes.py
+
+      - name: Build ${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}
+        run: |
+          # Windows-only: pick up the MSVC bin dir that the earlier
+          # "Add MSVC cl.exe to msys2 PATH" step appended to bash_profile.
+          # Harmless no-op on Linux/macOS where the file does not exist.
+          [ -f ~/.bash_profile ] && source ~/.bash_profile || true
+          python3 ./conan/scripts/conan_install_target.py \
+              "${{ matrix.name }}" "${{ matrix.version }}" "${CONAN_PROFILE}"
+          conan list "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}:*"
+      - name: Upload all @openrv/* refs built in this cell
+        if: github.event_name != 'pull_request'
+        run: |
+          upload_fail=0
+          CONAN_CMD="${CONAN_EXEC:-conan}"
+          for channel in common vfx2025; do
+            pattern="*@openrv/$channel"
+            set +e
+            output=$("$CONAN_CMD" upload "$pattern" --remote "$REMOTE_NAME" --confirm 2>&1)
+            rc=$?
+            set -e
+            echo "$output"
+            if [ $rc -eq 0 ]; then
+              echo "Upload of $pattern succeeded"
+            elif echo "$output" | grep -qi "permission denied\|403\|DELETE"; then
+              echo "::warning::Upload of $pattern hit 403 (recipe already on remote with different revision). Skipping."
+            else
+              echo "::error::Upload of $pattern failed with unexpected error"
+              upload_fail=1
+            fi
+          done
+          [ "$upload_fail" -eq 0 ] || exit 1
+
+      - name: Verify server-side listing of target
+        if: github.event_name != 'pull_request'
+        run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"

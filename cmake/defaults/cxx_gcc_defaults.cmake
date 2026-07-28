@@ -29,7 +29,9 @@ ADD_COMPILE_OPTIONS(
 
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
   # Release build specific options
-  ADD_COMPILE_OPTIONS(-DNDEBUG -O3 # Maximum optimization
+  ADD_COMPILE_OPTIONS(
+    -DNDEBUG -O3 # Maximum optimization
+    -g # Debug info for crash dump symbolication (does not affect runtime performance)
   )
 ELSEIF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
   # Debug build specific options

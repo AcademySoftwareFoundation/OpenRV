@@ -134,6 +134,10 @@ INCLUDE(yaml-cpp) # depends on OCIO
 
 INCLUDE(bmd.cmake)
 INCLUDE(spdlog)
+INCLUDE(crashpad)
+IF(NOT RV_TARGET_WINDOWS)
+  INCLUDE(breakpad)
+ENDIF()
 INCLUDE(aja.cmake)
 INCLUDE(prores.cmake)
 
@@ -184,3 +188,6 @@ MESSAGE(STATUS "Using WebP:         ${RV_DEPS_WEBP_VERSION}")
 MESSAGE(STATUS "Using Yaml-CPP:     ${RV_DEPS_YAML_CPP_VERSION} (Using OCIO's own copy)")
 MESSAGE(STATUS "Using zlib:         ${RV_DEPS_ZLIB_VERSION}")
 MESSAGE(STATUS "Using spdlog:       ${RV_DEPS_SPDLOG_VERSION}")
+IF(RV_DEPS_BREAKPAD_VERSION)
+  MESSAGE(STATUS "Using Breakpad:     ${RV_DEPS_BREAKPAD_VERSION}")
+ENDIF()

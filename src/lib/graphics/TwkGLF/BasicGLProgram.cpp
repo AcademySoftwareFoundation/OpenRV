@@ -20,7 +20,13 @@ extern const char* SoftOldReplaceFrag_glsl;
 extern const char* ReplaceColoredVertex_glsl;
 extern const char* ReplaceVertex_glsl;
 extern const char* ReplaceFrag_glsl;
-extern const char* SoftReplaceFrag_glsl;
+
+// Stamp brush shaders embedded from OpenRV-annotation/assets/shaders/.
+// compat_gl21.glsl is prepended at program-build time
+extern const char* ap_compat_gl21;
+extern const char* ap_stamp_vert;
+extern const char* ap_stamp_frag;
+extern const char* ap_soft_stamp_frag;
 extern const char* EraseVertex_glsl;
 extern const char* EraseFrag_glsl;
 extern const char* SoftEraseFrag_glsl;
@@ -105,11 +111,18 @@ namespace TwkGLF
         v = glCreateShader(GL_VERTEX_SHADER);
         f = glCreateShader(GL_FRAGMENT_SHADER);
 
-        const char* versionHeader = basicGLVersionHeader();
+        // Skip injecting #version if the shader already provides one.
+        // ap_compat_gl21.glsl contains "#version 120"; injecting a second
+        // #version directive before it is rejected by strict drivers on
+        // Windows/Linux while Mac silently ignores it.
+        const bool vertOwnsVersion = m_vertexCode.find("#version") != std::string::npos;
+        const bool fragOwnsVersion = m_fragmentCode.find("#version") != std::string::npos;
+        const char* versionHeader = vertOwnsVersion ? "" : basicGLVersionHeader();
+        const char* fragVersionHeader = fragOwnsVersion ? "" : basicGLVersionHeader();
         const char* vsrc[2] = {versionHeader, m_vertexCode.c_str()};
         glShaderSource(v, 2, vsrc, NULL);
         glCompileShader(v);
-        const char* fsrc[2] = {versionHeader, m_fragmentCode.c_str()};
+        const char* fsrc[2] = {fragVersionHeader, m_fragmentCode.c_str()};
         glShaderSource(f, 2, fsrc, NULL);
         glCompileShader(f);
 
@@ -241,7 +254,13 @@ namespace TwkGLF
 
     const GLProgram* paintReplaceGLProgram() { return basicGLProgram(ReplaceVertex_glsl, ReplaceFrag_glsl); }
 
-    const GLProgram* softPaintReplaceGLProgram() { return basicGLProgram(ReplaceVertex_glsl, SoftReplaceFrag_glsl); }
+    const GLProgram* softPaintReplaceGLProgram()
+    {
+        static const GLProgram* prog = nullptr;
+        if (!prog)
+            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_vert, std::string(ap_compat_gl21) + ap_soft_stamp_frag);
+        return prog;
+    }
 
     const GLProgram* paintEraseGLProgram() { return basicGLProgram(EraseVertex_glsl, EraseFrag_glsl); }
 
@@ -260,5 +279,13 @@ namespace TwkGLF
     const GLProgram* softDirectionPaintGLProgram() { return basicGLProgram(DirectionPaintVertex_glsl, SoftDirectionPaintFrag_glsl); }
 
     const GLProgram* paintTessellateGLProgram() { return basicGLProgram(ReplaceColoredVertex_glsl, PaintColoredFrag_glsl); }
+
+    const GLProgram* texturePaintReplaceGLProgram()
+    {
+        static const GLProgram* prog = nullptr;
+        if (!prog)
+            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_vert, std::string(ap_compat_gl21) + ap_stamp_frag);
+        return prog;
+    }
 
 } // namespace TwkGLF

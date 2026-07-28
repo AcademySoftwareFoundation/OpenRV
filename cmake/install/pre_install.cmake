@@ -65,6 +65,20 @@ FUNCTION(before_copy FILE_PATH RET_VAL)
     RETURN()
   ENDIF()
 
+  # Crash-reporting symbols (the Breakpad symbols/ tree) are not shipped to customers. They are archived separately for offline symbolication via the
+  # 'symbols_archive' build target (see docs/crash-reporting.md, section 7). Strip the tree from Release (customer) installs while keeping it for local Debug
+  # installs, matching how .debug/.pdb/.dSYM are handled per-platform.
+  STRING(FIND "${FILE_PATH}" "${RV_APP_ROOT}/symbols/" _rv_symbols_pos)
+  IF(NOT _rv_symbols_pos EQUAL -1
+     AND CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$"
+  )
+    SET(${RET_VAL}
+        "NO"
+        PARENT_SCOPE
+    )
+    RETURN()
+  ENDIF()
+
   IF(FILE_PATH MATCHES "${RV_STAGE_LIB_DIR}/cmake"
      OR FILE_PATH MATCHES "${RV_STAGE_LIB_DIR}/engine"
      OR FILE_PATH MATCHES "${RV_STAGE_LIB_DIR}/metatype"

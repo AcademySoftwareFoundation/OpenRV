@@ -71,6 +71,11 @@ TARGET_LINK_LIBRARIES(
           BDWGC::Gc
 )
 
+# Set source version in Mach-O binary for crash dump symbolication
+IF(RV_TARGET_DARWIN)
+  TARGET_LINK_OPTIONS(${_target} PRIVATE "-Wl,-source_version,${RV_MAJOR_VERSION}.${RV_MINOR_VERSION}.${RV_REVISION_NUMBER}")
+ENDIF()
+
 GET_PROPERTY(
   RV_THIRD_PARTY_CUSTOMIZATION GLOBAL
   PROPERTY "RV_THIRD_PARTY_CUSTOMIZATION"
@@ -86,7 +91,38 @@ IF(RV_THIRD_PARTY_CUSTOMIZATION)
   )
 ENDIF()
 
+# Ensure Breakpad tools are built before generating symbols
+IF(RV_DEPS_BREAKPAD_VERSION)
+  ADD_DEPENDENCIES(${_target} RV_DEPS_BREAKPAD-stage-target)
+ENDIF()
+
 RV_STAGE(TYPE "MAIN_EXECUTABLE" TARGET ${_target})
+
+SET(_scripts_src
+    ${PROJECT_SOURCE_DIR}/src/bin/apps/rv
+)
+
+# Breakpad symbolication helper (uses minidump_stackwalk)
+IF(RV_DEPS_BREAKPAD_VERSION)
+  CONFIGURE_FILE(${_scripts_src}/symbolicate_crash.sh ${RV_STAGE_BIN_DIR}/symbolicate_crash.sh COPYONLY)
+ENDIF()
+
+# Crashpad handler wrapper
+IF(RV_DEPS_CRASHPAD_VERSION)
+  CONFIGURE_FILE(${_scripts_src}/crashpad_handler_macos.sh.in ${CMAKE_CURRENT_BINARY_DIR}/crashpad_handler_macos.sh @ONLY)
+  FILE(
+    COPY ${CMAKE_CURRENT_BINARY_DIR}/crashpad_handler_macos.sh
+    DESTINATION ${RV_STAGE_BIN_DIR}
+    FILE_PERMISSIONS
+      OWNER_READ
+      OWNER_WRITE
+      OWNER_EXECUTE
+      GROUP_READ
+      GROUP_EXECUTE
+      WORLD_READ
+      WORLD_EXECUTE
+  )
+ENDIF()
 
 FILE(GLOB _icns_files *.icns)
 FOREACH(

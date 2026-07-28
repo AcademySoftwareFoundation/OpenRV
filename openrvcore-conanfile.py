@@ -61,71 +61,33 @@ class OpenRVBase:
         self.tool_requires("cmake/3.31.8")
 
     def requirements(self):
-        self.requires("zlib/1.3.1", force=True, options={"shared": True})
+        # Versions and options are read from conan/packages.yml, which is the
+        # single source of truth for the Conan build path. To bump a dep:
+        # edit packages.yml, then run conan/scripts/gen_profile_common.py.
+        #
+        # libtiff is intentionally absent: it is force-built from source in
+        # CMake (private headers needed) and excluded from Conan because
+        # libtiff 4.6.0 doesn't build against libjpeg-turbo's 12-bit API.
+        # openjph/openexr pull it in transitively; disabled via
+        # openjph:with_tiff=False in packages.yml.
+        import yaml
 
-        self.requires("libatomic_ops/7.10.0", options={"shared": False})
+        packages_yml = os.path.join(self.recipe_folder, "conan", "packages.yml")
+        pkgs = yaml.safe_load(open(packages_yml))
 
-        # Version conflict: ffmpeg/4.4.3->libwebp/1.3.2, ->libwebp/1.2.1
-        # Webp >=1.3.0 depends on sharpyuv and it causes issues with OIIO.
-        self.requires("libwebp/1.2.1", force=True, options={"shared": False})
-
-        self.requires("dav1d/1.5.3", force=True, options={"shared": True})
-
-        self.requires(
-            "libjpeg-turbo/2.1.4",
-            force=True,
-            options={
-                "shared": True,
-            },
-        )
-
-        # Override openssl version for ffmpeg, but do not use it for OpenRV right now.
-        self.requires("openssl/3.6.2", force=True, options={"shared": True, "no_zlib": True})
-
-        # Override boost version for other dependencies.
-        self.requires(
-            "boost/1.85.0",
-            force=True,
-            options={"shared": True, "extra_b2_flags": "-d+0 -s NO_LZMA=1"},
-        )
-
-        # PCRE2 for Windows (boost regex used on other platforms)
-        if self.settings.os == "Windows":
-            self.requires(
-                "pcre2/10.44",
-                force=True,
-                options={
-                    "shared": True,
-                    "with_zlib": False,
-                    "with_bzip2": False,
-                    "support_jit": False,
-                    "build_pcre2_16": False,
-                    "build_pcre2_32": False,
-                },
-            )
-
-        # Override imath version for other dependencies.
-        self.requires("imath/3.1.12", force=True, options={"shared": True})
-
-        self.requires("libdeflate/1.25", force=True, options={"shared": True})
-
-        self.requires("openexr/3.3.6", force=True, options={"shared": True})
-
-        self.requires("libpng/1.6.55", force=True, options={"shared": True})
-
-        # libtiff is force-built from source in CMake (private headers needed).
-        # Excluded from Conan: libtiff 4.6.0 doesn't build against libjpeg-turbo (12-bit API).
-        # openjph/openexr pull it in transitively; disabled via openjph:with_tiff=False.
-
-        self.requires("openjpeg/2.5.4", force=True, options={"shared": True})
-
-        self.requires(
-            "libraw/0.21.1",
-            force=True,
-            options={"shared": True, "with_jpeg": "libjpeg-turbo", "with_jasper": False},
-        )
-
-        self.requires("openjph/0.26.3", force=True, options={"shared": True})
+        for dep in pkgs["deps"]:
+            # Mirror of conan/scripts/_common.py:is_active_dep. Conan's
+            # recipe sandbox makes importing helper modules fragile, so
+            # the rule is duplicated here. Update both sites together.
+            if dep.get("windows_only") and self.settings.os != "Windows":
+                continue
+            # Strip the "name/*:" pattern prefix from option keys to get bare names.
+            opts = {}
+            for k, v in (dep.get("options") or {}).items():
+                bare = k.split(":")[-1]
+                # YAML booleans are already Python bools; strings stay strings.
+                opts[bare] = v
+            self.requires(f"{dep['name']}/{dep['version']}", force=True, options=opts)
 
     def generate(self):
         buildenv = VirtualBuildEnv(self)

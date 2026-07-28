@@ -1,0 +1,15 @@
+--- a/util/CMakeLists.txt
++++ b/util/CMakeLists.txt
+@@ -253,10 +253,6 @@
+ if(LINUX OR ANDROID)
+     if (LINUX)
+-        if(NOT TARGET CURL::libcurl) # Some other lib might bring libcurl already
+-            find_package(CURL REQUIRED)
+-        endif()
+-
+-        target_link_libraries(crashpad_util PRIVATE CURL::libcurl)
+-        SET(HTTP_TRANSPORT_IMPL net/http_transport_libcurl.cc)
++        # RV: local minidump storage only — no HTTP uploads, no libcurl/libldap.
++        SET(HTTP_TRANSPORT_IMPL net/http_transport_disabled.cc)
+ 
+         target_compile_options(crashpad_util PRIVATE

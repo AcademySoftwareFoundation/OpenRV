@@ -35,8 +35,13 @@ jobs:
         - /usr/local/share/powershell:/github/home/powershell
         - /usr/local/share/chromium:/github/home/chromium
         - /usr/local/lib/node_modules:/github/home/node_modules
-        - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
+        - /opt/hostedtoolcache:/github/home/hostedtoolcache
         - /usr/local/share/boost:/github/home/boost
+        - /usr/share/swift:/github/home/swift
+        - /usr/share/miniconda:/github/home/miniconda
+        - /usr/local/share/vcpkg:/github/home/vcpkg
+        - /home/runner/.cargo:/github/home/.cargo
+        - /home/runner/.rustup:/github/home/.rustup
     strategy:
       fail-fast: false
       matrix:
@@ -101,8 +106,13 @@ jobs:
         - /usr/local/share/powershell:/github/home/powershell
         - /usr/local/share/chromium:/github/home/chromium
         - /usr/local/lib/node_modules:/github/home/node_modules
-        - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
+        - /opt/hostedtoolcache:/github/home/hostedtoolcache
         - /usr/local/share/boost:/github/home/boost
+        - /usr/share/swift:/github/home/swift
+        - /usr/share/miniconda:/github/home/miniconda
+        - /usr/local/share/vcpkg:/github/home/vcpkg
+        - /home/runner/.cargo:/github/home/.cargo
+        - /home/runner/.rustup:/github/home/.rustup
     strategy:
       fail-fast: false
       matrix:
@@ -167,8 +177,13 @@ jobs:
         - /usr/local/share/powershell:/github/home/powershell
         - /usr/local/share/chromium:/github/home/chromium
         - /usr/local/lib/node_modules:/github/home/node_modules
-        - /opt/hostedtoolcache/CodeQL:/github/home/CodeQL
+        - /opt/hostedtoolcache:/github/home/hostedtoolcache
         - /usr/local/share/boost:/github/home/boost
+        - /usr/share/swift:/github/home/swift
+        - /usr/share/miniconda:/github/home/miniconda
+        - /usr/local/share/vcpkg:/github/home/vcpkg
+        - /home/runner/.cargo:/github/home/.cargo
+        - /home/runner/.rustup:/github/home/.rustup
     strategy:
       fail-fast: false
       matrix:

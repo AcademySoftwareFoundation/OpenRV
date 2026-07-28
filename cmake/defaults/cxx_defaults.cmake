@@ -61,6 +61,8 @@ ENDIF()
 # Set 3rd party dependency versions and hashes
 INCLUDE(CYCOMMON)
 
+INCLUDE(rv_generate_symbols)
+
 #
 # VFX Platform option
 #

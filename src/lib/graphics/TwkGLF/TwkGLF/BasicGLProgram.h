@@ -77,6 +77,7 @@ namespace TwkGLF
 
     const GLProgram* paintReplaceGLProgram();
     const GLProgram* softPaintReplaceGLProgram();
+    const GLProgram* texturePaintReplaceGLProgram();
     const GLProgram* paintScaleGLProgram();
     const GLProgram* softPaintScaleGLProgram();
     const GLProgram* paintEraseGLProgram();
