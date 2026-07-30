@@ -353,11 +353,6 @@ int utf8Main(int argc, char* argv[])
 
     TwkFB::ThreadPool::initialize();
 
-    // Qt 5.12.1 specific
-    // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
-    // QGLWidget
-    setEnvVar("QT_QUICK_BACKEND", "software");
-
 #if defined(PLATFORM_LINUX)
     // Work around for Wacom Tablet issue on linux
     // Note: This is a Qt 5.12.4 regression
@@ -368,6 +363,14 @@ int utf8Main(int argc, char* argv[])
     // Prevent crash at startup when multithreaded upload is enabled
     // (RV Preferences/Rendering/Multithread GPU Upload)
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+
+    // Share GL resources across every QOpenGLContext in the process. This is a
+    // documented QtWebEngine requirement, and it lets RV's auxiliary GL
+    // surfaces -- the second-output ScreenView and the multithreaded-upload
+    // worker device -- share textures/FBOs with the main viewport context
+    // without an explicit, ordering-sensitive setShareContext() call. Must be
+    // set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     TwkUtil::MemPool::initialize();
 

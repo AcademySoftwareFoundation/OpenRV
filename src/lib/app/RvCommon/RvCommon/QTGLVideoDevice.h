@@ -10,6 +10,9 @@
 #include <iostream>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
+#include <QOpenGLWindow>
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
 #include <QWindow>
 #include <QtWidgets/QWidget>
 #include <RvCommon/QTTranslator.h>
@@ -29,12 +32,32 @@ namespace Rv
     {
     public:
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWidget* view);
+        //
+        //  Native-window backed variant. The GL surface is a QOpenGLWindow
+        //  (embedded in the widget tree via createWindowContainer); eventWidget
+        //  is the container QWidget used by the QTTranslator for coordinate
+        //  mapping (height/mapToGlobal) and mouse grab.
+        //
+        QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWindow* window, QWidget* eventWidget);
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
         void setWidget(QOpenGLWidget*);
 
         QOpenGLWidget* widget() const { return m_view; }
+
+        QOpenGLWindow* window() const { return m_window; }
+
+        //
+        //  Backing-agnostic accessors for the shareable GL context and its
+        //  surface format. The control view may be backed by either a
+        //  QOpenGLWidget (m_view) or, in the native-window port, a
+        //  QOpenGLWindow (m_window). Second-output devices (DesktopVideoDevice)
+        //  share the control context and need these without caring which.
+        //
+        QOpenGLContext* glShareContext() const { return m_window ? m_window->context() : (m_view ? m_view->context() : nullptr); }
+
+        QSurfaceFormat glSurfaceFormat() const { return m_window ? m_window->format() : (m_view ? m_view->format() : QSurfaceFormat()); }
 
         virtual void makeCurrent() const;
 
@@ -85,6 +108,7 @@ namespace Rv
         float m_refresh;
         float m_devicePixelRatio{1.0f};
         QOpenGLWidget* m_view;
+        QOpenGLWindow* m_window{nullptr};
         QTTranslator* m_translator;
     };
 
