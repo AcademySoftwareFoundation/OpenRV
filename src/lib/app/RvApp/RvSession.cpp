@@ -2912,8 +2912,10 @@ namespace Rv
                     ++m_gtoSourceTotal;
 
                 // Optimization: Start preloading media if this is an
-                // RVFileSource with active media
-                if (p == "RVFileSource" && !Options::sharedOptions().progressiveSourceLoading)
+                // RVFileSource with active media. Preloading is not
+                // supported in rvio/batch mode
+                if (p == "RVFileSource" && !Options::sharedOptions().progressiveSourceLoading
+                    && Options::sharedOptions().delaySessionLoading)
                 {
                     IntProperty* mediaActive = pc->property<IntProperty>("media.active");
                     if (mediaActive && !mediaActive->empty() && mediaActive->front() == 1)
