@@ -2126,6 +2126,7 @@ namespace Rv
             newRequest.setOption("sessionProtocol", string("RVSession"));
             newRequest.setOption("sessionProtocolVersion", 4);
             newRequest.setOption("sessionName", string("rv"));
+            newRequest.setOption("saveAs", writeAsCopy);
             newRequest.setOption("version", 2);
             if (bigFile)
                 newRequest.setOption("compressed", true);
@@ -2144,7 +2145,6 @@ namespace Rv
             //
 
             Session::write(filename, newRequest);
-            setFileName(filename.c_str());
 
             //
             //  post write events
