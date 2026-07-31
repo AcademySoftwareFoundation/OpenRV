@@ -1,0 +1,18 @@
+package: Annotate Toolbar
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 0.1
+rv: 2025.1
+openrv: 3.0.0
+optional: false
+hidden: false
+
+modes:
+  - file: annotate_toolbar_mode.py
+    load: immediate
+
+description: |
+  <p>New Python-based annotation toolbar matching the FY27 design.
+  Provides shapes (rectangle, ellipse, arrow, line) and text annotation tools
+  in addition to brush and eraser tools. Developed in parallel with the
+  existing Mu-based annotate_mode; replaces it when complete.</p>
