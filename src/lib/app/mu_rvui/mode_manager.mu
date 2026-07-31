@@ -755,8 +755,40 @@ class: ModeManagerMode : MinorMode
 
         let vnode = viewNode(),
             vtype = nodeType(vnode),
-            name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "",
-            entry = findModeEntry(name);
+            name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "";
+
+        //
+        //  Avoid redundant deactivate->reactivate churn when the view-edit-mode
+        //  is not actually changing. Toggling an edit mode is expensive (it
+        //  rebuilds menus/event tables), and clearSession re-sets the same
+        //  default view twice with force=true -- so without this the same edit
+        //  mode is toggled off then on up to four times per clear for no net
+        //  change. On the 'before' event, event.contents() holds the node we
+        //  are switching TO while viewNode() is still the OLD view; if both map
+        //  to the same edit mode, skip the deactivation. The matching 'after'
+        //  event then finds the mode already active and no-ops in activateEntry.
+        //
+        if (!on)
+        {
+            try
+            {
+                let toName = event.contents();
+                if (toName != "")
+                {
+                    let toType     = nodeType(toName),
+                        toEditMode = if toType.substr(0,2) == "RV"
+                                        then toType.substr(2,0) + "_edit_mode"
+                                        else "";
+                    if (toEditMode == name)
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (exception exc) { let ignore = exc; }
+        }
+
+        let entry = findModeEntry(name);
 
         if (entry neq nil)
         {
