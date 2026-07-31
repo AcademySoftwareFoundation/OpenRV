@@ -134,7 +134,22 @@ namespace IPCore
             //
             setThreadName("PBO Upload");
 
+            if (!renderer->uploadThreadDevice())
+            {
+                renderer->setUseThreadedUpload(false);
+                return;
+            }
+
             renderer->uploadThreadDevice()->makeCurrent();
+
+            if (TwkGLF::safeGLGetString(GL_VERSION).empty())
+            {
+                std::cerr << "ERROR: [ImageRenderer] upload thread GL context init failed; "
+                             "disabling threaded upload\n";
+                renderer->setUseThreadedUpload(false);
+                renderer->notifyDraw();
+                return;
+            }
 
             while (true)
             {
@@ -155,6 +170,14 @@ namespace IPCore
                 // probably not significant.
                 //
                 renderer->manager()->insertTextureFence(renderer->uploadRootHash());
+
+                // The fence was created on THIS (worker) GL context. glClientWaitSync's
+                // GL_SYNC_FLUSH_COMMANDS_BIT on the main thread only flushes the main
+                // context, not this one, so without an explicit flush here the sync
+                // object never reaches the GPU and the main thread stalls on the 10s
+                // fence timeout every frame. Flushing publishes the uploads + fence so
+                // the waiter wakes immediately.
+                glFlush();
 
                 // signal renderer to proceed
                 renderer->notifyDraw();
@@ -625,9 +648,21 @@ namespace IPCore
 
     void ImageRenderer::createGLContexts()
     {
-        m_setGLContext = true;
         delete m_uploadThreadDevice;
         m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
+        if (!m_uploadThreadDevice)
+        {
+            static bool logged = false;
+            if (!logged)
+            {
+                logged = true;
+                std::cerr << "WARNING: [ImageRenderer] threaded GPU upload unavailable; "
+                             "falling back to synchronous upload\n";
+            }
+            setUseThreadedUpload(false);
+            return;
+        }
+        m_setGLContext = true;
         controlDevice().glDevice->makeCurrent();
     }
 
@@ -1558,11 +1593,17 @@ namespace IPCore
         {
             createGLContexts();
 
-            // upload thread initialization
-            m_uploadThread = Thread(uploadThreadTrampoline, this); // func and data
+            if (!GLContextNotSet())
+            {
+                // upload thread initialization
+                m_uploadThread = Thread(uploadThreadTrampoline, this);
+            }
         }
 
-        notifyUpload();
+        if (useThreadedUpload())
+        {
+            notifyUpload();
+        }
     }
 
     void ImageRenderer::renderBegin(const InternalRenderContext& context)
@@ -1602,6 +1643,11 @@ namespace IPCore
                     }
                     m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
 
+                    // Texture object creation (glGenTextures, PBO alloc) must run
+                    // on the control device's GL context — especially on the Metal
+                    // offscreen path where nothing else guarantees it is current.
+                    controlDevice().glDevice->makeCurrent();
+
                     //
                     // traverse our IPTree, and create gl textures/buffers for
                     // all texture uploads the upload thread will need the
@@ -1626,6 +1672,13 @@ namespace IPCore
 
                     prepareTextureDescriptionsForUpload(uploadRoot);
                     setupUploadThread(uploadRoot);
+
+                    // Worker creation may fail (e.g. Metal offscreen share setup);
+                    // fall back to synchronous upload for this frame.
+                    if (!useThreadedUpload())
+                    {
+                        prefetch(uploadRoot);
+                    }
                 }
                 else
                 {
