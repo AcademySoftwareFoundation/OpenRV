@@ -191,7 +191,6 @@ namespace TwkMovie
 
         std::string streamLang(int index);
         bool correctLang(int index);
-        void readSubtitle(VideoTrack* track);
 
         //
         // Metadata & Lookup Methods

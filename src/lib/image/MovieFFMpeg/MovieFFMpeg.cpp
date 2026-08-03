@@ -1181,14 +1181,6 @@ namespace TwkMovie
         }
         m_videoTracks.resize(0);
 
-        for (map<int, int>::iterator i = m_subtitleMap.begin(); i != m_subtitleMap.end(); ++i)
-        {
-            if (i->second)
-                ContextPool::flushContext(this, i->first);
-            //  XXX We should be closing these streams too once we are opening
-            //  them
-        }
-
         if (m_avFormatContext)
             avformat_close_input(&m_avFormatContext);
     }
@@ -1258,7 +1250,6 @@ namespace TwkMovie
             }
             mov->m_timecodeTrack = m_timecodeTrack;
             mov->m_formatStartFrame = m_formatStartFrame;
-            mov->m_subtitleMap = m_subtitleMap;
             mov->m_multiTrackAudio = m_multiTrackAudio;
         }
         mov->m_cloning = false;
@@ -2324,21 +2315,25 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Video Track: " << i);
                 if (heroVideoTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
+                    ContextPool::Reservation reserve(this, i);
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     track->useAppleProRes = isProRes;
 #endif
                     if (isJ2K)
                     {
-                        track->number = i;
-                        ostringstream trackName;
-                        trackName << "track " << m_videoTracks.size() + 1;
-                        track->name = trackName.str();
-                        track->isOpen = true;
-                        openAVCodec(i, &track->avCodecContext, &track->hardwareContext);
-                        m_videoTracks.push_back(track);
+                        if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext)) {
+                            track->number = i;
+                            ostringstream trackName;
+                            trackName << "track " << m_videoTracks.size() + 1;
+                            track->name = trackName.str();
+                            track->isOpen = true;
+                            m_videoTracks.push_back(track);
+                        }
+                        else {
+                            delete track;
+                        }
                     }
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     else if (isProRes)
@@ -2447,8 +2442,8 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Audio Track: " << i);
                 if (heroAudioTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
                     AudioTrack* track = new AudioTrack;
+                    ContextPool::Reservation reserve(this, i);
                     if (openAVCodec(i, &track->avCodecContext))
                     {
                         track->number = i;
@@ -2476,16 +2471,6 @@ namespace TwkMovie
                 break;
             case AVMEDIA_TYPE_SUBTITLE:
                 DBL(DB_METADATA, "Subtitle Track: " << i);
-                {
-                    // TODO Need to allocate memory now in ffmpeg6
-                    // #if DB_LEVEL & DB_SUBTITLES
-                    //    ContextPool::Reservation reserve(this, i);
-                    //    if (openAVCodec(i))
-                    //    {
-                    //        m_subtitleMap[i] = 1;
-                    //    }
-                    // #endif
-                }
                 break;
             case AVMEDIA_TYPE_UNKNOWN:
             default:
@@ -2511,14 +2496,6 @@ namespace TwkMovie
         // Capture video metadata information for the frame buffer attributes
         if (m_videoTracks.size() > 0)
             initializeVideo(height, width);
-
-// Initialize subtitles
-#if DB_LEVEL & DB_SUBTITLES
-        if (m_subtitleMap.size() > 0)
-        {
-            m_info.proxy.newAttribute("SubtitleTracks", m_subtitleMap.size());
-        }
-#endif
 
         // Look for chapters
         m_info.chapters.resize(m_avFormatContext->nb_chapters);
@@ -2701,6 +2678,15 @@ namespace TwkMovie
 
         m_info.video = true;
     }
+    /*
+    context-> decoder
+
+    Each context has 1 Video track and/or 1 Audio track, 1 FFMPEG decoder
+
+
+    
+    
+    */
 
     void MovieFFMpegReader::initializeAudio()
     {
@@ -3595,13 +3581,6 @@ namespace TwkMovie
                     TWK_THROW_EXC_STREAM("av_read_frame failed in video stream.");
                 }
             }
-#if DB_LEVEL & DB_SUBTITLES
-            if (m_subtitleMap.find(track->videoPacket->stream_index) != m_subtitleMap.end()
-                && correctLang(track->videoPacket->stream_index))
-            {
-                readSubtitle(track);
-            }
-#endif
         } while ((track->videoPacket->stream_index != track->number) && !finalPacket);
 
         // If we get a valid timestamp here then we should add it to
@@ -4174,51 +4153,6 @@ namespace TwkMovie
 #endif
 
         DBL(DB_VIDEO, "Got a frame and buggin' out!!!\n");
-    }
-
-    void MovieFFMpegReader::readSubtitle(VideoTrack* track)
-    {
-        //    openAVCodec(track->videoPacket->stream_index);
-        //    AVCodecContext* subtitleCodecContext =
-        //        m_avFormatContext->streams[track->videoPacket->stream_index]->codec;
-        //    ASSSplitContext* assSplitContext = ff_ass_split(
-        //        (const char*) subtitleCodecContext->subtitle_header);
-        //    ASS* ass = (ASS*)assSplitContext;
-        //    AVSubtitle subtitle;
-        //    int subtitleFinished = 0;
-        //    if (0 < avcodec_decode_subtitle2(subtitleCodecContext,
-        //            &subtitle, &subtitleFinished, track->videoPacket))
-        //    {
-        //        ostringstream text;
-        //        for (int r = 0; r < subtitle.num_rects; r++)
-        //        {
-        //            AVSubtitleRect* rect = subtitle.rects[r];
-        //            switch (rect->type)
-        //            {
-        //                case SUBTITLE_ASS:
-        //                    {
-        //                        ASSDialog* dialog = ff_ass_split_dialog(
-        //                            assSplitContext, rect->ass, 0, NULL);
-        //                        DBL (DB_SUBTITLES, "'" << dialog->text <<
-        //                        "'"); text << dialog->text << " ";
-        //                    }
-        //                    break;
-        //                case SUBTITLE_TEXT:
-        //                    text << rect->text << " ";
-        //                    break;
-        //                default:
-        //                    ostringstream message;
-        //                    message << "Unhandled type of subtitle: '" <<
-        //                    rect->type << "'"; report(message.str(), true);
-        //                    break;
-        //            }
-        //        }
-        //        DBL (DB_SUBTITLES, "freeing subtitle");
-        //        avsubtitle_free(&subtitle);
-        //        track->fb.newAttribute("SubtitleText", text.str());
-        //        track->fb.newAttribute("SubtitleLanguage",
-        //            streamLang(track->videoPacket->stream_index));
-        //    }
     }
 
     void MovieFFMpegReader::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
