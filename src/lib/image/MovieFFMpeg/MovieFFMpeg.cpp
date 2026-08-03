@@ -446,7 +446,7 @@ namespace TwkMovie
     //  Global pool object:
     //
 
-    ContextPool* globalContextPool = 0;
+    std::unique_ptr<ContextPool> globalContextPool{nullptr};
 
     void ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
     {
@@ -5892,7 +5892,8 @@ namespace TwkMovie
             {
                 poolSize = atoi(c);
             }
-            if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
+            if (poolSize > 0)
+                globalContextPool = std::make_unique<ContextPool>(poolSize);
             else
             {
                 report("Disabling mio_ffmpeg context thread pool.", true);
