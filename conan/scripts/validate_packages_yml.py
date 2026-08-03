@@ -11,7 +11,6 @@ Usage:
 import sys
 
 import yaml
-
 from _common import PACKAGES_YML
 
 REQUIRED = {"name": str, "version": str, "channel": str, "cci_folder": str}

@@ -5,12 +5,12 @@
 #
 
 import os
-import requests
-
+from collections.abc import Iterable
 from http.cookies import SimpleCookie
 from tempfile import NamedTemporaryFile
-from typing import Dict, Iterable
 from urllib.parse import urlparse
+
+import requests
 
 # !!!!! W A R N I N G !!!!!
 #
@@ -88,7 +88,7 @@ def is_redirecting(url: str) -> bool:
     return urlparse(url).scheme in ["http", "https"]
 
 
-def get_http_cookies(url: str) -> Iterable[Dict]:
+def get_http_cookies(url: str) -> Iterable[dict]:
     """
     Returns a list of cookies to be used for the given url.
 
@@ -116,7 +116,7 @@ def get_http_cookies(url: str) -> Iterable[Dict]:
     yield from ()
 
 
-def get_http_headers(url: str) -> Iterable[Dict]:
+def get_http_headers(url: str) -> Iterable[dict]:
     """
     Returns a list of headers to be used for the given url.
 

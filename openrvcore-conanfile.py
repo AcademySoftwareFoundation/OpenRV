@@ -1,11 +1,13 @@
 import os
 import sys
-from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeDeps, cmake_layout, CMakeToolchain
+
+from conan.errors import ConanException
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.env import VirtualBuildEnv
 from conan.tools.gnu import PkgConfigDeps
 from conan.tools.microsoft import VCVars
-from conan.tools.env import VirtualBuildEnv
-from conan.errors import ConanException
+
+from conan import ConanFile
 
 # The comment below is relevant for WINDOWS only because of the usage of MSYS2.
 

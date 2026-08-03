@@ -67,9 +67,10 @@ RELEASE NOTES:
 """
 
 import sys
-import six
+
 import gto
 import gtoContainer as gc
+import six
 
 apiName = "rvSession.py"
 apiVersion = "0.5"
@@ -258,7 +259,7 @@ class Source(_GroupNode):
         As a helper, a dictionary can be supplied that will print metadata sorted by the keys
         """
         if isinstance(metadata, dict):
-            metadata = ["{0}={1}".format(k, v) for k, v in sorted(metadata.items(), reverse=True)]
+            metadata = [f"{k}={v}" for k, v in sorted(metadata.items(), reverse=True)]
 
         self.setProperty(
             "RVFileSource",
@@ -407,7 +408,7 @@ class Source(_GroupNode):
             if k not in ["order", "sourceCount", "name"]:
                 if isinstance(v, str):
                     valueType = gto.STRING
-                self.setProperty("RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v)
+                self.setProperty("RVPaint", "paint", self.txt.name, f"{k}", valueType, v)
         # For layout, but not source
         # self.txt.order.append(self.txt.name)
         return self.txt.name
@@ -419,7 +420,7 @@ class Source(_GroupNode):
         self.setProperty(
             "RVPaint",
             "paint",
-            "frame:{0:d}".format(int(frame)),
+            f"frame:{int(frame):d}",
             "order",
             gto.STRING,
             setTextName,
@@ -606,7 +607,7 @@ class Layout(_GroupNode):
             if k not in ["order", "sourceCount", "name"]:
                 if isinstance(v, str):
                     valueType = gto.STRING
-                self.setProperty("RVPaint", "paint", self.txt.name, "{0}".format(k), valueType, v)
+                self.setProperty("RVPaint", "paint", self.txt.name, f"{k}", valueType, v)
         self.txt.order.append(self.txt.name)
 
     def setFrameNumberForText(self, frame):
@@ -616,7 +617,7 @@ class Layout(_GroupNode):
         self.setProperty(
             "RVPaint",
             "paint",
-            "frame:{0:d}".format(int(frame)),
+            f"frame:{int(frame):d}",
             "order",
             gto.STRING,
             self.txt.order,
@@ -645,9 +646,9 @@ class Layout(_GroupNode):
         scale = 1.0 / nside
 
         pos = []
-        for row in reversed(range(0, nside)):
+        for row in reversed(range(nside)):
             y = scale * row - (0.5 * scale)
-            for column in range(0, nside):
+            for column in range(nside):
                 x = scale * column
                 pos.append((x * 2, y))
 
@@ -664,7 +665,7 @@ class Layout(_GroupNode):
         tileList = self.createTileList(len(images))
         scale = tileList[0]
         pos = tileList[1]
-        for i in range(0, len(images)):
+        for i in range(len(images)):
             img = images[i]
             x, y = pos[i]
             tileDict[img] = (x, y)
@@ -832,7 +833,7 @@ class Session:
             (subObjType, subObject, container, prop) = path
             (typeName, value) = info
 
-            if subObject not in subObjects.keys():
+            if subObject not in subObjects:
                 #
                 #   This property belongs in a subObject we haven't
                 #   created yet, so do it now.
@@ -1280,4 +1281,3 @@ def SampleCode():
 
     s.write ("sample.rv")
     """
-    pass
