@@ -22,7 +22,7 @@ namespace TwkFB
 #ifdef RV_VFX_CY2023
     using namespace OpenImageIO_v2_5;
 #else
-    using namespace OpenImageIO;
+    using namespace OIIO;
 #endif
 
     IOoiio::IOoiio()

@@ -2459,6 +2459,28 @@ class: SessionManagerMode : MinorMode
         return nodes;
     }
 
+    //
+    //  Answer "session-manager-selected-nodes" with one node name per line.
+    //
+    //  Other packages used to reach the selection by requiring this module and
+    //  calling theMode().selectedNodes(). A Mu require cannot resolve the Python
+    //  port that replaces this file, so the cross-package API is served as an
+    //  internal event instead, and both implementations answer it identically.
+    //
+    method: selectedNodesEvent (void; Event event)
+    {
+        let nodes = selectedNodes();
+        string content = "";
+
+        for_index (i; nodes)
+        {
+            if (i > 0) content += "\n";
+            content += nodes[i];
+        }
+
+        event.setReturnContent(content);
+    }
+
     method: selectedItems (QStandardItem[]; )
     {
         let indices = _viewTreeView.selectionModel().selectedIndexes();
@@ -3141,7 +3163,8 @@ class: SessionManagerMode : MinorMode
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
                ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
-               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail")
+               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail"),
+               ("session-manager-selected-nodes", selectedNodesEvent, "Report the tree selection to other packages")
                ],
              nil,
              nil);

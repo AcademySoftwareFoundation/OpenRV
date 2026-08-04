@@ -314,9 +314,17 @@ IF(RV_TARGET_DARWIN
   )
 ENDIF()
 
-# Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
+# Phase 1: Install build dependencies for phase 2.
+# --constraint pins pip/setuptools/wheel to the exact versions in requirements.txt so that
+# Phase 2 sees them already satisfied and never attempts a mixed-version overwrite.
+# --ignore-installed is kept so that ensurepip-bootstrapped packages (which lack RECORD
+# files) are overwritten cleanly rather than triggering an uninstall-no-record-file error.
+# Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install
+    --no-cache-dir --no-deps --ignore-installed
+    --constraint "${_requirements_output_file}"
+    ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
@@ -413,9 +421,7 @@ LIST(
   -m
   pip
   install
-  --upgrade
   --no-cache-dir
-  --force-reinstall
   --no-binary
   :all:
   --only-binary

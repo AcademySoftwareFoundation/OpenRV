@@ -104,6 +104,10 @@ def prepare() -> None:
                 return "15.0.0-based-macos-universal.7z"
             elif major_minor_version_str == "17.0":
                 return "17.0.1-based-macos-universal.7z"
+            elif major_minor_version_str == "21.0":
+                return "21.1.0-based-macos-universal.7z"
+            elif major_minor_version_str == "22.1":
+                return "22.1.2-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
@@ -120,8 +124,9 @@ def prepare() -> None:
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
 
     # if we have a failed download, clean it up and redownload.
-    # checking for False since it can return None when archive doesn't have a CRC
-    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is False:
+    # verify_7z_archive returns True on success, False on CRC failure, or None for
+    # a file that is not a valid 7z at all (e.g. a truncated or HTML error response).
+    if os.path.exists(libclang_zip) and verify_7z_archive(libclang_zip) is not True:
         os.remove(libclang_zip)
 
     # download it if necessary
@@ -220,6 +225,10 @@ def build() -> None:
     python_home = PYTHON_OUTPUT_DIR
     python_interpreter_args = get_python_interpreter_args(python_home, VARIANT)
 
+    # Qt3D modules are not used by RV and their shiboken6 code-gen crashes with
+    # segfault on macOS 26 (Tahoe) + Apple clang 21.x.  Skip them all.
+    _qt3d_skip = "Qt3DAnimation,Qt3DCore,Qt3DExtras,Qt3DInput,Qt3DLogic,Qt3DRender"
+
     pyside_build_args = python_interpreter_args + [
         os.path.join(SOURCE_DIR, "setup.py"),
         "install",
@@ -230,6 +239,7 @@ def build() -> None:
         "--verbose-build",
         "--log-level=verbose",
         f"--parallel={os.cpu_count() or 1}",
+        f"--skip-modules={_qt3d_skip}",
     ]
 
     if OPENSSL_OUTPUT_DIR:

@@ -295,8 +295,70 @@ class: ModeManagerMode : MinorMode
         return if is_nil(pymode) then nil else PyMinorMode(pymode);
     }
 
+    method: requestedModeImpl (string; ModeEntry entry)
+    {
+        //
+        //  "python" or "mu" when the environment asks for a specific
+        //  implementation of a mode, nil when it does not care and the choice is
+        //  left to whatever the package actually ships. Asking explicitly is what
+        //  lets a Mu->Python port be verified against the Mu behavior while both
+        //  sources are still in the build: the migration's Mu-baseline gate runs
+        //  with RV_MODE_IMPL_<mode>=mu.
+        //
+        use path;
+
+        let base = without_extension(entry.name),
+            impl = getenv("RV_MODE_IMPL_%s" % base, nil);
+
+        if (impl neq nil) return if impl == "python" then "python" else "mu";
+
+        let prefer = getenv("RV_PREFER_PYTHON_MODES", nil);
+
+        if (prefer neq nil)
+        {
+            for_each (name; prefer.split(",")) if (name == base) return "python";
+        }
+
+        return nil;
+    }
+
+    method: pythonModuleExists (bool; string name)
+    {
+        //
+        //  Whether a Python implementation of this mode is importable, asked
+        //  without importing it and without leaving a Python error set.
+        //
+        //  It has to be this indirect. python.PyImport_Import() calls
+        //  PyErr_Print() when the module is missing, and most modes are Mu-only,
+        //  so probing by import would print a traceback for every one of them at
+        //  startup. find_spec() reports a missing module as None rather than as an
+        //  error, and None arrives here as a non-nil PyObject, so the answer is in
+        //  the type rather than in is_nil().
+        //
+        try
+        {
+            let util = PyImport_Import("importlib.util");
+
+            if (is_nil(util)) return false;
+
+            let finder = PyObject_GetAttr(util, "find_spec");
+
+            if (is_nil(finder)) return false;
+
+            let spec = PyObject_CallObject(finder, name);
+
+            return !is_nil(spec) && type_name(Py_TYPE(spec)) != "NoneType";
+        }
+        catch (...)
+        {
+            return false;
+        }
+    }
+
     method: loadEntry (void; ModeEntry entry)
     {
+        use path;
+
         if (!entry.loaded)
         {
             State state = data();
@@ -316,8 +378,21 @@ class: ModeManagerMode : MinorMode
             }
             let loadStartTime = theTime();
             PyMinorMode pymode = nil;
+            let requested = requestedModeImpl(entry);
 
-            if (!runtime.load_module(entry.name))
+            //
+            //  Python is the default whenever the package ships a Python
+            //  implementation, including when it also still ships a Mu one: the Mu
+            //  modes are being retired package by package, and a ported package
+            //  keeps its .mu source only so the migration's Mu-baseline gate can
+            //  still run against it. So the question is not "is Python being asked
+            //  for" but "is there a Python implementation at all".
+            //
+            let usePython = if requested neq nil
+                                then requested == "python"
+                                else pythonModuleExists(path.without_extension(entry.name));
+
+            if (usePython)
             {
                 try
                 {
@@ -328,11 +403,33 @@ class: ModeManagerMode : MinorMode
                     print("ERROR: while loading python module: %s\n" % exc);
                 }
 
-                if (pymode eq nil) throw exception("failed in runtime.load_module");
+                //
+                //  A Python implementation that exists but does not load is an
+                //  error, and deliberately NOT a quiet fall-through to Mu.
+                //
+                //  Falling back looks appealing but is unsound: a Python mode
+                //  registers itself with defineMinorMode() from inside init(), which
+                //  runs near the top of its constructor, so a failure anywhere after
+                //  that point leaves the mode already registered. Loading the Mu
+                //  module next makes its own defineMinorMode() throw "Duplicate
+                //  mode", and that exception is caught upstream and routed to
+                //  showWarning(), which is silent unless -ModeManagerVerbose. The
+                //  net effect was no mode at all and no message — strictly worse
+                //  than reporting the original failure here.
+                //
+                if (pymode eq nil)
+                {
+                    throw exception("python implementation of %s could not be loaded" % entry.name);
+                }
             }
 
             if (pymode eq nil)
             {
+                if (!runtime.load_module(entry.name))
+                {
+                    throw exception("failed in runtime.load_module");
+                }
+
 		if (_verbose)
 		{
 		    let foundIt = false;

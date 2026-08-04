@@ -1,0 +1,6828 @@
+GTOa (4)
+
+rv : RVSession (4)
+{
+    matte
+    {
+        int show = 0
+        float aspect = 1.33000004
+        float opacity = 0.330000013
+        float heightVisible = -1
+        float[2] centerPoint = [ [ 0 0 ] ]
+    }
+
+    paintEffects
+    {
+        int hold = 0
+        int ghost = 0
+        int ghostBefore = 5
+        int ghostAfter = 5
+    }
+
+    sm_view
+    {
+        int SEQUENCES = 1
+        int STACKS = 1
+        int LAYOUTS = 1
+        int SOURCES = 1
+    }
+
+    session
+    {
+        string viewNode = "sourceGroup000000"
+        int[2] range = [ [ 216000 216060 ] ]
+        int[2] region = [ [ 216000 216060 ] ]
+        float fps = 30
+        int realtime = 0
+        int inc = 1
+        int currentFrame = 216000
+        int marks = [ ]
+        int version = 2
+    }
+}
+
+connections : connection (2)
+{
+    evaluation
+    {
+        string[2] connections = [ [ "sourceGroup000000" "defaultLayout" ] [ "sourceGroup000001" "defaultLayout" ] [ "sourceGroup000002" "defaultLayout" ] [ "sourceGroup000003" "defaultLayout" ] [ "sourceGroup000004" "defaultLayout" ] [ "sourceGroup000005" "defaultLayout" ] [ "sourceGroup000006" "defaultLayout" ] [ "sourceGroup000007" "defaultLayout" ] [ "sourceGroup000008" "defaultLayout" ] [ "sourceGroup000009" "defaultLayout" ] [ "sourceGroup000010" "defaultLayout" ] [ "sourceGroup000011" "defaultLayout" ] [ "viewGroup" "defaultOutputGroup" ] [ "sourceGroup000000" "defaultSequence" ] [ "sourceGroup000001" "defaultSequence" ] [ "sourceGroup000002" "defaultSequence" ] [ "sourceGroup000003" "defaultSequence" ] [ "sourceGroup000004" "defaultSequence" ] [ "sourceGroup000005" "defaultSequence" ] [ "sourceGroup000006" "defaultSequence" ] [ "sourceGroup000007" "defaultSequence" ] [ "sourceGroup000008" "defaultSequence" ] [ "sourceGroup000009" "defaultSequence" ] [ "sourceGroup000010" "defaultSequence" ] [ "sourceGroup000011" "defaultSequence" ] [ "sourceGroup000000" "defaultStack" ] [ "sourceGroup000001" "defaultStack" ] [ "sourceGroup000002" "defaultStack" ] [ "sourceGroup000003" "defaultStack" ] [ "sourceGroup000004" "defaultStack" ] [ "sourceGroup000005" "defaultStack" ] [ "sourceGroup000006" "defaultStack" ] [ "sourceGroup000007" "defaultStack" ] [ "sourceGroup000008" "defaultStack" ] [ "sourceGroup000009" "defaultStack" ] [ "sourceGroup000010" "defaultStack" ] [ "sourceGroup000011" "defaultStack" ] [ "sourceGroup000000" "viewGroup" ] ]
+        string roots = "defaultOutputGroup"
+    }
+
+    top
+    {
+        string nodes = [ "defaultLayout" "defaultSequence" "defaultStack" "sourceGroup000000" "sourceGroup000001" "sourceGroup000002" "sourceGroup000003" "sourceGroup000004" "sourceGroup000005" "sourceGroup000006" "sourceGroup000007" "sourceGroup000008" "sourceGroup000009" "sourceGroup000010" "sourceGroup000011" ]
+    }
+}
+
+defaultLayout : RVLayoutGroup (1)
+{
+    ui
+    {
+        string name = "Default Layout"
+    }
+
+    layout
+    {
+        string mode = "packed"
+        float spacing = 1
+        int gridRows = 0
+        int gridColumns = 0
+    }
+
+    timing
+    {
+        int retimeInputs = 1
+    }
+}
+
+defaultLayout_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000000 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000001 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000002 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000003 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000004 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000005 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000006 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000007 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000008 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000009 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000010 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_rt_sourceGroup000011 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultLayout_stack : RVStack (1)
+{
+    output
+    {
+        float fps = 30
+        int size = [ 1920 1080 ]
+        int autoSize = 1
+        string chosenAudioInput = ".all."
+        int interactiveSize = 0
+    }
+
+    mode
+    {
+        int useCutInfo = 1
+        int alignStartFrames = 0
+        int strictFrameRanges = 0
+        int supportReversedOrderBlending = 1
+    }
+
+    composite
+    {
+        string type = "over"
+        float dissolveAmount = 0.5
+    }
+}
+
+defaultLayout_t_sourceGroup000000 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.666666687 0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000001 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.222222239 0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000002 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.222222209 0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000003 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.666666687 0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000004 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.666666687 0 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000005 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.222222239 0 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000006 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.222222209 0 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000007 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.666666687 0 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000008 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.666666687 -0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000009 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ -0.222222239 -0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000010 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.222222209 -0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultLayout_t_sourceGroup000011 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0.666666687 -0.25 ] ]
+        float[2] scale = [ [ 0.25 0.25 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultOutputGroup : RVOutputGroup (1)
+{
+    output
+    {
+        int active = 1
+        int width = 0
+        int height = 0
+        string dataType = "uint8"
+        float pixelAspect = 1
+    }
+}
+
+defaultOutputGroup_colorPipeline : RVDisplayPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVDisplayColor"
+    }
+}
+
+defaultOutputGroup_colorPipeline_0 : RVDisplayColor (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        string channelOrder = "RGBA"
+        int channelFlood = 0
+        int premult = 0
+        float gamma = 1
+        int sRGB = 0
+        int Rec709 = 0
+        float brightness = 0
+        int outOfRange = 0
+        int dither = 0
+        int ditherLast = 1
+        int active = 1
+    }
+
+    chromaticities
+    {
+        int active = 0
+        int adoptedNeutral = 1
+        float[2] white = [ [ 0.312700003 0.328999996 ] ]
+        float[2] red = [ [ 0.639999986 0.330000013 ] ]
+        float[2] green = [ [ 0.300000012 0.600000024 ] ]
+        float[2] blue = [ [ 0.150000006 0.0599999987 ] ]
+        float[2] neutral = [ [ 0.312700003 0.328999996 ] ]
+    }
+}
+
+defaultOutputGroup_stereo : RVDisplayStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+        string type = "off"
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+defaultSequence : RVSequenceGroup (1)
+{
+    ui
+    {
+        string name = "Default Sequence"
+    }
+
+    soundtrack
+    {
+        string file = ""
+        float offset = 0
+    }
+
+    timing
+    {
+        int retimeInputs = 1
+    }
+
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    session
+    {
+        int marks = [ ]
+        int frame = 1
+        float fps = 30
+    }
+
+    sm_state
+    {
+        int tab = 0
+    }
+}
+
+defaultSequence_p_sourceGroup000000 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000001 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000002 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000003 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000004 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000005 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000006 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000007 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000008 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000009 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000010 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_p_sourceGroup000011 : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000000 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000001 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000002 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000003 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000004 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000005 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000006 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000007 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000008 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000009 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000010 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_rt_sourceGroup000011 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultSequence_sequence : RVSequence (1)
+{
+    edl
+    {
+        int source = [ 0 1 2 3 4 5 6 7 8 9 10 11 0 ]
+        int frame = [ 1 61 312 553 787 939 1054 1208 1385 1783 2165 2711 2916 ]
+        int in = [ 216000 216060 216311 216552 216786 216938 217053 217207 217384 217782 218164 218710 0 ]
+        int out = [ 216059 216310 216551 216785 216937 217052 217206 217383 217781 218163 218709 218914 0 ]
+    }
+
+    output
+    {
+        int size = [ 1920 1080 ]
+        float fps = 30
+        int interactiveSize = 1
+        int autoSize = 1
+    }
+
+    mode
+    {
+        int autoEDL = 1
+        int useCutInfo = 1
+        int supportReversedOrderBlending = 1
+    }
+
+    composite
+    {
+        string inputBlendModes = [ ]
+        float inputOpacities = [ ]
+        float inputAngularMaskPivotX = [ ]
+        float inputAngularMaskPivotY = [ ]
+        float inputAngularMaskAngleInRadians = [ ]
+        int inputAngularMaskActive = [ ]
+        int swapAngularMaskInput = [ ]
+    }
+}
+
+defaultStack : RVStackGroup (1)
+{
+    ui
+    {
+        string name = "Default Stack"
+    }
+
+    timing
+    {
+        int retimeInputs = 1
+    }
+
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+}
+
+defaultStack_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000000 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000001 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000002 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000003 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000004 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000005 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000006 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000007 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000008 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000009 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000010 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_rt_sourceGroup000011 : RVRetime (1)
+{
+    visual
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    audio
+    {
+        float scale = 1
+        float offset = 0
+    }
+
+    output
+    {
+        float fps = 30
+    }
+
+    warp
+    {
+        int active = 0
+        int style = 0
+        int keyFrames = [ ]
+        float keyRates = [ ]
+    }
+
+    explicit
+    {
+        int active = 0
+        int firstOutputFrame = 1
+        int inputFrames = [ ]
+    }
+}
+
+defaultStack_stack : RVStack (1)
+{
+    output
+    {
+        float fps = 30
+        int size = [ 1920 1080 ]
+        int autoSize = 1
+        string chosenAudioInput = ".all."
+        int interactiveSize = 0
+    }
+
+    mode
+    {
+        int useCutInfo = 1
+        int alignStartFrames = 0
+        int strictFrameRanges = 0
+        int supportReversedOrderBlending = 1
+    }
+
+    composite
+    {
+        string type = "over"
+        float dissolveAmount = 0.5
+    }
+}
+
+defaultStack_t_sourceGroup000000 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000001 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000002 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000003 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000004 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000005 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000006 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000007 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000008 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000009 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000010 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+defaultStack_t_sourceGroup000011 : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000000 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0001.mp4"
+    }
+
+    session
+    {
+        float fps = 30
+        int marks = [ ]
+        int frame = 216000
+    }
+
+    sm_state
+    {
+        int tab = 1
+    }
+}
+
+sourceGroup000000_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000000_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000000_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000000_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000000_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000000_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000000_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000000_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000000_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000000_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000000_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0001.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216000 216060 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000000_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000000_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000000_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000000_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000000_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000001 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0002.mp4"
+    }
+}
+
+sourceGroup000001_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000001_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000001_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000001_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000001_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000001_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000001_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000001_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000001_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000001_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000001_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0002.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216060 216311 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000001_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000001_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000001_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000001_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000001_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000002 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0003.mp4"
+    }
+}
+
+sourceGroup000002_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000002_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000002_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000002_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000002_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000002_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000002_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000002_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000002_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000002_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000002_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0003.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216311 216552 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000002_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000002_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000002_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000002_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000002_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000003 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0004.mp4"
+    }
+}
+
+sourceGroup000003_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000003_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000003_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000003_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000003_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000003_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000003_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000003_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000003_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000003_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000003_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0004.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216552 216786 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000003_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000003_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000003_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000003_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000003_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000004 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0005.mp4"
+    }
+}
+
+sourceGroup000004_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000004_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000004_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000004_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000004_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000004_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000004_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000004_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000004_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000004_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000004_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0005.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216786 216938 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000004_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000004_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000004_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000004_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000004_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000005 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0006.mp4"
+    }
+}
+
+sourceGroup000005_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000005_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000005_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000005_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000005_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000005_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000005_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000005_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000005_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000005_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000005_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0006.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 216938 217053 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000005_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000005_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000005_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000005_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000005_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000006 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0007.mp4"
+    }
+}
+
+sourceGroup000006_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000006_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000006_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000006_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000006_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000006_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000006_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000006_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000006_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000006_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000006_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0007.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 217053 217207 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000006_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000006_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000006_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000006_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000006_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000007 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0008.mp4"
+    }
+}
+
+sourceGroup000007_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000007_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000007_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000007_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000007_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000007_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000007_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000007_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000007_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000007_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000007_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0008.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 217207 217384 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000007_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000007_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000007_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000007_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000007_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000008 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0009.mp4"
+    }
+}
+
+sourceGroup000008_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000008_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000008_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000008_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000008_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000008_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000008_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000008_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000008_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000008_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000008_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0009.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 217384 217782 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000008_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000008_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000008_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000008_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000008_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000009 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0010.mp4"
+    }
+}
+
+sourceGroup000009_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000009_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000009_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000009_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000009_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000009_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000009_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000009_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000009_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000009_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000009_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0010.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 217782 218164 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000009_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000009_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000009_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000009_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000009_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000010 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0011.mp4"
+    }
+}
+
+sourceGroup000010_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000010_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000010_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000010_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000010_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000010_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000010_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000010_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000010_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000010_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000010_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0011.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 218164 218710 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000010_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000010_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000010_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000010_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000010_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+sourceGroup000011 : RVSourceGroup (1)
+{
+    markers
+    {
+        int in = [ ]
+        int out = [ ]
+        float[4] color = [ ]
+        string name = [ ]
+    }
+
+    ui
+    {
+        string name = "Meridian_-_Clip_0012.mp4"
+    }
+}
+
+sourceGroup000011_cache : RVCache (1)
+{
+    render
+    {
+        int downSampling = 1
+    }
+}
+
+sourceGroup000011_cacheLUT : RVCacheLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000011_channelMap : RVChannelMap (1)
+{
+    format
+    {
+        string channels = [ ]
+    }
+}
+
+sourceGroup000011_colorPipeline : RVColorPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVColor"
+    }
+}
+
+sourceGroup000011_colorPipeline_0 : RVColor (2)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int invert = 0
+        float[3] gamma = [ [ 1 1 1 ] ]
+        string lut = "default"
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] scale = [ [ 1 1 1 ] ]
+        float[3] exposure = [ [ 0 0 0 ] ]
+        float[3] contrast = [ [ 0 0 0 ] ]
+        float saturation = 1
+        int normalize = 0
+        float hue = 0
+        int active = 1
+        int unpremult = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        string colorspace = "rec709"
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+
+    luminanceLUT
+    {
+        float lut = [ ]
+        float max = 1
+        int size = 0
+        string name = ""
+        int active = 0
+    }
+
+    "luminanceLUT:output"
+    {
+        int size = 256
+    }
+}
+
+sourceGroup000011_format : RVFormat (1)
+{
+    geometry
+    {
+        int xfit = 0
+        int yfit = 0
+        int xresize = 0
+        int yresize = 0
+        float scale = 1
+        string resampleMethod = "area"
+    }
+
+    color
+    {
+        int maxBitDepth = 0
+        int allowFloatingPoint = 1
+    }
+
+    crop
+    {
+        int active = 0
+        int xmin = 0
+        int ymin = 0
+        int xmax = 0
+        int ymax = 0
+    }
+
+    uncrop
+    {
+        int active = 0
+        int width = 0
+        int height = 0
+        int x = 0
+        int y = 0
+    }
+}
+
+sourceGroup000011_lookPipeline : RVLookPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = "RVLookLUT"
+    }
+}
+
+sourceGroup000011_lookPipeline_0 : RVLookLUT (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+}
+
+sourceGroup000011_overlay : RVOverlay (1)
+{
+    overlay
+    {
+        int nextRectId = 0
+        int nextTextId = 0
+        int show = 1
+    }
+}
+
+sourceGroup000011_paint : RVPaint (3)
+{
+    paint
+    {
+        int nextId = 0
+        int nextAnnotationId = 0
+        int show = 1
+        string exclude = [ ]
+        string include = [ ]
+    }
+}
+
+sourceGroup000011_source : RVFileSource (1)
+{
+    request
+    {
+        string imageComponent = [ ]
+        string stereoViews = "track 1"
+        int readAllChannels = 0
+    }
+
+    media
+    {
+        string repName = ""
+        int active = 1
+        string movie = "/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/Meridian_-_Clip_0012.mp4"
+        string name = [ ]
+    }
+
+    group
+    {
+        float fps = 0
+        float volume = 1
+        float audioOffset = 0
+        int rangeOffset = 0
+        int noMovieAudio = 0
+        float balance = 0
+        float crossover = 0
+    }
+
+    cut
+    {
+        int in = -2147483647
+        int out = 2147483647
+    }
+
+    proxy
+    {
+        int[2] range = [ [ 218710 218915 ] ]
+        int inc = 1
+        float fps = 30
+        int[2] size = [ [ 1920 1080 ] ]
+    }
+}
+
+sourceGroup000011_sourceStereo : RVSourceStereo (1)
+{
+    stereo
+    {
+        int swap = 0
+        float relativeOffset = 0
+        float rightOffset = 0
+    }
+
+    rightTransform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+    }
+}
+
+sourceGroup000011_tolinPipeline : RVLinearizePipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ "RVLinearize" "RVLensWarp" ]
+    }
+}
+
+sourceGroup000011_tolinPipeline_0 : RVLinearize (1)
+{
+    lut
+    {
+        float[16] inMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float[16] outMatrix = [ [ 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ] ]
+        float lut = [ ]
+        float prelut = [ ]
+        float scale = 1
+        float offset = 0
+        float conditioningGamma = 1
+        string type = "Luminance"
+        string name = ""
+        string file = ""
+        int size = [ 0 0 0 ]
+        int active = 0
+    }
+
+    color
+    {
+        int alphaType = 0
+        int logtype = 0
+        int YUV = 0
+        int sRGB2linear = 0
+        int Rec709ToLinear = 1
+        float fileGamma = 1
+        int active = 1
+        int ignoreChromaticities = 0
+    }
+
+    cineon
+    {
+        int whiteCodeValue = 0
+        int blackCodeValue = 0
+        int breakPointValue = 0
+    }
+
+    CDL
+    {
+        int active = 0
+        float[3] slope = [ [ 1 1 1 ] ]
+        float[3] offset = [ [ 0 0 0 ] ]
+        float[3] power = [ [ 1 1 1 ] ]
+        float saturation = 1
+        int noClamp = 0
+    }
+}
+
+sourceGroup000011_tolinPipeline_1 : RVLensWarp (1)
+{
+    node
+    {
+        int active = 1
+    }
+
+    warp
+    {
+        float pixelAspectRatio = 0
+        string model = "brown"
+        float k1 = 0
+        float k2 = 0
+        float k3 = 0
+        float d = 1
+        float p1 = 0
+        float p2 = 0
+        float[2] center = [ [ 0.5 0.5 ] ]
+        float[2] offset = [ [ 0 0 ] ]
+        float fx = 1
+        float fy = 1
+        float cropRatioX = 1
+        float cropRatioY = 1
+        float cx02 = 0
+        float cy02 = 0
+        float cx22 = 0
+        float cy22 = 0
+        float cx04 = 0
+        float cy04 = 0
+        float cx24 = 0
+        float cy24 = 0
+        float cx44 = 0
+        float cy44 = 0
+        float cx06 = 0
+        float cy06 = 0
+        float cx26 = 0
+        float cy26 = 0
+        float cx46 = 0
+        float cy46 = 0
+        float cx66 = 0
+        float cy66 = 0
+    }
+}
+
+sourceGroup000011_transform2D : RVTransform2D (1)
+{
+    transform
+    {
+        int flip = 0
+        int flop = 0
+        float rotate = 0
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+        int active = 1
+    }
+
+    stencil
+    {
+        float visibleBox = [ 0 1 0 1 ]
+    }
+}
+
+viewGroup_dxform : RVDispTransform2D (1)
+{
+    transform
+    {
+        float[2] translate = [ [ 0 0 ] ]
+        float[2] scale = [ [ 1 1 ] ]
+    }
+}
+
+viewGroup_soundtrack : RVSoundTrack (1)
+{
+    audio
+    {
+        float volume = 1
+        float balance = 0
+        float offset = 0
+        float internalOffset = 0
+        int mute = 0
+        int softClamp = 1
+    }
+
+    visual
+    {
+        int width = 0
+        int height = 0
+        int frameStart = 0
+        int frameEnd = 0
+    }
+}
+
+viewGroup_viewPipeline : RVViewPipelineGroup (1)
+{
+    pipeline
+    {
+        string nodes = [ ]
+    }
+}

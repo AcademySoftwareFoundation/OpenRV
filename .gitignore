@@ -52,3 +52,7 @@ about_rv.cpp
 
 # Dear ImgGui generated
 imgui.ini
+
+# Local golden-test media paths (see src/test/golden/session_manager/fixtures/mp4.env.example)
+src/test/golden/session_manager/fixtures/mp4.env
+src/test/golden/layer_select/fixtures/layers.env

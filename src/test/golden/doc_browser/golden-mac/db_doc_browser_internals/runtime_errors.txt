@@ -1,0 +1,3 @@
+# Normalized runtime error signatures from Mu capture.
+# Python port must not introduce errors beyond this set.
+ERROR: Exception thrown while calling commands.defineMinorMode, Duplicate mode: Source Setup
