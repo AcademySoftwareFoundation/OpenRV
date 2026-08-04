@@ -20,7 +20,6 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
-#include <cstddef>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -413,7 +412,7 @@ namespace TwkMovie
         class Reservation
         {
         public:
-            Reservation(MovieFFMpegReader* reader, int streamIndex, VideoTrack* vTrack=nullptr, AudioTrack* aTrack=nullptr);
+            Reservation(MovieFFMpegReader* reader, int streamIndex);
             ~Reservation();
 
         private:
@@ -474,7 +473,7 @@ namespace TwkMovie
         gcp.m_contextMap.erase(i);
     }
 
-    ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex, VideoTrack* vTrack, AudioTrack* aTrack)
+    ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex)
         : m_context(0)
         , m_dbline(0)
         , m_dblline(0)
@@ -497,13 +496,6 @@ namespace TwkMovie
         context.reserved = true;
         context.reader = reader;
         context.streamIndex = streamIndex;
-
-        if (vTrack) {
-            context.vTrack = vTrack;
-        }
-        if (aTrack) {
-            context.aTrack = aTrack;
-        }
 
         //
         //  If it's already in the list move it to the front now.
@@ -592,6 +584,7 @@ namespace TwkMovie
         {
             AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
 
+            context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
             if (context.vTrack)
             {
                 context.avContext = context.vTrack->avCodecContext;
@@ -2323,14 +2316,15 @@ namespace TwkMovie
                 if (heroVideoTracks[i])
                 {
                     VideoTrack* track = new VideoTrack;
-                    ContextPool::Reservation reserve(this, i, track);
+                    ContextPool::Reservation reserve(this, i);
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     track->useAppleProRes = isProRes;
 #endif
                     if (isJ2K)
                     {
-                        if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext)) {
+                        if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext))
+                        {
                             track->number = i;
                             ostringstream trackName;
                             trackName << "track " << m_videoTracks.size() + 1;
@@ -2338,7 +2332,8 @@ namespace TwkMovie
                             track->isOpen = true;
                             m_videoTracks.push_back(track);
                         }
-                        else {
+                        else
+                        {
                             delete track;
                         }
                     }
@@ -2450,7 +2445,7 @@ namespace TwkMovie
                 if (heroAudioTracks[i])
                 {
                     AudioTrack* track = new AudioTrack;
-                    ContextPool::Reservation reserve(this, i, nullptr, track);
+                    ContextPool::Reservation reserve(this, i);
                     if (openAVCodec(i, &track->avCodecContext))
                     {
                         track->number = i;
@@ -3220,7 +3215,7 @@ namespace TwkMovie
             if (start < 0)
                 continue;
             AudioTrack* track = m_audioTracks[i];
-            ContextPool::Reservation reserve(this, track->number, nullptr, track);
+            ContextPool::Reservation reserve(this, track->number);
             track->isOpen = openAVCodec(track->number, &track->avCodecContext);
             if (!track->isOpen)
             {
@@ -4096,7 +4091,7 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
-            ContextPool::Reservation reserve(this, track->number, track);
+            ContextPool::Reservation reserve(this, track->number);
             track->isOpen = openAVCodec(track->number, &track->avCodecContext, &track->hardwareContext);
             if (!track->isOpen)
             {
