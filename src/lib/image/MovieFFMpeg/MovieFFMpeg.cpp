@@ -454,6 +454,12 @@ namespace TwkMovie
     //
     //  Global pool object:
     //
+    // The global context pool caps the number of simultaneously-open decoder
+    // threads. It was disabled during the FFmpeg 6.0 migration because a context
+    // cannot be reopened after being closed
+    // (https://ffmpeg.org/doxygen/trunk/deprecated.html). That is now handled:
+    // when the pool evicts a context it frees it and nulls the owning track's
+    // avCodecContext, so openAVCodec() allocates a fresh context on next use.
 
     std::unique_ptr<ContextPool> globalContextPool{nullptr};
 
@@ -537,6 +543,7 @@ namespace TwkMovie
                 //
 
                 cout << "ERROR: Attempted to reuse reserved context! (" << closeContext.reader->filename() << ")" << endl;
+                gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
             }
             else if (closeContext.avContext)
             {
