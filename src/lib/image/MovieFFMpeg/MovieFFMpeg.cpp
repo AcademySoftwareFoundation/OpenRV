@@ -2685,15 +2685,6 @@ namespace TwkMovie
 
         m_info.video = true;
     }
-    /*
-    context-> decoder
-
-    Each context has 1 Video track and/or 1 Audio track, 1 FFMPEG decoder
-
-
-    
-    
-    */
 
     void MovieFFMpegReader::initializeAudio()
     {
