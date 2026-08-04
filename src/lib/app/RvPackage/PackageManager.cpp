@@ -20,6 +20,21 @@
 
 #include <QRegularExpression>
 
+namespace
+{
+    QString baseNameFromPackageFileName(const QString& fileName)
+    {
+        QRegularExpressionMatch match = QRegularExpression(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)").match(fileName);
+
+        if (!match.hasMatch())
+        {
+            match = QRegularExpression(R"((.*)\.zip)").match(fileName);
+        }
+
+        return match.hasMatch() ? match.captured(1) : QString();
+    }
+} // namespace
+
 namespace Rv
 {
     using namespace std;
@@ -812,30 +827,17 @@ namespace Rv
         QFileInfo info(package.file);
         QDir rdir = info.absoluteDir();
         rdir.cdUp();
-        QDir mudir = rdir;
-        QDir pydir = rdir;
-        QDir supportdir = rdir;
-        QDir imgdir = rdir;
-        QDir movdir = rdir;
-        QDir libdir = rdir;
-        QDir nodedir = rdir;
-        QDir profdir = rdir;
 
-        mudir.cd("Mu");
-        pydir.cd("Python");
-        supportdir.cd("SupportFiles");
-        imgdir.cd("ImageFormats");
-        movdir.cd("MovieFormats");
-        libdir.cd("lib");
-        nodedir.cd("Nodes");
-        profdir.cd("Nodes");
+        const QString pname = package.baseName;
 
-        QFileInfo pfile(package.file);
-        QString pname = package.baseName;
-
-        if (!supportdir.exists(pname))
-            supportdir.mkdir(pname);
-        supportdir.cd(pname);
+        QDir mudir(rdir.filePath("Mu"));
+        QDir pydir(rdir.filePath("Python"));
+        QDir supportdir(rdir.filePath("SupportFiles/" + pname));
+        QDir imgdir(rdir.filePath("ImageFormats"));
+        QDir movdir(rdir.filePath("MovieFormats"));
+        QDir libdir(rdir.filePath("lib"));
+        QDir nodedir(rdir.filePath("Nodes"));
+        QDir profdir(rdir.filePath("Profiles"));
 
         // Skip dependency check if requested
         if (!m_skipDependencyCheck)
@@ -988,8 +990,10 @@ namespace Rv
         // Remove the dangling supportdir
         //
 
-        if (!supportdir.removeRecursively())
+        if (!pname.isEmpty() && supportdir.exists() && !supportdir.removeRecursively())
+        {
             notremoved.push_back(supportdir.absolutePath());
+        }
 
         //
         // Report what was unremovable
@@ -1351,20 +1355,7 @@ namespace Rv
                                       });
                     }
 
-                    QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
-                    QRegularExpression zipRE(R"((.*)\.zip)");
-
-                    QRegularExpressionMatch match = rvpkgRE.match(finfo.fileName());
-                    if (!match.hasMatch())
-                    {
-                        match = zipRE.match(finfo.fileName());
-                    }
-                    if (match.hasMatch())
-                    {
-                        pname = match.captured(1);
-                    }
-
-                    package.baseName = pname;
+                    package.baseName = baseNameFromPackageFileName(finfo.fileName());
                 }
             }
         }
@@ -1506,13 +1497,14 @@ namespace Rv
                 if (i == m_packageMap.end())
                 {
                     m_packages.push_back(Package());
-                    m_packages.back().file = line;
+                    m_packages.back().file = path;
+                    m_packages.back().baseName = baseNameFromPackageFileName(QFileInfo(path).fileName());
                     m_packages.back().installed = installed;
                     m_packages.back().zipFile = false;
                     m_packages.back().name = "Missing Package";
                     m_packages.back().description = "<p><i>The original zip file for this package is "
                                                     "missing</i></p>";
-                    m_packageMap.insert(line, m_packages.size() - 1);
+                    m_packageMap.insert(path, m_packages.size() - 1);
                 }
                 else
                 {
@@ -1863,7 +1855,7 @@ namespace Rv
 
                     m_packages.erase(m_packages.begin() + q);
 
-                    if (!QFile::remove(files[i]))
+                    if (incomingFI.exists() && !QFile::remove(files[i]))
                     {
                         cerr << "ERROR: " << files[i].toUtf8().constData() << " not removed" << endl;
                     }
