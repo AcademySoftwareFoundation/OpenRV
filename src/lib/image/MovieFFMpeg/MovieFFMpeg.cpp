@@ -20,6 +20,7 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
+#include <cstddef>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -412,7 +413,7 @@ namespace TwkMovie
         class Reservation
         {
         public:
-            Reservation(MovieFFMpegReader* reader, int streamIndex);
+            Reservation(MovieFFMpegReader* reader, int streamIndex, VideoTrack* vTrack=nullptr, AudioTrack* aTrack=nullptr);
             ~Reservation();
 
         private:
@@ -473,7 +474,7 @@ namespace TwkMovie
         gcp.m_contextMap.erase(i);
     }
 
-    ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex)
+    ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex, VideoTrack* vTrack, AudioTrack* aTrack)
         : m_context(0)
         , m_dbline(0)
         , m_dblline(0)
@@ -496,6 +497,13 @@ namespace TwkMovie
         context.reserved = true;
         context.reader = reader;
         context.streamIndex = streamIndex;
+
+        if (vTrack) {
+            context.vTrack = vTrack;
+        }
+        if (aTrack) {
+            context.aTrack = aTrack;
+        }
 
         //
         //  If it's already in the list move it to the front now.
@@ -584,7 +592,6 @@ namespace TwkMovie
         {
             AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
 
-            context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
             if (context.vTrack)
             {
                 context.avContext = context.vTrack->avCodecContext;
@@ -2316,7 +2323,7 @@ namespace TwkMovie
                 if (heroVideoTracks[i])
                 {
                     VideoTrack* track = new VideoTrack;
-                    ContextPool::Reservation reserve(this, i);
+                    ContextPool::Reservation reserve(this, i, track);
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     track->useAppleProRes = isProRes;
@@ -2443,7 +2450,7 @@ namespace TwkMovie
                 if (heroAudioTracks[i])
                 {
                     AudioTrack* track = new AudioTrack;
-                    ContextPool::Reservation reserve(this, i);
+                    ContextPool::Reservation reserve(this, i, nullptr, track);
                     if (openAVCodec(i, &track->avCodecContext))
                     {
                         track->number = i;
@@ -3222,7 +3229,7 @@ namespace TwkMovie
             if (start < 0)
                 continue;
             AudioTrack* track = m_audioTracks[i];
-            ContextPool::Reservation reserve(this, track->number);
+            ContextPool::Reservation reserve(this, track->number, nullptr, track);
             track->isOpen = openAVCodec(track->number, &track->avCodecContext);
             if (!track->isOpen)
             {
@@ -4098,7 +4105,7 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
-            ContextPool::Reservation reserve(this, track->number);
+            ContextPool::Reservation reserve(this, track->number, track);
             track->isOpen = openAVCodec(track->number, &track->avCodecContext, &track->hardwareContext);
             if (!track->isOpen)
             {
