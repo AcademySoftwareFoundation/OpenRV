@@ -322,19 +322,6 @@ namespace IPCore
 
     IPGraph::~IPGraph()
     {
-        if (m_jobDispatcher)
-        {
-            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
-            jobDispatcher->stop();
-            delete jobDispatcher;
-        }
-
-        // m_fbcache.showCacheContents();
-
-        setCachingMode(NeverCache, 1, 2, 1, 2, 1, 1, 24.0);
-        finishCachingThread();
-        finishAudioThread();
-
         //
         //  Explicitly delete all nodes so that source nodes close their
         //  decoders (e.g. MovieFFMpegReader::close()) before the graph is
@@ -355,6 +342,19 @@ namespace IPCore
         }
 
         m_nodeMap.clear();
+
+        if (m_jobDispatcher)
+        {
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            jobDispatcher->stop();
+            delete jobDispatcher;
+        }
+
+        // m_fbcache.showCacheContents();
+
+        setCachingMode(NeverCache, 1, 2, 1, 2, 1, 1, 24.0);
+        finishCachingThread();
+        finishAudioThread();
 
         pthread_mutex_destroy(&m_internalLock);
         pthread_mutex_destroy(&m_audioInternalLock);
