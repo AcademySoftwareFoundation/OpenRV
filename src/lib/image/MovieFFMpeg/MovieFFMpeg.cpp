@@ -416,7 +416,16 @@ namespace TwkMovie
             ~Reservation();
 
         private:
-            Context* m_context;
+            //
+            //  The Context is looked up by key rather than held by pointer:
+            //  a stored Context* would dangle if the entry were erased (by
+            //  flushContext()) while this Reservation was alive, and the
+            //  destructor's "does my entry still exist" check could not
+            //  detect that without dereferencing the very node in question.
+            //
+
+            MovieFFMpegReader* m_reader;
+            int m_streamIndex;
             int m_dbline;
             int m_dblline;
         };
@@ -474,7 +483,8 @@ namespace TwkMovie
     }
 
     ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex)
-        : m_context(0)
+        : m_reader(reader)
+        , m_streamIndex(streamIndex)
         , m_dbline(0)
         , m_dblline(0)
     {
@@ -491,7 +501,6 @@ namespace TwkMovie
         //
 
         Context& context = gcp.m_contextMap[ContextKey(reader, streamIndex)];
-        m_context = &context;
 
         context.reserved = true;
         context.reader = reader;
@@ -561,17 +570,13 @@ namespace TwkMovie
 
         LockGuard lock(gcp.m_mutex);
 
-        Context& context = *m_context;
+        ContextMap::iterator i = gcp.m_contextMap.find(ContextKey(m_reader, m_streamIndex));
+        if (i == gcp.m_contextMap.end())
+            return;
+
+        Context& context = i->second;
 
         context.reserved = false;
-
-        //
-        //  Make sure the context still exists and we aren't closing.
-        //
-
-        ContextKey key(context.reader, context.streamIndex);
-        if (gcp.m_contextMap.find(key) == gcp.m_contextMap.end())
-            return;
 
         //
         //  If this is the first time we've encountered this Context, it's only
@@ -582,8 +587,6 @@ namespace TwkMovie
 
         if (!context.avContext)
         {
-            AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
-
             context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
             if (context.vTrack)
             {
