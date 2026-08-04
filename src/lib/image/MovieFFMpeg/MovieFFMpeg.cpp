@@ -2725,7 +2725,6 @@ namespace TwkMovie
             AVChannelLayout layout = audioCodecContext->ch_layout;
             audioChannels = idAudioChannels(layout, numChannels);
 
-            // XXX Assume this thread will never decode audio
             ContextPool::flushContext(this, track->number);
             avcodec_free_context(&track->avCodecContext);
             track->isOpen = false;
