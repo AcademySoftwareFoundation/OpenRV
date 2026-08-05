@@ -167,6 +167,7 @@ IF(_jpegturbo_include_dir)
 ENDIF()
 
 LIST(APPEND _configure_options "-DOpenJPEG_ROOT=${RV_DEPS_OPENJPEG_ROOT_DIR}")
+LIST(APPEND _configure_options "-DOPENJPEG_VERSION=${RV_DEPS_OPENJPEG_VERSION}")
 # Use openjp2 target (the actual IMPORTED library). OpenJpeg::OpenJpeg is an INTERFACE wrapper when found via CONFIG.
 RV_RESOLVE_IMPORTED_LINKER_FILE(openjp2 _openjpeg_library)
 IF(NOT _openjpeg_library)

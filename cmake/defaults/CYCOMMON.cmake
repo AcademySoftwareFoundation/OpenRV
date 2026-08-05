@@ -198,10 +198,10 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB
 
 # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION
-    "2.5.19.1"
+    "3.1.12.0"
 )
 SET(RV_DEPS_OIIO_DOWNLOAD_HASH
-    "5af6de5a73c6d234eed8e2874a5aed62"
+    "4f7cb0e132117613d828439d987e187c"
 )
 
 # openjpeg https://github.com/uclouvain/openjpeg
