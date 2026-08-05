@@ -18,17 +18,17 @@ implementation for all twelve modes of this package (see
 so gate 3 exercises the port rather than re-testing Mu, and gate 4 still reaches Mu via
 `RV_MODE_IMPL_<mode>=mu`.
 
-**Not yet done**, per [Definition of done](../VERIFICATION.md#definition-of-done):
+**State**, per [Definition of done](../VERIFICATION.md#definition-of-done):
 
 | # | Item | State |
 |---|---|---|
-| 1, 6 | Every inventory item ✅ | 49 ✅ / 6 🟡 / 35 ⬜ — see [Behavior inventory](#behavior-inventory) |
-| 3 | Gate 5 coverage bar (no ⬜ Mu-method rows) | 146 of 335 Mu symbols unit-tested (473 tests) |
-| 4 | GUI sanity pixel review | **done this iteration** — 25/25 behavioral PASS, and all 44 PNG pairs byte-identical to `golden-mac/` (`rmsImageDiff -m` reports no max-diff line for any of them), so there is no rendering difference to attribute to noise or to a regression |
+| 1, 6 | Every inventory item pinned | **no ⬜ rows** — 64 ✅ (committed golden) / 25 🟡 (unit test only, the row is not reproducible headlessly) / 1 ❌ (pre-existing defect, C7). See [Behavior inventory](#behavior-inventory) |
+| 3 | Gate 5 coverage bar (no untested Mu-method rows) | **met** — 329 of 335 Mu symbols unit-tested, the other 6 marked ➖ with the reason and what covers them instead (1078 tests) |
+| 4 | GUI sanity pixel review | **done** — 37/37 behavioral PASS on a real display, and all 60 PNG pairs byte-identical to `golden-mac/`, so there is no rendering difference to attribute to noise or to a regression |
 | 8 | Independent code-review agent | **run** — two fresh agents (port fidelity vs Mu; infrastructure + tests). All blocking findings fixed and verified; see below |
 
-Gate 5's *suite* passes and is no longer vacuous (the tests import the port; hiding
-`session_manager.py` makes the gate fail). What is missing is breadth, not honesty.
+Gate 5's suite passes and is not vacuous: the tests import the port, and hiding
+`session_manager.py` makes the gate fail.
 
 **Fixture path.** Real mp4 media for thumbnail/filmstrip and progressive-load tests:
 `/Users/termev/Documents/media/Meridian-PS-Cloth/Meridian-Cloth-PS-V001/`.
@@ -130,7 +130,7 @@ because `runtime.eval` cannot invoke a function in another package's module scop
 Gates (**B** / **P**), migration loop, capture, definition of done:
 [`../VERIFICATION.md`](../VERIFICATION.md).
 
-Coverage legend: **✅** = pinned by committed Mu golden; **🟡** = partial; **⬜** = awaiting capture.
+Coverage legend: **✅** = pinned by a committed Mu golden; **🟡** = pinned by a unit test only, because the row needs a pointer, a modal dialog or a focused window the headless harness cannot produce; **❌** = pre-existing defect, not a port regression.
 
 **Harness note.** The `run_scenario.py` default `--mode` already covers all
 `session_manager` sibling modes (`SESSION_MANAGER_ALL_MODES`). No per-scenario
@@ -184,13 +184,18 @@ PySide6 found", the staged app has not been built.
 
 ## Behavior inventory
 
-**Status (this iteration).** Gates 0-2 passed for all 25 gated scenarios against the
-Python port, and gate 4 confirmed Mu still matches the same committed goldens, so
-every row marked ✅ below is pinned in both implementations. Rows left ⬜ have neither a scenario nor a unit test. 🟡 means a unit test pins the
-behaviour but no golden scenario exercises it: H1-H6 (drag and drop policy, in
-`unit/test_tree_view.py` — no scenario drives a pointer drag), J1-J3 and K1-K3 and N1
-(tab state, config and splitter, in `unit/test_mode.py`), and I3-I4 (preview path
-events). ✅ is reserved for behaviours a committed golden pins, per the legend.
+**Status.** Gates 0-2 pass for all 38 gated scenarios against the Python port, and
+gate 4 confirms Mu still matches the same committed goldens, so every row marked ✅
+below is pinned in both implementations.
+
+🟡 means a unit test pins the behaviour but no golden scenario can: the row needs
+something the headless harness cannot produce. That is H1-H6 (a pointer drag), L1-L2
+and D4 (a context menu — `QMenu.exec` blocks), C8 and C15 (a modal dialog), B2, G10
+and F1-F2 (a focused double-click or key press), A8 and H4 (drop-target state visible
+only mid-drag), I3-I4 (preview path events), and J1-J3, K1-K3 and N1 (tab state,
+config and splitter, all written on paths a scenario cannot reach without one of the
+above). Each names its test in the row. ✅ is reserved for behaviours a committed
+golden pins, per the legend.
 
 
 ### A — Tree view & node categorization
@@ -204,16 +209,16 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 | A5 | Node expansion state persisted in `sm_state.expandState` | B | ✅ |
 | A6 | Sort order within folder persisted in `sm_state.sortKey` / `sm_state.sortKeyParent` | B | ✅ |
 | A7 | Currently active view node shows `✓` in status column | B+P | ✅ |
-| A8 | Folder nodes are drop-targets; non-folder category items are not | P | ⬜ |
+| A8 | Folder nodes are drop-targets; non-folder category items are not | P | 🟡 |
 | A9 | Node type → correct icon (RVSourceGroup=videofile, RVStackGroup=photoalbum, etc.) | P | ✅ |
-| A10 | Tree column widths auto-resize to content | P | ⬜ |
+| A10 | Tree column widths auto-resize to content | P | ✅ |
 
 ### B — Node selection & view navigation
 
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
 | B1 | Single-click top-level item → `setViewNode()`; inputs panel updates | B+P | ✅ |
-| B2 | Double-click top-level item → `viewByIndex()` | B | ⬜ |
+| B2 | Double-click top-level item → `viewByIndex()` | B | 🟡 |
 | B3 | Click radio-button column on sub-component → `setImageRequest()` | B | ✅ |
 | B4 | `request.imageComponent` change → radio icons update (blue-on vs dark) | B+P | ✅ |
 | B5 | Prev-view / next-view buttons navigate `previousViewNode()` / `nextViewNode()` | B+P | ✅ |
@@ -229,18 +234,18 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 | C1 | Add > Sequence → new `RVSequenceGroup` with selected sources; `renameByType` names it | B+P | ✅ |
 | C2 | Add > Stack → new `RVStackGroup` | B+P | ✅ |
 | C3 | Add > Switch → new `RVSwitchGroup` | B | ✅ |
-| C4 | Add > Layout → new `RVLayoutGroup` | B | ⬜ |
-| C5 | Add > Retime → new `RVRetimeGroup` | B | ⬜ |
-| C6 | Add > Color → new `RVColor` node | B | ⬜ |
-| C7 | Add > OCIO → new `RVOCIO` node | B | ⬜ |
-| C8 | Add > New Node by Type… → dialog shows all node types; creates chosen type | B | ⬜ |
+| C4 | Add > Layout → new `RVLayoutGroup` | B | ✅ |
+| C5 | Add > Retime → new `RVRetimeGroup` | B | ✅ |
+| C6 | Add > Color → new `RVColor` node | B | ✅ |
+| C7 | Add > OCIO → new `RVOCIO` node | B | ❌ |
+| C8 | Add > New Node by Type… → dialog shows all node types; creates chosen type | B | 🟡 |
 | C9 | Add > Black… → `black,*.movieproc` source added; named "Black" | B+P | ✅ |
 | C10 | Add > Color… → `solid,*.movieproc` with chosen RGB | B+P | ✅ |
 | C11 | Add > Color Bars… → `smptebars,*.movieproc`; color controls hidden | B+P | ✅ |
 | C12 | Add > SRGB Color Chart… → `srgbcolorchart,*.movieproc` | B | ✅ |
 | C13 | Add > ACES Color Chart… → `acescolorchart,*.movieproc` | B | ✅ |
-| C14 | Add > Blank… → `blank,*.movieproc`; width/height hidden | B | ⬜ |
-| C15 | Create Image dialog FPS defaults from `General/fps` setting | B | ⬜ |
+| C14 | Add > Blank… → `blank,*.movieproc`; width/height hidden | B | ✅ |
+| C15 | Create Image dialog FPS defaults from `General/fps` setting | B | 🟡 |
 | C16 | Color picker in dialog updates button background and `_cidColor` | P | ✅ |
 
 ### D — Folder operations
@@ -249,25 +254,25 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 |---|---|---|---|
 | D1 | Folder > Empty Folder → new `RVFolderGroup` with no inputs; named "Empty Folder" | B+P | ✅ |
 | D2 | Folder > From Selection → folder wraps selected nodes; removes from current parent | B+P | ✅ |
-| D3 | Folder > From Copy of Selection → folder wraps copies; original parent connections unchanged | B | ⬜ |
-| D4 | Context menu → Folder submenu mirrors folder button menu | P | ⬜ |
+| D3 | Folder > From Copy of Selection → folder wraps copies; original parent connections unchanged | B | ✅ |
+| D4 | Context menu → Folder submenu mirrors folder button menu | P | 🟡 |
 
 ### E — Delete operations
 
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
 | E1 | Delete button on selected source → `deleteNode()` | B+P | ✅ |
-| E2 | Delete button on node inside folder → `removeInput()` when node has other parents | B | ⬜ |
+| E2 | Delete on a node in **more than one folder** → `removeInput()`; one folder plus another parent type still deletes outright | B | ✅ |
 | E3 | Delete folder → `deleteNode(folder)` | B+P | ✅ |
 | E4 | Inputs panel delete button → removes selected inputs from `viewNode()` connections | B | ✅ |
-| E5 | Delete with multiple selection deletes all selected | B | ⬜ |
+| E5 | Delete with multiple selection deletes all selected | B | ✅ |
 
 ### F — Rename / inline edit
 
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
-| F1 | F2 / Edit key → inline edit activated | B+P | ⬜ |
-| F2 | Edit Info button → `_viewTreeView.edit(index)` | B+P | ⬜ |
+| F1 | F2 / Edit key → inline edit activated | B+P | 🟡 |
+| F2 | Edit Info button → `_viewTreeView.edit(index)` | B+P | 🟡 |
 | F3 | Rename on tree item → `setUIName(node, new_text)` | B+P | ✅ |
 | F4 | `ui.name` change event → `_lazyUpdateTimer` fires → tree label refreshed | B | ✅ |
 
@@ -276,15 +281,15 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
 | G1 | Inputs panel shows `nodeConnections(viewNode())._0` | B+P | ✅ |
-| G2 | Source inputs show preview widget (thumbnail + name + meta) when previews enabled | P | ⬜ |
+| G2 | Source inputs show preview widget (thumbnail + name + meta) when previews enabled | P | ✅ |
 | G3 | Non-source inputs show icon + `uiName` | B+P | ✅ |
 | G4 | Order Up moves selected input(s) one position toward top | B+P | ✅ |
 | G5 | Order Down moves selected input(s) one position toward bottom | B+P | ✅ |
 | G6 | Sort A-Z sorts all inputs alphabetically ascending; sets node connections | B+P | ✅ |
 | G7 | Sort Z-A sorts descending | B+P | ✅ |
 | G8 | Folder node sort also updates `sm_state.sortKey` on each child | B | ✅ |
-| G9 | Inputs panel disabled for `RVSourceGroup` and `RVFileSource` nodes | P | ⬜ |
-| G10 | Double-click input → `viewByIndex()` sets that node as view | B | ⬜ |
+| G9 | Inputs panel disabled for `RVSourceGroup` and `RVFileSource` nodes | P | ✅ |
+| G10 | Double-click input → `viewByIndex()` sets that node as view | B | 🟡 |
 
 ### H — Drag and drop
 
@@ -318,7 +323,7 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 | J1 | Tab index saved to `sm_state.tab` on view change | B | 🟡 |
 | J2 | Tab state restored on `after-graph-view-change` | B | 🟡 |
 | J3 | Selecting `RVSourceGroup` auto-switches to tab index 1 | B | 🟡 |
-| J4 | `view-edit-mode-activated` → per-type edit widget loads | B | ⬜ |
+| J4 | `view-edit-mode-activated` → per-type edit widget loads | B | ✅ |
 
 ### K — Config / startup
 
@@ -332,19 +337,19 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
-| L1 | Right-click tree → context menu with Delete / Edit Info / Select Current | P | ⬜ |
-| L2 | Context menu → Folder and Create submenus visible | P | ⬜ |
+| L1 | Right-click tree → context menu with Delete / Edit Info / Select Current | P | 🟡 |
+| L2 | Context menu → Folder and Create submenus visible | P | 🟡 |
 
 ### M — Events
 
 | ID | Behavior | Gate | Status |
 |---|---|---|---|
-| M1 | `new-node` → `updateTree()` | B | ⬜ |
+| M1 | `new-node` → `updateTree()` | B | ✅ |
 | M2 | `after-node-delete` → `updateTree()` | B | ✅ |
-| M3 | `after-clear-session` → `updateTree()` | B | ⬜ |
-| M4 | `graph-node-inputs-changed` → `updateInputs(viewNode())` | B | ⬜ |
+| M3 | `after-clear-session` → `updateTree()` | B | ✅ |
+| M4 | `graph-node-inputs-changed` → `updateInputs(viewNode())` | B | ✅ |
 | M5 | `graph-state-change` on `ui.name` → `_lazyUpdateTimer` | B | ✅ |
-| M6 | `graph-state-change` on `request.imageComponent` → sub-component icons update | B+P | ⬜ |
+| M6 | `graph-state-change` on `request.imageComponent` → sub-component icons update | B+P | ✅ |
 | M7 | `before/after-progressive-loading` → suppress tree updates during bulk load | B | ✅ |
 
 ### N — Splitter
@@ -365,14 +370,51 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 
 ---
 
-## Scenarios (25 gated golden tests)
+### Headless limitations (cannot be pinned by a golden on this harness)
 
-`sm_folder_thumbnails` is also gated but was missing from this table;
-`sm_folder_thumbnails_all` runs after the gates via `run_folder_thumbnails_all.sh`.
+`run_scenario.py` drives RV through `-pyeval`, before the Qt event loop, with no real
+window focus. Some triggers do not propagate there, which is already noted inside
+`sm_select_node` for the single-click case:
+
+| Row | Why | Covered by |
+|---|---|---|
+| B2, G10, F1, F2 | A synthesised double-click on a tree row / inputs row does not reach `viewByIndex()` headlessly. Re-verified by writing the scenario and running it: `viewNode()` stays on the previous node under **Mu** as well as under Python, so it is a harness limitation, not a port defect, and the scenario was dropped rather than committed with a baseline that pins nothing | `unit/test_mode_interactions.py::TestViewByIndex`, `::TestEditViewInfoSlot`, `unit/test_mode_slots.py::TestItemPressed` → 🟡 |
+| C15 | The Create Image dialog is modal; VERIFICATION.md drops modal UI from the golden inventory | `unit/test_mode_interactions.py::TestCreateImageDialogDefaults` → 🟡 |
+| A8 | A real drag needs a pointer grab and a live event loop, which `-pyeval` has not got. The policy is pinned where it is decided instead: `dragEnterEvent` clearing the FOLDERS row's `ItemIsDropEnabled` for a non-folder drag, and `dragMoveEvent`'s rejection rules | `unit/test_mode_interactions.py::TestFolderDropTargets` + `unit/test_tree_view.py` → 🟡 |
+| C8 | The New Node by Type dialog is modal. The type list it is filled from and the creation path it feeds are pinned instead | `unit/test_mode_interactions.py::TestNewNodeByTypeDialog` → 🟡 |
+| L1, L2, D4 | The context menu is shown with `QMenu.exec()`, which blocks until dismissed and never returns headlessly. Its *construction* is checked instead — including that the Folder submenu is literally the same QMenu object as the folder button's, so the two cannot drift | `unit/test_mode_interactions.py::TestContextMenuConstruction` → 🟡 |
+| M3 | Grabbing the dock's widget *after* `clearSession()` segfaults RV — reproduced on Mu, so pre-existing. `sm_tree_event_clear` grabs the panel before the clear and asserts the post-clear state on the model and the saved graph | `sm_tree_event_clear` (✅, panel PNG pre-clear) |
+| I7, I8 (at 83 clips) | The full-folder variant `sm_folder_thumbnails_all` is gated behaviorally, not on pixels. At 83 rows Qt re-rasterises the row labels with different subpixel weights between two runs of the *same* implementation — same glyphs, same layout, glyph-edge deltas up to 167/255 — so no meaningful dmax absorbs it. What the scenario is for is asserted on the graph and the thumbnail cache instead: 83 thumbnails and 83 filmstrips written, 83 rows off the fallback icon, 83 *distinct* row images. The pixel-exact check on the same panel is `sm_folder_thumbnails` at 12 clips, which does capture deterministically | `sm_folder_thumbnails` (✅, dmax 0) + `sm_folder_thumbnails_all` assertions |
+
+### Known pre-existing defects (not port regressions)
+
+| Row | Defect |
+|---|---|
+| C7 | **Add ▸ OCIO cannot work.** Both `session_manager.mu.in` and `session_manager.py` pass `"RVOCIO"` to `newNode`, and this build has no such node type — it ships `OCIO`, `OCIODisplay`, `OCIOFile`, `OCIOLook`. The action raises in either implementation. It is also unpinnable by a golden: the traceback names `session_manager.py` frames under Python and Mu frames under Mu, so gate 0 reports a new signature whichever implementation captured the baseline. `sm_add_node_types` asserts `RVOCIO` is still absent, so if the node type ever appears the scenario fails and the row can be pinned properly. Marked ❌ rather than ⬜ — it is not missing coverage, it is a defect upstream of this migration. |
+| — | **`nodeAspect(node)` ignores its argument**, measuring `viewNode()` instead (`transform_manip.mu:294`), so `fitAll`'s scale is always `1.0` and "Fit All Images" only resets transforms. Pinned as-is in `unit/test_transform_manip_mode.py`. |
+
+## Scenarios (37 gated golden tests)
+
+`sm_folder_thumbnails_all` is the 38th golden directory; it runs after the gates via
+`run_folder_thumbnails_all.sh` rather than inside them, because it loads every clip
+in the fixture folder and takes minutes.
 
 | ID | Primary outcome(s) | Coverage | Skip from |
 |---|---|---|---|
 | `sm_tree_categories` | #1 | A1, A2, A7, A9 | — |
+| `sm_tree_columns` | — | A10 | — |
+| `sm_tree_event_newnode` | — | M1, M4 | — |
+| `sm_tree_event_clear` | — | M3 | — |
+| `sm_subcomponent_icons` | — | M6 | — |
+| `sm_add_node_types` | — | C4, C5, C6, C7 | — |
+| `sm_add_movieproc_blank` | — | C14 | — |
+| `sm_folder_from_copy` | — | D3 | — |
+| `sm_delete_multi` | — | E5 | — |
+| `sm_delete_in_folder` | — | E2 | — |
+| `sm_inputs_disabled_for_source` | — | G9 | — |
+| `sm_inputs_preview_widget` | — | G2 | — |
+| `sm_editor_tab_per_type` | — | J4 | — |
+| `sm_folder_thumbnails` | #8 | I2, I5, I7, I8, I9, M7 | — |
 | `sm_tree_folder_sort` | — | A5, A6 | — |
 | `sm_select_node` | #2 | B1, B7, B8, B9 | — |
 | `sm_subcomponent_select` | — | B3, B4, A3, A4 | — |
@@ -401,10 +443,11 @@ events). ✅ is reserved for behaviours a committed golden pins, per the legend.
 
 ## Mu methods → Python unit tests
 
-**Mandatory gate 5.** The suite passes (424 tests) and is not vacuous, but the
-coverage bar is **not met**: 189 of 335 Mu symbols still have no unit test. The table below is the full inventory across all twelve
-Mu sources (the earlier version of this table listed 107 rows from
-`session_manager.mu.in` only and omitted the eleven sibling modes entirely).
+**Mandatory gate 5.** The suite passes (1078 tests) and is not vacuous. Every one of
+the 335 Mu symbols across all twelve Mu sources now maps to either a unit test on the
+ported symbol or a ➖ row explaining why there is nothing to test and naming what does
+cover it. (An earlier version of this table listed 107 rows from
+`session_manager.mu.in` only and omitted the eleven sibling modes entirely.)
 
 **Unit tests exercise the port.** Every module under `unit/` imports the real module
 from `src/plugins/rv-packages/session_manager/` through `unit/_rv_stubs.py`, which
@@ -415,76 +458,81 @@ inside the test files, and the whole suite passed with `session_manager.py` dele
 the same PySide6 the port runs against) and fails if zero tests execute, so an
 all-skipped run can no longer read as a pass.
 
-| Mu source | Symbols | ✅ unit-tested | ⬜ not yet |
+**Statuses.** ✅ a unit test exercises the ported symbol. ➖ there is no ported
+symbol to test — either the Mu helper was inlined as a Python built-in, or it is dead
+in Mu, or it cannot be reached headlessly and is pinned by the golden gates instead.
+Each ➖ row says which, and names whatever does cover it.
+
+| Mu source | Symbols | ✅ unit-tested | ➖ n/a |
 |---|---:|---:|---:|
-| `session_manager.mu.in` | 144 | 69 | 75 |
-| `Composite_edit_mode.mu` | 11 | 5 | 6 |
-| `FolderGroup_edit_mode.mu` | 9 | 2 | 7 |
-| `LayoutGroup_edit_mode.mu` | 33 | 13 | 20 |
-| `RetimeGroup_edit_mode.mu` | 20 | 5 | 15 |
-| `SequenceGroup_edit_mode.mu` | 19 | 7 | 12 |
-| `SourceGroup_edit_mode.mu` | 23 | 9 | 14 |
-| `StackGroup_edit_mode.mu` | 7 | 4 | 3 |
-| `Stack_edit_mode.mu` | 21 | 6 | 15 |
-| `SwitchGroup_edit_mode.mu` | 5 | 3 | 2 |
-| `Switch_edit_mode.mu` | 18 | 3 | 15 |
-| `transform_manip.mu` | 25 | 20 | 5 |
-| **TOTAL** | **335** | **146** | **189** |
+| `session_manager.mu.in` | 144 | 138 | 6 |
+| `Composite_edit_mode.mu` | 11 | 11 | 0 |
+| `FolderGroup_edit_mode.mu` | 9 | 9 | 0 |
+| `LayoutGroup_edit_mode.mu` | 33 | 33 | 0 |
+| `RetimeGroup_edit_mode.mu` | 20 | 20 | 0 |
+| `SequenceGroup_edit_mode.mu` | 19 | 19 | 0 |
+| `SourceGroup_edit_mode.mu` | 23 | 23 | 0 |
+| `StackGroup_edit_mode.mu` | 7 | 7 | 0 |
+| `Stack_edit_mode.mu` | 21 | 21 | 0 |
+| `SwitchGroup_edit_mode.mu` | 5 | 5 | 0 |
+| `Switch_edit_mode.mu` | 18 | 18 | 0 |
+| `transform_manip.mu` | 25 | 25 | 0 |
+| **TOTAL** | **335** | **329** | **6** |
 
 
 <details><summary><code>session_manager.mu.in</code> — 144 symbols, 58 tested</summary>
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `EventFilter` | — | ⬜ |
+| `EventFilter` | `unit/test_mode_events.py::TestEventFilter` | ✅ |
 | `FilmstripWidget` | `unit/test_preview_widgets.py::TestFilmstripWidget` | ✅ |
-| `InputsView` | — | ⬜ |
-| `NodeModel` | — | ⬜ |
-| `NodeTreeView` | — | ⬜ |
-| `SessionManagerMode` | — | ⬜ |
+| `InputsView` | `unit/test_tree_view.py::TestInputsView` | ✅ |
+| `NodeModel` | `unit/test_node_model.py` | ✅ |
+| `NodeTreeView` | `unit/test_tree_view.py` | ✅ |
+| `SessionManagerMode` | *constructing the mode segfaults headlessly — pinned by gates 0–4* — `unit/test_mode_slots.py::TestConstructionIsNotUnitTestable` | ➖ |
 | `SourcePreviewWidget` | `unit/test_preview_widgets.py::TestSourcePreviewWidget` | ✅ |
 | `ThumbnailWidget` | `unit/test_preview_widgets.py::TestThumbnailWidget` | ✅ |
-| `activate` | — | ⬜ |
-| `addEditor` | — | ⬜ |
+| `activate` | `unit/test_mode_events.py::TestActivateDeactivate` | ✅ |
+| `addEditor` | `unit/test_mode_slots.py::TestEditorTabs` | ✅ |
 | `addInput` | `unit/test_node_ops.py::TestAddInput` | ✅ |
-| `addMovieProc` | — | ⬜ |
-| `addNodeByTypeName` | — | ⬜ |
-| `addNodeOfType` | — | ⬜ |
+| `addMovieProc` | `unit/test_mode_dialogs.py::TestCreateImageDialog` | ✅ |
+| `addNodeByTypeName` | `unit/test_mode_dialogs.py::TestNewNodeByTypeDialog` | ✅ |
+| `addNodeOfType` | `unit/test_mode_interactions.py::TestNewNodeByTypeDialog` | ✅ |
 | `addRow` | `unit/test_helpers.py::TestAddRow` | ✅ |
-| `addThingSlot` | — | ⬜ |
-| `afterGraphViewChange` | — | ⬜ |
-| `afterProgressiveLoading` | — | ⬜ |
+| `addThingSlot` | `unit/test_mode_interactions.py::TestNewNodeByTypeDialog` | ✅ |
+| `afterGraphViewChange` | `unit/test_mode_events.py::TestGraphViewChange` | ✅ |
+| `afterProgressiveLoading` | `unit/test_mode_events.py::TestProgressiveLoading` | ✅ |
 | `assignSortOrder` | `unit/test_state_props.py::TestAssignSortOrder` | ✅ |
 | `auxFilePath` | `unit/test_mode.py::TestAuxFilePath` | ✅ |
-| `auxIcon` | — | ⬜ |
-| `beforeGraphViewChange` | — | ⬜ |
-| `beforeProgressiveLoading` | — | ⬜ |
-| `chooseColorSlot` | — | ⬜ |
-| `colorAdjustedIcon` | — | ⬜ |
-| `componentAndFolderNodeFromHash` | — | ⬜ |
+| `auxIcon` | `unit/test_mode_tree_build.py::TestIcons` | ✅ |
+| `beforeGraphViewChange` | `unit/test_mode_events.py::TestGraphViewChange` | ✅ |
+| `beforeProgressiveLoading` | `unit/test_mode_events.py::TestProgressiveLoading` | ✅ |
+| `chooseColorSlot` | `unit/test_mode_slots.py::TestColorSlots` | ✅ |
+| `colorAdjustedIcon` | `unit/test_mode_tree_build.py::TestIcons` | ✅ |
+| `componentAndFolderNodeFromHash` | `unit/test_mode_tree_build.py::TestSourceFromSubComponent` | ✅ |
 | `componentMatch` | `unit/test_helpers.py::TestComponentMatch` | ✅ |
 | `configSlot` | `unit/test_mode.py::TestConfigSlot` | ✅ |
-| `contains` | — | ⬜ |
-| `createMode` | — | ⬜ |
-| `deactivate` | — | ⬜ |
-| `deleteViewableSlot` | — | ⬜ |
+| `contains` | *inlined as Python `in`* — `unit/test_state_props.py::TestSubComponentExpanded` | ➖ |
+| `createMode` | *constructing the mode segfaults headlessly — pinned by gates 0–4* — `unit/test_mode_slots.py::TestConstructionIsNotUnitTestable` | ➖ |
+| `deactivate` | `unit/test_mode_events.py::TestActivateDeactivate` | ✅ |
+| `deleteViewableSlot` | `unit/test_mode_slots.py::TestDeleteViewableSlot` | ✅ |
 | `dragEnterEvent` | `unit/test_tree_view.py::TestDragEnterEvent` | ✅ |
 | `dragMoveEvent` | `unit/test_tree_view.py::TestDragMoveEvent` | ✅ |
-| `dropEvent` | — | ⬜ |
-| `editViewInfoSlot` | — | ⬜ |
-| `enterQuittingState` | — | ⬜ |
+| `dropEvent` | `unit/test_mode_dialogs.py::TestDropEvent` | ✅ |
+| `editViewInfoSlot` | `unit/test_mode_interactions.py::TestEditViewInfoSlot` | ✅ |
+| `enterQuittingState` | `unit/test_mode_events.py::TestQuittingAndCategory` | ✅ |
 | `event` | `unit/test_preview_widgets.py::TestSourcePreviewWidget` | ✅ |
-| `eventFilter` | — | ⬜ |
+| `eventFilter` | `unit/test_mode_events.py::TestEventFilter` | ✅ |
 | `filteredDraggedPaths` | `unit/test_tree_view.py::TestFilteredDraggedPaths` | ✅ |
 | `hasInput` | `unit/test_node_ops.py::TestHasInput` | ✅ |
 | `hashedSubComponent` | `unit/test_hashed_subcomponent.py` | ✅ |
 | `iconForNode` | `unit/test_mode.py::TestIconForNode` | ✅ |
 | `includes` | `unit/test_helpers.py::TestIncludes` | ✅ |
-| `indexOf` | — | ⬜ |
-| `indexOfItem` | — | ⬜ |
-| `inputRowsInsertedSlot` | — | ⬜ |
-| `inputRowsRemovedSlot` | — | ⬜ |
-| `inputsDeleteSlot` | — | ⬜ |
+| `indexOf` | *inlined as `list.index()`* — `unit/test_state_props.py::TestAssignSortOrder` | ➖ |
+| `indexOfItem` | *dead in Mu — defined, never called; not ported* | ➖ |
+| `inputRowsInsertedSlot` | `unit/test_mode_events.py::TestInputRowSlots` | ✅ |
+| `inputRowsRemovedSlot` | `unit/test_mode_events.py::TestInputRowSlots` | ✅ |
+| `inputsDeleteSlot` | `unit/test_mode_panel.py::TestInputsDeleteSlot` | ✅ |
 | `isExpandedInParent` | `unit/test_state_props.py::TestExpandedInParent` | ✅ |
 | `isImageRequestPropEqual` | `unit/test_image_request.py::TestIsImageRequestPropEqual` | ✅ |
 | `isLoaded` | `unit/test_preview_widgets.py::TestFilmstripWidget` | ✅ |
@@ -493,7 +541,7 @@ all-skipped run can no longer read as a pass.
 | `itemNode` | `unit/test_helpers.py::TestItemNode` | ✅ |
 | `itemOfNode` | `unit/test_helpers.py::TestMapItems` | ✅ |
 | `itemParentNode` | `unit/test_helpers.py::TestSubComponentAccessors` | ✅ |
-| `itemPressed` | — | ⬜ |
+| `itemPressed` | `unit/test_mode_slots.py::TestItemPressed` | ✅ |
 | `itemSubComponentHash` | `unit/test_helpers.py::TestSubComponentAccessors` | ✅ |
 | `itemSubComponentMedia` | `unit/test_helpers.py::TestSubComponentAccessors` | ✅ |
 | `itemSubComponentStringData` | `unit/test_helpers.py::TestSubComponentAccessors` | ✅ |
@@ -501,44 +549,44 @@ all-skipped run can no longer read as a pass.
 | `itemSubComponentTypeForName` | `unit/test_helpers.py::TestSubComponentTypeForName` | ✅ |
 | `itemSubComponentValue` | `unit/test_helpers.py::TestSubComponentAccessors` | ✅ |
 | `load` | `unit/test_preview_widgets.py` | ✅ |
-| `loadStrip` | — | ⬜ |
-| `loadThumbnail` | — | ⬜ |
-| `mainWinVisTimeout` | — | ⬜ |
-| `makeImage` | — | ⬜ |
-| `makeNewNodeOfType` | — | ⬜ |
-| `makeSourceRowWidget` | — | ⬜ |
+| `loadStrip` | `unit/test_preview_widgets.py::TestSourcePreviewWidget` | ✅ |
+| `loadThumbnail` | `unit/test_preview_widgets.py::TestSourcePreviewWidget` | ✅ |
+| `mainWinVisTimeout` | `unit/test_mode_events.py::TestVisibility` | ✅ |
+| `makeImage` | `unit/test_mode_dialogs.py::TestCreateImageDialog` | ✅ |
+| `makeNewNodeOfType` | `unit/test_mode_dialogs.py::TestNewNodeByTypeDialog` | ✅ |
+| `makeSourceRowWidget` | `unit/test_mode_tree_build.py::TestMakeSourceRowWidget` | ✅ |
 | `map` | `unit/test_helpers.py::TestMapItems` | ✅ |
-| `mapOverItem` | — | ⬜ |
+| `mapOverItem` | `unit/test_mode_tree_build.py::TestMapOverItem` | ✅ |
 | `mimeData` | `unit/test_node_model.py::TestMimeData` | ✅ |
 | `mimeTypes` | `unit/test_node_model.py::TestMimeTypes` | ✅ |
 | `mouseMoveEvent` | `unit/test_preview_widgets.py::TestFilmstripWidget` | ✅ |
 | `navButtonClicked` | `unit/test_mode.py::TestNavButtonClicked` | ✅ |
-| `newColorSlot` | — | ⬜ |
-| `newFolderSlot` | — | ⬜ |
-| `newNodeRow` | — | ⬜ |
-| `newNodeStatusColumns` | — | ⬜ |
-| `newNodeSubComponent` | — | ⬜ |
-| `newSubComponentNode` | — | ⬜ |
+| `newColorSlot` | `unit/test_mode_slots.py::TestColorSlots` | ✅ |
+| `newFolderSlot` | `unit/test_mode_dialogs.py::TestNewFolderSlot` | ✅ |
+| `newNodeRow` | `unit/test_mode_tree_build.py::TestNewNodeRow` | ✅ |
+| `newNodeStatusColumns` | `unit/test_mode_tree_build.py::TestNewNodeRow` | ✅ |
+| `newNodeSubComponent` | `unit/test_mode_tree_build.py::TestSubComponentRows` | ✅ |
+| `newSubComponentNode` | `unit/test_mode_tree_build.py::TestSourceFromSubComponent` | ✅ |
 | `nodeFromIndex` | `unit/test_helpers.py::TestNodeFromIndex` | ✅ |
 | `nodeInputs` | `unit/test_helpers.py::TestNodeInputs` | ✅ |
-| `nodeInputsChanged` | — | ⬜ |
-| `onCategoryStateChanged` | — | ⬜ |
-| `printRows` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
-| `rebuildInputsFromList` | — | ⬜ |
-| `reloadEditorTab` | — | ⬜ |
-| `remove` | — | ⬜ |
+| `nodeInputsChanged` | `unit/test_mode_events.py::TestNodeInputsChanged` | ✅ |
+| `onCategoryStateChanged` | `unit/test_mode_events.py::TestQuittingAndCategory` | ✅ |
+| `printRows` | `unit/test_mode_slots.py::TestPrintRows` | ✅ |
+| `propertyChanged` | `unit/test_mode_events.py::TestPropertyChanged` | ✅ |
+| `rebuildInputsFromList` | `unit/test_mode_panel.py::TestRebuildInputsFromList` | ✅ |
+| `reloadEditorTab` | `unit/test_mode_slots.py::TestEditorTabs` | ✅ |
+| `remove` | *inlined as a list comprehension* — `unit/test_state_props.py::TestSubComponentExpanded` | ➖ |
 | `removeInput` | `unit/test_node_ops.py::TestRemoveInput` | ✅ |
 | `renameByType` | `unit/test_rename.py::TestRenameByType` | ✅ |
-| `reorderSelected` | — | ⬜ |
+| `reorderSelected` | `unit/test_mode_slots.py::TestReorderSelected` | ✅ |
 | `resizeColumns` | `unit/test_helpers.py::TestResizeColumns` | ✅ |
 | `restoreTabState` | `unit/test_mode.py::TestTabState` | ✅ |
 | `saveTabState` | `unit/test_mode.py::TestTabState` | ✅ |
-| `selectCurrentViewSlot` | — | ⬜ |
-| `selectInputsRange` | — | ⬜ |
-| `selectViewableNode` | — | ⬜ |
-| `selectedConvertedSubComponents` | — | ⬜ |
-| `selectedItems` | — | ⬜ |
+| `selectCurrentViewSlot` | `unit/test_mode_slots.py::TestViewSelectionChanged` | ✅ |
+| `selectInputsRange` | `unit/test_mode_slots.py::TestSelectInputsRange` | ✅ |
+| `selectViewableNode` | `unit/test_mode_panel.py::TestSelectViewableNode` | ✅ |
+| `selectedConvertedSubComponents` | `unit/test_mode_slots.py::TestSelectionReaders` | ✅ |
+| `selectedItems` | `unit/test_mode_slots.py::TestSelectionReaders` | ✅ |
 | `selectedNodePaths` | `unit/test_tree_view.py::TestSelectedNodePaths` | ✅ |
 | `selectedNodes` | `unit/test_sort_inputs.py (via selectedNodesEvent)` | ✅ |
 | `selectedNodesEvent` | `unit/test_cross_package_api.py::TestSelectedNodesEvent` | ✅ |
@@ -547,39 +595,39 @@ all-skipped run can no longer read as a pass.
 | `setImageRequest` | `unit/test_image_request.py::TestSetImageRequestToggle` | ✅ |
 | `setImageRequestProp` | `unit/test_image_request.py::TestSetImageRequestProp` | ✅ |
 | `setInputs` | `unit/test_node_ops.py::TestSetInputs` | ✅ |
-| `setItemExpandedState` | — | ⬜ |
+| `setItemExpandedState` | `unit/test_mode_panel.py::TestSetItemExpandedState` | ✅ |
 | `setNodeRequest` | `unit/test_image_request.py::TestSetNodeRequest` | ✅ |
 | `setNodeStatus` | `unit/test_mode.py::TestSetNodeStatus` | ✅ |
 | `setSortKeyInParent` | `unit/test_state_props.py::TestSortKey` | ✅ |
 | `setSubComponentExpanded` | `unit/test_state_props.py::TestSubComponentExpanded` | ✅ |
 | `setToolTipProp` | `unit/test_state_props.py::TestToolTipProp` | ✅ |
 | `showFrameAtX` | `unit/test_preview_widgets.py::TestFilmstripWidget` | ✅ |
-| `showRows` | — | ⬜ |
+| `showRows` | `unit/test_mode_slots.py::TestPrintRows` | ✅ |
 | `sortFolderChildren` | `unit/test_tree_view.py::TestSortFolderChildren` | ✅ |
 | `sortFolders` | `unit/test_tree_view.py::TestSortFolders` | ✅ |
 | `sortInputs` | `unit/test_sort_inputs.py` | ✅ |
 | `sortKeyInParent` | `unit/test_state_props.py::TestSortKey` | ✅ |
-| `sourceFromSubComponent` | — | ⬜ |
+| `sourceFromSubComponent` | `unit/test_mode_tree_build.py::TestSourceFromSubComponent` | ✅ |
 | `sourceNodeOfGroup` | `unit/test_helpers.py::TestSourceNodeOfGroup` | ✅ |
 | `splitterMoved` | `unit/test_mode.py::TestSplitterMoved` | ✅ |
 | `subComponentItemsOfNode` | `unit/test_helpers.py::TestSubComponentItemsOfNode` | ✅ |
 | `subComponentPropValue` | `unit/test_subcomponent_prop.py` | ✅ |
 | `tabChangeSlot` | `unit/test_mode.py::TestTabState` | ✅ |
-| `theMode` | — | ⬜ |
+| `theMode` | `unit/test_cross_package_api.py::TestSelectedNodeLines` | ✅ |
 | `togglePreviews` | `unit/test_mode.py::TestTogglePreviews` | ✅ |
 | `toolTipFromProp` | `unit/test_state_props.py::TestToolTipProp` | ✅ |
-| `updateInputs` | — | ⬜ |
-| `updateNavUI` | — | ⬜ |
-| `updateNodePreviewEvent` | — | ⬜ |
-| `updateTree` | — | ⬜ |
-| `updateTreeEvent` | — | ⬜ |
-| `useEditor` | — | ⬜ |
-| `viewByIndex` | — | ⬜ |
-| `viewContextMenuSlot` | — | ⬜ |
-| `viewEditModeActivated` | — | ⬜ |
-| `viewItemChanged` | — | ⬜ |
-| `viewSelectionChanged` | — | ⬜ |
-| `visibilityChanged` | — | ⬜ |
+| `updateInputs` | `unit/test_mode_panel.py::TestUpdateInputs` | ✅ |
+| `updateNavUI` | `unit/test_mode_panel.py::TestUpdateNavUI` | ✅ |
+| `updateNodePreviewEvent` | `unit/test_mode_tree_build.py::TestUpdateNodePreviewEvent` | ✅ |
+| `updateTree` | `unit/test_mode_tree_build.py::TestUpdateTree` | ✅ |
+| `updateTreeEvent` | `unit/test_mode_events.py::TestProgressiveLoading` | ✅ |
+| `useEditor` | `unit/test_mode_slots.py::TestEditorTabs` | ✅ |
+| `viewByIndex` | `unit/test_mode_interactions.py::TestViewByIndex` | ✅ |
+| `viewContextMenuSlot` | `unit/test_mode_interactions.py::TestContextMenuConstruction` | ✅ |
+| `viewEditModeActivated` | `unit/test_mode_events.py::TestGraphViewChange` | ✅ |
+| `viewItemChanged` | `unit/test_mode_dialogs.py::TestViewItemChanged` | ✅ |
+| `viewSelectionChanged` | `unit/test_mode_slots.py::TestViewSelectionChanged` | ✅ |
+| `visibilityChanged` | `unit/test_mode_events.py::TestVisibility` | ✅ |
 
 </details>
 
@@ -587,12 +635,12 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `CompositeEditMode` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
-| `createMode` | — | ⬜ |
-| `loadUI` | — | ⬜ |
-| `opState` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
+| `CompositeEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestCompositeLoadUI` | ✅ |
+| `opState` | `unit/test_edit_mode_menus.py::TestCompositeMenu` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_menus.py::TestCompositeMenu` | ✅ |
 | `setDissolveAmount` | `unit/test_composite_edit_mode.py::TestDissolveAmount` | ✅ |
 | `setDissolveAmountFromSlider` | `unit/test_composite_edit_mode.py::TestDissolveAmount` | ✅ |
 | `setOp` | `unit/test_composite_edit_mode.py::TestSetOp` | ✅ |
@@ -605,13 +653,13 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `FolderGroupEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `activateUI` | — | ⬜ |
-| `createMode` | — | ⬜ |
-| `deactivate` | — | ⬜ |
-| `loadUI` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
+| `FolderGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_slots.py::TestFolderActivateUI` | ✅ |
+| `activateUI` | `unit/test_edit_mode_slots.py::TestFolderActivateUI` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `deactivate` | `unit/test_edit_mode_slots.py::TestFolderActivateUI` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestFolderLoadUI` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_slots.py::TestFolderPropertyChanged` | ✅ |
 | `setViewType` | `unit/test_folder_group_edit_mode.py::TestSetViewType` | ✅ |
 | `updateUI` | `unit/test_folder_group_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
 
@@ -621,38 +669,38 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `LayoutGroupEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `activateTransformMode` | — | ⬜ |
-| `activateUI` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
-| `createMode` | — | ⬜ |
-| `deactivate` | — | ⬜ |
-| `gridColumnsChangedSlot` | — | ⬜ |
-| `gridRowsChangedSlot` | — | ⬜ |
+| `LayoutGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_slots.py::TestLayoutActivation` | ✅ |
+| `activateTransformMode` | `unit/test_edit_mode_slots.py::TestLayoutActivation` | ✅ |
+| `activateUI` | `unit/test_edit_mode_slots.py::TestLayoutActivation` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `deactivate` | `unit/test_edit_mode_slots.py::TestLayoutActivation` | ✅ |
+| `gridColumnsChangedSlot` | `unit/test_edit_mode_slots.py::TestLayoutSlots` | ✅ |
+| `gridRowsChangedSlot` | `unit/test_edit_mode_slots.py::TestLayoutSlots` | ✅ |
 | `isLayoutMode` | `unit/test_layout_group_edit_mode.py::TestIsLayoutMode` | ✅ |
 | `layoutInColumn` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutInColumnEvent` | — | ⬜ |
+| `layoutInColumnEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
 | `layoutInGrid` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutInGridEvent` | — | ⬜ |
+| `layoutInGridEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
 | `layoutInRow` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutInRowEvent` | — | ⬜ |
+| `layoutInRowEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
 | `layoutManually` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutManuallyEvent` | — | ⬜ |
+| `layoutManuallyEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
 | `layoutMode` | `unit/test_layout_group_edit_mode.py::TestLayoutMode` | ✅ |
 | `layoutPacked` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
 | `layoutPacked2` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutPacked2Event` | — | ⬜ |
-| `layoutPackedEvent` | — | ⬜ |
+| `layoutPacked2Event` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
+| `layoutPackedEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
 | `layoutStatic` | `unit/test_layout_group_edit_mode.py::TestLayoutSelectors` | ✅ |
-| `layoutStaticEvent` | — | ⬜ |
-| `loadUI` | — | ⬜ |
-| `modeComboChangedSlot` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
+| `layoutStaticEvent` | `unit/test_edit_mode_slots.py::TestLayoutMenuEvents` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestLayoutLoadUI` | ✅ |
+| `modeComboChangedSlot` | `unit/test_edit_mode_slots.py::TestLayoutSlots` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_slots.py::TestLayoutPropertyChanged` | ✅ |
 | `setGridRowsColumns` | `unit/test_layout_group_edit_mode.py::TestSpacingAndGrid` | ✅ |
 | `setLayoutMode` | `unit/test_layout_group_edit_mode.py::TestLayoutMode` | ✅ |
 | `setSpacing` | `unit/test_layout_group_edit_mode.py::TestSpacingAndGrid` | ✅ |
-| `spacingSliderChangedSlot` | — | ⬜ |
+| `spacingSliderChangedSlot` | `unit/test_edit_mode_slots.py::TestLayoutSlots` | ✅ |
 | `updateUI` | `unit/test_layout_group_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
 
 </details>
@@ -661,25 +709,25 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `RetimeGroupEditMode` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
-| `convertToFPS` | — | ⬜ |
-| `createMode` | — | ⬜ |
-| `editSlot` | — | ⬜ |
-| `factorPrompt` | — | ⬜ |
-| `fpsPrompt` | — | ⬜ |
-| `loadUI` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
+| `RetimeGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
+| `convertToFPS` | `unit/test_edit_mode_slots.py::TestRetimeConvertToFPS` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `editSlot` | `unit/test_edit_mode_slots.py::TestRetimeSlots` | ✅ |
+| `factorPrompt` | `unit/test_edit_mode_slots.py::TestRetimePrompts` | ✅ |
+| `fpsPrompt` | `unit/test_edit_mode_slots.py::TestRetimePrompts` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestRetimeLoadUI` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_slots.py::TestRetimePropertyChanged` | ✅ |
 | `reset` | `unit/test_retime_group_edit_mode.py::TestReset` | ✅ |
-| `resetSlot` | — | ⬜ |
-| `resetTiming` | — | ⬜ |
+| `resetSlot` | `unit/test_edit_mode_slots.py::TestRetimeSlots` | ✅ |
+| `resetTiming` | `unit/test_edit_mode_slots.py::TestRetimeSlots` | ✅ |
 | `reverse` | `unit/test_retime_group_edit_mode.py::TestReverse` | ✅ |
-| `reverseSlot` | — | ⬜ |
-| `reverseTiming` | — | ⬜ |
+| `reverseSlot` | `unit/test_edit_mode_slots.py::TestRetimeSlots` | ✅ |
+| `reverseTiming` | `unit/test_edit_mode_slots.py::TestRetimeSlots` | ✅ |
 | `setConvertFPS` | `unit/test_retime_group_edit_mode.py::TestSetConvertFPS` | ✅ |
 | `setFactorValue` | `unit/test_retime_group_edit_mode.py::TestSetFactorValue` | ✅ |
-| `slowDownPrompt` | — | ⬜ |
-| `speedUpPrompt` | — | ⬜ |
+| `slowDownPrompt` | `unit/test_edit_mode_slots.py::TestRetimePrompts` | ✅ |
+| `speedUpPrompt` | `unit/test_edit_mode_slots.py::TestRetimePrompts` | ✅ |
 | `updateUI` | `unit/test_retime_group_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
 
 </details>
@@ -688,24 +736,24 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `SequenceGroupEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `activateUI` | — | ⬜ |
+| `SequenceGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
+| `activateUI` | `unit/test_edit_mode_ui_loading.py::TestSequenceLoadUI` | ✅ |
 | `afterSessionRead` | `unit/test_sequence_group_edit_mode.py::TestSessionReadFreeze` | ✅ |
-| `autoEDL` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
+| `autoEDL` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
 | `beforeSessionRead` | `unit/test_sequence_group_edit_mode.py::TestSessionReadFreeze` | ✅ |
 | `checkBoxSlot` | `unit/test_sequence_group_edit_mode.py::TestCheckBoxSlot` | ✅ |
-| `createMode` | — | ⬜ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `fpsChanged` | `unit/test_sequence_group_edit_mode.py::TestFpsChanged` | ✅ |
 | `heightChanged` | `unit/test_sequence_group_edit_mode.py::TestSizeEdits` | ✅ |
-| `loadUI` | — | ⬜ |
-| `menu` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
-| `stateFunc` | — | ⬜ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestSequenceLoadUI` | ✅ |
+| `menu` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
+| `stateFunc` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
 | `updateUI` | `unit/test_sequence_group_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
-| `updateUIEvent` | — | ⬜ |
-| `useCutInfo` | — | ⬜ |
+| `updateUIEvent` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
+| `useCutInfo` | `unit/test_edit_mode_menus.py::TestSequenceMenu` | ✅ |
 | `widthChanged` | `unit/test_sequence_group_edit_mode.py::TestSizeEdits` | ✅ |
 
 </details>
@@ -714,28 +762,28 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `SourceGroupEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
-| `changedSlot` | — | ⬜ |
-| `createMode` | — | ⬜ |
+| `SourceGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_slots.py::TestSourceUpdateFromProps` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
+| `changedSlot` | `unit/test_edit_mode_slots.py::TestSourceChangedSlot` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `cutInPrompt` | `unit/test_source_group_edit_mode.py::TestPrompts` | ✅ |
 | `cutOutPrompt` | `unit/test_source_group_edit_mode.py::TestPrompts` | ✅ |
-| `finishedSlot` | — | ⬜ |
-| `loadUI` | — | ⬜ |
+| `finishedSlot` | `unit/test_edit_mode_slots.py::TestSourceFinishedSlot` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestSourceLoadUI` | ✅ |
 | `newInPoint` | `unit/test_source_group_edit_mode.py::TestNewInOutPoint` | ✅ |
 | `newOutPoint` | `unit/test_source_group_edit_mode.py::TestNewInOutPoint` | ✅ |
-| `propertyChanged` | — | ⬜ |
+| `propertyChanged` | `unit/test_edit_mode_slots.py::TestSourceResetAndPropertyChanged` | ✅ |
 | `reset` | `unit/test_source_group_edit_mode.py::TestReset` | ✅ |
 | `resetCut` | `unit/test_source_group_edit_mode.py::TestReset` | ✅ |
-| `resetSlot` | — | ⬜ |
+| `resetSlot` | `unit/test_edit_mode_slots.py::TestSourceResetAndPropertyChanged` | ✅ |
 | `setCutValue` | `unit/test_source_group_edit_mode.py::TestSetCutValue` | ✅ |
-| `sourceMenuState` | — | ⬜ |
-| `syncGuiInOut` | — | ⬜ |
+| `sourceMenuState` | `unit/test_edit_mode_slots.py::TestSourceSyncGuiInOut` | ✅ |
+| `syncGuiInOut` | `unit/test_edit_mode_slots.py::TestSourceSyncGuiInOut` | ✅ |
 | `syncSlot` | `unit/test_source_group_edit_mode.py::TestSyncSlot` | ✅ |
-| `syncState` | — | ⬜ |
-| `toggleSync` | — | ⬜ |
-| `updateFromProps` | — | ⬜ |
+| `syncState` | `unit/test_edit_mode_slots.py::TestSourceSyncGuiInOut` | ✅ |
+| `toggleSync` | `unit/test_edit_mode_slots.py::TestSourceToggleSync` | ✅ |
+| `updateFromProps` | `unit/test_edit_mode_slots.py::TestSourceUpdateFromProps` | ✅ |
 | `updateUI` | `unit/test_source_group_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
 
 </details>
@@ -744,11 +792,11 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `StackGroupEditMode` | — | ⬜ |
+| `StackGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `activate` | `unit/test_group_edit_modes.py::TestStackGroupEditMode` | ✅ |
 | `activateUI` | `unit/test_group_edit_modes.py::TestStackGroupEditMode` | ✅ |
-| `auxFilePath` | — | ⬜ |
-| `createMode` | — | ⬜ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `deactivate` | `unit/test_group_edit_modes.py::TestStackGroupEditMode` | ✅ |
 | `propertyChanged` | `unit/test_group_edit_modes.py::TestStackGroupEditMode` | ✅ |
 
@@ -758,26 +806,26 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `StackEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `alignStartFrames` | — | ⬜ |
-| `autoRetimeInputs` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
+| `StackEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `alignStartFrames` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `autoRetimeInputs` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
 | `checkBoxSlot` | `unit/test_stack_edit_mode.py::TestCheckBoxSlot` | ✅ |
-| `createMode` | — | ⬜ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `fpsChanged` | `unit/test_stack_edit_mode.py::TestFpsChanged` | ✅ |
 | `heightChanged` | `unit/test_stack_edit_mode.py::TestSizeEdits` | ✅ |
-| `loadUI` | — | ⬜ |
-| `menu` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
-| `retimeState` | — | ⬜ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestStackLoadUI` | ✅ |
+| `menu` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `retimeState` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
 | `setChosenAudioInput` | `unit/test_stack_edit_mode.py::TestSetChosenAudioInput` | ✅ |
-| `stateFunc` | — | ⬜ |
-| `strictFrameRanges` | — | ⬜ |
-| `updateMenu` | — | ⬜ |
+| `stateFunc` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `strictFrameRanges` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `updateMenu` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
 | `updateUI` | `unit/test_stack_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
-| `updateUIEvent` | — | ⬜ |
-| `useCutInfo` | — | ⬜ |
+| `updateUIEvent` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
+| `useCutInfo` | `unit/test_edit_mode_menus.py::TestStackMenu` | ✅ |
 | `widthChanged` | `unit/test_stack_edit_mode.py::TestSizeEdits` | ✅ |
 
 </details>
@@ -786,10 +834,10 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `SwitchGroupEditMode` | — | ⬜ |
+| `SwitchGroupEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `activate` | `unit/test_group_edit_modes.py::TestSwitchGroupEditMode` | ✅ |
 | `activateUI` | `unit/test_group_edit_modes.py::TestSwitchGroupEditMode` | ✅ |
-| `createMode` | — | ⬜ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `deactivate` | `unit/test_group_edit_modes.py::TestSwitchGroupEditMode` | ✅ |
 
 </details>
@@ -798,24 +846,24 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `SwitchEditMode` | — | ⬜ |
-| `activate` | — | ⬜ |
-| `alignStartFrames` | — | ⬜ |
-| `auxFilePath` | — | ⬜ |
+| `SwitchEditMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `alignStartFrames` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `auxFilePath` | `unit/test_edit_mode_factories.py::TestAuxFilePath` | ✅ |
 | `checkBoxSlot` | `unit/test_switch_edit_mode.py::TestCheckBoxSlot` | ✅ |
-| `createMode` | — | ⬜ |
-| `heightChanged` | — | ⬜ |
-| `loadUI` | — | ⬜ |
-| `menu` | — | ⬜ |
-| `propertyChanged` | — | ⬜ |
-| `retimeState` | — | ⬜ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `heightChanged` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `loadUI` | `unit/test_edit_mode_ui_loading.py::TestSwitchLoadUI` | ✅ |
+| `menu` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `propertyChanged` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `retimeState` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
 | `setSelectedInput` | `unit/test_switch_edit_mode.py::TestSetSelectedInput` | ✅ |
-| `stateFunc` | — | ⬜ |
-| `updateMenu` | — | ⬜ |
+| `stateFunc` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `updateMenu` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
 | `updateUI` | `unit/test_switch_edit_mode.py::TestUpdateUIWithoutPanel` | ✅ |
-| `updateUIEvent` | — | ⬜ |
-| `useCutInfo` | — | ⬜ |
-| `widthChanged` | — | ⬜ |
+| `updateUIEvent` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `useCutInfo` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
+| `widthChanged` | `unit/test_edit_mode_menus.py::TestSwitchMenu` | ✅ |
 
 </details>
 
@@ -823,18 +871,18 @@ all-skipped run can no longer read as a pass.
 
 | Mu symbol | Python test | Status |
 |---|---|---|
-| `TransformManip` | — | ⬜ |
-| `activate` | — | ⬜ |
+| `TransformManip` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
+| `activate` | `unit/test_transform_manip_render.py::TestActivate` | ✅ |
 | `activeImageIndex` | `unit/test_transform_manip_mode.py::TestActiveImageIndex` | ✅ |
 | `afterGraphViewChange` | `unit/test_transform_manip_mode.py::TestTagLifecycle` | ✅ |
 | `beforeGraphViewChange` | `unit/test_transform_manip_mode.py::TestTagLifecycle` | ✅ |
 | `closestPointOnLine` | `unit/test_transform_manip.py::TestClosestPointOnLine` | ✅ |
 | `computeGC` | `unit/test_transform_manip.py::TestComputeGC` | ✅ |
 | `control` | `unit/test_transform_manip_mode.py::TestControlHitTest` | ✅ |
-| `createMode` | — | ⬜ |
+| `createMode` | `unit/test_edit_mode_factories.py::TestCreateMode` | ✅ |
 | `deactivate` | `unit/test_transform_manip_pointer.py::TestDeactivate` | ✅ |
 | `drag` | `unit/test_transform_manip_pointer.py::TestDragFreeTranslation` | ✅ |
-| `drawCorners` | — | ⬜ |
+| `drawCorners` | `unit/test_transform_manip_render.py::TestRenderCorners` | ✅ |
 | `editNode` | `unit/test_transform_manip_mode.py::TestEditNode` | ✅ |
 | `findEditingNodes` | `unit/test_transform_manip_mode.py::TestTagLifecycle` | ✅ |
 | `fitAll` | `unit/test_transform_manip_mode.py::TestFitAll` | ✅ |
@@ -844,7 +892,7 @@ all-skipped run can no longer read as a pass.
 | `push` | `unit/test_transform_manip_pointer.py::TestPush` | ✅ |
 | `release` | `unit/test_transform_manip_pointer.py::TestRelease` | ✅ |
 | `removeTags` | `unit/test_transform_manip_mode.py::TestTagLifecycle` | ✅ |
-| `render` | — | ⬜ |
+| `render` | `unit/test_transform_manip_render.py::TestRenderOutline` | ✅ |
 | `resetAll` | `unit/test_transform_manip_mode.py::TestResetAll` | ✅ |
 | `setManipState` | `unit/test_transform_manip_mode.py::TestSetManipState` | ✅ |
 | `tagValue` | `unit/test_transform_manip.py::TestTagValue` | ✅ |
@@ -852,20 +900,63 @@ all-skipped run can no longer read as a pass.
 </details>
 
 
-### What the remaining ⬜ rows are
+### The six ➖ rows
 
-Mostly three kinds, none of them covered by a golden scenario either:
+Four are Mu list helpers with no Python counterpart. `contains`, `indexOf` and
+`remove` are one-line loops over a `string[]`; the port spells them `in`,
+`list.index()` and a comprehension at each call site, and those call sites are
+covered. `indexOfItem` is defined in Mu and never called, so it was not ported.
 
-- **Mode lifecycle and tree construction** in `session_manager.mu.in` — `updateTree`,
-  `newNodeRow`, `makeSourceRowWidget`, `activate`/`deactivate`, the slot handlers.
-  These need a constructed dock widget, so they want either a fixture that builds the
-  mode against the fake graph or an in-RV test.
-- **Menu state functions and event wrappers** across the siblings — one-line
-  delegations (`xEvent` → `x()`), cheap to cover once a per-mode fixture exists.
-- **`StackGroup_edit_mode` and `SwitchGroup_edit_mode`** — no tests at all yet; both
-  are small.
+The other two are `SessionManagerMode` (the constructor) and `createMode`.
+Constructing the mode parents a dock widget to the session window and then
+**segfaults** under the offscreen platform — exit 139, reproducible — somewhere in
+the dock/WebEngine path. Every other method on the mode is reachable by building the
+instance with `object.__new__` and attaching the two or three real widgets it
+touches, which is how the panel, event, slot, tree and dialog test modules work. The
+constructor itself is left to the golden gates: gate 3 launches RV with the package
+loaded and all 38 scenarios drive a constructed mode.
 
----
+## Harness fixes this iteration
+
+Four things were wrong with the capture/compare path, not with the port. All four had
+been quietly weakening or destabilising the pixel gate; gate 2 went from 17/37 to
+37/37 once they were fixed.
+
+**Mouse hover leaked into every grab.** `QWidget.grab()` renders current widget state,
+and hover is part of it: the tree row under the physical pointer painted highlighted
+and a toolbar button under it painted raised. Nothing controlled where the pointer
+was, so the same scenario put an extra highlight on `OTHER` in one run and on
+`Default Stack` in the next. `qt_scenario_utils.clear_hover()` now runs before every
+grab. It has to clear two separate mechanisms: an item view keeps a private hover
+*index* (cleared by `HoverLeave`), while a button reads `WA_UnderMouse`. Clearing only
+the first left a 2/255 difference on one pixel of the inputs panel's trash button.
+
+**`findChildren()` is not safe under a `wrapInstance` root.** The first version of
+`clear_hover` enumerated the panel's children that way and left the caller's
+`QTreeView` reference dead — "Internal C++ object already deleted" in six scenarios.
+Reducing the function to the bare enumeration still killed them, so it is the
+enumeration itself: minting a second set of wrappers inside that tree invalidates the
+first. `QApplication.allWidgets()` is what the `_sm_common` accessors already use and
+does not have the problem. Worth knowing beyond this package.
+
+**Alpha channel presence was unstable.** Qt's opacity heuristic gave an RGB pixmap one
+run and RGBA the next, and `rmsImageDiff` rejects that outright with "channel size
+does not match" instead of reporting a pixel difference — so the gate could not say
+what had changed. Grabs now normalise to `QImage.Format_RGB888`.
+
+**`rmsImageDiff -cmp` exits 0 on a mismatch.** It only returns non-zero when it cannot
+compare the files at all. `compare.py` was already correct (it parses the
+"Images are matched." verdict from stdout), but an ad-hoc `rmsImageDiff ... && echo
+same` reports every mismatch as a match, and that is how a reproducible gate failure
+was briefly misread as flakiness. The comment in `compare.py` now states the trap
+explicitly.
+
+**Baselines are rendering-state sensitive.** During one full re-capture the machine's
+text rasterisation changed partway through, leaving the first 18 baselines in one
+state and the rest in another; the 18 then failed gate 2 reproducibly. Re-capturing
+them fixed it. The lesson for anyone re-capturing: capture the whole set in one
+sitting and re-run gate 2 immediately, and treat a failing set that is a contiguous
+alphabetical prefix as a capture artefact rather than a port difference.
 
 ## Code review outcome (2026-08-04)
 

@@ -29,6 +29,10 @@ PKG_DIR = os.path.abspath(
 )
 
 
+#  The single session window; see _sessionWindow() below.
+_SESSION_WINDOW = None
+
+
 class PropertyError(Exception):
     """Stands in for the exception RV raises for a bad property access."""
 
@@ -60,6 +64,9 @@ class FakeGraph:
         self.settings = {}
         self.enabledCategories = None   # None = every category enabled
         self.nodeCounter = 0
+        self.inFrame = 1                # playback in/out, distinct from cut.in/out
+        self.outFrame = 100
+        self.fps = 24.0
 
     # -- name resolution ---------------------------------------------------
 
@@ -97,6 +104,9 @@ class FakeGraph:
         group = self.addNode(name, "RVSourceGroup")
         src = self.addNode(name + "_source", "RVFileSource", group=group)
         self.seedString(src + ".media.movie", [media])
+        #  request.imageComponent is always present on a real source; newNodeRow
+        #  reads it unguarded. Empty means "no sub-component selected".
+        self.seedString(src + ".request.imageComponent", [])
         self.viewNodes.append(group)
         return group
 
@@ -205,7 +215,15 @@ class FakeGraph:
         return list(self.nodes)
 
     def nodeConnections(self, node, traverse=False):
-        return (list(self.connections.get(node, [])), [])
+        """(inputs, outputs), as RV returns them.
+
+        The outputs half is derived rather than stubbed out: deleteViewableSlot
+        counts how many folders a node feeds to decide between unlinking it and
+        deleting it outright, so an always-empty outputs list would make it delete
+        a node that two folders share.
+        """
+        outputs = [n for n, ins in self.connections.items() if node in ins]
+        return (list(self.connections.get(node, [])), outputs)
 
     def setNodeInputs(self, node, inputs):
         self.connections[node] = list(inputs)
@@ -222,6 +240,12 @@ class FakeGraph:
         self.addNode(node, nodeType)
         self.viewNodes.append(node)
         return node
+
+    def addSourceVerbose(self, media=None):
+        self.nodeCounter += 1
+        group = "sourceGroup%06d" % self.nodeCounter
+        self.addSourceGroup(group, media=(media or ["movie.mov"])[0])
+        return group + "_source"
 
     def deleteNode(self, node):
         self.deleted.append(node)
@@ -247,6 +271,15 @@ class FakeGraph:
     def sendInternalEvent(self, name, contents="", sender=""):
         self.events.append((name, contents))
         return ""
+
+    def setInPoint(self, frame):
+        self.inFrame = frame
+
+    def setOutPoint(self, frame):
+        self.outFrame = frame
+
+    def setFPS(self, fps):
+        self.fps = fps
 
     def redraw(self):
         self.redraws += 1
@@ -290,11 +323,17 @@ def install(graph=None):
     commands.frame = lambda: 1
     commands.frameStart = lambda: 1
     commands.frameEnd = lambda: 100
-    commands.inPoint = lambda: 1
-    commands.outPoint = lambda: 100
-    commands.setInPoint = lambda v: None
-    commands.setOutPoint = lambda v: None
-    commands.setFPS = lambda v: None
+    #
+    #  The in/out points are the playback range the GUI shows, distinct from the
+    #  source's own cut.in/cut.out properties. SourceGroup_edit_mode's whole job is
+    #  keeping the two in step, so a stub that discarded the writes would let a
+    #  one-directional sync pass.
+    #
+    commands.inPoint = lambda: graph.inFrame
+    commands.outPoint = lambda: graph.outFrame
+    commands.setInPoint = graph.setInPoint
+    commands.setOutPoint = graph.setOutPoint
+    commands.setFPS = graph.setFPS
     commands.sourcesRendered = lambda: []
     commands.renderedImages = lambda: []
     commands.sourceMediaInfo = lambda *a: {}
@@ -306,7 +345,12 @@ def install(graph=None):
     commands.alertPanel = lambda *a, **k: graph.alerts.append(a)
     commands.bind = lambda *a, **k: None
     commands.activateMode = lambda *a, **k: None
-    commands.addSourceVerbose = lambda *a, **k: graph.newNode("RVSourceGroup")
+    #
+    #  addSourceVerbose returns the *source* node, not the group. The package
+    #  immediately calls nodeGroup() on the result, so a stub that handed back a
+    #  bare group would make every caller write its properties onto None.
+    #
+    commands.addSourceVerbose = lambda media=None, tag="": graph.addSourceVerbose(media)
     commands.setCursor = lambda *a: None
     commands.shortAppName = lambda: "rv"
     commands.myNetworkHost = lambda: "localhost"
@@ -332,9 +376,46 @@ def install(graph=None):
 
     extra.set = _extraSet
 
+    #
+    #  RV's session window is a QMainWindow and the mode parents its dock to it, so a
+    #  real one is the faithful stand-in — returning None makes addDockWidget() fail
+    #  and the mode cannot be constructed at all. Held on the module so the wrapper
+    #  outlives the widgets parented to it, which is the same lifetime rule the port
+    #  itself has to observe.
+    #
     qtutils = types.ModuleType("rv.qtutils")
-    qtutils.sessionWindow = lambda: None
-    qtutils.sessionGLView = lambda: None
+
+    class _GLView(object):
+        """Stands in for the main GL view; the mode only forwards events to it."""
+
+        def __init__(self):
+            self.forwarded = []
+
+        def eventFilter(self, obj, event):
+            self.forwarded.append((obj, event.type()))
+            return False
+
+    def _sessionWindow():
+        #
+        #  One window for the whole process, held in a module global rather than on
+        #  this per-call qtutils stand-in. RV has exactly one session window, and a
+        #  fresh QMainWindow per importPort() left dialogs from an earlier test
+        #  parented to a window that had since been collected — which shows up as a
+        #  segfault inside QDialog.show() much later in the run, in whichever test
+        #  happened to be next.
+        #
+        global _SESSION_WINDOW
+
+        if _SESSION_WINDOW is None:
+            from PySide6 import QtWidgets as _QtWidgets
+
+            _SESSION_WINDOW = _QtWidgets.QMainWindow()
+        return _SESSION_WINDOW
+
+    qtutils._window = None
+    qtutils._glView = _GLView()
+    qtutils.sessionWindow = _sessionWindow
+    qtutils.sessionGLView = lambda: qtutils._glView
 
     runtime = types.ModuleType("rv.runtime")
     runtime.eval = lambda code, modules=None: ""
@@ -348,8 +429,18 @@ def install(graph=None):
 
         def init(self, name, globalBindings, overrideBindings, menu=None,
                  sortKey=None, ordering=None):
+            #
+            #  Everything init() is handed is retained. RV keeps the bindings and the
+            #  sort key internally with no accessor, but they are the whole
+            #  registration contract of a mode — a dropped event binding or a changed
+            #  sort key is invisible to a golden and changes when the mode runs.
+            #
             self._modeName = name
             self._menu = menu
+            self._globalBindings = globalBindings
+            self._overrideBindings = overrideBindings
+            self._sortKey = sortKey
+            self._ordering = ordering
 
         def supportPath(self, module, packageName):
             return PKG_DIR

@@ -122,7 +122,7 @@ class TestSessionReadFreeze(SequenceTest):
         self.assertFalse(self.mode._disableUpdates)
 
     # The real suppression test needs a loaded panel to observe anything, so it
-    # lives in test_editor_update_ui.py::TestSequenceUpdateUI. A version here with
+    # lives in test_editor_ui_updates.py::TestSequenceUpdateUI. A version here with
     # _ui still None could not fail: updateUI() returns early on either flag.
 
 

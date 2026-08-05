@@ -170,7 +170,13 @@ def compare_gto(
 def compare_png(golden_png: str, actual_png: str, dmax: float) -> tuple[bool, str]:
     if not os.path.isfile(RMS_IMAGE_DIFF):
         return False, f"pixel: rmsImageDiff not found at {RMS_IMAGE_DIFF}"
-    # Parse stdout's verdict line rather than relying solely on the exit code.
+    # Parse stdout's verdict line. The exit code is NOT usable: rmsImageDiff -cmp
+    # exits 0 for a mismatch as well as a match -- it only returns non-zero when it
+    # cannot read or compare the files at all (e.g. 255 for "channel size does not
+    # match"). An ad-hoc `rmsImageDiff -cmp ... && echo same` therefore reports every
+    # mismatch as a match, which is exactly how a real pixel-gate failure got
+    # misread as flakiness once. Check for "Images are matched." and nothing else.
+    #
     # Do not pass -m alongside -cmp: in the per-pixel loop, -m's branch shadows
     # -cmp's comparison entirely, so the dmax check would never run.
     proc = subprocess.run(

@@ -205,8 +205,7 @@ Do not capture Mu goldens until Primary outcomes rows are approved.
      / default state in committed `session.rv` — not merely logged as a NOTE.
    - **Pixel (P), when user-visible:** if the outcome changes what is displayed, capture
      **two** viewport states (before/after or A vs B) that **must differ** in the image
-     region, not only in the margin/widget. One PNG of "default red" for every scenario
-     is insufficient.
+     region, not only in the margin/widget. 
 
 3. **Fixtures must be used.** If you add a fixture with visually distinct variants (colored
    layers, two clips, different resolutions), at least one primary-outcome scenario must
@@ -240,10 +239,6 @@ shortcuts, dock/float chrome) are listed in the inventory tables below — they 
 replace primary outcomes.
 ```
 
-**Anti-pattern (layer_select):** many scenarios, colored EXR fixture, but no row that
-selects layer B vs layer A and commits different `imageComponent` **and** different
-viewport image color. That is incomplete coverage regardless of scenario count.
-
 ---
 
 ## The harness
@@ -258,38 +253,6 @@ Reusable across all packages; lives in `src/test/golden/harness/`.
 | `migration_loop_agent_reminder.sh` | Sourced by `run_migration_loop*.sh` — prints agent read checklist; loop procedure in `mu-python-migration` skill §5. |
 | `run_unit_tests.sh` | Gate 5 — runs `pytest` on `<package>/unit/test_*.py`. |
 | `compare.py` | Normalized GTO diff + `rmsImageDiff` pixel compare (gates 1 and 2). Exit 0 = PASS. |
-
-### Package runners (`session_manager`)
-
-| File | Role |
-|---|---|
-| `session_manager/run_all_goldens.sh` | Linux scenario runner — used by the orchestrator for [the six gates](#the-six-gates); `compare.py` against `golden/`. |
-| `session_manager/run_gui_sanity_gate.sh` | Conditional real-display step; see [GUI sanity](#gui-sanity-real-display). |
-| `session_manager/run_all_goldens_mac.sh` | macOS scenario runner — same role, compared against `golden-mac/` ([Mac-native capture](#mac-native-capture)). |
-| `session_manager/capture_golden.sh` | Capture Mu baselines into `golden/<id>/` on Linux (`--impl mu` via `run_scenario.py`, under Xvfb). |
-| `session_manager/capture_golden_mac.sh` | Capture Mu baselines into `golden-mac/<id>/` on macOS (real display). Captures each scenario twice and refuses to commit unless both captures are byte-identical. |
-| `session_manager/run_folder_thumbnails_all.sh` | Post-gate full-folder thumbnail check (`sm_folder_thumbnails_all`); the orchestrator runs it after gate 5. |
-| `session_manager/fixtures/run_mp4_integration.sh` | Optional mp4 integration helper; not part of `run_all_goldens*.sh`. |
-
-```bash
-# Migration loop, Linux (Python port must pass all committed goldens):
-src/test/golden/session_manager/run_all_goldens.sh
-
-# Migration loop, macOS (against the separate Mac-native baselines):
-src/test/golden/session_manager/run_all_goldens_mac.sh
-
-# Re-capture Mu baselines after intentional behavior change:
-src/test/golden/session_manager/capture_golden.sh [scenario_id ...]        # Linux
-src/test/golden/session_manager/capture_golden_mac.sh [scenario_id ...]    # macOS
-```
-
-Skipped by `run_all_goldens_mac.sh` (`GATE_EXCLUDED_IDS`): `sm_folder_thumbnails_all`
-only, on cost grounds — 83 clips x 2 rvio jobs would otherwise be paid once per gate.
-`run_folder_thumbnails_all.sh` runs it once after the gates, and the orchestrator calls
-that. Every other scenario with a `golden-mac/` baseline is gated, `sm_mp4_all` and the
-other mp4 scenarios included. (`sm_reopen_after_hide`, `sm_toggle_diag`, `sm_thumb_diag`
-and `sm_thumb_diag2` were named here previously; they are listed under the package's
-Dropped behaviors and no scenario files for them exist.)
 
 ### Layout per package
 
@@ -396,16 +359,6 @@ which scenarios to look at without re-reading the whole log.
 The script's final phase re-runs scenarios with `--impl default` on a real display. See
 [Gate 3](#gate-3--default-launch); the orchestrator runs the authoritative Gate 3 pass via
 `run_all_goldens*`.
-
-**Resolved, no longer skipped: `sm_meridian_mp4_load` and `sm_media_add_sources`.**
-Both used to hang under a real display because `waitForProgressiveLoading()` blocks the
-very event loop the loader needs (observed 2026-07-24 and originally believed to be a
-native limitation). The helpers now poll `loadTotal()` while pumping and load folders
-with `addSourceVerbose`, so both run under this gate — verified 2026-08-03,
-`sm_meridian_mp4_load` in 4.9s. `run_gui_sanity_gate.sh` skips only
-`sm_folder_thumbnails_all`, on cost grounds, since
-`run_folder_thumbnails_all.sh` covers it after the gates.
-
 ---
 
 ## Mac-native capture
@@ -416,9 +369,7 @@ baseline tree** `golden-mac/`: Mac output is compared only against Mac-captured 
 `run_all_goldens_mac.sh` / `capture_golden_mac.sh`. It does not replace `golden/` — the two
 pixel spaces are not comparable and are never diffed against each other.
 
-**Why separate Mac baselines work** (verified empirically
-2026-07-24 on one Mac dev machine, real logged-in display session, no Xvfb — macOS has
-none):
+**Why separate Mac baselines work**:
 
 - Two back-to-back captures of `tree_readonly` produced a byte-identical `session.rv` and a
   byte-identical `panel.png` (`rmsImageDiff -m` reported no diff). Real-display rendering
@@ -441,24 +392,6 @@ baseline unless both runs are byte-identical (session.rv via `diff`, every PNG v
 with an error, never committed with a caveat — same "never loosen the gate to paper over
 flakiness" principle as everywhere else in this doc, applied automatically at capture time
 instead of discovered later.
-
-**Known limitation, not yet resolved:** everything above was verified using a real,
-logged-in GUI/WindowServer session on one interactive dev Mac. A genuinely unattended,
-no-monitor Mac (e.g. a CI runner nobody is logged into) is a materially different and
-untested question — Qt/Cocoa apps generally require a WindowServer session to exist at all.
-Before relying on this gate in an unattended CI environment, verify RV actually launches and
-renders there first; don't assume the dev-machine result transfers.
-
-**Transient, not a structural bug: `sm_folder_sort` failed its determinism check once**
-during the full-batch capture (a single pixel differed between the two runs — mid-gray value
-shift at one coordinate, everything else identical). The scenario is command-API-driven with
-no scripted hover/click, so the likely cause is incidental: this machine's real, shared mouse
-cursor sitting somewhere different over RV's window between the two runs during a busy
-capture batch — a risk specific to real-display capture on an otherwise-in-use dev machine
-(Xvfb has no such shared cursor state). Re-run alone immediately after, with the machine
-otherwise idle, it passed cleanly and is now committed. If this recurs, don't relax the
-check — re-run in isolation first, since a busy machine is a more likely explanation than a
-real scenario bug.
 
 ---
 

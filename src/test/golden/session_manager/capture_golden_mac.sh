@@ -125,6 +125,20 @@ for id in "${ids[@]}"; do
         det_ok=0
     fi
     rm -f "$tmp1" "$tmp2"
+    #
+    #  One scenario is exempt from PNG determinism. sm_folder_thumbnails_all loads
+    #  83 clips, and at that many rows Qt re-rasterises the row labels with
+    #  different subpixel weights between two runs of the same implementation --
+    #  same glyphs and same layout, but glyph-edge deltas up to 167/255. It is
+    #  gated behaviorally instead (see run_folder_thumbnails_all.sh), so its PNGs
+    #  are reference images for a human to eyeball, not gated baselines. The
+    #  12-clip sm_folder_thumbnails does capture deterministically and keeps the
+    #  pixel-exact check on the same panel.
+    #
+    png_determinism=1
+    case "$id" in
+        sm_folder_thumbnails_all) png_determinism=0 ;;
+    esac
     for png in "$out1"/*.png; do
         [ -f "$png" ] || continue
         name="$(basename "$png")"
@@ -134,8 +148,13 @@ for id in "${ids[@]}"; do
             continue
         fi
         if ! pngs_identical "$png" "$out2/$name"; then
-            echo "FAIL $id: $name not deterministic"
-            det_ok=0
+            if [ "$png_determinism" -eq 0 ]; then
+                echo "note $id: $name differs between runs (text rasterisation; "\
+                     "not gated on pixels, see run_folder_thumbnails_all.sh)"
+            else
+                echo "FAIL $id: $name not deterministic"
+                det_ok=0
+            fi
         fi
     done
     # Every scenario must pin its outcome in pixels, so a run that produced no PNG

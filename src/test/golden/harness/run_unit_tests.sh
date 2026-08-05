@@ -73,8 +73,10 @@ echo "Gate 5: running ${#_tests[@]} unit test module(s) in $_UNIT_DIR"
 echo "Gate 5: interpreter $_PY"
 
 # Headless: the tests build real widgets, so Qt needs a platform plugin that does
-# not require a display.
-export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-minimal}"
+# not require a display. "offscreen" rather than "minimal" — minimal has no window
+# surface, and QDialog.show() segfaults on it, which would put the Create Image and
+# New Node by Type dialogs out of reach of gate 5 for no good reason.
+export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}"
 
 _run_and_check() {
     # A run whose every test was skipped is not a pass either: skips are legitimate

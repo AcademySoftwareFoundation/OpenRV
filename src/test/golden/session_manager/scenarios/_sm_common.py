@@ -12,7 +12,7 @@ import time
 
 import rv.commands as rvc
 import rv.qtutils as qtutils
-from qt_scenario_utils import QtCore, QtWidgets, QTest, pump, click_button, open_tool_button_menu, click_menu_action
+from qt_scenario_utils import QtCore, QtWidgets, QTest, pump, clear_hover, opaque_rgb, click_button, open_tool_button_menu, click_menu_action
 
 SM_MODE = "session_manager"
 
@@ -609,6 +609,74 @@ def select_tree_item_for_node(tree_view, node: str, log=None) -> bool:
     return search(root)
 
 
+def the_mode(log=None):
+    """The session manager mode object, whichever implementation is loaded.
+
+    The Python port exposes it as a module global; under the Mu implementation the
+    module has no mode and this returns None, so callers that need the mode must
+    assert on it rather than assume.
+    """
+    try:
+        import session_manager
+
+        mode = session_manager.theMode()
+    except Exception as exc:
+        if log:
+            log("the_mode unavailable:", exc)
+        return None
+    if log:
+        log("the_mode ->", type(mode).__name__ if mode else None)
+    return mode
+
+
+def select_tree_items_for_nodes(tree_view, nodes, log=None) -> list:
+    """Select several tree rows at once, for the multi-selection behaviours.
+
+    select_tree_item_for_node() replaces the selection each time (it uses
+    SelectCurrent and also synthesises a plain click), so it cannot build up a
+    multi-row selection. This adds each row with Select instead and leaves the
+    click out, since a plain click would collapse the selection again.
+    """
+    tv = _safe_tree_view(tree_view, log=log)
+    if tv is None:
+        return []
+    try:
+        model = tv.model()
+    except RuntimeError:
+        return []
+    if model is None:
+        return []
+
+    wanted = list(nodes)
+    found = []
+    root = model.invisibleRootItem()
+
+    def walk(parent_item):
+        for row in range(parent_item.rowCount()):
+            item = parent_item.child(row, 0)
+            if item is None:
+                continue
+            node = item.data(QtCore.Qt.UserRole + 2)
+            isSubComponent = item.data(QtCore.Qt.UserRole + 4) not in (None, 0)
+            if node in wanted and not isSubComponent and node not in found:
+                idx = model.indexFromItem(item)
+                tv.scrollTo(idx)
+                tv.selectionModel().select(
+                    idx,
+                    QtCore.QItemSelectionModel.Select
+                    | QtCore.QItemSelectionModel.Rows,
+                )
+                found.append(node)
+            walk(item)
+
+    tv.selectionModel().clearSelection()
+    walk(root)
+    pump(400)
+    if log:
+        log("selected", len(found), "of", len(wanted), "requested rows:", found)
+    return found
+
+
 def get_inputs_node_list(inputs_view=None, log=None) -> list[str]:
     """Return list of node names from the inputs view model (UserRole+2 data).
 
@@ -812,6 +880,295 @@ def wait_for_all_previews(expected: int, timeout_s: float = 900.0, log=None) -> 
         log("preview generation finished:", thumbs, "thumbnails,", strips, "filmstrips in",
             round(time.time() - start, 1), "s (expected", expected, "each)")
     return (thumbs, strips)
+
+
+def trigger_menu_action(button, label, log=None):
+    """Trigger the action named `label` in a QToolButton's menu.
+
+    Scenarios drive the package the way a user does, through the real menu action,
+    because they have to run against BOTH implementations: baselines are captured
+    from Mu, where the Python module's mode object does not exist, so a scenario
+    that called mode methods could never be baselined.
+
+    Matching ignores '&' accelerators and leading/trailing space, since the menu
+    labels carry indentation for grouping.
+    """
+    menu = open_tool_button_menu(button)
+    wanted = label.replace("&", "").strip()
+    target = None
+    available = []
+    for action in menu.actions():
+        text = action.text().replace("&", "").strip()
+        available.append(text)
+        if text == wanted:
+            target = action
+            break
+    assert target is not None, (
+        "menu action %r not found; available: %s" % (label, available))
+    assert target.isEnabled(), "menu action %r is disabled" % label
+    target.trigger()
+    pump(600)
+    try:
+        menu.close()
+    except RuntimeError:
+        pass          # triggering can rebuild the panel and take the menu with it
+    pump(300)
+    if log:
+        log("triggered menu action", wanted)
+    return True
+
+
+def submenu_action_labels(button, submenu_label, log=None) -> list:
+    """The action labels inside a named submenu, for the menu-structure rows."""
+    menu = open_tool_button_menu(button)
+    wanted = submenu_label.replace("&", "").strip()
+    for action in menu.actions():
+        if action.text().replace("&", "").strip() == wanted and action.menu():
+            labels = [a.text().replace("&", "").strip() for a in action.menu().actions()]
+            if log:
+                log("submenu", wanted, "->", labels)
+            try:
+                menu.close()
+            except RuntimeError:
+                pass
+            return labels
+    labels = [a.text().replace("&", "").strip() for a in menu.actions()]
+    if log:
+        log("no submenu", wanted, "; top level:", labels)
+    try:
+        menu.close()
+    except RuntimeError:
+        pass
+    return []
+
+
+def select_tree_item_under_parent(parent_node: str, node: str, tree_view=None,
+                                  log=None) -> bool:
+    """Select `node`'s row that sits beneath `parent_node`'s row.
+
+    Which row is selected changes what Delete does: from the top-level category row
+    the node is deleted outright (E1), while from inside a folder it is only removed
+    as that folder's input when it still has other parents (E2). Selecting "the first
+    row for this node" cannot distinguish them.
+    """
+    tv = _safe_tree_view(tree_view, log=log)
+    if tv is None:
+        return False
+    model = tv.model()
+    if model is None:
+        return False
+
+    def find_parent(parent_item):
+        for row in range(parent_item.rowCount()):
+            item = parent_item.child(row, 0)
+            if item is None:
+                continue
+            if item.data(QtCore.Qt.UserRole + 2) == parent_node:
+                return item
+            hit = find_parent(item)
+            if hit is not None:
+                return hit
+        return None
+
+    parent_item = find_parent(model.invisibleRootItem())
+    if parent_item is None:
+        if log:
+            log("no row found for parent", parent_node)
+        return False
+
+    tv.expand(model.indexFromItem(parent_item))
+    pump(200)
+
+    for row in range(parent_item.rowCount()):
+        item = parent_item.child(row, 0)
+        if item is None:
+            continue
+        if item.data(QtCore.Qt.UserRole + 2) != node:
+            continue
+        if item.data(QtCore.Qt.UserRole + 4) not in (None, 0):
+            continue                      # a sub-component row, not the node row
+        idx = model.indexFromItem(item)
+        tv.scrollTo(idx)
+        tv.setCurrentIndex(idx)
+        tv.selectionModel().select(
+            idx,
+            QtCore.QItemSelectionModel.SelectCurrent
+            | QtCore.QItemSelectionModel.Rows,
+        )
+        pump(300)
+        if log:
+            log("selected", node, "under", parent_node, "row", row)
+        return True
+
+    if log:
+        log("no row for", node, "under", parent_node)
+    return False
+
+
+def double_click_tree_item_for_node(tree_view, node: str, log=None) -> bool:
+    """Double-click the top-level tree row for `node` (COVERAGE B2).
+
+    A double-click has to land on the row's own viewport rect, and the row must be
+    the node's own row rather than one of its sub-component children, which carry the
+    same node in UserRole+2.
+    """
+    from qt_scenario_utils import QTest
+
+    tv = _safe_tree_view(tree_view, log=log)
+    if tv is None:
+        return False
+    model = tv.model()
+    if model is None:
+        return False
+
+    def walk(parent_item):
+        for row in range(parent_item.rowCount()):
+            item = parent_item.child(row, 0)
+            if item is None:
+                continue
+            if (item.data(QtCore.Qt.UserRole + 2) == node
+                    and item.data(QtCore.Qt.UserRole + 4) in (None, 0)):
+                idx = model.indexFromItem(item)
+                tv.scrollTo(idx)
+                tv.setCurrentIndex(idx)
+                pump(200)
+                rect = tv.visualRect(idx)
+                if rect.isValid() and rect.width() > 0:
+                    QTest.mouseDClick(
+                        tv.viewport(),
+                        QtCore.Qt.LeftButton,
+                        QtCore.Qt.NoModifier,
+                        rect.center(),
+                    )
+                    pump(600)
+                    if log:
+                        log("double-clicked tree row for", node)
+                    return True
+            if walk(item):
+                return True
+        return False
+
+    return walk(model.invisibleRootItem())
+
+
+def double_click_inputs_item(node: str, inputs_view=None, log=None) -> bool:
+    """Double-click the inputs-panel row standing for `node` (COVERAGE G10)."""
+    from qt_scenario_utils import QTest
+
+    iv = _safe_inputs_view(inputs_view, log=log)
+    if iv is None:
+        return False
+    model = iv.model()
+    if model is None:
+        return False
+
+    for row in range(model.rowCount()):
+        item = model.item(row)
+        if item is None:
+            continue
+        if item.data(QtCore.Qt.UserRole + 2) != node:
+            continue
+        idx = model.indexFromItem(item)
+        iv.scrollTo(idx)
+        iv.setCurrentIndex(idx)
+        pump(200)
+        rect = iv.visualRect(idx)
+        if rect.isValid() and rect.width() > 0:
+            QTest.mouseDClick(
+                iv.viewport(),
+                QtCore.Qt.LeftButton,
+                QtCore.Qt.NoModifier,
+                rect.center(),
+            )
+            pump(600)
+            if log:
+                log("double-clicked inputs row for", node)
+            return True
+    if log:
+        log("no inputs row for", node)
+    return False
+
+
+def source_node_of_group(group: str):
+    """The RVFileSource/RVImageSource inside a source group."""
+    for n in rvc.nodesInGroup(group):
+        if rvc.nodeType(n) in ("RVFileSource", "RVImageSource"):
+            return n
+    return None
+
+
+def inputs_rows_with_widgets(inputs_view=None, log=None) -> int:
+    """How many inputs-panel rows carry an index widget (COVERAGE G2).
+
+    updateInputs() installs a source-row widget only for source inputs and only when
+    previews are on, so this count is the discriminant between the two states.
+    """
+    iv = _safe_inputs_view(inputs_view, log=log)
+    if iv is None:
+        return 0
+    model = iv.model()
+    if model is None:
+        return 0
+    n = 0
+    for row in range(model.rowCount()):
+        item = model.item(row)
+        if item is None:
+            continue
+        if iv.indexWidget(model.indexFromItem(item)) is not None:
+            n += 1
+    if log:
+        log("inputs rows with an index widget:", n, "of", model.rowCount())
+    return n
+
+
+def editor_tab_names(log=None) -> list:
+    """Names of the per-type editors currently loaded into the panel (COVERAGE J4).
+
+    addEditor() puts each one in as a top-level row of the editor QTreeWidget, so the
+    row labels are the observable — implementation-agnostic, unlike asking the mode.
+    """
+    from PySide6 import QtWidgets
+
+    base = find_base_widget(log=log)
+    if base is None:
+        return []
+    names = []
+    for tw in base.findChildren(QtWidgets.QTreeWidget):
+        for row in range(tw.topLevelItemCount()):
+            item = tw.topLevelItem(row)
+            if item is not None and item.text(0):
+                names.append(item.text(0))
+    if log:
+        log("editor rows:", names)
+    return names
+
+
+def tree_selected_nodes(tree_view=None, log=None) -> list:
+    """The nodes currently selected in the tree, read straight off the widget.
+
+    Implementation-agnostic stand-in for the mode's selectedNodes(): reads the
+    selection model rather than asking the mode, so it works under Mu too.
+    """
+    tv = _safe_tree_view(tree_view, log=log)
+    if tv is None:
+        return []
+    model = tv.model()
+    if model is None:
+        return []
+    nodes = []
+    for idx in tv.selectionModel().selectedIndexes():
+        if idx.column() != 0:
+            continue
+        item = model.itemFromIndex(idx)
+        if item is None:
+            continue
+        node = item.data(QtCore.Qt.UserRole + 2)
+        isSubComponent = item.data(QtCore.Qt.UserRole + 4) not in (None, 0)
+        if node and not isSubComponent and rvc.nodeExists(node) and node not in nodes:
+            nodes.append(node)
+    if log:
+        log("tree selection:", nodes)
+    return nodes
 
 
 def find_config_menu(log=None):
@@ -1091,10 +1448,17 @@ def wait_for_progressive_loading(
 # ---------------------------------------------------------------------------
 
 def grab_widget_png(widget, out_dir: str, name: str, w: int, h: int, log=None) -> str:
-    """Grab widget at fixed logical size w×h and save to out_dir/name.png."""
+    """Grab widget at fixed logical size w×h and save to out_dir/name.png.
+
+    Hover is cleared first — see qt_scenario_utils.clear_hover(). Without it the
+    row under the physical mouse pointer paints highlighted and the PNG depends on
+    where the pointer happened to be.
+    """
     assert widget is not None, f"grab_widget_png: widget for {name} is None"
     widget.setFixedSize(w, h)
     pump(300)
+    clear_hover(widget)
+    pump(50)
     pixmap = widget.grab()
     if pixmap.width() != w or pixmap.height() != h:
         pixmap = pixmap.scaled(
@@ -1103,6 +1467,8 @@ def grab_widget_png(widget, out_dir: str, name: str, w: int, h: int, log=None) -
             QtCore.Qt.FastTransformation,
         )
     path = os.path.join(out_dir, name)
+    #  Fixed 8-bit RGB: see qt_scenario_utils.opaque_rgb().
+    pixmap = opaque_rgb(pixmap)
     ok = pixmap.save(path, "PNG")
     assert ok, f"grab_widget_png: failed to save {path}"
     if log:
