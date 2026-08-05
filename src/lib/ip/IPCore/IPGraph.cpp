@@ -322,6 +322,27 @@ namespace IPCore
 
     IPGraph::~IPGraph()
     {
+        //
+        //  Explicitly delete all nodes so that source nodes close their
+        //  decoders (e.g. MovieFFMpegReader::close()) before the graph is
+        //  destroyed. Session::clear() skips graph().reset() when being
+        //  deleted, so without this the nodes are never freed on exit.
+        //
+
+        for (auto& [name, node] : m_viewNodeMap)
+        {
+            node->willDelete();
+            node->disconnectInputs();
+        }
+
+        while (!m_viewNodeMap.empty())
+        {
+            IPNode* node = m_viewNodeMap.begin()->second;
+            delete node;
+        }
+
+        m_nodeMap.clear();
+
         if (m_jobDispatcher)
         {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);

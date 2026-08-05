@@ -416,7 +416,16 @@ namespace TwkMovie
             ~Reservation();
 
         private:
-            Context* m_context;
+            //
+            //  The Context is looked up by key rather than held by pointer:
+            //  a stored Context* would dangle if the entry were erased (by
+            //  flushContext()) while this Reservation was alive, and the
+            //  destructor's "does my entry still exist" check could not
+            //  detect that without dereferencing the very node in question.
+            //
+
+            MovieFFMpegReader* m_reader;
+            int m_streamIndex;
             int m_dbline;
             int m_dblline;
         };
@@ -445,8 +454,14 @@ namespace TwkMovie
     //
     //  Global pool object:
     //
+    // The global context pool caps the number of simultaneously-open decoder
+    // threads. It was disabled during the FFmpeg 6.0 migration because a context
+    // cannot be reopened after being closed
+    // (https://ffmpeg.org/doxygen/trunk/deprecated.html). That is now handled:
+    // when the pool evicts a context it frees it and nulls the owning track's
+    // avCodecContext, so openAVCodec() allocates a fresh context on next use.
 
-    ContextPool* globalContextPool = 0;
+    std::unique_ptr<ContextPool> globalContextPool{nullptr};
 
     void ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
     {
@@ -474,7 +489,8 @@ namespace TwkMovie
     }
 
     ContextPool::Reservation::Reservation(MovieFFMpegReader* reader, int streamIndex)
-        : m_context(0)
+        : m_reader(reader)
+        , m_streamIndex(streamIndex)
         , m_dbline(0)
         , m_dblline(0)
     {
@@ -491,7 +507,6 @@ namespace TwkMovie
         //
 
         Context& context = gcp.m_contextMap[ContextKey(reader, streamIndex)];
-        m_context = &context;
 
         context.reserved = true;
         context.reader = reader;
@@ -528,6 +543,7 @@ namespace TwkMovie
                 //
 
                 cout << "ERROR: Attempted to reuse reserved context! (" << closeContext.reader->filename() << ")" << endl;
+                gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
             }
             else if (closeContext.avContext)
             {
@@ -539,9 +555,15 @@ namespace TwkMovie
                 avcodec_free_context(&closeContext.avContext);
 
                 if (closeContext.vTrack)
+                {
+                    closeContext.vTrack->avCodecContext = nullptr;
                     closeContext.vTrack->isOpen = false;
+                }
                 if (closeContext.aTrack)
+                {
+                    closeContext.aTrack->avCodecContext = nullptr;
                     closeContext.aTrack->isOpen = false;
+                }
             }
         }
     }
@@ -555,17 +577,13 @@ namespace TwkMovie
 
         LockGuard lock(gcp.m_mutex);
 
-        Context& context = *m_context;
+        ContextMap::iterator i = gcp.m_contextMap.find(ContextKey(m_reader, m_streamIndex));
+        if (i == gcp.m_contextMap.end())
+            return;
+
+        Context& context = i->second;
 
         context.reserved = false;
-
-        //
-        //  Make sure the context still exists and we aren't closing.
-        //
-
-        ContextKey key(context.reader, context.streamIndex);
-        if (gcp.m_contextMap.find(key) == gcp.m_contextMap.end())
-            return;
 
         //
         //  If this is the first time we've encountered this Context, it's only
@@ -576,8 +594,6 @@ namespace TwkMovie
 
         if (!context.avContext)
         {
-            AVStream* avStream = context.reader->m_avFormatContext->streams[context.streamIndex];
-
             context.reader->trackFromStreamIndex(context.streamIndex, context.vTrack, context.aTrack);
             if (context.vTrack)
             {
@@ -1154,11 +1170,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_audioTracks.size(); i++)
         {
             AudioTrack* track = m_audioTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_audioTracks.resize(0);
@@ -1166,22 +1182,14 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_videoTracks.resize(0);
-
-        for (map<int, int>::iterator i = m_subtitleMap.begin(); i != m_subtitleMap.end(); ++i)
-        {
-            if (i->second)
-                ContextPool::flushContext(this, i->first);
-            //  XXX We should be closing these streams too once we are opening
-            //  them
-        }
 
         if (m_avFormatContext)
             avformat_close_input(&m_avFormatContext);
@@ -1252,7 +1260,6 @@ namespace TwkMovie
             }
             mov->m_timecodeTrack = m_timecodeTrack;
             mov->m_formatStartFrame = m_formatStartFrame;
-            mov->m_subtitleMap = m_subtitleMap;
             mov->m_multiTrackAudio = m_multiTrackAudio;
         }
         mov->m_cloning = false;
@@ -2318,21 +2325,27 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Video Track: " << i);
                 if (heroVideoTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
                     VideoTrack* track = new VideoTrack;
+                    ContextPool::Reservation reserve(this, i);
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     track->useAppleProRes = isProRes;
 #endif
                     if (isJ2K)
                     {
-                        track->number = i;
-                        ostringstream trackName;
-                        trackName << "track " << m_videoTracks.size() + 1;
-                        track->name = trackName.str();
-                        track->isOpen = true;
-                        openAVCodec(i, &track->avCodecContext, &track->hardwareContext);
-                        m_videoTracks.push_back(track);
+                        if (openAVCodec(i, &track->avCodecContext, &track->hardwareContext))
+                        {
+                            track->number = i;
+                            ostringstream trackName;
+                            trackName << "track " << m_videoTracks.size() + 1;
+                            track->name = trackName.str();
+                            track->isOpen = true;
+                            m_videoTracks.push_back(track);
+                        }
+                        else
+                        {
+                            delete track;
+                        }
                     }
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     else if (isProRes)
@@ -2441,8 +2454,8 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Audio Track: " << i);
                 if (heroAudioTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
                     AudioTrack* track = new AudioTrack;
+                    ContextPool::Reservation reserve(this, i);
                     if (openAVCodec(i, &track->avCodecContext))
                     {
                         track->number = i;
@@ -2470,16 +2483,6 @@ namespace TwkMovie
                 break;
             case AVMEDIA_TYPE_SUBTITLE:
                 DBL(DB_METADATA, "Subtitle Track: " << i);
-                {
-                    // TODO Need to allocate memory now in ffmpeg6
-                    // #if DB_LEVEL & DB_SUBTITLES
-                    //    ContextPool::Reservation reserve(this, i);
-                    //    if (openAVCodec(i))
-                    //    {
-                    //        m_subtitleMap[i] = 1;
-                    //    }
-                    // #endif
-                }
                 break;
             case AVMEDIA_TYPE_UNKNOWN:
             default:
@@ -2505,14 +2508,6 @@ namespace TwkMovie
         // Capture video metadata information for the frame buffer attributes
         if (m_videoTracks.size() > 0)
             initializeVideo(height, width);
-
-// Initialize subtitles
-#if DB_LEVEL & DB_SUBTITLES
-        if (m_subtitleMap.size() > 0)
-        {
-            m_info.proxy.newAttribute("SubtitleTracks", m_subtitleMap.size());
-        }
-#endif
 
         // Look for chapters
         m_info.chapters.resize(m_avFormatContext->nb_chapters);
@@ -2740,8 +2735,8 @@ namespace TwkMovie
             AVChannelLayout layout = audioCodecContext->ch_layout;
             audioChannels = idAudioChannels(layout, numChannels);
 
-            // XXX Assume this thread will never decode audio
-            avcodec_free_context(&audioCodecContext);
+            ContextPool::flushContext(this, track->number);
+            avcodec_free_context(&track->avCodecContext);
             track->isOpen = false;
         }
 
@@ -3588,13 +3583,6 @@ namespace TwkMovie
                     TWK_THROW_EXC_STREAM("av_read_frame failed in video stream.");
                 }
             }
-#if DB_LEVEL & DB_SUBTITLES
-            if (m_subtitleMap.find(track->videoPacket->stream_index) != m_subtitleMap.end()
-                && correctLang(track->videoPacket->stream_index))
-            {
-                readSubtitle(track);
-            }
-#endif
         } while ((track->videoPacket->stream_index != track->number) && !finalPacket);
 
         // If we get a valid timestamp here then we should add it to
@@ -4167,51 +4155,6 @@ namespace TwkMovie
 #endif
 
         DBL(DB_VIDEO, "Got a frame and buggin' out!!!\n");
-    }
-
-    void MovieFFMpegReader::readSubtitle(VideoTrack* track)
-    {
-        //    openAVCodec(track->videoPacket->stream_index);
-        //    AVCodecContext* subtitleCodecContext =
-        //        m_avFormatContext->streams[track->videoPacket->stream_index]->codec;
-        //    ASSSplitContext* assSplitContext = ff_ass_split(
-        //        (const char*) subtitleCodecContext->subtitle_header);
-        //    ASS* ass = (ASS*)assSplitContext;
-        //    AVSubtitle subtitle;
-        //    int subtitleFinished = 0;
-        //    if (0 < avcodec_decode_subtitle2(subtitleCodecContext,
-        //            &subtitle, &subtitleFinished, track->videoPacket))
-        //    {
-        //        ostringstream text;
-        //        for (int r = 0; r < subtitle.num_rects; r++)
-        //        {
-        //            AVSubtitleRect* rect = subtitle.rects[r];
-        //            switch (rect->type)
-        //            {
-        //                case SUBTITLE_ASS:
-        //                    {
-        //                        ASSDialog* dialog = ff_ass_split_dialog(
-        //                            assSplitContext, rect->ass, 0, NULL);
-        //                        DBL (DB_SUBTITLES, "'" << dialog->text <<
-        //                        "'"); text << dialog->text << " ";
-        //                    }
-        //                    break;
-        //                case SUBTITLE_TEXT:
-        //                    text << rect->text << " ";
-        //                    break;
-        //                default:
-        //                    ostringstream message;
-        //                    message << "Unhandled type of subtitle: '" <<
-        //                    rect->type << "'"; report(message.str(), true);
-        //                    break;
-        //            }
-        //        }
-        //        DBL (DB_SUBTITLES, "freeing subtitle");
-        //        avsubtitle_free(&subtitle);
-        //        track->fb.newAttribute("SubtitleText", text.str());
-        //        track->fb.newAttribute("SubtitleLanguage",
-        //            streamLang(track->videoPacket->stream_index));
-        //    }
     }
 
     void MovieFFMpegReader::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)
@@ -5944,28 +5887,20 @@ namespace TwkMovie
             addType(formatsItr->first, formatsItr->second.first, formatsItr->second.second, video, audio, separams, sdparams);
         }
 
-        // Note : No longer using the global context pool (since FFmpeg 6.0)
-        // Rationale: The global context pool was based on the premise that a
-        // context could be opened and closed multiple times. However, with
-        // FFmpeg 6.0, this premise is no longer valid and was causing crashes.
-        // As per the FFmpeg 6 documentation:
-        // https://ffmpeg.org/doxygen/trunk/deprecated.html: "Opening and
-        // closing a codec context multiple times is not supported anymore – use
-        // multiple codec contexts instead."
-
-        // if (!globalContextPool)
-        // {
-        //     int poolSize = 500;
-        //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-        //     {
-        //         int poolSize = atoi(c);
-        //     }
-        //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-        //     else
-        //     {
-        //         report("Disabling mio_ffmpeg context thread pool.", true);
-        //     }
-        // }
+        if (!globalContextPool)
+        {
+            int poolSize = 500;
+            if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
+            {
+                poolSize = atoi(c);
+            }
+            if (poolSize > 0)
+                globalContextPool = std::make_unique<ContextPool>(poolSize);
+            else
+            {
+                report("Disabling mio_ffmpeg context thread pool.", true);
+            }
+        }
     }
 
     MovieFFMpegIO::~MovieFFMpegIO()
