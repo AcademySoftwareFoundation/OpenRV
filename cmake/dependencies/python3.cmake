@@ -415,7 +415,7 @@ LIST(
   install
   --upgrade
   --no-cache-dir
-  --force-reuinstall
+  --force-reinstall
   --no-binary
   :all:
   --only-binary

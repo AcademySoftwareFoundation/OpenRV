@@ -13,6 +13,26 @@ ADD_LIBRARY(yaml_cpp STATIC IMPORTED GLOBAL)
 ADD_DEPENDENCIES(yaml_cpp RV_DEPS_OCIO)
 IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
   # Here the postfix is "d" and not "_d": the postfix inside OCIO is: "d".
+  SET(_debug_postfix
+      "d"
+  )
+  MESSAGE(DEBUG "Using debug postfix: '${_debug_postfix}'")
+ELSE()
+  SET(_debug_postfix
+      ""
+  )
+ENDIF()
+
+IF(RHEL_VERBOSE)
+  SET(_lib_dir
+      ${RV_DEPS_OCIO_DIST_DIR}/lib64
+  )
+ELSE()
+  SET(_lib_dir
+      ${RV_DEPS_OCIO_DIST_DIR}/lib
+  )
+ENDIF()
+
 SET(_ocio_yaml_cpp_libpath
     ${_lib_dir}/${CMAKE_STATIC_LIBRARY_PREFIX}yaml-cpp${_debug_postfix}${CMAKE_STATIC_LIBRARY_SUFFIX}
 )
