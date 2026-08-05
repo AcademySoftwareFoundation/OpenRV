@@ -1089,7 +1089,8 @@ namespace Rv
         if (!m_prefDialog)
         {
             Rv::Session* session = Rv::Session::currentSession();
-            assert(session);
+            if (!session)
+                return nullptr;
             RvDocument* rvDoc = (RvDocument*)session->opaquePointer();
             m_prefDialog = new RvPreferences(rvDoc);
             QRect docGeom = rvDoc->geometry();
@@ -1136,6 +1137,8 @@ namespace Rv
         }
 
         RvPreferences* prefs = prefDialog();
+        if (!prefs)
+            return;
         prefs->update();
 
         const TwkApp::Application::Documents& docs = documents();

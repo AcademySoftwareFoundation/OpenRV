@@ -2019,6 +2019,7 @@ namespace Rv
         {
             m_globalSettingsP->sync();
             delete m_globalSettingsP;
+            m_globalSettingsP = nullptr;
         }
     }
 
