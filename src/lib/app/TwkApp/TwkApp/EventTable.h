@@ -72,6 +72,15 @@ namespace TwkApp
         void unbindRegex(const std::string& eventRegex);
 
         //
+        //  Move an existing event to a new event. The action currently bound
+        //  to oldEvent is re-bound to newEvent (replacing any existing binding
+        //  there) and the oldEvent binding is removed.
+        //
+
+        void rebind(const std::string& oldEvent, const std::string& newEvent);
+        void rebindRegex(const std::string& oldEventRegex, const std::string& newEventRegex);
+
+        //
         //  ROI
         //
 
