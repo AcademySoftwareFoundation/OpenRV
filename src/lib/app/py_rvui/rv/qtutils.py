@@ -16,6 +16,7 @@ except ImportError:
         from PySide6 import QtGui, QtWidgets
         from PySide6.QtGui import *
         from PySide6.QtWidgets import *
+        from PySide6.QtOpenGLWidgets import QOpenGLWidget
         from shiboken6 import wrapInstance
         from shiboken6 import getCppPointer
     except ImportError:
