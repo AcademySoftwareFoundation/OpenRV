@@ -15,13 +15,12 @@ namespace TwkApp
     //
     //  Single shared crash-reporting init path for every RV executable (rv, the
     //  macOS RV bundle app, rvio, ...). Resolves the platform-specific crashpad
-    //  handler *wrapper* sitting next to the executable, initializes the crash
-    //  handler, and - on success - enables Mu debugging so dumps carry script
-    //  source context.
+    //  handler *wrapper* sitting next to the executable and initializes the
+    //  crash handler.
     //
     //  Per-executable copies of this sequence are how the entry points drifted
-    //  apart (bare handler vs wrapper, missing setDebugging); all binaries MUST
-    //  call this instead. See docs/crash-reporting.md (contracts C4/C5).
+    //  apart (bare handler vs wrapper); all binaries MUST call this instead.
+    //  See docs/crash-reporting.md (contracts C4/C5).
     //
     //  The handler path is resolved as executableDir + "/" + the fixed wrapper
     //  name for the platform:

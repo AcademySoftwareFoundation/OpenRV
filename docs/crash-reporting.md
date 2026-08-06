@@ -184,6 +184,15 @@ key: Mu context is function-level (see C2 for why line-level cannot be captured 
    them from Release installs — the macOS/Linux `symbols/` tree and the Windows `.pdb` files. (Debug
    installs keep them for local debugging; the strip is gated on `CMAKE_INSTALL_CONFIG_NAME`.)
    Customers never symbolicate, so shipping symbols only bloats the package.
+
+   In addition, the *staged binaries themselves* must not embed DWARF. Release compiles with `-g`
+   (so `dump_syms` can extract the `.sym` above), but on Linux the shipped artifact is the `stage`
+   tree itself — not a `cmake --install` output — so the install-time strip never runs on it.
+   Therefore `rv_stage.cmake` runs `strip --strip-debug` on each staged Linux binary in Release,
+   *after* `dump_syms` has read the DWARF and *before* the `.bin` rename. This keeps `.symtab` and
+   the GNU build-id (the key for the `symbols/` tree), so the DWARF lives only in the
+   `symbols_archive` zip while the shipped binaries carry none. macOS Mach-O binaries do not embed
+   DWARF (it stays in the dSYM), so no equivalent strip is needed there.
 3. The `symbols_archive` build target (`rv_archive_symbols.cmake`) instead packages a versioned,
    per-platform `RV-<version>-<os>-<arch>-symbols.zip` under `stage/packages/`:
    - macOS/Linux: the Breakpad `symbols/` tree plus the symbolication tools (`minidump_stackwalk`,
@@ -239,12 +248,12 @@ violates. This list is a remediation tracker, not part of the permanent design.
       entry points (values are set correctly at init via `StartHandler`).
 - [x] **C1 — three diverging init paths** for `rv` / `RV` / `rvio` (violated C4). Fixed: all three
       now call one shared helper, `TwkApp::initializeCrashHandler(appName, version, executableDir)`
-      (`src/lib/app/MuTwkApp/CrashHandlerInit.{h,cpp}`), which resolves the handler, initializes, and
-      enables Mu debugging. The per-`main.cpp` `#ifdef` path blocks are gone.
-- [x] **C2 — `rvio` used the bare `crashpad_handler`** (violated C5) and never called
-      `setDebugging(true)`. Fixed by C1's shared helper: every binary now uses the platform wrapper
-      (`crashpad_handler_{macos,linux}.sh` / `.exe`) and enables Mu debugging. The leftover
-      `rvio` `addAnnotation("platform", …)` dead write (B3) was removed in the same change.
+      (`src/lib/app/MuTwkApp/CrashHandlerInit.{h,cpp}`), which resolves the handler and initializes
+      it. The per-`main.cpp` `#ifdef` path blocks are gone. (Automatic Mu debugging was later
+      removed — the `mu_function` annotation carries the script context without it.)
+- [x] **C2 — `rvio` used the bare `crashpad_handler`** (violated C5). Fixed by C1's shared helper:
+      every binary now uses the platform wrapper (`crashpad_handler_{macos,linux}.sh` / `.exe`). The
+      leftover `rvio` `addAnnotation("platform", …)` dead write (B3) was removed in the same change.
 - [x] **D1 — Crashpad wrapper install guarded on `RV_DEPS_BREAKPAD_VERSION`** in
       `src/bin/nsapps/RV/CMakeLists.txt` (violated C6). Fixed: split by tool ownership — the Crashpad
       wrapper is now guarded on `RV_DEPS_CRASHPAD_VERSION`, `symbolicate_crash.sh` on the Breakpad var.

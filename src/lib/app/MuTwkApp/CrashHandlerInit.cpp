@@ -4,9 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 #include <MuTwkApp/CrashHandlerInit.h>
-#include <MuTwkApp/MuInterface.h>
 #include <TwkUtil/CrashHandler.h>
-#include <iostream>
 #include <sstream>
 
 namespace TwkApp
@@ -32,16 +30,7 @@ namespace TwkApp
 #endif
         const std::string handlerPath = executableDir + "/" + handlerName;
 
-        const bool initialized = TwkUtil::CrashHandler::instance().initialize(appName, appVersion, handlerPath);
-
-        if (initialized)
-        {
-            // Enable Mu debugging so crash dumps include script source context.
-            setDebugging(true);
-            std::cout << "INFO: Automatically enabled -debug mu for crash dumps" << std::endl;
-        }
-
-        return initialized;
+        return TwkUtil::CrashHandler::instance().initialize(appName, appVersion, handlerPath);
     }
 
 } // namespace TwkApp
