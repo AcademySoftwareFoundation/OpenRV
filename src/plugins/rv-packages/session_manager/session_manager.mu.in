@@ -621,13 +621,10 @@ class: ThumbnailWidget : QLabel
 
     method: setFallback (void; QPixmap pixmap) { setPixmap(pixmap); }
 
-    method: load (void; QImage thumbnailImage)
+    method: load (void; string path)
     {
-        let pixmap = QPixmap.fromImage(thumbnailImage, Qt.AutoColor);
-        if (!pixmap.isNull())
-        {
-            setPixmap(pixmap);
-        }
+        let pixmap = QPixmap.fromImage(QImage(path, ""), Qt.AutoColor);
+        if (!pixmap.isNull()) setPixmap(pixmap);
     }
 }
 
@@ -663,8 +660,9 @@ class: FilmstripWidget : QLabel
 
     method: isLoaded (bool;) { _loaded; }
 
-    method: load (void; QImage filmstripImage)
+    method: load (void; string path)
     {
+        let filmstripImage = QImage(path, "");
         if (!filmstripImage.isNull())
         {
             _strip  = filmstripImage;
@@ -700,9 +698,9 @@ class: SourcePreviewWidget : QWidget
         _filmstrip.hide();
     }
 
-    method: setFallback   (void; QPixmap pixmap) { _thumbnail.setFallback(pixmap); }
-    method: loadStrip     (void; QImage filmstripImage) { _filmstrip.load(filmstripImage); }
-    method: loadThumbnail (void; QImage thumbnailImage) { _thumbnail.load(thumbnailImage); }
+    method: setFallback (void; QPixmap pixmap) { _thumbnail.setFallback(pixmap); }
+    method: loadStrip   (void; string path) { _filmstrip.load(path); }
+    method: loadThumbnail (void; string path) { _thumbnail.load(path); }
 
     method: event (bool; QEvent event)
     {
@@ -1106,7 +1104,6 @@ class: SessionManagerMode : MinorMode
     QIcon              _channelIcon;
     QIcon              _videoIcon;
     QIcon              _fallbackSourceIcon;
-    (string, QImage)[]  _previewsCache;
     bool               _inputOrderLock;
     bool               _disableUpdates;
     bool               _previewsEnabled;
@@ -1816,37 +1813,6 @@ class: SessionManagerMode : MinorMode
         item;
     }
 
-    method: cachedPreview (QImage; string pathToCache)
-    {
-        for_each (preview; _previewsCache)
-        {
-            let (previewPath, previewImage) = (preview._0, preview._1);
-
-            if (previewPath == pathToCache)
-            {
-                return previewImage;
-            }
-        }
-
-        let imageToCache = QImage(pathToCache, nil);
-        _previewsCache.push_back((pathToCache, imageToCache));
-
-        return imageToCache;
-    }
-
-    method: dropPreviewFromCache (void; string pathToDrop)
-    {
-        for (int i = 0; i < _previewsCache.size(); i++)
-        {
-            let previewPath = _previewsCache[i]._0;
-            if (previewPath == pathToDrop)
-            {
-                _previewsCache.erase(i, 1);
-                return;
-            }
-        }
-    }
-
     method: makeSourceRowWidget (QWidget; string node)
     {
         string sourceNode = nil;
@@ -1877,15 +1843,11 @@ class: SessionManagerMode : MinorMode
             let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
             if (thumbnailPath != "" && io.path.exists(thumbnailPath))
             {
-                let thumbnailImage = cachedPreview(thumbnailPath);
-                preview.loadThumbnail(thumbnailImage);
+                preview.loadThumbnail(thumbnailPath);
 
                 let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
                 if (filmstripPath != "" && io.path.exists(filmstripPath))
-                {
-                    let filmstripImage = cachedPreview(filmstripPath);
-                    preview.loadStrip(filmstripImage);
-                }
+                    preview.loadStrip(filmstripPath);
             }
 
             let mediaPropertyPath = sourceNode + ".media.movie";
@@ -2234,12 +2196,6 @@ class: SessionManagerMode : MinorMode
             if (_srcNodeKeys[i] == sourceNode) { node = _grpNodeValues[i]; break; }
         }
         if (node eq nil) return;
-        
-        let thumbnailPath = sendInternalEvent("session-manager-get-thumbnail-path", sourceNode);
-        dropPreviewFromCache(thumbnailPath);
-
-        let filmstripPath = sendInternalEvent("session-manager-get-filmstrip-path", sourceNode);
-        dropPreviewFromCache(filmstripPath);
 
         let item = itemOfNode(_viewModel, node);
         if (item neq nil)
@@ -2501,6 +2457,28 @@ class: SessionManagerMode : MinorMode
         }
 
         return nodes;
+    }
+
+    //
+    //  Answer "session-manager-selected-nodes" with one node name per line.
+    //
+    //  Other packages used to reach the selection by requiring this module and
+    //  calling theMode().selectedNodes(). A Mu require cannot resolve the Python
+    //  port that replaces this file, so the cross-package API is served as an
+    //  internal event instead, and both implementations answer it identically.
+    //
+    method: selectedNodesEvent (void; Event event)
+    {
+        let nodes = selectedNodes();
+        string content = "";
+
+        for_index (i; nodes)
+        {
+            if (i > 0) content += "\n";
+            content += nodes[i];
+        }
+
+        event.setReturnContent(content);
     }
 
     method: selectedItems (QStandardItem[]; )
@@ -3185,7 +3163,8 @@ class: SessionManagerMode : MinorMode
                ("before-session-deletion", enterQuittingState, "Store quitting before session goes away"),
                ("view-edit-mode-activated", viewEditModeActivated, "Per-view edit mode activated, load UI"),
                ("event-category-state-changed", onCategoryStateChanged, "Category state changed"),
-               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail")
+               ("session-manager-preview-available", updateNodePreviewEvent, "Update preview widget for completed thumbnail"),
+               ("session-manager-selected-nodes", selectedNodesEvent, "Report the tree selection to other packages")
                ],
              nil,
              nil);
@@ -3320,8 +3299,6 @@ class: SessionManagerMode : MinorMode
         _layerIcon = auxIcon("layer.png", true);
         _unknownTypeIcon = auxIcon("new_48x48.png", true);
         _fallbackSourceIcon = QIcon(auxFilePath("fallback_thumbnail.png"));
-
-        _previewsCache = (string, QImage)[]();
 
         _addButton.setDefaultAction(addAction);
         _deleteButton.setDefaultAction(deleteAction);

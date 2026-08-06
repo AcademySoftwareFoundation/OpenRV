@@ -1,0 +1,4 @@
+# Normalized runtime error signatures from Mu capture.
+# Python port must not introduce errors beyond this set.
+ERROR: Exception thrown while calling commands.defineMinorMode, Duplicate mode: Source Setup
+RuntimeError: bad any cast @ File "/Users/termev/Documents/Dub/OpenRV-AI-loop-main/_build/stage/app/RV.app/Contents/lib/python3.11/site-packages/opentimelineio/plugins/manifest.py", line N, in load_manifest | File "/Users/termev/Documents/Dub/OpenRV-AI-loop-main/_build/stage/app/RV.app/Contents/lib/python3.11/site-packages/opentimelineio/plugins/manifest.py", line N, in manifest_from_file

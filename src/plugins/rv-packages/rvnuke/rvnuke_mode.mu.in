@@ -12,10 +12,98 @@ require app_utils;
 require extra_commands;
 require io;
 require rvui;
+require python;
 require qt;
-require session_manager;
 require rvnuke_process;
 require runtime;
+
+//
+//  Reaching the session manager from Mu.
+//
+//  The session manager is a Python package now, and a Mu `require` cannot resolve a
+//  Python module, so this file no longer requires it. Two things are still needed
+//  from it, and each is obtained in a way that works whichever implementation is
+//  loaded:
+//
+//    * whether it is loaded at all — minorModeFromName() finds a Python mode too,
+//      since it is registered as a PyMinorMode carrying the same mode name;
+//    * the current tree selection — served as an internal event, which either
+//      implementation answers with one node name per line.
+//
+
+\: sessionManagerLoaded (bool;)
+{
+    return rvui.minorModeFromName("session_manager") neq nil;
+}
+
+\: sessionManagerSelectedNodes (string[];)
+{
+    string[] nodes;
+    string content = "";
+
+    //
+    //  Ask the loaded Python mode directly. This is what preserves the original
+    //  semantics: the Mu code this replaced held the mode object and read its tree
+    //  view, which exists from the constructor onward, so the selection was
+    //  readable whether or not the panel was open. RV only dispatches internal
+    //  events to *active* modes, and session_manager is `load: delay`, so relying on
+    //  the event alone reported an empty selection whenever the panel was closed --
+    //  which silently flipped the menu states below.
+    //
+    try
+    {
+        let mod = python.PyImport_Import("session_manager");
+
+        if (!python.is_nil(mod))
+        {
+            let f = python.PyObject_GetAttr(mod, "selectedNodeLines");
+
+            if (!python.is_nil(f))
+            {
+                content = python.to_string(
+                    python.PyObject_CallObject(f, python.PyTuple_New(0)));
+            }
+        }
+    }
+    catch (...)
+    {
+        content = "";
+    }
+
+    //
+    //  Empty means the Python implementation is not the one loaded (its module-level
+    //  mode is nil). The Mu implementation answers the internal event instead, which
+    //  requires it to be active.
+    //
+    if (content == "")
+    {
+        content = commands.sendInternalEvent("session-manager-selected-nodes", "", "");
+    }
+
+    if (content == "") return nodes;
+
+    for_each (n; content.split("\n")) if (n != "") nodes.push_back(n);
+
+    return nodes;
+}
+
+//
+//  session_manager.setToolTipProp() inlined: it is a single property write, so
+//  duplicating it here is cheaper than keeping a cross-package dependency for it.
+//
+
+\: setSessionManagerToolTip (void; string node, string toolTip)
+{
+    let propName = "%s.sm_state.toolTip" % node;
+
+    if (!commands.propertyExists(propName))
+    {
+        commands.newProperty(propName, commands.StringType, 1);
+    }
+
+    commands.setStringProperty(propName, string[] {toolTip}, true);
+}
+
 
 \: decodeNL (string; string str)
 {
@@ -408,10 +496,10 @@ class: RVNukeMode : rvtypes.MinorMode
     {
         deb ("compareSelected %s" % style);
 
-        if (session_manager.theMode() eq nil) return;
+        if (!sessionManagerLoaded()) return;
 
         let nodeType = if (style == "tile") then "RVLayoutGroup" else "RVStackGroup",
-            selected = session_manager.theMode().selectedNodes();
+            selected = sessionManagerSelectedNodes();
 
         if (selected.size() < 2) return;
 
@@ -625,7 +713,7 @@ class: RVNukeMode : rvtypes.MinorMode
         let name  = getNukeProp (source, "node"),
             label = getNukeProp (source, "label");
 
-        if (label != "") session_manager.setToolTipProp (source, label + "\n(node: %s)\n" % name);
+        if (label != "") setSessionManagerToolTip (source, label + "\n(node: %s)\n" % name);
         deb ("   setUiNameAndTip '%s' inProgess %s, done" % (source, inProgress));
     }
 
@@ -1701,9 +1789,9 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
         //  Collect target source from session manager selection
         //
         {
-            if (session_manager.theMode() eq nil) return;
+            if (!sessionManagerLoaded()) return;
 
-            let selectedNodes = session_manager.theMode().selectedNodes();
+            let selectedNodes = sessionManagerSelectedNodes();
 
             deb ("    selectedNodes %s" % selectedNodes);
 
@@ -2131,9 +2219,9 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
     {
         deb ("restoreCheckpoint()");
 
-        if (session_manager.theMode() eq nil) return;
+        if (!sessionManagerLoaded()) return;
 
-        let selectedNodes = session_manager.theMode().selectedNodes();
+        let selectedNodes = sessionManagerSelectedNodes();
 
         deb ("    selectedNodes %s" % selectedNodes);
 
@@ -2227,9 +2315,9 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
     {
         deb ("creatNukeReadNodes()");
 
-        if (session_manager.theMode() eq nil) return;
+        if (!sessionManagerLoaded()) return;
 
-        let selectedNodes = session_manager.theMode().selectedNodes();
+        let selectedNodes = sessionManagerSelectedNodes();
 
         deb ("    selectedNodes %s" % selectedNodes);
 
@@ -2286,9 +2374,18 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
 
     method: sourceSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return commands.DisabledMenuState;
+        if (!sessionManagerLoaded()) return commands.DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
+
+        //
+        //  An empty selection used to fall through the loop and report enabled, so
+        //  the item could be picked and then quietly do nothing. Rarely reachable
+        //  before, because the selection was readable even with the panel closed;
+        //  worth guarding either way, since "no sources selected" is not a state in
+        //  which a source action should be offered.
+        //
+        if (nodes.empty()) return commands.DisabledMenuState;
 
         for_each (n; nodes)
         {
@@ -2300,18 +2397,18 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
 
     method: viewsSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return commands.DisabledMenuState;
+        if (!sessionManagerLoaded()) return commands.DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         return if (nodes.size() >= 2) then commands.NeutralMenuState else commands.DisabledMenuState;
     }
 
     method: renderSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return commands.DisabledMenuState;
+        if (!sessionManagerLoaded()) return commands.DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         if (nodes.size() == 1 && getNukeProp(nodes[0], "type") == "current")
         {
@@ -2322,9 +2419,9 @@ nuke.executeMultiple((writeNode,), ([%s, %s, %s],))
 
     method: checkpointSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return commands.DisabledMenuState;
+        if (!sessionManagerLoaded()) return commands.DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         if (nodes.size() == 1)
         {

@@ -13,9 +13,77 @@ use app_utils;
 require io;
 require extra_commands;
 require runtime;
-require session_manager;
+require rvui;
+require python;
 
 require qt;
+
+//
+//  Reaching the session manager from Mu.
+//
+//  The session manager is a Python package now, and a Mu `require` cannot resolve a
+//  Python module, so this file no longer requires it. Whether it is loaded is
+//  answered by minorModeFromName(), which finds a Python mode too (it is registered
+//  as a PyMinorMode carrying the same mode name), and the tree selection is served
+//  as an internal event that either implementation answers with one node per line.
+//
+
+\: sessionManagerLoaded (bool;)
+{
+    return rvui.minorModeFromName("session_manager") neq nil;
+}
+
+\: sessionManagerSelectedNodes (string[];)
+{
+    string[] nodes;
+    string content = "";
+
+    //
+    //  Ask the loaded Python mode directly. This is what preserves the original
+    //  semantics: the Mu code this replaced held the mode object and read its tree
+    //  view, which exists from the constructor onward, so the selection was
+    //  readable whether or not the panel was open. RV only dispatches internal
+    //  events to *active* modes, and session_manager is `load: delay`, so relying on
+    //  the event alone reported an empty selection whenever the panel was closed --
+    //  which silently flipped the menu states below.
+    //
+    try
+    {
+        let mod = python.PyImport_Import("session_manager");
+
+        if (!python.is_nil(mod))
+        {
+            let f = python.PyObject_GetAttr(mod, "selectedNodeLines");
+
+            if (!python.is_nil(f))
+            {
+                content = python.to_string(
+                    python.PyObject_CallObject(f, python.PyTuple_New(0)));
+            }
+        }
+    }
+    catch (...)
+    {
+        content = "";
+    }
+
+    //
+    //  Empty means the Python implementation is not the one loaded (its module-level
+    //  mode is nil). The Mu implementation answers the internal event instead, which
+    //  requires it to be active.
+    //
+    if (content == "")
+    {
+        content = commands.sendInternalEvent("session-manager-selected-nodes", "", "");
+    }
+
+    if (content == "") return nodes;
+
+    for_each (n; content.split("\n")) if (n != "") nodes.push_back(n);
+
+    return nodes;
+}
+
 require io;
 
 function: deb(void; string s) { if (false) print (s + "\n"); }
@@ -156,10 +224,10 @@ class: MayaTools : MinorMode
 
     method: compareSelected (void; Event event, string style)
     {
-        if (session_manager.theMode() eq nil) return;
+        if (!sessionManagerLoaded()) return;
 
         let nodeType = if (style == "tile") then "RVLayoutGroup" else "RVStackGroup",
-            selected = session_manager.theMode().selectedNodes();
+            selected = sessionManagerSelectedNodes();
 
         if (selected.size() < 2) return;
 
@@ -213,18 +281,18 @@ class: MayaTools : MinorMode
 
     method: oneViewSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return DisabledMenuState;
+        if (!sessionManagerLoaded()) return DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         return if (nodes.size() == 1) then NeutralMenuState else DisabledMenuState;
     }
 
     method: viewsSelected (int; )
     {
-        if (session_manager.theMode() eq nil) return DisabledMenuState;
+        if (!sessionManagerLoaded()) return DisabledMenuState;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         return if (nodes.size() >= 2) then NeutralMenuState else DisabledMenuState;
     }
@@ -261,9 +329,9 @@ class: MayaTools : MinorMode
 
     method: markCurrentAsTarget (void; Event event)
     {
-        if (session_manager.theMode() eq nil) return;
+        if (!sessionManagerLoaded()) return;
 
-        let nodes = session_manager.theMode().selectedNodes();
+        let nodes = sessionManagerSelectedNodes();
 
         if (nodes.size() != 1) return;
 
