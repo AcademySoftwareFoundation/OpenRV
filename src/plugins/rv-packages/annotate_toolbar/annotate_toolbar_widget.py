@@ -87,9 +87,6 @@ _TOOL_TOOLTIP = {
     TOOL_EYEDROPPER: "Eyedropper",
 }
 
-_FONT_SIZES = ("small", "medium", "large")
-_FONT_SIZE_LABELS = {"small": "S", "medium": "M", "large": "L"}
-
 # ---------------------------------------------------------------------------
 # Stylesheets
 # ---------------------------------------------------------------------------
@@ -398,9 +395,6 @@ class ColourSwatch(QtWidgets.QAbstractButton):
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setToolTip("Colour")
 
-    def get_colour(self):
-        return QtGui.QColor(self._colour)
-
     def set_colour(self, colour):
         self._colour = QtGui.QColor(colour)
         self.update()
@@ -636,9 +630,6 @@ class _SliderSection(QtWidgets.QWidget):
         except (ValueError, TypeError):
             self._input.setText(f"{self._slider.value()}{self._suffix}")
 
-    def get_value(self):
-        return self._slider.value()
-
     def set_value(self, v):
         self._slider.setValue(v)
         if not self._input.hasFocus():
@@ -669,12 +660,6 @@ class _SizeOpacityPanel(QtWidgets.QWidget):
 
         lay.addStretch()
 
-    def get_size(self):
-        return self._size.get_value()
-
-    def get_opacity(self):
-        return self._opacity.get_value()
-
     def set_size(self, v):
         self._size.set_value(v)
 
@@ -703,20 +688,6 @@ def _apply_icon(btn, name, size=16):
         btn.setIcon(icon)
         btn.setIconSize(QtCore.QSize(size, size))
         btn.setText("")
-
-
-def _load_png_icon(filename):
-    """Load a PNG icon by filename from the package's support files."""
-    python_dir = os.path.dirname(os.path.abspath(__file__))
-    support_dir = os.path.join(os.path.dirname(python_dir), "SupportFiles", "annotate_beta")
-    path = os.path.join(support_dir, filename)
-    if os.path.exists(path):
-        return QtGui.QIcon(path)
-    # Fallback: same directory as this file (development layout)
-    path = os.path.join(python_dir, filename)
-    if os.path.exists(path):
-        return QtGui.QIcon(path)
-    return QtGui.QIcon()
 
 
 def _apply_combo_style(combo):
@@ -816,9 +787,6 @@ class _EraserPanel(QtWidgets.QWidget):
         if brush:
             self.eraser_brush_changed.emit(brush)
 
-    def get_eraser_brush(self):
-        return self._brush_combo.currentData() or "circle"
-
     def set_eraser_brush(self, brush):
         for i in range(self._brush_combo.count()):
             if self._brush_combo.itemData(i) == brush:
@@ -840,12 +808,6 @@ class _EraserPanel(QtWidgets.QWidget):
                     if self._brush_combo.currentIndex() == i:
                         self._brush_combo.setCurrentIndex(0)
                 break
-
-    def get_size(self):
-        return self._size.get_value()
-
-    def get_opacity(self):
-        return self._opacity.get_value()
 
     def set_size(self, v):
         self._size.set_value(v)
@@ -921,12 +883,6 @@ class _PenPanel(QtWidgets.QWidget):
                 self.color_modifier_changed.emit(key)
                 return
 
-    def get_color_modifier(self):
-        for key, btn in self._blend_btns.items():
-            if btn.isChecked():
-                return key
-        return COLOR_MOD_NORMAL
-
     def set_color_modifier(self, mode):
         btn = self._blend_btns.get(mode)
         if btn:
@@ -940,12 +896,6 @@ class _PenPanel(QtWidgets.QWidget):
             if not enabled and btn.isChecked():
                 self._blend_btns[COLOR_MOD_NORMAL].setChecked(True)
                 self.color_modifier_changed.emit(COLOR_MOD_NORMAL)
-
-    def get_size(self):
-        return self._size.get_value()
-
-    def get_opacity(self):
-        return self._opacity.get_value()
 
     def set_size(self, v):
         self._size.set_value(v)
@@ -985,15 +935,6 @@ class _ShapeOptionsPanel(QtWidgets.QWidget):
         lay.addWidget(self._opacity)
 
         lay.addStretch()
-
-    def get_filled(self):
-        return self._filled.isChecked()
-
-    def get_size(self):
-        return self._size.get_value()
-
-    def get_opacity(self):
-        return self._opacity.get_value()
 
     def set_filled(self, v):
         self._filled.setChecked(v)
@@ -1102,21 +1043,6 @@ class _TextOptionsPanel(QtWidgets.QWidget):
 
         lay.addStretch()
 
-    def get_font_family(self):
-        return self._font_combo.currentText()
-
-    def get_font_size(self):
-        return {"S": "small", "M": "medium", "L": "large"}.get(self._size_combo.currentText(), "medium")
-
-    def get_bold(self):
-        return self._bold_btn.isChecked()
-
-    def get_italic(self):
-        return self._italic_btn.isChecked()
-
-    def get_underline(self):
-        return self._underline_btn.isChecked()
-
     def set_font_family(self, name):
         idx = self._font_combo.findText(name)
         if idx >= 0:
@@ -1176,9 +1102,6 @@ class ColourPickerPopup(QtWidgets.QFrame):
 
     def set_colour(self, c):
         self._picker.set_colour(c)
-
-    def get_colour(self):
-        return self._picker._colour
 
 
 # ---------------------------------------------------------------------------
@@ -1252,35 +1175,11 @@ class AnnotateSecondaryPanel(QtWidgets.QWidget):
     def set_page_for_tool(self, tool):
         self._stack.setCurrentIndex(_TOOL_PAGE.get(tool, _PAGE_EMPTY))
 
-    def get_size(self):
-        p = self._stack.currentIndex()
-        if p == _PAGE_BRUSH:
-            return self._brush_panel.get_size()
-        if p == _PAGE_SHAPE:
-            return self._shape_panel.get_size()
-        if p == _PAGE_PEN:
-            return self._pen_panel.get_size()
-        if p == _PAGE_ERASER:
-            return self._eraser_panel.get_size()
-        return 32
-
     def set_size(self, v):
         self._brush_panel.set_size(v)
         self._shape_panel.set_size(v)
         self._pen_panel.set_size(v)
         self._eraser_panel.set_size(v)
-
-    def get_opacity(self):
-        p = self._stack.currentIndex()
-        if p == _PAGE_BRUSH:
-            return self._brush_panel.get_opacity()
-        if p == _PAGE_SHAPE:
-            return self._shape_panel.get_opacity()
-        if p == _PAGE_PEN:
-            return self._pen_panel.get_opacity()
-        if p == _PAGE_ERASER:
-            return self._eraser_panel.get_opacity()
-        return 50
 
     def set_opacity(self, v):
         self._brush_panel.set_opacity(v)
@@ -1288,41 +1187,17 @@ class AnnotateSecondaryPanel(QtWidgets.QWidget):
         self._pen_panel.set_opacity(v)
         self._eraser_panel.set_opacity(v)
 
-    def get_color_modifier(self):
-        return self._pen_panel.get_color_modifier()
-
     def set_color_modifier(self, mode):
         self._pen_panel.set_color_modifier(mode)
 
     def set_blend_mode_enabled(self, mode, enabled):
         self._pen_panel.set_blend_mode_enabled(mode, enabled)
 
-    def get_eraser_brush(self):
-        return self._eraser_panel.get_eraser_brush()
-
     def set_eraser_brush(self, brush):
         self._eraser_panel.set_eraser_brush(brush)
 
     def set_soft_erase_enabled(self, enabled):
         self._eraser_panel.set_soft_erase_enabled(enabled)
-
-    def get_filled(self):
-        return self._shape_panel.get_filled()
-
-    def get_font_family(self):
-        return self._text_panel.get_font_family()
-
-    def get_font_size(self):
-        return self._text_panel.get_font_size()
-
-    def get_bold(self):
-        return self._text_panel.get_bold()
-
-    def get_italic(self):
-        return self._text_panel.get_italic()
-
-    def get_underline(self):
-        return self._text_panel.get_underline()
 
     def set_font_family(self, name):
         self._text_panel.set_font_family(name)
