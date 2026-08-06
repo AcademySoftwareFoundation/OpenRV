@@ -116,6 +116,7 @@ namespace Rv
             QString version;
             QString url;
             QString icon;
+            QString excludes;
             QString
                 requires;
             QStringList imageio;
@@ -143,6 +144,7 @@ namespace Rv
 
             QList<int> uses;
             QList<int> usedBy;
+            QList<int> exclusions;
         };
 
         struct ModeEntry
