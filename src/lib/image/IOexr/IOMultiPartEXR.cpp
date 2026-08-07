@@ -1133,6 +1133,28 @@ namespace TwkFB
                     {
                         addToMultiPartChannelList(requestedMPChannelList, p, partName, ci.name(), ci.channel());
                     }
+
+                    //
+                    //  Performance: for straight playback the caller asks for
+                    //  no specific view/layer/channel and does not request all
+                    //  channels. In that case we only need the default part
+                    //  (the primary "beauty"/rgba image, part 0 by EXR
+                    //  convention). Multipart EXRs routinely carry additional
+                    //  full-resolution parts (mattes, AOVs, etc.) which are
+                    //  never displayed unless the user explicitly selects that
+                    //  layer. Collecting every part here forces the decoder to
+                    //  decompress 2x-Nx the pixel data per frame and then throw
+                    //  most of it away, which can dominate playback cost for
+                    //  large frames. Once we have captured the default part's
+                    //  channels, stop scanning the remaining parts. Explicit
+                    //  layer/channel selection and readAllChannels still read
+                    //  exactly what was requested via the branches above.
+                    //
+                    if (!requestedAllChannels && !requestedMPChannelList.empty())
+                    {
+                        p = numOfParts; // default part captured; skip the rest
+                        break;
+                    }
                 }
                 else
                 {
