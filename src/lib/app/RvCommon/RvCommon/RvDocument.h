@@ -27,9 +27,17 @@ namespace TwkApp
     class Menu;
 }
 
+namespace TwkGLF
+{
+    class GLVideoDevice;
+}
+
 namespace Rv
 {
     class GLView;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    class VulkanView;
+#endif
     class DiagnosticsView;
     class DesktopVideoModule;
     class DesktopVideoDevice;
@@ -72,6 +80,26 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewWidget() const;
+
+        //
+        //  Active presentation video device for whichever backend is in use
+        //  (the OpenGL GLView or, on Linux, the Vulkan VulkanView). Returns
+        //  nullptr if no view has been created yet. Prefer this over
+        //  view()->videoDevice() in backend-neutral code so the Vulkan/Metal
+        //  paths (where view() is null) stay crash-safe.
+        //
+        TwkGLF::GLVideoDevice* viewVideoDevice() const;
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        VulkanView* vulkanView() const;
+
+        // True once close has been accepted or the document is being destroyed.
+        bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
+
+        // Replace a live VulkanView with GLView after a runtime Vulkan failure.
+        void fallbackVulkanToGLView();
+#endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
 
@@ -158,6 +186,10 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        void setActiveViewContentSize(int w, int h);
+        void setActiveViewMinimumContentSize(int w, int h);
+        bool activeViewFirstPaintCompleted() const;
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;
@@ -168,6 +200,10 @@ namespace Rv
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        VulkanView* m_vulkanView;
+#endif
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;
