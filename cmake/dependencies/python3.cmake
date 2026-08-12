@@ -406,13 +406,36 @@ ELSE()
   )
 ENDIF()
 
+# Declare the pydebug ABI explicitly on Windows Debug. OTIO's setup.py runs find_package(Python ... Interpreter Development.Module) against our custom debug
+# Python, whose artifacts carry the "_d" suffix (python311_d.lib, python_d.exe). CMake 4.4.1 changed two things that together make that search fail:
+#
+# * the default Python_FIND_ABI on Windows went from "any ABI except gil_disabled" to OFF for every flag, i.e. a release-only search, and
+# * FindPython's version/ABI regex went from "python([23])([0-9]+)([tdmu]*)" to "([tdmu_]*)", so "python311_d" now reports ABI "_d" instead of no ABI.
+#
+# The artifacts that used to read as release-ABI now read as debug-ABI, which no longer matches the default, and find_package reports "Could NOT find Python
+# (missing: Interpreter Development.Module)". Stating the ABI we actually want is the documented fix and is forward compatible.
+#
+# The 4-tuple is (pydebug, pymalloc, unicode, gil_disabled). The semicolons are escaped so the value stays one CMake list element and reaches OTIO as a single
+# whitespace-delimited CMAKE_ARGS token. The leading space lives inside the value so the non-Windows case appends nothing.
+IF(RV_TARGET_WINDOWS
+   AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+)
+  SET(_python_find_abi_arg
+      " -DPython_FIND_ABI=ON\;ANY\;ANY\;OFF"
+  )
+ELSE()
+  SET(_python_find_abi_arg
+      ""
+  )
+ENDIF()
+
 # Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
 # cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
 LIST(
   APPEND
   _requirements_install_command
   # Use old and more recent library name convention to ensure the correct library is used in the build.
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}${_python_find_abi_arg}"
   "${_python3_executable}"
   -s
   -E

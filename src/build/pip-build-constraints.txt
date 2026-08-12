@@ -1,18 +1,14 @@
 # Constraints applied to pip's build-isolation environments when installing the packages in requirements.txt.
 #
 # Packages built from source (notably OpenTimelineIO) get an isolated build environment whose build requirements are resolved fresh from PyPI on every build.
-# Those resolutions float, so an upstream release can break a build that has not changed. Pin the ones that have bitten us here.
+# Those resolutions float, so an upstream release can break a build that has not changed. Pin the ones that matter here.
 #
 # cmake: OTIO's setup.py runs find_package(Python ... Interpreter Development.Module) using the cmake wheel installed into its isolated build environment (NOT
-# the cmake driving the outer OpenRV build). cmake 4.4.2 added "FindPython: Add support for pydebug ABI flag on Windows" (Kitware/CMake 84cb7e262), which
-# changes how the debug Python artifacts are located and makes that find_package fail against our custom debug Python on Windows:
+# the cmake driving the outer OpenRV build). cmake 4.4.1 changed how the pydebug ABI is handled on Windows (Kitware/CMake 84cb7e262), which broke that call
+# against our custom debug Python and took out every Windows Debug CI build from 2026-08-05 onward with no OpenRV change.
 #
-#   Could NOT find Python (missing: Interpreter Development.Module) (found version "3.11.9")
-#
-# This broke every Windows Debug CI build from 2026-08-05 onward with no OpenRV change: cmake 4.4.2 was published to PyPI on 2026-08-04T06:13:31Z, between two
-# nightly runs of the same commit. 4.4.0 is the last version known good on Windows, Linux and macOS.
-#
-# TODO: This pin holds the line rather than adapting to the new behaviour. The forward fix is to satisfy 4.4.2+ directly -- likely by passing
-# Python_LIBRARY_DEBUG in the CMAKE_ARGS built in cmake/dependencies/python3.cmake, and revisiting the python<ver>_d.lib -> python<ver>.lib copy in that same
-# file, which predates cmake's own pydebug support and may now interfere with it. That needs a Windows Debug build to validate before the pin can be lifted.
-cmake==4.4.0
+# We adapt to that change rather than avoid it: cmake/dependencies/python3.cmake passes -DPython_FIND_ABI on Windows Debug to declare the pydebug ABI
+# explicitly. That hint is only correct for 4.4.1+ -- on 4.4.0 the same flag produces "python311d" instead of "python311_d" -- so the pin and the hint must move
+# together. Pinning an exact version keeps the build reproducible instead of tracking whatever PyPI serves that day; raise it deliberately after checking
+# FindPython's changelog.
+cmake==4.4.2
