@@ -46,15 +46,6 @@ namespace IPCore
         typedef std::pair<int, int> FrameRange;
         typedef std::vector<FrameRange> FrameRangeVector;
 
-        enum FreeMode
-        {
-            ConservativeFreeMode, /// never frees in in/out range
-            ActiveFreeMode,       /// allows freeing in in/out range behind display
-                                  /// frame
-            GreedyFreeMode        /// allows freeing in in/out range in FRONT of
-                                  /// display frame
-        };
-
         enum TreeResults
         {
             HasAllIDs,  /// All of the ids passed in are in the cache
@@ -124,13 +115,10 @@ namespace IPCore
 
         void setCacheFrame(int f) { m_cacheFrame = f; }
 
-        void setCacheWrapFrame(int f) { m_cacheWrapFrame = f; }
 
         void setDisplayFPS(float f) { m_displayFPS = f; }
 
         int cacheFrame() const { return m_cacheFrame; }
-
-        int cacheWrapFrame() const { return m_cacheWrapFrame; }
 
         int displayFrame() const { return m_displayFrame; }
 
@@ -151,15 +139,8 @@ namespace IPCore
 
         void showCacheContents() const;
 
-        void setFreeMode(FreeMode m) { m_freeMode = m; }
-
-        bool allowGreedyFree() const { return m_freeMode == GreedyFreeMode; }
-
-        bool allowActiveFree() const { return m_freeMode == ActiveFreeMode; }
-
         void clearAllButFrame(int, bool force = false);
         void clearFrameCaches();
-        void garbageCollect(bool force = false);
 
         virtual void setMemoryUsage(size_t bytes);
 
@@ -328,7 +309,6 @@ namespace IPCore
         FrameMap m_frames;
         ItemFrames m_itemMap;
         int m_cacheFrame;
-        int m_cacheWrapFrame;
         int m_displayFrame;
         int m_displayInc;
         float m_displayFPS;
@@ -336,7 +316,6 @@ namespace IPCore
         int m_maxFrame;
         int m_inFrame;
         int m_outFrame;
-        FreeMode m_freeMode;
         CacheStats m_cacheStats;
         mutable pthread_mutex_t m_statMutex;
         size_t m_overflowBoundary;

@@ -247,6 +247,7 @@ namespace IPCore
         , m_audioThreadGroup(1, 2)
         , m_cacheMode(NeverCache)
         , m_fbcache(this)
+        , m_mediacache(this)
         , m_audioRequestContext(0)
         , m_audioFPS(0)
         , m_minAudioSample(0)
@@ -1372,7 +1373,6 @@ IPGraph::findNodesByAbstractPath(int frame,
             if (memUsage != 0)
                 m_fbcache.setMemoryUsage(memUsage);
             m_fbcache.clearAllButFrame(frame);
-            m_fbcache.setFreeMode(FBCache::ConservativeFreeMode);
             m_fbcache.setInOutFrames(inframe, outframe, minFrame, maxFrame);
             m_fbcache.unlock();
             break;
@@ -1381,7 +1381,6 @@ IPGraph::findNodesByAbstractPath(int frame,
             m_fbcache.lock();
             if (memUsage != 0)
                 m_fbcache.setMemoryUsage(memUsage);
-            m_fbcache.setFreeMode(FBCache::GreedyFreeMode);
             m_fbcache.unlock();
             if (doDispatch)
             {
@@ -1404,7 +1403,6 @@ IPGraph::findNodesByAbstractPath(int frame,
             m_fbcache.lock();
             if (memUsage != 0)
                 m_fbcache.setMemoryUsage(memUsage);
-            m_fbcache.setFreeMode(FBCache::ConservativeFreeMode);
             m_fbcache.unlock();
             if (doDispatch)
             {
@@ -1523,8 +1521,6 @@ IPGraph::findNodesByAbstractPath(int frame,
             {
             }
         }
-
-        m_fbcache.garbageCollect();
 
         TWK_CACHE_UNLOCK(m_fbcache, "flush");
     }
@@ -1943,7 +1939,6 @@ IPGraph::findNodesByAbstractPath(int frame,
         int cacheFrame = m_fbcache.displayFrame();
         int otherframe = inc > 0 ? inframe : outframe - 1;
         m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame : otherframe);
-        m_fbcache.setCacheWrapFrame(otherframe);
 
         if (m_fbcache.used() > m_fbcache.capacity())
             m_fbcache.emergencyFree();
@@ -2025,7 +2020,6 @@ IPGraph::findNodesByAbstractPath(int frame,
         int cacheFrame = m_fbcache.displayFrame();
         int otherframe = inc > 0 ? inframe : outframe - 1;
         m_fbcache.setCacheFrame(m_cacheMode == BufferCache ? cacheFrame : otherframe);
-        m_fbcache.setCacheWrapFrame(otherframe);
 
         if (m_fbcache.used() > m_fbcache.capacity())
             m_fbcache.emergencyFree();
@@ -2082,7 +2076,6 @@ IPGraph::findNodesByAbstractPath(int frame,
         m_cacheStop = false;
         unlockInternal();
         TWK_CACHE_LOCK(m_fbcache, "finishCachingThread");
-        m_fbcache.garbageCollect(true);
         TWK_CACHE_UNLOCK(m_fbcache, "finishCachingThread");
         DBL(DB_DISP, "finishCachingThread end");
     }
