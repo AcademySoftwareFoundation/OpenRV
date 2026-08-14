@@ -66,7 +66,7 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp MetalView.mm QTMetalVideoDevice.mm)
+  LIST(APPEND _sources DisplayLink.cpp MetalView.mm QTMetalVideoDevice.mm MetalDesktopVideoDevice.cpp)
   SET_SOURCE_FILES_PROPERTIES(
     MetalView.mm
     PROPERTIES COMPILE_FLAGS "-fobjc-arc"
@@ -173,7 +173,15 @@ FILE(
   RvCommon/*.h
 )
 IF(NOT RV_TARGET_DARWIN)
-  LIST(REMOVE_ITEM _files_to_moc "RvCommon/DisplayLink.h" "RvCommon/CGDesktopVideoDevice.h" "RvCommon/MetalView.h" "RvCommon/QTMetalVideoDevice.h")
+  LIST(
+    REMOVE_ITEM
+    _files_to_moc
+    "RvCommon/DisplayLink.h"
+    "RvCommon/CGDesktopVideoDevice.h"
+    "RvCommon/MetalView.h"
+    "RvCommon/QTMetalVideoDevice.h"
+    "RvCommon/MetalDesktopVideoDevice.h"
+  )
 ENDIF()
 
 # Platform-specific defines to forward to the MOC executable so that platform-guarded Q_OBJECT declarations (e.g. MetalView.h, DisplayLink.h) are visible to

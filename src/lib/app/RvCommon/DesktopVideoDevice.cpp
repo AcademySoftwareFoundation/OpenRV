@@ -31,6 +31,9 @@
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #include <RvCommon/VulkanDesktopVideoDevice.h>
 #include <RvCommon/VulkanView.h>
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <RvCommon/MetalDesktopVideoDevice.h>
+#include <RvCommon/MetalView.h>
 #endif
 
 #include <QOpenGLContext>
@@ -1117,11 +1120,14 @@ namespace Rv
         return opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2;
     }
 
-    bool DesktopVideoDevice::shouldUseVulkanPresentation()
+    bool DesktopVideoDevice::shouldUseNativePresentation()
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //  Same rule as the main view in RvDocument.
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         return tenBitDisplayRequested() && VulkanView::supports10BitPresentation();
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //  supports10BitPresentation() is memoized, so this is cheap to re-call.
+        return tenBitDisplayRequested() && MetalView::supports10BitPresentation();
 #else
         return false;
 #endif
@@ -1129,16 +1135,16 @@ namespace Rv
 
     std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
     {
-        return createDesktopVideoDevices(module, shareDevice, shouldUseVulkanPresentation());
+        return createDesktopVideoDevices(module, shareDevice, shouldUseNativePresentation());
     }
 
     std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                            bool useVulkan)
+                                                                            bool useNative)
     {
         std::vector<VideoDevice*> devices;
 
-#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
-        (void)useVulkan;
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        (void)useNative;
 #endif
 
         const auto screens = QGuiApplication::screens();
@@ -1154,9 +1160,15 @@ namespace Rv
 
             DesktopVideoDevice* sd = nullptr;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-            if (useVulkan)
+            if (useNative)
             {
                 sd = new VulkanDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
+            else
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            if (useNative)
+            {
+                sd = new MetalDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
             }
             else
 #endif

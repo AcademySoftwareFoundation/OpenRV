@@ -43,10 +43,11 @@ namespace Rv
     // MetalView implementation
     //--------------------------------------------------------------------------
 
-    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool noResize)
+    MetalView::MetalView(RvDocument* doc, QWidget* parent, bool noResize, bool presentationMode)
         : QWidget(parent)
         , m_doc(doc)
         , m_videoDevice(nullptr)
+        , m_presentationMode(presentationMode)
         , m_initialized(false)
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
@@ -79,7 +80,17 @@ namespace Rv
         setAutoFillBackground(false);
 
         ostringstream str;
-        str << UI_APPLICATION_NAME " Main Window (Metal)" << "/" << m_doc;
+        if (m_presentationMode)
+        {
+            // A presentation view can exist once per screen and carries a null
+            // doc, so key the device name on the view pointer (not the doc) to
+            // keep it unique.
+            str << UI_APPLICATION_NAME " Presentation (Metal)" << "/" << static_cast<const void*>(this);
+        }
+        else
+        {
+            str << UI_APPLICATION_NAME " Main Window (Metal)" << "/" << m_doc;
+        }
         m_videoDevice = new QTMetalVideoDevice(nullptr, str.str(), this, nullptr);
 
         m_activityTimer.start();
@@ -112,6 +123,12 @@ namespace Rv
 
     bool MetalView::supports10BitPresentation()
     {
+        // Memoized: 10-bit presentation support is a fixed hardware/OS property,
+        // so probe at most once per process.  The presentation-backend decision
+        // (DesktopVideoDevice::shouldUseNativePresentation) re-asks on every
+        // device rebuild, and the log lines below should not repeat each time.
+        static const bool cached = []() -> bool
+        {
         // Requirement 1: a Metal device must exist.  This file is compiled with
         // -fobjc-arc; ARC releases the device when it goes out of scope, so no
         // explicit release is needed.
@@ -164,7 +181,9 @@ namespace Rv
                                 "may be dithered/truncated at scanout).\n");
         }
 
-        return true;
+            return true;
+        }();
+        return cached;
     }
 
     //--------------------------------------------------------------------------
@@ -367,6 +386,14 @@ namespace Rv
 
     void MetalView::render()
     {
+        // A presentation-mode view is a passive output surface: it is rendered
+        // into and presented by its owning MetalDesktopVideoDevice (via
+        // transfer()/syncBuffers() driven by the main render loop), so it must
+        // never drive the session itself.  Its own IOSurface is presented from
+        // paintEvent() on expose and from the device's syncBuffers().
+        if (m_presentationMode)
+            return;
+
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
             return;
@@ -434,20 +461,22 @@ namespace Rv
 
         if (session)
         {
+            // Always present the main (control) view's own IOSurface.  Unlike the
+            // GL path, where QOpenGLWidget always composites the control widget
+            // after paintGL, the Metal main view is only shown by an explicit
+            // present, so it must NOT be skipped when a separate output
+            // (presentation) device is active — skipping it leaves the main
+            // window showing a stale frame once presentation mode is on.
+            m_videoDevice->syncBuffers();
+
+            // In presentation mode the output device is a distinct fullscreen
+            // window that must also be presented this frame.
             if (const TwkApp::VideoDevice* output = session->outputVideoDevice())
             {
                 if (output != videoDevice())
                 {
                     output->syncBuffers();
                 }
-                else
-                {
-                    m_videoDevice->syncBuffers();
-                }
-            }
-            else
-            {
-                m_videoDevice->syncBuffers();
             }
         }
 
@@ -511,6 +540,23 @@ namespace Rv
         {
             m_updatePending = false;
             render();
+            return;
+        }
+
+        // In presentation mode the output is a distinct fullscreen window that
+        // has no render loop of its own; re-presenting only this view on expose
+        // would leave it stale.  m_doc is null on a presentation view, so this
+        // only ever runs for the main window.
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (session)
+        {
+            if (const TwkApp::VideoDevice* output = session->outputVideoDevice())
+            {
+                if (output != videoDevice())
+                {
+                    output->syncBuffers();
+                }
+            }
         }
     }
 

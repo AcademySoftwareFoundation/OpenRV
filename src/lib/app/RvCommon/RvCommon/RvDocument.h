@@ -101,6 +101,17 @@ namespace Rv
         void swapGLViewToVulkan();
 #elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* metalView() const;
+
+        // True once close has been accepted or the document is being destroyed.
+        bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
+
+        //  Promote a live GLView to a MetalView so a 10-bit request applies
+        //  immediately (the forward mirror of fallbackMetalToGLView). The
+        //  MetalView's offscreen GL context is created synchronously, so this
+        //  uses build-and-verify ordering: the working GLView is kept until the
+        //  MetalView confirms its context is ready, and on failure the swap is
+        //  abandoned with the GLView left in place.
+        void swapGLViewToMetal();
 #endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }

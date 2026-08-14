@@ -50,10 +50,16 @@ namespace Rv
     public:
         typedef TwkUtil::Timer Timer;
 
-        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
+        //  presentationMode constructs a passive second-display output surface:
+        //  it is driven (rendered to and presented) by a MetalDesktopVideoDevice
+        //  rather than by the main render loop, so it must be given a null doc,
+        //  never drive the session, and never trigger the main-window GL fallback.
+        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true, bool presentationMode = false);
         ~MetalView();
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice; }
+
+        bool isPresentationMode() const { return m_presentationMode; }
 
         //
         //  Returns true when the platform can present 10-bit content through the
@@ -143,6 +149,7 @@ namespace Rv
     private:
         RvDocument* m_doc;
         QTMetalVideoDevice* m_videoDevice;
+        bool m_presentationMode;
 
         bool m_initialized;
         bool m_firstPaintCompleted;

@@ -443,6 +443,11 @@ namespace Rv
         return m_fbo;
     }
 
+    GLuint QTMetalVideoDevice::fboID() const
+    {
+        return m_fbo ? m_fbo->fboID() : 0;
+    }
+
     std::string QTMetalVideoDevice::hardwareIdentification() const
     {
         return "metal-hybrid";

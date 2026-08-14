@@ -225,10 +225,11 @@ namespace Rv
         // window — same semantics as the Vulkan side.
         const bool want10bit = DesktopVideoDevice::tenBitDisplayRequested();
 
-        bool useMetal = false;
+        // Shared with the presentation output so both stay on the same backend.
+        const bool useMetal = DesktopVideoDevice::shouldUseNativePresentation();
+
         if (want10bit)
         {
-            useMetal = MetalView::supports10BitPresentation();
             if (!useMetal)
             {
                 cerr << "INFO: 10-bit display requested but Metal 10-bit "
@@ -311,13 +312,13 @@ namespace Rv
         }
 
         // Shared with the presentation output so both stay on the same backend.
-        const bool useVulkan = DesktopVideoDevice::shouldUseVulkanPresentation();
+        const bool useVulkan = DesktopVideoDevice::shouldUseNativePresentation();
 
         if (want10bit)
         {
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: RvDocument: shouldUseVulkanPresentation()=" << (useVulkan ? "true" : "false") << endl;
+                cout << "INFO: RvDocument: shouldUseNativePresentation()=" << (useVulkan ? "true" : "false") << endl;
             }
             if (!useVulkan)
             {
@@ -1227,10 +1228,13 @@ namespace Rv
 #if defined(PLATFORM_DARWIN) && defined(USE_METAL)
     void RvDocument::fallbackMetalToGLView()
     {
-        // Swap a live MetalView for an 8-bit OpenGL GLView after a runtime Metal
-        // failure.  Invoked (queued) from MetalView::render() when the offscreen
-        // GL context cannot be (re)established, so the user gets a working window
-        // instead of a permanently black one.  Mirrors the Vulkan branch's
+        // Swap a live MetalView for an OpenGL GLView.  Reached both when the
+        // Metal path fails at runtime (queued from MetalView::render() when the
+        // offscreen GL context cannot be (re)established, so the user gets a
+        // working window instead of a permanently black one) and when the user
+        // switches the display output away from 10-bit.  The new GLView is built
+        // from the current display-depth options, so callers persist the desired
+        // depth before invoking this.  Mirrors the Vulkan branch's
         // fallbackVulkanToGLView() and reuses the device-rewiring sequence from
         // rebuildGLView().
         if (!m_metalView)
@@ -1251,7 +1255,7 @@ namespace Rv
             return;
         }
 
-        cerr << "INFO: RvDocument: switching from Metal to OpenGL presentation." << endl;
+        cout << "INFO: RvDocument: switching main view from Metal to OpenGL." << endl;
 
         MetalView* oldView = m_metalView;
         oldView->stopProcessingEvents();
@@ -1287,22 +1291,110 @@ namespace Rv
 
         m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
 
-        if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
-        {
-            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
-            for (size_t i = 0; i < devices.size(); i++)
-            {
-                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
-                    d->setShareDevice(m_glView->videoDevice());
-            }
-        }
+        // Rebuild the desktop presentation devices for the GL backend, re-bind
+        // the share device, and re-open the presentation output on the selected
+        // screen, so the second display follows the main view back to OpenGL
+        // instead of being left mismatched (black).
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
-        // Defer deletion: avoid destroying the MetalView while it may still have
-        // queued events in this event-loop cycle (same rationale as
-        // lazyDeleteGLView()).  It has already been removed from the stacked
-        // layout above; deleteLater() detaches it from its parent on destruction.
         oldView->hide();
         oldView->deleteLater();
+    }
+
+    void RvDocument::swapGLViewToMetal()
+    {
+        // Hot-swap GLView -> MetalView and rebind the live session to the Metal
+        // device.  The forward mirror of fallbackMetalToGLView, reached when the
+        // user selects 10-bit while the main window is running on the OpenGL
+        // GLView and Metal reports 10-bit presentation support.  The caller
+        // persists the desired 10-bit depth before invoking this (so a later
+        // Metal->GL fallback rebuilds GL at the right depth).
+        //
+        // Unlike the Vulkan branch, MetalView's offscreen GL context is created
+        // synchronously, so this can genuinely build-and-verify: the working
+        // GLView is kept until the MetalView reports its context ready, and on
+        // failure the swap is abandoned with the GLView left in place.
+        if (!m_glView || isClosing() || !m_session)
+        {
+            return;
+        }
+
+        cout << "INFO: RvDocument: switching main view from OpenGL to Metal." << endl;
+
+        GLView* oldGLView = m_glView;
+        Qt::KeyboardModifiers cur = oldGLView->videoDevice()->translator().currentModifiers();
+
+        MetalView* newMetalView = new MetalView(this, m_centralWidget, !m_startupResize);
+        newMetalView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
+        newMetalView->setMinimumContentSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        configureViewWidget(newMetalView);
+        newMetalView->setEventWidget(newMetalView);
+
+        // The Metal path renders IPCore through an offscreen GL 2.1 context; the
+        // constructor sets this before session init, so match it here.  Idempotent.
+        IPCore::Shader::Function::useShadingLanguageVersion("1.20");
+
+        // Verify before committing: if the offscreen context/FBO cannot be
+        // established there is nothing to present, so keep the working GLView.
+        newMetalView->videoDevice()->makeCurrent();
+        if (!newMetalView->videoDevice()->isGLContextReady())
+        {
+            cerr << "WARNING: RvDocument: Metal offscreen GL context unavailable; "
+                    "staying on OpenGL."
+                 << endl;
+            delete newMetalView;
+            return;
+        }
+
+        m_stackedLayout->addWidget(newMetalView);
+        oldGLView->stopProcessingEvents();
+
+        m_metalView = newMetalView;
+        m_viewWidget = newMetalView;
+        // On the Metal path m_glView must be null: backend-neutral code across
+        // RvDocument keys the active backend on (!m_glView).
+        m_glView = nullptr;
+
+        newMetalView->show();
+
+        m_stackedLayout->removeWidget(oldGLView);
+        oldGLView->hide();
+
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+
+        m_topViewToolBar->setDevice(m_metalView->videoDevice());
+
+        const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+        m_session->setEventVideoDevice(0);
+        m_session->setOutputVideoDevice(0);
+        m_session->setControlVideoDevice(m_metalView->videoDevice());
+        if (same)
+        {
+            m_session->setOutputVideoDevice(m_metalView->videoDevice());
+        }
+
+        m_metalView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("metal-context-changed", m_metalView->videoDevice()));
+
+        // Rebuild the desktop presentation devices for the Metal backend and
+        // re-open the presentation output on the selected screen, so the second
+        // display follows the promoted Metal main view rather than going black.
+        // No GL share device on Metal; Qt::AA_ShareOpenGLContexts still shares.
+        RvApp()->rebuildDesktopVideoDevices(m_session, nullptr, true);
+
+        // QTMetalVideoDevice only owns a translator once an event widget is set
+        // (done above), but guard anyway — translator() dereferences it.
+        if (m_metalView->videoDevice()->hasTranslator())
+        {
+            m_metalView->videoDevice()->translator().setCurrentModifiers(cur);
+        }
+
+        // Lazy-delete the old GLView a little later (mirrors rebuildGLView):
+        // deleting it inline while the swap is still settling can dump core.
+        m_oldGLView = oldGLView;
+        QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
+
+        m_metalView->videoDevice()->makeCurrent();
+        m_metalView->update();
     }
 #endif
 
@@ -1496,9 +1588,42 @@ namespace Rv
             return;
         }
 #elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //
+        //  10-bit goes through Metal (IOSurface + CALayer): macOS OpenGL cannot
+        //  present 10-bit through a QOpenGLWidget, so a GL context rebuild at
+        //  10-bit fails validity and pops a misleading "Display Configuration is
+        //  Invalid" dialog.
+        //
+        if (type == OpenGL1010102)
+        {
+            // Already on Metal.
+            if (!m_glView)
+            {
+                return;
+            }
+
+            if (MetalView::supports10BitPresentation())
+            {
+                swapGLViewToMetal();
+                return;
+            }
+
+            QMessageBox box(this);
+            box.setWindowModality(Qt::WindowModal);
+            box.setIcon(QMessageBox::Critical);
+            box.setWindowTitle(tr(UI_APPLICATION_NAME ": 10-bit Display Output Unavailable"));
+            box.setText(tr("This display cannot present 10-bit output"));
+            box.setInformativeText(tr("This graphics hardware does not provide a 10-bit presentation surface. " UI_APPLICATION_NAME
+                                      " cannot output 10-bit on this display and will continue in 8-bit."));
+
+            box.exec();
+            return;
+        }
+
+        // Leaving 10-bit while Metal is live: swap back to OpenGL.
         if (!m_glView)
         {
-            warnMetalDisplaySurfaceOptionIgnored();
+            fallbackMetalToGLView();
             return;
         }
 #endif

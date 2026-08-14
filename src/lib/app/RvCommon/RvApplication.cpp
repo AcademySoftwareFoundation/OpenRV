@@ -1962,7 +1962,7 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
-    void RvApplication::rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
+    void RvApplication::rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsNative)
     {
         if (!m_desktopModule)
         {
@@ -1975,7 +1975,7 @@ namespace Rv
 
         // Returns false when the backend is unchanged; the share device is
         // still rebound below.
-        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
+        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsNative);
 
         const VideoModule::VideoDevices& devices = m_desktopModule->devices();
         for (VideoDevice* device : devices)
@@ -1996,6 +1996,32 @@ namespace Rv
         {
             session->graph().refreshPhysicalDevices(videoModules());
             session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
+        }
+
+        if (rebuilt)
+        {
+            //  The main view's device caches the desktop device it sits on; left
+            //  alone it would dangle once the retired devices are purged.
+            const RvDocument* doc = session ? static_cast<const RvDocument*>(session->opaquePointer()) : nullptr;
+            if (TwkGLF::GLVideoDevice* control = doc ? doc->viewVideoDevice() : nullptr)
+            {
+                if (const DesktopVideoDevice* oldDevice = dynamic_cast<const DesktopVideoDevice*>(control->physicalDevice()))
+                {
+                    for (VideoDevice* device : m_desktopModule->devices())
+                    {
+                        DesktopVideoDevice* newDevice = dynamic_cast<DesktopVideoDevice*>(device);
+                        if (newDevice && newDevice != oldDevice && newDevice->qtScreen() == oldDevice->qtScreen())
+                        {
+                            control->setPhysicalDevice(newDevice);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //  Only now is it safe to destroy the replaced devices (see
+            //  DesktopVideoModule::purgeRetiredDevices()).
+            m_desktopModule->purgeRetiredDevices();
         }
 
         // The callers reset the session output device, so re-open and re-bind it.
