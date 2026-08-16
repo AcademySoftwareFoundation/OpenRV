@@ -113,6 +113,18 @@ SET(_patch_command_for_imgui
     patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/imgui_cpp_h.patch
 )
 
+# On macOS, cmake --install runs install_name_tool -delete_rpath on the installed dylib. If the install tree is up-to-date the rpath was already stripped, so
+# delete_rpath fails. Remove the installed copy first so it is recopied from the build tree (which still has the rpath to strip).
+IF(RV_TARGET_DARWIN)
+  SET(_imgui_install_command
+      ${CMAKE_COMMAND} -E remove -f ${_libpath} COMMAND ${_cmake_install_command}
+  )
+ELSE()
+  SET(_imgui_install_command
+      ${_cmake_install_command}
+  )
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_target}
   URL ${_imgui_download_url}
@@ -129,7 +141,7 @@ EXTERNALPROJECT_ADD(
     ${_patch_command_for_imgui}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options} -DFIND_QT_VERSION=${_find_qt_version} -DCMAKE_PREFIX_PATH=${_qt_location}/lib/cmake
   BUILD_COMMAND ${_cmake_build_command}
-  INSTALL_COMMAND ${_cmake_install_command}
+  INSTALL_COMMAND ${_imgui_install_command}
   BUILD_BYPRODUCTS ${_libpath}
   BUILD_ALWAYS FALSE
   USES_TERMINAL_BUILD TRUE

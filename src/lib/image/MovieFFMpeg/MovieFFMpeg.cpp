@@ -20,6 +20,10 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
+#include <boost/thread/lock_algorithms.hpp>
+#include <boost/thread/pthread/mutex.hpp>
+#include <cstddef>
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -34,7 +38,6 @@
 #include <mutex>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mp4v2Utils/mp4v2Utils.h>
@@ -1295,6 +1298,45 @@ namespace TwkMovie
 #endif
     }
 
+    void MovieFFMpegReader::warmOpen()
+    {
+        if (m_filename.empty())
+        {
+            return;
+        }
+
+        boost::lock_guard<boost::mutex> lock(m_deferredOpenLock);
+
+        if (m_avFormatContext != nullptr)
+        {
+            return;
+        }
+
+        try
+        {
+            openAVFormat();
+            findStreamInfo();
+        }
+        catch (const std::exception& exc)
+        {
+            if (m_avFormatContext != nullptr)
+            {
+                avformat_close_input(&m_avFormatContext);
+                m_avFormatContext = nullptr;
+            }
+
+            DBL(DB_GENERAL, "warmOpen failed for " << m_filename << ": " << exc.what());
+        }
+        catch (...)
+        {
+            if (m_avFormatContext != nullptr)
+            {
+                avformat_close_input(&m_avFormatContext);
+                m_avFormatContext = nullptr;
+            }
+        }
+    }
+
     bool MovieFFMpegReader::openAVFormat()
     {
         const bool filepathIsURL = TwkUtil::pathIsURL(m_filename);
@@ -1316,6 +1358,9 @@ namespace TwkMovie
         AVDictionary* fmtOptions = NULL;
         if (filepathIsURL)
         {
+            safe_path = "async:shared:" + safe_path;
+            //!TODO turn this into a env variable
+            std::filesystem::path cache_path = std::filesystem::path("/").root_path() / "tmp";
             for (int i = 0; i < m_request.parameters.size(); i++)
             {
                 const string& name = m_request.parameters[i].first;
@@ -1326,6 +1371,7 @@ namespace TwkMovie
                     av_dict_set_int(&fmtOptions, "seekable", 1, 0);
                     av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
                     av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
+                    av_dict_set(&fmtOptions, "cache_dir", cache_path.c_str(), 0);
                 }
                 else if (name == "headers")
                 {
@@ -1375,11 +1421,20 @@ namespace TwkMovie
 
     bool MovieFFMpegReader::openAVCodec(int index, AVCodecContext** avCodecContext, HardwareContext* hardwareContext)
     {
-        // Make sure the format is opened
+        //
+        //  Make sure the format is opened
+        //
+
+        boost::lock_guard<boost::mutex> lock(m_deferredOpenLock);
         if (m_avFormatContext == nullptr)
         {
-            openAVFormat();
-            findStreamInfo();
+                openAVFormat();
+                findStreamInfo();
+        }
+
+        if (m_avFormatContext == nullptr)
+        {
+            return false;
         }
 
         // Get the codec context
@@ -2824,11 +2879,6 @@ namespace TwkMovie
             fb->newAttribute("View", view);
         fb->newAttribute("File", m_filename);
         fb->newAttribute("Sequence", m_filename);
-    }
-
-    void MovieFFMpegReader::scan()
-    {
-        // NO LONGER NEEDED
     }
 
     void MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks, vector<bool> heroAudioTracks)

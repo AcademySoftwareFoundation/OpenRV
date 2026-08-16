@@ -24,6 +24,7 @@
 #include <TwkMovie/MovieReader.h>
 #include <TwkMovie/MovieWriter.h>
 #include <TwkMovie/dll_defs.h>
+#include <stream/StreamPreloadPool.h>
 
 #ifdef _MSC_VER
 #define strcasecmp _stricmp
@@ -333,6 +334,14 @@ namespace TwkMovie
                 bool isRemove() const;
                 void load();
 
+                //
+                //  Hand this reader's url to the streamer pool so its bytes
+                //  land in the shared protocol cache before playback needs
+                //  them. Returns immediately; local files are ignored.
+                //
+
+                void queuePrefetch();
+
             public:
                 std::string m_filename;
                 Status m_status = Status::PENDING;
@@ -390,6 +399,8 @@ namespace TwkMovie
 
             // control variable to exit the scheduler thread
             bool m_exitRequested;
+
+            StreamerPool streamerPool;
         };
 
     public:

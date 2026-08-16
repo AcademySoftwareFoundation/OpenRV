@@ -38,7 +38,9 @@
 #include <TwkMediaLibrary/Library.h>
 
 #include <algorithm>
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <iterator>
+#include <thread>
 
 #include <boost/algorithm/string/regex.hpp>
 #include <boost/functional/hash.hpp>
@@ -56,6 +58,7 @@
     }
 
 static ENVVAR_BOOL(evIgnoreAudio, "RV_IGNORE_AUDIO", false);
+static ENVVAR_BOOL(evWarmClones, "RV_WARM_CLONES", true);
 static ENVVAR_BOOL(evDebugCookies, "RV_DEBUG_FFMPEG_COOKIES", false);
 static ENVVAR_BOOL(evDebugHeaders, "RV_DEBUG_FFMPEG_HEADERS", false);
 
@@ -370,6 +373,30 @@ namespace IPCore
                     {
                         cerr << "ERROR: failed to clone Movie '" << reader->filename() << "'" << endl;
                         break;
+                    }
+                }
+
+                if (evWarmClones.getValue())
+                {
+                    vector<boost::shared_ptr<MovieReader>> toWarm;
+
+                    for (size_t i = 1; i < sharedMedia->movies.size(); i++)
+                    {
+                        if (boost::shared_ptr<MovieReader> clone = dynamic_pointer_cast<MovieReader>(sharedMedia->movies[i]))
+                        {
+                            toWarm.push_back(clone);
+                        }
+                    }
+
+                    if (boost::shared_ptr<MovieReader> clone = dynamic_pointer_cast<MovieReader>(sharedMedia->audioMovie))
+                    {
+                        toWarm.push_back(clone);
+                    }
+
+                    for (size_t i = 0; i < toWarm.size(); i++)
+                    {
+                        boost::shared_ptr<MovieReader> clone = toWarm[i];
+                        std::thread([clone]() { clone->warmOpen(); }).detach();
                     }
                 }
             }
@@ -2727,24 +2754,6 @@ namespace IPCore
         Movie::ReadRequest request;
         std::copy(m_inparams.begin(), m_inparams.end(), back_inserter(request.parameters));
         MovieReader* reader = TwkMovie::GenericIO::openMovieReader(filename, info, request);
-
-        if (reader && reader->needsScan())
-        {
-            reader->scan();
-
-            string cacheItemString = cacheHash(filename, "movpd_");
-
-            Bundle* bundle = Bundle::mainBundle();
-            string cachePath = bundle->cacheItemPath("MediaMetadata", cacheItemString);
-            boost::filesystem::create_directories(boost::filesystem::path(UNICODE_STR(cachePath)).parent_path());
-
-            TwkContainer::GTOWriter writer;
-            TwkContainer::GTOWriter::ObjectVector objs(1);
-            objs[0] = TwkContainer::GTOWriter::Object(pc, cacheItemString, "MovieIOPrivatedata", 1);
-            writer.write(cachePath.c_str(), objs, Gto::Writer::CompressedGTO);
-
-            bundle->addCacheItem("MediaMetaData", cacheItemString);
-        }
 
         return reader;
     }

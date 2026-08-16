@@ -1731,10 +1731,6 @@ namespace IPCore
         graph().cache().unlock();
         graph().setAudioCachingMode(IPGraph::BufferCache);
         graph().flushAudioCache();
-        
-
-        // !new We're going to need to clear the new cache here too
-
 
         if (!m_beingDeleted)
             graph().reset(App()->videoModules());

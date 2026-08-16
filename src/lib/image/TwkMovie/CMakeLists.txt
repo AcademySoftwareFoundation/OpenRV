@@ -37,7 +37,7 @@ TARGET_INCLUDE_DIRECTORIES(
 
 TARGET_LINK_LIBRARIES(
   ${_target}
-  PUBLIC TwkAudio TwkExc TwkFB stl_ext
+  PUBLIC TwkAudio TwkExc TwkFB stl_ext stream
   PRIVATE TwkFBAux TwkUtil ffmpeg::swresample ${CMAKE_DL_LIBS}
 )
 

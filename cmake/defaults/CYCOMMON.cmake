@@ -61,7 +61,33 @@ SET(RV_DEPS_EXPAT_DOWNLOAD_HASH
 )
 
 # ffmpeg https://github.com/FFmpeg/FFmpeg
-IF(RV_FFMPEG STREQUAL 8)
+IF(RV_FFMPEG STREQUAL 9)
+  SET(RV_FFMPEG_9
+      ON
+  )
+  ADD_COMPILE_DEFINITIONS(RV_FFMPEG_9)
+  SET(RV_DEPS_FFMPEG_VERSION
+      "n9.0"
+  )
+  SET(RV_DEPS_FFMPEG_DOWNLOAD_HASH
+      "4125d1c9fe54424681b47a468afcb0d4"
+  )
+  SET(RV_DEPS_FFMPEG_VERSION_LIB_avutil
+      "61"
+  )
+  SET(RV_DEPS_FFMPEG_VERSION_LIB_swresample
+      "7"
+  )
+  SET(RV_DEPS_FFMPEG_VERSION_LIB_swscale
+      "10"
+  )
+  SET(RV_DEPS_FFMPEG_VERSION_LIB_avcodec
+      "63"
+  )
+  SET(RV_DEPS_FFMPEG_VERSION_LIB_avformat
+      "63"
+  )
+ELSEIF(RV_FFMPEG STREQUAL 8)
   SET(RV_FFMPEG_8
       ON
   )
@@ -141,7 +167,7 @@ ELSEIF(RV_FFMPEG STREQUAL 6)
   )
 ELSE()
   # This will happene if a valid RV_FFMPEG is not defined
-  MESSAGE(FATAL_ERROR "FFMPEG_8, RV_FFMPEG_7, or RV_FFMPEG_6 must be defined to select the FFMPEG version to use")
+  MESSAGE(FATAL_ERROR "RV_FFMPEG_9, RV_FFMPEG_8, RV_FFMPEG_7, or RV_FFMPEG_6 must be defined to select the FFMPEG version to use")
 ENDIF()
 
 # gc https://github.com/ivmai/bdwgc

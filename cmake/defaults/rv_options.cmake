@@ -91,11 +91,11 @@ SET_PROPERTY(
 
 # Supported FFmpeg versions.
 SET(RV_FFMPEG_SUPPORTED_OPTIONS
-    6 7 8
+    6 7 8 9
 )
 # Default option
 SET(_RV_FFMPEG
-    "8"
+    "9"
 )
 
 IF(DEFINED RV_FFMPEG)

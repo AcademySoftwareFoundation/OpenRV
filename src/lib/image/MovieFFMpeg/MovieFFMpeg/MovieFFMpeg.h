@@ -154,6 +154,8 @@ namespace TwkMovie
 
         virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
+        virtual void warmOpen();
+
         virtual bool canConvertAudioChannels() const;
         void close();
 
@@ -166,8 +168,6 @@ namespace TwkMovie
         virtual size_t audioFillBuffer(const AudioReadRequest&, AudioBuffer&);
         virtual MovieReader* clone() const;
         virtual void audioConfigure(const AudioConfiguration& config);
-
-        virtual void scan();
 
         float scanProgress() const { return 1.0; }
 
