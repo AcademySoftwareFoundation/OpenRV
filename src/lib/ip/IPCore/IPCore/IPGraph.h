@@ -11,7 +11,6 @@
 #include <IPCore/IPImage.h>
 #include <IPCore/IPNode.h>
 #include <IPCore/FBCache.h>
-#include <IPCore/MediaCache.h>
 #include <IPCore/IPProperty.h>
 #include <TwkAudio/AudioCache.h>
 #include <TwkContainer/PropertyContainer.h>
@@ -20,7 +19,6 @@
 #include <boost/signals2.hpp>
 #include <boost/thread.hpp>
 #include <atomic>
-#include <deque>
 #include <mutex>
 #include <set>
 
@@ -791,7 +789,6 @@ namespace IPCore
         NodeVector m_renderOutputNodeVector;
         CachingMode m_cacheMode;
         mutable FBCache m_fbcache;
-        mutable MediaCache m_mediacache;
         CacheSizeMap m_cacheSizeMap;
         int m_editing;
         WorkItemIDSet m_mediaLoadingSet;

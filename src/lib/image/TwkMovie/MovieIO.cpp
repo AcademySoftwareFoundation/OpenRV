@@ -150,12 +150,6 @@ namespace TwkMovie
 
     void GenericIO::Preloader::shutdown()
     {
-        //
-        //  Interrupt the prefetch downloads first: they are the only
-        //  threads here that can be parked on a network read, and nothing
-        //  else in shutdown depends on them.
-        //
-
         streamerPool.shutdown();
 
         {

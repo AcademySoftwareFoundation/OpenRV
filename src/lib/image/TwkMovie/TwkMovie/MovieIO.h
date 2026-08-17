@@ -335,9 +335,7 @@ namespace TwkMovie
                 void load();
 
                 //
-                //  Hand this reader's url to the streamer pool so its bytes
-                //  land in the shared protocol cache before playback needs
-                //  them. Returns immediately; local files are ignored.
+                // Used for streamed media only to download raw videos in the background
                 //
 
                 void queuePrefetch();

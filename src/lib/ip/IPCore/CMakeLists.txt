@@ -45,7 +45,6 @@ SET(_sources
     FBCache.cpp
     ShaderValues.cpp
     IPGraph.cpp
-    MediaCache.cpp
     PaintCommand.cpp
     NodeDefinition.cpp
     NodeManager.cpp
