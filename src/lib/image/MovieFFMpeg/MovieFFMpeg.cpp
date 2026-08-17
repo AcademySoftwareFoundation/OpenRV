@@ -461,7 +461,7 @@ namespace TwkMovie
     // when the pool evicts a context it frees it and nulls the owning track's
     // avCodecContext, so openAVCodec() allocates a fresh context on next use.
 
-    std::unique_ptr<ContextPool> globalContextPool{nullptr};
+    ContextPool* globalContextPool = 0;
 
     void ContextPool::flushContext(MovieFFMpegReader* reader, int streamIndex)
     {
@@ -2735,6 +2735,10 @@ namespace TwkMovie
             AVChannelLayout layout = audioCodecContext->ch_layout;
             audioChannels = idAudioChannels(layout, numChannels);
 
+            // The context was opened only to read the audio stream parameters above.
+            // Drop it from the pool before freeing so the pool does not retain a
+            // dangling AVCodecContext* and its open-thread count stays accurate.
+            // Decoding clones reopen their own context on demand in audioFillBuffer().
             ContextPool::flushContext(this, track->number);
             avcodec_free_context(&track->avCodecContext);
             track->isOpen = false;
