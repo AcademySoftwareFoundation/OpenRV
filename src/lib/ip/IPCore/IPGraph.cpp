@@ -322,6 +322,10 @@ namespace IPCore
 
     IPGraph::~IPGraph()
     {
+        setCachingMode(NeverCache, 1, 2, 1, 2, 1, 1, 24.0);
+        finishCachingThread();
+        finishAudioThread();
+
         //
         //  Explicitly delete all nodes so that source nodes close their
         //  decoders (e.g. MovieFFMpegReader::close()) before the graph is
@@ -348,13 +352,8 @@ namespace IPCore
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->stop();
             delete jobDispatcher;
+            m_jobDispatcher = nullptr;
         }
-
-        // m_fbcache.showCacheContents();
-
-        setCachingMode(NeverCache, 1, 2, 1, 2, 1, 1, 24.0);
-        finishCachingThread();
-        finishAudioThread();
 
         pthread_mutex_destroy(&m_internalLock);
         pthread_mutex_destroy(&m_audioInternalLock);
@@ -3765,21 +3764,31 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     IPGraph::WorkItemID IPGraph::addWorkItem(const VoidFunction& function, const char* tag)
     {
-        auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+        if (tag)
+        {
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            return (WorkItemID)jobDispatcher->addJob(WorkItem(function, tag));
+        }
 
-        return (WorkItemID)jobDispatcher->addJob(WorkItem(function, tag));
+        return 0;
     }
 
     void IPGraph::removeWorkItem(WorkItemID id)
     {
-        auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
-        jobDispatcher->removeJob(id);
+        if (id)
+        { 
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            jobDispatcher->removeJob(id);
+        }
     }
 
     void IPGraph::waitWorkItem(WorkItemID id)
     {
-        auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
-        jobDispatcher->waitJob(id);
+        if (id) 
+        {
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            jobDispatcher->waitJob(id);
+        }
     }
 
     void IPGraph::prioritizeWorkItem(WorkItemID id)
