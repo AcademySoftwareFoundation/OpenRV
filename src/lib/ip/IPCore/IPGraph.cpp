@@ -247,7 +247,6 @@ namespace IPCore
         , m_audioThreadGroup(1, 2)
         , m_cacheMode(NeverCache)
         , m_fbcache(this)
-        , m_mediacache(this)
         , m_audioRequestContext(0)
         , m_audioFPS(0)
         , m_minAudioSample(0)
