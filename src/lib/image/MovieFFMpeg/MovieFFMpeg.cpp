@@ -1315,6 +1315,7 @@ namespace TwkMovie
         try
         {
             openAVFormat();
+            findStreamInfo();
         }
         catch (const std::exception& exc)
         {
