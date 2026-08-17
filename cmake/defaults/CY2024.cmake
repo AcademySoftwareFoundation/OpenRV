@@ -105,6 +105,24 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2024")
   )
   # SET(RV_DEPS_PYTHON_VERSION "3.11.14") SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "5f43ab9d5a74b9ac0dd2e20f58740f9e")
 
+  # python-build-standalone (PBS) pins, used only when RV_DEPS_PYTHON_USE_PBS=ON (Release). PBS release 20240814 is the latest that ships CPython 3.11.9 for all
+  # target triples. Hashes are the official .sha256 sidecars published next to each install_only asset. Keep the tag in sync with RV_DEPS_PYTHON_VERSION above.
+  SET(RV_DEPS_PYTHON_PBS_RELEASE_TAG
+      "20240814"
+  )
+  SET(RV_DEPS_PYTHON_PBS_HASH_AARCH64_APPLE_DARWIN
+      "8760e908f25fdc8a01f4d1b101854ac047b4eacb723fb2593a168fb989c86eef"
+  )
+  SET(RV_DEPS_PYTHON_PBS_HASH_X86_64_APPLE_DARWIN
+      "76073305812c093ce840df9c4c17068aa69da8d951e7376ef48f43376986a13e"
+  )
+  SET(RV_DEPS_PYTHON_PBS_HASH_X86_64_LINUX_GNU
+      "9a332ba354f3b4e8a96a15db6b2805a7a31dcc1b6b9c1b7b93e5246949fbb50f"
+  )
+  SET(RV_DEPS_PYTHON_PBS_HASH_X86_64_WINDOWS_MSVC
+      "4c71d25731214b8a960d1d87510f24179d819249c5b434aaf7135818421b6215"
+  )
+
   # Qt
   SET(RV_DEPS_QT_VERSION
       "6.5.3"
