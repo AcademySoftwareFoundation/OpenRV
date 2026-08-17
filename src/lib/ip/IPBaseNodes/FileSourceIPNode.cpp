@@ -59,6 +59,7 @@
 
 static ENVVAR_BOOL(evIgnoreAudio, "RV_IGNORE_AUDIO", false);
 static ENVVAR_BOOL(evWarmClones, "RV_WARM_CLONES", true);
+static ENVVAR_INT(evWarmCloneThreads, "RV_WARM_CLONE_THREADS", 2);
 static ENVVAR_BOOL(evDebugCookies, "RV_DEBUG_FFMPEG_COOKIES", false);
 static ENVVAR_BOOL(evDebugHeaders, "RV_DEBUG_FFMPEG_HEADERS", false);
 
@@ -393,10 +394,21 @@ namespace IPCore
                         toWarm.push_back(clone);
                     }
 
-                    for (size_t i = 0; i < toWarm.size(); i++)
+                    const int configuredWarmThreads = evWarmCloneThreads.getValue();
+                    const size_t warmThreads =
+                        std::min(toWarm.size(), size_t(configuredWarmThreads));
+
+                    for (size_t worker = 0; worker < warmThreads; worker++)
                     {
-                        boost::shared_ptr<MovieReader> clone = toWarm[i];
-                        std::thread([clone]() { clone->warmOpen(); }).detach();
+                        std::thread(
+                            [toWarm, worker, warmThreads]()
+                            {
+                                for (size_t i = worker; i < toWarm.size(); i += warmThreads)
+                                {
+                                    toWarm[i]->warmOpen();
+                                }
+                            })
+                            .detach();
                     }
                 }
             }

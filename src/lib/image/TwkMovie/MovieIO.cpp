@@ -234,15 +234,18 @@ namespace TwkMovie
 
     void GenericIO::Preloader::addReader(const std::string_view filename, const Movie::ReadRequest& request)
     {
-        std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+        std::shared_ptr<Preloader::Reader> newReader;
 
-        //        std::cerr << "PRELOADER ADD " << filename << std::endl;
+        {
+            std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
 
-        auto newReader = std::make_shared<Preloader::Reader>(filename, request);
+            //        std::cerr << "PRELOADER ADD " << filename << std::endl;
 
-        m_readers.push_back(newReader);
+            newReader = std::make_shared<Preloader::Reader>(filename, request);
+            m_readers.push_back(newReader);
+        }
 
-        // newReader->queuePrefetch();
+        newReader->queuePrefetch();
 
         // Wake up the scheduler thread in order to process the
         // newly added readers.
