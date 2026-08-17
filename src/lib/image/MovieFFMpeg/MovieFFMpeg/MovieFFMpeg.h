@@ -154,7 +154,10 @@ namespace TwkMovie
 
         virtual void postPreloadOpen(const MovieInfo& as, const ReadRequest& request);
 
-        virtual void warmOpen();
+        //
+        // Used for streamed media only to establish connections at the launch of RV for movie reader clones
+        //
+        void warmOpen() override;
 
         virtual bool canConvertAudioChannels() const;
         void close();
