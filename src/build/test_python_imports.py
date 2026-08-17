@@ -36,7 +36,6 @@ SKIP_IMPORTS = [
 # Additional imports to test beyond what's in requirements.txt.in.
 # These test deeper functionality (e.g., sub-modules that verify OpenSSL legacy provider support).
 ADDITIONAL_IMPORTS = [
-    "opentimelineio",  # Installed via python3.cmake phase 2a (git source, force-rebuilt each build)
     "cryptography.fernet",
     "cryptography.hazmat.bindings._rust",
 ]

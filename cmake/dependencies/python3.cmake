@@ -250,13 +250,10 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
-# Using a fork until the main branch of OTIO merge the PR to fix a crash on windows with a debug build of OpenRV. Installed separately (phase 2a) with
-# --force-reinstall so native extensions are always rebuilt against RV's Python.
-SET(_otio_pip_spec
-    "opentimelineio @ git+https://github.com/cedrik-fuoco-adsk/OpenTimelineIO.git@fix-windows-debug-crash"
-)
-
-# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries.
+# OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
+# new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
+# PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
+# --force-reinstall: Reinstall packages even if already installed (ensures fresh build)
 
 # Set OTIO_CXX_DEBUG_BUILD for all Debug builds to ensure OTIO's C++ extensions are built with debug symbols and proper optimization levels matching RV's build
 # type. On Windows, this also ensures OTIO links against the debug Python library (python311_d.lib).
@@ -273,9 +270,9 @@ ENDIF()
 # Build dependencies that must be installed FIRST before building other packages. These are installed from wheels in a separate pip command to ensure they're
 # available when packages like PyOpenGL_accelerate need Cython to compile .pyx files.
 SET(RV_PYTHON_BUILD_DEPS
-    "pip==24.0" # Package installer (pure Python)
-    "setuptools==69.5.1" # Build system (pure Python)
-    "wheel==0.43.0" # Wheel format support (pure Python)
+    "pip" # Package installer (pure Python)
+    "setuptools" # Build system (pure Python)
+    "wheel" # Wheel format support (pure Python)
     "Cython" # Build tool - MUST be installed before packages with .pyx files
     "meson-python" # Build backend (pure Python)
     "ninja" # Build tool (native but doesn't link to Python)
@@ -323,7 +320,7 @@ SET(_build_deps_install_command
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
-SET(_pip_install_env_command
+SET(_requirements_install_command
     ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
 )
 # On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
@@ -336,7 +333,7 @@ SET(_pip_install_env_command
 # file or directory"). --modify prepends at runtime instead.
 IF(RV_TARGET_WINDOWS)
   CMAKE_PATH(GET CMAKE_COMMAND PARENT_PATH _cmake_bin_dir)
-  LIST(APPEND _pip_install_env_command "--modify" "PATH=path_list_prepend:${_cmake_bin_dir}")
+  LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_cmake_bin_dir}")
 
   # Also prepend the MSVC compiler directory so nested CMake invocations (e.g. from OTIO's setup.py / scikit-build) can find cl.exe. On MSVC, CMAKE_C_COMPILER
   # and CMAKE_CXX_COMPILER both point to cl.exe in the same HostX64\x64 directory, so a single PATH prepend covers both C and C++ compilation. We use
@@ -346,9 +343,9 @@ IF(RV_TARGET_WINDOWS)
   )
     CMAKE_PATH(GET CMAKE_C_COMPILER PARENT_PATH _msvc_c_compiler_dir)
     CMAKE_PATH(GET CMAKE_CXX_COMPILER PARENT_PATH _msvc_cxx_compiler_dir)
-    LIST(APPEND _pip_install_env_command "--modify" "PATH=path_list_prepend:${_msvc_c_compiler_dir}")
+    LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_msvc_c_compiler_dir}")
     IF(NOT _msvc_c_compiler_dir STREQUAL _msvc_cxx_compiler_dir)
-      LIST(APPEND _pip_install_env_command "--modify" "PATH=path_list_prepend:${_msvc_cxx_compiler_dir}")
+      LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_msvc_cxx_compiler_dir}")
     ENDIF()
   ELSE()
     MESSAGE(WARNING "CMAKE_C_COMPILER or CMAKE_CXX_COMPILER not set on Windows: opentimelineio pip build may fail to find cl.exe")
@@ -362,12 +359,12 @@ IF(RV_TARGET_WINDOWS)
       "${_pip_drive}/_t"
   )
   FILE(MAKE_DIRECTORY "${_pip_tmp_dir}")
-  LIST(APPEND _pip_install_env_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
+  LIST(APPEND _requirements_install_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
 ENDIF()
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
 IF(DEFINED RV_DEPS_OPENSSL_INSTALL_DIR)
-  LIST(APPEND _pip_install_env_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
+  LIST(APPEND _requirements_install_command "OPENSSL_DIR=${RV_DEPS_OPENSSL_INSTALL_DIR}")
 ENDIF()
 
 # CMAKE_ARGS is split on whitespace by pip/setuptools/OTIO setup.py, so compiler paths containing spaces (e.g. "C:/Program Files/Microsoft Visual Studio/...")
@@ -402,9 +399,13 @@ ELSE()
   )
 ENDIF()
 
-# Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (numpy, PyOpenGL-accelerate, cryptography, pydantic,
-# cffi, etc.) will be built from source for proper ABI compatibility.
-SET(_pip_common_install_args
+# Build all packages from source except those in RV_PYTHON_WHEEL_SAFE. Packages with native extensions (opentimelineio, numpy, PyOpenGL-accelerate,
+# cryptography, pydantic, cffi, etc.) will be built from source for proper ABI compatibility.
+LIST(
+  APPEND
+  _requirements_install_command
+  # Use old and more recent library name convention to ensure the correct library is used in the build.
+  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
   "${_python3_executable}"
   -s
   -E
@@ -414,29 +415,7 @@ SET(_pip_common_install_args
   install
   --upgrade
   --no-cache-dir
-  --no-build-isolation
-  --retries
-  10
-  --timeout
-  120
-)
-
-# Phase 2a: OpenTimelineIO must be force-reinstalled every build so native extensions match RV's Python ABI.
-SET(_otio_install_command
-  ${_pip_install_env_command}
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
-  ${_pip_common_install_args}
   --force-reinstall
-  --no-binary
-  opentimelineio
-  ${_otio_pip_spec}
-)
-
-# Phase 2b: Remaining requirements (skip already-satisfied packages to avoid unnecessary PyPI downloads).
-SET(_requirements_install_command
-  ${_pip_install_env_command}
-  "CMAKE_ARGS=-DPYTHON_LIBRARY=${_python3_cmake_library} -DPYTHON_INCLUDE_DIR=${_include_dir} -DPYTHON_EXECUTABLE=${_python3_executable} -DPython_INCLUDE_DIR=${_include_dir} -DPython_LIBRARY=${_python3_cmake_library} -DPython_EXECUTABLE=${_python3_executable} -DPython_ROOT_DIR=${_install_dir}"
-  ${_pip_common_install_args}
   --no-binary
   :all:
   --only-binary
@@ -512,7 +491,6 @@ SET(${_python3_target}-requirements-flag
 ADD_CUSTOM_COMMAND(
   COMMENT "Installing requirements from ${_requirements_output_file} pyside and other dependencies"
   OUTPUT ${${_python3_target}-requirements-flag}
-  COMMAND ${_otio_install_command}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
