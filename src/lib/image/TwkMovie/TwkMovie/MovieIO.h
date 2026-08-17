@@ -384,9 +384,16 @@ namespace TwkMovie
             std::thread m_schedulerThread;
 
             // number of actively loading readers, and the
+            // ceiling thread count. The ceiling thread count
+            // may exceed m_maxThreads if somehow all readers
+            // get prioritized.
             int m_maxThreads;         // max allowable threads, unless the load is
                                       // lagging.
             int m_threadCount;        // currently running readers
+            int m_ceilingThreadCount; // ceiling running readers
+            int m_completedCount;     // done reading count
+            int m_notReadyCount;      // count we had to wait to complete
+            int m_getCount;           // number of times getReader was called
 
             // control variable to exit the scheduler thread
             bool m_exitRequested;

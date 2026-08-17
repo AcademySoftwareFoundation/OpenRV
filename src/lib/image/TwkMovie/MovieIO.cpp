@@ -141,6 +141,10 @@ namespace TwkMovie
         : m_maxThreads(32)
         , m_exitRequested(false)
         , m_threadCount(0)
+        , m_ceilingThreadCount(0)
+        , m_completedCount(0)
+        , m_notReadyCount(0)
+        , m_getCount(0)
     {
     }
 
@@ -176,6 +180,8 @@ namespace TwkMovie
 
     void GenericIO::Preloader::finalizeCompletedThreads()
     {
+        bool update = false;
+
         // Finalize completed threads.
         for (auto& reader : m_readers)
         {
@@ -191,6 +197,8 @@ namespace TwkMovie
                     reader->m_thread.join();
                     reader->m_thread = std::thread();
                     m_threadCount--;
+                    m_completedCount++;
+                    update = true;
                 }
             }
         }
@@ -199,9 +207,23 @@ namespace TwkMovie
         // from the getReader method and that have been marked for removal.
 
         auto range = std::remove_if(m_readers.begin(), m_readers.end(),
-                                    [](const std::shared_ptr<Reader>& reader) { return reader->isRemove(); });
+                                    [&update](const std::shared_ptr<Reader>& reader)
+                                    {
+                                        bool remove = reader->isRemove();
+                                        if (remove)
+                                            update = true;
+                                        return remove;
+                                    });
 
         m_readers.erase(range, m_readers.end());
+
+        /*
+        if (update)
+            std::cerr << "PRELOADER STATS DONE(" << m_completedCount << ") GET("
+                      << m_getCount << ") NR(" << m_notReadyCount << ") TCNT("
+                      << m_threadCount << ") TCEIL(" << m_ceilingThreadCount
+                      << ")" << std::endl;
+        */
     }
 
     void GenericIO::Preloader::addReader(const std::string_view filename, const Movie::ReadRequest& request)
@@ -210,6 +232,8 @@ namespace TwkMovie
 
         {
             std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
+
+            //        std::cerr << "PRELOADER ADD " << filename << std::endl;
 
             newReader = std::make_shared<Preloader::Reader>(filename, request);
             m_readers.push_back(newReader);
@@ -248,6 +272,10 @@ namespace TwkMovie
 
     MovieReader* GenericIO::Preloader::getReader(std::string_view filename, const MovieInfo& info, Movie::ReadRequest& request)
     {
+        //        std::cerr << "PRELOADER GET " << filename << std::endl;
+
+        m_getCount++;
+
         std::shared_ptr<Reader> reader = nullptr;
 
         //
@@ -284,6 +312,7 @@ namespace TwkMovie
             {
                 // if so, we don't have enough threads and our maxThreads
                 reader->setPriority(true);
+                m_notReadyCount++;
 
                 // Wake up the scheduler thread so that it may
                 // schedule this reader.
@@ -313,6 +342,10 @@ namespace TwkMovie
             if (movieReader)
             {
                 movieReader->postPreloadOpen(info, request);
+            }
+            else
+            {
+                std::cerr << "PRELOADER READ ERROR: " << reader->filename() << std::endl;
             }
 
             return movieReader;
@@ -381,6 +414,8 @@ namespace TwkMovie
                     // we have confirmed we can schedule a new reader thread.
                     reader->setStatus(Reader::Status::LOADING);
                     m_threadCount++;
+                    if (m_ceilingThreadCount < m_threadCount)
+                        m_ceilingThreadCount = m_threadCount;
 
                     // Start the loader thread
                     reader->m_thread = std::thread(&Preloader::loaderThreadFunc, this, reader);
