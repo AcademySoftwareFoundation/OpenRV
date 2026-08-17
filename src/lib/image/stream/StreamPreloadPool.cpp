@@ -39,8 +39,6 @@ int StreamerPool::interruptCallback(void* opaque)
 
 void StreamerPool::enqueue(const std::string& url, const Options& options)
 {
-    bool queued = false;
-
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -49,26 +47,19 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
             return;
         }
 
-        if (queued)
+        Job job;
+        job.url = url;
+        job.options = options;
+        m_queue.push_back(job);
+
+        // Start the scheduler loop on a new thread the first time we add a file
+        if (!m_scheduler.joinable())
         {
-            Job job;
-            job.url = url;
-            job.options = options;
-            m_queue.push_back(job);
-
-
-            // Start the scheduler loop on a new thread the first time we add a file
-            if (!m_scheduler.joinable())
-            {
-                m_scheduler = std::thread(&StreamerPool::schedulerLoop, this);
-            }
+            m_scheduler = std::thread(&StreamerPool::schedulerLoop, this);
         }
     }
 
-    if (queued)
-    {
-        m_wake.notify_one();
-    }
+    m_wake.notify_all();
 }
 
 void StreamerPool::schedulerLoop()
@@ -126,7 +117,7 @@ void StreamerPool::workerFunc(Job job)
         m_finished.insert(std::this_thread::get_id());
     }
 
-    m_wake.notify_one();
+    m_wake.notify_all();
 }
 
 void StreamerPool::download(const Job& job)
@@ -189,7 +180,7 @@ void StreamerPool::shutdown()
     }
 
     m_abort.store(true);
-    m_wake.notify_one();
+    m_wake.notify_all();
 
     if (m_scheduler.joinable())
     {
@@ -206,4 +197,10 @@ void StreamerPool::shutdown()
 
     m_activeWorkers.clear();
     m_finished.clear();
+
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_abort.store(false);
+        m_stopped = false;
+    }
 }
