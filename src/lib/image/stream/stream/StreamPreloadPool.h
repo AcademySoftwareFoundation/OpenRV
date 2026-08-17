@@ -108,15 +108,6 @@ private:
     const size_t m_maxThreads;
     std::atomic<bool> m_abort;
 
-    //
-    //  Reported at shutdown when RV_STREAM_PREFETCH_DEBUG is set.
-    //
-
-    std::atomic<int> m_completedCount;
-    std::atomic<int> m_failedCount;
-    std::atomic<int> m_abortedCount;
-    std::atomic<long long> m_byteCount;
-
     std::mutex m_mutex;
     std::condition_variable m_wake;
 

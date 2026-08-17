@@ -10,11 +10,6 @@
 
 #include <TwkUtil/EnvVar.h>
 
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-
 extern "C"
 {
 #include <libavformat/avio.h>
@@ -22,7 +17,6 @@ extern "C"
 #include <libavutil/error.h>
 }
 
-static ENVVAR_BOOL(evPrefetchDebug, "RV_STREAM_PREFETCH_DEBUG", false);
 static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 4);
 
 namespace
@@ -35,18 +29,6 @@ namespace
     //
 
     const int readChunkSize = 32 * 1024;
-
-    //
-    //  Composed first and written once: several workers log at the same
-    //  time and a streamed message interleaves mid line.
-    //
-
-    void logLine(const std::string& message) { std::cerr << message + "\n" << std::flush; }
-
-    double secondsSince(const std::chrono::steady_clock::time_point& start)
-    {
-        return std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
-    }
 
     //
     //  Deliberately resolved here rather than as a default argument: the
@@ -69,29 +51,11 @@ namespace
         return configured > 0 ? size_t(configured) : size_t(evPrefetchThreads.getDefaultValue());
     }
 
-    std::string errorString(int code)
-    {
-        char text[AV_ERROR_MAX_STRING_SIZE] = {0};
-        av_strerror(code, text, sizeof(text));
-        return std::string(text);
-    }
-
-    std::string megabytes(long long bytes)
-    {
-        std::ostringstream str;
-        str << std::fixed << std::setprecision(1) << (double(bytes) / (1024.0 * 1024.0)) << " MB";
-        return str.str();
-    }
-
 } // namespace
 
 StreamerPool::StreamerPool(size_t maxThreads)
     : m_maxThreads(resolveThreadCount(maxThreads))
     , m_abort(false)
-    , m_completedCount(0)
-    , m_failedCount(0)
-    , m_abortedCount(0)
-    , m_byteCount(0)
     , m_stopped(false)
 {
 }
@@ -107,7 +71,6 @@ int StreamerPool::interruptCallback(void* opaque)
 void StreamerPool::enqueue(const std::string& url, const Options& options)
 {
     bool queued = false;
-    size_t pending = 0;
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -123,7 +86,6 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
             job.url = url;
             job.options = options;
             m_queue.push_back(job);
-            pending = m_queue.size();
 
             //
             //  Start the scheduler on the first job rather than paying for
@@ -139,18 +101,6 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
 
     if (queued)
         m_wake.notify_all();
-
-    //
-    //  Logged outside the lock so a slow console cannot stall the workers.
-    //
-
-    if (evPrefetchDebug.getValue())
-    {
-        if (queued)
-            logLine("INFO: prefetch queued " + url + " (pending " + std::to_string(pending) + ")");
-        else
-            logLine("INFO: prefetch already known, skipping " + url);
-    }
 }
 
 void StreamerPool::schedulerLoop()
@@ -228,8 +178,6 @@ void StreamerPool::download(const Job& job)
     interrupt.callback = &StreamerPool::interruptCallback;
     interrupt.opaque = this;
 
-    const std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
-
     AVIOContext* context = NULL;
     const int status = avio_open2(&context, job.url.c_str(), AVIO_FLAG_READ, &interrupt, &options);
 
@@ -237,23 +185,10 @@ void StreamerPool::download(const Job& job)
 
     if (status < 0 || context == NULL)
     {
-        m_failedCount++;
-        logLine("WARNING: prefetch could not open " + job.url);
         return;
     }
 
-    //
-    //  Worth reporting separately: on an https source this is the DNS
-    //  lookup, the TCP connect and the TLS handshake, which is the latency
-    //  the prefetch exists to move off the playback path.
-    //
-
-    const double openSeconds = secondsSince(started);
-    const int64_t expected = avio_size(context);
-
     std::vector<unsigned char> buffer(readChunkSize);
-    long long bytes = 0;
-    int error = 0;
 
     while (!m_abort.load())
     {
@@ -262,70 +197,11 @@ void StreamerPool::download(const Job& job)
         if (n == 0 || n == AVERROR_EOF)
             break;
 
-        //
-        //  A short read is the end of the file, but a negative return is a
-        //  real failure part way through. Distinguishing them matters: a
-        //  download killed by an expired token or a rejected range request
-        //  otherwise looks exactly like a complete one.
-        //
-
         if (n < 0)
-        {
-            error = n;
             break;
-        }
-
-        bytes += n;
     }
 
     avio_closep(&context);
-
-    const bool aborted = m_abort.load();
-    const double totalSeconds = secondsSince(started);
-    const bool truncated = (error == 0 && !aborted && expected > 0 && bytes < expected);
-
-    m_byteCount += bytes;
-
-    if (error != 0 || truncated)
-        m_failedCount++;
-    else if (aborted)
-        m_abortedCount++;
-    else
-        m_completedCount++;
-
-    std::ostringstream str;
-
-    if (error != 0)
-        str << "WARNING: prefetch read failed for ";
-    else if (truncated)
-        str << "WARNING: prefetch truncated for ";
-    else if (aborted)
-        str << "INFO: prefetch aborted ";
-    else
-        str << "INFO: prefetch done ";
-
-    str << job.url << " (" << megabytes(bytes);
-
-    if (expected > 0)
-        str << " of " << megabytes(expected);
-
-    str << " in " << std::fixed << std::setprecision(2) << totalSeconds << "s, open " << openSeconds << "s";
-
-    if (totalSeconds > 0.0)
-        str << ", " << megabytes(static_cast<long long>(double(bytes) / totalSeconds)) << "/s";
-
-    if (error != 0)
-        str << ", " << errorString(error);
-
-    str << ")";
-
-    //
-    //  Failures are always worth reporting; the rest is noise unless the
-    //  debug variable is set.
-    //
-
-    if (error != 0 || truncated || evPrefetchDebug.getValue())
-        logLine(str.str());
 }
 
 void StreamerPool::shutdown()
@@ -365,14 +241,4 @@ void StreamerPool::shutdown()
 
     m_workers.clear();
     m_finished.clear();
-
-    if (evPrefetchDebug.getValue())
-    {
-        std::ostringstream str;
-
-        str << "INFO: prefetch summary (" << m_maxThreads << " threads): " << m_completedCount.load() << " completed, "
-            << m_failedCount.load() << " failed, " << m_abortedCount.load() << " aborted, " << megabytes(m_byteCount.load()) << " total";
-
-        logLine(str.str());
-    }
 }
