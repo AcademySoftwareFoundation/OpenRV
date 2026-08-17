@@ -91,8 +91,6 @@ namespace TwkMovie
                 return;
             }
             setStatus(Reader::Status::LOADED);
-
-            queuePrefetch();
         }
         catch (...)
         {
@@ -243,6 +241,8 @@ namespace TwkMovie
         auto newReader = std::make_shared<Preloader::Reader>(filename, request);
 
         m_readers.push_back(newReader);
+
+        newReader->queuePrefetch();
 
         // Wake up the scheduler thread in order to process the
         // newly added readers.

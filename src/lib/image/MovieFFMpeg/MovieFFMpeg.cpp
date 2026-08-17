@@ -21,7 +21,7 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
 #include <boost/thread/lock_algorithms.hpp>
-#include <boost/thread/pthread/mutex.hpp>
+#include <boost/thread/mutex.hpp>
 #include <cstddef>
 #include <filesystem>
 #include <iostream>
@@ -1360,7 +1360,12 @@ namespace TwkMovie
         {
             safe_path = "async:shared:" + safe_path;
             //!TODO turn this into a env variable
-            std::filesystem::path cache_path = std::filesystem::path("/").root_path() / "tmp";
+            const std::string cachePath = (std::filesystem::path("/").root_path() / "tmp").string();
+            av_dict_set_int(&fmtOptions, "seekable", 1, 0);
+            av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
+            av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
+            av_dict_set(&fmtOptions, "cache_dir", cachePath.c_str(), 0);
+
             for (int i = 0; i < m_request.parameters.size(); i++)
             {
                 const string& name = m_request.parameters[i].first;
@@ -1368,23 +1373,17 @@ namespace TwkMovie
                 if (name == "cookies")
                 {
                     av_dict_set(&fmtOptions, "cookies", value.c_str(), 0);
-                    av_dict_set_int(&fmtOptions, "seekable", 1, 0);
-                    av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
-                    av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
-                    av_dict_set(&fmtOptions, "cache_dir", cache_path.c_str(), 0);
                 }
                 else if (name == "headers")
                 {
                     av_dict_set(&fmtOptions, "headers", value.c_str(), 0);
-                    av_dict_set_int(&fmtOptions, "seekable", 1, 0);
-                    av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
-                    av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
                 }
             }
         }
 
         // Open the file
         const int ret = avformat_open_input(&m_avFormatContext, safe_path.c_str(), 0, &fmtOptions);
+        av_dict_free(&fmtOptions);
         if (ret != 0)
             TWK_THROW_EXC_STREAM("Failed to open " << m_filename << " for reading: " << avErr2Str(ret));
 
