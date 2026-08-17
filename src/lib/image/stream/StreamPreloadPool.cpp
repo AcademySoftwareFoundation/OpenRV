@@ -6,6 +6,7 @@
 //
 //******************************************************************************
 
+#include <cstddef>
 #include <stream/StreamPreloadPool.h>
 
 #include <TwkUtil/EnvVar.h>
@@ -17,44 +18,12 @@ extern "C"
 #include <libavutil/error.h>
 }
 
-static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 4);
+// 32 KB
+const int readChunkSize = 32 * 1024;
+const size_t MAX_THREADS = 12;
 
-namespace
-{
-
-    //
-    //  The shared protocol hands back a single block per read, so asking
-    //  for more than the block size just leaves the tail of the buffer
-    //  unused.
-    //
-
-    const int readChunkSize = 32 * 1024;
-
-    //
-    //  Deliberately resolved here rather than as a default argument: the
-    //  pool is a static member, and EnvVar::getValue initializes itself on
-    //  demand, so reading it during static construction is safe.
-    //
-
-    size_t resolveThreadCount(size_t requested)
-    {
-        if (requested > 0)
-            return requested;
-
-        //
-        //  An empty or non numeric value parses as 0, so fall back to the
-        //  variable's own default rather than silently running single
-        //  threaded.
-        //
-
-        const int configured = evPrefetchThreads.getValue();
-        return configured > 0 ? size_t(configured) : size_t(evPrefetchThreads.getDefaultValue());
-    }
-
-} // namespace
-
-StreamerPool::StreamerPool(size_t maxThreads)
-    : m_maxThreads(resolveThreadCount(maxThreads))
+StreamerPool::StreamerPool()
+    : m_maxThreads(MAX_THREADS)
     , m_abort(false)
     , m_stopped(false)
 {
@@ -64,7 +33,7 @@ StreamerPool::~StreamerPool() { shutdown(); }
 
 int StreamerPool::interruptCallback(void* opaque)
 {
-    const StreamerPool* pool = static_cast<const StreamerPool*>(opaque);
+    const auto *const pool = static_cast<const StreamerPool*>(opaque);
     return pool->m_abort.load() ? 1 : 0;
 }
 
@@ -76,9 +45,9 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
         std::lock_guard<std::mutex> lock(m_mutex);
 
         if (m_stopped)
+        {
             return;
-
-        queued = m_known.insert(url).second;
+        }
 
         if (queued)
         {
@@ -87,11 +56,8 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
             job.options = options;
             m_queue.push_back(job);
 
-            //
-            //  Start the scheduler on the first job rather than paying for
-            //  an idle thread in sessions that never stream anything.
-            //
 
+            // Start the scheduler loop on a new thread the first time we add a file
             if (!m_scheduler.joinable())
             {
                 m_scheduler = std::thread(&StreamerPool::schedulerLoop, this);
@@ -100,7 +66,9 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
     }
 
     if (queued)
-        m_wake.notify_all();
+    {
+        m_wake.notify_one();
+    }
 }
 
 void StreamerPool::schedulerLoop()
@@ -113,36 +81,38 @@ void StreamerPool::schedulerLoop()
                     [this]
                     {
                         reapFinished();
-                        return m_stopped || (!m_queue.empty() && m_workers.size() < m_maxThreads);
+                        return m_stopped || (!m_queue.empty() && m_activeWorkers.size() < m_maxThreads);
                     });
 
         if (m_stopped)
+        {
             return;
+        }
 
-        while (!m_queue.empty() && m_workers.size() < m_maxThreads)
+        while (!m_queue.empty() && m_activeWorkers.size() < m_maxThreads)
         {
             Job job = m_queue.front();
             m_queue.pop_front();
-            m_workers.push_back(std::thread(&StreamerPool::workerFunc, this, job));
+            m_activeWorkers.emplace_back(&StreamerPool::workerFunc, this, job);
         }
     }
 }
 
 void StreamerPool::reapFinished()
 {
-    std::list<std::thread>::iterator i = m_workers.begin();
+    auto worker_it = m_activeWorkers.begin();
 
-    while (i != m_workers.end())
+    while (worker_it != m_activeWorkers.end())
     {
-        if (m_finished.count(i->get_id()) > 0)
+        if (m_finished.count(worker_it->get_id()) > 0)
         {
-            m_finished.erase(i->get_id());
-            i->join();
-            i = m_workers.erase(i);
+            m_finished.erase(worker_it->get_id());
+            worker_it->join();
+            worker_it = m_activeWorkers.erase(worker_it);
         }
         else
         {
-            ++i;
+            ++worker_it;
         }
     }
 }
@@ -153,52 +123,52 @@ void StreamerPool::workerFunc(Job job)
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        m_known.erase(job.url);
         m_finished.insert(std::this_thread::get_id());
     }
 
-    //
-    //  Wake the scheduler so it can reap this thread and start whatever is
-    //  next in the queue.
-    //
-
-    m_wake.notify_all();
+    m_wake.notify_one();
 }
 
 void StreamerPool::download(const Job& job)
 {
-    AVDictionary* options = NULL;
+    AVDictionary* options = nullptr;
 
-    for (size_t i = 0; i < job.options.size(); i++)
+    // Add the options for FFMPEG reading over HTTPS
+    for (const auto &[key, value]: job.options)
     {
-        av_dict_set(&options, job.options[i].first.c_str(), job.options[i].second.c_str(), 0);
+        av_dict_set(&options, key.c_str(), value.c_str(), 0);
     }
 
     AVIOInterruptCB interrupt;
     interrupt.callback = &StreamerPool::interruptCallback;
     interrupt.opaque = this;
 
-    AVIOContext* context = NULL;
+    AVIOContext* context = nullptr;
     const int status = avio_open2(&context, job.url.c_str(), AVIO_FLAG_READ, &interrupt, &options);
 
     av_dict_free(&options);
 
-    if (status < 0 || context == NULL)
+    if (status < 0 || context == nullptr)
     {
         return;
     }
 
     std::vector<unsigned char> buffer(readChunkSize);
 
+    // Drain all the bytes from the stream to download the raw media
     while (!m_abort.load())
     {
-        const int n = avio_read(context, &buffer[0], readChunkSize);
+        const int ret = avio_read(context, buffer.data(), readChunkSize);
 
-        if (n == 0 || n == AVERROR_EOF)
+        if (ret == 0 || ret == AVERROR_EOF)
+        {
             break;
+        }
 
-        if (n < 0)
+        if (ret < 0)
+        {
             break;
+        }
     }
 
     avio_closep(&context);
@@ -210,35 +180,30 @@ void StreamerPool::shutdown()
         std::lock_guard<std::mutex> lock(m_mutex);
 
         if (m_stopped)
+        {
             return;
+        }
 
         m_stopped = true;
         m_queue.clear();
-        m_known.clear();
     }
-
-    //
-    //  Set after m_stopped so that a worker already inside avio_open2 or
-    //  avio_read is interrupted rather than waited on.
-    //
 
     m_abort.store(true);
-    m_wake.notify_all();
+    m_wake.notify_one();
 
     if (m_scheduler.joinable())
-        m_scheduler.join();
-
-    //
-    //  The scheduler has exited and enqueue refuses to start anything new,
-    //  so m_workers is stable from here on.
-    //
-
-    for (std::list<std::thread>::iterator i = m_workers.begin(); i != m_workers.end(); ++i)
     {
-        if (i->joinable())
-            i->join();
+        m_scheduler.join();
     }
 
-    m_workers.clear();
+    for (auto &worker: m_activeWorkers)
+    {
+        if (worker.joinable())
+        {
+            worker.join();
+        }
+    }
+
+    m_activeWorkers.clear();
     m_finished.clear();
 }

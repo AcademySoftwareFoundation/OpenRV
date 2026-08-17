@@ -393,7 +393,7 @@ namespace TwkMovie
             // control variable to exit the scheduler thread
             bool m_exitRequested;
 
-            StreamerPool streamerPool;
+            StreamerPool &streamerPool{StreamerPool::getPool()};
         };
 
     public:
