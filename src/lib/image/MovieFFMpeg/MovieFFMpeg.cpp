@@ -1358,7 +1358,7 @@ namespace TwkMovie
         AVDictionary* fmtOptions = NULL;
         if (filepathIsURL)
         {
-            safe_path = "async:shared:" + safe_path;
+            safe_path = "shared:" + safe_path;
             //!TODO turn this into a env variable
             const std::string cachePath = (std::filesystem::path("/").root_path() / "tmp").string();
             av_dict_set_int(&fmtOptions, "seekable", 1, 0);

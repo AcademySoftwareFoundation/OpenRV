@@ -242,7 +242,7 @@ namespace TwkMovie
 
         m_readers.push_back(newReader);
 
-        newReader->queuePrefetch();
+        // newReader->queuePrefetch();
 
         // Wake up the scheduler thread in order to process the
         // newly added readers.
