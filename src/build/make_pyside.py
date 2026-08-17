@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # *****************************************************************************
 # Copyright 2020 Autodesk, Inc. All rights reserved.
@@ -11,21 +10,21 @@
 import argparse
 import glob
 import os
-import re
 import pathlib
+import platform
+import re
 import shutil
 import subprocess
-import platform
 import tempfile
 import uuid
 
+from make_python import get_python_interpreter_args
 from utils import (
     download_file,
     extract_7z_archive,
-    verify_7z_archive,
     update_env_path,
+    verify_7z_archive,
 )
-from make_python import get_python_interpreter_args
 
 SOURCE_DIR = ""
 OUTPUT_DIR = ""
@@ -85,7 +84,7 @@ def prepare() -> None:
     system = platform.system()
     if system == "Darwin":
         clang_version_search = re.search(
-            "version (\d+)\.(\d+)\.(\d+)",
+            r"version (\d+)\.(\d+)\.(\d+)",
             os.popen("clang --version").read(),
         )
         clang_version_str = ".".join(clang_version_search.groups())
@@ -147,15 +146,14 @@ def prepare() -> None:
         os.remove(old_cmakelist_path)
 
     os.rename(cmakelist_path, old_cmakelist_path)
-    with open(old_cmakelist_path) as old_cmakelist:
-        with open(cmakelist_path, "w") as cmakelist:
-            for line in old_cmakelist:
-                new_line = line.replace(
-                    " set(HAS_LIBXSLT 1)",
-                    " #set(HAS_LIBXSLT 1)",
-                )
+    with open(old_cmakelist_path) as old_cmakelist, open(cmakelist_path, "w") as cmakelist:
+        for line in old_cmakelist:
+            new_line = line.replace(
+                " set(HAS_LIBXSLT 1)",
+                " #set(HAS_LIBXSLT 1)",
+            )
 
-                cmakelist.write(new_line)
+            cmakelist.write(new_line)
 
 
 def remove_broken_shortcuts(python_home: str) -> None:

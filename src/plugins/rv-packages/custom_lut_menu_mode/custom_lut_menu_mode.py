@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import rvtypes, commands, extra_commands
 import os
+
+from rv import commands, extra_commands, rvtypes
 
 CDLS = ["cc", "ccc", "cdl"]
 LUTS = [
@@ -145,7 +146,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 self.restoreDefaultProps(lutNode, display)
         except Exception as inst:
             extra_commands.displayFeedback("LUT File Failed to Read: Check File %s" % path, 5.0)
-            print(("ERROR: Failed to set LUT '%s' for %s: %s" % (path, lutNode, str(inst))))
+            print("ERROR: Failed to set LUT '%s' for %s: %s" % (path, lutNode, str(inst)))
 
     def sourceColorSetup(self, event):
         # IF No Linearization is set, turn off all To->Linear Conversions
@@ -159,7 +160,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
         for lut in self.lutNodes.keys():
             if self.lutNodes[lut].startswith("#") and self._autoLoadCXfrm[lut]:
                 if self._autoFormat[lut] != "":
-                    print(("INFO: Searching for accompanying '%s'" % self._autoFormat[lut]))
+                    print("INFO: Searching for accompanying '%s'" % self._autoFormat[lut])
                 self.loadColorXfrm(lut, event)
 
         event.reject()
@@ -178,7 +179,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
             if self._autoLoadDLUT:
                 lut = commands.readSettings("CUSTOM_LUTS", "defaultDisplayLut", "NONE")
                 if lut != "NONE":
-                    print(("INFO: Autoloading Default Display LUT: '%s'" % lut))
+                    print("INFO: Autoloading Default Display LUT: '%s'" % lut)
                     self.setLUT(lut, dnode, True)
 
         event.reject()
@@ -236,7 +237,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 xfrmFile = self._autoLUT[lut]
                 xfrmExt = xfrmFile.split(".")[-1]
             except Exception:
-                print(("ERROR: Unable to determine extension from '%s'" % xfrmFile))
+                print("ERROR: Unable to determine extension from '%s'" % xfrmFile)
         else:
             dirUp = 0
             while dirUp < self._autoLevel[lut]:
@@ -252,14 +253,14 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 "Unable to find accompanying color" + " transform with extension '%s'" % self._autoFormat[lut],
                 5.0,
             )
-            print(("WARNING: No '%s' file found in '%s' for '%s'" % (self._autoFormat[lut], containing, movie)))
+            print("WARNING: No '%s' file found in '%s' for '%s'" % (self._autoFormat[lut], containing, movie))
             return
 
         try:
             searchType = self.lutNodes[lut][1:]
             xfrmNode = extra_commands.associatedNode(searchType, srcNode)
         except Exception:
-            print(("ERROR: Unable to find transform node from '%s'" % searchType))
+            print("ERROR: Unable to find transform node from '%s'" % searchType)
             return
 
         if xfrmExt in CDLS:
@@ -267,7 +268,7 @@ class CustomLUTMenuMode(rvtypes.MinorMode):
                 commands.readCDL(xfrmFile, xfrmNode, True)
             except Exception as inst:
                 extra_commands.displayFeedback("CDL File Failed to Read: Check File %s" % xfrmFile, 5.0)
-                print(("ERROR: Failed to set CDL '%s' for %s: %s" % (xfrmFile, xfrmNode, str(inst))))
+                print("ERROR: Failed to set CDL '%s' for %s: %s" % (xfrmFile, xfrmNode, str(inst)))
 
         elif xfrmExt in LUTS:
             self.setLUT(xfrmFile, xfrmNode)
