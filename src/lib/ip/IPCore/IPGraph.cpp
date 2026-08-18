@@ -326,6 +326,12 @@ namespace IPCore
         finishCachingThread();
         finishAudioThread();
 
+        if (m_jobDispatcher)
+        {
+            auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
+            jobDispatcher->stop();
+        }
+
         //
         //  Explicitly delete all nodes so that source nodes close their
         //  decoders (e.g. MovieFFMpegReader::close()) before the graph is
@@ -350,7 +356,6 @@ namespace IPCore
         if (m_jobDispatcher)
         {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
-            jobDispatcher->stop();
             delete jobDispatcher;
             m_jobDispatcher = nullptr;
         }
@@ -3764,7 +3769,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     IPGraph::WorkItemID IPGraph::addWorkItem(const VoidFunction& function, const char* tag)
     {
-        if (tag)
+        if (m_jobDispatcher)
         {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             return (WorkItemID)jobDispatcher->addJob(WorkItem(function, tag));
@@ -3775,7 +3780,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::removeWorkItem(WorkItemID id)
     {
-        if (id)
+        if (m_jobDispatcher)
         { 
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->removeJob(id);
@@ -3784,7 +3789,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::waitWorkItem(WorkItemID id)
     {
-        if (id) 
+        if (m_jobDispatcher)
         {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->waitJob(id);
@@ -3793,7 +3798,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
     void IPGraph::prioritizeWorkItem(WorkItemID id)
     {
-        if (id)
+        if (m_jobDispatcher)
         {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->prioritizeJob(id);

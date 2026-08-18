@@ -394,6 +394,7 @@ namespace TwkMovie
             MovieFFMpegReader* reader;
             int streamIndex;
             AVCodecContext* avContext;
+            HardwareContext* hardwareContext;
             VideoTrack* vTrack;
             AudioTrack* aTrack;
 
@@ -528,7 +529,7 @@ namespace TwkMovie
         //  this context.
         //
 
-        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads)
+        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads && !gcp.m_openContexts.empty())
         {
             Context& closeContext = *gcp.m_openContexts.back();
             gcp.m_openContexts.pop_back();
@@ -543,7 +544,6 @@ namespace TwkMovie
                 //
 
                 cout << "ERROR: Attempted to reuse reserved context! (" << closeContext.reader->filename() << ")" << endl;
-                gcp.m_currentOpenThreads -= closeContext.avContext->thread_count;
             }
             else if (closeContext.avContext)
             {
@@ -1036,6 +1036,7 @@ namespace TwkMovie
             }
 
             codecContext->hw_device_ctx = av_buffer_ref(hardwareDeviceContext);
+            av_buffer_unref(&hardwareDeviceContext);
 
             return result;
         }
@@ -2506,8 +2507,16 @@ namespace TwkMovie
         m_info.uncropHeight = 120;
 
         // Capture video metadata information for the frame buffer attributes
-        if (m_videoTracks.size() > 0)
+        if (m_videoTracks.size() > 0) {
+            std::vector<ContextPool::Reservation> reservations;
+
+            for (const auto* const &track: m_videoTracks)
+            {
+                reservations.emplace_back(this, track->number);
+            }
+
             initializeVideo(height, width);
+        }
 
         // Look for chapters
         m_info.chapters.resize(m_avFormatContext->nb_chapters);
@@ -2536,7 +2545,15 @@ namespace TwkMovie
 
         // Capture audio metadata information for the frame buffer attributes
         if (m_audioTracks.size() > 0)
+        {
+            std::vector<ContextPool::Reservation> reservations;
+
+            for (const auto* const &track: m_audioTracks)
+            {
+                reservations.emplace_back(this, track->number);
+            }
             initializeAudio();
+        }
         string hasAudio = string((m_audioTracks.size() > 0) ? "Yes" : "No");
         m_info.proxy.newAttribute("Audio", hasAudio);
 
@@ -2554,6 +2571,8 @@ namespace TwkMovie
             for (unsigned int i = 0; i < m_videoTracks.size(); i++)
             {
                 VideoTrack* track = m_videoTracks[i];
+                auto reservation = ContextPool::Reservation(this, track->number);
+
                 m_info.proxy.appendAttributesAndPrefixTo(&track->fb, "");
                 addVideoFBAttrs(track);
             }
@@ -5899,7 +5918,7 @@ namespace TwkMovie
                 poolSize = atoi(c);
             }
             if (poolSize > 0)
-                globalContextPool = std::make_unique<ContextPool>(poolSize);
+                globalContextPool = new ContextPool(poolSize);
             else
             {
                 report("Disabling mio_ffmpeg context thread pool.", true);
