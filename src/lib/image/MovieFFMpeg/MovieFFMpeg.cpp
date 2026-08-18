@@ -2306,6 +2306,7 @@ namespace TwkMovie
 
         collectPlaybackTiming(heroVideoTracks, heroAudioTracks);
 
+        std::list<ContextPool::Reservation> reservations;
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             AVStream* tsStream = m_avFormatContext->streams[i];
@@ -2321,7 +2322,7 @@ namespace TwkMovie
                 if (heroVideoTracks[i])
                 {
                     VideoTrack* track = new VideoTrack;
-                    ContextPool::Reservation reserve(this, i);
+                    reservations.emplace_back(this, i);
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
                     track->useAppleProRes = isProRes;
@@ -2450,7 +2451,7 @@ namespace TwkMovie
                 if (heroAudioTracks[i])
                 {
                     AudioTrack* track = new AudioTrack;
-                    ContextPool::Reservation reserve(this, i);
+                    reservations.emplace_back(this, i);
                     if (openAVCodec(i, &track->avCodecContext))
                     {
                         track->number = i;
@@ -2501,14 +2502,8 @@ namespace TwkMovie
         m_info.uncropHeight = 120;
 
         // Capture video metadata information for the frame buffer attributes
-        if (m_videoTracks.size() > 0) {
-            std::list<ContextPool::Reservation> reservations;
-
-            for (const auto* const &track: m_videoTracks)
-            {
-                reservations.emplace_back(this, track->number);
-            }
-
+        if (m_videoTracks.size() > 0)
+        {
             initializeVideo(height, width);
         }
 
@@ -2540,12 +2535,6 @@ namespace TwkMovie
         // Capture audio metadata information for the frame buffer attributes
         if (m_audioTracks.size() > 0)
         {
-            std::list<ContextPool::Reservation> reservations;
-
-            for (const auto* const &track: m_audioTracks)
-            {
-                reservations.emplace_back(this, track->number);
-            }
             initializeAudio();
         }
         string hasAudio = string((m_audioTracks.size() > 0) ? "Yes" : "No");
