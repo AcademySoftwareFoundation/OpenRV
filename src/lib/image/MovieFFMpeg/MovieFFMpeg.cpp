@@ -2508,7 +2508,7 @@ namespace TwkMovie
 
         // Capture video metadata information for the frame buffer attributes
         if (m_videoTracks.size() > 0) {
-            std::vector<ContextPool::Reservation> reservations;
+            std::list<ContextPool::Reservation> reservations;
 
             for (const auto* const &track: m_videoTracks)
             {
@@ -2546,7 +2546,7 @@ namespace TwkMovie
         // Capture audio metadata information for the frame buffer attributes
         if (m_audioTracks.size() > 0)
         {
-            std::vector<ContextPool::Reservation> reservations;
+            std::list<ContextPool::Reservation> reservations;
 
             for (const auto* const &track: m_audioTracks)
             {
