@@ -289,6 +289,18 @@ static NSString *RVLinkDisplayURL(NSString *url) {
         [[popup lastItem] setRepresentedObject:appURL];
     }
 
+    NSString *lastSelectedPath = [[NSUserDefaults standardUserDefaults]
+        stringForKey:@"LastSelectedRVAppPath"];
+    if (lastSelectedPath != nil) {
+        for (NSInteger i = 0; i < [popup numberOfItems]; ++i) {
+            NSURL *appURL = [[popup itemAtIndex:i] representedObject];
+            if ([[appURL path] isEqualToString:lastSelectedPath]) {
+                [popup selectItemAtIndex:i];
+                break;
+            }
+        }
+    }
+
     NSButton *copyButton = [[NSButton alloc] initWithFrame:NSMakeRect(404, 0, 90, 24)];
     [copyButton setTitle:@"Copy URL"];
     [copyButton setBezelStyle:NSBezelStyleRounded];
@@ -306,6 +318,12 @@ static NSString *RVLinkDisplayURL(NSString *url) {
 
     if (result == NSAlertFirstButtonReturn) {
         NSURL *selectedAppURL = [[popup selectedItem] representedObject];
+
+        // Save preference
+        [[NSUserDefaults standardUserDefaults]
+            setObject:[selectedAppURL path]
+            forKey:@"LastSelectedRVAppPath"];
+
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
             NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
