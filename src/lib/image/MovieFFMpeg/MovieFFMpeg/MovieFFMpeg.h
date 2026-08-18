@@ -186,13 +186,6 @@ namespace TwkMovie
         void findStreamInfo();
 
         //
-        // Subtitle & Language Methods
-        //
-
-        std::string streamLang(int index);
-        bool correctLang(int index);
-
-        //
         // Metadata & Lookup Methods
         //
 
@@ -265,7 +258,6 @@ namespace TwkMovie
         AVFormatContext* m_avFormatContext;
         AudioTracks m_audioTracks;
         VideoTracks m_videoTracks;
-        std::map<int, int> m_subtitleMap;
         int m_timecodeTrack;
         int64_t m_formatStartFrame;
         TimingDetails* m_timingDetails;

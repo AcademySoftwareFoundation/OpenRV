@@ -2139,12 +2139,6 @@ namespace TwkMovie
         return typeStr;
     }
 
-    bool MovieFFMpegReader::correctLang(int index)
-    {
-        string stmLang = streamLang(index);
-        return (stmLang == m_io->language() || stmLang == "und");
-    }
-
     string MovieFFMpegReader::streamLang(int index)
     {
         AVStream* avStream = m_avFormatContext->streams[index];

@@ -3781,7 +3781,7 @@ IPGraph::findNodesByAbstractPath(int frame,
     void IPGraph::removeWorkItem(WorkItemID id)
     {
         if (m_jobDispatcher)
-        { 
+        {
             auto jobDispatcher = reinterpret_cast<JobDispatcher*>(m_jobDispatcher);
             jobDispatcher->removeJob(id);
         }
