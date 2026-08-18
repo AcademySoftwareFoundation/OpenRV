@@ -2554,7 +2554,6 @@ namespace TwkMovie
             for (unsigned int i = 0; i < m_videoTracks.size(); i++)
             {
                 VideoTrack* track = m_videoTracks[i];
-                auto reservation = ContextPool::Reservation(this, track->number);
 
                 m_info.proxy.appendAttributesAndPrefixTo(&track->fb, "");
                 addVideoFBAttrs(track);
