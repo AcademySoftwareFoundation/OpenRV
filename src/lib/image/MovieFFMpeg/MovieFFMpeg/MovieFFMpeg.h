@@ -186,6 +186,12 @@ namespace TwkMovie
         void findStreamInfo();
 
         //
+        // Subtitle & Language Methods
+        //
+
+        std::string streamLang(int index);
+
+        //
         // Metadata & Lookup Methods
         //
 
