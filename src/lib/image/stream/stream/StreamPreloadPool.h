@@ -24,7 +24,7 @@
 //
 // Class to manage threads opened by the Preloader for streamed media ONLY
 // to start caching raw media locally instead of fetching them over HTTPS.
-// Threads are added to a queue, woken up by a CV every time a new file is 
+// Threads are added to a queue, woken up by a CV every time a new file is
 // requested to be cached or if a file finished being cached.
 //
 
@@ -39,13 +39,13 @@ public:
     StreamerPool& operator=(const StreamerPool&&) = delete;
 
     // Singleton
-    static StreamerPool& getPool() {
+    static StreamerPool& getPool()
+    {
         static StreamerPool pool;
         return pool;
     }
 
-
-    // Wakes 
+    // Wakes
     void enqueue(const std::string& url, const Options& options);
 
     //
@@ -79,7 +79,7 @@ private:
 
     //
     // Checks which workers have finished, waits for the threads to finish for sure,
-    // and releases a worker slot if possible. 
+    // and releases a worker slot if possible.
     // Called when waking up the scheduler.
     // Must be called with m_mutex
     //
@@ -97,14 +97,14 @@ private:
     std::atomic<bool> m_abort;
 
     std::mutex m_mutex;
-    std::condition_variable m_wake;  // verify if a new worker can be started
+    std::condition_variable m_wake; // verify if a new worker can be started
 
     std::thread m_scheduler;
     std::list<std::thread> m_activeWorkers;
     std::set<std::thread::id> m_finished;
 
-    std::deque<Job> m_queue;  // pending jobs if threads maxed out
-    bool m_stopped;  // scheduler finished
+    std::deque<Job> m_queue; // pending jobs if threads maxed out
+    bool m_stopped;          // scheduler finished
 };
 
 #endif // __stream__StreamPreloadPool__h__

@@ -239,7 +239,9 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   # non-free prores decoder above, leaving prores_raw enabled produces an undefined symbol in libavcodec on x86 (mio_ffmpeg fails to dlopen). Disable prores_raw
   # too for consistency with our non-free ProRes policy. Guarded on FFmpeg 8 and newer since the decoder does not exist in FFmpeg 6/7 and --disable-decoder on
   # an unknown decoder makes FFmpeg's configure fail.
-  IF(RV_FFMPEG_8 OR RV_FFMPEG_9)
+  IF(RV_FFMPEG_8
+     OR RV_FFMPEG_9
+  )
     LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "prores_raw")
 
     # We disable the non-free ac3 decoder above, which (via eac3_decoder_select="ac3_decoder") also disables the eac3 decoder, so CONFIG_EAC3_DECODER=0. But the

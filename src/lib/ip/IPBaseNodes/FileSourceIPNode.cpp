@@ -58,7 +58,7 @@
     }
 
 static ENVVAR_BOOL(evIgnoreAudio, "RV_IGNORE_AUDIO", false);
-static ENVVAR_INT(evWarmCloneThreads, "RV_WARM_CLONE_THREADS", 2);
+static ENVVAR_INT(evWarmCloneThreads, "RV_WARM_CLONE_THREADS", 4);
 static ENVVAR_BOOL(evDebugCookies, "RV_DEBUG_FFMPEG_COOKIES", false);
 static ENVVAR_BOOL(evDebugHeaders, "RV_DEBUG_FFMPEG_HEADERS", false);
 
@@ -394,8 +394,7 @@ namespace IPCore
                     }
 
                     const int configuredWarmThreads = evWarmCloneThreads.getValue();
-                    const size_t warmThreads =
-                        std::min(toWarm.size(), size_t(configuredWarmThreads));
+                    const size_t warmThreads = std::min(toWarm.size(), size_t(configuredWarmThreads));
 
                     for (size_t worker = 0; worker < warmThreads; worker++)
                     {

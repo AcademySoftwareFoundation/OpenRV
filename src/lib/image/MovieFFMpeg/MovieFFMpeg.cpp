@@ -1425,8 +1425,8 @@ namespace TwkMovie
         boost::lock_guard<boost::mutex> lock(m_deferredOpenLock);
         if (m_avFormatContext == nullptr)
         {
-                openAVFormat();
-                findStreamInfo();
+            openAVFormat();
+            findStreamInfo();
         }
 
         if (m_avFormatContext == nullptr)
@@ -2647,7 +2647,7 @@ namespace TwkMovie
             AVCodecContext* videoCodecContext = track->avCodecContext;
 
             // Tell RV to restrict caching to one thread
-            bool slowTrackRandomAccess = (codecHasSlowAccess(videoCodecContext->codec->name) || TwkUtil::pathIsURL(m_filename));
+            bool slowTrackRandomAccess = codecHasSlowAccess(videoCodecContext->codec->name);
             slowRandomAccess = slowTrackRandomAccess || slowRandomAccess;
 
             // Make sure the orientation/rotation matches for each track

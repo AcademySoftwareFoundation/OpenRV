@@ -28,10 +28,9 @@ namespace
     size_t maxStreamerThreads()
     {
         const int configured = evPrefetchThreads.getValue();
-        return configured > 0 ? static_cast<size_t>(configured)
-                              : static_cast<size_t>(evPrefetchThreads.getDefaultValue());
+        return configured > 0 ? static_cast<size_t>(configured) : static_cast<size_t>(evPrefetchThreads.getDefaultValue());
     }
-}
+} // namespace
 
 StreamerPool::StreamerPool()
     : m_maxThreads(maxStreamerThreads())
@@ -44,7 +43,7 @@ StreamerPool::~StreamerPool() { shutdown(); }
 
 int StreamerPool::interruptCallback(void* opaque)
 {
-    const auto *const pool = static_cast<const StreamerPool*>(opaque);
+    const auto* const pool = static_cast<const StreamerPool*>(opaque);
     return pool->m_abort.load() ? 1 : 0;
 }
 
@@ -136,7 +135,7 @@ void StreamerPool::download(const Job& job)
     AVDictionary* options = nullptr;
 
     // Add the options for FFMPEG reading over HTTPS
-    for (const auto &[key, value]: job.options)
+    for (const auto& [key, value] : job.options)
     {
         av_dict_set(&options, key.c_str(), value.c_str(), 0);
     }
@@ -198,7 +197,7 @@ void StreamerPool::shutdown()
         m_scheduler.join();
     }
 
-    for (auto &worker: m_activeWorkers)
+    for (auto& worker : m_activeWorkers)
     {
         if (worker.joinable())
         {

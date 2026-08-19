@@ -115,7 +115,6 @@ namespace IPCore
 
         void setCacheFrame(int f) { m_cacheFrame = f; }
 
-
         void setDisplayFPS(float f) { m_displayFPS = f; }
 
         int cacheFrame() const { return m_cacheFrame; }
