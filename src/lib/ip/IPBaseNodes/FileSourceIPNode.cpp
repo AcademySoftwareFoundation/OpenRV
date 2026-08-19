@@ -58,7 +58,6 @@
     }
 
 static ENVVAR_BOOL(evIgnoreAudio, "RV_IGNORE_AUDIO", false);
-static ENVVAR_BOOL(evWarmClones, "RV_WARM_CLONES", true);
 static ENVVAR_INT(evWarmCloneThreads, "RV_WARM_CLONE_THREADS", 2);
 static ENVVAR_BOOL(evDebugCookies, "RV_DEBUG_FFMPEG_COOKIES", false);
 static ENVVAR_BOOL(evDebugHeaders, "RV_DEBUG_FFMPEG_HEADERS", false);
@@ -377,7 +376,7 @@ namespace IPCore
                     }
                 }
 
-                if (evWarmClones.getValue())
+                if (TwkUtil::pathIsURL(reader->filename()))
                 {
                     vector<boost::shared_ptr<MovieReader>> toWarm;
 
