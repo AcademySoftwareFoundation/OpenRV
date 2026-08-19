@@ -20,6 +20,7 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
+#include <stream/StreamPreloadPool.h>
 #include <boost/thread/lock_algorithms.hpp>
 #include <boost/thread/mutex.hpp>
 #include <cstddef>
@@ -66,6 +67,7 @@ extern "C"
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
 static ENVVAR_STRING(evStreamCachePath, "RV_STREAM_CACHE_PATH", "/tmp");
+static ENVVAR_FLOAT(evPlayheadPrefetchSeconds, "RV_STREAM_PLAYHEAD_PREFETCH_SECONDS", 5.0f);
 
 namespace TwkMovie
 {
@@ -1335,6 +1337,36 @@ namespace TwkMovie
                 m_avFormatContext = nullptr;
             }
         }
+    }
+
+    void MovieFFMpegReader::prefetchAtFrame(int frame)
+    {
+        const float windowSeconds = evPlayheadPrefetchSeconds.getValue();
+        if (!TwkUtil::pathIsURL(m_filename) || windowSeconds <= 0.0f || m_info.fps <= 0.0f)
+            return;
+
+        const double frameSeconds = std::max(0.0, double(frame - m_info.start) / double(m_info.fps));
+        const int64_t window = static_cast<int64_t>(frameSeconds / windowSeconds);
+        if (m_lastPrefetchWindow.exchange(window) == window)
+            return;
+
+        std::string url = m_filename;
+        if (evUseUploadedMovieForStreaming.getValue())
+            boost::replace_all(url, "#.mp4", "");
+        url = "shared:" + url;
+
+        StreamerPool::Options options;
+        options.emplace_back("cache_dir", evStreamCachePath.getValue());
+        options.emplace_back("seekable", "1");
+        options.emplace_back("reconnect", "1");
+        options.emplace_back("multiple_requests", "1");
+        for (const auto& [name, value] : m_request.parameters)
+        {
+            if (name == "cookies" || name == "headers")
+                options.emplace_back(name, value);
+        }
+
+        StreamerPool::getPool().enqueueWindow(url, options, frameSeconds, windowSeconds);
     }
 
     bool MovieFFMpegReader::openAVFormat()
@@ -2647,7 +2679,7 @@ namespace TwkMovie
             AVCodecContext* videoCodecContext = track->avCodecContext;
 
             // Tell RV to restrict caching to one thread
-            bool slowTrackRandomAccess = (codecHasSlowAccess(videoCodecContext->codec->name) || TwkUtil::pathIsURL(m_filename));
+            bool slowTrackRandomAccess = codecHasSlowAccess(videoCodecContext->codec->name);
             slowRandomAccess = slowTrackRandomAccess || slowRandomAccess;
 
             // Make sure the orientation/rotation matches for each track

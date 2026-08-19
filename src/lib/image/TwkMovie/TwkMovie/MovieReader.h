@@ -132,6 +132,8 @@ namespace TwkMovie
 
         virtual void warmOpen();
 
+        virtual void prefetchAtFrame(int frame);
+
         ///
         /// if an additional scanning pass is required after open this
         /// should return true from needsScan() while that is the case.

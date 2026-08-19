@@ -48,6 +48,10 @@ public:
     // Wakes
     void enqueue(const std::string& url, const Options& options);
 
+    // Prefetch a short demuxed window without decoding it. Window jobs use
+    // one reserved worker and supersede older queued window jobs.
+    void enqueueWindow(const std::string& url, const Options& options, double startSeconds, double durationSeconds);
+
     //
     //  Interrupt every in flight download, drop whatever is still queued
     //  and join the workers.
@@ -63,6 +67,9 @@ private:
     {
         std::string url;
         Options options;
+        bool window = false;
+        double startSeconds = 0.0;
+        double durationSeconds = 0.0;
     };
 
     //
@@ -76,6 +83,7 @@ private:
     // Handles FFMPEG API calls and fully downloads the raw media of the file
     //
     void download(const Job& job);
+    void downloadWindow(const Job& job);
 
     //
     // Checks which workers have finished, waits for the threads to finish for sure,
@@ -102,6 +110,7 @@ private:
     std::thread m_scheduler;
     std::list<std::thread> m_activeWorkers;
     std::set<std::thread::id> m_finished;
+    size_t m_activeWindowWorkers = 0;
 
     std::deque<Job> m_queue; // pending jobs if threads maxed out
     bool m_stopped;          // scheduler finished

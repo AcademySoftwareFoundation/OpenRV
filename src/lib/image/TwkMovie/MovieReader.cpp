@@ -38,6 +38,8 @@ namespace TwkMovie
 
     void MovieReader::warmOpen() {}
 
+    void MovieReader::prefetchAtFrame(int) {}
+
     Movie* MovieReader::clone() const { return 0; }
 
     float MovieReader::scanProgress() const { return 1.0; }

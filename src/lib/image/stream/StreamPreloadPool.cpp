@@ -11,11 +11,15 @@
 
 #include <TwkUtil/EnvVar.h>
 
+#include <algorithm>
+
 extern "C"
 {
+#include <libavformat/avformat.h>
 #include <libavformat/avio.h>
 #include <libavutil/dict.h>
 #include <libavutil/error.h>
+#include <libavutil/mathematics.h>
 }
 
 // 32 KB
@@ -72,6 +76,35 @@ void StreamerPool::enqueue(const std::string& url, const Options& options)
     m_wake.notify_all();
 }
 
+void StreamerPool::enqueueWindow(const std::string& url, const Options& options, double startSeconds, double durationSeconds)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        if (m_stopped)
+        {
+            return;
+        }
+
+        m_queue.erase(std::remove_if(m_queue.begin(), m_queue.end(), [](const Job& job) { return job.window; }), m_queue.end());
+
+        Job job;
+        job.url = url;
+        job.options = options;
+        job.window = true;
+        job.startSeconds = startSeconds;
+        job.durationSeconds = durationSeconds;
+        m_queue.push_front(job);
+
+        if (!m_scheduler.joinable())
+        {
+            m_scheduler = std::thread(&StreamerPool::schedulerLoop, this);
+        }
+    }
+
+    m_wake.notify_all();
+}
+
 void StreamerPool::schedulerLoop()
 {
     for (;;)
@@ -82,7 +115,9 @@ void StreamerPool::schedulerLoop()
                     [this]
                     {
                         reapFinished();
-                        return m_stopped || (!m_queue.empty() && m_activeWorkers.size() < m_maxThreads);
+                        return m_stopped
+                               || (!m_queue.empty()
+                                   && (m_queue.front().window ? m_activeWindowWorkers == 0 : m_activeWorkers.size() < m_maxThreads));
                     });
 
         if (m_stopped)
@@ -90,10 +125,22 @@ void StreamerPool::schedulerLoop()
             return;
         }
 
-        while (!m_queue.empty() && m_activeWorkers.size() < m_maxThreads)
+        while (!m_queue.empty())
         {
+            if (m_queue.front().window)
+            {
+                if (m_activeWindowWorkers != 0)
+                    break;
+            }
+            else if (m_activeWorkers.size() >= m_maxThreads)
+            {
+                break;
+            }
+
             Job job = m_queue.front();
             m_queue.pop_front();
+            if (job.window)
+                ++m_activeWindowWorkers;
             m_activeWorkers.emplace_back(&StreamerPool::workerFunc, this, job);
         }
     }
@@ -120,10 +167,15 @@ void StreamerPool::reapFinished()
 
 void StreamerPool::workerFunc(Job job)
 {
-    download(job);
+    if (job.window)
+        downloadWindow(job);
+    else
+        download(job);
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
+        if (job.window)
+            --m_activeWindowWorkers;
         m_finished.insert(std::this_thread::get_id());
     }
 
@@ -173,6 +225,58 @@ void StreamerPool::download(const Job& job)
     }
 
     avio_closep(&context);
+}
+
+void StreamerPool::downloadWindow(const Job& job)
+{
+    AVDictionary* options = nullptr;
+    for (const auto& [key, value] : job.options)
+    {
+        av_dict_set(&options, key.c_str(), value.c_str(), 0);
+    }
+
+    AVFormatContext* context = avformat_alloc_context();
+    if (context == nullptr)
+    {
+        av_dict_free(&options);
+        return;
+    }
+
+    context->interrupt_callback.callback = &StreamerPool::interruptCallback;
+    context->interrupt_callback.opaque = this;
+
+    if (avformat_open_input(&context, job.url.c_str(), nullptr, &options) < 0)
+    {
+        av_dict_free(&options);
+        avformat_free_context(context);
+        return;
+    }
+    av_dict_free(&options);
+
+    if (avformat_find_stream_info(context, nullptr) >= 0)
+    {
+        const int64_t mediaStart = context->start_time == AV_NOPTS_VALUE ? 0 : context->start_time;
+        const int64_t start = mediaStart + static_cast<int64_t>(job.startSeconds * AV_TIME_BASE);
+        const int64_t end = start + static_cast<int64_t>(job.durationSeconds * AV_TIME_BASE);
+
+        if (avformat_seek_file(context, -1, INT64_MIN, start, INT64_MAX, AVSEEK_FLAG_BACKWARD) >= 0)
+        {
+            AVPacket* packet = av_packet_alloc();
+            while (packet != nullptr && !m_abort.load() && av_read_frame(context, packet) >= 0)
+            {
+                const int64_t timestamp = packet->pts != AV_NOPTS_VALUE ? packet->pts : packet->dts;
+                const int64_t packetTime = timestamp == AV_NOPTS_VALUE
+                                               ? start
+                                               : av_rescale_q(timestamp, context->streams[packet->stream_index]->time_base, AV_TIME_BASE_Q);
+                av_packet_unref(packet);
+                if (packetTime >= end)
+                    break;
+            }
+            av_packet_free(&packet);
+        }
+    }
+
+    avformat_close_input(&context);
 }
 
 void StreamerPool::shutdown()

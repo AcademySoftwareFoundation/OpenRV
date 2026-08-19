@@ -10,6 +10,7 @@
 #include <TwkMovie/MovieReader.h>
 #include <TwkMovie/MovieWriter.h>
 #include <TwkMovie/MovieIO.h>
+#include <atomic>
 #include <stdint.h>
 extern "C"
 {
@@ -158,6 +159,7 @@ namespace TwkMovie
         // Used for streamed media only to establish connections at the launch of RV for movie reader clones
         //
         void warmOpen() override;
+        void prefetchAtFrame(int frame) override;
 
         virtual bool canConvertAudioChannels() const;
         void close();
@@ -279,6 +281,7 @@ namespace TwkMovie
         bool m_multiTrackAudio;
         AudioState* m_audioState;
         bool m_cloning{false};
+        std::atomic<int64_t> m_lastPrefetchWindow{-1};
         bool m_mustReadFirstFrame{false};
         AVPixelFormat m_pxlFormatOnOpen{AV_PIX_FMT_NONE};
 
