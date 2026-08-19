@@ -23,7 +23,6 @@
 #include <boost/thread/lock_algorithms.hpp>
 #include <boost/thread/mutex.hpp>
 #include <cstddef>
-#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -66,6 +65,7 @@ extern "C"
 #endif
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
+static ENVVAR_STRING(evStreamCachePath, "RV_STREAM_CACHE_PATH", "/tmp");
 
 namespace TwkMovie
 {
@@ -1359,12 +1359,10 @@ namespace TwkMovie
         if (filepathIsURL)
         {
             safe_path = "shared:" + safe_path;
-            //!TODO turn this into a env variable
-            const std::string cachePath = (std::filesystem::path("/").root_path() / "tmp").string();
             av_dict_set_int(&fmtOptions, "seekable", 1, 0);
             av_dict_set_int(&fmtOptions, "reconnect", 1, 0);
             av_dict_set_int(&fmtOptions, "multiple_requests", 1, 0);
-            av_dict_set(&fmtOptions, "cache_dir", cachePath.c_str(), 0);
+            av_dict_set(&fmtOptions, "cache_dir", evStreamCachePath.getValue().c_str(), 0);
 
             for (int i = 0; i < m_request.parameters.size(); i++)
             {

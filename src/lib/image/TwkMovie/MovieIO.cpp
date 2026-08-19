@@ -9,7 +9,6 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/PathConform.h>
 #include <stream/StreamPreloadPool.h>
-#include <filesystem>
 #include <boost/algorithm/string/replace.hpp>
 #include <TwkUtil/EnvVar.h>
 #include <stdarg.h>
@@ -32,6 +31,7 @@
 #endif
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
+static ENVVAR_STRING(evStreamCachePath, "RV_STREAM_CACHE_PATH", "/tmp");
 
 static std::mutex plugin_mutex;
 
@@ -112,11 +112,8 @@ namespace TwkMovie
 
         url = "shared:" + url;
 
-        // TODO: turn this into an env variable
-        const std::filesystem::path cachePath = std::filesystem::path("/").root_path() / "tmp";
-
         StreamerPool::Options options;
-        options.push_back(std::make_pair("cache_dir", cachePath.string()));
+        options.push_back(std::make_pair("cache_dir", evStreamCachePath.getValue()));
         options.push_back(std::make_pair("seekable", "1"));
         options.push_back(std::make_pair("reconnect", "1"));
         options.push_back(std::make_pair("multiple_requests", "1"));
