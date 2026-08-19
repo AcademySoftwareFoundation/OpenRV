@@ -20,10 +20,21 @@ extern "C"
 
 // 32 KB
 const int readChunkSize = 32 * 1024;
-const size_t MAX_THREADS = 12;
+
+static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 12);
+
+namespace
+{
+    size_t maxStreamerThreads()
+    {
+        const int configured = evPrefetchThreads.getValue();
+        return configured > 0 ? static_cast<size_t>(configured)
+                              : static_cast<size_t>(evPrefetchThreads.getDefaultValue());
+    }
+}
 
 StreamerPool::StreamerPool()
-    : m_maxThreads(MAX_THREADS)
+    : m_maxThreads(maxStreamerThreads())
     , m_abort(false)
     , m_stopped(false)
 {
