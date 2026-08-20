@@ -265,6 +265,11 @@ namespace Rv
                 }
             }
 
+            for (const int exclusion : package.exclusions)
+            {
+                allowLoading(m_packages[exclusion], false, depth + 1);
+            }
+
             m_doNotLoadPackages.removeOne(package.file);
 
             if (package.optional && !m_optLoadPackages.contains(package.file))
@@ -1301,6 +1306,8 @@ namespace Rv
                                     package.contact = v;
                                 else if (pname == "version")
                                     package.version = v;
+                                else if (pname == "excludes")
+                                    package.excludes = v;
                                 else if (pname == "requires")
                                 package.
                                     requires
@@ -1546,7 +1553,7 @@ namespace Rv
 
     void PackageManager::findPackageDependencies()
     {
-        for (size_t i = 0; i < m_packages.size(); i++)
+        for (int i = 0; i < m_packages.size(); i++)
         {
             Package& package = m_packages[i];
             QStringList deps = package.
@@ -1563,6 +1570,28 @@ namespace Rv
                     package.uses.push_back(di);
                     if (!m_packages[di].compatible)
                         package.compatible = false;
+                }
+            }
+
+            const auto excludedPackages = package.excludes.split(" ", Qt::SkipEmptyParts);
+
+            for (const auto& excludedPackage : excludedPackages)
+            {
+                const int packageIndex = findPackageIndexByZip(excludedPackage);
+
+                if (packageIndex == -1 || packageIndex == i)
+                {
+                    continue;
+                }
+
+                if (!package.exclusions.contains(packageIndex))
+                {
+                    package.exclusions.push_back(packageIndex);
+                }
+
+                if (!m_packages[packageIndex].exclusions.contains(i))
+                {
+                    m_packages[packageIndex].exclusions.push_back(i);
                 }
             }
         }
@@ -1873,6 +1902,7 @@ namespace Rv
         {
             m_packages[q].usedBy.clear();
             m_packages[q].uses.clear();
+            m_packages[q].exclusions.clear();
         }
 
         findPackageDependencies();

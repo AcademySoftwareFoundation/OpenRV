@@ -709,6 +709,14 @@ class: ModeManagerMode : MinorMode
                     toggleModeEntry(ev, m, this);
                 });
             }
+
+            if (m.name == "annotate_mode")
+            {
+                bind("toggle-annotate-toolbar", \: (void; Event event)
+                {
+                    toggleModeEntry(event, m, this);
+                });
+            }
         }
 
         defineModeMenu(name(), top);

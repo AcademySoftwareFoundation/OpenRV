@@ -1,0 +1,22 @@
+package: Annotation (Beta)
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 0.1
+rv: 2025.1
+openrv: 3.0.0
+optional: true
+hidden: true
+excludes: annotate
+
+modes:
+  - file: annotate_beta_mode.py
+    load: immediate
+
+description: |
+  <p>Beta Python-based annotation package that provides shapes
+  (rectangle, ellipse, arrow, line) and text annotation tools
+  in addition to brush and eraser tools.</p>
+
+  <p>This package is hidden and disabled by default in favor of the
+  legacy "Annotation" package. The two cannot run at the same time, so
+  enabling this package automatically disables the other.</p>
