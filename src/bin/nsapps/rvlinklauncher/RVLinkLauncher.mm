@@ -289,9 +289,19 @@ static NSString *RVLinkDisplayURL(NSString *url) {
         [[popup lastItem] setRepresentedObject:appURL];
     }
 
-    static NSString * const kLastSelectedRVAppPathKey = @"LastSelectedRVAppPath";
-    NSString *lastSelectedPath = [[NSUserDefaults standardUserDefaults]
-        stringForKey:kLastSelectedRVAppPathKey];
+    static NSString * const kRVLinkLauncherDefaultsSuite =
+        @"com.autodesk.RVLinkLauncher";
+
+    static NSString * const kLastSelectedRVAppPathKey =
+        @"LastSelectedRVAppPath";
+    
+    NSUserDefaults *defaults =
+        [[NSUserDefaults alloc]
+            initWithSuiteName:kRVLinkLauncherDefaultsSuite];
+
+    NSString *lastSelectedPath =
+        [defaults stringForKey:kLastSelectedRVAppPathKey];
+
     if (lastSelectedPath != nil) {
         for (NSInteger i = 0; i < [popup numberOfItems]; ++i) {
             NSURL *appURL = [[popup itemAtIndex:i] representedObject];
@@ -301,6 +311,8 @@ static NSString *RVLinkDisplayURL(NSString *url) {
             }
         }
     }
+
+    [defaults release];
 
     NSButton *copyButton = [[NSButton alloc] initWithFrame:NSMakeRect(404, 0, 90, 24)];
     [copyButton setTitle:@"Copy URL"];
@@ -320,9 +332,14 @@ static NSString *RVLinkDisplayURL(NSString *url) {
     if (result == NSAlertFirstButtonReturn) {
         NSURL *selectedAppURL = [[popup selectedItem] representedObject];
 
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSUserDefaults *defaults =
+            [[NSUserDefaults alloc]
+                initWithSuiteName:kRVLinkLauncherDefaultsSuite];
+
         [defaults setObject:[selectedAppURL path]
                     forKey:kLastSelectedRVAppPathKey];
+
+        [defaults release];
 
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
