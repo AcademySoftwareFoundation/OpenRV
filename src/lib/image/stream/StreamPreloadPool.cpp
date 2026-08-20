@@ -116,8 +116,8 @@ void StreamerPool::schedulerLoop()
                     {
                         reapFinished();
                         return m_stopped
-                               || (!m_queue.empty()
-                                   && (m_queue.front().window ? m_activeWindowWorkers == 0 : m_activeWorkers.size() < m_maxThreads));
+                               || (!m_queue.empty() && m_activeWindowWorkers == 0
+                                   && (m_queue.front().window || m_activeWorkers.size() < m_maxThreads));
                     });
 
         if (m_stopped)
@@ -127,12 +127,12 @@ void StreamerPool::schedulerLoop()
 
         while (!m_queue.empty())
         {
-            if (m_queue.front().window)
+            if (m_activeWindowWorkers != 0)
             {
-                if (m_activeWindowWorkers != 0)
-                    break;
+                break;
             }
-            else if (m_activeWorkers.size() >= m_maxThreads)
+
+            if (!m_queue.front().window && m_activeWorkers.size() >= m_maxThreads)
             {
                 break;
             }
