@@ -135,7 +135,7 @@ OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before buil
 # boundary between RV and the wheels; only Qt's ABI matters, which is satisfied by repointing the PySide6 wheel at RV's Qt (same version). Windows Debug still
 # builds from source because release wheels are not loadable by python_d (debug CRT mismatch), so this option is honored only for non-Debug configurations.
 #
-OPTION(RV_DEPS_PYTHON_USE_PBS "Use python-build-standalone prebuilt Python + wheels instead of building CPython/PySide6 from source (non-Debug only)" OFF)
+OPTION(RV_DEPS_PYTHON_USE_PBS "Use python-build-standalone prebuilt Python + wheels instead of building CPython/PySide6 from source (non-Debug only)" ON)
 
 #
 # Version matching mode for dependency resolution.
