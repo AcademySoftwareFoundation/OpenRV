@@ -72,11 +72,15 @@ def get_site_packages(install_dir: str) -> str:
 
 
 def fix_windows_layout(install_dir: str) -> None:
-    """Move python*.dll / python*.exe from the install root into bin/.
+    """Move python*.dll / python*.exe from the install root into bin/, and mirror
+    the import lib from libs/ into bin/.
 
-    PBS Windows install_only places these at the install root. RV's CMake
-    (python3.cmake, Windows branch) resolves the interpreter and shared library
-    from ``bin/``.
+    PBS Windows install_only places the DLL/exe at the install root and the
+    import lib under ``libs/``. RV's CMake (python3.cmake, Windows branch)
+    resolves the interpreter and shared library from ``bin/``, and several
+    dependency builds (e.g. cmake/dependencies/ocio.cmake) hardcode the
+    from-source layout's ``bin/python<ver>.lib`` path rather than ``libs/``,
+    so the import lib needs to exist in both places.
     """
     if platform.system() != "Windows":
         return
@@ -103,6 +107,13 @@ def fix_windows_layout(install_dir: str) -> None:
             if not os.path.exists(dst):
                 _log(f"move {os.path.basename(src)} -> bin/")
                 shutil.copy2(src, dst)
+
+    libs_dir = os.path.join(install_dir, "libs")
+    for src in glob.glob(os.path.join(libs_dir, "python*.lib")):
+        dst = os.path.join(bin_dir, os.path.basename(src))
+        if not os.path.exists(dst):
+            _log(f"copy {os.path.basename(src)} -> bin/")
+            shutil.copy2(src, dst)
 
 
 def inject_sitecustomize(install_dir: str) -> None:

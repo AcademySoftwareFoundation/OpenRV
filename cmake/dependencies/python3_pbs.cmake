@@ -230,6 +230,13 @@ IF(RV_TARGET_WINDOWS)
   SET(_python_release_implib
       ${_lib_dir}/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}${CMAKE_IMPORT_LIBRARY_SUFFIX}
   )
+  # CMAKE_CONFIGURATION_TYPES always includes Debug on MSVC (see root CMakeLists.txt), so the multi-config generator validates Python::Python against a Debug
+  # configuration too, even when only Release is being built. PBS is gated to non-Debug (python3.cmake), so there is no Debug import lib to point at; set the
+  # generic (config-unsuffixed) property as the fallback CMake uses for any configuration without its own IMPORTED_IMPLIB_<CONFIG>.
+  SET_PROPERTY(
+    TARGET Python::Python
+    PROPERTY IMPORTED_IMPLIB ${_python_release_implib}
+  )
   SET_PROPERTY(
     TARGET Python::Python
     PROPERTY IMPORTED_IMPLIB_RELEASE ${_python_release_implib}
