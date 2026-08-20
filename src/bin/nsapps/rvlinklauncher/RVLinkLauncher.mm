@@ -291,6 +291,7 @@ static NSString *RVLinkDisplayURL(NSString *url) {
 
     NSString *lastSelectedPath = [[NSUserDefaults standardUserDefaults]
         stringForKey:@"LastSelectedRVAppPath"];
+    NSLog(@"Previously selected RV application: %@", lastSelectedPath);
     if (lastSelectedPath != nil) {
         for (NSInteger i = 0; i < [popup numberOfItems]; ++i) {
             NSURL *appURL = [[popup itemAtIndex:i] representedObject];
@@ -319,10 +320,11 @@ static NSString *RVLinkDisplayURL(NSString *url) {
     if (result == NSAlertFirstButtonReturn) {
         NSURL *selectedAppURL = [[popup selectedItem] representedObject];
 
-        // Save preference
-        [[NSUserDefaults standardUserDefaults]
-            setObject:[selectedAppURL path]
-            forKey:@"LastSelectedRVAppPath"];
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:[selectedAppURL path]
+                    forKey:@"LastSelectedRVAppPath"];
+        [defaults synchronize];
+        NSLog(@"Saved last selected RV application: %@", [selectedAppURL path]);
 
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
