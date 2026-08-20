@@ -319,6 +319,16 @@ namespace Rv
             m_session->setOpaquePointer(this);
             m_session->makeActive();
             m_session->postInitialize();
+
+            //
+            //  Note that the -eval / -pyeval command line expressions are
+            //  deliberately NOT evaluated here. The display groups do not exist
+            //  yet at this point, so evaluating them now would prevent the
+            //  source setup packages from configuring the view settings of any
+            //  source they add. RvApplication::newSessionFromFiles() calls
+            //  evalCommandLineScripts() once the display groups are in place.
+            //
+
             char nm[64];
             sprintf(nm, "session%03d", sessionCount++);
             m_session->setEventNodeName(nm);
