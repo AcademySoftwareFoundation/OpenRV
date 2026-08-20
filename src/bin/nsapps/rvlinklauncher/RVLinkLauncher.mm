@@ -289,8 +289,9 @@ static NSString *RVLinkDisplayURL(NSString *url) {
         [[popup lastItem] setRepresentedObject:appURL];
     }
 
+    static NSString * const kLastSelectedRVAppPathKey = @"LastSelectedRVAppPath";
     NSString *lastSelectedPath = [[NSUserDefaults standardUserDefaults]
-        stringForKey:@"LastSelectedRVAppPath"];
+        stringForKey:kLastSelectedRVAppPathKey];
     if (lastSelectedPath != nil) {
         for (NSInteger i = 0; i < [popup numberOfItems]; ++i) {
             NSURL *appURL = [[popup itemAtIndex:i] representedObject];
@@ -321,8 +322,7 @@ static NSString *RVLinkDisplayURL(NSString *url) {
 
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:[selectedAppURL path]
-                    forKey:@"LastSelectedRVAppPath"];
-        [defaults synchronize];
+                    forKey:kLastSelectedRVAppPathKey];
 
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
