@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 //******************************************************************************
-
 #ifndef __stream__StreamPreloadPool__h__
 #define __stream__StreamPreloadPool__h__
 

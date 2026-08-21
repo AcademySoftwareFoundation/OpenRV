@@ -137,11 +137,15 @@ namespace TwkMovie
         /// if an additional scanning pass is required after open this
         /// should return true from needsScan() while that is the case.
         ///
+        /// scan() will be called by a thread which may not be the same
+        /// that called opne(), and should block until complete.
+        ///
         /// In addition scanProgress() which may be called from other
         /// threads should return scan progress.
         ///
 
         virtual bool needsScan() const;
+        virtual void scan();
         virtual float scanProgress() const;
 
         ///
