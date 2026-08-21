@@ -174,6 +174,8 @@ namespace TwkMovie
         virtual MovieReader* clone() const;
         virtual void audioConfigure(const AudioConfiguration& config);
 
+        virtual void scan();
+
         float scanProgress() const { return 1.0; }
 
         bool needsScan() const { return false; }
