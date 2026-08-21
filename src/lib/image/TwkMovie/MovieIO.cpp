@@ -98,7 +98,7 @@ namespace TwkMovie
         }
     }
 
-    void GenericIO::Preloader::Reader::queuePrefetch()
+    void GenericIO::Preloader::Reader::queuePrefetch() const
     {
         if (!TwkUtil::pathIsURL(filename()))
         {
