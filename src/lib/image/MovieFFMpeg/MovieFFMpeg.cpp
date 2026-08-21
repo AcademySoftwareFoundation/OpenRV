@@ -1343,16 +1343,22 @@ namespace TwkMovie
     {
         const float windowSeconds = evPlayheadPrefetchSeconds.getValue();
         if (!TwkUtil::pathIsURL(m_filename) || windowSeconds <= 0.0f || m_info.fps <= 0.0f)
+        {
             return;
+        }
 
         const double frameSeconds = std::max(0.0, double(frame - m_info.start) / double(m_info.fps));
         const int64_t window = static_cast<int64_t>(frameSeconds / windowSeconds);
         if (m_lastPrefetchWindow.exchange(window) == window)
+        {
             return;
+        }
 
         std::string url = m_filename;
         if (evUseUploadedMovieForStreaming.getValue())
+        {
             boost::replace_all(url, "#.mp4", "");
+        }
         url = "shared:" + url;
 
         StreamerPool::Options options;
@@ -1363,7 +1369,9 @@ namespace TwkMovie
         for (const auto& [name, value] : m_request.parameters)
         {
             if (name == "cookies" || name == "headers")
+            {
                 options.emplace_back(name, value);
+            }
         }
 
         StreamerPool::getPool().enqueueWindow(url, options, frameSeconds, windowSeconds);
@@ -1415,7 +1423,9 @@ namespace TwkMovie
         const int ret = avformat_open_input(&m_avFormatContext, safe_path.c_str(), 0, &fmtOptions);
         av_dict_free(&fmtOptions);
         if (ret != 0)
+        {
             TWK_THROW_EXC_STREAM("Failed to open " << m_filename << " for reading: " << avErr2Str(ret));
+        }
 
         return true;
     }

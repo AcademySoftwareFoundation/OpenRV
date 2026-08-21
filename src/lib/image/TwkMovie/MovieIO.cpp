@@ -126,7 +126,7 @@ namespace TwkMovie
         {
             if (name == "cookies" || name == "headers")
             {
-                options.push_back(std::make_pair(name, value));
+                options.emplace_back(name, value);
             }
         }
 

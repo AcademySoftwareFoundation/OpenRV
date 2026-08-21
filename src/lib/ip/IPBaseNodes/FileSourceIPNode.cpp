@@ -1069,7 +1069,9 @@ namespace IPCore
         if (context.thread & DisplayThread)
         {
             if (MovieReader* reader = dynamic_cast<MovieReader*>(mov))
+            {
                 reader->prefetchAtFrame(request.frame);
+            }
         }
 
         if (failed || empty)

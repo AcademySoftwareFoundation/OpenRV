@@ -1731,7 +1731,6 @@ namespace IPCore
         graph().cache().unlock();
         graph().setAudioCachingMode(IPGraph::BufferCache);
         graph().flushAudioCache();
-
         if (!m_beingDeleted)
             graph().reset(App()->videoModules());
         setFileName("Untitled");
@@ -2079,10 +2078,35 @@ namespace IPCore
         m_stopTimer.start();
         m_preEval = false;
 
+        if (m_cacheMode == GreedyCache)
+        {
+            graph().cache().setFreeMode(FBCache::ConservativeFreeMode);
+        }
+        else
+        {
+        }
+
         if (multipleVideoDevices() && outputVideoDevice()->hasClock())
         {
             outputVideoDevice()->resetClock();
         }
+
+        FBCache::FreeMode fmode;
+
+        switch (m_cacheMode)
+        {
+        case GreedyCache:
+            fmode = FBCache::ConservativeFreeMode;
+            break;
+        case BufferCache:
+            fmode = FBCache::GreedyFreeMode;
+            break;
+        default:
+            fmode = FBCache::ActiveFreeMode;
+            break;
+        }
+
+        graph().cache().setFreeMode(fmode);
 
         m_shift = m_frame - rangeStart();
         //  cerr << "stop() setting(2) m_shift to " << m_shift << ".  m_frame "
