@@ -37,11 +37,13 @@ namespace TwkMovie
     MovieReader::~MovieReader() {}
 
     void MovieReader::warmOpen() {}
-
+    
     void MovieReader::prefetchAtFrame(int) {}
 
     Movie* MovieReader::clone() const { return 0; }
 
+    void MovieReader::scan() {}
+    
     float MovieReader::scanProgress() const { return 1.0; }
 
     bool MovieReader::needsScan() const { return false; }

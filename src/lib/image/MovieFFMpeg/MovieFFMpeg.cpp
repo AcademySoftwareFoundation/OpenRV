@@ -2909,6 +2909,12 @@ namespace TwkMovie
         fb->newAttribute("File", m_filename);
         fb->newAttribute("Sequence", m_filename);
     }
+ 
+        void MovieFFMpegReader::scan()
+    {
+        // NO LONGER NEEDED
+    }
+
 
     void MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks, vector<bool> heroAudioTracks)
     {
