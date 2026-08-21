@@ -126,7 +126,9 @@ void StreamerPool::schedulerLoop()
             if (m_queue.front().window)
             {
                 if (m_activeWindowWorkers != 0)
+                {
                     break;
+                }
             }
             else if (m_activeWorkers.size() >= m_maxThreads)
             {
@@ -136,7 +138,9 @@ void StreamerPool::schedulerLoop()
             Job job = m_queue.front();
             m_queue.pop_front();
             if (job.window)
+            {
                 ++m_activeWindowWorkers;
+            }
             m_activeWorkers.emplace_back(&StreamerPool::workerFunc, this, job);
         }
     }
@@ -164,14 +168,20 @@ void StreamerPool::reapFinished()
 void StreamerPool::workerFunc(Job job)
 {
     if (job.window)
+    {
         downloadWindow(job);
+    }
     else
+    {
         download(job);
+    }
 
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         if (job.window)
+        {
             --m_activeWindowWorkers;
+        }
         m_finished.insert(std::this_thread::get_id());
     }
 
@@ -269,7 +279,9 @@ void StreamerPool::downloadWindow(const Job& job)
                                                : av_rescale_q(timestamp, context->streams[packet->stream_index]->time_base, AV_TIME_BASE_Q);
                 av_packet_unref(packet);
                 if (packetTime >= end)
+                {
                     break;
+                }
             }
             av_packet_free(&packet);
         }
