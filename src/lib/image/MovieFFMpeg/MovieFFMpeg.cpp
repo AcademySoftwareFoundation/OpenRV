@@ -1307,7 +1307,7 @@ namespace TwkMovie
             return;
         }
 
-        boost::lock_guard<boost::mutex> lock(m_deferredOpenLock);
+        std::lock_guard<std::mutex> lock(m_deferredOpenLock);
 
         if (m_avFormatContext != nullptr)
         {
@@ -1454,7 +1454,7 @@ namespace TwkMovie
         //  Make sure the format is opened
         //
 
-        boost::lock_guard<boost::mutex> lock(m_deferredOpenLock);
+        std::lock_guard<std::mutex> lock(m_deferredOpenLock);
         if (m_avFormatContext == nullptr)
         {
             openAVFormat();
