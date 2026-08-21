@@ -181,7 +181,7 @@ void StreamerPool::workerFunc(Job job)
 void StreamerPool::download(const Job& job)
 {
     // 32 KB
-    const int readChunkSize = 32 * 1024;
+    constexpr int readChunkSize = 32 * 1024;
 
     AVDictionary* options = nullptr;
 
