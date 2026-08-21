@@ -20,7 +20,6 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
-#include <cstddef>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
