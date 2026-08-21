@@ -25,7 +25,7 @@ extern "C"
 // 32 KB
 const int readChunkSize = 32 * 1024;
 
-static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 12);
+static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 4);
 
 namespace
 {
