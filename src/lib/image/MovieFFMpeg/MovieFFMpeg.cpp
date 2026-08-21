@@ -2915,7 +2915,6 @@ namespace TwkMovie
         // NO LONGER NEEDED
     }
 
-
     void MovieFFMpegReader::collectPlaybackTiming(vector<bool> heroVideoTracks, vector<bool> heroAudioTracks)
     {
         double formatTimeDur = double(m_avFormatContext->duration) / double(AV_TIME_BASE);
