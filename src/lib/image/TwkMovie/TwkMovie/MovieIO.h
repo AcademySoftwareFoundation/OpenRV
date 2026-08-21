@@ -338,7 +338,7 @@ namespace TwkMovie
                 // Used for streamed media only to download raw videos in the background
                 //
 
-                void  queuePrefetch() const;
+                void queuePrefetch() const;
 
             public:
                 std::string m_filename;

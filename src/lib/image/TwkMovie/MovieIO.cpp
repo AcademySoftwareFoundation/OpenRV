@@ -122,7 +122,7 @@ namespace TwkMovie
 
         const auto& parameters = request().parameters;
 
-        for (const auto &[name, value]: parameters)
+        for (const auto& [name, value] : parameters)
         {
             if (name == "cookies" || name == "headers")
             {
