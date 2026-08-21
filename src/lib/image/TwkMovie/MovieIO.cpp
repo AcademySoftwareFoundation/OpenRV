@@ -101,7 +101,9 @@ namespace TwkMovie
     void GenericIO::Preloader::Reader::queuePrefetch()
     {
         if (!TwkUtil::pathIsURL(filename()))
+        {
             return;
+        }
 
         std::string url = filename();
 
@@ -113,18 +115,15 @@ namespace TwkMovie
         url = "shared:" + url;
 
         StreamerPool::Options options;
-        options.push_back(std::make_pair("cache_dir", evStreamCachePath.getValue()));
-        options.push_back(std::make_pair("seekable", "1"));
-        options.push_back(std::make_pair("reconnect", "1"));
-        options.push_back(std::make_pair("multiple_requests", "1"));
+        options.emplace_back("cache_dir", evStreamCachePath.getValue());
+        options.emplace_back("seekable", "1");
+        options.emplace_back("reconnect", "1");
+        options.emplace_back("multiple_requests", "1");
 
         const auto& parameters = request().parameters;
 
-        for (size_t i = 0; i < parameters.size(); i++)
+        for (const auto &[name, value]: parameters)
         {
-            const string& name = parameters[i].first;
-            const string& value = parameters[i].second;
-
             if (name == "cookies" || name == "headers")
             {
                 options.push_back(std::make_pair(name, value));
@@ -229,8 +228,6 @@ namespace TwkMovie
 
         {
             std::unique_lock<std::mutex> lock(m_schedulerThread_mutex);
-
-            //        std::cerr << "PRELOADER ADD " << filename << std::endl;
 
             newReader = std::make_shared<Preloader::Reader>(filename, request);
             m_readers.push_back(newReader);

@@ -9,7 +9,6 @@
 #define __TwkMovie__MovieReader__h__
 #include <TwkMovie/Movie.h>
 #include <TwkMovie/dll_defs.h>
-#include <boost/thread/mutex.hpp>
 
 namespace TwkMovie
 {
@@ -161,7 +160,7 @@ namespace TwkMovie
     protected:
         std::string m_filename; /// derived class should set this to the filename
         ReadRequest m_request;
-        boost::mutex m_deferredOpenLock;
+        std::mutex m_deferredOpenLock;
     };
 
 } // namespace TwkMovie

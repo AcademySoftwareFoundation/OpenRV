@@ -22,9 +22,6 @@ extern "C"
 #include <libavutil/mathematics.h>
 }
 
-// 32 KB
-const int readChunkSize = 32 * 1024;
-
 static ENVVAR_INT(evPrefetchThreads, "RV_STREAM_PREFETCH_THREADS", 4);
 
 namespace
@@ -184,6 +181,9 @@ void StreamerPool::workerFunc(Job job)
 
 void StreamerPool::download(const Job& job)
 {
+    // 32 KB
+    const int readChunkSize = 32 * 1024;
+
     AVDictionary* options = nullptr;
 
     // Add the options for FFMPEG reading over HTTPS
