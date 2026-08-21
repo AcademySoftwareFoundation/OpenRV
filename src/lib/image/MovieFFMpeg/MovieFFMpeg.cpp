@@ -21,8 +21,6 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
 #include <stream/StreamPreloadPool.h>
-#include <boost/thread/lock_algorithms.hpp>
-#include <boost/thread/mutex.hpp>
 #include <cstddef>
 #include <iostream>
 #include <iomanip>
