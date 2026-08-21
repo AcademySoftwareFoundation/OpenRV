@@ -100,7 +100,6 @@ private:
 
     static int interruptCallback(void* opaque);
 
-private:
     const size_t m_maxThreads;
     std::atomic<bool> m_abort;
 
