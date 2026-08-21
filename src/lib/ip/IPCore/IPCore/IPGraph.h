@@ -19,6 +19,7 @@
 #include <boost/signals2.hpp>
 #include <boost/thread.hpp>
 #include <atomic>
+#include <deque>
 #include <mutex>
 #include <set>
 
