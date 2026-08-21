@@ -20,7 +20,6 @@
 #include <TwkUtil/PathConform.h>
 #include <TwkUtil/File.h>
 #include <TwkUtil/sgcHop.h>
-#include <stream/StreamPreloadPool.h>
 #include <cstddef>
 #include <iostream>
 #include <iomanip>
@@ -36,6 +35,7 @@
 #include <mutex>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/thread/lock_guard.hpp>
 #include <boost/algorithm/string.hpp>
 #include <mp4v2Utils/mp4v2Utils.h>
