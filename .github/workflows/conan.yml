@@ -22,7 +22,7 @@ env:
 
 jobs:
   rocky-linux:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
        python=${{ matrix.python-version }},
@@ -380,7 +380,7 @@ jobs:
           cmake --install build/Release --prefix $(pwd)/_install --config ${{ matrix.build-type }}
 
   macos:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
        python=${{ matrix.python-version }},
@@ -550,7 +550,7 @@ jobs:
           cmake --install build/Release --prefix $(pwd)/_install --config ${{ matrix.build-type }}
 
   windows:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: 'Windows ${{ matrix.vfx-platform }}
       <${{ matrix.os }}
        msvc=${{ matrix.msvc-component }},
