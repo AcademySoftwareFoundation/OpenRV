@@ -1,12 +1,9 @@
-# Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
+# Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 from rv import commands, extra_commands, rvtypes, qtutils
 
-try:
-    from PySide2 import QtCore, QtWidgets, QtGui
-except ImportError:
-    from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets, QtGui
 
 from annotate_beta_widget import (
     AnnotateToolbarDockWidget,
@@ -247,10 +244,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _create_dock(self):
         sw = qtutils.sessionWindow()
         self._dock = AnnotateToolbarDockWidget(sw)
-        # Hide the native title bar while docked (we have our own Draw header).
-        # Restore it when floating so the user can drag the window.
-        self._dock.setTitleBarWidget(QtWidgets.QWidget())
-        self._dock.topLevelChanged.connect(self._on_dock_top_level_changed)
         sw.addDockWidget(QtCore.Qt.RightDockWidgetArea, self._dock)
         self._dock.hide()  # Start hidden; user opens via Annotation menu
         sw.resizeDocks([self._dock], [115], QtCore.Qt.Horizontal)
@@ -277,8 +270,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         w.redo_requested.connect(self._on_redo)
         w.clear_requested.connect(self._on_clear)
         w.clear_all_requested.connect(self._on_clear_all)
-        w.close_requested.connect(self._on_close_requested)
-        w.dock_requested.connect(self._on_dock_requested)
         w.color_modifier_changed.connect(self._on_color_modifier_changed)
         w.eraser_brush_changed.connect(self._on_eraser_brush_changed)
 

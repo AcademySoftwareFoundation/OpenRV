@@ -1,10 +1,7 @@
-# Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
+# Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-try:
-    from PySide2 import QtCore, QtWidgets, QtGui
-except ImportError:
-    from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets, QtGui
 
 _PRESETS = [
     "#FF3B30",  # red
@@ -176,7 +173,7 @@ class ColourPickerSection(QtWidgets.QWidget):
         lay.addWidget(self._hue_bar)
 
         swatch_row = QtWidgets.QWidget()
-        swatch_row.setStyleSheet("QWidget { background: transparent; }")
+        swatch_row.setObjectName("swatchRow")
         srow = QtWidgets.QHBoxLayout(swatch_row)
         srow.setContentsMargins(0, 0, 0, 0)
         srow.setSpacing(4)
