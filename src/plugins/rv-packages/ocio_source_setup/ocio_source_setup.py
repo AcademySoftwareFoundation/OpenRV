@@ -3,9 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import rvtypes, commands
 import os
+
 import PyOpenColorIO as OCIO
+from rv import commands, rvtypes
 
 #
 #   Default implementations of helper methods
@@ -284,7 +285,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 if commands.nodeType(pNode).startswith("OCIO"):
                     commands.ocioUpdateConfig(pNode)
 
-            print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
+            print("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot))
             return
 
         #
@@ -320,17 +321,17 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     DEFAULT_PIPE[pipeSlot] = currentPipelineNodes
             pipelineList = ocio_node_from_media(self.config, srcPipeline, DEFAULT_PIPE[pipeSlot], media, attrDict)
         except Exception as inst:
-            print(("ERROR: Problem occurred while loading OCIO settings for %s: %s" % (nodeType, inst)))
+            print("ERROR: Problem occurred while loading OCIO settings for %s: %s" % (nodeType, inst))
             return
 
         try:
             pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
-            print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
+            print("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst)
         if pipeline == DEFAULT_PIPE[pipeSlot]:
             return
 
-        print(("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot)))
+        print("INFO: using %s node for %s %s" % (nodeType, source, pipeSlot))
 
         commands.setStringProperty(srcPipeline + ".pipeline.nodes", pipeline, True)
         pipeNodes = commands.nodesInGroup(srcPipeline)
@@ -340,7 +341,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             try:
                 applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                print(("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst)))
+                print("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst))
 
         commands.redraw()
 
@@ -358,7 +359,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if pipeSlot not in DEFAULT_PIPE or current == DEFAULT_PIPE[pipeSlot]:
             return
 
-        print(("INFO: resetting %s for %s" % (pipeSlot, source)))
+        print("INFO: resetting %s for %s" % (pipeSlot, source))
 
         commands.setStringProperty(srcPipeline + ".pipeline.nodes", DEFAULT_PIPE[pipeSlot], True)
         commands.redraw()
@@ -393,18 +394,18 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                     DEFAULT_PIPE[groupName] = currentPipelineNodes
             pipelineList = ocio_node_from_media(self.config, dpipeline, DEFAULT_PIPE[groupName])
         except Exception as inst:
-            print(("ERROR: Problem occurred while loading OCIO settings for OCIODisplay: %s" % inst))
+            print("ERROR: Problem occurred while loading OCIO settings for OCIODisplay: %s" % inst)
             return
 
         try:
             pipeline = [p["nodeType"] for p in pipelineList]
         except KeyError as inst:
-            print(("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst))
+            print("ERROR: Unable to make use of ocio_node_from_media return: %s" % inst)
         if pipeline == DEFAULT_PIPE[groupName]:
             return
 
         device = commands.getStringProperty(group + ".device.name")[0]
-        print(("INFO: using OCIODisplay for display: %s" % device))
+        print("INFO: using OCIODisplay for display: %s" % device)
 
         dpipeline = groupMemberOfType(group, groupName)
         commands.setStringProperty(dpipeline + ".pipeline.nodes", pipeline, True)
@@ -416,7 +417,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             try:
                 applyProps(stageOCIO, pNode["context"], pNode["properties"])
             except KeyError as inst:
-                print(("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst)))
+                print("ERROR: Unable to apply properties to %s: %s" % (stageOCIO, inst))
 
         self.usingOCIOForDisplay[group] = True
         commands.redraw()
@@ -438,7 +439,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         commands.setStringProperty(dpipeline + ".pipeline.nodes", DEFAULT_PIPE[groupName], True)
 
         device = commands.getStringProperty(group + ".device.name")[0]
-        print(("INFO: using RVDisplayColor for display: %s" % device))
+        print("INFO: using RVDisplayColor for display: %s" % device)
 
         self.usingOCIOForDisplay[group] = False
         commands.redraw()
@@ -459,7 +460,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         imageSource = groupMemberOfType(group, "RVImageSource")
         source = fileSource if imageSource is None else imageSource
 
-        for nodeType in OCIO_ROLES.keys():
+        for nodeType in OCIO_ROLES:
             self.useSourceOCIO(source, nodeType)
 
         #
@@ -529,13 +530,13 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for nodeType in OCIO_ROLES.keys():
+                for nodeType in OCIO_ROLES:
                     self.disableSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.disableDisplayOCIO(group)
             DEFAULT_PIPE.clear()
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
-                for nodeType in OCIO_ROLES.keys():
+                for nodeType in OCIO_ROLES:
                     self.useSourceOCIO(source, nodeType)
             for group in commands.nodesOfType("RVDisplayGroup"):
                 self.usingOCIOForDisplay[group] = False
@@ -725,7 +726,7 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 except AttributeError:
                     pass
 
-            print(("INFO: Using %s for OCIO setup methods: %s" % (rv_ocio_setup.__file__, " ".join(inherited))))
+            print("INFO: Using %s for OCIO setup methods: %s" % (rv_ocio_setup.__file__, " ".join(inherited)))
 
         except ImportError:
             pass

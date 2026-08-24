@@ -105,11 +105,12 @@ the .copy() method:
 
 """
 
-from types import *
-import re
-import gto
 import operator
+import re
 from functools import reduce
+from types import *
+
+import gto
 import six
 
 
@@ -407,7 +408,7 @@ class Component:
     def __delattr__(self, name):
         if name in self.__dict__:
             del self.__dict__[name]
-        for p in range(0, len(self.__properties)):
+        for p in range(len(self.__properties)):
             if self.__properties[p].name() == name:
                 del self.__properties[p]
                 return
@@ -631,7 +632,7 @@ class Object:
     def __delattr__(self, name):
         if name in self.__dict__:
             del self.__dict__[name]
-        for c in range(0, len(self.__components)):
+        for c in range(len(self.__components)):
             if self.__components[c].name() == name:
                 del self.__components[c]
                 return
@@ -911,7 +912,7 @@ class gtoContainer(gto.Reader):
     def __delattr__(self, name):
         if name in self.__dict__:
             del self.__dict__[name]
-        for o in range(0, len(self.__objects)):
+        for o in range(len(self.__objects)):
             if self.__objects[o].name() == name:
                 del self.__objects[o]
                 return

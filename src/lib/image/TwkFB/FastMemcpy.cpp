@@ -93,8 +93,8 @@ void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf, s
         return small_memcpy(outBuf, inBuf, n);
     }
 
-    const unsigned char* PXLRESTRICT src = static_cast<const unsigned char * PXLRESTRICT>(inBuf);
-    unsigned char* PXLRESTRICT dst = static_cast<unsigned char * PXLRESTRICT>(outBuf);
+    const unsigned char* PXLRESTRICT src = static_cast<const unsigned char* PXLRESTRICT>(inBuf);
+    unsigned char* PXLRESTRICT dst = static_cast<unsigned char* PXLRESTRICT>(outBuf);
 
     // memcpy until dst is aligned with simd
     if (!is_aligned(dst, SSE_REGISTER_SIZE))
@@ -114,7 +114,7 @@ void* FastMemcpy_SIMD(void* PXLRESTRICT outBuf, const void* PXLRESTRICT inBuf, s
     {
         for (; n >= step; n -= step)
         {
-            _mm_prefetch(reinterpret_cast<const char * PXLRESTRICT>(src) + 1024, _MM_HINT_T0);
+            _mm_prefetch(reinterpret_cast<const char* PXLRESTRICT>(src) + 1024, _MM_HINT_T0);
             __m128 xmm0 = _mm_load_ps((float*)(src + 0 * SSE_REGISTER_SIZE));
             __m128 xmm1 = _mm_load_ps((float*)(src + 1 * SSE_REGISTER_SIZE));
             __m128 xmm2 = _mm_load_ps((float*)(src + 2 * SSE_REGISTER_SIZE));
