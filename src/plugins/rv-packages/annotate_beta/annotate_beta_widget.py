@@ -897,32 +897,32 @@ class AnnotateToolStrip(_StyledWidget):
                     pos = "mid"
                 _add_tool(tool, grouppos=pos)
                 if i < len(tools) - 1:
-                    lay.addSpacing(1)
+                    lay.addSpacing(0.5)
 
         # Cursor — standalone
         _add_tool(TOOL_CURSOR)
 
-        lay.addSpacing(1)
+        lay.addSpacing(2)
 
         # Drawing group: pen + airbrush + eraser
         _group_of([TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER])
 
-        lay.addSpacing(1)
+        lay.addSpacing(2)
 
         # Shapes group: rect + circle + arrow + line
         _group_of([TOOL_RECT, TOOL_CIRCLE, TOOL_ARROW, TOOL_LINE])
 
-        lay.addSpacing(1)
+        lay.addSpacing(2)
 
         # Text and eyedropper — standalone
         _add_tool(TOOL_TEXT)
-        lay.addSpacing(1)
+        lay.addSpacing(2)
         _add_tool(TOOL_EYEDROPPER)
 
         # Fixed gap + divider + swatch (NOT floating — swatch follows tools)
-        lay.addSpacing(8)
+        lay.addSpacing(14)
         lay.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        lay.addSpacing(14)
 
         self._swatch = ColourSwatch()
         lay.addWidget(self._swatch, alignment=QtCore.Qt.AlignHCenter)
