@@ -42,6 +42,14 @@ SET(_numpy_version
     "${RV_DEPS_NUMPY_VERSION}"
 )
 
+SET(_cryptography_version
+    "${RV_DEPS_CRYPTOGRAPHY_VERSION}"
+)
+
+SET(_pydantic_version
+    "${RV_DEPS_PYDANTIC_VERSION}"
+)
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -68,11 +76,23 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
+# PySide6's pyside-tools installs the macOS Qt tool .app bundles unconditionally, so a Qt build that does not ship Qt Designer fails at install time on macOS.
+# The patch makes that loop skip-with-warning like the file loop next to it. PySide2 (CY2023) has no sources/pyside-tools, hence the version guard.
+SET(_pyside_patch_command
+    ${CMAKE_COMMAND} -E true
+)
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
+  SET(_pyside_patch_command
+      patch -p1 -N -i ${CMAKE_CURRENT_LIST_DIR}/patch/pyside6_tools_optional_qt_app_bundles.patch
+  )
+ENDIF()
+
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
   URL ${_pyside_archive_url}
   URL_HASH MD5=${_pyside_download_hash}
   SOURCE_SUBDIR "sources" # Avoids the top level CMakeLists.txt
+  PATCH_COMMAND ${_pyside_patch_command}
 )
 
 FETCHCONTENT_MAKEAVAILABLE(${_pyside_target})
