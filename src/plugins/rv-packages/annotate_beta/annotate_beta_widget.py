@@ -58,19 +58,6 @@ COLOR_MOD_NORMAL = "normal"
 COLOR_MOD_ADDITIVE = "additive"
 COLOR_MOD_DARKEN = "darken"
 
-_TOOL_LABEL = {
-    TOOL_CURSOR: "↖",
-    TOOL_PEN: "✏",
-    TOOL_AIRBRUSH: "∴",
-    TOOL_ERASER: "⌫",
-    TOOL_RECT: "▭",
-    TOOL_CIRCLE: "○",
-    TOOL_ARROW: "↗",
-    TOOL_LINE: "╱",
-    TOOL_TEXT: "T",
-    TOOL_EYEDROPPER: "⌖",
-}
-
 _TOOL_TOOLTIP = {
     TOOL_CURSOR: "Cursor",
     TOOL_PEN: "Pen",
@@ -89,9 +76,8 @@ _TOOL_TOOLTIP = {
 # ---------------------------------------------------------------------------
 
 
-def _tool_button(label, tooltip, checkable=True, size=30):
+def _tool_button(tooltip, checkable=True, size=30):
     btn = QtWidgets.QToolButton()
-    btn.setText(label)
     btn.setToolTip(tooltip)
     btn.setCheckable(checkable)
     btn.setFixedSize(size, size)
@@ -892,7 +878,7 @@ class AnnotateToolStrip(_StyledWidget):
         self._buttons = {}
 
         def _add_tool(tool, grouppos="solo"):
-            btn = _tool_button(_TOOL_LABEL[tool], _TOOL_TOOLTIP[tool])
+            btn = _tool_button(_TOOL_TOOLTIP[tool])
             _apply_icon(btn, tool)
             if grouppos != "solo":
                 btn.setProperty("grouppos", grouppos)
@@ -945,7 +931,7 @@ class AnnotateToolStrip(_StyledWidget):
         # All remaining space goes here, pushing actions to the bottom
         lay.addStretch()
 
-        self._undo_btn = _tool_button("↩", "Undo", checkable=False)
+        self._undo_btn = _tool_button("Undo", checkable=False)
         self._undo_btn.setObjectName("actionButton")
         _apply_icon(self._undo_btn, "undo")
         self._undo_btn.setEnabled(False)
@@ -954,7 +940,7 @@ class AnnotateToolStrip(_StyledWidget):
 
         lay.addSpacing(1)
 
-        self._redo_btn = _tool_button("↪", "Redo", checkable=False)
+        self._redo_btn = _tool_button("Redo", checkable=False)
         self._redo_btn.setObjectName("actionButton")
         _apply_icon(self._redo_btn, "redo")
         self._redo_btn.setEnabled(False)
@@ -963,7 +949,7 @@ class AnnotateToolStrip(_StyledWidget):
 
         lay.addSpacing(1)
 
-        self._clear_btn = _tool_button("⊗", "Clear Frame", checkable=False)
+        self._clear_btn = _tool_button("Clear Frame", checkable=False)
         self._clear_btn.setObjectName("actionButton")
         _apply_icon(self._clear_btn, "clear")
         self._clear_btn.clicked.connect(self._on_clear_clicked)
