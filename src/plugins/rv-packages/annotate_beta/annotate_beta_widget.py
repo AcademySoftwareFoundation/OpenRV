@@ -834,6 +834,9 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._pen_panel.set_opacity(v)
         self._eraser_panel.set_opacity(v)
 
+    def set_filled(self, v):
+        self._shape_panel.set_filled(v)
+
     def set_color_modifier(self, mode):
         self._pen_panel.set_color_modifier(mode)
 
@@ -1112,6 +1115,9 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
 
     def set_opacity(self, v):
         self._panel.set_opacity(v)
+
+    def set_filled(self, v):
+        self._panel.set_filled(v)
 
     # Passthrough accessors so the mode can read current UI state
     @property

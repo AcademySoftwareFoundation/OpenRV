@@ -66,6 +66,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._tool_sizes = {}
         self._tool_opacities = {}
         self._tool_color_modifiers = {}
+        self._tool_filled = {}
 
         self._engine = AnnotateDrawEngine(self)
 
@@ -141,6 +142,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._tool_sizes[tool] = int(self._read(g, f"{tool}_size", _DEFAULT_SIZE))
             self._tool_opacities[tool] = int(self._read(g, f"{tool}_opacity", _DEFAULT_OPACITY))
             self._tool_color_modifiers[tool] = self._read(g, f"{tool}_color_modifier", "normal")
+            self._tool_filled[tool] = bool(self._read(g, f"{tool}_filled", False))
 
         saved_tool = self._read(g, "active_tool", TOOL_PEN)
         if saved_tool in _ALL_TOOLS:
@@ -168,6 +170,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._size = self._tool_sizes.get(self._tool, _DEFAULT_SIZE)
         self._opacity = self._tool_opacities.get(self._tool, _DEFAULT_OPACITY)
         self._color_modifier = self._tool_color_modifiers.get(self._tool, "normal")
+        self._filled = self._tool_filled.get(self._tool, False)
 
         w = self._dock.toolbar_widget
         w.strip.set_active_tool(self._tool)
@@ -175,6 +178,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         w.set_colour(self._colour)
         w.set_size(self._size)
         w.set_opacity(self._opacity)
+        w.set_filled(self._filled)
         w.panel.set_color_modifier(self._color_modifier)
         w.panel.set_eraser_brush(self._eraser_brush)
         w.panel.set_font_family(self._font_family)
@@ -192,6 +196,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             commands.writeSettings(g, f"{tool}_size", self._tool_sizes.get(tool, _DEFAULT_SIZE))
             commands.writeSettings(g, f"{tool}_opacity", self._tool_opacities.get(tool, _DEFAULT_OPACITY))
             commands.writeSettings(g, f"{tool}_color_modifier", self._tool_color_modifiers.get(tool, "normal"))
+            commands.writeSettings(g, f"{tool}_filled", self._tool_filled.get(tool, False))
         except Exception as e:
             print(f"[annotate_beta] settings write error: {e}")
 
@@ -292,6 +297,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._tool_sizes[self._tool] = self._size
         self._tool_opacities[self._tool] = self._opacity
         self._tool_color_modifiers[self._tool] = self._color_modifier
+        self._tool_filled[self._tool] = self._filled
         self._save_tool_state(self._tool)
 
         outgoing_tool = self._tool
@@ -323,6 +329,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         if restored_blend != self._color_modifier:
             self._color_modifier = restored_blend
             self._dock.toolbar_widget.panel.set_color_modifier(restored_blend)
+
+        restored_filled = self._tool_filled.get(tool, False)
+        if restored_filled != self._filled:
+            self._filled = restored_filled
+            self._dock.toolbar_widget.set_filled(restored_filled)
 
         if tool in _DRAWING_TOOLS:
             self._push_shape_table()
@@ -365,6 +376,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_filled_changed(self, v):
         self._filled = v
+        self._tool_filled[self._tool] = v
+        self._save_tool_state(self._tool)
 
     def _on_font_family_changed(self, v):
         self._engine.commit_text_if_active()
