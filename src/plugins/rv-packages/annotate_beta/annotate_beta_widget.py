@@ -935,7 +935,7 @@ class AnnotateToolStrip(_StyledWidget):
 
         # Fixed gap + divider + swatch (NOT floating — swatch follows tools)
         lay.addSpacing(8)
-        lay.addWidget(_separator())
+        lay.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
         lay.addSpacing(8)
 
         self._swatch = ColourSwatch()
