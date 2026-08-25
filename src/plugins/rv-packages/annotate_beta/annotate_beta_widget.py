@@ -1150,11 +1150,7 @@ class AnnotateToolbarDockWidget(QtWidgets.QDockWidget):
 
     def __init__(self, parent=None):
         super().__init__("Draw", parent)
-        self.setFeatures(
-            QtWidgets.QDockWidget.DockWidgetClosable
-            | QtWidgets.QDockWidget.DockWidgetMovable
-            | QtWidgets.QDockWidget.DockWidgetFloatable
-        )
+        self.setObjectName("annotationBetaDock")
         self.setAllowedAreas(QtCore.Qt.LeftDockWidgetArea | QtCore.Qt.RightDockWidgetArea)
         # Show tooltips even when this window is not the active window (e.g. when floating
         # or when RV's main viewport has focus).

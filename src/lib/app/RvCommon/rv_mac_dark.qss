@@ -1139,7 +1139,12 @@ QWidget#annotationTool QGroupBox {
     margin: 0px;
 }
 
-/* ANNOTATION TOOL (BETA) */
+/* ANNOTATION (BETA) */
+
+QDockWidget#annotationBetaDock::title {
+    background-color: rgb(23, 23, 23);
+    border-bottom: 2px solid rgb(77, 77, 77);
+}
 
 QWidget#annotationBeta QWidget#toolStrip {
     background-color: rgb(34, 34, 34);

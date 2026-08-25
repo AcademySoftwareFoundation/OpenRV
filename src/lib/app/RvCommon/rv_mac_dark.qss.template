@@ -1110,6 +1110,11 @@ QWidget#annotationTool QGroupBox {
 
 /* ANNOTATION TOOL (BETA) */
 
+QDockWidget#annotationBetaDock::title {
+    background-color: {{INPUT_BACKGROUND}};
+    border-bottom: 2px solid {{BORDER_MEDIUM}};
+}
+
 QWidget#annotationBeta QWidget#toolStrip {
     background-color: {{PRIMARY_BACKGROUND}};
 }
