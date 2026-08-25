@@ -880,10 +880,10 @@ class AnnotateToolStrip(_StyledWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("toolStrip")
-        self.setFixedWidth(30)
+        self.setFixedWidth(50)
 
         lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(0, 8, 0, 8)
+        lay.setContentsMargins(8, 8, 8, 8)
         lay.setSpacing(0)
 
         self._group = QtWidgets.QButtonGroup(self)
