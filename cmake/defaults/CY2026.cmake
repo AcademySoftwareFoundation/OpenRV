@@ -27,6 +27,13 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
       "45.0.7"
   )
 
+  # Cython https://github.com/cython/cython/releases Pinned because numpy 2.3.0 declares an unbounded "Cython>=3.0.6" build requirement, so pip's build
+  # isolation would otherwise resolve the newest Cython. Cython 3.3.0 breaks Meson's cython sanity check ("Compiler cython cannot compile programs") when
+  # building numpy from source. CY2023-CY2025 do not need this: their numpy versions cap Cython themselves (<3.0 / <3.1).
+  SET(RV_DEPS_CYTHON_VERSION
+      "3.2.9"
+  )
+
   # Imath Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
   SET(RV_DEPS_IMATH_VERSION
       "3.2.2"

@@ -50,6 +50,17 @@ SET(_pydantic_version
     "${RV_DEPS_PYDANTIC_VERSION}"
 )
 
+# Cython is only constrained on the VFX platforms whose numpy leaves its own Cython build requirement unbounded. See src/build/constraints.txt.in.
+IF(RV_DEPS_CYTHON_VERSION)
+  SET(_cython_constraint
+      "Cython==${RV_DEPS_CYTHON_VERSION}"
+  )
+ELSE()
+  SET(_cython_constraint
+      "# Cython intentionally unconstrained: this platform's numpy pins its own Cython upper bound."
+  )
+ENDIF()
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -270,6 +281,26 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
+# Generate constraints.txt from template. Unlike requirements.txt this one is exported as PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT so that pip's PEP 517
+# build-isolation environments inherit our pins: format control propagates into those environments but version pins do not.
+SET(_constraints_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/constraints.txt.in"
+)
+SET(_constraints_output_file
+    "${CMAKE_BINARY_DIR}/constraints.txt"
+)
+
+CONFIGURE_FILE(${_constraints_input_file} ${_constraints_output_file} @ONLY)
+
+# Both env vars point at the same file and must be absolute paths: pip's build-environment subprocesses run with their working directory inside the unpacked
+# source distribution. The python -s -E -I flags below do not strip either, -E only ignores PYTHON* variables. PIP_CONSTRAINT pins the outer/main resolve
+# (requirements.txt itself, and build-isolation envs on pip < 26.2). PIP_BUILD_CONSTRAINT pins build-isolation envs on pip >= 26.2, where PIP_CONSTRAINT was
+# deprecated for that purpose (pip issue: build constraints must be requested explicitly via --build-constraint / PIP_BUILD_CONSTRAINT). RV_PYTHON_BUILD_DEPS
+# installs an unpinned "pip", so the newest pip is always in play and both variables are needed for the fix to hold across pip versions.
+SET(_pip_constraint_env
+    "PIP_CONSTRAINT=${_constraints_output_file}" "PIP_BUILD_CONSTRAINT=${_constraints_output_file}"
+)
+
 # OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
 # new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
 # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
@@ -336,12 +367,13 @@ ENDIF()
 
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_constraint_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir
+    ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env} ${_pip_constraint_env}
 )
 # On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
 # OTIO's setup.py always calls "cmake" by name from PATH; it does not read CMAKE_GENERATOR. Prepend the directory of our outer build's cmake binary (the Windows
@@ -500,7 +532,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-build-deps-flag}
   COMMAND ${_build_deps_install_command}
   COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
-  DEPENDS ${_python3_target}
+  DEPENDS ${_python3_target} ${_constraints_output_file} ${_constraints_input_file}
 )
 
 # Phase 2 flag: Main requirements (depends on build deps being installed first)
@@ -513,7 +545,8 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_constraints_output_file}
+          ${_constraints_input_file}
 )
 
 # Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,
