@@ -152,6 +152,7 @@ namespace Rv
         void changeEvent(QEvent*) override;
         bool event(QEvent*) override;
         void moveEvent(QMoveEvent*) override;
+        void showEvent(QShowEvent*) override;
         void resizeEvent(QResizeEvent*) override;
 
         void setBuildMenu();
@@ -187,6 +188,7 @@ namespace Rv
         bool m_currentlyClosing;
         bool m_closeEventReceived;
         bool m_vsyncDisabled;
+        bool m_hdpiResizeWorkaroundDone;
         RvSourceEditor* m_sourceEditor;
         DisplayLink* m_displayLink;
         QWidget* m_blockingOverlay;
