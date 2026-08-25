@@ -371,12 +371,11 @@ class _EraserPanel(_PanelSurface):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(0)
 
         self._brush_btn = QtWidgets.QToolButton()
-        self._brush_btn.setObjectName("eraserBrushButton")
         self._brush_btn.setToolTip("Brush Type")
         self._brush_btn.setProperty("tbstyle", "palette")
         self._brush_btn.setIconSize(QtCore.QSize(20, 20))
@@ -391,25 +390,25 @@ class _EraserPanel(_PanelSurface):
         self._brush_menu.triggered.connect(self._on_brush_triggered)
         self._brush_btn.setMenu(self._brush_menu)
         self._update_brush_button("circle")
-        lay.addWidget(self._brush_btn)
+        layout.addWidget(self._brush_btn)
 
-        lay.addSpacing(8)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        layout.addSpacing(8)
+        layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+        layout.addSpacing(8)
 
         self._size = _SliderSection("Size", 1, 100, 32)
         self._size.value_changed.connect(self.size_changed)
-        lay.addWidget(self._size)
+        layout.addWidget(self._size)
 
-        lay.addSpacing(8)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        layout.addSpacing(8)
+        layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+        layout.addSpacing(8)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
-        lay.addWidget(self._opacity)
+        layout.addWidget(self._opacity)
 
-        lay.addStretch()
+        layout.addStretch()
 
     def _on_brush_triggered(self, action):
         brush = action.data()
