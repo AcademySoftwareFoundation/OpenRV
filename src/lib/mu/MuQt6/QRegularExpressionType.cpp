@@ -173,7 +173,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegularExpression& arg0 = getqtype<QRegularExpressionType>(param_this);
         const QRegularExpression arg1 = getqtype<QRegularExpressionType>(param_re);
-        return arg0.operator!=(arg1);
+        return arg0 != arg1;
     }
 
     bool qt_QRegularExpression_operatorEQ_EQ__bool_QRegularExpression_QRegularExpression(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -182,7 +182,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegularExpression& arg0 = getqtype<QRegularExpressionType>(param_this);
         const QRegularExpression arg1 = getqtype<QRegularExpressionType>(param_re);
-        return arg0.operator==(arg1);
+        return arg0 == arg1;
     }
 
     Pointer qt_QRegularExpression_anchoredPattern_string_string(Mu::Thread& NODE_THREAD, Pointer param_expression)

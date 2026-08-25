@@ -622,7 +622,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QImage arg1 = getqtype<QImageType>(param_image);
-        return arg0.operator!=(arg1);
+        return arg0 != arg1;
     }
 
     bool qt_QImage_operatorEQ_EQ__bool_QImage_QImage(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_image)
@@ -630,7 +630,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QImage& arg0 = getqtype<QImageType>(param_this);
         const QImage arg1 = getqtype<QImageType>(param_image);
-        return arg0.operator==(arg1);
+        return arg0 == arg1;
     }
 
     Pointer qt_QImage_trueMatrix_QTransform_QTransform_int_int(Mu::Thread& NODE_THREAD, Pointer param_matrix, int param_width,
