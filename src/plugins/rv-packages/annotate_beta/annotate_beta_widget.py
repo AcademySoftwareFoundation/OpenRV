@@ -627,40 +627,31 @@ class _TextOptionsPanel(_PanelSurface):
 
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
 
-        # B / I / U style toggles — full-width, stacked vertically
-        def _style_btn(label, tooltip):
-            btn = QtWidgets.QToolButton()
-            btn.setText(label)
-            btn.setCheckable(True)
-            btn.setToolTip(tooltip)
-            btn.setProperty("tbstyle", "palette")
-            btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-            btn.setFixedHeight(30)
-            return btn
+        # B / I / U style toggles
 
-        self._bold_btn = _style_btn("B", "Bold")
+        self._bold_btn = _tool_button("Bold")
         font_b = self._bold_btn.font()
         font_b.setBold(True)
         self._bold_btn.setFont(font_b)
         _apply_icon(self._bold_btn, "bold")
         self._bold_btn.toggled.connect(self.font_bold_changed)
-        lay.addWidget(self._bold_btn)
+        lay.addWidget(self._bold_btn, alignment=QtCore.Qt.AlignHCenter)
 
-        self._italic_btn = _style_btn("I", "Italic")
+        self._italic_btn = _tool_button("Italic")
         font_i = self._italic_btn.font()
         font_i.setItalic(True)
         self._italic_btn.setFont(font_i)
         _apply_icon(self._italic_btn, "italic")
         self._italic_btn.toggled.connect(self.font_italic_changed)
-        lay.addWidget(self._italic_btn)
+        lay.addWidget(self._italic_btn, alignment=QtCore.Qt.AlignHCenter)
 
-        self._underline_btn = _style_btn("U", "Underline")
+        self._underline_btn = _tool_button("Underline")
         font_u = self._underline_btn.font()
         font_u.setUnderline(True)
         self._underline_btn.setFont(font_u)
         _apply_icon(self._underline_btn, "underline")
         self._underline_btn.toggled.connect(self.font_underline_changed)
-        lay.addWidget(self._underline_btn)
+        lay.addWidget(self._underline_btn, alignment=QtCore.Qt.AlignHCenter)
 
         lay.addStretch()
 
