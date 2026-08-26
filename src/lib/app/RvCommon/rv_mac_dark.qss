@@ -1309,17 +1309,17 @@ QWidget#annotationBeta QSlider#annotationSlider::handle:vertical:disabled {
     background-color: rgb(7, 75, 120);
 }
 
-QWidget#annotationBeta QAbstractButton#colourSwatch {
+QWidget#annotationBeta QAbstractButton#colorSwatch {
     background: transparent;
     color: rgb(140, 140, 140);
 }
 
-QFrame#annotationBetaColourPopup {
+QFrame#annotationBetaColorPopup {
     background-color: rgb(23, 23, 23);
     border: 1px solid rgb(77, 77, 77);
     border-radius: 4px;
 }
 
-QFrame#annotationBetaColourPopup QWidget#swatchRow {
+QFrame#annotationBetaColorPopup QWidget#swatchRow {
     background: transparent;
 }

@@ -128,37 +128,37 @@ class _HueSlider(QtWidgets.QWidget):
 
 
 class _SwatchButton(QtWidgets.QAbstractButton):
-    """Small rounded square colour preset."""
+    """Small rounded square color preset."""
 
-    clicked_colour = QtCore.Signal(QtGui.QColor)
+    clicked_color = QtCore.Signal(QtGui.QColor)
 
-    def __init__(self, colour, parent=None):
+    def __init__(self, color, parent=None):
         super().__init__(parent)
-        self._colour = colour
+        self._color = color
         self.setFixedSize(22, 22)
         self.setCursor(QtCore.Qt.PointingHandCursor)
-        self.setToolTip(colour.name().upper())
+        self.setToolTip(color.name().upper())
 
     def paintEvent(self, event):
         p = QtGui.QPainter(self)
         p.setRenderHint(QtGui.QPainter.Antialiasing, True)
         p.setPen(QtGui.QPen(QtGui.QColor("#555555"), 1))
-        p.setBrush(self._colour)
+        p.setBrush(self._color)
         p.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 3, 3)
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self.clicked_colour.emit(self._colour)
+            self.clicked_color.emit(self._color)
 
 
-class ColourPickerSection(QtWidgets.QWidget):
-    """Inline colour picker — shown/hidden inside the secondary panel."""
+class ColorPickerSection(QtWidgets.QWidget):
+    """Inline color picker — shown/hidden inside the secondary panel."""
 
-    colour_changed = QtCore.Signal(QtGui.QColor)
+    color_changed = QtCore.Signal(QtGui.QColor)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._colour = QtGui.QColor(255, 255, 255)
+        self._color = QtGui.QColor(255, 255, 255)
 
         lay = QtWidgets.QVBoxLayout(self)
         lay.setContentsMargins(10, 10, 10, 10)
@@ -179,15 +179,15 @@ class ColourPickerSection(QtWidgets.QWidget):
         srow.setSpacing(4)
         for hex_col in _PRESETS:
             btn = _SwatchButton(QtGui.QColor(hex_col))
-            btn.clicked_colour.connect(self._on_preset_clicked)
+            btn.clicked_color.connect(self._on_preset_clicked)
             srow.addWidget(btn)
         srow.addStretch()
         lay.addWidget(swatch_row)
 
-    def set_colour(self, colour):
-        """Sync all controls to colour without emitting colour_changed."""
-        self._colour = QtGui.QColor(colour)
-        h, s, v, _ = self._colour.getHsvF()
+    def set_color(self, color):
+        """Sync all controls to color without emitting color_changed."""
+        self._color = QtGui.QColor(color)
+        h, s, v, _ = self._color.getHsvF()
         if h < 0:
             h = 0.0
         self._sv.set_hue(h)
@@ -198,13 +198,13 @@ class ColourPickerSection(QtWidgets.QWidget):
 
     def _on_hue_changed(self, hue_f):
         self._sv.set_hue(hue_f)
-        self._colour = QtGui.QColor.fromHsvF(hue_f, self._sv._sat, self._sv._val)
-        self.colour_changed.emit(self._colour)
+        self._color = QtGui.QColor.fromHsvF(hue_f, self._sv._sat, self._sv._val)
+        self.color_changed.emit(self._color)
 
     def _on_sv_changed(self, sat, val):
-        self._colour = QtGui.QColor.fromHsvF(self._hue_bar._hue, sat, val)
-        self.colour_changed.emit(self._colour)
+        self._color = QtGui.QColor.fromHsvF(self._hue_bar._hue, sat, val)
+        self.color_changed.emit(self._color)
 
-    def _on_preset_clicked(self, colour):
-        self.set_colour(colour)
-        self.colour_changed.emit(colour)
+    def _on_preset_clicked(self, color):
+        self.set_color(color)
+        self.color_changed.emit(color)

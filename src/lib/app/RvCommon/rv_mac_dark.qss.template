@@ -1285,17 +1285,17 @@ QWidget#annotationBeta QSlider#annotationSlider::handle:vertical:disabled {
     background-color: {{ACCENT_PRIMARY}};
 }
 
-QWidget#annotationBeta QAbstractButton#colourSwatch {
+QWidget#annotationBeta QAbstractButton#colorSwatch {
     background: transparent;
     qproperty-borderColor: {{BORDER_LIGHT}};
 }
 
-QFrame#annotationBetaColourPopup {
+QFrame#annotationBetaColorPopup {
     background-color: {{INPUT_BACKGROUND}};
     border: 1px solid {{BORDER_MEDIUM}};
     border-radius: 4px;
 }
 
-QFrame#annotationBetaColourPopup QWidget#swatchRow {
+QFrame#annotationBetaColorPopup QWidget#swatchRow {
     background: transparent;
 }      

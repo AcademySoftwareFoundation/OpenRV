@@ -5,7 +5,7 @@ import os
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
-from annotate_beta_colour_picker import ColourPickerSection
+from annotate_beta_color_picker import ColorPickerSection
 
 
 def _load_bundled_fonts():
@@ -108,7 +108,7 @@ class _StyledWidget(QtWidgets.QWidget):
 
 
 class _PanelSurface(_StyledWidget):
-    """Styled widget painted with the panelSurface background colour."""
+    """Styled widget painted with the panelSurface background color."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -116,36 +116,36 @@ class _PanelSurface(_StyledWidget):
 
 
 # ---------------------------------------------------------------------------
-# Colour swatch
+# Color swatch
 # ---------------------------------------------------------------------------
 
 
-class ColourSwatch(QtWidgets.QAbstractButton):
-    """Square button showing the current annotation colour.
+class ColorSwatch(QtWidgets.QAbstractButton):
+    """Square button showing the current annotation color.
 
     Clicking it emits swatch_clicked — the parent is responsible for
-    showing/hiding the inline colour picker.
+    showing/hiding the inline color picker.
     """
 
     swatch_clicked = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName("colourSwatch")
-        self._colour = QtGui.QColor(255, 204, 0)
+        self.setObjectName("colorSwatch")
+        self._color = QtGui.QColor(255, 204, 0)
         self.setFixedSize(30, 30)
         self.setCursor(QtCore.Qt.PointingHandCursor)
-        self.setToolTip("Colour")
+        self.setToolTip("Color")
 
-    def set_colour(self, colour):
-        self._colour = QtGui.QColor(colour)
+    def set_color(self, color):
+        self._color = QtGui.QColor(color)
         self.update()
 
     def paintEvent(self, event):
         p = QtGui.QPainter(self)
         p.setRenderHint(QtGui.QPainter.Antialiasing, False)
         p.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
-        p.setBrush(self._colour)
+        p.setBrush(self._color)
         p.drawRect(self.rect().adjusted(1, 1, -1, -1))
 
     def mousePressEvent(self, event):
@@ -696,23 +696,23 @@ class _TextOptionsPanel(_PanelSurface):
 
 
 # ---------------------------------------------------------------------------
-# Floating colour picker popup
+# Floating color picker popup
 # ---------------------------------------------------------------------------
 
 
-class ColourPickerPopup(QtWidgets.QFrame):
-    """Floating colour picker that appears to the right of the toolbar."""
+class ColorPickerPopup(QtWidgets.QFrame):
+    """Floating color picker that appears to the right of the toolbar."""
 
-    colour_changed = QtCore.Signal(QtGui.QColor)
+    color_changed = QtCore.Signal(QtGui.QColor)
 
     def __init__(self, parent=None):
         super().__init__(parent, QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
-        self.setObjectName("annotationBetaColourPopup")
+        self.setObjectName("annotationBetaColorPopup")
         self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
         lay = QtWidgets.QVBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
-        self._picker = ColourPickerSection()
-        self._picker.colour_changed.connect(self.colour_changed)
+        self._picker = ColorPickerSection()
+        self._picker.color_changed.connect(self.color_changed)
         lay.addWidget(self._picker)
         self.adjustSize()
 
@@ -723,8 +723,8 @@ class ColourPickerPopup(QtWidgets.QFrame):
         self.show()
         self.raise_()
 
-    def set_colour(self, c):
-        self._picker.set_colour(c)
+    def set_color(self, c):
+        self._picker.set_color(c)
 
 
 # ---------------------------------------------------------------------------
@@ -915,7 +915,7 @@ class AnnotateToolStrip(_StyledWidget):
         lay.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
         lay.addSpacing(14)
 
-        self._swatch = ColourSwatch()
+        self._swatch = ColorSwatch()
         lay.addWidget(self._swatch, alignment=QtCore.Qt.AlignHCenter)
         self._swatch.swatch_clicked.connect(self.swatch_toggle_requested)
 
@@ -991,9 +991,9 @@ class AnnotateToolStrip(_StyledWidget):
     def set_redo_enabled(self, enabled):
         self._redo_btn.setEnabled(enabled)
 
-    def set_colour(self, colour):
-        """Update the swatch colour display."""
-        self._swatch.set_colour(colour)
+    def set_color(self, color):
+        """Update the swatch color display."""
+        self._swatch.set_color(color)
 
 
 # ---------------------------------------------------------------------------
@@ -1005,7 +1005,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     """Tool strip + secondary panel.  All signals bubble up from children."""
 
     tool_changed = QtCore.Signal(str)
-    colour_changed = QtCore.Signal(QtGui.QColor)
+    color_changed = QtCore.Signal(QtGui.QColor)
     size_changed = QtCore.Signal(int)
     opacity_changed = QtCore.Signal(int)
     filled_changed = QtCore.Signal(bool)
@@ -1036,9 +1036,9 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._panel = AnnotateSecondaryPanel()
         lay.addWidget(self._panel)
 
-        # Floating colour picker popup (no parent — truly floating)
-        self._picker_popup = ColourPickerPopup()
-        self._picker_popup.colour_changed.connect(self._on_colour_changed)
+        # Floating color picker popup (no parent — truly floating)
+        self._picker_popup = ColorPickerPopup()
+        self._picker_popup.color_changed.connect(self._on_color_changed)
 
         # Wire strip signals
         self._strip.tool_changed.connect(self._on_tool_changed)
@@ -1048,7 +1048,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._strip.clear_all_requested.connect(self.clear_all_requested)
         self._strip.swatch_toggle_requested.connect(self._on_swatch_toggle)
 
-        # Wire panel signals (no colour_changed — that comes from the popup now)
+        # Wire panel signals (no color_changed — that comes from the popup now)
         self._panel.size_changed.connect(self.size_changed)
         self._panel.opacity_changed.connect(self.opacity_changed)
         self._panel.filled_changed.connect(self.filled_changed)
@@ -1077,14 +1077,14 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     def hide_popups(self):
         self._picker_popup.hide()
 
-    def _on_colour_changed(self, colour):
-        self._strip.set_colour(colour)
-        self.colour_changed.emit(colour)
+    def _on_color_changed(self, color):
+        self._strip.set_color(color)
+        self.color_changed.emit(color)
 
-    def set_colour(self, colour):
-        """Programmatically set the active colour (e.g. on tool switch)."""
-        self._strip.set_colour(colour)
-        self._picker_popup.set_colour(colour)
+    def set_color(self, color):
+        """Programmatically set the active color (e.g. on tool switch)."""
+        self._strip.set_color(color)
+        self._picker_popup.set_color(color)
 
     def set_size(self, v):
         self._panel.set_size(v)
