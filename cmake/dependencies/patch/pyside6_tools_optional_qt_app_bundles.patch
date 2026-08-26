@@ -1,46 +1,3 @@
-# PySide6 installs the individual Qt tool executables behind an if(EXISTS) guard (warn and skip when the Qt build
-# does not ship one), but installs the macOS .app bundles unconditionally. Qt builds without Qt Designer therefore
-# fail at install time on macOS only:
-#
-#   CMake Error at cmake_install.cmake:133 (file):
-#     file INSTALL cannot find ".../bin/Designer.app": No such file or directory
-#   error: Error pseudo installing pyside-tools
-#
-# RV does not use Qt Designer (it loads .ui files through QUiLoader/QtUiTools, and deliberately avoids the
-# QtDesigner dependency for LGPL reasons), so make the directory loop as tolerant as the file loop above it.
-# Upstreamable to PySide6 as-is.
---- a/sources/pyside-tools/CMakeLists.txt
-+++ b/sources/pyside-tools/CMakeLists.txt
-@@ -79,13 +79,17 @@
-     endforeach()
- 
-     foreach(directory ${directories})
--        install(DIRECTORY "${directory}"
--                DESTINATION bin
--                FILE_PERMISSIONS
--                OWNER_EXECUTE OWNER_WRITE OWNER_READ
--                GROUP_EXECUTE GROUP_READ
--                WORLD_EXECUTE WORLD_READ
--                PATTERN "android_utilities.py" EXCLUDE) # excluding the symlink
-+        if(EXISTS ${directory})
-+            install(DIRECTORY "${directory}"
-+                    DESTINATION bin
-+                    FILE_PERMISSIONS
-+                    OWNER_EXECUTE OWNER_WRITE OWNER_READ
-+                    GROUP_EXECUTE GROUP_READ
-+                    WORLD_EXECUTE WORLD_READ
-+                    PATTERN "android_utilities.py" EXCLUDE) # excluding the symlink
-+        else()
-+            message(WARNING "${directory} does not exist. Hence, the matching pyside6 tool will not work")
-+        endif()
-     endforeach()
- 
-     # dealing with android_utilities.py
-#
-# The same assumption appears twice more in the macOS packaging step, so it is patched here too:
-#   - _macos_patch_executable() runs install_name_tool on every bundled tool, including Designer.app
-#   - the designer widget-plugin dir is copied unconditionally, but PySide only builds it when it finds
-#     Qt6Designer, so it is absent for the same reason (copydir already supports force=False for this).
 --- a/build_scripts/platforms/macos.py
 +++ b/build_scripts/platforms/macos.py
 @@ -18,6 +18,9 @@
@@ -61,3 +18,33 @@
                      _vars=_vars)
  
      if copy_qml:
+--- a/build_scripts/platforms/linux.py
++++ b/build_scripts/platforms/linux.py
+@@ -79,6 +79,9 @@
+ 
+         for tool in PYSIDE_UNIX_BUNDLED_TOOLS:
+             tool_path = destination_dir / tool
++            if not tool_path.exists():
++                log.info(f"**Skipping rpath patching of {tool_path}. Tool was not bundled.")
++                continue
+             linux_patch_executable(pyside_build._patchelf_path, tool_path)
+ 
+     if pyside_build.is_webengine_built(built_modules):
+@@ -101,6 +104,7 @@
+                     plugins_target / "designer",
+                     _filter=["*.so"],
+                     recursive=False,
++                    force=False,
+                     _vars=_vars)
+ 
+         copied_plugins = pyside_build.get_shared_libraries_in_path_recursively(
+--- a/build_scripts/platforms/windows_desktop.py
++++ b/build_scripts/platforms/windows_desktop.py
+@@ -393,6 +393,7 @@
+                     f"{plugins_target}/designer",
+                     _filter=["*.dll"],
+                     recursive=False,
++                    force=False,
+                     _vars=_vars)
+ 
+     if copy_translations:

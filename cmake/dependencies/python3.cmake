@@ -87,14 +87,18 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
-# PySide6's pyside-tools installs the macOS Qt tool .app bundles unconditionally, so a Qt build that does not ship Qt Designer fails at install time on macOS.
-# The patch makes that loop skip-with-warning like the file loop next to it. PySide2 (CY2023) has no sources/pyside-tools, hence the version guard.
+# PySide6's pyside-tools and standalone packaging assume Qt Designer/Assistant/Linguist were bundled. macOS .app installs, Linux patchelf rpath patching, and
+# Windows/Linux designer-plugin copies all fail when the Qt build does not ship those tools. CY2026's Qt 6.8 build omits Designer; the patch makes each step
+# skip-with-warning like the individual tool file install loop.
 SET(_pyside_patch_command
     ${CMAKE_COMMAND} -E true
 )
-IF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
+IF(RV_VFX_PLATFORM STREQUAL CY2026)
+  SET(_pyside_patch_script
+      "${PROJECT_SOURCE_DIR}/src/build/apply_pyside6_tools_patch.py"
+  )
   SET(_pyside_patch_command
-      patch -p1 -N -i ${CMAKE_CURRENT_LIST_DIR}/patch/pyside6_tools_optional_qt_app_bundles.patch
+      python3 "${_pyside_patch_script}" "<SOURCE_DIR>" "${CMAKE_CURRENT_LIST_DIR}/patch"
   )
 ENDIF()
 
