@@ -1148,3 +1148,7 @@ height: 10px;
 margin: 0px -8px;
 border-radius: 9px;
 }
+
+QWidget#annotationBeta QWidget#separator {
+background-color: rgb(77, 77, 77);
+}
