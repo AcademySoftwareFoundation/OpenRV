@@ -23,6 +23,12 @@ QSizeGrip {
     background-color: transparent;
 }
 
+QToolTip {
+    color: rgb(67, 67, 67);
+    background-color: rgb(240, 240, 240);
+    padding: 2px;
+}
+
 /* TOOLBARS */
     
 QToolBar { 
