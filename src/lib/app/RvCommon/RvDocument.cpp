@@ -143,6 +143,7 @@ namespace Rv
         , m_currentlyClosing(false)
         , m_closeEventReceived(false)
         , m_vsyncDisabled(false)
+        , m_hdpiResizeWorkaroundDone(false)
         , m_oldGLView(0)
         , m_glView(0)
         , m_diagnosticsView(0)
@@ -222,25 +223,6 @@ namespace Rv
 
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
-
-        // #ifdef PLATFORM_DARWIN
-        //  Under macOS, for Qt6/QOpenGLWidget port,
-        //  the initial display shows incorrect pixel
-        //  scaling due to some sort of effect related
-        //  to high-dpi on mac, until the main view is
-        //  resized by the user. This is a workaround
-        //  on macOS to force this resize;
-        //  Also enabling this on other platforms which
-        //  may have HDPI display with pixel doubling
-        //  enabled.
-        QTimer::singleShot(0, this,
-                           [this]()
-                           {
-                               QSize currentSize = size();
-                               resize(currentSize.width() + 1, currentSize.height());
-                               resize(currentSize);
-                           });
-        // #endif
 
         m_resetPolicyTimer = new QTimer(this);
         m_resetPolicyTimer->setSingleShot(true);
@@ -1977,6 +1959,36 @@ namespace Rv
     {
         if (m_session)
             m_session->askForRedraw();
+    }
+
+    void RvDocument::showEvent(QShowEvent* event)
+    {
+        QMainWindow::showEvent(event);
+
+        if (m_hdpiResizeWorkaroundDone)
+            return;
+
+        m_hdpiResizeWorkaroundDone = true;
+
+#if defined(PLATFORM_DARWIN)
+        const bool needWorkaround = true;
+#else
+        const bool needWorkaround = (devicePixelRatio() > 1.0);
+#endif
+
+        if (!needWorkaround)
+            return;
+
+        // Under Qt6/QOpenGLWidget, initial HDPI scaling can be wrong until the
+        // main view is resized once after it is shown. Defer until showEvent so
+        // child widgets (including any QML-backed UI) are fully constructed.
+        QTimer::singleShot(0, this,
+                           [this]()
+                           {
+                               QSize currentSize = size();
+                               resize(currentSize.width() + 1, currentSize.height());
+                               resize(currentSize);
+                           });
     }
 
     void RvDocument::resizeEvent(QResizeEvent* event)

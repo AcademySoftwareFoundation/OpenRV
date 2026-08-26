@@ -49,25 +49,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._color_modifier = "normal"
         self._eraser_brush = "circle"  # "circle" = hard, "gauss" = soft
 
-        # Paint node override set by live_review via set-current-annotate-mode-node.
+        # Paint node override set via set-current-annotate-mode-node.
         # When non-empty, the engine uses this node instead of metaEvaluate so that
         # RV-drawn annotations land on the annotation source group's RVPaint node
-        # (the same one live_review tracks) rather than the local pipeline node.
+        # rather than the local pipeline node.
         self._preferred_paint_node = ""
-
-        # Set to True when the user explicitly closes the dock via the × button so
-        # that activate() does not force-reopen it on mode re-activation.
-        self._user_closed = False
-
-        # Tracks whether the old "Draw" dock was visible when the user opened the new
-        # toolbar, so we can restore it if they close the new toolbar.
-        self._old_draw_dock_was_visible = False
-
-        # True when the dock was hidden because Live Review revoked annotate_category
-        # permission.  Used to restore the toolbar when permission is re-granted,
-        # without auto-showing it on unrelated event-category-state-changed events
-        # (e.g., menu-bar clicks).
-        self._hidden_by_lr = False
 
         # Configure settings — match old annotate_mode.mu defaults
         self._store_on_src = False  # "Draw On Source When Possible"
@@ -108,6 +94,9 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         # Re-push the event table in case the mode was deactivated by a view change.
         if self._tool in _DRAWING_TOOLS:
             self._push_shape_table()
+
+        self._update_tool_availability()
+        self._update_undo_redo_buttons()
 
     def deactivate(self):
         self._pop_shape_table()
@@ -453,48 +442,18 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             self._dock.setTitleBarWidget(QtWidgets.QWidget())
 
-    def _find_old_draw_dock(self):
-        """Return the old annotate_mode 'Draw' QDockWidget, or None if not present."""
-        sw = qtutils.sessionWindow()
-        for dock in sw.findChildren(QtWidgets.QDockWidget):
-            try:
-                if dock is not self._dock and dock.windowTitle() == "Draw":
-                    return dock
-            except RuntimeError:
-                continue
-        return None
-
-    def _show_new_toolbar(self):
-        """Show the new toolbar and hide the old Draw dock (mutual exclusion)."""
-        old_dock = self._find_old_draw_dock()
-        if old_dock:
-            try:
-                self._old_draw_dock_was_visible = old_dock.isVisible()
-                old_dock.hide()
-            except RuntimeError:
-                old_dock = None
-        self._user_closed = False
+    def _show_toolbar(self):
         self._dock.show()
         self._dock.raise_()
 
-    def _hide_new_toolbar(self):
-        """Hide the new toolbar and restore the old Draw dock if it was visible."""
-        self._user_closed = True
-        self._dock.hide()
-        if self._old_draw_dock_was_visible:
-            old_dock = self._find_old_draw_dock()
-            if old_dock:
-                try:
-                    old_dock.show()
-                except RuntimeError:
-                    pass
-        self._old_draw_dock_was_visible = False
-
     def _on_close_requested(self):
-        self._hide_new_toolbar()
+        """Closing the panel."""
+        if self.isActive():
+            self.toggle()
+        else:
+            self._dock.hide()
 
     def _on_dock_requested(self):
-        self._user_closed = False
         self._dock.setFloating(not self._dock.isFloating())
 
     def _hide_colour_picker(self):
@@ -508,27 +467,19 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             w.set_redo_enabled(self._engine.has_redo())
 
     def _update_tool_availability(self):
-        """Enable/disable tools whose RV event categories are currently disabled.
-
-        Live Review uses commands.disableEventCategory() to prevent webclient
-        users from accessing tools not supported over the web protocol.
-        Also hides the dock entirely when annotate_category is disabled (viewer role).
-        """
+        """Enable/disable tools whose RV event categories are currently disabled."""
         if not self._dock:
             return
         w = self._dock.toolbar_widget
 
-        # Hide/show the toolbar based on Live Review role permissions.
-        # Only restore visibility when permission was previously revoked by Live Review
-        # (_hidden_by_lr=True); do NOT auto-show on unrelated category-state events
-        # (e.g., menu-bar clicks) which would pop the toolbar open unexpectedly.
+        # Hide/show the toolbar depending on if the annotate category is enabled or not.
+        # isActive() is the authority on whether the user wants the toolbar open, so unrelated
+        # category-state events (e.g., menu-bar clicks) can't pop it open, and the
+        # toolbar comes back on its own once the category is re-enabled.
         if commands.isEventCategoryEnabled("annotate_category"):
-            if self._hidden_by_lr and not self._user_closed:
-                self._show_new_toolbar()
-            self._hidden_by_lr = False
+            if self.isActive():
+                self._show_toolbar()
         else:
-            if self._dock.isVisible():
-                self._hidden_by_lr = True
             self._dock.hide()
 
         airbrush_on = commands.isEventCategoryEnabled("annotate_airbrush_category")
@@ -553,7 +504,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         event.reject()
 
     def _on_undo_redo_clear_update(self, event):
-        """Fired by live_review's paint manager after processing an incoming PAINT_BATCH_UPDATE.
+        """Fired once an incoming remote paint update has been applied.
 
         A remote client's undo/redo/clear changes the annotation state on the current
         frame, so our undo/redo button enabled state may be stale.
@@ -562,14 +513,13 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         event.reject()
 
     def _on_set_current_annotate_node(self, event):
-        """Receive the paint node that live_review wants annotations stored on.
+        """Receive the paint node that annotations should be stored on.
 
-        Live Review fires this event (via on_annotate_mode_activated) to direct
-        us to draw on the annotation source group's RVPaint node rather than the
-        local pipeline node, so that it can track and sync all annotations.
+        An external package sends this event to direct us to draw on the annotation
+        source group's RVPaint node rather than the local pipeline node, so that it can track
+        and sync all annotations.
 
-        Matches legacy annotate_mode.mu's setCurrentNodeEvent: only accept the
-        node if it's actually part of the current view's paint nodes, otherwise
+        Only accept the node if it's actually part of the current view's paint nodes, otherwise
         clear the override rather than storing a name that may never resolve.
         """
         node_name = event.contents() or ""
@@ -653,12 +603,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
                 self._on_undo_redo_clear_update,
                 "Sync undo/redo state after remote paint update",
             ),
-            # Matches the F10 binding the legacy annotate_mode package used to show/hide
-            # its "Draw" dock, so users don't have to learn a new hotkey.
-            ("key-down--f10", self._toggle_toolbar, "Toggle Annotate Toolbar"),
-            # Sent by the "Toggle Annotation tools" button in the bottom view toolbar
-            # (RvBottomViewToolBar::paintActionTriggered).
-            ("toggle-annotate-toolbar", self._toggle_toolbar, "Toggle Annotate Toolbar (bottom bar button)"),
             # Matches the legacy annotate_mode package's Next/Previous Annotated Frame hotkeys.
             # (RV joins simultaneous modifiers with a single dash, e.g. "alt-shift", and
             # brackets the modifier block with double dashes -- see QTTranslator::modifierString.)
@@ -688,19 +632,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
                 self._save_tool_state(self._tool)
         except Exception as e:
             print(f"[annotate_beta] eyedropper error: {e}")
-
-    def _toggle_toolbar(self, event=None):
-        if not self._dock:
-            return
-        if self._dock.isVisible():
-            self._hide_new_toolbar()
-        else:
-            self._show_new_toolbar()
-
-    def _toolbar_state(self):
-        if self._dock and self._dock.isVisible():
-            return commands.CheckedMenuState
-        return commands.NeutralMenuState
 
     # ------------------------------------------------------------------
     # Next/Previous Annotated Frame navigation
@@ -752,14 +683,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         ]
 
         return [
-            (
-                "Tools",
-                [
-                    # Same menu path and hotkey as the legacy annotate_mode package, so
-                    # switching to the new toolbar doesn't require re-training muscle memory.
-                    ("Annotation", self._toggle_toolbar, "F10", self._toolbar_state),
-                ],
-            ),
             (
                 "Annotation",
                 [

@@ -10,7 +10,10 @@ excludes: annotate
 
 modes:
   - file: annotate_beta_mode.py
-    load: immediate
+    menu: Tools/Annotation
+    shortcut: 'F10'
+    event: 'key-down--f10'
+    load: delay
 
 description: |
   <p>Beta Python-based annotation package that provides shapes
