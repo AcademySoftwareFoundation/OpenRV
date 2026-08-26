@@ -1,4 +1,4 @@
-/* Copyright (c) 2025 Autodesk.
+/* Copyright (c) 2026 Autodesk.
 
 * CONFIDENTIAL AND PROPRIETARY
 
@@ -31,6 +31,12 @@ QFrame {
 
 QSizeGrip {
     background-color: transparent;
+}
+
+QToolTip {
+    color: {{TOOLTIP_TEXT}};
+    background-color: {{TOOLTIP_BACKGROUND}};
+    padding: 2px;
 }
 
 /* TOOLBARS */
@@ -1141,4 +1147,190 @@ QAbstractItemView#uiTreeWidget QWidget {
     
 QWidget#annotationTool QGroupBox {
     margin: 0px;
-}      
+}
+
+/* ANNOTATION (BETA) */
+
+QDockWidget#annotationBetaDock::title {
+    background-color: {{INPUT_BACKGROUND}};
+    border-bottom: 2px solid {{BORDER_MEDIUM}};
+}
+
+QWidget#annotationBeta QWidget#toolStrip {
+    background-color: {{PRIMARY_BACKGROUND}};
+}
+
+QWidget#annotationBeta QWidget#secondaryPanel,
+QWidget#annotationBeta QWidget#panelSurface {
+    background-color: {{INPUT_BACKGROUND}};
+}
+
+QWidget#annotationBeta QWidget#separator {
+    background-color: {{BORDER_MEDIUM}};
+}
+
+QWidget#annotationBeta QToolButton[tbstyle="palette"] {
+    background-color: {{SECONDARY_BACKGROUND}};
+    border: none;
+}
+
+QWidget#annotationBeta QToolButton[tbstyle="palette"]:hover {
+    background-color: {{TERTIARY_BACKGROUND}};
+}
+
+QWidget#annotationBeta QToolButton[tbstyle="palette"]:checked {
+    background-color: {{ACCENT_PRIMARY}};
+}
+
+QWidget#annotationBeta QToolButton[grouppos="first"] {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QWidget#annotationBeta QToolButton[grouppos="mid"] {
+    border-radius: 0px;
+}
+
+QWidget#annotationBeta QToolButton[grouppos="last"] {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+QWidget#annotationBeta QToolButton#actionButton {
+    background: transparent;
+}
+
+QWidget#annotationBeta QToolButton#actionButton:hover {
+    background-color: {{TERTIARY_BACKGROUND}};
+}
+
+QWidget#annotationBeta QToolButton#actionButton:pressed {
+    background-color: {{BUTTON_PRESSED}};
+}
+
+QWidget#annotationBeta QCheckBox {
+    background: transparent;
+}
+
+QWidget#annotationBeta QComboBox {
+    color: {{TEXT_BRIGHT}};
+    background-color: {{SECONDARY_BACKGROUND}};
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 2px;
+    font-size: %2pt;
+    font-weight: bold;
+    padding: 0px 4px;
+    min-height: 32px;
+    max-height: 32px;
+}
+
+QWidget#annotationBeta QComboBox:drop-down {
+    border: none;
+    background: transparent;
+    width: 16px;
+    subcontrol-origin: padding;
+    subcontrol-position: right center;
+}
+
+QWidget#annotationBeta QComboBox:hover {
+    border: none;
+    border-bottom: 1px solid {{BORDER_LIGHT}};
+}
+
+QWidget#annotationBeta QComboBox:focus,
+QWidget#annotationBeta QComboBox:on {
+    border: none;
+    border-bottom: 1px solid {{ACCENT_SECONDARY}};
+}
+
+QWidget#annotationBeta QComboBox#eraserBrushButton {
+    background-color: {{INPUT_BACKGROUND}};
+}
+
+QWidget#annotationBeta QLineEdit#sliderValue {
+    color: {{TEXT_BRIGHT}};
+    background-color: {{SECONDARY_BACKGROUND}};
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 2px;
+    font-size: %2pt;
+    padding: 0px 4px;
+    min-height: 22px;
+    max-height: 22px;
+    selection-background-color: {{ACCENT_PRIMARY}};
+    selection-color: {{TEXT_BRIGHT}};
+}
+
+QWidget#annotationBeta QLineEdit#sliderValue:hover {
+    border-bottom: 1px solid {{BORDER_LIGHT}};
+}
+
+QWidget#annotationBeta QLineEdit#sliderValue:focus {
+    border-bottom: 1px solid {{ACCENT_SECONDARY}};
+}
+
+QWidget#annotationBeta QLineEdit#sliderValue:disabled {
+    color: {{TEXT_DISABLED}};
+}
+
+QWidget#annotationBeta QSlider#annotationSlider {
+    background: transparent;
+    min-width: 32px;
+    max-width: 32px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
+    width: 3px;
+    margin: 3px 0px;
+    background: transparent;
+    border: none;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical {
+    background-color: {{CONTROL_HANDLE}};
+    background-clip: padding;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical {
+    background-color: {{ACCENT_SECONDARY}};
+    border-radius: 1px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+    width: 10px;
+    height: 10px;
+    margin: 0px -8px;
+    background-color: {{ACCENT_SECONDARY}};
+    border: 4px solid {{ACCENT_PRIMARY}};;
+    border-radius: 9px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical:disabled {
+    background-color: {{TEXT_DISABLED}};
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical:disabled {
+    background-color: {{ACCENT_PRIMARY}};
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:vertical:disabled {
+    background-color: {{ACCENT_PRIMARY}};
+}
+
+QWidget#annotationBeta QAbstractButton#colorSwatch {
+    background: transparent;
+    qproperty-borderColor: {{BORDER_LIGHT}};
+}
+
+QFrame#annotationBetaColorPopup {
+    background-color: {{INPUT_BACKGROUND}};
+    border: 1px solid {{BORDER_MEDIUM}};
+    border-radius: 4px;
+}
+
+QFrame#annotationBetaColorPopup QWidget#swatchRow {
+    background: transparent;
+}

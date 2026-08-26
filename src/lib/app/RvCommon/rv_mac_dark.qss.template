@@ -1114,7 +1114,7 @@ QWidget#annotationTool QGroupBox {
     margin: 0px;
 }
 
-/* ANNOTATION TOOL (BETA) */
+/* ANNOTATION (BETA) */
 
 QDockWidget#annotationBetaDock::title {
     background-color: {{INPUT_BACKGROUND}};
