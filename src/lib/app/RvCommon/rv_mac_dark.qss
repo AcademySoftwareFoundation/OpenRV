@@ -419,15 +419,6 @@ QDockWidget::float-button {
     height: 16px;
     margin: 2px;
 }
-
-QDockWidget::float-button:hover {
-    background-color: rgb(7, 75, 120);
-    border: 1px solid rgb(6, 150, 215);
-}
-
-QDockWidget::float-button:pressed {
-    background-color: rgb(6, 150, 215);
-}
     
 QDockWidget::title {
     background-color: rgb(67, 67, 67);
@@ -1150,6 +1141,11 @@ QWidget#annotationTool QGroupBox {
 QDockWidget#annotationBetaDock::title {
     background-color: rgb(23, 23, 23);
     border-bottom: 2px solid rgb(77, 77, 77);
+}
+
+QDockWidget#annotationBetaDock::close-button,
+QDockWidget#annotationBetaDock::float-button {
+    background-color: rgb(23, 23, 23);
 }
 
 QWidget#annotationBeta QWidget#toolStrip {
