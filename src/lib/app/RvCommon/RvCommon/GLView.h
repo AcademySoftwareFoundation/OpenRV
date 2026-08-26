@@ -14,6 +14,7 @@
 #include <QSize>
 
 class QOpenGLContext;
+class QWindow;
 
 namespace Rv
 {
@@ -84,6 +85,32 @@ namespace Rv
         float devicePixelRatio() const;
 
     private:
+        //
+        //  Keeping the viewport window alive across top-level window churn.
+        //
+        //  createWindowContainer() transfers ownership of the viewport window to
+        //  the container, which parents it to the top-level QWidgetWindow. Qt
+        //  destroys and recreates that QWidgetWindow when a widget is reparented
+        //  into the window -- QWidget::setParent() -> destroy() -> ~QWidgetWindow
+        //  -- as happens when a plugin adds a QWebEngineView to a layout, and
+        //  ~QObject deletes its child QWindows, viewport included. Nothing in Qt
+        //  puts it back, and QWindowContainer then dereferences the window it no
+        //  longer has on the next layout pass.
+        //
+        //  QObject::destroyed is emitted at the top of ~QObject, before
+        //  deleteChildren() runs, so watching the parent window gives us a
+        //  moment where the viewport can still be detached and kept -- which is
+        //  much cheaper than rebuilding it, and keeps the GL context, the device
+        //  wiring and the uploaded textures intact.
+        //
+        void watchParentWindow();
+        void parentWindowDestroyed();
+        void reattachGLWindow();
+
+    protected:
+        void showEvent(QShowEvent*) override;
+
+    private:
         RvDocument* m_doc;
         GLWindow* m_glWindow;
         QWidget* m_container;
@@ -91,6 +118,15 @@ namespace Rv
         QSize m_csize;
         QSize m_msize;
         QOpenGLContext* m_sharedContext;
+
+        //
+        //  The parent QWindow whose destruction is being watched, plus the
+        //  connection to it so it can be rewired when the viewport window is
+        //  re-parented. See watchParentWindow().
+        //
+        QWindow* m_watchedParentWindow;
+        QMetaObject::Connection m_watchedParentConnection;
+        bool m_reattachPending;
     };
 
 } // namespace Rv

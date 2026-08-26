@@ -78,6 +78,16 @@ namespace Rv
         m_translator = new QTTranslator(this, m_view);
     }
 
+    void QTGLVideoDevice::setWindow(QOpenGLWindow* window, QWidget* eventWidget)
+    {
+        m_window = window;
+
+        if (m_translator)
+            m_translator->setWidet(eventWidget);
+        else
+            m_translator = new QTTranslator(this, eventWidget);
+    }
+
     GLVideoDevice* QTGLVideoDevice::newSharedContextWorkerDevice() const
     {
         // A freshly constructed QOpenGLWidget has no context() yet -- it is
@@ -184,6 +194,7 @@ namespace Rv
             return;
         }
 
+        if (m_view)
         {
             if (m_view->isVisible())
             {
@@ -211,17 +222,21 @@ namespace Rv
         }
     }
 
+    int QTGLVideoDevice::surfaceWidth() const { return m_window ? m_window->width() : (m_view ? m_view->width() : 1); }
+
+    int QTGLVideoDevice::surfaceHeight() const { return m_window ? m_window->height() : (m_view ? m_view->height() : 1); }
+
     VideoDevice::Resolution QTGLVideoDevice::resolution() const
     {
-        const int w = m_window ? m_window->width() : m_view->width();
-        const int h = m_window ? m_window->height() : m_view->height();
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
         return Resolution(w * devicePixelRatio(), h * devicePixelRatio(), 1.0f, 1.0f);
     }
 
     VideoDevice::Resolution QTGLVideoDevice::internalResolution() const
     {
-        const int w = m_window ? m_window->width() : m_view->width();
-        const int h = m_window ? m_window->height() : m_view->height();
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
         return Resolution(w, h, 1.0f, 1.0f);
     }
 
@@ -231,8 +246,8 @@ namespace Rv
 
     VideoDevice::VideoFormat QTGLVideoDevice::format() const
     {
-        const int w = m_window ? m_window->width() : m_view->width();
-        const int h = m_window ? m_window->height() : m_view->height();
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
         return VideoFormat(w * devicePixelRatio(), h * devicePixelRatio(), 1.0, 1.0, (m_refresh != -1.0) ? m_refresh : 0.0,
                            hardwareIdentification());
     }
@@ -243,7 +258,7 @@ namespace Rv
             return;
         if (m_window)
             m_window->show();
-        else
+        else if (m_view)
             m_view->show();
     }
 
@@ -253,7 +268,7 @@ namespace Rv
             return;
         if (m_window)
             m_window->hide();
-        else
+        else if (m_view)
             m_view->hide();
     }
 
@@ -261,12 +276,12 @@ namespace Rv
     {
         if (isWorkerDevice())
             return false;
-        return m_window ? m_window->isVisible() : m_view->isVisible();
+        return m_window ? m_window->isVisible() : (m_view ? m_view->isVisible() : false);
     }
 
-    size_t QTGLVideoDevice::width() const { return (m_window ? m_window->width() : m_view->width()) * devicePixelRatio(); }
+    size_t QTGLVideoDevice::width() const { return surfaceWidth() * devicePixelRatio(); }
 
-    size_t QTGLVideoDevice::height() const { return (m_window ? m_window->height() : m_view->height()) * devicePixelRatio(); }
+    size_t QTGLVideoDevice::height() const { return surfaceHeight() * devicePixelRatio(); }
 
     void QTGLVideoDevice::syncBuffers() const
     {
@@ -275,7 +290,7 @@ namespace Rv
         makeCurrent();
         if (m_window)
             m_window->context()->swapBuffers(m_window);
-        else
+        else if (m_view)
             m_view->context()->swapBuffers(m_view->context()->surface());
     }
 

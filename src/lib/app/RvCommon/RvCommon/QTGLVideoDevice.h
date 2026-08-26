@@ -12,6 +12,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLWindow>
 #include <QOpenGLContext>
+#include <QPointer>
 #include <QSurfaceFormat>
 #include <QWindow>
 #include <QtWidgets/QWidget>
@@ -43,6 +44,17 @@ namespace Rv
         virtual ~QTGLVideoDevice();
 
         void setWidget(QOpenGLWidget*);
+
+        //
+        //  Re-point the device at a different viewport window and event widget.
+        //  The window is owned by the widget container that embeds it, so Qt can
+        //  destroy it independently of this device (see m_window); the hosting
+        //  GLView rebuilds both and calls this. Passing a null window leaves the
+        //  device backing-less until the next call, which the guards throughout
+        //  this class tolerate. The translator is reused rather than recreated so
+        //  its accumulated modifier/pointer state survives the swap.
+        //
+        void setWindow(QOpenGLWindow* window, QWidget* eventWidget);
 
         QOpenGLWidget* widget() const { return m_view; }
 
@@ -102,13 +114,28 @@ namespace Rv
     protected:
         QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);
 
+        //
+        //  Logical size of whichever surface backs this device. Falls back to
+        //  1x1 when neither backing is alive, so callers computing an aspect
+        //  ratio cannot divide by zero. See m_window for why it can go away.
+        //
+        int surfaceWidth() const;
+        int surfaceHeight() const;
+
     protected:
         int m_x;
         int m_y;
         float m_refresh;
         float m_devicePixelRatio{1.0f};
         QOpenGLWidget* m_view;
-        QOpenGLWindow* m_window{nullptr};
+        //
+        //  Guarded: the window is embedded via QWidget::createWindowContainer(),
+        //  which owns it, so Qt can delete it independently of this device (and
+        //  of the GLView that created both). A QPointer makes the `if (m_window)`
+        //  checks below actual liveness checks instead of null checks -- without
+        //  it, redraw() would call update() on a freed QOpenGLWindow.
+        //
+        QPointer<QOpenGLWindow> m_window;
         QTTranslator* m_translator;
     };
 
