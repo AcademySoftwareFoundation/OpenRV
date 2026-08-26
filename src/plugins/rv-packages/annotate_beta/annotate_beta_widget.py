@@ -363,6 +363,7 @@ class _EraserPanel(_PanelSurface):
 
         self._brush_btn = QtWidgets.QToolButton()
         self._brush_btn.setToolTip("Brush Type")
+        self._brush_btn.setObjectName("menuToolButton")
         self._brush_btn.setProperty("tbstyle", "palette")
         self._brush_btn.setIconSize(QtCore.QSize(20, 20))
         self._brush_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
@@ -608,6 +609,7 @@ class _TextOptionsPanel(_PanelSurface):
 
         self._size_btn = QtWidgets.QToolButton()
         self._size_btn.setToolTip("Size")
+        self._size_btn.setObjectName("menuToolButton")
         self._size_btn.setProperty("tbstyle", "palette")
         self._size_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self._size_btn.setFixedHeight(30)

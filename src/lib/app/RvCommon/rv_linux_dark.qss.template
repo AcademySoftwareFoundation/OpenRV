@@ -1208,6 +1208,27 @@ QWidget#annotationBeta QCheckBox {
     background: transparent;
 }
 
+QWidget#annotationBeta QToolButton#menuToolButton {
+    padding-right: 26px;
+    text-align: center;
+}
+
+QWidget#annotationBeta QToolButton#menuToolButton::menu-indicator {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    position: relative;
+    top: 0px;
+    right: 8px;
+}
+
+QWidget#annotationBeta QToolButton#menuToolButton:hover {
+    border-bottom: 1px solid {{BORDER_LIGHT}}
+}
+
+QWidget#annotationBeta QToolButton#menuToolButton:pressed {
+    border-bottom: 1px solid {{ACCENT_SECONDARY}}
+}
+
 QWidget#annotationBeta QComboBox {
     color: {{TEXT_BRIGHT}};
     background-color: {{SECONDARY_BACKGROUND}};
