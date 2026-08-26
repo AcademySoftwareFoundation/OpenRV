@@ -303,9 +303,9 @@ class _SizeOpacityPanel(_PanelSurface):
         self._size.value_changed.connect(self.size_changed)
         lay.addWidget(self._size)
 
-        lay.addSpacing(8)
+        lay.addSpacing(16)
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        lay.addSpacing(16)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
@@ -378,17 +378,17 @@ class _EraserPanel(_PanelSurface):
         self._update_brush_button("circle")
         layout.addWidget(self._brush_btn)
 
-        layout.addSpacing(8)
+        layout.addSpacing(16)
         layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        layout.addSpacing(8)
+        layout.addSpacing(16)
 
         self._size = _SliderSection("Size", 1, 100, 32)
         self._size.value_changed.connect(self.size_changed)
         layout.addWidget(self._size)
 
-        layout.addSpacing(8)
+        layout.addSpacing(16)
         layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        layout.addSpacing(8)
+        layout.addSpacing(16)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
@@ -447,17 +447,17 @@ class _PenPanel(_PanelSurface):
         self._size.value_changed.connect(self.size_changed)
         lay.addWidget(self._size)
 
-        lay.addSpacing(8)
+        lay.addSpacing(16)
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        lay.addSpacing(16)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
         lay.addWidget(self._opacity)
 
-        lay.addSpacing(8)
+        lay.addSpacing(16)
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        lay.addSpacing(16)
 
         # Blend mode buttons — grouped with 1px gaps, connected border-radius
         self._blend_grp = QtWidgets.QButtonGroup(self)
@@ -539,9 +539,9 @@ class _ShapeOptionsPanel(_PanelSurface):
         self._size.value_changed.connect(self.size_changed)
         lay.addWidget(self._size)
 
-        lay.addSpacing(8)
+        lay.addSpacing(16)
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(8)
+        lay.addSpacing(16)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
@@ -625,7 +625,9 @@ class _TextOptionsPanel(_PanelSurface):
         self._update_size_button("medium")
         lay.addWidget(self._size_btn)
 
+        lay.addSpacing(5)
         lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+        lay.addSpacing(5)
 
         # B / I / U style toggles
 
@@ -911,9 +913,9 @@ class AnnotateToolStrip(_StyledWidget):
         _add_tool(TOOL_EYEDROPPER)
 
         # Fixed gap + divider + swatch (NOT floating — swatch follows tools)
-        lay.addSpacing(14)
+        lay.addSpacing(10)
         lay.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(14)
+        lay.addSpacing(10)
 
         self._swatch = ColorSwatch()
         lay.addWidget(self._swatch, alignment=QtCore.Qt.AlignHCenter)
