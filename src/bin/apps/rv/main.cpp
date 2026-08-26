@@ -369,6 +369,15 @@ int utf8Main(int argc, char* argv[])
     // (RV Preferences/Rendering/Multithread GPU Upload)
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
+    // Share resources across every QOpenGLContext in the process. The
+    // diagnostics tool is a QOpenGLWidget (ImGui OpenGL2) whose font atlas must
+    // share with the context that actually renders. On the Metal/Vulkan
+    // presentation backends that render context is an offscreen QOpenGLContext
+    // owned by the video device, so without a global share context the
+    // diagnostics font-texture uploads fail and the panel renders blank.
+    // Must be set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
     TwkUtil::MemPool::initialize();
 
     string altPrefsPath;
