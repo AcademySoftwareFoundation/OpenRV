@@ -1266,10 +1266,6 @@ QWidget#annotationBeta QLineEdit#sliderValue:focus {
     border-bottom: 1px solid {{ACCENT_SECONDARY}};
 }
 
-QWidget#annotationBeta QLineEdit#sliderValue:disabled {
-    color: {{TEXT_DISABLED}};
-}
-
 QWidget#annotationBeta QSlider#annotationSlider {
     background: transparent;
     min-width: 32px;
@@ -1278,7 +1274,7 @@ QWidget#annotationBeta QSlider#annotationSlider {
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
     width: 3px;
-    margin: 3px 0px;
+    margin: 0px;
     background: transparent;
     border: none;
 }
@@ -1291,7 +1287,7 @@ QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical {
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical {
-    background-color: {{ACCENT_SECONDARY}};
+    background-color: {{ACCENT_SECONDARY}}
     border-radius: 1px;
 }
 
@@ -1304,21 +1300,9 @@ QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
     border-radius: 9px;
 }
 
-QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical:disabled {
-    background-color: {{TEXT_DISABLED}};
-}
-
-QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical:disabled {
-    background-color: {{ACCENT_PRIMARY}};
-}
-
-QWidget#annotationBeta QSlider#annotationSlider::handle:vertical:disabled {
-    background-color: {{ACCENT_PRIMARY}};
-}
-
 QWidget#annotationBeta QAbstractButton#colorSwatch {
     background: transparent;
-    qproperty-borderColor: {{BORDER_LIGHT}};
+    color: {{BORDER_LIGHT}};
 }
 
 QFrame#annotationBetaColorPopup {

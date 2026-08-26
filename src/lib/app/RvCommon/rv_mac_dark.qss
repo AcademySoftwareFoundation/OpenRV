@@ -1,4 +1,4 @@
-/* Copyright (c) 2025 Autodesk.
+/* Copyright (c) 2026 Autodesk.
 
 * CONFIDENTIAL AND PROPRIETARY
 
@@ -1267,7 +1267,7 @@ QWidget#annotationBeta QSlider#annotationSlider {
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
     width: 3px;
-    margin: 3px 0px;
+    margin: 0px;
     background: transparent;
     border: none;
 }
@@ -1291,18 +1291,6 @@ QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
     background-color: rgb(6, 150, 215);
     border: 4px solid rgb(23, 23, 23);
     border-radius: 9px;
-}
-
-QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical:disabled {
-    background-color: rgb(120, 120, 120);
-}
-
-QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical:disabled {
-    background-color: rgb(7, 75, 120);
-}
-
-QWidget#annotationBeta QSlider#annotationSlider::handle:vertical:disabled {
-    background-color: rgb(7, 75, 120);
 }
 
 QWidget#annotationBeta QAbstractButton#colorSwatch {

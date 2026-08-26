@@ -1,4 +1,4 @@
-/* Copyright (c) 2025 Autodesk.
+/* Copyright (c) 2026 Autodesk.
 
 * CONFIDENTIAL AND PROPRIETARY
 
@@ -1130,4 +1130,21 @@ font-size: %2pt;
 
 QWidget#annotationTool QGroupBox {
 margin: 0px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider {
+min-width: 32px;
+max-width: 32px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
+width: 2px;
+margin: 3px 0px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+width: 10px;
+height: 10px;
+margin: 0px -8px;
+border-radius: 9px;
 }
