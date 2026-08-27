@@ -23,6 +23,7 @@
 #include <TwkApp/VideoDevice.h>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLContext>
+#include <QtGui/QGuiApplication>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
@@ -297,10 +298,48 @@ namespace Rv
         switch (event->type())
         {
         case QEvent::FocusIn:
+            //
+            //  Qt has already made this the focus window by the time FocusIn is
+            //  delivered, so there is nothing to activate here. The case exists
+            //  only to drop modifier state that went stale while the keyboard
+            //  was elsewhere. (The missing break let execution fall into the
+            //  hover case below.)
+            //
             m_videoDevice->translator().resetModifiers();
-        case QEvent::Enter:
-            requestActivate();
             break;
+
+        case QEvent::Enter:
+            //
+            //  Hovering hands the keyboard to the viewport as a *widget* focus
+            //  change, never as a window activation. QWidget::setFocus() only
+            //  delivers FocusIn when the top-level is already active; otherwise
+            //  it just records the window's focus_child and the keyboard arrives
+            //  once the user activates RV. That is what keeps a hover from
+            //  stealing activation from another top-level of ours (the Console)
+            //  or from another application: requestActivate() on a native child
+            //  window activates the whole top-level, and on Windows it will even
+            //  AttachThreadInput/SetForegroundWindow when RV is not the active
+            //  application.
+            //
+            //  The container is GLView's focus proxy, so setFocus() on the view
+            //  lands on it, and QWindowContainer turns its FocusIn into the
+            //  QWindow::requestActivate() that hands the keyboard to this
+            //  window -- the same path RvDocument and the Mu commands use.
+            //
+            //  Skipped when this window already holds focus: QWindowContainer
+            //  clears the container's widget focus once it has handed focus
+            //  over, so a repeat FocusIn would take its "return to the normal
+            //  focus chain" branch and push the keyboard to the next widget in
+            //  the tab chain instead. QWidget::setFocus()'s own focusWidget()
+            //  early-out did this for us on the widget-based viewport.
+            //
+            if (QGuiApplication::focusWindow() != this)
+            {
+                if (GLView* view = m_doc ? m_doc->view() : nullptr)
+                    view->setFocus(Qt::MouseFocusReason);
+            }
+            break;
+
         default:
             break;
         }
