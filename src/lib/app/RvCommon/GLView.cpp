@@ -93,13 +93,54 @@ namespace Rv
         //  before anything else gets the chance to trigger it. Qt would create
         //  it on the first show anyway.
         //
+        //
+        //  Realize the top-level's window now, and watch for Qt replacing it.
+        //
+        //  Creating it here has a cost that is worth stating plainly: before any
+        //  render-to-texture widget is in the tree, the window's composition gets
+        //  pinned to OpenGL. Qt Quick defaults to Direct3D 11 on Windows, so
+        //  every QQuickWidget in the window -- which is what a QWebEngineView's
+        //  page is -- would then fail to get a QRhi and render nothing. RV
+        //  therefore also pins Qt Quick to OpenGL (see main.cpp), which is the
+        //  same pairing the QOpenGLWidget-based viewport produced before this
+        //  branch.
+        //
+        //  It is done up front because the container can only be detached safely
+        //  once a teardown has already happened at a benign point; arming later
+        //  puts the first teardown at the dangerous one, which faults inside
+        //  Qt's focus handling. See parentWindowDestroyed().
+        //
         if (QWidget* topLevel = window())
             topLevel->createWinId();
 
         watchParentWindow();
     }
 
-    GLView::~GLView() { delete m_videoDevice; }
+    GLView::~GLView()
+    {
+        //
+        //  Two things have to be undone before the device goes away, both of
+        //  them consequences of the viewport window outliving the widget tree in
+        //  the detached state (see parentWindowDestroyed()).
+        //
+        //  The window holds a raw back-pointer to the device and would keep
+        //  using it -- GLWindow::event() and paintGL() both dereference it -- so
+        //  clear that first. And while detached the container has no parent
+        //  widget, so it would not be destroyed along with this widget: it would
+        //  survive as a stray top-level owning the viewport window, still
+        //  pointing at a deleted device.
+        //
+        if (m_glWindow)
+            m_glWindow->setVideoDevice(nullptr);
+
+        if (m_container && !m_container->parentWidget())
+        {
+            delete m_container;
+            m_container = nullptr;
+        }
+
+        delete m_videoDevice;
+    }
 
     void GLView::showEvent(QShowEvent* event)
     {
@@ -172,6 +213,21 @@ namespace Rv
         //  without checking it -- and that is null from here until Qt recreates
         //  the window, which it does lazily on the next show. A layout pass runs
         //  before then. A container that is not in the tree is never visited.
+        //
+        //
+        //  Take the container out of the widget tree for the duration as well.
+        //  Qt reaches window containers through QWindowContainer::parentWasMoved()
+        //  on every layout pass and dereferences the top-level's windowHandle()
+        //  without checking it -- and that is null from here until Qt recreates
+        //  the window. A layout pass runs before then, inside this same reparent,
+        //  so a container left in the tree faults there.
+        //
+        //  This is the fragile part of the workaround: reparenting a widget from
+        //  inside Qt's window teardown runs its focus machinery against the
+        //  half-destroyed QWidgetWindow. It is safe here only because the window
+        //  is realized up front (see the constructor), which means the first of
+        //  these teardowns happens at a benign point and later ones find the
+        //  container already detached. See the note in the constructor.
         //
         if (m_container)
         {
