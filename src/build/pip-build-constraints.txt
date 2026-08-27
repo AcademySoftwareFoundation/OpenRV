@@ -1,0 +1,9 @@
+# Constraints applied to pip's build-isolation environments when installing packages from requirements.txt.
+#
+# OpenTimelineIO is built from source against our custom Python. Its setup.py runs find_package(Python ...
+# Interpreter Development.Module) using the cmake wheel pip installs into the isolated build environment,
+# not the cmake driving the outer OpenRV build. That resolution is unpinned and floats with PyPI.
+#
+# CMake 4.4.1+ changed Windows FindPython ABI handling and breaks Development.Module against our custom
+# debug Python (python311_d.lib). Pin to the same cmake line as the outer OpenRV build.
+cmake==3.31.6
