@@ -50,7 +50,7 @@ SET(_pydantic_version
     "${RV_DEPS_PYDANTIC_VERSION}"
 )
 
-# Cython is only constrained on the VFX platforms whose numpy leaves its own Cython build requirement unbounded. See src/build/constraints.txt.in.
+# Cython is only constrained on the VFX platforms whose numpy leaves its own Cython build requirement unbounded. See src/build/pip-build-constraints.txt.in.
 IF(RV_DEPS_CYTHON_VERSION)
   SET(_cython_constraint
       "Cython==${RV_DEPS_CYTHON_VERSION}"
@@ -285,16 +285,16 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
-# Generate constraints.txt from template. Unlike requirements.txt this one is exported as PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT so that pip's PEP 517
+# Generate pip-build-constraints.txt from template. Unlike requirements.txt this one is exported as PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT so that pip's PEP 517
 # build-isolation environments inherit our pins: format control propagates into those environments but version pins do not.
-SET(_constraints_input_file
-    "${PROJECT_SOURCE_DIR}/src/build/constraints.txt.in"
+SET(_pip_build_constraints_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/pip-build-constraints.txt.in"
 )
-SET(_constraints_output_file
-    "${CMAKE_BINARY_DIR}/constraints.txt"
+SET(_pip_constraint_file
+    "${CMAKE_BINARY_DIR}/pip-build-constraints.txt"
 )
 
-CONFIGURE_FILE(${_constraints_input_file} ${_constraints_output_file} @ONLY)
+CONFIGURE_FILE(${_pip_build_constraints_input_file} ${_pip_constraint_file} @ONLY)
 
 # Both env vars point at the same file and must be absolute paths: pip's build-environment subprocesses run with their working directory inside the unpacked
 # source distribution. The python -s -E -I flags below do not strip either, -E only ignores PYTHON* variables. PIP_CONSTRAINT pins the outer/main resolve
@@ -302,7 +302,7 @@ CONFIGURE_FILE(${_constraints_input_file} ${_constraints_output_file} @ONLY)
 # deprecated for that purpose (pip issue: build constraints must be requested explicitly via --build-constraint / PIP_BUILD_CONSTRAINT). RV_PYTHON_BUILD_DEPS
 # installs an unpinned "pip", so the newest pip is always in play and both variables are needed for the fix to hold across pip versions.
 SET(_pip_constraint_env
-    "PIP_CONSTRAINT=${_constraints_output_file}" "PIP_BUILD_CONSTRAINT=${_constraints_output_file}"
+    "PIP_CONSTRAINT=${_pip_constraint_file}" "PIP_BUILD_CONSTRAINT=${_pip_constraint_file}"
 )
 
 # OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
@@ -536,7 +536,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-build-deps-flag}
   COMMAND ${_build_deps_install_command}
   COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
-  DEPENDS ${_python3_target} ${_constraints_output_file} ${_constraints_input_file}
+  DEPENDS ${_python3_target} ${_pip_constraint_file} ${_pip_build_constraints_input_file}
 )
 
 # Phase 2 flag: Main requirements (depends on build deps being installed first)
@@ -549,8 +549,8 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_constraints_output_file}
-          ${_constraints_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_pip_constraint_file}
+          ${_pip_build_constraints_input_file}
 )
 
 # Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,
