@@ -31,10 +31,15 @@ import contextlib
 import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 import time
+
+# Written by the platform wrapper next to the dumps (see
+# crashpad_handler_linux.sh.in / crashpad_handler_macos.sh.in).
+HANDLER_LOG_NAME = "crashpad_handler.log"
 
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
@@ -56,6 +61,90 @@ def log(msg):
 def find_dumps(crash_dir):
     # Crashpad writes new reports under <dir>/pending/<uuid>.dmp.
     return glob.glob(os.path.join(crash_dir, "**", "*.dmp"), recursive=True)
+
+
+def resource_snapshot(path):
+    """Return a free-disk / free-memory summary for path.
+
+    Both kinds of starvation can silently cost us the dump: no space for the
+    handler to write it, or not enough memory, so that the kernel kills the
+    handler before the crash happens. The numbers are logged before the launch
+    and again if no dump shows up, so the two can be compared.
+    """
+    parts = []
+    try:
+        usage = shutil.disk_usage(path)
+        parts.append(f"disk free {usage.free // (1 << 20)} MiB of {usage.total // (1 << 20)} MiB")
+    except OSError as exc:
+        parts.append(f"disk usage unavailable ({exc})")
+
+    try:
+        with open("/proc/meminfo", "r", encoding="utf-8") as fh:
+            match = re.search(r"^MemAvailable:\s+(\d+) kB", fh.read(), re.MULTILINE)
+        if match:
+            parts.append(f"memory available {int(match.group(1)) // 1024} MiB")
+    except OSError:
+        pass  # No /proc (macOS/Windows): disk numbers alone will have to do.
+
+    return ", ".join(parts)
+
+
+def report_handler_log(crash_dir):
+    """Log the handler's own log, and return the pid it reported (or None).
+
+    The wrappers create the log through a shell redirection, so the file
+    existing proves only that the wrapper ran. The "[wrapper] ... starting"
+    marker is written just before the exec, so its absence means
+    crashpad_handler itself never started; a failing exec reports its error
+    into the same log, right after the marker.
+    """
+    handler_log = os.path.join(crash_dir, HANDLER_LOG_NAME)
+    if not os.path.isfile(handler_log):
+        log(f"{HANDLER_LOG_NAME} does not exist: the handler wrapper never ran.")
+        return None
+
+    with open(handler_log, "rb") as fh:
+        fh.seek(0, os.SEEK_END)
+        size = fh.tell()
+        fh.seek(max(0, size - 8192))
+        tail = fh.read().decode("utf-8", errors="replace")
+
+    log(f"{HANDLER_LOG_NAME} ({size} bytes, last 8 KiB):")
+    for line in tail.splitlines():
+        log(f"  | {line}")
+
+    match = re.search(r"^\[wrapper\].*\bpid=(\d+)", tail, re.MULTILINE)
+    if not match:
+        log("  -> no wrapper start marker: crashpad_handler was never exec'd.")
+        return None
+
+    pid = int(match.group(1))
+    log(f"  -> wrapper reached exec with pid {pid}; lines after the marker are the exec error or handler stderr.")
+    return pid
+
+
+def report_oom_kills(handler_pid):
+    """Log any kernel OOM activity, which would explain a handler that died."""
+    if not sys.platform.startswith("linux"):
+        return
+
+    try:
+        completed = subprocess.run(["dmesg"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        log(f"dmesg unavailable ({exc}); cannot check for OOM kills.")
+        return
+
+    text = completed.stdout.decode("utf-8", errors="replace")
+    hits = [line for line in text.splitlines() if re.search(r"Out of memory|oom-kill|Killed process", line)]
+    if not hits:
+        log("dmesg reports no OOM kills.")
+        return
+
+    log("dmesg OOM activity (last 10 matching lines):")
+    for line in hits[-10:]:
+        log(f"  | {line}")
+    if handler_pid is not None and any(str(handler_pid) in line for line in hits):
+        log(f"  -> handler pid {handler_pid} appears in the OOM kill log.")
 
 
 @contextlib.contextmanager
@@ -155,6 +244,7 @@ def main():
 
         log(f"Launching: {args.rv_binary} -eval '{CRASH_EVAL}'")
         log(f"Crash dir: {crash_dir}")
+        log(f"Resources before launch: {resource_snapshot(crash_dir)}")
         try:
             with macos_crash_dialog_suppressed():
                 proc = subprocess.run(
@@ -192,16 +282,12 @@ def main():
             time.sleep(0.5)
 
         if not dumps:
-            handler_log = os.path.join(crash_dir, "crashpad_handler.log")
-            if os.path.isfile(handler_log):
-                log("crashpad_handler.log (last 8 KiB):")
-                with open(handler_log, "rb") as fh:
-                    fh.seek(0, os.SEEK_END)
-                    size = fh.tell()
-                    fh.seek(max(0, size - 8192))
-                    tail = fh.read().decode("utf-8", errors="replace")
-                for line in tail.splitlines():
-                    log(f"  | {line}")
+            # A missing dump is almost never a bug in the capture code itself;
+            # it is the handler process being absent, starved or killed. Report
+            # enough about its state to tell those apart from the CI log alone.
+            handler_pid = report_handler_log(crash_dir)
+            log(f"Resources after failure: {resource_snapshot(crash_dir)}")
+            report_oom_kills(handler_pid)
             log(f"FAIL: no .dmp produced in {crash_dir} within {args.dump_timeout}s.")
             return 1
 
