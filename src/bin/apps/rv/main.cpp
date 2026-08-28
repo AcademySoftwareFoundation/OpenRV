@@ -100,6 +100,11 @@
 #endif
 #include <QtWidgets/QtWidgets>
 #include <QtGui/QtGui>
+#ifdef PLATFORM_WINDOWS
+// For QQuickWindow::setGraphicsApi(); see the call site in utf8Main().
+#include <QtQuick/QQuickWindow>
+#include <QtQuick/QSGRendererInterface>
+#endif
 #include <RvCommon/RvDocument.h>
 
 // TODO_QT: Remove if everything works.
@@ -353,11 +358,6 @@ int utf8Main(int argc, char* argv[])
 
     TwkFB::ThreadPool::initialize();
 
-    // Qt 5.12.1 specific
-    // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
-    // QGLWidget
-    setEnvVar("QT_QUICK_BACKEND", "software");
-
 #if defined(PLATFORM_LINUX)
     // Work around for Wacom Tablet issue on linux
     // Note: This is a Qt 5.12.4 regression
@@ -368,6 +368,52 @@ int utf8Main(int argc, char* argv[])
     // Prevent crash at startup when multithreaded upload is enabled
     // (RV Preferences/Rendering/Multithread GPU Upload)
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
+
+    // Share GL resources across every QOpenGLContext in the process. This is a
+    // documented QtWebEngine requirement, and it lets RV's auxiliary GL
+    // surfaces -- the second-output ScreenView and the multithreaded-upload
+    // worker device -- share textures/FBOs with the main viewport context
+    // without an explicit, ordering-sensitive setShareContext() call. Must be
+    // set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
+    // Render Qt Quick through OpenGL, matching the graphics API RV's windows
+    // composite with.
+    //
+    // Qt Quick's RHI backend defaults to Direct3D 11 on Windows. RV's top-level
+    // windows composite with OpenGL (GLView realizes the window up front, before
+    // any render-to-texture widget joins the tree), and a QQuickWidget cannot
+    // obtain a QRhi from a window using a different API. Without this, anything
+    // Quick-based inside an RV window -- most visibly a QWebEngineView, whose
+    // page is rendered by a QQuickWidget -- silently draws nothing and logs "The
+    // top-level window is not using the expected graphics API for composition"
+    // followed by "Attempted to render scene with no rhi".
+    //
+#ifdef PLATFORM_WINDOWS
+    // Put Qt Quick on the same graphics API RV's windows composite with.
+    //
+    // Qt Quick's RHI backend defaults to Direct3D 11 on Windows, while RV's
+    // top-level windows composite with OpenGL. A QQuickWidget cannot obtain a
+    // QRhi from a window using a different API, so anything Quick-based inside
+    // an RV window -- most visibly a QWebEngineView, whose page is rendered by a
+    // QQuickWidget -- draws nothing and logs "The top-level window is not using
+    // the expected graphics API for composition" followed by "Attempted to
+    // render scene with no rhi".
+    //
+    // Windows only: Quick already defaults to OpenGL on Linux. macOS defaults to
+    // Metal and so may need the same treatment, but that is untested here.
+    //
+    // Setting QSG_RHI_BACKEND from this point does not work -- by the time any
+    // code in main() runs, the backend has already been resolved, so only the
+    // environment RV was launched with is honoured. setGraphicsApi() is the
+    // documented way to choose it from the application, and is specified to work
+    // when called before the first QQuickWindow exists. It is skipped when the
+    // environment already chooses a backend, so QSG_RHI_BACKEND still overrides.
+    if (!getenv("QSG_RHI_BACKEND"))
+    {
+        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    }
+#endif
 
     TwkUtil::MemPool::initialize();
 
@@ -575,7 +621,7 @@ int utf8Main(int argc, char* argv[])
     }
     else
     {
-        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+        Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
     }
 
     //

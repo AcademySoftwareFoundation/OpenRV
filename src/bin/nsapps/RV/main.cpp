@@ -284,9 +284,34 @@ int main(int argc, char* argv[])
 
     setPlatformSpecificLocale();
 
-    // Qt 5.12.1 specific
-    // Disable Qt Quick hardware rendering because QwebEngineView conflicts with
-    // QGLWidget
+    //
+    //  Keep Qt Quick on the software backend. Do not remove this on macOS.
+    //
+    //  It was originally added because QWebEngineView conflicted with the
+    //  QGLWidget viewport, and src/bin/apps/rv/main.cpp has since dropped it for
+    //  Windows and Linux -- but on macOS it is now load bearing for a different
+    //  reason. The viewport is a native QOpenGLWindow embedded via
+    //  QWidget::createWindowContainer, which makes it a QObject child of the top
+    //  level window's QWidgetWindow. With the hardware Qt Quick backend, adding a
+    //  QWebEngineView to the widget tree makes Qt destroy and recreate that
+    //  native subtree; the viewport window is deleted with it rather than
+    //  reparented, and QWindowContainer then dereferences the window it just
+    //  lost. RV segfaults inside Qt, before it can react.
+    //
+    //  Reproducible in four lines from any docked panel -- with the software
+    //  backend this survives, with the hardware backend it crashes:
+    //
+    //      w = rv.qtutils.sessionWindow()
+    //      d = QtWidgets.QDockWidget('t', w)
+    //      v = QtWebEngineWidgets.QWebEngineView(d)
+    //      d.setWidget(v); w.addDockWidget(QtCore.Qt.RightDockWidgetArea, d)
+    //      v.setHtml('<b>hi</b>')
+    //
+    //  The cost of keeping it is that web panels composite in software on macOS,
+    //  so macOS gets the cheap-viewport-repaint half of SG-43585 but not the
+    //  hardware web panel half. Removing it needs the viewport to stop being
+    //  owned by the top level window's native subtree, not just a comment change.
+    //
     setenv("QT_QUICK_BACKEND", "software", 0 /* changeFlag : Do not change the existing value */);
 
     // Prevent usage of native sibling widgets on Mac. This attribute can be
@@ -542,7 +567,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+        Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
     }
 
     //
