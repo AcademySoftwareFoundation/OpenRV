@@ -465,13 +465,22 @@ class: Wipe : MinorMode
     { 
         event.reject();
         removeTags(); 
-        set(viewNode() + ".ui.wipes", 1);
+        
+        let vnode = viewNode();
+        if (vnode neq nil && vnode != "")
+        {
+            set(vnode + ".ui.wipes", 1);
+        }
     }
 
     method: afterGraphViewChange (void; Event event) 
     { 
         event.reject();
-        if (nodeType(viewNode()) != "RVStackGroup")
+        
+        let vnode = viewNode();
+        if (vnode eq nil || vnode == "") return;
+        
+        if (nodeType(vnode) != "RVStackGroup")
         {
             toggle();
         }
