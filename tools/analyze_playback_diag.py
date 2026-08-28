@@ -1399,9 +1399,14 @@ def verdict(dec, aud, buf, slow, disp, cache, fps):
                     "cache the frame the player needed next" % cache["cachestalls"]
                 )
         else:
+            #  Do NOT point at render_v2 targetFrame/shift here. That pacing
+            #  theory was investigated and disproven (the measured vsync bias
+            #  was -0.10, and the held-1 share explained the cadence); the cost
+            #  was later traced to the GPU texture-upload path instead. Point at
+            #  the upload/present metrics, which is where it actually lived.
             cache_reasons.append(
                 "cache MISS rate ~0% (needed frames were resident) -> drops are NOT a cache-"
-                "content problem; investigate pacing (render_v2 targetFrame/shift)"
+                "content problem; look at the upload path (pbo %, cpuGBps) and gpuFinish first"
             )
 
     frame_bound = bool(frame_reasons)
