@@ -8,18 +8,6 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from annotate_beta_color_picker import ColorPickerSection
 
 
-def _load_bundled_fonts():
-    """Register any .ttf/.otf files from the fonts/ directory next to this file."""
-    fonts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
-    if not os.path.isdir(fonts_dir):
-        return
-    db = QtGui.QFontDatabase()
-    for root, _dirs, files in os.walk(fonts_dir):
-        for fname in files:
-            if fname.lower().endswith((".ttf", ".otf")):
-                db.addApplicationFont(os.path.join(root, fname))
-
-
 # Tool identifiers
 TOOL_CURSOR = "cursor"
 TOOL_PEN = "pen"
@@ -370,10 +358,13 @@ class _EraserPanel(_PanelSurface):
         self._brush_btn.setFixedHeight(30)
         self._brush_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         self._brush_menu = QtWidgets.QMenu(self._brush_btn)
+        self._brush_group = QtGui.QActionGroup(self._brush_menu)
+        self._brush_group.setExclusive(True)
         for brush_id, icon_name, label in self._BRUSHES:
             action = self._brush_menu.addAction(_load_icon(icon_name), label)
             action.setCheckable(True)
             action.setData(brush_id)
+            self._brush_group.addAction(action)
         self._brush_menu.triggered.connect(self._on_brush_triggered)
         self._brush_btn.setMenu(self._brush_menu)
         self._update_brush_button("circle")
@@ -560,8 +551,31 @@ class _ShapeOptionsPanel(_PanelSurface):
         self._opacity.set_value(v)
 
 
-class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
-    """Renders each font name item in its own typeface."""
+class _CheckedComboDelegate(QtWidgets.QStyledItemDelegate):
+    """Draws a checkmark on the current combo item."""
+
+    def __init__(self, combo, parent=None):
+        super().__init__(parent)
+        self._combo = combo
+
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+        option.features |= QtWidgets.QStyleOptionViewItem.HasDecoration
+        option.decorationSize = QtCore.QSize(12, 12)
+
+    def paint(self, painter, option, index):
+        super().paint(painter, option, index)
+        if index.data() != self._combo.currentText():
+            return
+        style = QtWidgets.QApplication.style()
+        opt = QtWidgets.QStyleOptionViewItem(option)
+        self.initStyleOption(opt, index)
+        opt.rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemDecoration, opt, None)
+        style.drawPrimitive(QtWidgets.QStyle.PE_IndicatorMenuCheckMark, opt, painter, None)
+
+
+class _FontNameDelegate(_CheckedComboDelegate):
+    """Checked-item delegate that also renders each font name in its own typeface."""
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
@@ -576,6 +590,32 @@ class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
                 if px > 0:
                     f.setPixelSize(px)
             option.font = f
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        size.setHeight(option.fontMetrics.height() + 8)
+        return size
+
+
+class _FontComboBox(QtWidgets.QComboBox):
+    """Combo box whose closed field always shows "Aa" in the selected font."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.currentTextChanged.connect(self._sync_display_font)
+
+    def _sync_display_font(self, family):
+        f = self.font()
+        f.setFamily(family)
+        self.setFont(f)
+
+    def paintEvent(self, event):
+        painter = QtWidgets.QStylePainter(self)
+        opt = QtWidgets.QStyleOptionComboBox()
+        self.initStyleOption(opt)
+        opt.currentText = "Aa"
+        painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, opt)
+        painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, opt)
 
 
 class _TextOptionsPanel(_PanelSurface):
@@ -593,16 +633,13 @@ class _TextOptionsPanel(_PanelSurface):
         lay.setContentsMargins(8, 8, 8, 8)
         lay.setSpacing(8)
 
-        # Font family — system fonts + any fonts bundled in annotation-platform.
-        # Filter to smoothly scalable fonts only; bitmap fonts trigger Qt bearing warnings.
-        _load_bundled_fonts()
-        _db = QtGui.QFontDatabase()
-        self._font_combo = QtWidgets.QComboBox()
+        self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
-        self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
-        for name in _db.families():
-            if not name.startswith(".") and _db.isSmoothlyScalable(name):
+        self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo, self._font_combo))
+        for name in QtGui.QFontDatabase.families():
+            if not name.startswith(".") and QtGui.QFontDatabase.isSmoothlyScalable(name):
                 self._font_combo.addItem(name)
+        self._font_combo.setMaxVisibleItems(10)
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         self._font_combo.view().setMinimumWidth(160)
         lay.addWidget(self._font_combo)
