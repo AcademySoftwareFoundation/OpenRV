@@ -416,6 +416,12 @@ IF(RV_TARGET_WINDOWS)
   )
   FILE(MAKE_DIRECTORY "${_pip_tmp_dir}")
   LIST(APPEND _requirements_install_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
+
+  # OTIO's C++ extensions compile against debug Python headers, which #pragma-link python<ver>_d.lib. Pip builds under D:/_t/..., so MSVC must search our libs
+  # directory via LIB (cmake -E env --modify avoids MSBuild semicolon issues with $ENV{LIB}).
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    LIST(APPEND _requirements_install_command "--modify" "LIB=path_list_prepend:${_lib_dir}")
+  ENDIF()
 ENDIF()
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
