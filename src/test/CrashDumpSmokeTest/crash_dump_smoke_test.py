@@ -41,6 +41,9 @@ import time
 # crashpad_handler_linux.sh.in / crashpad_handler_macos.sh.in).
 HANDLER_LOG_NAME = "crashpad_handler.log"
 
+# Start marker the Linux wrapper writes just before exec'ing crashpad_handler.
+WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
+
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
 # that capture + annotation delivery worked.
@@ -89,18 +92,19 @@ def resource_snapshot(path):
     return ", ".join(parts)
 
 
-def report_handler_log(crash_dir):
-    """Log the handler's own log, and return the pid it reported (or None).
+def read_handler_log(crash_dir):
+    """Return (size, tail, handler_pid) for the handler log, or None if absent.
 
     The wrappers create the log through a shell redirection, so the file
     existing proves only that the wrapper ran. The "[wrapper] ... starting"
     marker is written just before the exec, so its absence means
     crashpad_handler itself never started; a failing exec reports its error
-    into the same log, right after the marker.
+    into the same log, right after the marker. handler_pid is None when the
+    marker is missing (that includes macOS and Windows, whose wrappers do not
+    write one).
     """
     handler_log = os.path.join(crash_dir, HANDLER_LOG_NAME)
     if not os.path.isfile(handler_log):
-        log(f"{HANDLER_LOG_NAME} does not exist: the handler wrapper never ran.")
         return None
 
     with open(handler_log, "rb") as fh:
@@ -109,18 +113,44 @@ def report_handler_log(crash_dir):
         fh.seek(max(0, size - 8192))
         tail = fh.read().decode("utf-8", errors="replace")
 
+    match = WRAPPER_MARKER_PATTERN.search(tail)
+    return size, tail, int(match.group(1)) if match else None
+
+
+def log_handler_log_summary(crash_dir):
+    """Log a one-line handler-log summary on the success path.
+
+    Cheap continuous proof that the marker mechanism still works, so we find
+    out it has broken here rather than on the one run where the dump is
+    missing and the log is the only evidence we have.
+    """
+    entry = read_handler_log(crash_dir)
+    if entry is None:
+        log(f"{HANDLER_LOG_NAME}: absent")
+        return
+    size, _, handler_pid = entry
+    marker = f"marker present (handler pid {handler_pid})" if handler_pid is not None else "no marker"
+    log(f"{HANDLER_LOG_NAME}: {size} bytes, {marker}")
+
+
+def report_handler_log(crash_dir):
+    """Log the handler's own log in full, and return the pid it reported."""
+    entry = read_handler_log(crash_dir)
+    if entry is None:
+        log(f"{HANDLER_LOG_NAME} does not exist: the handler wrapper never ran.")
+        return None
+
+    size, tail, handler_pid = entry
     log(f"{HANDLER_LOG_NAME} ({size} bytes, last 8 KiB):")
     for line in tail.splitlines():
         log(f"  | {line}")
 
-    match = re.search(r"^\[wrapper\].*\bpid=(\d+)", tail, re.MULTILINE)
-    if not match:
+    if handler_pid is None:
         log("  -> no wrapper start marker: crashpad_handler was never exec'd.")
         return None
 
-    pid = int(match.group(1))
-    log(f"  -> wrapper reached exec with pid {pid}; lines after the marker are the exec error or handler stderr.")
-    return pid
+    log(f"  -> wrapper reached exec with pid {handler_pid}; lines after it are the exec error or handler stderr.")
+    return handler_pid
 
 
 def report_oom_kills(handler_pid):
@@ -293,6 +323,7 @@ def main():
 
         dump = max(dumps, key=os.path.getmtime)
         log(f"Found dump: {dump}")
+        log_handler_log_summary(crash_dir)
 
         if not have_dump_tool:
             log("PASS: dump produced (minidump_dump not provided; annotation verification skipped).")
