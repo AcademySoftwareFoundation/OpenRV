@@ -250,6 +250,16 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
+# Constraints for pip's build-isolation environments. PIP_CONSTRAINT must be an absolute path: pip resolves it relative to each build-environment subprocess
+# working directory. PIP_BUILD_CONSTRAINT is required on pip >= 26.2 to constrain build-isolation envs; set both since RV_PYTHON_BUILD_DEPS installs an unpinned
+# pip.
+SET(_pip_constraint_file
+    "${PROJECT_SOURCE_DIR}/src/build/pip-build-constraints.txt"
+)
+SET(_pip_constraint_env
+    "PIP_CONSTRAINT=${_pip_constraint_file}" "PIP_BUILD_CONSTRAINT=${_pip_constraint_file}"
+)
+
 # OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
 # new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
 # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
@@ -316,12 +326,13 @@ ENDIF()
 
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_constraint_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir
+    ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env} ${_pip_constraint_env}
 )
 # On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
 # OTIO's setup.py always calls "cmake" by name from PATH; it does not read CMAKE_GENERATOR. Prepend the directory of our outer build's cmake binary (the Windows
@@ -360,6 +371,12 @@ IF(RV_TARGET_WINDOWS)
   )
   FILE(MAKE_DIRECTORY "${_pip_tmp_dir}")
   LIST(APPEND _requirements_install_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
+
+  # OTIO's C++ extensions compile against debug Python headers, which #pragma-link python<ver>_d.lib. Pip builds under D:/_t/..., so MSVC must search our libs
+  # directory via LIB (cmake -E env --modify avoids MSBuild semicolon issues with $ENV{LIB}).
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    LIST(APPEND _requirements_install_command "--modify" "LIB=path_list_prepend:${_lib_dir}")
+  ENDIF()
 ENDIF()
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
@@ -480,7 +497,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-build-deps-flag}
   COMMAND ${_build_deps_install_command}
   COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
-  DEPENDS ${_python3_target}
+  DEPENDS ${_python3_target} ${_pip_constraint_file}
 )
 
 # Phase 2 flag: Main requirements (depends on build deps being installed first)
@@ -493,7 +510,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_pip_constraint_file}
 )
 
 # Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,
