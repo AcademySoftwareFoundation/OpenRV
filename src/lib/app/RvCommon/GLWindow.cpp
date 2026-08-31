@@ -19,14 +19,16 @@
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLContext>
-#include <QtGui/QGuiApplication>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <iostream>
 #include <sstream>
 
@@ -101,6 +103,55 @@ namespace Rv
             //
 
             QSurfaceFormat f = context()->format();
+
+            //
+            //  One-shot -debug gpu baseline: everything needed to answer "why
+            //  did I only get 8 bits per component" without a second run --
+            //  what was asked for, what Qt negotiated, what the driver is, and
+            //  which display server we are on.
+            //
+            static bool baselineLogged = false;
+            if (ImageRenderer::debugGpu() && !baselineLogged)
+            {
+                baselineLogged = true;
+
+                QScreen* scr = screen();
+                if (!scr)
+                    scr = QGuiApplication::primaryScreen();
+
+                const GLubyte* glVendor = glGetString(GL_VENDOR);
+                const GLubyte* glRenderer = glGetString(GL_RENDERER);
+                const GLubyte* glVersion = glGetString(GL_VERSION);
+                const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+                cout << "INFO: GLWindow runtime baseline begin" << endl;
+                cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
+                cout << "INFO: Qt version: " << qVersion() << endl;
+                cout << "INFO: Constructor-requested color bits: rgba " << m_red << " " << m_green << " " << m_blue << " " << m_alpha
+                     << endl;
+                cout << "INFO: QOpenGLWindow::format() (post-negotiation): " << glDebugFormatSummary(format()) << endl;
+                cout << "INFO: Actual QOpenGLContext format: " << glDebugFormatSummary(f) << endl;
+                if (scr)
+                {
+                    cout << "INFO: Screen name: " << scr->name().toStdString() << ", depth: " << scr->depth() << endl;
+                }
+                else
+                {
+                    cout << "INFO: Screen name: <unknown>, depth: <unknown>" << endl;
+                }
+
+                cout << "INFO: GL vendor: " << (glVendor ? reinterpret_cast<const char*>(glVendor) : "<unknown>") << endl;
+                cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
+                cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
+                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
+#ifdef PLATFORM_LINUX
+                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << glDebugEnvOrUnset("XDG_SESSION_TYPE")
+                     << ", WAYLAND_DISPLAY=" << glDebugEnvOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << glDebugEnvOrUnset("DISPLAY")
+                     << ", XDG_CURRENT_DESKTOP=" << glDebugEnvOrUnset("XDG_CURRENT_DESKTOP")
+                     << ", DESKTOP_SESSION=" << glDebugEnvOrUnset("DESKTOP_SESSION") << endl;
+#endif
+                cout << "INFO: GLWindow runtime baseline end" << endl;
+            }
 
 #ifndef PLATFORM_DARWIN
             if (f.redBufferSize() != m_red && m_red != 0)
