@@ -5,18 +5,17 @@ import math
 import os
 import uuid
 
-from rv import commands
-
 from annotate_beta_widget import (
-    TOOL_PEN,
     TOOL_AIRBRUSH,
-    TOOL_ERASER,
-    TOOL_RECT,
-    TOOL_CIRCLE,
     TOOL_ARROW,
+    TOOL_CIRCLE,
+    TOOL_ERASER,
     TOOL_LINE,
+    TOOL_PEN,
+    TOOL_RECT,
     TOOL_TEXT,
 )
+from rv import commands
 
 _SHAPE_TOOLS = {TOOL_RECT, TOOL_CIRCLE, TOOL_ARROW, TOOL_LINE}
 _DRAWING_TOOLS = _SHAPE_TOOLS | {TOOL_TEXT, TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER}
@@ -237,9 +236,7 @@ class AnnotateDrawEngine:
         alpha = self._mode._opacity / 100.0
         border = [c.redF(), c.greenF(), c.blueF(), alpha]
         tool = self._mode._tool
-        if tool == TOOL_ARROW:
-            inner = list(border)
-        elif self._mode._filled and tool in (TOOL_RECT, TOOL_CIRCLE):
+        if tool == TOOL_ARROW or self._mode._filled and tool in (TOOL_RECT, TOOL_CIRCLE):
             inner = list(border)
         else:
             inner = [c.redF(), c.greenF(), c.blueF(), 0.0]
