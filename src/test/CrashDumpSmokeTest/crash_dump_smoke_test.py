@@ -44,6 +44,10 @@ HANDLER_LOG_NAME = "crashpad_handler.log"
 # Start marker the Linux wrapper writes just before exec'ing crashpad_handler.
 WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
 
+# Trailing handler-log lines echoed on the success path. Bounded so a chatty
+# handler cannot flood the CI log; the failure path still dumps the last 8 KiB.
+SUCCESS_HANDLER_LOG_LINES = 20
+
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
 # that capture + annotation delivery worked.
@@ -118,19 +122,32 @@ def read_handler_log(crash_dir):
 
 
 def log_handler_log_summary(crash_dir):
-    """Log a one-line handler-log summary on the success path.
+    """Log the handler-log summary, and a bounded tail, on the success path.
 
-    Cheap continuous proof that the marker mechanism still works, so we find
-    out it has broken here rather than on the one run where the dump is
-    missing and the log is the only evidence we have.
+    The summary line is cheap continuous proof that the marker mechanism still
+    works, so we find out it has broken here rather than on the one run where
+    the dump is missing and the log is the only evidence we have.
+
+    The tail is diagnostic and temporary: a healthy capture writes several KB
+    of handler stderr and we do not yet know what it says, which matters
+    because the run that flaked wrote none of it. Reduce this back to the
+    summary line alone once that output is understood.
     """
     entry = read_handler_log(crash_dir)
     if entry is None:
         log(f"{HANDLER_LOG_NAME}: absent")
         return
-    size, _, handler_pid = entry
+
+    size, tail, handler_pid = entry
     marker = f"marker present (handler pid {handler_pid})" if handler_pid is not None else "no marker"
     log(f"{HANDLER_LOG_NAME}: {size} bytes, {marker}")
+
+    lines = tail.splitlines()
+    shown = lines[-SUCCESS_HANDLER_LOG_LINES:]
+    if shown:
+        log(f"  (last {len(shown)} of {len(lines)} lines):")
+        for line in shown:
+            log(f"  | {line}")
 
 
 def report_handler_log(crash_dir):
