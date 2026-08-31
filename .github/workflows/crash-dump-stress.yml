@@ -1,0 +1,88 @@
+name: Crash Dump Stress
+
+# Manual-only diagnostic workflow. CrashDumpSmokeTest fails on roughly 44% of
+# Rocky 8 Debug jobs and on none of the Rocky 9 ones, which is frequent enough
+# to catch deliberately but too infrequent to chase one CI run at a time.
+# Builds once, then runs that single test repeatedly and reports the tally.
+#
+# Ten iterations catch a 44% failure with about 99.7% probability.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rocky-version:
+        description: 'Rocky Linux major version (8 fails, 9 is the control)'
+        type: choice
+        options:
+          - '8'
+          - '9'
+        default: '8'
+      vfx-platform:
+        description: 'VFX reference platform'
+        type: choice
+        options:
+          - 'CY2025'
+          - 'CY2024'
+        default: 'CY2025'
+      build-type:
+        description: 'Build configuration (only Debug has been seen to fail)'
+        type: choice
+        options:
+          - 'Debug'
+          - 'Release'
+        default: 'Debug'
+      iterations:
+        description: 'How many times to run CrashDumpSmokeTest'
+        default: '10'
+      strip-marker:
+        description: 'Remove the crashpad wrapper start marker first (A/B test)'
+        type: boolean
+        default: false
+
+jobs:
+  stress:
+    name: 'Crash dump stress
+      <rocky=${{ inputs.rocky-version }},
+       ${{ inputs.vfx-platform }},
+       config=${{ inputs.build-type }},
+       iterations=${{ inputs.iterations }},
+       strip-marker=${{ inputs.strip-marker }}>'
+
+    runs-on: ubuntu-latest
+    container:
+      image: amd64/rockylinux:${{ inputs.rocky-version }}
+      volumes:
+        - /usr/local/lib/android:/github/home/android
+        - /usr/share/dotnet:/github/home/dotnet
+        - /opt/ghc:/github/home/ghc
+        - /usr/local/.ghcup:/github/home/.ghcup
+        - /usr/local/graalvm:/github/home/graalvm
+        - /usr/local/share/powershell:/github/home/powershell
+        - /usr/local/share/chromium:/github/home/chromium
+        - /usr/local/lib/node_modules:/github/home/node_modules
+        - /opt/hostedtoolcache:/github/home/hostedtoolcache
+        - /usr/local/share/boost:/github/home/boost
+        - /usr/share/swift:/github/home/swift
+        - /usr/share/miniconda:/github/home/miniconda
+        - /usr/local/share/vcpkg:/github/home/vcpkg
+        - /home/runner/.cargo:/github/home/.cargo
+        - /home/runner/.rustup:/github/home/.rustup
+    steps:
+      - name: Install git
+        run: dnf install -y git
+        shell: bash
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-linux
+        with:
+          rocky-version: ${{ inputs.rocky-version }}
+          build-type: ${{ inputs.build-type }}
+          qt-version: "6.5.3"
+          cmake-version: "3.31.6"
+          python-version: "3.11.8"
+          vfx-platform: ${{ inputs.vfx-platform }}
+          extra_repo: ${{ inputs.rocky-version == '8' && 'powertools' || 'crb' }}
+          stress-iterations: ${{ inputs.iterations }}
+          stress-strip-marker: ${{ inputs.strip-marker }}

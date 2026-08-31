@@ -22,6 +22,22 @@ inputs:
   rocky_qt6_archives:
     required: false
     default: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
+  stress-iterations:
+    required: false
+    default: '0'
+    description: >
+      When non-zero, skip the normal test suite and instead run
+      CrashDumpSmokeTest this many times, reporting how many failed. Used to
+      reproduce the intermittent Rocky 8 crash-dump failure on demand rather
+      than waiting for it to surface in a daily build. Also skips the install
+      steps, which are not interesting here.
+  stress-strip-marker:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Removes the crashpad wrapper
+      start marker from the staged handler before stressing, to test whether
+      adding it perturbed the failure.
 
 runs:
   using: "composite"
@@ -272,15 +288,50 @@ runs:
       shell: bash
 
     - name: Tests
+      if: ${{ inputs.stress-iterations == '0' }}
       run: ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
       shell: bash
 
+    # Stress steps run here, before the deps directories below are deleted:
+    # the staged application still resolves libraries out of them.
+    - name: Strip crashpad wrapper start marker
+      if: ${{ inputs.stress-iterations != '0' && inputs.stress-strip-marker == 'true' }}
+      run: |
+        wrapper=_build/stage/app/bin/crashpad_handler_linux.sh
+        sed -i '/^echo "\[wrapper\]/d' "$wrapper"
+        echo "Wrapper after stripping the marker:"
+        cat "$wrapper"
+      shell: bash
+
+    - name: Stress CrashDumpSmokeTest
+      if: ${{ inputs.stress-iterations != '0' }}
+      run: |
+        iterations='${{ inputs.stress-iterations }}'
+        failures=0
+        for i in $(seq 1 "$iterations"); do
+          echo "::group::CrashDumpSmokeTest iteration $i of $iterations"
+          if ctest --test-dir _build -C ${{ inputs.build-type }} -R '^CrashDumpSmokeTest$' --output-on-failure; then
+            outcome=pass
+          else
+            outcome=FAIL
+            failures=$((failures + 1))
+          fi
+          echo "::endgroup::"
+          echo "iteration $i: $outcome"
+        done
+        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}"
+        echo "$summary"
+        echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+      shell: bash
+
     - name: Free some spaces for the install steps
+      if: ${{ inputs.stress-iterations == '0' }}
       run: |
         rm -rf _build/RV_DEPS_*
         rm -rf _build/_deps
       shell: bash
 
     - name: Install OpenRV
+      if: ${{ inputs.stress-iterations == '0' }}
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: bash
