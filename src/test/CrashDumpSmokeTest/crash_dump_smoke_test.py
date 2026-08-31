@@ -44,10 +44,6 @@ HANDLER_LOG_NAME = "crashpad_handler.log"
 # Start marker the Linux wrapper writes just before exec'ing crashpad_handler.
 WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
 
-# Trailing handler-log lines echoed on the success path. Bounded so a chatty
-# handler cannot flood the CI log; the failure path still dumps the last 8 KiB.
-SUCCESS_HANDLER_LOG_LINES = 20
-
 # RV's startup signature under the offscreen platform, from runs where the
 # deliberate crash was captured normally. Deviating from it means RV took a
 # different path to its SIGSEGV. See report_startup_divergence().
@@ -129,32 +125,26 @@ def read_handler_log(crash_dir):
 
 
 def log_handler_log_summary(crash_dir):
-    """Log the handler-log summary, and a bounded tail, on the success path.
+    """Log a one-line handler-log summary on the success path.
 
-    The summary line is cheap continuous proof that the marker mechanism still
-    works, so we find out it has broken here rather than on the one run where
-    the dump is missing and the log is the only evidence we have.
+    Cheap continuous proof that the marker mechanism still works, so we find
+    out it has broken here rather than on the one run where the dump is
+    missing and the log is the only evidence we have.
 
-    The tail is diagnostic and temporary: a healthy capture writes several KB
-    of handler stderr and we do not yet know what it says, which matters
-    because the run that flaked wrote none of it. Reduce this back to the
-    summary line alone once that output is understood.
+    The byte count is the useful part. A healthy capture writes about 7 KB,
+    almost entirely repeated "read out of range" from process_memory_range and
+    a couple of missing-cpufreq errors, which is routine minidump-writing
+    noise. A failing run writes the marker and nothing else, so the size alone
+    distinguishes them; the failure path prints the contents.
     """
     entry = read_handler_log(crash_dir)
     if entry is None:
         log(f"{HANDLER_LOG_NAME}: absent")
         return
 
-    size, tail, handler_pid = entry
+    size, _, handler_pid = entry
     marker = f"marker present (handler pid {handler_pid})" if handler_pid is not None else "no marker"
     log(f"{HANDLER_LOG_NAME}: {size} bytes, {marker}")
-
-    lines = tail.splitlines()
-    shown = lines[-SUCCESS_HANDLER_LOG_LINES:]
-    if shown:
-        log(f"  (last {len(shown)} of {len(lines)} lines):")
-        for line in shown:
-            log(f"  | {line}")
 
 
 def report_handler_log(crash_dir):
@@ -262,12 +252,12 @@ def annotation_value(dump_text, key):
 def report_startup_divergence(rv_output):
     """Log whether RV's startup output matches the known-good signature.
 
-    The test only sees a non-zero exit code, so it cannot by itself tell the
-    deliberate crash() apart from RV dying of something else on the way there.
-    Observed on Rocky 8: QtWebEngine/OpenGL initialization fails, RV emits one
-    fewer widget warning, dies about a second earlier, and the crash handler is
-    never asked for a dump. A missing dump after a diverging startup therefore
-    does not implicate the crash handler.
+    Rocky 8 intermittently fails QtWebEngine/OpenGL initialization, which
+    shows up as a WebEngineContext warning and one fewer widget warning. That
+    looked like it might explain the missing dumps, but it does not: the same
+    divergence has since been seen on runs where the crash was captured
+    normally. It is an independent flake, recorded here only so the two can be
+    correlated over more runs.
 
     Returns True when the startup diverged.
     """
@@ -287,8 +277,8 @@ def report_startup_divergence(rv_output):
     log("Startup signature: DIVERGED from a healthy run.")
     for problem in problems:
         log(f"  - {problem}")
-    log("  -> RV may have died before reaching crash(); a missing dump here does")
-    log("     not necessarily implicate the crash handler.")
+    log("  -> Recorded for correlation. This has been seen on passing runs too,")
+    log("     so on its own it does not explain a missing dump.")
     return True
 
 
