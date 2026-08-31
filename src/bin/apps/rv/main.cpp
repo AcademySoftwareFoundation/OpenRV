@@ -373,22 +373,16 @@ int utf8Main(int argc, char* argv[])
     // documented QtWebEngine requirement, and it lets RV's auxiliary GL
     // surfaces -- the second-output ScreenView and the multithreaded-upload
     // worker device -- share textures/FBOs with the main viewport context
-    // without an explicit, ordering-sensitive setShareContext() call. Must be
-    // set before the QApplication is constructed.
+    // without an explicit, ordering-sensitive setShareContext() call.
+    //
+    // It is also what makes the Vulkan presentation path work: there is no
+    // GLView to chain from there, so QTVulkanVideoDevice::ensureGLContext()
+    // joins this global group instead. Without it, FTGL font-atlas glyph
+    // uploads land in a context where the atlas texture has no storage.
+    //
+    // Must be set before the QApplication is constructed.
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
-    // Render Qt Quick through OpenGL, matching the graphics API RV's windows
-    // composite with.
-    //
-    // Qt Quick's RHI backend defaults to Direct3D 11 on Windows. RV's top-level
-    // windows composite with OpenGL (GLView realizes the window up front, before
-    // any render-to-texture widget joins the tree), and a QQuickWidget cannot
-    // obtain a QRhi from a window using a different API. Without this, anything
-    // Quick-based inside an RV window -- most visibly a QWebEngineView, whose
-    // page is rendered by a QQuickWidget -- silently draws nothing and logs "The
-    // top-level window is not using the expected graphics API for composition"
-    // followed by "Attempted to render scene with no rhi".
-    //
 #ifdef PLATFORM_WINDOWS
     // Put Qt Quick on the same graphics API RV's windows composite with.
     //
