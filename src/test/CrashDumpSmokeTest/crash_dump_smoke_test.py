@@ -48,6 +48,13 @@ WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
 # handler cannot flood the CI log; the failure path still dumps the last 8 KiB.
 SUCCESS_HANDLER_LOG_LINES = 20
 
+# RV's startup signature under the offscreen platform, from runs where the
+# deliberate crash was captured normally. Deviating from it means RV took a
+# different path to its SIGSEGV. See report_startup_divergence().
+STARTUP_OPENGL_WARNING = "QOpenGLWidget is not supported on this platform."
+EXPECTED_OPENGL_WARNINGS = 2
+STARTUP_FAILURE_MARKERS = ("WebEngineContext is used before",)
+
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
 # that capture + annotation delivery worked.
@@ -252,6 +259,39 @@ def annotation_value(dump_text, key):
     return "" if found_empty else None
 
 
+def report_startup_divergence(rv_output):
+    """Log whether RV's startup output matches the known-good signature.
+
+    The test only sees a non-zero exit code, so it cannot by itself tell the
+    deliberate crash() apart from RV dying of something else on the way there.
+    Observed on Rocky 8: QtWebEngine/OpenGL initialization fails, RV emits one
+    fewer widget warning, dies about a second earlier, and the crash handler is
+    never asked for a dump. A missing dump after a diverging startup therefore
+    does not implicate the crash handler.
+
+    Returns True when the startup diverged.
+    """
+    problems = []
+    for marker in STARTUP_FAILURE_MARKERS:
+        if marker in rv_output:
+            problems.append(f"found {marker!r}")
+
+    seen = rv_output.count(STARTUP_OPENGL_WARNING)
+    if seen != EXPECTED_OPENGL_WARNINGS:
+        problems.append(f"saw {seen} of the expected {EXPECTED_OPENGL_WARNINGS} OpenGL widget warning(s)")
+
+    if not problems:
+        log("Startup signature: nominal.")
+        return False
+
+    log("Startup signature: DIVERGED from a healthy run.")
+    for problem in problems:
+        log(f"  - {problem}")
+    log("  -> RV may have died before reaching crash(); a missing dump here does")
+    log("     not necessarily implicate the crash handler.")
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rv-binary", required=True, help="Path to the RV main executable to drive.")
@@ -308,13 +348,13 @@ def main():
 
         # A captured crash makes the process exit abnormally (non-zero).
         log(f"RV exited with code {rc}")
-        if proc.stdout:
+        rv_output = proc.stdout.decode("utf-8", errors="replace") if proc.stdout else ""
+        if rv_output:
             log("RV output (last 8 KiB):")
-            tail = proc.stdout[-8192:]
-            if isinstance(tail, bytes):
-                tail = tail.decode("utf-8", errors="replace")
-            for line in tail.splitlines():
+            for line in rv_output[-8192:].splitlines():
                 log(f"  | {line}")
+            # Checked against the whole output, not just the printed tail.
+            report_startup_divergence(rv_output)
         if rc == 0:
             log("FAIL: RV exited cleanly; the crash was not triggered.")
             return 1
