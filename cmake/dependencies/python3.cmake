@@ -240,6 +240,18 @@ ELSE()
   )
 ENDIF()
 
+# python-build-standalone (PBS) path: instead of compiling CPython/PySide6/native packages from source, fetch a PBS prebuilt Python and install wheels. This is
+# gated to non-Debug because Windows Debug uses python_d (debug CRT), which cannot load release wheels. All the path variables the PBS module relies on
+# (_install_dir, _source_dir, _bin_dir, _lib_dir, _include_dir, _python3_executable, _python3_lib(_name), _pyside_version, _numpy_version) are defined above.
+# python3_pbs.cmake defines the same outputs (Python::Python target, stage target, cache vars) and we RETURN() to skip the from-source path entirely.
+IF(RV_DEPS_PYTHON_USE_PBS
+   AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
+)
+  CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/src/build/requirements_pbs.txt.in" "${CMAKE_BINARY_DIR}/requirements_pbs.txt" @ONLY)
+  INCLUDE(python3_pbs)
+  RETURN()
+ENDIF()
+
 # Generate requirements.txt from template with the OpenTimelineIO and NumPy versions substituted
 SET(_requirements_input_file
     "${PROJECT_SOURCE_DIR}/src/build/requirements.txt.in"
@@ -310,6 +322,31 @@ SET(RV_PYTHON_WHEEL_SAFE
     "vcs-versioning" # VCS version detection for setuptools-scm 10.x (pure Python)
     CACHE STRING "Packages safe to install from wheels (pure Python or build tools)"
 )
+
+# When using a python-build-standalone (PBS) prebuilt Python (RV_DEPS_PYTHON_USE_PBS), the interpreter is a stock standard-ABI CPython, so native extensions can
+# be installed from their cp311 platform wheels instead of being compiled from source. This is where the large build-time savings come from (PySide6
+# especially). We only do this for non-Debug configurations: Windows Debug uses python_d (debug CRT), which cannot load release wheels, so those must still
+# build from source.
+#
+# PySide6/shiboken6 are added here too; after install they are repointed at RV's Qt by adapt_pbs_python.py (--qt) so a single Qt serves both RV's C++ and
+# PySide6.
+IF(RV_DEPS_PYTHON_USE_PBS
+   AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug"
+)
+  LIST(
+    APPEND
+    RV_PYTHON_WHEEL_SAFE
+    "numpy"
+    "opentimelineio"
+    "PyOpenGL_accelerate"
+    "psutil"
+    "cryptography"
+    "pydantic"
+    "PySide6"
+    "shiboken6"
+  )
+  MESSAGE(STATUS "RV_DEPS_PYTHON_USE_PBS: installing native extensions (incl. PySide6) from wheels")
+ENDIF()
 
 # Convert lists to space/comma-separated strings for pip commands
 STRING(REPLACE ";" "," _wheel_safe_packages "${RV_PYTHON_WHEEL_SAFE}")

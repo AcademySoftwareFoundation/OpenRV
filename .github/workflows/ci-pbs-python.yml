@@ -1,0 +1,95 @@
+name: OpenRV PBS Python (manual)
+
+# Manual, opt-in validation of RV_DEPS_PYTHON_USE_PBS on each platform.
+# Not wired into the regular ci.yml fan-out and not gated on repository
+# owner, so it can be dispatched from any fork while the option is
+# being validated.
+on:
+  workflow_dispatch:
+    inputs:
+      vfx-platform:
+        description: 'VFX Reference Platform'
+        required: true
+        default: 'CY2025'
+        type: choice
+        options:
+          - CY2025
+          - CY2024
+
+jobs:
+  linux-pbs:
+    runs-on: ubuntu-latest
+    container:
+      image: amd64/rockylinux:9
+      volumes:
+        - /usr/local/lib/android:/github/home/android
+        - /usr/share/dotnet:/github/home/dotnet
+        - /opt/ghc:/github/home/ghc
+        - /usr/local/.ghcup:/github/home/.ghcup
+        - /usr/local/graalvm:/github/home/graalvm
+        - /usr/local/share/powershell:/github/home/powershell
+        - /usr/local/share/chromium:/github/home/chromium
+        - /usr/local/lib/node_modules:/github/home/node_modules
+        - /opt/hostedtoolcache:/github/home/hostedtoolcache
+        - /usr/local/share/boost:/github/home/boost
+        - /usr/share/swift:/github/home/swift
+        - /usr/share/miniconda:/github/home/miniconda
+        - /usr/local/share/vcpkg:/github/home/vcpkg
+        - /home/runner/.cargo:/github/home/.cargo
+        - /home/runner/.rustup:/github/home/.rustup
+    steps:
+      - name: Install git
+        run: dnf install -y git
+        shell: bash
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-linux
+        with:
+          rocky-version: "9"
+          build-type: "Release"
+          qt-version: "6.5.3"
+          cmake-version: "3.31.6"
+          python-version: "3.11.8"
+          vfx-platform: ${{ inputs.vfx-platform }}
+          extra_repo: "crb"
+          use-pbs-python: 'true'
+
+  windows-pbs:
+    runs-on: windows-2022
+    env:
+      SCCACHE_GHA_ENABLED: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-windows
+        with:
+          build-type: "Release"
+          qt-version: "6.5.3"
+          python-version: "3.11"
+          cmake-version: "3.31.6"
+          vfx-platform: ${{ inputs.vfx-platform }}
+          msvc-component: "14.40.17.10.x86.x64"
+          msvc-compiler: "14.40.33807"
+          use-pbs-python: 'true'
+
+  macos-pbs:
+    runs-on: macos-14
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-macos
+        with:
+          arch-type: "arm64"
+          build-type: "Release"
+          qt-version: "6.5.3"
+          qt-version-short: "6.5"
+          python-version: "3.11"
+          cmake-version: "3.31.6"
+          vfx-platform: ${{ inputs.vfx-platform }}
+          use-pbs-python: 'true'

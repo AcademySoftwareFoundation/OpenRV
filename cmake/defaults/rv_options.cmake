@@ -127,6 +127,17 @@ SET_PROPERTY(
 OPTION(RV_DEPS_PREFER_INSTALLED "Try find_package() for dependencies before building from source" OFF)
 
 #
+# When ON, RV's embedded Python is sourced from a python-build-standalone (PBS) prebuilt distribution instead of being compiled from source, and its heavy
+# native packages (numpy, cryptography, OpenTimelineIO, pydantic, PySide6/shiboken6) are installed from wheels rather than built from source. This dramatically
+# reduces build time (PySide6 is the slowest component on every platform). See src/build/adapt_pbs_python.py and cmake/dependencies/python3_pbs.cmake.
+#
+# Wheels are ABI-safe here because RV's C++<->PySide bridge passes Qt objects as pointer-sized integers (see rv/qtutils.py wrapInstance), so there is no C++ ABI
+# boundary between RV and the wheels; only Qt's ABI matters, which is satisfied by repointing the PySide6 wheel at RV's Qt (same version). Windows Debug still
+# builds from source because release wheels are not loadable by python_d (debug CRT mismatch), so this option is honored only for non-Debug configurations.
+#
+OPTION(RV_DEPS_PYTHON_USE_PBS "Use python-build-standalone prebuilt Python + wheels instead of building CPython/PySide6 from source (non-Debug only)" ON)
+
+#
 # Version matching mode for dependency resolution.
 #
 # Controls how RV_FIND_DEPENDENCY matches versions when RV_DEPS_PREFER_INSTALLED=ON. EXACT requires the exact version specified in CY*.cmake (default,
