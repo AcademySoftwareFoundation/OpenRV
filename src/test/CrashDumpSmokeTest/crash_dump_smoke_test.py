@@ -44,12 +44,12 @@ HANDLER_LOG_NAME = "crashpad_handler.log"
 # Start marker the Linux wrapper writes just before exec'ing crashpad_handler.
 WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
 
-# RV's startup signature under the offscreen platform, from runs where the
-# deliberate crash was captured normally. Deviating from it means RV took a
-# different path to its SIGSEGV. See report_startup_divergence().
+# Startup facts worth recording for correlation with capture failures. Neither
+# has predicted a failure so far: the WebEngine warning appears on passing runs
+# too, and the OpenGL warning count varies between healthy runs (0 on Release,
+# 1 or 2 on Debug). Reported, not judged. See log_startup_signature().
 STARTUP_OPENGL_WARNING = "QOpenGLWidget is not supported on this platform."
-EXPECTED_OPENGL_WARNINGS = 2
-STARTUP_FAILURE_MARKERS = ("WebEngineContext is used before",)
+STARTUP_WEBENGINE_WARNING = "WebEngineContext is used before"
 
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
@@ -249,37 +249,22 @@ def annotation_value(dump_text, key):
     return "" if found_empty else None
 
 
-def report_startup_divergence(rv_output):
-    """Log whether RV's startup output matches the known-good signature.
+def log_startup_signature(rv_output):
+    """Log the startup facts that might correlate with a missing dump.
 
-    Rocky 8 intermittently fails QtWebEngine/OpenGL initialization, which
-    shows up as a WebEngineContext warning and one fewer widget warning. That
-    looked like it might explain the missing dumps, but it does not: the same
-    divergence has since been seen on runs where the crash was captured
-    normally. It is an independent flake, recorded here only so the two can be
-    correlated over more runs.
+    Rocky 8 intermittently fails QtWebEngine/OpenGL initialization, which shows
+    up as a WebEngineContext warning. That looked like it might explain the
+    missing dumps, but it does not: the warning has since appeared on runs
+    where the crash was captured normally, on both Debug and Release. The
+    OpenGL widget warning count is not a signature either, having been seen as
+    0, 1 and 2 on runs that passed.
 
-    Returns True when the startup diverged.
+    So neither is treated as a fault here. They are printed every run so the
+    two can be correlated once there are enough samples.
     """
-    problems = []
-    for marker in STARTUP_FAILURE_MARKERS:
-        if marker in rv_output:
-            problems.append(f"found {marker!r}")
-
-    seen = rv_output.count(STARTUP_OPENGL_WARNING)
-    if seen != EXPECTED_OPENGL_WARNINGS:
-        problems.append(f"saw {seen} of the expected {EXPECTED_OPENGL_WARNINGS} OpenGL widget warning(s)")
-
-    if not problems:
-        log("Startup signature: nominal.")
-        return False
-
-    log("Startup signature: DIVERGED from a healthy run.")
-    for problem in problems:
-        log(f"  - {problem}")
-    log("  -> Recorded for correlation. This has been seen on passing runs too,")
-    log("     so on its own it does not explain a missing dump.")
-    return True
+    webengine_failed = STARTUP_WEBENGINE_WARNING in rv_output
+    opengl_warnings = rv_output.count(STARTUP_OPENGL_WARNING)
+    log(f"Startup signature: webengine-init-failed={webengine_failed}, opengl-warnings={opengl_warnings}")
 
 
 def main():
@@ -344,7 +329,7 @@ def main():
             for line in rv_output[-8192:].splitlines():
                 log(f"  | {line}")
             # Checked against the whole output, not just the printed tail.
-            report_startup_divergence(rv_output)
+            log_startup_signature(rv_output)
         if rc == 0:
             log("FAIL: RV exited cleanly; the crash was not triggered.")
             return 1
