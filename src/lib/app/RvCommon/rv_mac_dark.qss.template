@@ -1187,17 +1187,16 @@ QWidget#annotationBeta QToolButton#menuToolButton::menu-indicator {
 }
 
 QWidget#annotationBeta QToolButton#menuToolButton:hover {
-    border-bottom: 1px solid {{BORDER_LIGHT}}
+    border-bottom: 1px solid {{BORDER_LIGHT}};
 }
 
 QWidget#annotationBeta QToolButton#menuToolButton:pressed {
-    border-bottom: 1px solid {{ACCENT_SECONDARY}}
+    border-bottom: 1px solid {{ACCENT_SECONDARY}};
 }
 
 QWidget#annotationBeta QComboBox {
     color: {{TEXT_BRIGHT}};
     background-color: {{SECONDARY_BACKGROUND}};
-    border: none;
     border-bottom: 1px solid transparent;
     border-radius: 4px;
     font-size: %2pt;
@@ -1229,10 +1228,6 @@ QWidget#annotationBeta QComboBox:focus,
 QWidget#annotationBeta QComboBox:on {
     border: none;
     border-bottom: 1px solid {{ACCENT_SECONDARY}};
-}
-
-QWidget#annotationBeta QComboBox#eraserBrushButton {
-    background-color: {{INPUT_BACKGROUND}};
 }
 
 QWidget#annotationBeta QLineEdit#sliderValue {
@@ -1282,7 +1277,7 @@ QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical {
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical {
-    background-color: {{ACCENT_SECONDARY}}
+    background-color: {{ACCENT_SECONDARY}};
     border-radius: 1px;
 }
 
@@ -1291,7 +1286,7 @@ QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
     height: 10px;
     margin: 0px -8px;
     background-color: {{ACCENT_SECONDARY}};
-    border: 4px solid {{ACCENT_PRIMARY}};;
+    border: 4px solid {{INPUT_BACKGROUND}};
     border-radius: 9px;
 }
 
@@ -1308,4 +1303,4 @@ QFrame#annotationBetaColorPopup {
 
 QFrame#annotationBetaColorPopup QWidget#swatchRow {
     background: transparent;
-}      
+}

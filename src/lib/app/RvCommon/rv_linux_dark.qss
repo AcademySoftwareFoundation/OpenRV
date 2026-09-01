@@ -1296,10 +1296,6 @@ QWidget#annotationBeta QComboBox:on {
     border-bottom: 1px solid rgb(6, 150, 215);
 }
 
-QWidget#annotationBeta QComboBox#eraserBrushButton {
-    background-color: rgb(23, 23, 23);
-}
-
 QWidget#annotationBeta QLineEdit#sliderValue {
     color: rgb(240, 240, 240);
     background-color: rgb(67, 67, 67);
