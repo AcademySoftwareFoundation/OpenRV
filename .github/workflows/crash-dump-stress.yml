@@ -1,13 +1,26 @@
 name: Crash Dump Stress
 
-# Manual-only diagnostic workflow. CrashDumpSmokeTest fails on roughly 44% of
-# Rocky 8 Debug jobs and on none of the Rocky 9 ones, which is frequent enough
-# to catch deliberately but too infrequent to chase one CI run at a time.
-# Builds once, then runs that single test repeatedly and reports the tally.
+# Diagnostic workflow. CrashDumpSmokeTest fails on roughly 44% of Rocky 8 Debug
+# jobs and on none of the Rocky 9 ones, which is frequent enough to catch
+# deliberately but too infrequent to chase one CI run at a time. Builds once,
+# then runs that single test repeatedly and reports the tally.
 #
 # Ten iterations catch a 44% failure with about 99.7% probability.
+#
+# Two ways to run it:
+#
+#   workflow_dispatch, once this file is on the default branch. GitHub only
+#   lists dispatchable workflows that exist on the default branch, so this is
+#   unavailable while the file lives on a feature branch.
+#
+#   push to a crash-stress/** branch, which works from any branch and is the
+#   way to run it before this merges. Push events carry no inputs, so the
+#   defaults below apply, with gdb enabled since a backtrace is the point.
 
 on:
+  push:
+    branches:
+      - 'crash-stress/**'
   workflow_dispatch:
     inputs:
       rocky-version:
@@ -45,17 +58,11 @@ on:
 
 jobs:
   stress:
-    name: 'Crash dump stress
-      <rocky=${{ inputs.rocky-version }},
-       ${{ inputs.vfx-platform }},
-       config=${{ inputs.build-type }},
-       iterations=${{ inputs.iterations }},
-       strip-marker=${{ inputs.strip-marker }},
-       gdb=${{ inputs.gdb-backtrace }}>'
+    name: "Crash dump stress <rocky=${{ inputs.rocky-version || '8' }}, ${{ inputs.vfx-platform || 'CY2025' }}, config=${{ inputs.build-type || 'Debug' }}, iterations=${{ inputs.iterations || '10' }}, strip-marker=${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}, gdb=${{ github.event_name == 'push' && 'true' || inputs.gdb-backtrace }}>"
 
     runs-on: ubuntu-latest
     container:
-      image: amd64/rockylinux:${{ inputs.rocky-version }}
+      image: amd64/rockylinux:${{ inputs.rocky-version || '8' }}
       volumes:
         - /usr/local/lib/android:/github/home/android
         - /usr/share/dotnet:/github/home/dotnet
@@ -82,13 +89,13 @@ jobs:
           submodules: recursive
       - uses: ./.github/actions/build-linux
         with:
-          rocky-version: ${{ inputs.rocky-version }}
-          build-type: ${{ inputs.build-type }}
+          rocky-version: ${{ inputs.rocky-version || '8' }}
+          build-type: ${{ inputs.build-type || 'Debug' }}
           qt-version: "6.5.3"
           cmake-version: "3.31.6"
           python-version: "3.11.8"
-          vfx-platform: ${{ inputs.vfx-platform }}
-          extra_repo: ${{ inputs.rocky-version == '8' && 'powertools' || 'crb' }}
-          stress-iterations: ${{ inputs.iterations }}
-          stress-strip-marker: ${{ inputs.strip-marker }}
-          stress-gdb: ${{ inputs.gdb-backtrace }}
+          vfx-platform: ${{ inputs.vfx-platform || 'CY2025' }}
+          extra_repo: ${{ (inputs.rocky-version || '8') == '8' && 'powertools' || 'crb' }}
+          stress-iterations: ${{ inputs.iterations || '10' }}
+          stress-strip-marker: ${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}
+          stress-gdb: ${{ github.event_name == 'push' && 'true' || inputs.gdb-backtrace }}
