@@ -59,9 +59,16 @@ REQUIRED_ANNOTATIONS = ("platform",)
 # Reported for information only (not asserted) -- empty under offscreen Qt.
 INFO_ANNOTATIONS = ("mu_function", "mu_script_file", "py_function")
 
+# Printed by the Mu function immediately before crash(). Nothing else in the
+# test can tell the deliberate crash apart from RV dying on the way to it: all
+# the test sees is a non-zero exit code. Mu's print writes to cout with an
+# explicit flush (MuLang/StringType.cpp, print_void_string), so the sentinel
+# survives the SIGSEGV that follows and no marker file is needed.
+CRASH_SENTINEL = "RV_CRASH_SMOKE_REACHED_CRASH"
+
 # crash() is invoked from a named Mu function so mu_function has a value in a
 # display-backed run (informational here).
-CRASH_EVAL = "function: rvCrashSmokeTest (void;) { crash(); } rvCrashSmokeTest();"
+CRASH_EVAL = f'function: rvCrashSmokeTest (void;) {{ print("{CRASH_SENTINEL}\\n"); crash(); }} rvCrashSmokeTest();'
 
 
 def log(msg):
@@ -330,6 +337,8 @@ def main():
                 log(f"  | {line}")
             # Checked against the whole output, not just the printed tail.
             log_startup_signature(rv_output)
+        reached_crash = CRASH_SENTINEL in rv_output
+        log(f"Reached crash(): {reached_crash}")
         if rc == 0:
             log("FAIL: RV exited cleanly; the crash was not triggered.")
             return 1
@@ -350,7 +359,13 @@ def main():
             handler_pid = report_handler_log(crash_dir)
             log(f"Resources after failure: {resource_snapshot(crash_dir)}")
             report_oom_kills(handler_pid)
-            log(f"FAIL: no .dmp produced in {crash_dir} within {args.dump_timeout}s.")
+            if reached_crash:
+                log("FAIL: crash() ran and no .dmp was produced: the crash handler dropped it.")
+            else:
+                log("FAIL: RV died before reaching crash(), so this is an RV startup crash,")
+                log("      not a crash handler failure. The dump is missing because nothing")
+                log("      asked for one.")
+            log(f"No .dmp in {crash_dir} within {args.dump_timeout}s.")
             return 1
 
         dump = max(dumps, key=os.path.getmtime)
