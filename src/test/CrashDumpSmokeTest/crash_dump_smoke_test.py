@@ -59,6 +59,12 @@ REQUIRED_ANNOTATIONS = ("platform",)
 # Reported for information only (not asserted) -- empty under offscreen Qt.
 INFO_ANNOTATIONS = ("mu_function", "mu_script_file", "py_function")
 
+# Set to a non-empty, non-zero value to launch RV under a batch gdb that dumps
+# the startup crash's stack. Diagnostic only: gdb becomes the tracer, so
+# Crashpad cannot ptrace RV and no dump is written. Used by the crash-dump
+# stress workflow, not by the normal ctest invocation.
+GDB_ENV_VAR = "RV_CRASH_SMOKE_GDB"
+
 # Printed by the Mu function immediately before crash(). Nothing else in the
 # test can tell the deliberate crash apart from RV dying on the way to it: all
 # the test sees is a non-zero exit code. Mu's print writes to cout with an
@@ -256,6 +262,53 @@ def annotation_value(dump_text, key):
     return "" if found_empty else None
 
 
+def shebang_argv(path):
+    """Return the interpreter argv for a #! script, or [] for a real binary.
+
+    On Linux the staged "rv" is a tcsh wrapper that sets RV_HOME and the
+    library paths before exec'ing rv.bin, and gdb cannot load a script as an
+    executable. Running the interpreter instead keeps that setup intact; gdb
+    follows the exec into rv.bin on its own.
+    """
+    try:
+        with open(path, "rb") as fh:
+            first = fh.readline(256)
+    except OSError:
+        return []
+    if not first.startswith(b"#!"):
+        return []
+    return first[2:].decode("utf-8", errors="replace").strip().split()
+
+
+def gdb_launch_command(rv_binary, eval_arg):
+    """Wrap the RV launch in a batch gdb that prints the crash backtrace."""
+    program = shebang_argv(rv_binary) + [rv_binary, "-eval", eval_arg]
+    return [
+        "gdb",
+        "-batch",
+        "-nx",
+        "-ex",
+        "set confirm off",
+        "-ex",
+        "set pagination off",
+        # Debug builds have deep stacks; keep the output readable.
+        "-ex",
+        "set backtrace limit 40",
+        "-ex",
+        "run",
+        "-ex",
+        r"echo \n=== gdb: crashing thread ===\n",
+        "-ex",
+        "bt full",
+        "-ex",
+        r"echo \n=== gdb: all threads ===\n",
+        "-ex",
+        "thread apply all bt",
+        "--args",
+        *program,
+    ]
+
+
 def log_startup_signature(rv_output):
     """Log the startup facts that might correlate with a missing dump.
 
@@ -311,19 +364,33 @@ def main():
         if sys.platform.startswith("linux") and os.geteuid() == 0:
             env.setdefault("QTWEBENGINE_DISABLE_SANDBOX", "1")
 
-        log(f"Launching: {args.rv_binary} -eval '{CRASH_EVAL}'")
+        gdb_mode = os.environ.get(GDB_ENV_VAR, "") not in ("", "0")
+        if gdb_mode:
+            command = gdb_launch_command(args.rv_binary, CRASH_EVAL)
+            log("GDB mode: launching RV under gdb to capture the startup backtrace.")
+            log("  gdb is the tracer, so Crashpad cannot ptrace RV and no dump will be")
+            log("  written. This mode diagnoses the startup crash; it does not test capture.")
+        else:
+            command = [args.rv_binary, "-eval", CRASH_EVAL]
+
+        log(f"Launching: {' '.join(command)}")
         log(f"Crash dir: {crash_dir}")
         log(f"Resources before launch: {resource_snapshot(crash_dir)}")
         try:
             with macos_crash_dialog_suppressed():
                 proc = subprocess.run(
-                    [args.rv_binary, "-eval", CRASH_EVAL],
+                    command,
                     env=env,
                     timeout=args.launch_timeout,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                 )
             rc = proc.returncode
+        except FileNotFoundError as exc:
+            log(
+                f"FAIL: could not launch ({exc}). Is gdb installed?" if gdb_mode else f"FAIL: could not launch ({exc})."
+            )
+            return 1
         except subprocess.TimeoutExpired:
             log(f"FAIL: RV did not exit within {args.launch_timeout}s (no crash?).")
             return 1
@@ -339,6 +406,16 @@ def main():
             log_startup_signature(rv_output)
         reached_crash = CRASH_SENTINEL in rv_output
         log(f"Reached crash(): {reached_crash}")
+
+        if gdb_mode:
+            # Under gdb the exit code is gdb's and no dump can be written, so
+            # the only question is whether the startup crash reproduced.
+            if reached_crash:
+                log("RV reached crash() normally; the startup crash did not reproduce.")
+                return 0
+            log("REPRODUCED: RV died before reaching crash(). Backtrace is in the output above.")
+            return 1
+
         if rc == 0:
             log("FAIL: RV exited cleanly; the crash was not triggered.")
             return 1

@@ -38,6 +38,10 @@ on:
         description: 'Remove the crashpad wrapper start marker first (A/B test)'
         type: boolean
         default: false
+      gdb-backtrace:
+        description: 'Run RV under gdb to print the startup crash backtrace (no dump is written)'
+        type: boolean
+        default: false
 
 jobs:
   stress:
@@ -46,7 +50,8 @@ jobs:
        ${{ inputs.vfx-platform }},
        config=${{ inputs.build-type }},
        iterations=${{ inputs.iterations }},
-       strip-marker=${{ inputs.strip-marker }}>'
+       strip-marker=${{ inputs.strip-marker }},
+       gdb=${{ inputs.gdb-backtrace }}>'
 
     runs-on: ubuntu-latest
     container:
@@ -86,3 +91,4 @@ jobs:
           extra_repo: ${{ inputs.rocky-version == '8' && 'powertools' || 'crb' }}
           stress-iterations: ${{ inputs.iterations }}
           stress-strip-marker: ${{ inputs.strip-marker }}
+          stress-gdb: ${{ inputs.gdb-backtrace }}

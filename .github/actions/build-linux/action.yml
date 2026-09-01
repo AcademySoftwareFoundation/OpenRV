@@ -38,6 +38,14 @@ inputs:
       Only meaningful with stress-iterations. Removes the crashpad wrapper
       start marker from the staged handler before stressing, to test whether
       adding it perturbed the failure.
+  stress-gdb:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Runs RV under a batch gdb so the
+      startup crash's backtrace is printed. gdb becomes the tracer, so Crashpad
+      cannot write a dump in this mode: it diagnoses the startup crash rather
+      than testing capture. An iteration "fails" when the crash reproduced.
 
 runs:
   using: "composite"
@@ -303,8 +311,15 @@ runs:
         cat "$wrapper"
       shell: bash
 
+    - name: Install gdb for backtrace capture
+      if: ${{ inputs.stress-iterations != '0' && inputs.stress-gdb == 'true' }}
+      run: dnf install -y gdb
+      shell: bash
+
     - name: Stress CrashDumpSmokeTest
       if: ${{ inputs.stress-iterations != '0' }}
+      env:
+        RV_CRASH_SMOKE_GDB: ${{ inputs.stress-gdb == 'true' && '1' || '0' }}
       run: |
         iterations='${{ inputs.stress-iterations }}'
         failures=0
@@ -319,7 +334,7 @@ runs:
           echo "::endgroup::"
           echo "iteration $i: $outcome"
         done
-        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}"
+        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}, gdb=${{ inputs.stress-gdb }}"
         echo "$summary"
         echo "$summary" >> "$GITHUB_STEP_SUMMARY"
       shell: bash
