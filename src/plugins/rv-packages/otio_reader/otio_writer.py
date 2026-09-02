@@ -226,9 +226,12 @@ def _create_stack(node_name, *args, **kwargs):
     :return: `otio.schema.Stack`
     """
     stack_node = group_member_of_type(node_name, "RVStack")
-    fps = commands.getFloatProperty(stack_node + ".output.fps")[0]
+    fps = commands.getFloatProperty(f"{stack_node}.output.fps")[0]
+    reverse_order = commands.getIntProperty(f"{stack_node}.mode.supportReversedOrderBlending")
 
     input_node_names, _ = commands.nodeConnections(node_name)
+    if reverse_order and reverse_order[0]:
+        input_node_names.reverse()
 
     stack = otio.schema.Stack(extra_commands.uiName(node_name), metadata=get_node_otio_metadata(node_name))
     stack.markers.extend(_create_markers(node_name, fps))

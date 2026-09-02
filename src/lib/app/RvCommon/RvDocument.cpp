@@ -143,6 +143,7 @@ namespace Rv
         , m_currentlyClosing(false)
         , m_closeEventReceived(false)
         , m_vsyncDisabled(false)
+        , m_hdpiResizeWorkaroundDone(false)
         , m_oldGLView(0)
         , m_glView(0)
         , m_diagnosticsView(0)
@@ -223,25 +224,6 @@ namespace Rv
         m_glView->setFocus(Qt::OtherFocusReason);
         // qApp->installEventFilter(m_glView);
 
-        // #ifdef PLATFORM_DARWIN
-        //  Under macOS, for Qt6/QOpenGLWidget port,
-        //  the initial display shows incorrect pixel
-        //  scaling due to some sort of effect related
-        //  to high-dpi on mac, until the main view is
-        //  resized by the user. This is a workaround
-        //  on macOS to force this resize;
-        //  Also enabling this on other platforms which
-        //  may have HDPI display with pixel doubling
-        //  enabled.
-        QTimer::singleShot(0, this,
-                           [this]()
-                           {
-                               QSize currentSize = size();
-                               resize(currentSize.width() + 1, currentSize.height());
-                               resize(currentSize);
-                           });
-        // #endif
-
         m_resetPolicyTimer = new QTimer(this);
         m_resetPolicyTimer->setSingleShot(true);
         connect(m_resetPolicyTimer, SIGNAL(timeout()), this, SLOT(resetSizePolicy()));
@@ -282,16 +264,29 @@ namespace Rv
         }
 
         //
-        //  Create UI blocking overlay - transparent widget that captures all input
+        //  Create UI blocking overlay - a transparent window that captures all
+        //  input and dims the UI.
         //
-        m_blockingOverlay = new QWidget(this);
+        //  It is a frameless top-level window (owned by this document) rather
+        //  than a child widget. The viewport is a native QOpenGLWindow, which
+        //  renders above any sibling raster child widget regardless of
+        //  raise()/stacking order, so a child overlay could never dim or block
+        //  the viewport. A top-level window sits above the main window and its
+        //  native child, so it covers the viewport too.
+        //
+        m_blockingOverlay = new QWidget(this, Qt::FramelessWindowHint | Qt::Tool);
         m_blockingOverlay->setObjectName("UIBlockingOverlay");
 
-        // Semi-transparent dark overlay for visual feedback
-        m_blockingOverlay->setStyleSheet("QWidget#UIBlockingOverlay { background-color: rgba(0, 0, 0, 100); }");
+        // Semi-transparent dark overlay for visual feedback. A top-level window
+        // has no per-pixel alpha unless WA_TranslucentBackground is set, and an
+        // rgba stylesheet fill does not reliably paint on a plain translucent
+        // top-level QWidget. Instead fill solid black and make the whole window
+        // see-through with window opacity, which is deterministic on all
+        // platforms and composites correctly above the native GL viewport.
+        m_blockingOverlay->setStyleSheet("QWidget#UIBlockingOverlay { background-color: rgb(0, 0, 0); }");
+        m_blockingOverlay->setWindowOpacity(0.4);
 
-        // Ensure it stays on top and captures input
-        m_blockingOverlay->raise();
+        // Capture input (mouse + keyboard) while shown
         m_blockingOverlay->setAttribute(Qt::WA_TransparentForMouseEvents, false);
         m_blockingOverlay->setFocusPolicy(Qt::StrongFocus);
 
@@ -299,10 +294,35 @@ namespace Rv
         m_blockingOverlay->hide();
     }
 
+    void RvDocument::positionBlockingOverlay()
+    {
+        if (!m_blockingOverlay)
+            return;
+
+        // Cover the main window's client area in global coordinates (the
+        // overlay is a top-level window, so it needs screen coordinates).
+        m_blockingOverlay->setGeometry(QRect(mapToGlobal(QPoint(0, 0)), size()));
+        m_blockingOverlay->raise();
+    }
+
     void RvDocument::initializeSession()
     {
+        //
+        //  Called by RvApplication::newSessionFromFiles() once the document has
+        //  been shown, so the viewport window exists and its GL context has
+        //  been created. Constructing an RvSession queries
+        //  GL_SHADING_LANGUAGE_VERSION and aborts without a current context, so
+        //  make the viewport context current first.
+        //
+        if (!m_glView)
+        {
+            return;
+        }
+
         if (!m_session)
         {
+            m_glView->makeCurrent();
+
             m_session = new RvSession;
             // m_session->setFrameBuffer(fb);
 
@@ -1987,18 +2007,49 @@ namespace Rv
     {
         if (m_session)
             m_session->askForRedraw();
+
+        // Keep the top-level overlay aligned with the window when visible.
+        if (m_blockingOverlay && m_blockingOverlay->isVisible())
+            positionBlockingOverlay();
+    }
+
+    void RvDocument::showEvent(QShowEvent* event)
+    {
+        QMainWindow::showEvent(event);
+
+        if (m_hdpiResizeWorkaroundDone)
+            return;
+
+        m_hdpiResizeWorkaroundDone = true;
+
+#if defined(PLATFORM_DARWIN)
+        const bool needWorkaround = true;
+#else
+        const bool needWorkaround = (devicePixelRatio() > 1.0);
+#endif
+
+        if (!needWorkaround)
+            return;
+
+        // Under Qt6/QOpenGLWidget, initial HDPI scaling can be wrong until the
+        // main view is resized once after it is shown. Defer until showEvent so
+        // child widgets (including any QML-backed UI) are fully constructed.
+        QTimer::singleShot(0, this,
+                           [this]()
+                           {
+                               QSize currentSize = size();
+                               resize(currentSize.width() + 1, currentSize.height());
+                               resize(currentSize);
+                           });
     }
 
     void RvDocument::resizeEvent(QResizeEvent* event)
     {
         QMainWindow::resizeEvent(event);
 
-        // Keep overlay covering entire window when visible
+        // Keep overlay covering entire client area when visible
         if (m_blockingOverlay && m_blockingOverlay->isVisible())
-        {
-            m_blockingOverlay->setGeometry(0, 0, width(), height());
-            m_blockingOverlay->raise();
-        }
+            positionBlockingOverlay();
     }
 
     void RvDocument::setUIBlocked(bool blocked)
@@ -2010,12 +2061,13 @@ namespace Rv
 
         if (blocked)
         {
-            // Cover entire window
-            m_blockingOverlay->setGeometry(0, 0, width(), height());
-            m_blockingOverlay->raise(); // Bring to front, above everything
+            // Cover entire client area (top-level window, global coords)
+            positionBlockingOverlay();
             m_blockingOverlay->show();
+            m_blockingOverlay->raise(); // Bring to front, above everything
 
             // Grab focus to also block keyboard input
+            m_blockingOverlay->activateWindow();
             m_blockingOverlay->setFocus(Qt::OtherFocusReason);
         }
         else
