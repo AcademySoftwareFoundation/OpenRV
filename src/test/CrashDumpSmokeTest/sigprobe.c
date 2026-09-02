@@ -27,6 +27,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -45,8 +46,35 @@ static signal_fn real_signal;
 static sigprocmask_fn real_sigprocmask;
 static pthread_sigmask_fn real_pthread_sigmask;
 
+typedef int (*pthread_create_fn)(pthread_t*, const pthread_attr_t*, void* (*)(void*), void*);
+static pthread_create_fn real_pthread_create;
+
 /* -1 means "not yet sampled on this thread". */
 static __thread int last_blocked = -1;
+
+static void resolve_real_symbols(void)
+{
+    if (!real_sigaction)
+    {
+        real_sigaction = (sigaction_fn)dlsym(RTLD_NEXT, "sigaction");
+    }
+    if (!real_signal)
+    {
+        real_signal = (signal_fn)dlsym(RTLD_NEXT, "signal");
+    }
+    if (!real_sigprocmask)
+    {
+        real_sigprocmask = (sigprocmask_fn)dlsym(RTLD_NEXT, "sigprocmask");
+    }
+    if (!real_pthread_sigmask)
+    {
+        real_pthread_sigmask = (pthread_sigmask_fn)dlsym(RTLD_NEXT, "pthread_sigmask");
+    }
+    if (!real_pthread_create)
+    {
+        real_pthread_create = (pthread_create_fn)dlsym(RTLD_NEXT, "pthread_create");
+    }
+}
 
 static long probe_tid(void)
 {
@@ -123,7 +151,13 @@ static void report_mask_state(const char* who)
     {
         return;
     }
+
+    int first_sample = (last_blocked == -1);
     last_blocked = blocked;
+    if (first_sample && !blocked)
+    {
+        return;
+    }
     probe_log("%s -> SIGSEGV %s", who, blocked ? "BLOCKED" : "unblocked");
 }
 
@@ -190,6 +224,55 @@ int pthread_sigmask(int how, const sigset_t* set, sigset_t* oldset)
     return rc;
 }
 
+struct thread_start_context
+{
+    void* (*entry)(void*);
+    void* arg;
+};
+
+static void* thread_start_wrapper(void* raw)
+{
+    struct thread_start_context context = *(struct thread_start_context*)raw;
+    sigset_t current;
+
+    free(raw);
+
+    if (real_pthread_sigmask != NULL && real_pthread_sigmask(SIG_BLOCK, NULL, &current) == 0)
+    {
+        last_blocked = (sigismember(&current, SIGSEGV) == 1);
+        if (last_blocked)
+        {
+            probe_log("thread start -> SIGSEGV BLOCKED (inherited)");
+        }
+    }
+    return context.entry(context.arg);
+}
+
+int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*entry)(void*), void* arg)
+{
+    struct thread_start_context* context;
+
+    if (!real_pthread_create)
+    {
+        resolve_real_symbols();
+    }
+
+    context = (struct thread_start_context*)malloc(sizeof(*context));
+    if (context == NULL)
+    {
+        return real_pthread_create(thread, attr, entry, arg);
+    }
+    context->entry = entry;
+    context->arg = arg;
+
+    int rc = real_pthread_create(thread, attr, thread_start_wrapper, context);
+    if (rc != 0)
+    {
+        free(context);
+    }
+    return rc;
+}
+
 /*
  * Confirm the probe actually loaded, but only for the process under test: the
  * tcsh wrapper also runs readlink, python, openssl, grep and cut, and every one
@@ -198,6 +281,9 @@ int pthread_sigmask(int how, const sigset_t* set, sigset_t* oldset)
 __attribute__((constructor)) static void sigprobe_init(void)
 {
     char comm[64] = {0};
+
+    resolve_real_symbols();
+
     FILE* fh = fopen("/proc/self/comm", "r");
 
     if (fh == NULL)
