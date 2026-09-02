@@ -47,6 +47,16 @@ inputs:
       Answers why a real SIGSEGV produces no dump while Crashpad's handler is
       installed. Unlike gdb it does not use ptrace, so the timing-sensitive
       failure still reproduces.
+  stress-malloc-check:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Sets MALLOC_PERTURB_ and
+      MALLOC_CHECK_, so freshly allocated and freed heap memory is filled with
+      a known byte and heap metadata corruption aborts where it is detected.
+      Tests whether the startup crash is a heap bug: it costs almost nothing
+      at runtime, unlike a sanitiser or a tracer, both of which have been seen
+      to change the failure rate.
   stress-gdb:
     required: false
     default: 'false'
@@ -339,6 +349,9 @@ runs:
       env:
         RV_CRASH_SMOKE_GDB: ${{ inputs.stress-gdb == 'true' && '1' || '0' }}
         LD_PRELOAD: ${{ inputs.stress-sigprobe == 'true' && format('{0}/_build/sigprobe.so', github.workspace) || '' }}
+        # 165 is 0xA5: conspicuous in a dump and an unlikely pointer or length.
+        MALLOC_PERTURB_: ${{ inputs.stress-malloc-check == 'true' && '165' || '' }}
+        MALLOC_CHECK_: ${{ inputs.stress-malloc-check == 'true' && '3' || '' }}
       run: |
         iterations='${{ inputs.stress-iterations }}'
         failures=0
@@ -353,7 +366,7 @@ runs:
           echo "::endgroup::"
           echo "iteration $i: $outcome"
         done
-        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}, gdb=${{ inputs.stress-gdb }}, sigprobe=${{ inputs.stress-sigprobe }}"
+        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}, gdb=${{ inputs.stress-gdb }}, sigprobe=${{ inputs.stress-sigprobe }}, malloc-check=${{ inputs.stress-malloc-check }}"
         echo "$summary"
         echo "$summary" >> "$GITHUB_STEP_SUMMARY"
       shell: bash

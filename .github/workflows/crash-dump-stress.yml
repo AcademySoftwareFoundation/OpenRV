@@ -15,8 +15,9 @@ name: Crash Dump Stress
 #
 #   push to a crash-stress/** branch, which works from any branch and is the
 #   way to run it before this merges. Push events carry no inputs, so the
-#   defaults below apply: the sigprobe on, since that is the open question,
-#   and gdb off, because attaching it suppresses the failure.
+#   defaults below apply: the malloc check on, since that is the current
+#   experiment, and gdb and the sigprobe off, because both distort the
+#   failure rate rather than observing it.
 
 on:
   push:
@@ -57,13 +58,17 @@ on:
         type: boolean
         default: false
       sigprobe:
-        description: 'LD_PRELOAD a probe logging SIGSEGV handler changes and blocking (no ptrace)'
+        description: 'LD_PRELOAD a SIGSEGV probe. Note: it has been seen to both cause and mask the failure'
+        type: boolean
+        default: false
+      malloc-check:
+        description: 'Set MALLOC_PERTURB_ and MALLOC_CHECK_ to test whether the startup crash is a heap bug'
         type: boolean
         default: true
 
 jobs:
   stress:
-    name: "Crash dump stress <rocky=${{ inputs.rocky-version || '8' }}, ${{ inputs.vfx-platform || 'CY2025' }}, config=${{ inputs.build-type || 'Debug' }}, iterations=${{ inputs.iterations || '10' }}, strip-marker=${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}, gdb=${{ github.event_name == 'push' && 'false' || inputs.gdb-backtrace }}, sigprobe=${{ github.event_name == 'push' && 'true' || inputs.sigprobe }}>"
+    name: "Crash dump stress <rocky=${{ inputs.rocky-version || '8' }}, ${{ inputs.vfx-platform || 'CY2025' }}, config=${{ inputs.build-type || 'Debug' }}, iterations=${{ inputs.iterations || '10' }}, strip-marker=${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}, gdb=${{ github.event_name == 'push' && 'false' || inputs.gdb-backtrace }}, sigprobe=${{ github.event_name == 'push' && 'false' || inputs.sigprobe }}, malloc-check=${{ github.event_name == 'push' && 'true' || inputs.malloc-check }}>"
 
     runs-on: ubuntu-latest
     container:
@@ -104,4 +109,5 @@ jobs:
           stress-iterations: ${{ inputs.iterations || '10' }}
           stress-strip-marker: ${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}
           stress-gdb: ${{ github.event_name == 'push' && 'false' || inputs.gdb-backtrace }}
-          stress-sigprobe: ${{ github.event_name == 'push' && 'true' || inputs.sigprobe }}
+          stress-sigprobe: ${{ github.event_name == 'push' && 'false' || inputs.sigprobe }}
+          stress-malloc-check: ${{ github.event_name == 'push' && 'true' || inputs.malloc-check }}
