@@ -15,7 +15,8 @@ name: Crash Dump Stress
 #
 #   push to a crash-stress/** branch, which works from any branch and is the
 #   way to run it before this merges. Push events carry no inputs, so the
-#   defaults below apply, with gdb enabled since a backtrace is the point.
+#   defaults below apply: the sigprobe on, since that is the open question,
+#   and gdb off, because attaching it suppresses the failure.
 
 on:
   push:
@@ -52,13 +53,17 @@ on:
         type: boolean
         default: false
       gdb-backtrace:
-        description: 'Run RV under gdb to print the startup crash backtrace (no dump is written)'
+        description: 'Run RV under gdb for a backtrace. Note: gdb suppresses the failure'
         type: boolean
         default: false
+      sigprobe:
+        description: 'LD_PRELOAD a probe logging SIGSEGV handler changes and blocking (no ptrace)'
+        type: boolean
+        default: true
 
 jobs:
   stress:
-    name: "Crash dump stress <rocky=${{ inputs.rocky-version || '8' }}, ${{ inputs.vfx-platform || 'CY2025' }}, config=${{ inputs.build-type || 'Debug' }}, iterations=${{ inputs.iterations || '10' }}, strip-marker=${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}, gdb=${{ github.event_name == 'push' && 'true' || inputs.gdb-backtrace }}>"
+    name: "Crash dump stress <rocky=${{ inputs.rocky-version || '8' }}, ${{ inputs.vfx-platform || 'CY2025' }}, config=${{ inputs.build-type || 'Debug' }}, iterations=${{ inputs.iterations || '10' }}, strip-marker=${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}, gdb=${{ github.event_name == 'push' && 'false' || inputs.gdb-backtrace }}, sigprobe=${{ github.event_name == 'push' && 'true' || inputs.sigprobe }}>"
 
     runs-on: ubuntu-latest
     container:
@@ -98,4 +103,5 @@ jobs:
           extra_repo: ${{ (inputs.rocky-version || '8') == '8' && 'powertools' || 'crb' }}
           stress-iterations: ${{ inputs.iterations || '10' }}
           stress-strip-marker: ${{ github.event_name == 'push' && 'false' || inputs.strip-marker }}
-          stress-gdb: ${{ github.event_name == 'push' && 'true' || inputs.gdb-backtrace }}
+          stress-gdb: ${{ github.event_name == 'push' && 'false' || inputs.gdb-backtrace }}
+          stress-sigprobe: ${{ github.event_name == 'push' && 'true' || inputs.sigprobe }}
