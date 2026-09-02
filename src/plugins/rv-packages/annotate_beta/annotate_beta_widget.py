@@ -325,6 +325,68 @@ def _apply_icon(btn, name, size=16):
         btn.setText("")
 
 
+class _MenuToolButton(QtWidgets.QToolButton):
+    """Tool button with a checkable drop-down menu."""
+
+    selection_changed = QtCore.Signal(str)
+
+    def __init__(self, tooltip, items, icon_size=None, parent=None):
+        """items: sequence of (item_id, label, icon_name or None) triples."""
+        super().__init__(parent)
+        self.setObjectName("menuToolButton")
+        self.setProperty("tbstyle", "palette")
+        self.setToolTip(tooltip)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setFixedHeight(30)
+        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
+        if icon_size is not None:
+            self.setIconSize(QtCore.QSize(icon_size, icon_size))
+
+        self._menu = QtWidgets.QMenu(self)
+        group = QtGui.QActionGroup(self._menu)
+        group.setExclusive(True)
+        for item_id, label, icon_name in items:
+            action = self._menu.addAction(_load_icon(icon_name), label) if icon_name else self._menu.addAction(label)
+            action.setCheckable(True)
+            action.setData(item_id)
+            group.addAction(action)
+        self._menu.triggered.connect(self._on_triggered)
+        self.setMenu(self._menu)
+
+    def _on_triggered(self, action):
+        item_id = action.data()
+        self.set_selection(item_id)
+        self.selection_changed.emit(item_id)
+
+    def _action_for(self, item_id):
+        return next((a for a in self._menu.actions() if a.data() == item_id), None)
+
+    def has_item(self, item_id):
+        return self._action_for(item_id) is not None
+
+    def selection(self):
+        action = next((a for a in self._menu.actions() if a.isChecked()), None)
+        return action.data() if action is not None else None
+
+    def set_selection(self, item_id):
+        """Tick item_id in the menu and show it on the button face."""
+        for action in self._menu.actions():
+            checked = action.data() == item_id
+            action.setChecked(checked)
+            if not checked:
+                continue
+            if action.icon().isNull():
+                self.setText(action.text())
+            else:
+                self.setIcon(action.icon())
+
+    def set_item_enabled(self, item_id, enabled):
+        action = self._action_for(item_id)
+        if action is not None:
+            action.setEnabled(enabled)
+
+
 class _EraserPanel(_PanelSurface):
     """Brush-type dropdown + size/opacity sliders for the eraser tool."""
 
@@ -332,83 +394,49 @@ class _EraserPanel(_PanelSurface):
     size_changed = QtCore.Signal(int)
     opacity_changed = QtCore.Signal(int)
 
-    _BRUSHES = [
-        ("circle", "erase_circle", "Circle (Hard)"),
-        ("gauss", "erase_gauss", "Gauss (Soft)"),
-    ]
+    _BRUSHES = (
+        ("circle", "Circle (Hard)", "erase_circle"),
+        ("gauss", "Gauss (Soft)", "erase_gauss"),
+    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(8, 8, 8, 8)
-        layout.setSpacing(0)
+        lay = QtWidgets.QVBoxLayout(self)
+        lay.setContentsMargins(8, 8, 8, 8)
+        lay.setSpacing(0)
 
-        self._brush_btn = QtWidgets.QToolButton()
-        self._brush_btn.setToolTip("Brush Type")
-        self._brush_btn.setObjectName("menuToolButton")
-        self._brush_btn.setProperty("tbstyle", "palette")
-        self._brush_btn.setIconSize(QtCore.QSize(20, 20))
-        self._brush_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self._brush_btn.setFixedHeight(30)
-        self._brush_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self._brush_menu = QtWidgets.QMenu(self._brush_btn)
-        self._brush_group = QtGui.QActionGroup(self._brush_menu)
-        self._brush_group.setExclusive(True)
-        for brush_id, icon_name, label in self._BRUSHES:
-            action = self._brush_menu.addAction(_load_icon(icon_name), label)
-            action.setCheckable(True)
-            action.setData(brush_id)
-            self._brush_group.addAction(action)
-        self._brush_menu.triggered.connect(self._on_brush_triggered)
-        self._brush_btn.setMenu(self._brush_menu)
-        self._update_brush_button("circle")
-        layout.addWidget(self._brush_btn)
+        self._brush_btn = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
+        self._brush_btn.set_selection("circle")
+        self._brush_btn.selection_changed.connect(self.eraser_brush_changed)
+        lay.addWidget(self._brush_btn)
 
-        layout.addSpacing(16)
-        layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        layout.addSpacing(16)
+        lay.addSpacing(16)
+        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+        lay.addSpacing(16)
 
         self._size = _SliderSection("Size", 1, 100, 32)
         self._size.value_changed.connect(self.size_changed)
-        layout.addWidget(self._size)
+        lay.addWidget(self._size)
 
-        layout.addSpacing(16)
-        layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        layout.addSpacing(16)
+        lay.addSpacing(16)
+        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+        lay.addSpacing(16)
 
         self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
         self._opacity.value_changed.connect(self.opacity_changed)
-        layout.addWidget(self._opacity)
+        lay.addWidget(self._opacity)
 
-        layout.addStretch()
-
-    def _on_brush_triggered(self, action):
-        brush = action.data()
-        self._update_brush_button(brush)
-        self.eraser_brush_changed.emit(brush)
-
-    def _update_brush_button(self, brush):
-        """Show the active brush on the button face and tick it in the menu."""
-        for action in self._brush_menu.actions():
-            checked = action.data() == brush
-            action.setChecked(checked)
-            if checked:
-                self._brush_btn.setIcon(action.icon())
+        lay.addStretch()
 
     def set_eraser_brush(self, brush):
-        if any(a.data() == brush for a in self._brush_menu.actions()):
-            self._update_brush_button(brush)
+        if self._brush_btn.has_item(brush):
+            self._brush_btn.set_selection(brush)
 
     def set_soft_erase_enabled(self, enabled):
         """Enable or disable the Gauss (soft) eraser brush option."""
-        action = next((a for a in self._brush_menu.actions() if a.data() == "gauss"), None)
-        if action is None:
-            return
-
-        action.setEnabled(enabled)
-
-        if not enabled and action.isChecked():
-            self._update_brush_button("circle")
+        self._brush_btn.set_item_enabled("gauss", enabled)
+        if not enabled and self._brush_btn.selection() == "gauss":
+            self._brush_btn.set_selection("circle")
             self.eraser_brush_changed.emit("circle")
 
     def set_size(self, v):
@@ -617,7 +645,11 @@ class _TextOptionsPanel(_PanelSurface):
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
 
-    _SIZES = [("small", "S"), ("medium", "M"), ("large", "L")]
+    _SIZES = (
+        ("small", "S", None),
+        ("medium", "M", None),
+        ("large", "L", None),
+    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -636,24 +668,9 @@ class _TextOptionsPanel(_PanelSurface):
         self._font_combo.view().setMinimumWidth(160)
         lay.addWidget(self._font_combo)
 
-        self._size_btn = QtWidgets.QToolButton()
-        self._size_btn.setToolTip("Size")
-        self._size_btn.setObjectName("menuToolButton")
-        self._size_btn.setProperty("tbstyle", "palette")
-        self._size_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self._size_btn.setFixedHeight(30)
-        self._size_btn.setPopupMode(QtWidgets.QToolButton.InstantPopup)
-        self._size_menu = QtWidgets.QMenu(self._size_btn)
-        self._size_group = QtGui.QActionGroup(self._size_menu)
-        self._size_group.setExclusive(True)
-        for size_id, label in self._SIZES:
-            action = self._size_menu.addAction(label)
-            action.setCheckable(True)
-            action.setData(size_id)
-            self._size_group.addAction(action)
-        self._size_menu.triggered.connect(self._on_size_triggered)
-        self._size_btn.setMenu(self._size_menu)
-        self._update_size_button("medium")
+        self._size_btn = _MenuToolButton("Size", self._SIZES)
+        self._size_btn.set_selection("medium")
+        self._size_btn.selection_changed.connect(self.font_size_changed)
         lay.addWidget(self._size_btn)
 
         lay.addSpacing(5)
@@ -661,30 +678,17 @@ class _TextOptionsPanel(_PanelSurface):
         lay.addSpacing(5)
 
         # B / I / U style toggles
-
-        self._bold_btn = _tool_button("Bold")
-        font_b = self._bold_btn.font()
-        font_b.setBold(True)
-        self._bold_btn.setFont(font_b)
-        _apply_icon(self._bold_btn, "bold")
-        self._bold_btn.toggled.connect(self.font_bold_changed)
-        lay.addWidget(self._bold_btn, alignment=QtCore.Qt.AlignHCenter)
-
-        self._italic_btn = _tool_button("Italic")
-        font_i = self._italic_btn.font()
-        font_i.setItalic(True)
-        self._italic_btn.setFont(font_i)
-        _apply_icon(self._italic_btn, "italic")
-        self._italic_btn.toggled.connect(self.font_italic_changed)
-        lay.addWidget(self._italic_btn, alignment=QtCore.Qt.AlignHCenter)
-
-        self._underline_btn = _tool_button("Underline")
-        font_u = self._underline_btn.font()
-        font_u.setUnderline(True)
-        self._underline_btn.setFont(font_u)
-        _apply_icon(self._underline_btn, "underline")
-        self._underline_btn.toggled.connect(self.font_underline_changed)
-        lay.addWidget(self._underline_btn, alignment=QtCore.Qt.AlignHCenter)
+        self._style_btns = {}
+        for key, label, signal in (
+            ("bold", "Bold", self.font_bold_changed),
+            ("italic", "Italic", self.font_italic_changed),
+            ("underline", "Underline", self.font_underline_changed),
+        ):
+            btn = _tool_button(label)
+            _apply_icon(btn, key)
+            btn.toggled.connect(signal)
+            lay.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
+            self._style_btns[key] = btn
 
         lay.addStretch()
 
@@ -696,37 +700,23 @@ class _TextOptionsPanel(_PanelSurface):
             self._font_combo.sync_display_font(name)
             self._font_combo.blockSignals(False)
 
-    def _on_size_triggered(self, action):
-        size = action.data()
-        self._update_size_button(size)
-        self.font_size_changed.emit(size)
-
-    def _update_size_button(self, size):
-        """Show the active size on the button face and tick it in the menu."""
-        for action in self._size_menu.actions():
-            checked = action.data() == size
-            action.setChecked(checked)
-            if checked:
-                self._size_btn.setText(action.text())
-
     def set_font_size(self, size):
-        valid_sizes = {size_id for size_id, _ in self._SIZES}
-        self._update_size_button(size if size in valid_sizes else "medium")
+        self._size_btn.set_selection(size if self._size_btn.has_item(size) else "medium")
+
+    def _set_style(self, key, v):
+        btn = self._style_btns[key]
+        btn.blockSignals(True)
+        btn.setChecked(v)
+        btn.blockSignals(False)
 
     def set_bold(self, v):
-        self._bold_btn.blockSignals(True)
-        self._bold_btn.setChecked(v)
-        self._bold_btn.blockSignals(False)
+        self._set_style("bold", v)
 
     def set_italic(self, v):
-        self._italic_btn.blockSignals(True)
-        self._italic_btn.setChecked(v)
-        self._italic_btn.blockSignals(False)
+        self._set_style("italic", v)
 
     def set_underline(self, v):
-        self._underline_btn.blockSignals(True)
-        self._underline_btn.setChecked(v)
-        self._underline_btn.blockSignals(False)
+        self._set_style("underline", v)
 
 
 # ---------------------------------------------------------------------------
