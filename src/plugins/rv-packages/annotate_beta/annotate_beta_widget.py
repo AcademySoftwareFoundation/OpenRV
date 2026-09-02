@@ -172,7 +172,7 @@ class _AnnotationSlider(QtWidgets.QSlider):
         span = max(1, self.height() - 2 * self._GROOVE_MARGIN - self._HANDLE_LENGTH)
         bottom = self._GROOVE_MARGIN + self._HANDLE_LENGTH // 2 + span
 
-        return QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), bottom - y, span)
+        return QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), bottom - int(y), span)
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
@@ -195,12 +195,6 @@ class _AnnotationSlider(QtWidgets.QSlider):
             event.accept()
         else:
             super().mouseReleaseEvent(event)
-
-    def wheelEvent(self, event):
-        delta = event.angleDelta().y()
-        if delta:
-            self.setValue(self.value() + (1 if delta > 0 else -1))
-        event.accept()
 
 
 # ---------------------------------------------------------------------------
@@ -411,6 +405,8 @@ class _EraserPanel(_PanelSurface):
         if action is None:
             return
 
+        action.setEnabled(enabled)
+
         if not enabled and action.isChecked():
             self._update_brush_button("circle")
             self.eraser_brush_changed.emit("circle")
@@ -542,7 +538,9 @@ class _ShapeOptionsPanel(_PanelSurface):
         lay.addStretch()
 
     def set_filled(self, v):
+        self._filled.blockSignals(True)
         self._filled.setChecked(v)
+        self._filled.blockSignals(False)
 
     def set_size(self, v):
         self._size.set_value(v)
@@ -551,8 +549,8 @@ class _ShapeOptionsPanel(_PanelSurface):
         self._opacity.set_value(v)
 
 
-class _CheckedComboDelegate(QtWidgets.QStyledItemDelegate):
-    """Draws a checkmark on the current combo item."""
+class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
+    """Renders each font name in its own typeface, ticking the current one."""
 
     def __init__(self, combo, parent=None):
         super().__init__(parent)
@@ -563,22 +561,6 @@ class _CheckedComboDelegate(QtWidgets.QStyledItemDelegate):
         option.features |= QtWidgets.QStyleOptionViewItem.HasDecoration
         option.decorationSize = QtCore.QSize(12, 12)
 
-    def paint(self, painter, option, index):
-        super().paint(painter, option, index)
-        if index.data() != self._combo.currentText():
-            return
-        style = QtWidgets.QApplication.style()
-        opt = QtWidgets.QStyleOptionViewItem(option)
-        self.initStyleOption(opt, index)
-        opt.rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemDecoration, opt, None)
-        style.drawPrimitive(QtWidgets.QStyle.PE_IndicatorMenuCheckMark, opt, painter, None)
-
-
-class _FontNameDelegate(_CheckedComboDelegate):
-    """Checked-item delegate that also renders each font name in its own typeface."""
-
-    def initStyleOption(self, option, index):
-        super().initStyleOption(option, index)
         font_name = index.data()
         if font_name:
             f = QtGui.QFont(font_name)
@@ -591,6 +573,16 @@ class _FontNameDelegate(_CheckedComboDelegate):
                     f.setPixelSize(px)
             option.font = f
 
+    def paint(self, painter, option, index):
+        super().paint(painter, option, index)
+        if index.data() != self._combo.currentText():
+            return
+        style = QtWidgets.QApplication.style()
+        style_option = QtWidgets.QStyleOptionViewItem(option)
+        self.initStyleOption(style_option, index)
+        style_option.rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemDecoration, style_option, None)
+        style.drawPrimitive(QtWidgets.QStyle.PE_IndicatorMenuCheckMark, style_option, painter, None)
+
     def sizeHint(self, option, index):
         size = super().sizeHint(option, index)
         size.setHeight(option.fontMetrics.height() + 8)
@@ -602,9 +594,9 @@ class _FontComboBox(QtWidgets.QComboBox):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.currentTextChanged.connect(self._sync_display_font)
+        self.currentTextChanged.connect(self.sync_display_font)
 
-    def _sync_display_font(self, family):
+    def sync_display_font(self, family):
         f = self.font()
         f.setFamily(family)
         self.setFont(f)
@@ -701,6 +693,7 @@ class _TextOptionsPanel(_PanelSurface):
         if idx >= 0:
             self._font_combo.blockSignals(True)
             self._font_combo.setCurrentIndex(idx)
+            self._font_combo.sync_display_font(name)
             self._font_combo.blockSignals(False)
 
     def _on_size_triggered(self, action):
@@ -929,7 +922,7 @@ class AnnotateToolStrip(_StyledWidget):
                     pos = "mid"
                 _add_tool(tool, grouppos=pos)
                 if i < len(tools) - 1:
-                    lay.addSpacing(0.5)
+                    lay.addSpacing(1)
 
         # Cursor — standalone
         _add_tool(TOOL_CURSOR)
@@ -995,7 +988,7 @@ class AnnotateToolStrip(_StyledWidget):
         menu.addAction("Clear Frame", self.clear_requested.emit)
         menu.addAction("Clear All Frames on Timeline", self._on_clear_all_confirmed)
         pos = self._clear_btn.mapToGlobal(QtCore.QPoint(self._clear_btn.width() + 2, 0))
-        menu.exec_(pos)
+        menu.exec(pos)
 
     def _on_clear_all_confirmed(self):
         dlg = QtWidgets.QMessageBox(self)
@@ -1003,7 +996,7 @@ class AnnotateToolStrip(_StyledWidget):
         dlg.setText("Clear all annotations from the current timeline?")
         dlg.setStandardButtons(QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
         dlg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
-        if dlg.exec_() == QtWidgets.QMessageBox.Ok:
+        if dlg.exec() == QtWidgets.QMessageBox.Ok:
             self.clear_all_requested.emit()
 
     def _on_tool_clicked(self, btn):
@@ -1164,7 +1157,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
 class AnnotateToolbarDockWidget(QtWidgets.QDockWidget):
     """QDockWidget wrapper for the annotation toolbar."""
 
-    closed = QtCore.Signal()
+    close_requested = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__("Draw", parent)
@@ -1183,4 +1176,4 @@ class AnnotateToolbarDockWidget(QtWidgets.QDockWidget):
     def closeEvent(self, event):
         super().closeEvent(event)
         if event.isAccepted():
-            self.closed.emit()
+            self.close_requested.emit()

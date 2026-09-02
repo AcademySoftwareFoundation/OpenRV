@@ -249,6 +249,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _create_dock(self):
         sw = qtutils.sessionWindow()
         self._dock = AnnotateToolbarDockWidget(sw)
+        self._dock.close_requested.connect(self._on_close_requested)
         sw.addDockWidget(QtCore.Qt.RightDockWidgetArea, self._dock)
         self._dock.hide()  # Start hidden; user opens via Annotation menu
         sw.resizeDocks([self._dock], [115], QtCore.Qt.Horizontal)
@@ -439,13 +440,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._engine.clear_all_frames()
         self._update_undo_redo_buttons()
 
-    def _on_dock_top_level_changed(self, floating):
-        """Restore the native title bar when floating (enables dragging); hide it when docked."""
-        if floating:
-            self._dock.setTitleBarWidget(None)
-        else:
-            self._dock.setTitleBarWidget(QtWidgets.QWidget())
-
     def _show_toolbar(self):
         self._dock.show()
         self._dock.raise_()
@@ -456,9 +450,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self.toggle()
         else:
             self._dock.hide()
-
-    def _on_dock_requested(self):
-        self._dock.setFloating(not self._dock.isFloating())
 
     def _hide_color_picker(self):
         if self._dock:

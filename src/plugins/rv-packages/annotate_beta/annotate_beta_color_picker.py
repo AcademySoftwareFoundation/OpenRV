@@ -35,6 +35,12 @@ class _HSVGradientWidget(QtWidgets.QWidget):
         self._val = val
         self.update()
 
+    def sat(self):
+        return self._sat
+
+    def val(self):
+        return self._val
+
     def paintEvent(self, event):
         p = QtGui.QPainter(self)
         p.setRenderHint(QtGui.QPainter.Antialiasing, False)
@@ -69,11 +75,11 @@ class _HSVGradientWidget(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self._update_from_pos(event.pos())
+            self._update_from_pos(event.position())
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            self._update_from_pos(event.pos())
+            self._update_from_pos(event.position())
 
 
 class _HueSlider(QtWidgets.QWidget):
@@ -90,6 +96,9 @@ class _HueSlider(QtWidgets.QWidget):
     def set_hue(self, hue_f):
         self._hue = max(0.0, min(1.0, hue_f))
         self.update()
+
+    def hue(self):
+        return self._hue
 
     def paintEvent(self, event):
         p = QtGui.QPainter(self)
@@ -120,11 +129,11 @@ class _HueSlider(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self._update_from_pos(event.pos().x())
+            self._update_from_pos(event.position().x())
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            self._update_from_pos(event.pos().x())
+            self._update_from_pos(event.position().x())
 
 
 class _SwatchButton(QtWidgets.QAbstractButton):
@@ -134,6 +143,7 @@ class _SwatchButton(QtWidgets.QAbstractButton):
 
     def __init__(self, color, parent=None):
         super().__init__(parent)
+        self.setObjectName("presetSwatch")
         self._color = color
         self.setFixedSize(22, 22)
         self.setCursor(QtCore.Qt.PointingHandCursor)
@@ -142,7 +152,7 @@ class _SwatchButton(QtWidgets.QAbstractButton):
     def paintEvent(self, event):
         p = QtGui.QPainter(self)
         p.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        p.setPen(QtGui.QPen(QtGui.QColor("#555555"), 1))
+        p.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
         p.setBrush(self._color)
         p.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 3, 3)
 
@@ -198,11 +208,11 @@ class ColorPickerSection(QtWidgets.QWidget):
 
     def _on_hue_changed(self, hue_f):
         self._sv.set_hue(hue_f)
-        self._color = QtGui.QColor.fromHsvF(hue_f, self._sv._sat, self._sv._val)
+        self._color = QtGui.QColor.fromHsvF(hue_f, self._sv.sat(), self._sv.val())
         self.color_changed.emit(self._color)
 
     def _on_sv_changed(self, sat, val):
-        self._color = QtGui.QColor.fromHsvF(self._hue_bar._hue, sat, val)
+        self._color = QtGui.QColor.fromHsvF(self._hue_bar.hue(), sat, val)
         self.color_changed.emit(self._color)
 
     def _on_preset_clicked(self, color):

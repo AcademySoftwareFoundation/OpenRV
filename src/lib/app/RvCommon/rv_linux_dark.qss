@@ -435,6 +435,15 @@ QDockWidget::float-button {
     height: 16px;
     margin: 2px;
 }
+
+QDockWidget::float-button:hover {
+    background-color: rgb(7, 75, 120);
+    border: 1px solid rgb(6, 150, 215);
+}
+
+QDockWidget::float-button:pressed {
+    background-color: rgb(6, 150, 215);
+}
     
 QDockWidget::title {
     background-color: rgb(67, 67, 67);
@@ -1181,6 +1190,7 @@ QDockWidget#annotationBetaDock::title {
 QDockWidget#annotationBetaDock::close-button,
 QDockWidget#annotationBetaDock::float-button {
     background-color: rgb(23, 23, 23);
+    border: none;
 }
 
 QWidget#annotationBeta QWidget#toolStrip {
@@ -1369,4 +1379,9 @@ QFrame#annotationBetaColorPopup {
 
 QFrame#annotationBetaColorPopup QWidget#swatchRow {
     background: transparent;
+}
+
+QFrame#annotationBetaColorPopup QAbstractButton#presetSwatch {
+    background: transparent;
+    color: rgb(77, 77, 77);
 }
