@@ -2336,7 +2336,10 @@ namespace Rv
 
         void* ignored = callPythonFunction("setup");
         disposeOfPythonObject(ignored);
+    }
 
+    void RvSession::evalCommandLineScripts()
+    {
         //
         //  Mu init / command-line eval
         //
