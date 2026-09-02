@@ -266,6 +266,13 @@ namespace Rv
         m_viewWidget = m_glView;
 #endif
 
+        // Create the GL context before initializeSession() does GL work. Not done in GLView's
+        // ctor because the resize can reach RvDocument, which needs m_glView assigned first.
+        if (m_glView)
+        {
+            m_glView->ensureViewportContext();
+        }
+
         // DiagnosticsView has its own context and only needs a surface format.
         const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
         m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
@@ -934,6 +941,7 @@ namespace Rv
 
         m_glView = newGLView;
         m_viewWidget = newGLView;
+        m_glView->ensureViewportContext();
         m_viewWidget->setFocus(Qt::OtherFocusReason);
         newGLView->show();
 
@@ -1107,6 +1115,7 @@ namespace Rv
         m_stackedLayout->removeWidget(oldGLView);
         m_glView = newGLView;
         m_viewWidget = m_glView;
+        m_glView->ensureViewportContext();
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
 

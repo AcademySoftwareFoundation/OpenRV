@@ -23,6 +23,7 @@
 #include <QtGui/QResizeEvent>
 #include <QtGui/QCursor>
 #include <QtCore/QEvent>
+#include <QtCore/QCoreApplication>
 #include <QOpenGLContext>
 #include <QTimer>
 #include <iostream>
@@ -346,6 +347,21 @@ namespace Rv
 
         if (m_doc && m_doc->session())
             m_doc->session()->askForRedraw();
+    }
+
+    void GLView::ensureViewportContext()
+    {
+        if (!m_glWindow || m_glWindow->isValid())
+        {
+            return;
+        }
+
+        // Qt only creates the context from the first resize or paint event, which for an
+        // embedded window arrives after RV's startup GL setup. Send the resize ourselves.
+        m_glWindow->create();
+
+        QResizeEvent event(m_glWindow->size(), QSize());
+        QCoreApplication::sendEvent(m_glWindow, &event);
     }
 
     QOpenGLContext* GLView::context() const { return m_glWindow ? m_glWindow->context() : nullptr; }
