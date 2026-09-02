@@ -382,7 +382,7 @@ namespace Rv
             return true;
 
         QStringList deps = package.
-                               requires
+                               requires_
             .split(" ", Qt::SkipEmptyParts);
         QStringList missing;
         QStringList notinstalled;
@@ -759,9 +759,9 @@ namespace Rv
             entry.shortcut = mode.shortcut;
             entry.event = mode.event;
             entry.
-                requires
+                requires_
             = mode.
-                  requires;
+                  requires_;
             entry.rvversion = package.rvversion;
             entry.openrvversion = package.openrvversion;
             entry.optional = package.optional;
@@ -1256,7 +1256,7 @@ namespace Rv
                                         m.icon = v;
                                     else if (pname == "requires")
                                     m.
-                                        requires
+                                        requires_
                                     = v.split(" ");
                                 }
 
@@ -1310,7 +1310,7 @@ namespace Rv
                                     package.excludes = v;
                                 else if (pname == "requires")
                                 package.
-                                    requires
+                                    requires_
                                 = v;
                                 else if (pname == "rv") package.rvversion = v;
                                 else if (pname == "openrv") package.openrvversion = v;
@@ -1413,7 +1413,7 @@ namespace Rv
                     int requiresIndex = index;
                     for (int i = requiresIndex; i < parts.size(); i++)
                     entry.
-                        requires
+                        requires_
                         .push_back(parts[i]);
 
                     list.push_back(entry);
@@ -1460,11 +1460,11 @@ namespace Rv
                     line += QString(",") + e.openrvversion;
                 }
 
-                if (!e.requires.empty())
+                if (!e.requires_.empty())
                 {
-                    for (int q = 0; q < e.requires.size(); q++)
+                    for (int q = 0; q < e.requires_.size(); q++)
                     {
-                        line += QString(",%1").arg(e.requires[q]);
+                        line += QString(",%1").arg(e.requires_[q]);
                     }
                 }
 
@@ -1557,7 +1557,7 @@ namespace Rv
         {
             Package& package = m_packages[i];
             QStringList deps = package.
-                                   requires
+                                   requires_
                 .split(" ", Qt::SkipEmptyParts);
 
             for (size_t q = 0; q < deps.size(); q++)

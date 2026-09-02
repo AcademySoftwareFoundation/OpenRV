@@ -451,7 +451,7 @@ int utf8Main(int argc, char* argv[])
             cout << "URL: " << p.url << endl;
             cout << "Requires: "
                  << p.
-                        requires
+                        requires_
                  <<
                     endl;
             cout << "RV-Version: " << p.rvversion << endl;
