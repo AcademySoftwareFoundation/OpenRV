@@ -180,9 +180,10 @@ def prepare() -> None:
 
     # PySide6/shiboken6's generated bindings trigger thousands of
     # -Wcast-function-type-mismatch warnings from the intentional PyMethodDef
-    # function-pointer cast pattern used throughout CPython's C API. Upstream only
-    # silences the analogous -Wcast-function-type for GNU; add the Clang warning to
-    # gcc_warnings_options (after -Wall -Wextra) so it isn't re-enabled by them.
+    # function-pointer cast pattern used throughout CPython's C API. This warning
+    # is Clang-specific (GCC doesn't recognize the flag and fails with an
+    # unrecognized command-line option error), so only silence it when building
+    # with Clang, mirroring upstream's existing GNU-only -Wno-cast-function-type.
     shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake")
     old_shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake.old")
     if os.path.exists(old_shiboken_helpers_path):
@@ -190,15 +191,22 @@ def prepare() -> None:
 
     os.rename(shiboken_helpers_path, old_shiboken_helpers_path)
     with open(old_shiboken_helpers_path) as old_shiboken_helpers:
-        with open(shiboken_helpers_path, "w") as shiboken_helpers:
-            for line in old_shiboken_helpers:
-                new_line = line.replace(
-                    'set (gcc_warnings_options "-Wall -Wextra -Wno-strict-aliasing")',
-                    'set (gcc_warnings_options "-Wall -Wextra -Wno-strict-aliasing '
-                    '-Wno-error=cast-function-type-mismatch -Wno-cast-function-type-mismatch")',
-                )
+        old_content = old_shiboken_helpers.read()
 
-                shiboken_helpers.write(new_line)
+    new_content = old_content.replace(
+        'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} -Wno-cast-function-type")\n'
+        "    endif()",
+        'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} -Wno-cast-function-type")\n'
+        '    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} '
+        '-Wno-error=cast-function-type-mismatch -Wno-cast-function-type-mismatch")\n'
+        "    endif()",
+    )
+
+    with open(shiboken_helpers_path, "w") as shiboken_helpers:
+        shiboken_helpers.write(new_content)
 
 
 def remove_broken_shortcuts(python_home: str) -> None:
