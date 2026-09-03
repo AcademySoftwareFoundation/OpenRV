@@ -505,6 +505,10 @@ class SourceSetupMode(rvtypes.MinorMode):
         if commands.nodeType(event.contents()) == "RVDisplayGroup":
             self._haveNewDisplayGroups = True
 
+    def afterClearSession(self, event):
+        event.reject()
+        self._haveNewDisplayGroups = True
+
     def __init__(self):
         self._readingSession = False
         self._haveNewDisplayGroups = True
@@ -523,6 +527,7 @@ class SourceSetupMode(rvtypes.MinorMode):
                     "Color and Geometry Management",
                 ),
                 ("graph-new-node", self.checkForDisplayGroup, ""),
+                ("after-clear-session", self.afterClearSession, ""),
             ],
             None,
             "source_setup",
