@@ -54,10 +54,10 @@ SET(RV_DEPS_DOCTEST_DOWNLOAD_HASH
 
 # expat https://github.com/libexpat/libexpat
 SET(RV_DEPS_EXPAT_VERSION
-    "2.6.3"
+    "2.8.1"
 )
 SET(RV_DEPS_EXPAT_DOWNLOAD_HASH
-    "985086e206a01e652ca460eb069e4780"
+    "5be251ee1d93f9e60a3cdcf0f740efa9"
 )
 
 # ffmpeg https://github.com/FFmpeg/FFmpeg
