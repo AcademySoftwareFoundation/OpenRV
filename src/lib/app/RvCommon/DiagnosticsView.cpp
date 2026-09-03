@@ -36,6 +36,7 @@ namespace Rv
 
         if (_initCount == 1)
         {
+            Rv::ImGuiPythonBridge::init();
             ImGui::CreateContext();
             ImPlot::CreateContext();
             ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -52,7 +53,7 @@ namespace Rv
 
             if (_initCount == 0)
             {
-                Rv::ImGuiPythonBridge::clearCallbacks();
+                Rv::ImGuiPythonBridge::shutdown();
                 ImGui_ImplOpenGL2_Shutdown();
                 ImGui_ImplQt_Shutdown();
                 ImPlot::DestroyContext();
