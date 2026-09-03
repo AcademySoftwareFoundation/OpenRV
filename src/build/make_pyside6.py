@@ -178,6 +178,28 @@ def prepare() -> None:
 
                 cmakelist.write(new_line)
 
+    # PySide6/shiboken6's generated bindings trigger thousands of
+    # -Wcast-function-type-mismatch warnings from the intentional PyMethodDef
+    # function-pointer cast pattern used throughout CPython's C API. Upstream only
+    # silences the analogous -Wcast-function-type for GNU; add the Clang warning to
+    # gcc_warnings_options (after -Wall -Wextra) so it isn't re-enabled by them.
+    shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake")
+    old_shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake.old")
+    if os.path.exists(old_shiboken_helpers_path):
+        os.remove(old_shiboken_helpers_path)
+
+    os.rename(shiboken_helpers_path, old_shiboken_helpers_path)
+    with open(old_shiboken_helpers_path) as old_shiboken_helpers:
+        with open(shiboken_helpers_path, "w") as shiboken_helpers:
+            for line in old_shiboken_helpers:
+                new_line = line.replace(
+                    'set (gcc_warnings_options "-Wall -Wextra -Wno-strict-aliasing")',
+                    'set (gcc_warnings_options "-Wall -Wextra -Wno-strict-aliasing '
+                    '-Wno-error=cast-function-type-mismatch -Wno-cast-function-type-mismatch")',
+                )
+
+                shiboken_helpers.write(new_line)
+
 
 def remove_broken_shortcuts(python_home: str) -> None:
     """
