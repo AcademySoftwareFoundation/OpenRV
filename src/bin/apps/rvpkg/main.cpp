@@ -449,11 +449,7 @@ int utf8Main(int argc, char* argv[])
             cout << "Organization: " << p.organization << endl;
             cout << "Contact: " << p.contact << endl;
             cout << "URL: " << p.url << endl;
-            cout << "Requires: "
-                 << p.
-                        requires_
-                 <<
-                    endl;
+            cout << "Requires: " << p.requires_ << endl;
             cout << "RV-Version: " << p.rvversion << endl;
             cout << "OpenRV-Version: " << p.openrvversion << endl;
             cout << "Hidden: " << (p.hidden ? "YES" : "NO") << endl;

@@ -2971,12 +2971,7 @@ namespace Rv
             str << "<tr><td align=right> <b>Version</b> </td><td> " << p.version.toUtf8().data() << " </td></tr>";
 
         if (p.requires_ != "")
-        str << "<tr><td align=right> <b>Requires</b> </td><td> "
-            << p.
-                   requires_
-            .toUtf8()
-            .data()
-            << " </td></tr>";
+            str << "<tr><td align=right> <b>Requires</b> </td><td> " << p.requires_.toUtf8().data() << " </td></tr>";
 
         if (p.rvversion != "")
             str << "<tr><td align=right> <b>RV Version</b> </td><td> " << p.rvversion.toUtf8().data() << " </td></tr>";
@@ -3006,14 +3001,7 @@ namespace Rv
 
                 for (int i = 0; i < p.modes[q].requires_.size(); i++)
                 {
-                    str << "<li>"
-                        << p.modes[q]
-                               .
-                               requires_[
-                                       i]
-                               .toUtf8()
-                               .data()
-                        << "</li>\n";
+                    str << "<li>" << p.modes[q].requires_[i].toUtf8().data() << "</li>\n";
                 }
 
                 str << "</ul>\n";
