@@ -48,31 +48,6 @@ _SIZE_MIN = 0.001
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
 _FONT_SIZE_WCS_BASE = {"small": 24.0 / 1080.0, "medium": 48.0 / 1080.0, "large": 72.0 / 1080.0}
 
-# US keyboard shift-symbol mapping used for text input
-_SHIFT_MAP = {
-    "1": "!",
-    "2": "@",
-    "3": "#",
-    "4": "$",
-    "5": "%",
-    "6": "^",
-    "7": "&",
-    "8": "*",
-    "9": "(",
-    "0": ")",
-    "-": "_",
-    "=": "+",
-    "[": "{",
-    "]": "}",
-    "\\": "|",
-    ";": ":",
-    "'": '"',
-    ",": "<",
-    ".": ">",
-    "/": "?",
-    "`": "~",
-}
-
 
 class AnnotateDrawEngine:
     def __init__(self, mode):
@@ -147,6 +122,8 @@ class AnnotateDrawEngine:
             ("key-down--backspace", self.on_text_backspace, "Delete char"),
             ("key-down--delete", self.on_text_backspace, "Delete char"),
             ("key-down--space", self.on_text_space, "Insert space"),
+            ("key-down--shift--enter", self.on_text_new_line, "Insert a new line"),
+            ("key-down--shift--keypad-enter", self.on_text_new_line, "Insert a new line"),
             ("key-down--return", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
             ("key-down--enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
             ("key-down--keypad-enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
@@ -571,7 +548,7 @@ class AnnotateDrawEngine:
 
     def _commit_text(self):
         # Nothing typed — clean up the placeholder node rather than leaving an empty annotation
-        if not self._text_buffer:
+        if not self._text_buffer.strip():
             self._cancel_text()
             return
         self._update_text_display(cursor=False)
@@ -1010,15 +987,10 @@ class AnnotateDrawEngine:
             event.reject()
             return
         parts = event.name().split("--")
-        ch = parts[-1]
-        if len(ch) != 1:
+        char = parts[-1]
+        if len(char) != 1:
             event.reject()
             return
-        has_shift = "shift" in parts[:-1]
-        if has_shift:
-            char = ch.upper() if ch.isalpha() else _SHIFT_MAP.get(ch, ch)
-        else:
-            char = ch
         self._text_buffer += char
         self._ensure_text_node()
         self._update_text_display(cursor=True)
@@ -1037,6 +1009,15 @@ class AnnotateDrawEngine:
             return
         if self._text_buffer:
             self._text_buffer = self._text_buffer[:-1]
+        self._update_text_display(cursor=True)
+
+    def on_text_new_line(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+
+        self._text_buffer += "\n"
+        self._ensure_text_node()
         self._update_text_display(cursor=True)
 
     def on_text_commit(self, event, reject):
