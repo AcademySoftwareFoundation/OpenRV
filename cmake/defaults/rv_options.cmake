@@ -28,24 +28,6 @@ IF(NOT EXISTS (${RV_DEPS_DOWNLOAD_DIR}))
   FILE(MAKE_DIRECTORY ${RV_DEPS_DOWNLOAD_DIR})
 ENDIF()
 
-SET(RV_CPP_STANDARD
-    "20"
-    CACHE STRING "RV's general C++ coding standard"
-)
-SET_PROPERTY(
-  CACHE RV_CPP_STANDARD
-  PROPERTY STRINGS 14 17 20
-)
-
-SET(RV_C_STANDARD
-    "17"
-    CACHE STRING "RV's general C coding standard"
-)
-SET_PROPERTY(
-  CACHE RV_C_STANDARD
-  PROPERTY STRINGS C99 11 17
-)
-
 #
 # VFX Platform option
 #
@@ -79,6 +61,43 @@ SET(RV_VFX_PLATFORM
 SET_PROPERTY(
   CACHE RV_VFX_PLATFORM
   PROPERTY STRINGS ${_RV_VFX_PLATFORM}
+)
+
+#
+# C/C++ standard options
+#
+# The default C++ standard follows the VFX Reference Platform: CY2026 and later require C++20, earlier years stay on C++17. This can still be overridden
+# explicitly with -DRV_CPP_STANDARD=<14|17|20>.
+#
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2026")
+  SET(_RV_CPP_STANDARD
+      "20"
+  )
+ELSE()
+  SET(_RV_CPP_STANDARD
+      "17"
+  )
+ENDIF()
+
+SET(RV_CPP_STANDARD
+    "${_RV_CPP_STANDARD}"
+    CACHE STRING "RV's general C++ coding standard"
+)
+SET_PROPERTY(
+  CACHE RV_CPP_STANDARD
+  PROPERTY STRINGS 14 17 20
+)
+
+# The C standard stays at C17 on every VFX platform. It is deliberately not tied to RV_CPP_STANDARD: there is no C20, and CMake silently ignores an invalid
+# C_STANDARD value (emitting no -std flag at all, which would un-pin the C standard). C17 is the newest C standard with universal MSVC/GCC/Clang support, and
+# the VFX Reference Platform pins only the C++ standard.
+SET(RV_C_STANDARD
+    "17"
+    CACHE STRING "RV's general C coding standard"
+)
+SET_PROPERTY(
+  CACHE RV_C_STANDARD
+  PROPERTY STRINGS C99 11 17
 )
 
 #
