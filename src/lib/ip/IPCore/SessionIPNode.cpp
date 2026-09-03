@@ -29,7 +29,7 @@ namespace IPCore
         declareProperty<IntProperty>("paintEffects.ghostAfter", 5);
         setMaxInputs(0);
 
-        ImageRenderer::queryGLIntoContainer(this);
+        ImageRenderer::declareGLProperties(this);
     }
 
     SessionIPNode::~SessionIPNode()
