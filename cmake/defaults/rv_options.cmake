@@ -66,8 +66,8 @@ SET_PROPERTY(
 #
 # C/C++ standard options
 #
-# The default C++ standard follows the VFX Reference Platform: CY2026 and later require C++20, earlier years stay on C++17. This can still be overridden
-# explicitly with -DRV_CPP_STANDARD=<14|17|20>.
+# The C++ standard follows the VFX Reference Platform: CY2026 and later require C++20, earlier years stay on C++17. It is derived from RV_VFX_PLATFORM rather
+# than set by the user, so that the standard RV is built with always matches the one its dependencies are built with.
 #
 IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2026")
   SET(_RV_CPP_STANDARD
@@ -79,13 +79,15 @@ ELSE()
   )
 ENDIF()
 
+# Re-derived on every configure (FORCE), like RV_VFX_PLATFORM above. Without it an existing build tree reconfigured to a newer VFX platform would keep the
+# standard cached by its first configure and silently build CY2026 with C++17.
 SET(RV_CPP_STANDARD
     "${_RV_CPP_STANDARD}"
-    CACHE STRING "RV's general C++ coding standard"
+    CACHE STRING "RV's general C++ coding standard" FORCE
 )
 SET_PROPERTY(
   CACHE RV_CPP_STANDARD
-  PROPERTY STRINGS 14 17 20
+  PROPERTY STRINGS ${_RV_CPP_STANDARD}
 )
 
 # The C standard stays at C17 on every VFX platform. It is deliberately not tied to RV_CPP_STANDARD: there is no C20, and CMake silently ignores an invalid
