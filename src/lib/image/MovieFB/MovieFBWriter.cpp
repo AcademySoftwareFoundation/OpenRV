@@ -22,6 +22,9 @@
 #include <stl_ext/thread_group.h>
 #include <limits>
 #include <math.h>
+#include <chrono>
+#include <mutex>
+#include <condition_variable>
 
 namespace TwkMovie
 {
@@ -92,15 +95,12 @@ namespace TwkMovie
     {
     public:
         WriteTaskManager(int size);
-        ~WriteTaskManager();
 
         const WriteTask& taskByIndex(int index);
         void finishTask(int index);
         int nextReadyTaskIndex();
         void addTask(WriteTask& t);
         void waitAll();
-        void lock();
-        void unlock();
         void threadMain(int threadNumber);
         void dispatchThreads();
 
@@ -124,8 +124,8 @@ namespace TwkMovie
     private:
         vector<WriteTask> tasks;
         stl_ext::thread_group threadGroup;
-        pthread_mutex_t managerLock;
-        pthread_cond_t waitCond;
+        std::mutex managerLock;
+        std::condition_variable waitCond;
         vector<ThreadData> threadData;
 
         // Indicates that a task is currently being added when non 0
@@ -141,26 +141,13 @@ namespace TwkMovie
 
         for (int i = 0; i < size; ++i)
             threadData.push_back(ThreadData(this, i));
-
-        pthread_mutex_init(&managerLock, 0);
-        pthread_cond_init(&waitCond, 0);
     }
-
-    WriteTaskManager::~WriteTaskManager()
-    {
-        pthread_mutex_destroy(&managerLock);
-        pthread_cond_destroy(&waitCond);
-    }
-
-    void WriteTaskManager::lock() { threadGroup.lock(managerLock); }
-
-    void WriteTaskManager::unlock() { threadGroup.unlock(managerLock); }
 
     int WriteTaskManager::nextReadyTaskIndex()
     {
         int ret = NO_MORE_TASKS;
 
-        lock();
+        std::lock_guard<std::mutex> guard(managerLock);
         for (int i = 0; i < tasks.size(); ++i)
         {
             if (tasks[i].state == WriteTask::Ready)
@@ -174,7 +161,6 @@ namespace TwkMovie
         {
             ret = A_TASK_IS_CURRENTLY_BEING_ADDED;
         }
-        unlock();
 
         DB("nextReadyTaskIndex " << ret);
 
@@ -185,20 +171,19 @@ namespace TwkMovie
     {
         DB("finishTask " << index);
 
-        lock();
+        {
+            std::lock_guard<std::mutex> guard(managerLock);
 
-        //
-        //  Mark task complete
-        //
-        tasks[index].state = WriteTask::Finished;
+            //
+            //  Mark task complete
+            //
+            tasks[index].state = WriteTask::Finished;
 
-        //
-        //  Signal main thread that there's room for more tasks
-        //
-        stl_ext::thread_group::signal(waitCond);
-
-        unlock();
-
+            //
+            //  Signal main thread that there's room for more tasks
+            //
+        }
+        waitCond.notify_one();
         DB("finishTask " << index << " complete");
     }
 
@@ -258,13 +243,14 @@ namespace TwkMovie
     {
         bool addedTask = false;
 
-        lock();
-        currentlyAddingATask++;
-        unlock();
+        {
+            std::lock_guard<std::mutex> guard(managerLock);
+            currentlyAddingATask++;
+        }
 
         while (!addedTask)
         {
-            lock();
+            std::unique_lock<std::mutex> lock(managerLock);
 
             for (int i = 0; i < tasks.size(); ++i)
             {
@@ -284,8 +270,8 @@ namespace TwkMovie
                 //  Wait for worker thread to signal that there's room for more
                 //  tasks
                 //
-                static const size_t waitCondTimeOutInSecs = 5;
-                if (!stl_ext::thread_group::wait_cond_time(waitCond, managerLock, waitCondTimeOutInSecs * 1e6))
+                auto timeout = std::chrono::seconds(5);
+                if (waitCond.wait_for(lock, timeout) == std::cv_status::timeout)
                 {
                     DB("addTask waiting-timed out");
 
@@ -302,15 +288,14 @@ namespace TwkMovie
                     dispatchThreads();
                 }
             }
-
-            unlock();
         }
 
         dispatchThreads();
 
-        lock();
-        currentlyAddingATask--;
-        unlock();
+        {
+            std::lock_guard<std::mutex> guard(managerLock);
+            currentlyAddingATask--;
+        }
     }
 
     void WriteTaskManager::dispatchThreads()

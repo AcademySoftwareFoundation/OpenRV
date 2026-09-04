@@ -229,7 +229,6 @@ namespace IPCore
         , m_audioThreadRunning(false)
     {
         snd_lib_error_set_handler(alsaErrorHandler);
-        pthread_mutex_init(&m_runningLock, 0);
 
         if (m_parameters.rate == 0)
             m_parameters.rate = TWEAK_AUDIO_DEFAULT_SAMPLE_RATE;
@@ -263,7 +262,6 @@ namespace IPCore
     {
         AudioRenderer::stop();
         shutdown();
-        pthread_mutex_destroy(&m_runningLock);
     }
 
     void ALSAAudioRenderer::createDeviceList()
@@ -629,7 +627,7 @@ namespace IPCore
 
             snd_pcm_hw_params_set_periods(pcm, params, periods, 0);
             snd_pcm_hw_params_set_buffer_size(pcm, params, (period_size * periods) >> 2);
-            
+
             if (snd_pcm_hw_params(pcm, params) >= 0 && rrate == rate)
             {
                 rates.push_back((unsigned int)rate);
@@ -882,10 +880,11 @@ namespace IPCore
         if (!m_pcm)
             return;
 
-        m_threadGroup.lock(m_runningLock);
-        m_audioThreadRunning = true;
-        m_audioThread = pthread_self();
-        m_threadGroup.unlock(m_runningLock);
+        {
+            std::lock_guard<std::mutex> guard(m_runningLock);
+            m_audioThreadRunning = true;
+            m_audioThread = pthread_self();
+        }
 
         //
         //  Get the current state. (yeah, I know it was just set above)
@@ -1123,9 +1122,10 @@ namespace IPCore
         if (pcmState == SND_PCM_STATE_RUNNING)
             snd_pcm_drop(m_pcm);
 
-        m_threadGroup.lock(m_runningLock);
-        m_audioThreadRunning = false;
-        m_threadGroup.unlock(m_runningLock);
+        {
+            std::lock_guard<std::mutex> guard(m_runningLock);
+            m_audioThreadRunning = false;
+        }
 
         if (debug)
             cout << "DEBUG: audio thread exiting" << endl;
@@ -1180,12 +1180,14 @@ namespace IPCore
 
         const bool holdOpen = m_parameters.holdOpen;
         m_parameters.holdOpen = false;
+        bool isrunning = false;
 
         AudioRenderer::stop();
 
-        m_threadGroup.lock(m_runningLock);
-        bool isrunning = m_audioThreadRunning;
-        m_threadGroup.unlock(m_runningLock);
+        {
+            std::lock_guard<std::mutex> guard(m_runningLock);
+            isrunning = m_audioThreadRunning;
+        }
 
         if (isrunning)
             m_threadGroup.control_wait(true, 1.0);
@@ -1199,9 +1201,10 @@ namespace IPCore
             //  the audio device until after m_pcm has been zeroed.
             //
             snd_pcm_t* tmp = m_pcm;
-            m_threadGroup.lock(m_runningLock);
-            m_pcm = 0;
-            m_threadGroup.unlock(m_runningLock);
+            {
+                std::lock_guard<std::mutex> guard(m_runningLock);
+                m_pcm = 0;
+            }
             snd_pcm_close(tmp);
         }
 
