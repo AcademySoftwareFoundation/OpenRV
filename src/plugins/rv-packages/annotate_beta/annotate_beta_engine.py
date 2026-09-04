@@ -336,7 +336,7 @@ class AnnotateDrawEngine:
 
         if getattr(self._mode, "_auto_mark", False):
             try:
-                commands.markFrame(frame, True)
+                commands.markFrame(commands.frame(), True)
             except Exception:
                 pass
 
