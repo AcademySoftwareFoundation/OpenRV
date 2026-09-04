@@ -236,7 +236,7 @@ class AnnotateDrawEngine:
         return max(_SIZE_MIN, self._mode._size * _SIZE_SCALE * scale)
 
     def _colors(self):
-        c = self._mode._colour
+        c = self._mode._color
         alpha = self._mode._opacity / 100.0
         border = [c.redF(), c.greenF(), c.blueF(), alpha]
         tool = self._mode._tool
@@ -472,7 +472,7 @@ class AnnotateDrawEngine:
             n = self._unique_name(paint_node, "text", frame)
             shape_uuid = str(uuid.uuid4())
 
-            c = self._mode._colour
+            c = self._mode._color
             color = [c.redF(), c.greenF(), c.blueF(), 1.0]
 
             font_size = _FONT_SIZE_WCS_BASE.get(self._mode._font_size, 48.0 / 1080.0) * self._screen_scale()
@@ -619,7 +619,7 @@ class AnnotateDrawEngine:
             n = self._unique_name(paint_node, "pen", frame)
             stroke_uuid = str(uuid.uuid4())
 
-            c = self._mode._colour
+            c = self._mode._color
             alpha = self._mode._opacity / 100.0
             blend_mode = getattr(self._mode, "_color_modifier", "normal")
 
@@ -1287,9 +1287,9 @@ class AnnotateDrawEngine:
             pass
 
     def _notify_draw_started(self):
-        """Tell the mode to close any open popups (e.g. colour picker)."""
+        """Tell the mode to close any open popups (e.g. color picker)."""
         try:
-            self._mode._hide_colour_picker()
+            self._mode._hide_color_picker()
         except Exception:
             pass
 

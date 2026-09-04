@@ -1,12 +1,9 @@
-# Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
+# Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 from rv import commands, extra_commands, rvtypes, qtutils
 
-try:
-    from PySide2 import QtCore, QtWidgets, QtGui
-except ImportError:
-    from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets, QtGui
 
 from annotate_beta_widget import (
     AnnotateToolbarDockWidget,
@@ -20,7 +17,7 @@ from annotate_beta_widget import (
 )
 from annotate_beta_engine import AnnotateDrawEngine, TABLE_NAME, _DRAWING_TOOLS
 
-_DEFAULT_COLOUR_HEX = "#ffdc00"
+_DEFAULT_COLOR_HEX = "#ffdc00"
 _DEFAULT_SIZE = 32
 _DEFAULT_OPACITY = 50
 
@@ -37,7 +34,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         # Current tool state — drawing engine reads these
         self._tool = TOOL_PEN
-        self._colour = QtGui.QColor(_DEFAULT_COLOUR_HEX)
+        self._color = QtGui.QColor(_DEFAULT_COLOR_HEX)
         self._size = _DEFAULT_SIZE
         self._opacity = _DEFAULT_OPACITY
         self._filled = False
@@ -65,10 +62,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._auto_save_settings = True  # "Always Save Settings as Defaults On Exit"
 
         # Per-tool state memory — keyed by tool identifier.
-        self._tool_colours = {}
+        self._tool_colors = {}
         self._tool_sizes = {}
         self._tool_opacities = {}
         self._tool_color_modifiers = {}
+        self._tool_filled = {}
 
         self._engine = AnnotateDrawEngine(self)
 
@@ -138,12 +136,13 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         """Read per-tool state from RV settings and apply to the in-memory dicts and widget."""
         g = _SETTINGS_GROUP
         for tool in _ALL_TOOLS:
-            hex_col = self._read(g, f"{tool}_colour", _DEFAULT_COLOUR_HEX)
-            colour = QtGui.QColor(hex_col)
-            self._tool_colours[tool] = colour if colour.isValid() else QtGui.QColor(_DEFAULT_COLOUR_HEX)
+            hex_col = self._read(g, f"{tool}_color", _DEFAULT_COLOR_HEX)
+            color = QtGui.QColor(hex_col)
+            self._tool_colors[tool] = color if color.isValid() else QtGui.QColor(_DEFAULT_COLOR_HEX)
             self._tool_sizes[tool] = int(self._read(g, f"{tool}_size", _DEFAULT_SIZE))
             self._tool_opacities[tool] = int(self._read(g, f"{tool}_opacity", _DEFAULT_OPACITY))
             self._tool_color_modifiers[tool] = self._read(g, f"{tool}_color_modifier", "normal")
+            self._tool_filled[tool] = bool(self._read(g, f"{tool}_filled", False))
 
         saved_tool = self._read(g, "active_tool", TOOL_PEN)
         if saved_tool in _ALL_TOOLS:
@@ -167,17 +166,19 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._sync_auto_start = self._read_sync_auto_start()
 
         # Apply the saved state for the active tool to the live variables and widget.
-        self._colour = QtGui.QColor(self._tool_colours.get(self._tool, QtGui.QColor(_DEFAULT_COLOUR_HEX)))
+        self._color = QtGui.QColor(self._tool_colors.get(self._tool, QtGui.QColor(_DEFAULT_COLOR_HEX)))
         self._size = self._tool_sizes.get(self._tool, _DEFAULT_SIZE)
         self._opacity = self._tool_opacities.get(self._tool, _DEFAULT_OPACITY)
         self._color_modifier = self._tool_color_modifiers.get(self._tool, "normal")
+        self._filled = self._tool_filled.get(self._tool, False)
 
         w = self._dock.toolbar_widget
         w.strip.set_active_tool(self._tool)
         w.panel.set_page_for_tool(self._tool)
-        w.set_colour(self._colour)
+        w.set_color(self._color)
         w.set_size(self._size)
         w.set_opacity(self._opacity)
+        w.set_filled(self._filled)
         w.panel.set_color_modifier(self._color_modifier)
         w.panel.set_eraser_brush(self._eraser_brush)
         w.panel.set_font_family(self._font_family)
@@ -187,14 +188,15 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         w.panel.set_underline(self._font_underline)
 
     def _save_tool_state(self, tool):
-        """Persist colour/size/opacity for one tool."""
+        """Persist color/size/opacity for one tool."""
         g = _SETTINGS_GROUP
-        colour = self._tool_colours.get(tool, QtGui.QColor(_DEFAULT_COLOUR_HEX))
+        color = self._tool_colors.get(tool, QtGui.QColor(_DEFAULT_COLOR_HEX))
         try:
-            commands.writeSettings(g, f"{tool}_colour", colour.name())
+            commands.writeSettings(g, f"{tool}_color", color.name())
             commands.writeSettings(g, f"{tool}_size", self._tool_sizes.get(tool, _DEFAULT_SIZE))
             commands.writeSettings(g, f"{tool}_opacity", self._tool_opacities.get(tool, _DEFAULT_OPACITY))
             commands.writeSettings(g, f"{tool}_color_modifier", self._tool_color_modifiers.get(tool, "normal"))
+            commands.writeSettings(g, f"{tool}_filled", self._tool_filled.get(tool, False))
         except Exception as e:
             print(f"[annotate_beta] settings write error: {e}")
 
@@ -247,10 +249,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _create_dock(self):
         sw = qtutils.sessionWindow()
         self._dock = AnnotateToolbarDockWidget(sw)
-        # Hide the native title bar while docked (we have our own Draw header).
-        # Restore it when floating so the user can drag the window.
-        self._dock.setTitleBarWidget(QtWidgets.QWidget())
-        self._dock.topLevelChanged.connect(self._on_dock_top_level_changed)
+        self._dock.close_requested.connect(self._on_close_requested)
         sw.addDockWidget(QtCore.Qt.RightDockWidgetArea, self._dock)
         self._dock.hide()  # Start hidden; user opens via Annotation menu
         sw.resizeDocks([self._dock], [115], QtCore.Qt.Horizontal)
@@ -264,7 +263,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         w = self._dock.toolbar_widget
         w.tool_changed.connect(self._on_tool_changed)
-        w.colour_changed.connect(self._on_colour_changed)
+        w.color_changed.connect(self._on_color_changed)
         w.size_changed.connect(self._on_size_changed)
         w.opacity_changed.connect(self._on_opacity_changed)
         w.filled_changed.connect(self._on_filled_changed)
@@ -277,13 +276,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         w.redo_requested.connect(self._on_redo)
         w.clear_requested.connect(self._on_clear)
         w.clear_all_requested.connect(self._on_clear_all)
-        w.close_requested.connect(self._on_close_requested)
-        w.dock_requested.connect(self._on_dock_requested)
         w.color_modifier_changed.connect(self._on_color_modifier_changed)
         w.eraser_brush_changed.connect(self._on_eraser_brush_changed)
 
         # Load persisted settings after all signals are wired so the widget
-        # updates (set_colour/set_size/set_opacity) don't emit change signals
+        # updates (set_color/set_size/set_opacity) don't emit change signals
         # back into the mode before it's fully ready.
         self._load_settings()
 
@@ -297,27 +294,28 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._engine.commit_text_if_active()
 
         # Save current state for the outgoing tool.
-        self._tool_colours[self._tool] = QtGui.QColor(self._colour)
+        self._tool_colors[self._tool] = QtGui.QColor(self._color)
         self._tool_sizes[self._tool] = self._size
         self._tool_opacities[self._tool] = self._opacity
         self._tool_color_modifiers[self._tool] = self._color_modifier
+        self._tool_filled[self._tool] = self._filled
         self._save_tool_state(self._tool)
 
         outgoing_tool = self._tool
         self._tool = tool
         commands.writeSettings(_SETTINGS_GROUP, "active_tool", tool)
 
-        # If we just came from the eyedropper, propagate the sampled colour to
-        # the incoming tool instead of restoring its previous colour.
+        # If we just came from the eyedropper, propagate the sampled color to
+        # the incoming tool instead of restoring its previous color.
         if outgoing_tool == TOOL_EYEDROPPER:
-            self._tool_colours[tool] = QtGui.QColor(self._colour)
+            self._tool_colors[tool] = QtGui.QColor(self._color)
             self._save_tool_state(tool)
         else:
-            # Restore colour for the incoming tool.
-            restored_colour = self._tool_colours.get(tool, QtGui.QColor(self._colour))
-            if restored_colour != self._colour:
-                self._colour = QtGui.QColor(restored_colour)
-                self._dock.toolbar_widget.set_colour(restored_colour)
+            # Restore color for the incoming tool.
+            restored_color = self._tool_colors.get(tool, QtGui.QColor(self._color))
+            if restored_color != self._color:
+                self._color = QtGui.QColor(restored_color)
+                self._dock.toolbar_widget.set_color(restored_color)
 
         # Restore size/opacity for the incoming tool.
         restored_size = self._tool_sizes.get(tool, self._size)
@@ -333,6 +331,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._color_modifier = restored_blend
             self._dock.toolbar_widget.panel.set_color_modifier(restored_blend)
 
+        restored_filled = self._tool_filled.get(tool, False)
+        if restored_filled != self._filled:
+            self._filled = restored_filled
+            self._dock.toolbar_widget.set_filled(restored_filled)
+
         if tool in _DRAWING_TOOLS:
             self._push_shape_table()
         else:
@@ -345,14 +348,14 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             sw.unsetCursor()
 
-    def _on_colour_changed(self, colour):
-        self._colour = colour
+    def _on_color_changed(self, color):
+        self._color = color
         if self._link_tool_colors:
             for tool in _ALL_TOOLS:
-                self._tool_colours[tool] = QtGui.QColor(colour)
+                self._tool_colors[tool] = QtGui.QColor(color)
                 self._save_tool_state(tool)
         else:
-            self._tool_colours[self._tool] = QtGui.QColor(colour)
+            self._tool_colors[self._tool] = QtGui.QColor(color)
             self._save_tool_state(self._tool)
 
     def _on_size_changed(self, v):
@@ -374,6 +377,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_filled_changed(self, v):
         self._filled = v
+        self._tool_filled[self._tool] = v
+        self._save_tool_state(self._tool)
 
     def _on_font_family_changed(self, v):
         self._engine.commit_text_if_active()
@@ -435,13 +440,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._engine.clear_all_frames()
         self._update_undo_redo_buttons()
 
-    def _on_dock_top_level_changed(self, floating):
-        """Restore the native title bar when floating (enables dragging); hide it when docked."""
-        if floating:
-            self._dock.setTitleBarWidget(None)
-        else:
-            self._dock.setTitleBarWidget(QtWidgets.QWidget())
-
     def _show_toolbar(self):
         self._dock.show()
         self._dock.raise_()
@@ -453,10 +451,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             self._dock.hide()
 
-    def _on_dock_requested(self):
-        self._dock.setFloating(not self._dock.isFloating())
-
-    def _hide_colour_picker(self):
+    def _hide_color_picker(self):
         if self._dock:
             self._dock.toolbar_widget.hide_popups()
 
@@ -553,7 +548,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._link_tool_colors = not self._link_tool_colors
         if self._link_tool_colors:
             for tool in _ALL_TOOLS:
-                self._tool_colours[tool] = QtGui.QColor(self._colour)
+                self._tool_colors[tool] = QtGui.QColor(self._color)
                 self._save_tool_state(tool)
 
     def _cfg_state_link_colors(self):
@@ -619,16 +614,16 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             dpr = commands.devicePixelRatio()
             x = raw[0] * dpr
             y = raw[1] * dpr
-            colour = commands.framebufferPixelValue(x, y)
-            if colour and len(colour) >= 3:
+            color = commands.framebufferPixelValue(x, y)
+            if color and len(color) >= 3:
                 qcol = QtGui.QColor.fromRgbF(
-                    min(1.0, max(0.0, colour[0])),
-                    min(1.0, max(0.0, colour[1])),
-                    min(1.0, max(0.0, colour[2])),
+                    min(1.0, max(0.0, color[0])),
+                    min(1.0, max(0.0, color[1])),
+                    min(1.0, max(0.0, color[2])),
                 )
-                self._colour = qcol
-                self._tool_colours[self._tool] = QtGui.QColor(qcol)
-                self._dock.toolbar_widget.set_colour(qcol)
+                self._color = qcol
+                self._tool_colors[self._tool] = QtGui.QColor(qcol)
+                self._dock.toolbar_widget.set_color(qcol)
                 self._save_tool_state(self._tool)
         except Exception as e:
             print(f"[annotate_beta] eyedropper error: {e}")
