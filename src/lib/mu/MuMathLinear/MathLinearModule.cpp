@@ -16,14 +16,15 @@
 #include <MuLang/FixedArrayType.h>
 #include <MuLang/DynamicArray.h>
 #include <MuLang/FixedArray.h>
+#include <ImathMatrix.h>
 #include <algorithm>
-#include <Eigen/Eigen>
+#include <cmath>
+#include <cstring>
+#include <vector>
 
 namespace Mu
 {
     using namespace std;
-
-    // USING_PART_OF_NAMESPACE_EIGEN
 
     MathLinearModule::MathLinearModule(Context* c, const char* name)
         : Module(c, name)
@@ -32,9 +33,117 @@ namespace Mu
 
     MathLinearModule::~MathLinearModule() {}
 
-    typedef Eigen::Map<Eigen::Matrix<float, 4, 4, Eigen::RowMajor>> EigenMat44f;
-    typedef Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::RowMajor>> EigenMat33f;
-    typedef Eigen::Map<Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> EigenMatXf;
+    namespace
+    {
+
+        //
+        //  Mu fixed arrays and Imath matrices both store their elements
+        //  row-major, so the values can be copied verbatim.
+        //
+
+        template <typename M> M loadMatrix(const float* data)
+        {
+            M m;
+            memcpy(&m.x[0][0], data, sizeof(m.x));
+            return m;
+        }
+
+        template <typename M> void storeMatrix(const M& m, float* data) { memcpy(data, &m.x[0][0], sizeof(m.x)); }
+
+        void makeIdentity(float* m, size_t n)
+        {
+            fill(m, m + n * n, 0.0f);
+
+            for (size_t i = 0; i < n; i++)
+                m[i * n + i] = 1.0f;
+        }
+
+        //
+        //  Gauss-Jordan elimination with partial pivoting for arbitrarily sized
+        //  matrices. A singular matrix produces the identity, which is what
+        //  Imath's gjInverse() does for the fixed size cases below.
+        //
+
+        void invertSquareMatrix(const float* in, float* out, size_t n)
+        {
+            vector<float> t(in, in + n * n);
+            vector<float> s(n * n);
+            makeIdentity(s.data(), n);
+
+            for (size_t i = 0; i < n; i++)
+            {
+                size_t pivot = i;
+                float pivotSize = fabsf(t[i * n + i]);
+
+                for (size_t j = i + 1; j < n; j++)
+                {
+                    const float mag = fabsf(t[j * n + i]);
+
+                    if (mag > pivotSize)
+                    {
+                        pivot = j;
+                        pivotSize = mag;
+                    }
+                }
+
+                if (pivotSize == 0.0f)
+                {
+                    makeIdentity(out, n);
+                    return;
+                }
+
+                if (pivot != i)
+                {
+                    for (size_t j = 0; j < n; j++)
+                    {
+                        swap(t[i * n + j], t[pivot * n + j]);
+                        swap(s[i * n + j], s[pivot * n + j]);
+                    }
+                }
+
+                const float d = t[i * n + i];
+
+                for (size_t j = 0; j < n; j++)
+                {
+                    t[i * n + j] /= d;
+                    s[i * n + j] /= d;
+                }
+
+                for (size_t j = 0; j < n; j++)
+                {
+                    if (j == i)
+                        continue;
+
+                    const float f = t[j * n + i];
+
+                    for (size_t k = 0; k < n; k++)
+                    {
+                        t[j * n + k] -= f * t[i * n + k];
+                        s[j * n + k] -= f * s[i * n + k];
+                    }
+                }
+            }
+
+            copy(s.begin(), s.end(), out);
+        }
+
+        //
+        //  The generic inverse/transpose functions return the same type as their
+        //  argument, so they can only operate on square two dimensional arrays.
+        //  Returns 0 for anything else.
+        //
+
+        size_t squareMatrixSize(const FixedArray* array)
+        {
+            const FixedArrayType::SizeVector& dims = array->arrayType()->dimensions();
+
+            if (dims.size() != 2 || dims[0] != dims[1])
+                return 0;
+
+            return dims[0];
+        }
+
+    } // namespace
 
     NODE_IMPLEMENTATION(mult_m44_m44, Pointer)
     {
@@ -43,11 +152,10 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMat44f A(Aarray->data<float>());
-        EigenMat44f B(Barray->data<float>());
-        EigenMat44f C(Carray->data<float>());
+        const Imath::M44f A = loadMatrix<Imath::M44f>(Aarray->data<float>());
+        const Imath::M44f B = loadMatrix<Imath::M44f>(Barray->data<float>());
 
-        C = A * B;
+        storeMatrix(A * B, Carray->data<float>());
 
         NODE_RETURN(Carray);
     }
@@ -90,11 +198,10 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMat33f A(Aarray->data<float>());
-        EigenMat33f B(Barray->data<float>());
-        EigenMat33f C(Carray->data<float>());
+        const Imath::M33f A = loadMatrix<Imath::M33f>(Aarray->data<float>());
+        const Imath::M33f B = loadMatrix<Imath::M33f>(Barray->data<float>());
 
-        C = A * B;
+        storeMatrix(A * B, Carray->data<float>());
         NODE_RETURN(Carray);
     }
 
@@ -104,10 +211,9 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMat33f A(Aarray->data<float>());
-        EigenMat33f C(Carray->data<float>());
+        const Imath::M33f A = loadMatrix<Imath::M33f>(Aarray->data<float>());
 
-        C = A.inverse();
+        storeMatrix(A.gjInverse(), Carray->data<float>());
         NODE_RETURN(Carray);
     }
 
@@ -117,10 +223,9 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMat44f A(Aarray->data<float>());
-        EigenMat44f C(Carray->data<float>());
+        const Imath::M44f A = loadMatrix<Imath::M44f>(Aarray->data<float>());
 
-        C = A.inverse();
+        storeMatrix(A.gjInverse(), Carray->data<float>());
         NODE_RETURN(Carray);
     }
 
@@ -130,10 +235,16 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMatXf A(Aarray->data<float>(), Aarray->size(0), Aarray->size(1));
-        EigenMatXf C(Carray->data<float>(), Aarray->size(0), Aarray->size(1));
+        const size_t n = squareMatrixSize(Aarray);
+        float* C = Carray->data<float>();
 
-        C = A.inverse();
+        if (n == 0)
+        {
+            fill(C, C + Carray->size(), 0.0f);
+            NODE_RETURN(Carray);
+        }
+
+        invertSquareMatrix(Aarray->data<float>(), C, n);
         NODE_RETURN(Carray);
     }
 
@@ -143,10 +254,22 @@ namespace Mu
         const Class* mtype = static_cast<const Class*>(Aarray->type());
         FixedArray* Carray = static_cast<FixedArray*>(ClassInstance::allocate(mtype));
 
-        EigenMatXf A(Aarray->data<float>(), Aarray->size(0), Aarray->size(1));
-        EigenMatXf C(Carray->data<float>(), Aarray->size(0), Aarray->size(1));
+        const size_t n = squareMatrixSize(Aarray);
+        const float* A = Aarray->data<float>();
+        float* C = Carray->data<float>();
 
-        C = A.transpose();
+        if (n == 0)
+        {
+            fill(C, C + Carray->size(), 0.0f);
+            NODE_RETURN(Carray);
+        }
+
+        for (size_t i = 0; i < n; i++)
+        {
+            for (size_t j = 0; j < n; j++)
+                C[j * n + i] = A[i * n + j];
+        }
+
         NODE_RETURN(Carray);
     }
 

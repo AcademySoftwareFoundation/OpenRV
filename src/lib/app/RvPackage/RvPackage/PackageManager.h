@@ -73,8 +73,7 @@ namespace Rv
             QString event;
             QString load;
             QString icon;
-            QStringList
-                requires;
+            QStringList requires_;
         };
 
         struct AuxFile
@@ -117,8 +116,7 @@ namespace Rv
             QString url;
             QString icon;
             QString excludes;
-            QString
-                requires;
+            QString requires_;
             QStringList imageio;
             QStringList movieio;
             QString rvversion;
@@ -165,8 +163,7 @@ namespace Rv
             bool loaded;
             bool active;
             bool optional;
-            QStringList
-                requires;
+            QStringList requires_;
         };
 
         typedef QList<Package> PackageList;

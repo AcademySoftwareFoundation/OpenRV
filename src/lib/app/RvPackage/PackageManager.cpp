@@ -381,9 +381,7 @@ namespace Rv
         if (package.installing)
             return true;
 
-        QStringList deps = package.
-                               requires
-            .split(" ", Qt::SkipEmptyParts);
+        QStringList deps = package.requires_.split(" ", Qt::SkipEmptyParts);
         QStringList missing;
         QStringList notinstalled;
         QFileInfo info(package.file);
@@ -758,10 +756,7 @@ namespace Rv
             entry.menu = mode.menu;
             entry.shortcut = mode.shortcut;
             entry.event = mode.event;
-            entry.
-                requires
-            = mode.
-                  requires;
+            entry.requires_ = mode.requires_;
             entry.rvversion = package.rvversion;
             entry.openrvversion = package.openrvversion;
             entry.optional = package.optional;
@@ -1255,9 +1250,7 @@ namespace Rv
                                     else if (pname == "icon")
                                         m.icon = v;
                                     else if (pname == "requires")
-                                    m.
-                                        requires
-                                    = v.split(" ");
+                                        m.requires_ = v.split(" ");
                                 }
 
                                 valueState = false;
@@ -1309,16 +1302,21 @@ namespace Rv
                                 else if (pname == "excludes")
                                     package.excludes = v;
                                 else if (pname == "requires")
-                                package.
-                                    requires
-                                = v;
-                                else if (pname == "rv") package.rvversion = v;
-                                else if (pname == "openrv") package.openrvversion = v;
-                                else if (pname == "imageio") package.imageio = v.split(" ");
-                                else if (pname == "movieio") package.movieio = v.split(" ");
-                                else if (pname == "hidden") package.hidden = v == "true";
-                                else if (pname == "system") package.system = v == "true";
-                                else if (pname == "optional") package.optional = v == "true";
+                                    package.requires_ = v;
+                                else if (pname == "rv")
+                                    package.rvversion = v;
+                                else if (pname == "openrv")
+                                    package.openrvversion = v;
+                                else if (pname == "imageio")
+                                    package.imageio = v.split(" ");
+                                else if (pname == "movieio")
+                                    package.movieio = v.split(" ");
+                                else if (pname == "hidden")
+                                    package.hidden = v == "true";
+                                else if (pname == "system")
+                                    package.system = v == "true";
+                                else if (pname == "optional")
+                                    package.optional = v == "true";
                                 valueState = false;
                             }
                         }
@@ -1412,9 +1410,7 @@ namespace Rv
 
                     int requiresIndex = index;
                     for (int i = requiresIndex; i < parts.size(); i++)
-                    entry.
-                        requires
-                        .push_back(parts[i]);
+                        entry.requires_.push_back(parts[i]);
 
                     list.push_back(entry);
                 }
@@ -1460,11 +1456,11 @@ namespace Rv
                     line += QString(",") + e.openrvversion;
                 }
 
-                if (!e.requires.empty())
+                if (!e.requires_.empty())
                 {
-                    for (int q = 0; q < e.requires.size(); q++)
+                    for (int q = 0; q < e.requires_.size(); q++)
                     {
-                        line += QString(",%1").arg(e.requires[q]);
+                        line += QString(",%1").arg(e.requires_[q]);
                     }
                 }
 
@@ -1556,9 +1552,7 @@ namespace Rv
         for (int i = 0; i < m_packages.size(); i++)
         {
             Package& package = m_packages[i];
-            QStringList deps = package.
-                                   requires
-                .split(" ", Qt::SkipEmptyParts);
+            QStringList deps = package.requires_.split(" ", Qt::SkipEmptyParts);
 
             for (size_t q = 0; q < deps.size(); q++)
             {
