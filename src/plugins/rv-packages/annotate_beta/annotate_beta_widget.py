@@ -21,12 +21,12 @@ TOOL_TEXT = "text"
 TOOL_EYEDROPPER = "eyedropper"
 
 # Secondary panel page indices
-_PAGE_EMPTY = 0  # cursor, eyedropper
-_PAGE_BRUSH = 1  # arrow, line
-_PAGE_SHAPE = 2  # rect, circle
-_PAGE_TEXT = 3  # text
-_PAGE_PEN = 4  # pen and airbrush (size/opacity/blend mode)
-_PAGE_ERASER = 5  # eraser (brush type combo + size/opacity)
+_PAGE_EMPTY = -1  # cursor, eyedropper
+_PAGE_BRUSH = 0  # arrow, line
+_PAGE_SHAPE = 1  # rect, circle
+_PAGE_TEXT = 2  # text
+_PAGE_PEN = 3  # pen and airbrush (size/opacity/blend mode)
+_PAGE_ERASER = 4  # eraser (brush type combo + size/opacity)
 
 _TOOL_PAGE = {
     TOOL_CURSOR: _PAGE_EMPTY,
@@ -83,24 +83,11 @@ def _separator(width=None):
 
 
 class _StyledWidget(QtWidgets.QWidget):
-    """QWidget subclass whose QSS background-color is actually painted.
-
-    A plain, non-subclassed QWidget paints its stylesheet background for
-    free, but custom QWidget subclasses need Qt.WA_StyledBackground set
-    explicitly or the background-color rule is silently ignored.
-    """
+    """QWidget whose QSS background-color is actually painted."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground, True)
-
-
-class _PanelSurface(_StyledWidget):
-    """Styled widget painted with the panelSurface background color."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("panelSurface")
 
 
 # ---------------------------------------------------------------------------
@@ -168,7 +155,6 @@ class _AnnotationSlider(QtWidgets.QSlider):
     _GROOVE_MARGIN = 3
 
     def _value_at(self, y):
-        """Value under a y position, as if the handle centre were dragged there."""
         span = max(1, self.height() - 2 * self._GROOVE_MARGIN - self._HANDLE_LENGTH)
         bottom = self._GROOVE_MARGIN + self._HANDLE_LENGTH // 2 + span
 
@@ -210,7 +196,7 @@ class _ValueLineEdit(QtWidgets.QLineEdit):
         QtCore.QTimer.singleShot(0, self.selectAll)
 
 
-class _SliderSection(_PanelSurface):
+class _SliderSection(QtWidgets.QWidget):
     """Vertical slider + editable value input."""
 
     value_changed = QtCore.Signal(int)
@@ -271,7 +257,7 @@ class _SliderSection(_PanelSurface):
             self._input.setText(f"{v}{self._suffix}")
 
 
-class _SizeOpacityPanel(_PanelSurface):
+class _SizeOpacityPanel(QtWidgets.QWidget):
     size_changed = QtCore.Signal(int)
     opacity_changed = QtCore.Signal(int)
 
@@ -317,7 +303,7 @@ def _load_icon(name):
 
 
 def _apply_icon(btn, name, size=16):
-    """Set an SVG icon on a button; falls back to keeping existing text."""
+    """Set an SVG icon on a button"""
     icon = _load_icon(name)
     if not icon.isNull():
         btn.setIcon(icon)
@@ -331,7 +317,6 @@ class _MenuToolButton(QtWidgets.QToolButton):
     selection_changed = QtCore.Signal(str)
 
     def __init__(self, tooltip, items, icon_size=None, parent=None):
-        """items: sequence of (item_id, label, icon_name or None) triples."""
         super().__init__(parent)
         self.setObjectName("menuToolButton")
         self.setProperty("tbstyle", "palette")
@@ -343,6 +328,7 @@ class _MenuToolButton(QtWidgets.QToolButton):
         if icon_size is not None:
             self.setIconSize(QtCore.QSize(icon_size, icon_size))
 
+        self._selection = None
         self._menu = QtWidgets.QMenu(self)
         group = QtGui.QActionGroup(self._menu)
         group.setExclusive(True)
@@ -356,6 +342,8 @@ class _MenuToolButton(QtWidgets.QToolButton):
 
     def _on_triggered(self, action):
         item_id = action.data()
+        if item_id == self._selection:
+            return
         self.set_selection(item_id)
         self.selection_changed.emit(item_id)
 
@@ -366,20 +354,20 @@ class _MenuToolButton(QtWidgets.QToolButton):
         return self._action_for(item_id) is not None
 
     def selection(self):
-        action = next((a for a in self._menu.actions() if a.isChecked()), None)
-        return action.data() if action is not None else None
+        return self._selection
 
     def set_selection(self, item_id):
-        """Tick item_id in the menu and show it on the button face."""
-        for action in self._menu.actions():
-            checked = action.data() == item_id
-            action.setChecked(checked)
-            if not checked:
-                continue
-            if action.icon().isNull():
-                self.setText(action.text())
-            else:
-                self.setIcon(action.icon())
+        action = self._action_for(item_id)
+        if action is None:
+            return
+
+        self._selection = item_id
+        for other in self._menu.actions():
+            other.setChecked(other is action)
+        if action.icon().isNull():
+            self.setText(action.text())
+        else:
+            self.setIcon(action.icon())
 
     def set_item_enabled(self, item_id, enabled):
         action = self._action_for(item_id)
@@ -387,7 +375,7 @@ class _MenuToolButton(QtWidgets.QToolButton):
             action.setEnabled(enabled)
 
 
-class _EraserPanel(_PanelSurface):
+class _EraserPanel(QtWidgets.QWidget):
     """Brush-type dropdown + size/opacity sliders for the eraser tool."""
 
     eraser_brush_changed = QtCore.Signal(str)  # "circle" or "gauss"
@@ -446,7 +434,7 @@ class _EraserPanel(_PanelSurface):
         self._opacity.set_value(v)
 
 
-class _PenPanel(_PanelSurface):
+class _PenPanel(QtWidgets.QWidget):
     """Size + opacity sliders plus Normal / Darken / Additive blend mode buttons."""
 
     size_changed = QtCore.Signal(int)
@@ -478,10 +466,6 @@ class _PenPanel(_PanelSurface):
         # Blend mode buttons — grouped with 1px gaps, connected border-radius
         self._blend_grp = QtWidgets.QButtonGroup(self)
         self._blend_btns = {}
-        btn_container = _PanelSurface()
-        btn_lay = QtWidgets.QVBoxLayout(btn_container)
-        btn_lay.setContentsMargins(0, 0, 0, 0)
-        btn_lay.setSpacing(0)
         _blend_positions = ["first", "mid", "last"]
         for i, (key, icon_name, tip) in enumerate(
             [
@@ -499,12 +483,11 @@ class _PenPanel(_PanelSurface):
             btn.setFixedSize(30, 30)
             self._blend_grp.addButton(btn)
             self._blend_btns[key] = btn
-            btn_lay.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
+            lay.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
             if i < 2:
-                btn_lay.addSpacing(1)
+                lay.addSpacing(1)
         self._blend_btns[COLOR_MOD_NORMAL].setChecked(True)
         self._blend_grp.buttonClicked.connect(self._on_blend_clicked)
-        lay.addWidget(btn_container, alignment=QtCore.Qt.AlignHCenter)
         lay.addStretch()
 
     def _on_blend_clicked(self, btn):
@@ -534,7 +517,7 @@ class _PenPanel(_PanelSurface):
         self._opacity.set_value(v)
 
 
-class _ShapeOptionsPanel(_PanelSurface):
+class _ShapeOptionsPanel(QtWidgets.QWidget):
     filled_changed = QtCore.Signal(bool)
     size_changed = QtCore.Signal(int)
     opacity_changed = QtCore.Signal(int)
@@ -578,11 +561,7 @@ class _ShapeOptionsPanel(_PanelSurface):
 
 
 class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
-    """Renders each font name in its own typeface, ticking the current one."""
-
-    def __init__(self, combo, parent=None):
-        super().__init__(parent)
-        self._combo = combo
+    """Renders each font name in its own typeface and ticks the current one."""
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
@@ -603,7 +582,7 @@ class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         super().paint(painter, option, index)
-        if index.data() != self._combo.currentText():
+        if index.row() != self.parent().currentIndex():
             return
         style = QtWidgets.QApplication.style()
         style_option = QtWidgets.QStyleOptionViewItem(option)
@@ -638,7 +617,7 @@ class _FontComboBox(QtWidgets.QComboBox):
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, opt)
 
 
-class _TextOptionsPanel(_PanelSurface):
+class _TextOptionsPanel(QtWidgets.QWidget):
     font_family_changed = QtCore.Signal(str)
     font_size_changed = QtCore.Signal(str)
     font_bold_changed = QtCore.Signal(bool)
@@ -659,7 +638,7 @@ class _TextOptionsPanel(_PanelSurface):
 
         self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
-        self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo, self._font_combo))
+        self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
         for name in QtGui.QFontDatabase.families():
             if not name.startswith(".") and QtGui.QFontDatabase.isSmoothlyScalable(name):
                 self._font_combo.addItem(name)
@@ -780,23 +759,20 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._stack = QtWidgets.QStackedWidget()
         lay.addWidget(self._stack)
 
-        # Page 0 — empty (cursor / eyedropper)
-        self._stack.addWidget(_PanelSurface())
-
-        # Page 1 — brush tools (arrow, line)
+        # Page 0 — brush tools (arrow, line)
         self._brush_panel = _SizeOpacityPanel()
         self._brush_panel.size_changed.connect(self.size_changed)
         self._brush_panel.opacity_changed.connect(self.opacity_changed)
         self._stack.addWidget(self._brush_panel)
 
-        # Page 2 — shape tools (rect, circle)
+        # Page 1 — shape tools (rect, circle)
         self._shape_panel = _ShapeOptionsPanel()
         self._shape_panel.filled_changed.connect(self.filled_changed)
         self._shape_panel.size_changed.connect(self.size_changed)
         self._shape_panel.opacity_changed.connect(self.opacity_changed)
         self._stack.addWidget(self._shape_panel)
 
-        # Page 3 — text tool
+        # Page 2 — text tool
         self._text_panel = _TextOptionsPanel()
         self._text_panel.font_family_changed.connect(self.font_family_changed)
         self._text_panel.font_size_changed.connect(self.font_size_changed)
@@ -805,14 +781,14 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._text_panel.font_underline_changed.connect(self.font_underline_changed)
         self._stack.addWidget(self._text_panel)
 
-        # Page 4 — pen and airbrush (size + opacity + blend mode buttons)
+        # Page 3 — pen and airbrush (size + opacity + blend mode buttons)
         self._pen_panel = _PenPanel()
         self._pen_panel.size_changed.connect(self.size_changed)
         self._pen_panel.opacity_changed.connect(self.opacity_changed)
         self._pen_panel.color_modifier_changed.connect(self.color_modifier_changed)
         self._stack.addWidget(self._pen_panel)
 
-        # Page 5 — eraser (brush type combo + size + opacity)
+        # Page 4 — eraser (brush type combo + size + opacity)
         self._eraser_panel = _EraserPanel()
         self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
         self._eraser_panel.size_changed.connect(self.size_changed)
@@ -820,7 +796,10 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._stack.addWidget(self._eraser_panel)
 
     def set_page_for_tool(self, tool):
-        self._stack.setCurrentIndex(_TOOL_PAGE.get(tool, _PAGE_EMPTY))
+        page = _TOOL_PAGE.get(tool, _PAGE_EMPTY)
+        self._stack.setVisible(page != _PAGE_EMPTY)
+        if page != _PAGE_EMPTY:
+            self._stack.setCurrentIndex(page)
 
     def set_size(self, v):
         self._brush_panel.set_size(v)

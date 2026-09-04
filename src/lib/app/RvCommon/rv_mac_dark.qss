@@ -1162,9 +1162,12 @@ QWidget#annotationBeta QWidget#toolStrip {
     background-color: rgb(34, 34, 34);
 }
 
-QWidget#annotationBeta QWidget#secondaryPanel,
-QWidget#annotationBeta QWidget#panelSurface {
+QWidget#annotationBeta QWidget#secondaryPanel {
     background-color: rgb(23, 23, 23);
+}
+
+QWidget#annotationBeta QStackedWidget {
+    background: transparent;
 }
 
 QWidget#annotationBeta QWidget#separator {
@@ -1222,8 +1225,6 @@ QWidget#annotationBeta QToolButton#menuToolButton {
 QWidget#annotationBeta QToolButton#menuToolButton::menu-indicator {
     subcontrol-origin: padding;
     subcontrol-position: center right;
-    position: relative;
-    top: 0px;
     right: 8px;
 }
 
