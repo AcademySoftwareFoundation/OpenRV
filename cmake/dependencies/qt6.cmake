@@ -212,6 +212,53 @@ IF(RV_TARGET_DARWIN)
       )
     ENDIF()
   ENDFOREACH()
+
+  # QtWebEngine runs its Chromium renderer in a separate QtWebEngineProcess child. If that helper carries the hardened runtime WITHOUT the entitlements Chromium
+  # needs (allow-jit, allow-unsigned-executable-memory, disable-library-validation), macOS kills the renderer with SIGTRAP as soon as V8 starts. QtWebEngine
+  # reports "ProcessGone: 3 (5)" and every QWebEngineView (Live Review, the Flow Production Tracking browser, the Mu doc browser) renders blank. Re-signing
+  # without --options runtime drops the hardened runtime and fixes it.
+  #
+  # The signing identity is irrelevant: re-signing ad-hoc but keeping --options runtime reproduces the crash exactly. Only the hardened-runtime flag matters,
+  # which is why the check below keys on "runtime" and not on whether the signature is ad-hoc. Note that flags=0x10002(adhoc,runtime) is both ad-hoc and broken.
+  #
+  # Qt's own macOS binaries (qt.io installer, aqtinstall) are ad-hoc/linker-signed with no hardened runtime, so this skips them entirely. It triggers for
+  # redistributions that re-sign Qt with --options runtime; Autodesk's LGPL Qt package does exactly that, with no entitlements, for every framework it ships.
+  #
+  # Sign inside-out: the nested helper .app first, then the framework. Using --deep on the framework instead leaves it reporting "embedded framework contains
+  # modified or invalid version".
+  #
+  # Release builds are unaffected either way: they re-sign the bundle with --options runtime AND build/entitlements.plist, which grants all three relaxations.
+  # Note that stripping the signature outright is NOT an option, because arm64 binaries must carry at least an ad-hoc signature.
+  SET(_qt_webengine_framework
+      ${RV_STAGE_FRAMEWORKS_DIR}/QtWebEngineCore.framework
+  )
+  IF(EXISTS ${_qt_webengine_framework})
+    # codesign -dv reports on stderr. Match the hardened-runtime bit inside the decoded flags, e.g. flags=0x10000(runtime) or flags=0x10002(adhoc,runtime).
+    # Anchoring on the flags list avoids matching the unrelated "Runtime Version=" line.
+    EXECUTE_PROCESS(
+      COMMAND codesign -dv ${_qt_webengine_framework}
+      OUTPUT_QUIET
+      ERROR_VARIABLE _qt_webengine_signature_info
+    )
+    IF(_qt_webengine_signature_info MATCHES "flags=[^(]*\\([^)]*runtime")
+      MESSAGE(STATUS "QtWebEngineCore carries the hardened runtime; re-signing it without, so Chromium's renderer can start")
+      FILE(GLOB _qt_webengine_helpers ${_qt_webengine_framework}/Versions/A/Helpers/*.app)
+      FOREACH(
+        _qt_webengine_signable
+        ${_qt_webengine_helpers} ${_qt_webengine_framework}
+      )
+        EXECUTE_PROCESS(
+          COMMAND codesign --force --sign - ${_qt_webengine_signable}
+          RESULT_VARIABLE _qt_webengine_codesign_result
+          OUTPUT_QUIET
+          ERROR_VARIABLE _qt_webengine_codesign_error
+        )
+        IF(NOT _qt_webengine_codesign_result EQUAL 0)
+          MESSAGE(WARNING "Could not ad-hoc sign ${_qt_webengine_signable}: ${_qt_webengine_codesign_error}")
+        ENDIF()
+      ENDFOREACH()
+    ENDIF()
+  ENDIF()
 ENDIF()
 
 # Linux

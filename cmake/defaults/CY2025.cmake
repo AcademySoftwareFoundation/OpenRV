@@ -21,6 +21,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2025")
       "53aeccc3167909ee770e34469f8dd592"
   )
 
+  # Cryptography https://cryptography.io/en/latest/changelog/
+  SET(RV_DEPS_CRYPTOGRAPHY_VERSION
+      "42.0.5"
+  )
+
   # Imath Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
   SET(RV_DEPS_IMATH_VERSION
       "3.1.12"
@@ -80,6 +85,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2025")
   )
   SET(RV_DEPS_OPENSSL_VERSION_UNDERSCORE
       "3"
+  )
+
+  # Pydantic https://docs.pydantic.dev/latest/changelog/
+  SET(RV_DEPS_PYDANTIC_VERSION
+      "2.7.1"
   )
 
   # PySide

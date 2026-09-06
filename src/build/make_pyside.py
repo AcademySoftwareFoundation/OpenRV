@@ -85,7 +85,7 @@ def prepare() -> None:
     system = platform.system()
     if system == "Darwin":
         clang_version_search = re.search(
-            "version (\d+)\.(\d+)\.(\d+)",
+            r"version (\d+)\.(\d+)\.(\d+)",
             os.popen("clang --version").read(),
         )
         clang_version_str = ".".join(clang_version_search.groups())

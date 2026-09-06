@@ -21,6 +21,19 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
       "6cd58b3cc890e4fbbc036c7629129e18"
   )
 
+  # Cryptography https://cryptography.io/en/latest/changelog/ Newer than the CY2024/CY2025 pin because Python 3.13 needs it: 42.x vendors pyo3-ffi 0.20, whose
+  # build aborts with "the configured Python interpreter version (3.13) is newer than PyO3's maximum supported version (3.12)".
+  SET(RV_DEPS_CRYPTOGRAPHY_VERSION
+      "45.0.7"
+  )
+
+  # Cython https://github.com/cython/cython/releases Pinned because numpy 2.3.0 declares an unbounded "Cython>=3.0.6" build requirement, so pip's build
+  # isolation would otherwise resolve the newest Cython. Cython 3.3.0 breaks Meson's cython sanity check ("Compiler cython cannot compile programs") when
+  # building numpy from source. CY2023-CY2025 do not need this: their numpy versions cap Cython themselves (<3.0 / <3.1).
+  SET(RV_DEPS_CYTHON_VERSION
+      "3.2.9"
+  )
+
   # Imath Can find the build version in OpenRV/_build/RV_DEPS_IMATH/install/lib/
   SET(RV_DEPS_IMATH_VERSION
       "3.2.2"
@@ -80,6 +93,13 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2026")
   )
   SET(RV_DEPS_OPENSSL_VERSION_UNDERSCORE
       "3"
+  )
+
+  # Pydantic https://docs.pydantic.dev/latest/changelog/ Newer than the CY2024/CY2025 pin because Python 3.13 needs it: pydantic 2.7 pulls in pydantic-core
+  # 2.18, whose build-time generate_self_schema.py calls ForwardRef._evaluate() with the pre-3.13 signature and fails with "missing 1 required keyword-only
+  # argument: 'recursive_guard'".
+  SET(RV_DEPS_PYDANTIC_VERSION
+      "2.11.10"
   )
 
   # PySide

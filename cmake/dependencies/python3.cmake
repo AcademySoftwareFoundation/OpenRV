@@ -42,6 +42,25 @@ SET(_numpy_version
     "${RV_DEPS_NUMPY_VERSION}"
 )
 
+SET(_cryptography_version
+    "${RV_DEPS_CRYPTOGRAPHY_VERSION}"
+)
+
+SET(_pydantic_version
+    "${RV_DEPS_PYDANTIC_VERSION}"
+)
+
+# Cython is only constrained on the VFX platforms whose numpy leaves its own Cython build requirement unbounded. See src/build/pip-build-constraints.txt.in.
+IF(RV_DEPS_CYTHON_VERSION)
+  SET(_cython_constraint
+      "Cython==${RV_DEPS_CYTHON_VERSION}"
+  )
+ELSE()
+  SET(_cython_constraint
+      "# Cython intentionally unconstrained: this platform's numpy pins its own Cython upper bound."
+  )
+ENDIF()
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -68,11 +87,27 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
+# PySide6's pyside-tools and standalone packaging assume Qt Designer/Assistant/Linguist were bundled. macOS .app installs, Linux patchelf rpath patching, and
+# Windows/Linux designer-plugin copies all fail when the Qt build does not ship those tools. CY2026's Qt 6.8 build omits Designer; the patch makes each step
+# skip-with-warning like the individual tool file install loop.
+SET(_pyside_patch_command
+    ${CMAKE_COMMAND} -E true
+)
+IF(RV_VFX_PLATFORM STREQUAL CY2026)
+  SET(_pyside_patch_script
+      "${PROJECT_SOURCE_DIR}/src/build/apply_pyside6_tools_patch.py"
+  )
+  SET(_pyside_patch_command
+      python3 "${_pyside_patch_script}" "<SOURCE_DIR>" "${CMAKE_CURRENT_LIST_DIR}/patch"
+  )
+ENDIF()
+
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
   URL ${_pyside_archive_url}
   URL_HASH MD5=${_pyside_download_hash}
   SOURCE_SUBDIR "sources" # Avoids the top level CMakeLists.txt
+  PATCH_COMMAND ${_pyside_patch_command}
 )
 
 FETCHCONTENT_MAKEAVAILABLE(${_pyside_target})
@@ -250,12 +285,22 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
-# Constraints for pip's build-isolation environments. PIP_CONSTRAINT must be an absolute path: pip resolves it relative to each build-environment subprocess
-# working directory. PIP_BUILD_CONSTRAINT is required on pip >= 26.2 to constrain build-isolation envs; set both since RV_PYTHON_BUILD_DEPS installs an unpinned
-# pip.
-SET(_pip_constraint_file
-    "${PROJECT_SOURCE_DIR}/src/build/pip-build-constraints.txt"
+# Generate pip-build-constraints.txt from template. Unlike requirements.txt this one is exported as PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT so that pip's PEP 517
+# build-isolation environments inherit our pins: format control propagates into those environments but version pins do not.
+SET(_pip_build_constraints_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/pip-build-constraints.txt.in"
 )
+SET(_pip_constraint_file
+    "${CMAKE_BINARY_DIR}/pip-build-constraints.txt"
+)
+
+CONFIGURE_FILE(${_pip_build_constraints_input_file} ${_pip_constraint_file} @ONLY)
+
+# Both env vars point at the same file and must be absolute paths: pip's build-environment subprocesses run with their working directory inside the unpacked
+# source distribution. The python -s -E -I flags below do not strip either, -E only ignores PYTHON* variables. PIP_CONSTRAINT pins the outer/main resolve
+# (requirements.txt itself, and build-isolation envs on pip < 26.2). PIP_BUILD_CONSTRAINT pins build-isolation envs on pip >= 26.2, where PIP_CONSTRAINT was
+# deprecated for that purpose (pip issue: build constraints must be requested explicitly via --build-constraint / PIP_BUILD_CONSTRAINT). RV_PYTHON_BUILD_DEPS
+# installs an unpinned "pip", so the newest pip is always in play and both variables are needed for the fix to hold across pip versions.
 SET(_pip_constraint_env
     "PIP_CONSTRAINT=${_pip_constraint_file}" "PIP_BUILD_CONSTRAINT=${_pip_constraint_file}"
 )
@@ -497,7 +542,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-build-deps-flag}
   COMMAND ${_build_deps_install_command}
   COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
-  DEPENDS ${_python3_target} ${_pip_constraint_file}
+  DEPENDS ${_python3_target} ${_pip_constraint_file} ${_pip_build_constraints_input_file}
 )
 
 # Phase 2 flag: Main requirements (depends on build deps being installed first)
@@ -511,6 +556,7 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
   DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_pip_constraint_file}
+          ${_pip_build_constraints_input_file}
 )
 
 # Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,
