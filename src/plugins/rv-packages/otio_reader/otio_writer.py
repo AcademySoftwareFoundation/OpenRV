@@ -5,15 +5,12 @@
 #
 import math
 import numbers
-import six
 import os
 import re
 
 import opentimelineio as otio
-
-from rv import commands
-from rv import extra_commands
-from rv import runtime
+import six
+from rv import commands, extra_commands, runtime
 
 
 class NoMappingForNodeTypeError(otio.exceptions.OTIOError):
@@ -59,7 +56,7 @@ def create_timeline_from_node(root_node_name):
     if commands.nodeType(root_node_name) == "RVStackGroup":
         # check if the OTIO import saved any timeline properties to the stack
         timeline.metadata.update(get_node_otio_metadata(root_node_name, "timeline_metadata"))
-        name_prop = "{}.otio.timeline_name".format(root_node_name)
+        name_prop = f"{root_node_name}.otio.timeline_name"
         if commands.propertyExists(name_prop):
             timeline.name = commands.getStringProperty(name_prop)[0]
 
@@ -87,7 +84,7 @@ def _run_hook(hook_name, optional=True, *args, **kwargs):
         return otio.hooks.run(hook_name, kwargs.get("timeline"), kwargs)
     except KeyError:
         if not optional:
-            raise NoMappingForNodeTypeError("No {} hook found".format(hook_name))
+            raise NoMappingForNodeTypeError(f"No {hook_name} hook found")
 
 
 def create_otio_from_rv_node(node_name, *args, **kwargs):
@@ -107,15 +104,13 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
 
     node_type = commands.nodeType(node_name)
     if node_type in create_type_map:
-        process_node = _run_hook(
-            "pre_export_hook_{}".format(node_type), rv_node_name=node_name, optional=True, *args, **kwargs
-        )
+        process_node = _run_hook(f"pre_export_hook_{node_type}", rv_node_name=node_name, optional=True, *args, **kwargs)
         if process_node is False:
             return None
 
         result = create_type_map[node_type](node_name, *args, **kwargs)
         _run_hook(
-            "post_export_hook_{}".format(node_type),
+            f"post_export_hook_{node_type}",
             rv_node_name=node_name,
             post_node=result,
             optional=True,
@@ -123,7 +118,7 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
             **kwargs,
         )
     else:
-        result = _run_hook("export_{}".format(node_type), rv_node_name=node_name, optional=False, *args, **kwargs)
+        result = _run_hook(f"export_{node_type}", rv_node_name=node_name, optional=False, *args, **kwargs)
 
     if not isinstance(result, otio.schema.Effect):
         return result
@@ -134,7 +129,7 @@ def create_otio_from_rv_node(node_name, *args, **kwargs):
     # Each effect should have one input (another effect or something that
     # results in an otio item).  If not, we don't know how to handle it
     if num_effect_inputs != 1:
-        raise UnhandledEffectInput("{} effect ({}) should have 1 input".format(node_type, node_name))
+        raise UnhandledEffectInput(f"{node_type} effect ({node_name}) should have 1 input")
 
     # Since we are iterate through inputs, we will find effects before we find
     # the items they belong to. So recurse, keeping track of the effects we've
@@ -265,9 +260,9 @@ def _create_item(node_name, *args, **kwargs):
 
         for src_group in commands.nodeConnections(node_name)[0]:
             source = get_source_node(src_group)
-            key = commands.getStringProperty("{}.media.repName".format(source))[0]
+            key = commands.getStringProperty(f"{source}.media.repName")[0]
 
-            if commands.getIntProperty("{}.media.active".format(source))[0] == 1:
+            if commands.getIntProperty(f"{source}.media.active")[0] == 1:
                 active_key = key
                 active_source = source
                 active_source_group = src_group
@@ -325,11 +320,11 @@ def _create_media_reference(node_name, source_node):
     source_basename = os.path.basename(source_path)
 
     frame_zero_padding = None
-    image_seq_pattern = re.findall("\.%0\d+d\.", source_basename)
+    image_seq_pattern = re.findall(r"\.%0\d+d\.", source_basename)
     if image_seq_pattern:
-        frame_zero_padding = int(re.search("\d+", image_seq_pattern[0]).group(0))
+        frame_zero_padding = int(re.search(r"\d+", image_seq_pattern[0]).group(0))
     else:
-        image_seq_pattern = re.findall("\.\d+-\d+#|@+", source_basename)
+        image_seq_pattern = re.findall(r"\.\d+-\d+#|@+", source_basename)
         if image_seq_pattern:
             pattern = re.search("#|@+", image_seq_pattern[0]).group(0)
             frame_zero_padding = 4 if "#" in pattern else len(pattern)
@@ -400,7 +395,7 @@ def _create_transition(rv_trx, *args, **kwargs):
 
     # If we imported from OTIO, respect the original in_offset.  If not,
     # assume the transition frames are split evenly between the two clips
-    in_offset_prop = "{}.otio.in_offset".format(rv_trx)
+    in_offset_prop = f"{rv_trx}.otio.in_offset"
 
     if commands.propertyExists(in_offset_prop):
         in_offset_frames = commands.getIntProperty(in_offset_prop)[0]
@@ -504,7 +499,7 @@ def get_node_otio_metadata(node_name, prop_name="metadata"):
     :return: `str`
     """
     # Standard OTIO Metadata prop from OTIO Reader
-    otio_prop = "{}.otio.{}".format(node_name, prop_name)
+    otio_prop = f"{node_name}.otio.{prop_name}"
 
     # Persist the general OTIO metadata separately to match OTIO Reader
     if commands.propertyExists(otio_prop):
@@ -582,7 +577,7 @@ def is_same_media(node_name, item):
         return get_source_path(node_name) == item.media_reference.target_url
     elif isinstance(item.media_reference, otio.schema.ImageSequenceReference):
         return get_source_path(node_name) == item.media_reference_abstract_target_url(
-            symbol="%0{n}d".format(n=item.media_reference.frame_zero_padding)
+            symbol=f"%0{item.media_reference.frame_zero_padding}d"
         )
     elif isinstance(item.media_reference, otio.schema.GeneratorReference):
         if get_source_path(node_name).startswith("smptebars,"):

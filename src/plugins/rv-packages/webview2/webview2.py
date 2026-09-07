@@ -4,36 +4,24 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import sys
 import os
+import sys
 
-
-from rv import rvtypes
-from rv import qtutils
+from rv import qtutils, rvtypes
 
 try:
-    from PySide2 import QtCore
-    from PySide2 import QtWidgets
-    from PySide2 import QtWebChannel
-    from PySide2 import QtWebEngineWidgets
-    from PySide2 import QtQml
-
+    from PySide2 import QtCore, QtQml, QtWebChannel, QtWebEngineWidgets, QtWidgets
     from PySide2.QtWidgets import (
+        QDockWidget,
         qApp,
     )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
-    from PySide2.QtWidgets import QDockWidget
 except ImportError:
     try:
-        from PySide6 import QtCore
-        from PySide6 import QtWidgets
-        from PySide6 import QtWebChannel
-        from PySide6 import QtWebEngineWidgets
-        from PySide6 import QtQml
-
+        from PySide6 import QtCore, QtQml, QtWebChannel, QtWebEngineWidgets, QtWidgets
         from PySide6.QtWidgets import (
+            QDockWidget,
             qApp,
         )  # import qApp#, QMainWindow, QLabel, QPixmap, QColor, QGridLayout, QWidget, QPushButton, QComboBox
-        from PySide6.QtWidgets import QDockWidget
     except ImportError:
         pass
 

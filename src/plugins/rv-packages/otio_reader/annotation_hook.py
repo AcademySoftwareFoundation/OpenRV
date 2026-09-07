@@ -7,6 +7,7 @@
 
 
 import logging
+
 import effectHook
 import opentimelineio as otio
 from rv import commands, extra_commands

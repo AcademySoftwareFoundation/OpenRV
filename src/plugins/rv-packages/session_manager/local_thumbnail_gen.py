@@ -2,7 +2,6 @@ import hashlib
 import logging
 import math
 import os
-import psutil
 import shutil
 import subprocess
 import sys
@@ -13,6 +12,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
+
+import psutil
 
 try:
     from PySide2 import QtCore

@@ -24,8 +24,7 @@ def _fetch(name, func, url):
 
 def fetch_httplib(url):
     def impl(url):
-        from six.moves import http_client
-        from six.moves import urllib_parse
+        from six.moves import http_client, urllib_parse
 
         u = urllib_parse.urlparse(url)
         http_client.HTTPSConnection(u.netloc).request("GET", u.path)
@@ -57,19 +56,19 @@ app = None
 def fetch_pyside(url):
     def impl(url):
         try:
-            from PySide2.QtCore import QEventLoop, QUrl, QCoreApplication
+            from PySide2.QtCore import QCoreApplication, QEventLoop, QUrl
             from PySide2.QtNetwork import (
-                QNetworkRequest,
-                QNetworkReply,
                 QNetworkAccessManager,
+                QNetworkReply,
+                QNetworkRequest,
             )
         except ImportError:
             try:
-                from PySide6.QtCore import QEventLoop, QUrl, QCoreApplication
+                from PySide6.QtCore import QCoreApplication, QEventLoop, QUrl
                 from PySide6.QtNetwork import (
-                    QNetworkRequest,
-                    QNetworkReply,
                     QNetworkAccessManager,
+                    QNetworkReply,
+                    QNetworkRequest,
                 )
             except ImportError:
                 pass

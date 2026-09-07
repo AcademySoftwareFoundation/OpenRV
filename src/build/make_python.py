@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # *****************************************************************************
 # Copyright 2020 Autodesk, Inc. All rights reserved.
@@ -13,12 +12,10 @@ import argparse
 import glob
 import os
 import pathlib
-import shutil
-import sys
-import subprocess
 import platform
-
-from typing import List
+import shutil
+import subprocess
+import sys
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(ROOT_DIR)
@@ -44,7 +41,7 @@ def get_sitecustomize_content() -> str:
         return f.read()
 
 
-def get_python_interpreter_args(python_home: str, variant: str) -> List[str]:
+def get_python_interpreter_args(python_home: str, variant: str) -> list[str]:
     """
     Return the path to the python interpreter given a Python home
 
@@ -299,28 +296,27 @@ def configure() -> None:
         makefile_path = os.path.join(SOURCE_DIR, "Makefile")
         old_makefile_path = os.path.join(SOURCE_DIR, "Makefile.old")
         os.rename(makefile_path, old_makefile_path)
-        with open(old_makefile_path) as old_makefile:
-            with open(makefile_path, "w") as makefile:
-                for line in old_makefile:
-                    new_line = line.replace(
-                        "-Wl,-install_name,$(prefix)/lib/libpython$(",
-                        "-Wl,-install_name,@rpath/libpython$(",
-                    )
+        with open(old_makefile_path) as old_makefile, open(makefile_path, "w") as makefile:
+            for line in old_makefile:
+                new_line = line.replace(
+                    "-Wl,-install_name,$(prefix)/lib/libpython$(",
+                    "-Wl,-install_name,@rpath/libpython$(",
+                )
 
-                    # Adjust RPaths
-                    if new_line.startswith("LINKFORSHARED="):
-                        if platform.system() == "Linux":
-                            makefile.write(
-                                new_line.strip() + " -Wl,-rpath,'$$ORIGIN/../lib',-rpath,'$$ORIGIN/../Qt'" + "\n"
-                            )
-                        elif platform.system() == "Darwin":
-                            makefile.write(
-                                new_line.strip()
-                                + " -Wl,-rpath,@executable_path/../lib,-rpath,@executable_path/../Qt"
-                                + "\n"
-                            )
-                    else:
-                        makefile.write(new_line)
+                # Adjust RPaths
+                if new_line.startswith("LINKFORSHARED="):
+                    if platform.system() == "Linux":
+                        makefile.write(
+                            new_line.strip() + " -Wl,-rpath,'$$ORIGIN/../lib',-rpath,'$$ORIGIN/../Qt'" + "\n"
+                        )
+                    elif platform.system() == "Darwin":
+                        makefile.write(
+                            new_line.strip()
+                            + " -Wl,-rpath,@executable_path/../lib,-rpath,@executable_path/../Qt"
+                            + "\n"
+                        )
+                else:
+                    makefile.write(new_line)
 
 
 def build() -> None:

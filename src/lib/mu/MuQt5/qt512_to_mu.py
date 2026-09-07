@@ -4,15 +4,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from sgmllib import SGMLParser
-import urllib
+import os
+import pickle
+import pprint
+import re
+import string
 import sys
 import traceback
-import pprint
-import string
-import re
-import pickle
-import os
+import urllib
+
+from sgmllib import SGMLParser
 
 #
 #   Qt 5 splits the docs into subdirs which complicates things slightly.
@@ -869,7 +870,7 @@ def constReferenceType(t):
 
 
 def indexOf(element, sequence):
-    for i in range(0, len(sequence)):
+    for i in range(len(sequence)):
         if element == sequence[i]:
             return i
     return -1
@@ -1646,7 +1647,7 @@ def parseFunction(func, qtnamespace):
             params.append(parseParameter(current, count))
 
         # make new name for params with same name as func
-        for i in range(0, len(params)):
+        for i in range(len(params)):
             p = params[i]
             if p[0] == nameproto[-1]:
                 params[i] = (p[0] + "_", p[1], p[2])
@@ -1791,7 +1792,7 @@ class NamespaceInfo:
         return None
 
     def finish(self):
-        for q in range(0, len(self.functions)):
+        for q in range(len(self.functions)):
             f = self.functions[q]
             (name, fconst, params, rtype, prop) = f
             ctype = self.name + "::" + rtype
@@ -1807,7 +1808,7 @@ class NamespaceInfo:
 
             (name, fconst, params, rtype, prop) = self.functions[q]
 
-            for i in range(0, len(params)):
+            for i in range(len(params)):
                 p = params[i]
                 (pname, ptype, pval) = p
                 ctype = self.name + "::" + ptype
@@ -2000,7 +2001,7 @@ class MuFunction:
                 fargs = len(f.args)
                 if fargs == nargs and not f.failed:
                     samecount = 0
-                    for i in range(0, nargs):
+                    for i in range(nargs):
                         a = f.args[i][1]
                         b = self.args[i][1]
                         if a.startswith("flags"):
@@ -2236,7 +2237,7 @@ class MuFunction:
                 # else:
                 expr = "%s::%s(" % (muclass.qt.name, callname)
 
-        for i in range(0, len(self.args)):
+        for i in range(len(self.args)):
             a = self.args[i]
             (aname, atype, aval) = a
             (dexpr, dtype) = self.derefArg(a)
@@ -2639,7 +2640,7 @@ class MuClass:
         itypes = set([])
         endinclude = 0
 
-        for i in range(0, len(cpplines)):
+        for i in range(len(cpplines)):
             m = makeRE.search(cpplines[i])
             if "#include" in cpplines[i]:
                 endinclude = i
@@ -2807,7 +2808,7 @@ class MuClass:
                         out += rtype_clean + " MuQt_" + self.name + "::" + name + "("
 
                     # args
-                    for i in range(0, len(params)):
+                    for i in range(len(params)):
                         p = params[i]
                         (pname, ptype, pval) = p
                         if i > 0 or f.isconstructor:
@@ -2819,7 +2820,7 @@ class MuClass:
                     if f.isconstructor:
                         # call the base class constr
                         out += "\n : " + name + "("
-                        for i in range(0, len(params)):
+                        for i in range(len(params)):
                             p = params[i]
                             (pname, ptype, pval) = p
                             if i > 0:
@@ -2858,7 +2859,7 @@ class MuClass:
                             else:
                                 out += "return "
                             out += self.name + "::" + f.name + "("
-                            for i in range(0, len(params)):
+                            for i in range(len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
                                 if i > 0 or f.isconstructor:
@@ -2876,7 +2877,7 @@ class MuClass:
                         # if f.name == "splitPath":
                         #   print str(parms)
                         out += "        args[0] = Value(Pointer(_obj));\n"
-                        for i in range(0, len(params)):
+                        for i in range(len(params)):
                             p = params[i]
                             # print str(f.args[i+1])
                             out += "        args[%d] = Value(%s);\n" % (
@@ -2895,7 +2896,7 @@ class MuClass:
                             out += "defaultValue<%s>();\n" % rtype_clean
                         else:
                             out += self.name + "::" + f.name + "("
-                            for i in range(0, len(params)):
+                            for i in range(len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
                                 if i > 0 or f.isconstructor:
@@ -2939,7 +2940,7 @@ class MuClass:
                         out += "    " + "MuQt_" + name + "(Pointer muobj, const CallEnvironment*"
                     else:
                         out += "    " + rtype + " " + name + "("
-                    for i in range(0, len(params)):
+                    for i in range(len(params)):
                         p = params[i]
                         (pname, ptype, pval) = p
                         if i > 0 or f.isconstructor:
@@ -2960,7 +2961,7 @@ class MuClass:
                             if parent:
                                 nameSuffix = "_parent"
                             out += "    " + nvrtype + " " + name + "_pub%s(" % nameSuffix
-                            for i in range(0, len(params)):
+                            for i in range(len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
                                 if "::" in ptype:
@@ -2975,7 +2976,7 @@ class MuClass:
                             if parent:
                                 out += self.name + "::"
                             out += name + "("
-                            for i in range(0, len(params)):
+                            for i in range(len(params)):
                                 p = params[i]
                                 (pname, ptype, pval) = p
                                 if i > 0:
@@ -3071,7 +3072,7 @@ class MuClass:
             elif line.find("{%%propExclusions%%}") != -1:
                 if len(self.demotedProps):
                     s = "    const char* propExclusions[] = {"
-                    for i in range(0, len(self.demotedProps)):
+                    for i in range(len(self.demotedProps)):
                         if i != 0:
                             s += ", "
                         s += '"%s"' % self.demotedProps[i][0]
@@ -3096,7 +3097,7 @@ class MuClass:
                 cpplines.append(string.replace(line, "$T", self.name))
         cppfile.close()
 
-        for i in range(0, len(cpplines)):
+        for i in range(len(cpplines)):
             line = cpplines[i]
             if len(line) >= 1 and line[-1] != "\n":
                 cpplines[i] = line + "\n"
@@ -3180,7 +3181,7 @@ class MuClass:
                         self.name,
                         self.name,
                     )
-                    for i in range(0, len(inherits)):
+                    for i in range(len(inherits)):
                         out += ", t_%s" % inherits[i].name
                     out += ");"
                 else:
@@ -3460,9 +3461,7 @@ class QtDocParser(SGMLParser):
             return
         elif data == "Obsolete flags:":  # note obsolete
             self.defenum = False
-        elif data == " (preliminary)":  # shows up in qwidget.html, messes up everything
-            return
-        elif data == " (deprecated)":  # shows up in qprocess.html, messes up everything
+        elif data == " (preliminary)" or data == " (deprecated)":  # shows up in qwidget.html, messes up everything
             return
         elif self.modulespan and "Q" in data:
             self.module = data
@@ -3656,7 +3655,7 @@ def recursiveParse(url):
         for u in parser.childurls:
             # if "qwidget.html" in u:
             recursiveParse(u)
-    except IOError:
+    except OSError:
         print("FAILED: (IOError)", url)
     except Exception:
         print("FAILED:", url)

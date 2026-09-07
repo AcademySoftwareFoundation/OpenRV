@@ -19,8 +19,7 @@ def gen_random(max):
 
 
 def main(N):
-    if N < 1:
-        N = 1
+    N = max(N, 1)
     gr = gen_random
     for i in range(1, N):
         gr(100.0)

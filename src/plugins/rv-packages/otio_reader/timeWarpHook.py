@@ -5,8 +5,8 @@
 #
 import sys
 
-from rv import commands
 from effectHook import set_rv_effect_props
+from rv import commands
 
 
 def hook_function(in_timeline, argument_map=None):
@@ -18,6 +18,6 @@ def hook_function(in_timeline, argument_map=None):
 
     kind = "audio" if argument_map.get("kind", "") == "Audio" else "visual"
 
-    node_component = "{}.{}".format(rv_retime, kind)
+    node_component = f"{rv_retime}.{kind}"
     set_rv_effect_props(node_component, {"scale": 1 / scalar})
     return rv_retime
