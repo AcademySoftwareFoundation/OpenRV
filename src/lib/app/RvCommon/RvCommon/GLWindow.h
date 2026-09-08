@@ -68,6 +68,14 @@ namespace Rv
 
         float devicePixelRatioF() const;
 
+        //
+        //  Re-establish the surface and notify the session when the device
+        //  pixel ratio changes without a change of logical size. This is what
+        //  moving to a display with a different scale factor does, and which Qt
+        //  reports through no resize of its own. See the definition.
+        //
+        void syncDevicePixelRatio();
+
         QImage readPixels(int x, int y, int w, int h);
 
     public slots:
@@ -94,6 +102,8 @@ namespace Rv
         int m_alpha;
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
+        float m_devicePixelRatio;
+        bool m_syncingDevicePixelRatio;
         QOpenGLContext* m_sharedContext;
     };
 
