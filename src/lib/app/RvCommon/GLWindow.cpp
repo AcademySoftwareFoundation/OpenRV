@@ -28,6 +28,7 @@
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
@@ -180,7 +181,17 @@ namespace Rv
     {
         const float dpr = static_cast<float>(devicePixelRatio());
 
-        if (dpr == m_devicePixelRatio || m_syncingDevicePixelRatio)
+        //
+        //  Compare with a tolerance rather than exactly. Only macOS, which
+        //  reports whole-number ratios, has been tested; a platform that
+        //  derives the ratio from fractional scaling (Windows at 125%, 150%)
+        //  can return values that differ in the last bits from one call to the
+        //  next. An exact comparison would never take the early return there,
+        //  and since the work below ends in requestUpdate() (and the session notification) 
+        //  that brings us back here, that would spin continuously. 
+        //  The tolerance is far below any real difference in scale factor between two displays.
+        //
+        if (std::abs(dpr - m_devicePixelRatio) < 1e-4f || m_syncingDevicePixelRatio)
         {
             return;
         }
