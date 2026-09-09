@@ -19,7 +19,6 @@
 #include <ImathMatrix.h>
 #include <algorithm>
 #include <cmath>
-#include <cstring>
 #include <vector>
 
 namespace Mu
@@ -44,18 +43,23 @@ namespace Mu
         template <typename M> M loadMatrix(const float* data)
         {
             M m;
-            memcpy(&m.x[0][0], data, sizeof(m.x));
+            std::copy_n(data, M::dimensions() * M::dimensions(), m.getValue());
             return m;
         }
 
-        template <typename M> void storeMatrix(const M& m, float* data) { memcpy(data, &m.x[0][0], sizeof(m.x)); }
+        template <typename M> void storeMatrix(const M& m, float* data)
+        {
+            std::copy_n(m.getValue(), M::dimensions() * M::dimensions(), data);
+        }
 
         void makeIdentity(float* m, size_t n)
         {
             fill(m, m + n * n, 0.0f);
 
             for (size_t i = 0; i < n; i++)
+            {
                 m[i * n + i] = 1.0f;
+            }
         }
 
         //
@@ -73,16 +77,16 @@ namespace Mu
             for (size_t i = 0; i < n; i++)
             {
                 size_t pivot = i;
-                float pivotSize = fabsf(t[i * n + i]);
+                float pivotSize = std::abs(t[i * n + i]);
 
                 for (size_t j = i + 1; j < n; j++)
                 {
-                    const float mag = fabsf(t[j * n + i]);
+                    const float magnitude = std::abs(t[j * n + i]);
 
-                    if (mag > pivotSize)
+                    if (magnitude > pivotSize)
                     {
                         pivot = j;
-                        pivotSize = mag;
+                        pivotSize = magnitude;
                     }
                 }
 
@@ -112,7 +116,9 @@ namespace Mu
                 for (size_t j = 0; j < n; j++)
                 {
                     if (j == i)
+                    {
                         continue;
+                    }
 
                     const float f = t[j * n + i];
 
@@ -135,12 +141,14 @@ namespace Mu
 
         size_t squareMatrixSize(const FixedArray* array)
         {
-            const FixedArrayType::SizeVector& dims = array->arrayType()->dimensions();
+            const FixedArrayType::SizeVector& dimensions = array->arrayType()->dimensions();
 
-            if (dims.size() != 2 || dims[0] != dims[1])
+            if (dimensions.size() != 2 || dimensions[0] != dimensions[1])
+            {
                 return 0;
+            }
 
-            return dims[0];
+            return dimensions[0];
         }
 
     } // namespace
