@@ -147,6 +147,14 @@ namespace TwkApp
             new Function(c, "unbindRegex", CommandsModule::unbindRegex, None, Return, "void", Parameters,
                          new Param(c, "modeName", "string"), new Param(c, "tableName", "string"), new Param(c, "eventName", "string"), End),
 
+            new Function(c, "rebind", CommandsModule::rebind, None, Return, "void", Parameters, new Param(c, "modeName", "string"),
+                         new Param(c, "tableName", "string"), new Param(c, "oldEventName", "string"),
+                         new Param(c, "newEventName", "string"), End),
+
+            new Function(c, "rebindRegex", CommandsModule::rebindRegex, None, Return, "void", Parameters,
+                         new Param(c, "modeName", "string"), new Param(c, "tableName", "string"), new Param(c, "oldEventPattern", "string"),
+                         new Param(c, "newEventPattern", "string"), End),
+
             new Function(c, "setEventTableBBox", CommandsModule::setTableBBox, None, Return, "void", Parameters,
                          new Param(c, "modeName", "string"), new Param(c, "tableName", "string"), new Param(c, "min", "vector float[2]"),
                          new Param(c, "max", "vector float[2]"), End),
@@ -544,6 +552,84 @@ namespace TwkApp
             if (EventTable* table = mode->findTableByName(tableName->c_str()))
             {
                 table->unbindRegex(eventName->c_str());
+                //
+                //  currentDocument has a copy of this table, so invalidate
+                //  that copy.
+                //
+                d->invalidateEventTables();
+            }
+            else
+            {
+                string msg = "No table named " + string(tableName->c_str());
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, msg);
+            }
+        }
+        else
+        {
+            string msg = "No mode named " + string(modeName->c_str());
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, msg);
+        }
+    }
+
+    NODE_IMPLEMENTATION(CommandsModule::rebind, void)
+    {
+        Process* p = NODE_THREAD.process();
+        Document* d = currentDocument();
+
+        String* modeName = NODE_ARG_OBJECT(0, StringType::String);
+        String* tableName = NODE_ARG_OBJECT(1, StringType::String);
+        String* oldEventName = NODE_ARG_OBJECT(2, StringType::String);
+        String* newEventName = NODE_ARG_OBJECT(3, StringType::String);
+
+        if (!modeName || !tableName || !oldEventName || !newEventName)
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
+        }
+
+        if (Mode* mode = d->findModeByName(modeName->c_str()))
+        {
+            if (EventTable* table = mode->findTableByName(tableName->c_str()))
+            {
+                table->rebind(oldEventName->c_str(), newEventName->c_str());
+                //
+                //  currentDocument has a copy of this table, so invalidate
+                //  that copy.
+                //
+                d->invalidateEventTables();
+            }
+            else
+            {
+                string msg = "No table named " + string(tableName->c_str());
+                throwBadArgumentException(NODE_THIS, NODE_THREAD, msg);
+            }
+        }
+        else
+        {
+            string msg = "No mode named " + string(modeName->c_str());
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, msg);
+        }
+    }
+
+    NODE_IMPLEMENTATION(CommandsModule::rebindRegex, void)
+    {
+        Process* p = NODE_THREAD.process();
+        Document* d = currentDocument();
+
+        String* modeName = NODE_ARG_OBJECT(0, StringType::String);
+        String* tableName = NODE_ARG_OBJECT(1, StringType::String);
+        String* oldEventPattern = NODE_ARG_OBJECT(2, StringType::String);
+        String* newEventPattern = NODE_ARG_OBJECT(3, StringType::String);
+
+        if (!modeName || !tableName || !oldEventPattern || !newEventPattern)
+        {
+            throwBadArgumentException(NODE_THIS, NODE_THREAD, "Nil argument to function");
+        }
+
+        if (Mode* mode = d->findModeByName(modeName->c_str()))
+        {
+            if (EventTable* table = mode->findTableByName(tableName->c_str()))
+            {
+                table->rebindRegex(oldEventPattern->c_str(), newEventPattern->c_str());
                 //
                 //  currentDocument has a copy of this table, so invalidate
                 //  that copy.
