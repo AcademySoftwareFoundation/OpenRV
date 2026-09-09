@@ -23,6 +23,14 @@ namespace IPCore
         declareProperty<FloatProperty>("matte.opacity", 0.66f);
         declareProperty<FloatProperty>("matte.heightVisible", -1.0);
         declareProperty<Vec2fProperty>("matte.centerPoint", Vec2f(0.0, 0.0));
+        // When 0 (default), the matte (and other overlay geometry such as
+        // HUD rectangles/text/windows) does not rotate with the image when
+        // the user applies an arbitrary rotation via
+        // #RVTransform2D.transform.rotate. The matte still follows any
+        // user-applied scale and translate so that pan/zoom review still
+        // works normally. Setting this to 1 restores the legacy behavior
+        // where all overlays rotate with the image.
+        declareProperty<IntProperty>("matte.rotateWithImage", 0);
         declareProperty<IntProperty>("paintEffects.hold", 0);
         declareProperty<IntProperty>("paintEffects.ghost", 0);
         declareProperty<IntProperty>("paintEffects.ghostBefore", 5);

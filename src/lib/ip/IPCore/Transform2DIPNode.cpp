@@ -7,6 +7,8 @@
 //******************************************************************************
 
 #include <IPCore/Transform2DIPNode.h>
+#include <IPCore/IPGraph.h>
+#include <IPCore/SessionIPNode.h>
 #include <IPCore/ShaderCommon.h>
 #include <IPCore/ShaderUtil.h>
 #include <IPCore/NodeDefinition.h>
@@ -76,55 +78,75 @@ namespace IPCore
 
     void Transform2DIPNode::setFlop(bool b) { setProperty(m_flop, b ? 1 : 0); }
 
+    namespace
+    {
+        //
+        //  Build the local 2D transform. The composition order is:
+        //      M = T * R * S * FlipFlop
+        //  When 'includeRotate' is false, the R factor is omitted, producing
+        //      M_noRot = T * S * FlipFlop
+        //  This is the matrix used for the overlay chain (mattes, HUD, etc.)
+        //  so that overlays follow user scale/translate but do not rotate
+        //  with the image.
+        //
+        IPNode::Matrix
+        buildLocalMatrix(int flip, int flop, TwkMath::Vec2f scale, float rotDeg,
+                         TwkMath::Vec2f translate, bool includeRotate)
+        {
+            using namespace TwkMath;
+
+            IPNode::Matrix M;
+
+            if (flip == 1)
+            {
+                Mat44f S;
+                S.makeScale(Vec3f(1, -1, 1));
+                M *= S;
+            }
+
+            if (flop == 1)
+            {
+                Mat44f S;
+                S.makeScale(Vec3f(-1, 1, 1));
+                M *= S;
+            }
+
+            if (scale != Vec2f(1, 1))
+            {
+                Mat44f S;
+                S.makeScale(Vec3f(scale.x, scale.y, 1));
+                M = S * M;
+            }
+
+            if (includeRotate && rotDeg != 0.0f)
+            {
+                Mat44f R;
+                R.makeRotation(Vec3f(0, 0, -1), degToRad(rotDeg));
+                M = R * M;
+            }
+
+            if (translate != Vec2f(0, 0))
+            {
+                Mat44f T;
+                T.makeTranslation(Vec3f(translate.x, translate.y, 0));
+                M = T * M;
+            }
+
+            return M;
+        }
+    } // namespace
+
     IPNode::Matrix Transform2DIPNode::localMatrix(const Context& context) const
     {
         //
         //  The order here is important. We want to do all scaling
         //  followed by rotation followed by translation.
         //
-
-        Matrix M;
-
-        if (propertyValue(m_flip, 0) == 1)
-        {
-            Mat44f S;
-            S.makeScale(Vec3f(1, -1, 1));
-            M *= S;
-        }
-
-        if (propertyValue(m_flop, 0) == 1)
-        {
-            Mat44f S;
-            S.makeScale(Vec3f(-1, 1, 1));
-            M *= S;
-        }
-
-        Vec2f scale = propertyValue(m_scale, Vec2f(1, 1));
-        float rot = propertyValue(m_rotate, 0.0f);
-        Vec2f translate = propertyValue(m_translate, Vec2f(0, 0));
-
-        if (scale != Vec2f(1, 1))
-        {
-            Mat44f S;
-            S.makeScale(Vec3f(scale.x, scale.y, 1));
-            M = S * M;
-        }
-
-        if (rot != 0.0f)
-        {
-            Mat44f R;
-            R.makeRotation(Vec3f(0, 0, -1), degToRad(rot));
-            M = R * M;
-        }
-
-        if (translate != Vec2f(0, 0))
-        {
-            Mat44f T;
-            T.makeTranslation(Vec3f(translate.x, translate.y, 0));
-            M = T * M;
-        }
-
-        return M;
+        return buildLocalMatrix(propertyValue(m_flip, 0), propertyValue(m_flop, 0),
+                                propertyValue(m_scale, Vec2f(1, 1)),
+                                propertyValue(m_rotate, 0.0f),
+                                propertyValue(m_translate, Vec2f(0, 0)),
+                                /*includeRotate=*/true);
     }
 
     IPImage* Transform2DIPNode::evaluate(const Context& context)
@@ -138,6 +160,38 @@ namespace IPCore
         }
 
         Matrix M = localMatrix(context);
+
+        //
+        //  Build a rotation-stripped variant of the same transform for the
+        //  "overlay" chain. Overlays (mattes, HUD text, custom rectangles)
+        //  should follow the user's scale/translate but should not rotate
+        //  with the image when the user does an arbitrary rotation. When the
+        //  Session property Session.matte.rotateWithImage is non-zero, we
+        //  opt back into the legacy behavior by using M as-is here.
+        //
+        bool rotateOverlayWithImage = false;
+        if (IPGraph* g = graph())
+        {
+            if (IPNode* sn = g->sessionNode())
+            {
+                if (IntProperty* p =
+                        sn->property<IntProperty>("matte", "rotateWithImage"))
+                {
+                    if (p->size())
+                        rotateOverlayWithImage = p->front() != 0;
+                }
+            }
+        }
+
+        Matrix M_overlay =
+            rotateOverlayWithImage
+                ? M
+                : buildLocalMatrix(propertyValue(m_flip, 0),
+                                   propertyValue(m_flop, 0),
+                                   propertyValue(m_scale, Vec2f(1, 1)),
+                                   propertyValue(m_rotate, 0.0f),
+                                   propertyValue(m_translate, Vec2f(0, 0)),
+                                   /*includeRotate=*/false);
 
         //
         //  Transform2DIPNode still handles the visible box for wipes,
@@ -202,12 +256,16 @@ namespace IPCore
                 if (root->children->width >= root->width || root->children->height >= root->height)
                 {
                     child->transformMatrix = M * child->transformMatrix;
+                    child->overlayTransformMatrix =
+                        M_overlay * child->overlayTransformMatrix;
                 }
             }
         }
         else
         {
             root->transformMatrix = M * root->transformMatrix;
+            root->overlayTransformMatrix =
+                M_overlay * root->overlayTransformMatrix;
         }
 
         if (stencilBox)

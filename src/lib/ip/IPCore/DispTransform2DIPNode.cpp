@@ -65,16 +65,24 @@ namespace IPCore
 
         if (IPImage* root = IPNode::evaluate(newContext))
         {
+            // Display-level transform only supports scale and translate, so
+            // the overlay chain stays in lockstep with the main chain here.
             if (root->destination == IPImage::IntermediateBuffer && root->children)
             {
                 IPImage* child = root->children;
                 for (; child; child = child->next)
                 {
                     child->transformMatrix = M * child->transformMatrix;
+                    child->overlayTransformMatrix =
+                        M * child->overlayTransformMatrix;
                 }
             }
             else
+            {
                 root->transformMatrix = M * root->transformMatrix;
+                root->overlayTransformMatrix =
+                    M * root->overlayTransformMatrix;
+            }
             return root;
         }
 

@@ -211,9 +211,16 @@ namespace IPCore
                 right->useBackground = true;
 
                 if (flip)
+                {
+                    // M is a Y-flip scale (no rotation), so mirror into the
+                    // overlay chain as well.
                     left->transformMatrix = M * left->transformMatrix;
-                if (flip)
+                    left->overlayTransformMatrix =
+                        M * left->overlayTransformMatrix;
                     right->transformMatrix = M * right->transformMatrix;
+                    right->overlayTransformMatrix =
+                        M * right->overlayTransformMatrix;
+                }
             }
             catch (...)
             {
@@ -287,7 +294,13 @@ namespace IPCore
                     image = insertIntermediateRendersForPaint(image, newContext);
 
                 if (flip)
+                {
+                    // M is a Y-flip scale (no rotation), so mirror into the
+                    // overlay chain as well.
                     image->transformMatrix = M * image->transformMatrix;
+                    image->overlayTransformMatrix =
+                        M * image->overlayTransformMatrix;
+                }
                 image->useBackground = true;
 
                 IPImage* eimage = new IPImage(this, imageDevice(), IPImage::ExternalRenderType, IPImage::CurrentFrameBuffer,
