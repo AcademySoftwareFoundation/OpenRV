@@ -22,6 +22,49 @@ inputs:
   rocky_qt6_archives:
     required: false
     default: 'icu qtbase qtdeclarative qtsvg qttools qttranslations qtwayland'
+  stress-iterations:
+    required: false
+    default: '0'
+    description: >
+      When non-zero, skip the normal test suite and instead run
+      CrashDumpSmokeTest this many times, reporting how many failed. Used to
+      reproduce the intermittent Rocky 8 crash-dump failure on demand rather
+      than waiting for it to surface in a daily build. Also skips the install
+      steps, which are not interesting here.
+  stress-strip-marker:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Removes the crashpad wrapper
+      start marker from the staged handler before stressing, to test whether
+      adding it perturbed the failure.
+  stress-sigprobe:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. LD_PRELOADs a probe that logs
+      every change to the SIGSEGV handler and to whether SIGSEGV is blocked.
+      Answers why a real SIGSEGV produces no dump while Crashpad's handler is
+      installed. Unlike gdb it does not use ptrace, so the timing-sensitive
+      failure still reproduces.
+  stress-malloc-check:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Sets MALLOC_PERTURB_ and
+      MALLOC_CHECK_, so freshly allocated and freed heap memory is filled with
+      a known byte and heap metadata corruption aborts where it is detected.
+      Tests whether the startup crash is a heap bug: it costs almost nothing
+      at runtime, unlike a sanitiser or a tracer, both of which have been seen
+      to change the failure rate.
+  stress-gdb:
+    required: false
+    default: 'false'
+    description: >
+      Only meaningful with stress-iterations. Runs RV under a batch gdb so the
+      startup crash's backtrace is printed. gdb becomes the tracer, so Crashpad
+      cannot write a dump in this mode: it diagnoses the startup crash rather
+      than testing capture. An iteration "fails" when the crash reproduced.
 
 runs:
   using: "composite"
@@ -272,15 +315,70 @@ runs:
       shell: bash
 
     - name: Tests
+      if: ${{ inputs.stress-iterations == '0' }}
       run: ctest --test-dir _build -C ${{ inputs.build-type }} --extra-verbose
       shell: bash
 
+    # Stress steps run here, before the deps directories below are deleted:
+    # the staged application still resolves libraries out of them.
+    - name: Strip crashpad wrapper start marker
+      if: ${{ inputs.stress-iterations != '0' && inputs.stress-strip-marker == 'true' }}
+      run: |
+        wrapper=_build/stage/app/bin/crashpad_handler_linux.sh
+        sed -i '/^echo "\[wrapper\]/d' "$wrapper"
+        echo "Wrapper after stripping the marker:"
+        cat "$wrapper"
+      shell: bash
+
+    - name: Build the SIGSEGV probe
+      if: ${{ inputs.stress-iterations != '0' && inputs.stress-sigprobe == 'true' }}
+      run: |
+        # -ldl because dlsym still lives in libdl on the Rocky 8 glibc (2.28).
+        gcc -shared -fPIC -O1 -Wall -Wextra \
+          -o _build/sigprobe.so src/test/CrashDumpSmokeTest/sigprobe.c -ldl -lpthread
+        ls -l _build/sigprobe.so
+      shell: bash
+
+    - name: Install gdb for backtrace capture
+      if: ${{ inputs.stress-iterations != '0' && inputs.stress-gdb == 'true' }}
+      run: dnf install -y gdb
+      shell: bash
+
+    - name: Stress CrashDumpSmokeTest
+      if: ${{ inputs.stress-iterations != '0' }}
+      env:
+        RV_CRASH_SMOKE_GDB: ${{ inputs.stress-gdb == 'true' && '1' || '0' }}
+        LD_PRELOAD: ${{ inputs.stress-sigprobe == 'true' && format('{0}/_build/sigprobe.so', github.workspace) || '' }}
+        # 165 is 0xA5: conspicuous in a dump and an unlikely pointer or length.
+        MALLOC_PERTURB_: ${{ inputs.stress-malloc-check == 'true' && '165' || '' }}
+        MALLOC_CHECK_: ${{ inputs.stress-malloc-check == 'true' && '3' || '' }}
+      run: |
+        iterations='${{ inputs.stress-iterations }}'
+        failures=0
+        for i in $(seq 1 "$iterations"); do
+          echo "::group::CrashDumpSmokeTest iteration $i of $iterations"
+          if ctest --test-dir _build -C ${{ inputs.build-type }} -R '^CrashDumpSmokeTest$' --output-on-failure; then
+            outcome=pass
+          else
+            outcome=FAIL
+            failures=$((failures + 1))
+          fi
+          echo "::endgroup::"
+          echo "iteration $i: $outcome"
+        done
+        summary="CrashDumpSmokeTest: $failures failure(s) in $iterations run(s) on Rocky ${{ inputs.rocky-version }} ${{ inputs.vfx-platform }} ${{ inputs.build-type }}, strip-marker=${{ inputs.stress-strip-marker }}, gdb=${{ inputs.stress-gdb }}, sigprobe=${{ inputs.stress-sigprobe }}, malloc-check=${{ inputs.stress-malloc-check }}"
+        echo "$summary"
+        echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+      shell: bash
+
     - name: Free some spaces for the install steps
+      if: ${{ inputs.stress-iterations == '0' }}
       run: |
         rm -rf _build/RV_DEPS_*
         rm -rf _build/_deps
       shell: bash
 
     - name: Install OpenRV
+      if: ${{ inputs.stress-iterations == '0' }}
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: bash
