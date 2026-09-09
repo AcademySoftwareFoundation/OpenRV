@@ -199,11 +199,17 @@ def prepare() -> None:
         "    endif()",
         'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
         '        set (gcc_warnings_options "${gcc_warnings_options} -Wno-cast-function-type")\n'
-        '    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")\n'
+        '    elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")\n'
         '        set (gcc_warnings_options "${gcc_warnings_options} '
-        '-Wno-error=cast-function-type-mismatch -Wno-cast-function-type-mismatch")\n'
+        '-Wno-cast-function-type-mismatch")\n'
         "    endif()",
     )
+
+    if new_content == old_content:
+        raise RuntimeError(
+            f"Failed to patch {shiboken_helpers_path}: the expected compiler-id block was not found. "
+            "Upstream ShibokenHelpers.cmake likely changed; update the search string."
+        )
 
     with open(shiboken_helpers_path, "w") as shiboken_helpers:
         shiboken_helpers.write(new_content)
