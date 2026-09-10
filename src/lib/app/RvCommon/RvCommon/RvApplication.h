@@ -126,6 +126,22 @@ namespace Rv
         void setPresentationMode(bool);
         bool isInPresentationMode();
 
+        //
+        //  Re-evaluate and rebuild the desktop presentation devices so their
+        //  backend follows the current display-depth preference and the main
+        //  view's live backend, then re-bind the share device and, if
+        //  presentation mode is on, re-open the presentation output on the
+        //  selected screen.
+        //
+        //  Invoked from the RvDocument backend-transition points
+        //  (setDisplayOutput / swapGLViewToVulkan / fallbackVulkanToGLView /
+        //  rebuildGLView). shareDevice is the controller's new main-view GL
+        //  device, or null when the main view has moved to Vulkan and there is
+        //  no GL device to share. Fixes the frozen presentation bit depth and
+        //  the black second display on a backend mismatch.
+        //
+        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice);
+
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 
         static int parseInFiles(int argc, char* argv[]);
