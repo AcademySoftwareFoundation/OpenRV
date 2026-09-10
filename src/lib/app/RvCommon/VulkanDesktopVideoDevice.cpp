@@ -19,6 +19,24 @@ namespace Rv
         : DesktopVideoDevice(module, name, screen, shareDevice)
         , m_vulkanView(nullptr)
     {
+        //
+        //  The base constructor advertised RGB8. This device presents through a
+        //  10-bit Vulkan swapchain, so re-advertise at the depth actually
+        //  delivered -- the depth is only ever used to build the description
+        //  string, but that string is what Preferences, the top-view toolbar
+        //  and humanReadableID() show.
+        //
+        //  Claiming 10 here is sound: this class is only instantiated when
+        //  DesktopVideoDevice::shouldUseVulkanPresentation() is true, which
+        //  already required the 10-bit surface-format probe to succeed.
+        //
+        //  addDefaultDataFormats() appends the same six stereo modes in the
+        //  same order at any depth, so the indices are unchanged -- and the
+        //  persisted "dataFormat" preference is an index, so a user's stereo
+        //  choice survives a GL <-> Vulkan device rebuild.
+        //
+        m_dataFormats.clear();
+        addDefaultDataFormats(10);
     }
 
     VulkanDesktopVideoDevice::~VulkanDesktopVideoDevice() { close(); }
