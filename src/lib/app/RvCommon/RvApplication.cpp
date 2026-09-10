@@ -1948,6 +1948,115 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
+    void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice)
+    {
+        if (!m_desktopModule)
+            return;
+
+        //
+        //  Capture the presentation state before any teardown. The selected
+        //  screen is captured implicitly: it is Options::presentDevice, a
+        //  stable device name re-resolved after the rebuild via
+        //  findPresentationDevice, so we restore by name rather than by a
+        //  pointer the rebuild may have destroyed.
+        //
+        const bool wasPresenting = m_presentationMode;
+
+        TwkApp::Document* doc = TwkApp::Document::activeDocument();
+        Rv::Session* session = doc ? static_cast<Rv::Session*>(doc) : nullptr;
+
+        //
+        //  Rebuild the per-screen devices for the current backend. This is a
+        //  no-op returning false when the backend has not changed; the
+        //  share-device rebind below still runs, so a main-view swap that keeps
+        //  the same backend is honored.
+        //
+        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice);
+
+        //
+        //  Re-bind the controller's current main-view device as the share
+        //  device on every (possibly newly created) desktop device. This runs
+        //  after the rebuild so it never writes to an about-to-be-destroyed
+        //  device.
+        //
+        const VideoModule::VideoDevices& devices = m_desktopModule->devices();
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+            {
+                dd->setShareDevice(shareDevice);
+            }
+        }
+
+        //
+        //  Refresh the session graph's per-physical-device display-group
+        //  registry so it references the newly created device pointers.
+        //  rebuildDevices() deleted the old per-screen devices and
+        //  createDesktopVideoDevices() made new ones, but the graph's
+        //  DisplayGroupIPNodes -- built once at startup by setPhysicalDevices
+        //  -- still hold the destroyed pointers. Without this, a later
+        //  setOutputVideoDevice(newDevice) -> connectDisplayGroup ->
+        //  findDisplayGroupByDevice(newDevice) matches nothing and silently
+        //  no-ops, so the presentation output is never rendered and the second
+        //  display stays black.
+        //
+        //  This mirrors the startup sequence, and must run on every real
+        //  rebuild even when presentation is currently off: the device pointers
+        //  can change while presentation is disabled and only be bound as the
+        //  output later (the reported 10 -> 8 -> 10 -> enable repro).
+        //
+        if (rebuilt && session)
+        {
+            session->graph().setPhysicalDevices(videoModules());
+            session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
+        }
+
+        //
+        //  Re-establish the presentation output. The backend-transition callers
+        //  reset the session output device to 0 while rebinding the control
+        //  device, which is the root of the black second display. If
+        //  presentation mode is on, re-open the presentation output on the
+        //  selected screen with the new backend and bind it as the session
+        //  output; a backend change also destroyed the old device, so this
+        //  replaces any stale reference.
+        //
+        if (!wasPresenting || !session)
+            return;
+
+        Rv::Options& opts = Rv::Options::sharedOptions();
+        VideoDevice* d = findPresentationDevice(opts.presentDevice);
+        if (!d)
+        {
+            cerr << "ERROR: presentation device not found after rebuild." << endl;
+            session->setOutputVideoDevice(session->controlVideoDevice());
+            m_presentationMode = false;
+            return;
+        }
+
+        if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
+        {
+            dd->setShareDevice(shareDevice);
+        }
+
+        try
+        {
+            if (!d->isOpen())
+            {
+                string optionArgs = setVideoDeviceStateFromSettings(d);
+                StringVector vargs;
+                algorithm::split(vargs, optionArgs, is_any_of(string(" \t\n\r")), token_compress_on);
+                d->open(vargs);
+            }
+            session->setOutputVideoDevice(d);
+        }
+        catch (std::exception& exc)
+        {
+            cerr << "ERROR: failed to re-open presentation device after rebuild: " << exc.what() << endl;
+            session->setOutputVideoDevice(session->controlVideoDevice());
+            m_presentationMode = false;
+        }
+    }
+
     bool RvApplication::isInPresentationMode() { return m_presentationMode; }
 
     int RvApplication::findVideoModuleIndexByName(const string& name) const
