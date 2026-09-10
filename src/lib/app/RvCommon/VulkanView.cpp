@@ -118,8 +118,33 @@ namespace Rv
         //  it would survive as a stray top-level owning the viewport window,
         //  still pointing at a deleted device.
         //
+        //  Everything below also has to happen before ~QWidget runs.
+        //
+        //  ~QWidget destroys the widget's own QWidgetWindow and its child
+        //  widgets, and both of those emit destroyed() -- at a point where the
+        //  VulkanView sub-object is already gone. Delivering either signal
+        //  there invokes a slot on an object that no longer dynamic_casts to
+        //  VulkanView, which is a hard Q_ASSERT_X in Qt
+        //  (qobjectdefs_impl.h assertObjectType) for the parentWindowDestroyed
+        //  member slot, and a write through a dangling `this` for the lambda
+        //  below.
+        //
+        //  A presentation output view is what makes this reachable: it is
+        //  top-level, so the window it watches is its own (see
+        //  watchParentWindow) and dies with it. The main view watches the
+        //  enclosing document window, which outlives it.
+        //
+        if (m_watchedParentConnection)
+        {
+            disconnect(m_watchedParentConnection);
+            m_watchedParentConnection = QMetaObject::Connection();
+        }
+        m_watchedParentWindow = nullptr;
+
         if (m_vulkanWindow)
         {
+            disconnect(m_vulkanWindow, nullptr, this, nullptr);
+
             m_vulkanWindow->setVideoDevice(nullptr);
             m_vulkanWindow->setEventWidget(nullptr);
         }
@@ -155,7 +180,17 @@ namespace Rv
         //  knowable before the container gets around to re-parenting the
         //  viewport into it.
         //
+        //  Nothing to watch when this view is its own top level, as a
+        //  presentation output view is. The point of this is to survive Qt
+        //  replacing the *enclosing* window (see parentWindowDestroyed); a
+        //  standalone output window has no such enclosing tree, and watching
+        //  itself only creates a connection that fires while the view is being
+        //  destroyed.
+        //
         QWidget* topLevel = window();
+        if (topLevel == this)
+            return;
+
         QWindow* topLevelWindow = topLevel ? topLevel->windowHandle() : nullptr;
 
         if (topLevelWindow == m_watchedParentWindow)
