@@ -185,89 +185,144 @@ namespace Rv
         //
     }
 
+    //
+    //  One process-lifetime QVulkanInstance, shared by the 10-bit probe
+    //  (supports10BitPresentation) and every VulkanWindow (initVulkan). Created
+    //  lazily and never destroyed.
+    //
+    //  Tearing a VkInstance down and then creating or using another shortly
+    //  after corrupts RADV's shared X11/xcb WSI state and segfaults a
+    //  subsequent vkGetPhysicalDeviceSurfaceSupportKHR. That is exactly the
+    //  sequence a mid-session GL->Vulkan promotion produces: the probe runs,
+    //  drops its throwaway instance, and a VulkanWindow initializes moments
+    //  later. Keeping one instance alive for the whole process removes the
+    //  teardown entirely. initVulkan already relied on a never-destroyed
+    //  static instance, so this only extends the same lifetime to the probe.
+    //
+    static QVulkanInstance* sharedVulkanInstance()
+    {
+        static QVulkanInstance* instance = []() -> QVulkanInstance*
+        {
+            auto* inst = new QVulkanInstance();
+            if (!inst->create())
+            {
+                cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << endl;
+                delete inst;
+                return nullptr;
+            }
+            return inst;
+        }();
+        return instance;
+    }
+
     bool VulkanWindow::supports10BitPresentation()
     {
-        QVulkanInstance qtVkInst;
-        if (!qtVkInst.create())
+        //
+        //  Memoized: 10-bit presentation support is a fixed hardware/driver
+        //  property, so probe at most once per process. The probe uses the
+        //  shared, never-destroyed instance and a leaked probe window (see
+        //  sharedVulkanInstance), so it tears down nothing that could corrupt
+        //  RADV's WSI state ahead of a later VulkanWindow init; memoization is
+        //  then just an optimization that avoids re-running the device scan on
+        //  every DesktopVideoDevice::shouldUseVulkanPresentation() call.
+        //
+        static const bool cached = []() -> bool
         {
-            cerr << "ERROR: VulkanWindow: supports10BitPresentation: QVulkanInstance create failed" << endl;
-            return false;
-        }
-
-        VkInstance instance = qtVkInst.vkInstance();
-        if (instance == VK_NULL_HANDLE)
-        {
-            return false;
-        }
-
-        QWindow dummyWindow;
-        dummyWindow.setSurfaceType(QSurface::VulkanSurface);
-        dummyWindow.create();
-        dummyWindow.setVulkanInstance(&qtVkInst);
-
-        VkSurfaceKHR dummySurface = qtVkInst.surfaceForWindow(&dummyWindow);
-        if (!dummySurface)
-        {
-            cerr << "ERROR: VulkanWindow: supports10BitPresentation: failed to create dummy surface" << endl;
-            return false;
-        }
-
-        uint32_t deviceCount = 0;
-        vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-        if (deviceCount == 0)
-        {
-            cerr << "ERROR: VulkanWindow: supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices" << endl;
-            return false;
-        }
-        std::vector<VkPhysicalDevice> devices(deviceCount);
-        vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-
-        if (ImageRenderer::debugGpu())
-        {
-            cout << "INFO: VulkanWindow: supports10BitPresentation: probing " << deviceCount << " physical device(s)" << endl;
-        }
-
-        bool any10bit = false;
-        for (uint32_t di = 0; di < devices.size(); ++di)
-        {
-            VkPhysicalDevice dev = devices[di];
-
-            uint32_t formatCount = 0;
-            if (vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
+            QVulkanInstance* qtVkInst = sharedVulkanInstance();
+            if (!qtVkInst)
             {
-                continue;
+                return false;
             }
-            std::vector<VkSurfaceFormatKHR> formats(formatCount);
-            vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, formats.data());
 
-            bool has10bit = false;
-            for (const auto& fmt : formats)
+            VkInstance instance = qtVkInst->vkInstance();
+            if (instance == VK_NULL_HANDLE)
             {
-                if (isTenBitFormat(fmt.format))
+                return false;
+            }
+
+            //
+            //  Leak the probe window (process-lifetime, never shown).
+            //  Destroying its Vulkan surface right before a real VulkanWindow
+            //  init is part of the same WSI-teardown hazard as destroying the
+            //  instance, so it is never torn down either.
+            //
+            static QWindow* dummyWindow = []() -> QWindow*
+            {
+                auto* w = new QWindow();
+                w->setSurfaceType(QSurface::VulkanSurface);
+                w->create();
+                return w;
+            }();
+            dummyWindow->setVulkanInstance(qtVkInst);
+
+            VkSurfaceKHR dummySurface = qtVkInst->surfaceForWindow(dummyWindow);
+            if (!dummySurface)
+            {
+                cerr << "ERROR: VulkanWindow: supports10BitPresentation: failed to create dummy surface" << endl;
+                return false;
+            }
+
+            uint32_t deviceCount = 0;
+            vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+            if (deviceCount == 0)
+            {
+                cerr << "ERROR: VulkanWindow: supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices" << endl;
+                return false;
+            }
+            std::vector<VkPhysicalDevice> devices(deviceCount);
+            vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: VulkanWindow: supports10BitPresentation: probing " << deviceCount << " physical device(s)" << endl;
+            }
+
+            bool any10bit = false;
+            for (uint32_t di = 0; di < devices.size(); ++di)
+            {
+                VkPhysicalDevice dev = devices[di];
+
+                uint32_t formatCount = 0;
+                if (vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
                 {
-                    has10bit = true;
-                    any10bit = true;
-                    break;
+                    continue;
+                }
+                std::vector<VkSurfaceFormatKHR> formats(formatCount);
+                vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, formats.data());
+
+                bool has10bit = false;
+                for (const auto& fmt : formats)
+                {
+                    if (isTenBitFormat(fmt.format))
+                    {
+                        has10bit = true;
+                        any10bit = true;
+                        break;
+                    }
+                }
+
+                VkPhysicalDeviceProperties props = {};
+                vkGetPhysicalDeviceProperties(dev, &props);
+                if (ImageRenderer::debugGpu())
+                {
+                    cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
+                         << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
                 }
             }
 
-            VkPhysicalDeviceProperties props = {};
-            vkGetPhysicalDeviceProperties(dev, &props);
+            //
+            //  The probe window, its surface and the shared instance are all
+            //  kept alive for the process lifetime, so nothing is torn down
+            //  here.
+            //
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
-                     << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
+                cout << "INFO: VulkanWindow: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << endl;
             }
-        }
+            return any10bit;
+        }();
 
-        // The surface returned by surfaceForWindow() is owned by the platform
-        // integration and is released when dummyWindow is destroyed on return;
-        // QVulkanInstance has no destroySurface() in this Qt version.
-        if (ImageRenderer::debugGpu())
-        {
-            cout << "INFO: VulkanWindow: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << endl;
-        }
-        return any10bit;
+        return cached;
     }
 
     bool VulkanWindow::initVulkan()
@@ -292,23 +347,14 @@ namespace Rv
 #endif
         };
 
-        // Try to get Qt's extensions
-        static QVulkanInstance* qtVkInst = nullptr;
+        // Reuse the one process-lifetime instance, shared with the 10-bit probe.
+        // It is never destroyed: see sharedVulkanInstance for why tearing a
+        // VkInstance down near another init crashes RADV's WSI.
+        QVulkanInstance* qtVkInst = sharedVulkanInstance();
         if (!qtVkInst)
         {
-            qtVkInst = new QVulkanInstance();
-            //  The dedicated-allocation query in getSharedImageInfo() uses
-            //  vkGetImageMemoryRequirements2, which is core in Vulkan 1.1.
-            //  QVulkanInstance otherwise creates a 1.0 instance, which would put
-            //  that call out of contract.
-            qtVkInst->setApiVersion(QVersionNumber(1, 1));
-            if (!qtVkInst->create())
-            {
-                cerr << "ERROR: VulkanWindow: QVulkanInstance create failed" << endl;
-                delete qtVkInst;
-                qtVkInst = nullptr;
-                return false;
-            }
+            cerr << "ERROR: VulkanWindow: shared QVulkanInstance unavailable" << endl;
+            return false;
         }
 
         m_vkInstance = qtVkInst->vkInstance();
