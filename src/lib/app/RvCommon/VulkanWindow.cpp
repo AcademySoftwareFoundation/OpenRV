@@ -2071,6 +2071,17 @@ namespace Rv
             if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
             {
                 session->outputVideoDevice()->syncBuffers();
+
+                //
+                //  Presenting the output device made *its* offscreen GL context
+                //  current and did not put ours back, so restore it before
+                //  postRender() and anything else that runs after this frame
+                //  expects the viewport's context. The GL output path never
+                //  needed this: its syncBuffers() is a QOpenGLWidget update(),
+                //  which schedules a composite without touching the current
+                //  context.
+                //
+                m_videoDevice->makeCurrent();
             }
         }
 

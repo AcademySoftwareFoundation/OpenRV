@@ -130,17 +130,31 @@ namespace Rv
     void VulkanDesktopVideoDevice::redraw() const
     {
         //
-        //  Vulkan has no QOpenGLWidget auto-composite, so the frame the
-        //  inherited transfer()/transfer2() already put in the
-        //  QTVulkanVideoDevice FBO has to be presented explicitly. Neither the
-        //  base redraw() (m_view->update(), and m_view is null) nor
-        //  QTVulkanVideoDevice::redraw() (requestUpdate() -> render(), which
-        //  returns immediately for a null doc) would present it.
+        //  Deliberately empty -- do NOT present from here.
         //
-        if (m_viewDevice && m_vulkanView && m_vulkanView->isVisible())
-        {
-            m_viewDevice->syncBuffers();
-        }
+        //  Session::askForRedraw() calls redraw() on the control device and on
+        //  the output device, and it is called from arbitrary places, including
+        //  from inside a mouse-motion handler while an annotation stroke is
+        //  being drawn with the main view's GL context current.
+        //
+        //  Presenting here means QTVulkanVideoDevice::syncBuffers(), which
+        //  makes its own offscreen context current and does not restore the
+        //  previous one. That silently steals the context from whatever was
+        //  mid-draw: the first stroke point lands, then every later GL call
+        //  goes to the presentation device's context and the stroke stops. It
+        //  would also run a full vsync-blocking swapchain present per motion
+        //  event.
+        //
+        //  Nothing is lost by doing nothing. askForRedraw() also redraws the
+        //  control device, which schedules VulkanWindow::render(); that renders
+        //  the frame, composites into this device through the inherited
+        //  transfer(), and then presents this device in-frame via
+        //  syncBuffers(). A doc-less presentation window additionally presents
+        //  once on expose, so it is never left blank.
+        //
+        //  The base does effectively the same thing: its m_view->update() only
+        //  asks Qt to composite a QOpenGLWidget whose paintGL() is empty.
+        //
     }
 
     void VulkanDesktopVideoDevice::redrawImmediately() const { redraw(); }
