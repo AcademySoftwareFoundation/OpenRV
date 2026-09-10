@@ -198,6 +198,7 @@ namespace TwkMovie
         //
 
         void collectPlaybackTiming(std::vector<bool> heroVideoTracks, std::vector<bool> heroAudioTracks);
+        int64_t countHeroVideoPacketsAndReopen(const std::vector<bool>& heroVideoTracks);
         int64_t getFirstFrame(AVRational rate);
         void snagMetadata(AVDictionary* dict, std::string source, FrameBuffer* fb);
         bool snagColr(AVCodecContext* videoCodecContext, VideoTrack* track);
