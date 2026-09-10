@@ -381,7 +381,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
         const QMatrix4x4 arg1 = getqtype<QMatrix4x4Type>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != arg1;
     }
 
     Pointer qt_QMatrix4x4_operatorPlus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -390,7 +390,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
         const QMatrix4x4 arg1 = getqtype<QMatrix4x4Type>(param_other);
-        return makeqtype<QMatrix4x4Type>(c, arg0.operator+=(arg1), "qt.QMatrix4x4");
+        return makeqtype<QMatrix4x4Type>(c, arg0 += arg1, "qt.QMatrix4x4");
     }
 
     Pointer qt_QMatrix4x4_operatorMinus_EQ__QMatrix4x4_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this,
@@ -399,7 +399,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
         const QMatrix4x4 arg1 = getqtype<QMatrix4x4Type>(param_other);
-        return makeqtype<QMatrix4x4Type>(c, arg0.operator-=(arg1), "qt.QMatrix4x4");
+        return makeqtype<QMatrix4x4Type>(c, arg0 -= arg1, "qt.QMatrix4x4");
     }
 
     Pointer qt_QMatrix4x4_operatorSlash_EQ__QMatrix4x4_QMatrix4x4_float(Mu::Thread& NODE_THREAD, Pointer param_this, float param_divisor)
@@ -407,7 +407,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
         float arg1 = (float)(param_divisor);
-        return makeqtype<QMatrix4x4Type>(c, arg0.operator/=(arg1), "qt.QMatrix4x4");
+        return makeqtype<QMatrix4x4Type>(c, arg0 /= arg1, "qt.QMatrix4x4");
     }
 
     bool qt_QMatrix4x4_operatorEQ_EQ__bool_QMatrix4x4_QMatrix4x4(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_other)
@@ -415,7 +415,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QMatrix4x4 arg0 = getqtype<QMatrix4x4Type>(param_this);
         const QMatrix4x4 arg1 = getqtype<QMatrix4x4Type>(param_other);
-        return arg0.operator==(arg1);
+        return arg0 == arg1;
     }
 
     static NODE_IMPLEMENTATION(_n_QMatrix4x40, Pointer)

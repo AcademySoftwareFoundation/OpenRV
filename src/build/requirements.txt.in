@@ -2,6 +2,8 @@
 # NOTE: This is a CMake template file. The actual requirements.txt is generated during CMake configuration.
 #       To update OpenTimelineIO version, edit RV_DEPS_OTIO_VERSION in cmake/defaults/CYCOMMON.cmake
 #       To update NumPy version, edit RV_DEPS_NUMPY_VERSION in cmake/defaults/CY*.cmake
+#       Same for cryptography and pydantic: RV_DEPS_CRYPTOGRAPHY_VERSION / RV_DEPS_PYDANTIC_VERSION in cmake/defaults/CY*.cmake
+#       (they are per-VFX-year because their pinned versions must match the Python version of that year)
 # NOTE: By default, all packages are built from source to ensure proper ABI compatibility with our custom Python.
 #       Pure Python packages and build tools safe to install from wheels are listed in RV_PYTHON_WHEEL_SAFE in python3.cmake.
 #       This approach ensures safety by default: new packages will be built from source unless explicitly marked as wheel-safe.
@@ -23,5 +25,5 @@ certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0
 six==1.16.0             # License: MIT License (MIT)
 packaging==24.0         # License: Apache Software License, BSD License
 requests==2.31.0        # License: Apache Software License (Apache 2.0)
-cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
-pydantic==2.7.1         # License: MIT License (MIT)
+cryptography==@_cryptography_version@ # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+pydantic==@_pydantic_version@ # License: MIT License (MIT)

@@ -106,9 +106,20 @@ namespace Rv
     {
         if (m_window)
         {
-            // QOpenGLWindow creates its GL context lazily on the first
-            // makeCurrent(), provided the platform window (surface) exists.
-            if (m_window->handle())
+            //
+            //  QOpenGLWindow::makeCurrent() returns without doing anything
+            //  unless isValid(), and isValid() is false until Qt has built
+            //  the window's QOpenGLContext in QOpenGLWindowPrivate::initialize(),
+            //  which it only runs from the first resize/paint event. A platform
+            //  surface (handle()) is created well before that, so it is not a
+            //  usable precondition here: guarding on it let startup GL work run
+            //  with whatever unrelated context happened to be current, which is
+            //  how shader programs ended up cached against a foreign context.
+            //  GLView forces the initialization up front (see
+            //  GLView::ensureViewportContext()); this only has to agree with Qt
+            //  about when the call can do anything.
+            //
+            if (m_window->isValid())
             {
                 m_window->makeCurrent();
                 TWK_GLDEBUG;

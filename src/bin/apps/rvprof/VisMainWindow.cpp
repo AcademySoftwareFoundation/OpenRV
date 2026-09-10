@@ -7,11 +7,6 @@
 #include <iostream>
 #include <TwkGLText/TwkGLText.h>
 #include <sstream>
-#ifdef PLATFORM_DARWIN
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
 
 using namespace TwkGLText;
 
@@ -1025,7 +1020,7 @@ void GLView::paintGL()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     double l = (m_endTime - m_startTime) / double(width());
-    gluOrtho2D(0, m_endTime - m_startTime, 0, l * double(height()));
+    glOrtho(0, m_endTime - m_startTime, 0, l * double(height()), -1, 1);
     glEnable(GL_POLYGON_SMOOTH);
 
     glMatrixMode(GL_MODELVIEW);
