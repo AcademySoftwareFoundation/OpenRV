@@ -24,6 +24,13 @@
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 
+#include <RvApp/Options.h>
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#include <RvCommon/VulkanDesktopVideoDevice.h>
+#include <RvCommon/VulkanView.h>
+#endif
+
 #include <QOpenGLContext>
 #include <QScreen>
 
@@ -926,9 +933,36 @@ namespace Rv
     }
 #endif
 
+    bool DesktopVideoDevice::shouldUseVulkanPresentation()
+    {
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        //
+        //  Presentation-output backend selection, matching the main view's rule
+        //  in RvDocument: a 10-bit display request (RGB 10 + A 2) that this
+        //  machine's Vulkan can actually present routes the second-display
+        //  output through a Vulkan swapchain for true 10-bit, avoiding the
+        //  8-bit truncation of the OpenGL ScreenView path. Everything else
+        //  stays on the OpenGL DesktopVideoDevice.
+        //
+        //  supports10BitPresentation() is memoized, so this is cheap to re-call
+        //  whenever the display output format or the main-view backend changes.
+        //
+        const Options& opts = Options::sharedOptions();
+        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+
+        return want10bit && VulkanView::supports10BitPresentation();
+#else
+        return false;
+#endif
+    }
+
     std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
     {
         std::vector<VideoDevice*> devices;
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        const bool useVulkan = shouldUseVulkanPresentation();
+#endif
 
         const auto screens = QGuiApplication::screens();
         for (int screen = 0; screen < screens.size(); screen++)
@@ -941,7 +975,17 @@ namespace Rv
                 name = QString("Screen %1").arg(screen);
             }
 
-            DesktopVideoDevice* sd = new DesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            DesktopVideoDevice* sd = nullptr;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+            if (useVulkan)
+            {
+                sd = new VulkanDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
+            else
+#endif
+            {
+                sd = new DesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
 
             devices.push_back(sd);
         }

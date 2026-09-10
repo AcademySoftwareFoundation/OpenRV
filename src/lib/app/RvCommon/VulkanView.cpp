@@ -71,7 +71,20 @@ namespace Rv
         //  (height-based y-flip, mapToGlobal, mouse grab).
         //
         ostringstream str;
-        str << UI_APPLICATION_NAME " Main Window (Vulkan)" << "/" << m_doc;
+        if (m_doc)
+        {
+            str << UI_APPLICATION_NAME " Main Window (Vulkan)" << "/" << m_doc;
+        }
+        else
+        {
+            //
+            //  A doc-less view is a presentation output owned by a
+            //  VulkanDesktopVideoDevice. There can be one per screen and they
+            //  all carry a null doc, so keying the name on the doc would give
+            //  every one of them the same name; key it on the view instead.
+            //
+            str << UI_APPLICATION_NAME " Presentation (Vulkan)" << "/" << static_cast<const void*>(this);
+        }
         m_videoDevice = new QTVulkanVideoDevice(nullptr, str.str(), m_vulkanWindow, m_container);
         m_vulkanWindow->setVideoDevice(m_videoDevice);
         m_vulkanWindow->setEventWidget(m_container);

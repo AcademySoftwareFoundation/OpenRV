@@ -94,6 +94,17 @@ namespace Rv
         const TwkGLF::GLFBO* defaultFBO() const override;
         std::string hardwareIdentification() const override;
 
+        //
+        //  GL id of the offscreen FBO once the context and FBO have been
+        //  created, else 0. Unlike defaultFBO() this does NOT force context
+        //  creation: it is a readiness probe. DesktopVideoDevice::transfer()
+        //  returns early while its view device reports 0, which is how the
+        //  first composite is deferred until the target exists -- so this must
+        //  be overridden for a VulkanDesktopVideoDevice presentation output to
+        //  ever receive a frame.
+        //
+        GLuint fboID() const override;
+
     private:
         // Ensure the QOpenGLContext + FBO exist and match the current window size.
         // Makes the GL context current and binds the FBO on return.
