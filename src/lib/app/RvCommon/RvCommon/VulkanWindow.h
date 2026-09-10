@@ -259,6 +259,12 @@ namespace Rv
         // platform window, which invalidates the VkSurfaceKHR.
         void handleSurfaceLost();
 
+        // Destroy every Vulkan object this window owns and return it to the
+        // pre-initialize() state. MUST run while the platform window (and hence
+        // the VkSurfaceKHR) is still alive -- see the QEvent::PlatformSurface
+        // handler in event().
+        void releaseVulkanResources();
+
         // Queue a one-shot switch to GLView; no-op during shutdown.
         void requestGLFallback();
 

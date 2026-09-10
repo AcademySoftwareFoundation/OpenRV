@@ -56,6 +56,16 @@ namespace Rv
 
         void setAbsolutePosition(int x, int y);
 
+        //
+        //  Drop every GL object imported from the window's Vulkan side (the
+        //  memory objects, their textures/FBOs and the shared semaphores), so
+        //  none of them outlives the Vulkan memory it aliases. Called by
+        //  VulkanWindow::releaseVulkanResources() before it frees that memory;
+        //  syncBuffers() re-imports on the next frame (it rebuilds whenever
+        //  m_glMemoryObject[slot] is 0).
+        //
+        void releaseSharedGLObjects();
+
         // VideoDevice API
         void makeCurrent() const override;
         void syncBuffers() const override;
