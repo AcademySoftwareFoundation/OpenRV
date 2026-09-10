@@ -1996,6 +1996,19 @@ namespace Rv
             return;
         }
 
+        //
+        //  Vulkan is not ready until the surface and swapchain exist, which
+        //  happens in initialize() on first expose. resizeEvent() also calls
+        //  requestUpdate(), so an UpdateRequest can land here before then --
+        //  newly reachable now that swapGLViewToVulkan() builds a VulkanView
+        //  mid-session. Presenting into a null device would fault; another
+        //  render is requested once initialized.
+        //
+        if (!m_initialized)
+        {
+            return;
+        }
+
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
             return;
@@ -2038,15 +2051,26 @@ namespace Rv
             return;
         }
 
-        if (session)
+        if (session && m_videoDevice)
         {
+            //
+            //  Always present the main (control) viewport's own swapchain.
+            //  Unlike the GL path, where QOpenGLWidget composites the control
+            //  widget after paintGL regardless, the Vulkan viewport only
+            //  appears via an explicit present -- so it must NOT be skipped
+            //  when a separate output (presentation) device is active.
+            //  Skipping it leaves the main window on a stale frame once
+            //  presentation mode is on.
+            //
+            m_videoDevice->syncBuffers();
+
+            //
+            //  In presentation mode the output is a distinct fullscreen window
+            //  that must also be presented this frame.
+            //
             if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
             {
                 session->outputVideoDevice()->syncBuffers();
-            }
-            else
-            {
-                m_videoDevice->syncBuffers();
             }
         }
 
@@ -2087,6 +2111,20 @@ namespace Rv
         if (!m_initialized)
         {
             initialize();
+        }
+
+        //
+        //  A doc-less window is a passive presentation output: it is rendered
+        //  into and presented by its owning VulkanDesktopVideoDevice, and
+        //  render() returns at `!session` so it never drives itself. Present
+        //  once here so a freshly exposed (or re-exposed) presentation surface
+        //  shows the last composited frame instead of staying blank until the
+        //  next main-view frame.
+        //
+        if (!m_doc && m_initialized && m_videoDevice)
+        {
+            m_videoDevice->syncBuffers();
+            return;
         }
 
         requestUpdate();
