@@ -226,10 +226,18 @@ namespace Rv
                  << " A" << opts.dispAlphaBits << "  -> want10bit=" << (want10bit ? "true" : "false") << endl;
         }
 
-        bool useVulkan = false;
+        //
+        //  Take the decision from DesktopVideoDevice, which applies the same
+        //  rule to the second-display presentation output. Deriving both from
+        //  one function is what keeps the main view and the presentation output
+        //  on the same backend; a disagreement there is what left the second
+        //  display black. want10bit above is kept only to phrase the
+        //  diagnostics below.
+        //
+        const bool useVulkan = DesktopVideoDevice::shouldUseVulkanPresentation();
+
         if (want10bit)
         {
-            useVulkan = VulkanView::supports10BitPresentation();
             if (ImageRenderer::debugGpu())
             {
                 cout << "INFO: RvDocument: supports10BitPresentation()=" << (useVulkan ? "true" : "false") << endl;
