@@ -22,6 +22,7 @@
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPaintEvent>
+#include <QtGui/QPlatformSurfaceEvent>
 #include <QtGui/QWindow>
 #include <QtGui/QVulkanInstance>
 #include <QtGui/QGuiApplication>
@@ -127,10 +128,15 @@ namespace Rv
         //  (see setVideoDevice); only the Vulkan resources are torn down here.
         //
         m_videoDevice = nullptr;
-        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
-            cleanupSharedImage(i);
-        cleanupSwapchain();
-        cleanupVulkan();
+
+        //
+        //  Normally a no-op: the QEvent::PlatformSurface / SurfaceAboutToBeDestroyed
+        //  handler in event() has already released everything, because by the time
+        //  a QWindow reaches its destructor its surface is usually gone. This is
+        //  only the backstop for the paths where the window is deleted without
+        //  ever having had a platform window destroyed under it.
+        //
+        releaseVulkanResources();
     }
 
     //--------------------------------------------------------------------------
@@ -494,6 +500,33 @@ namespace Rv
         //
         cout << "INFO: VulkanWindow: platform window recreated; rebuilding Vulkan surface" << endl;
 
+        releaseVulkanResources();
+    }
+
+    //
+    //  Release everything initVulkan()/createSwapchain()/getSharedImageInfo()
+    //  built, in dependency order, and return to the pre-initialize() state so
+    //  the next exposeEvent() re-initializes from scratch.
+    //
+    //  Ordering constraint: every one of these destroy calls is made against
+    //  objects the driver ties back to the presentation surface -- and the
+    //  VkSurfaceKHR is only valid while the platform window that produced it
+    //  lives. Callers must therefore reach here *before* the platform window is
+    //  destroyed, not after (see the QEvent::PlatformSurface handler).
+    //
+    void VulkanWindow::releaseVulkanResources()
+    {
+        //
+        //  The GL side imported this window's shared device memory and
+        //  semaphores as GL memory objects; drop those first so nothing on the
+        //  GL side is left aliasing memory freed just below. syncBuffers()
+        //  re-imports on the next frame if the window comes back.
+        //
+        if (m_videoDevice)
+        {
+            m_videoDevice->releaseSharedGLObjects();
+        }
+
         for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
         {
             cleanupSharedImage(i);
@@ -501,7 +534,15 @@ namespace Rv
         cleanupSwapchain();
         cleanupVulkan();
 
+        //  Owned by the platform window / QVulkanInstance, never destroyed here;
+        //  just forget it, since it does not outlive the window it came from.
         m_vkSurface = VK_NULL_HANDLE;
+        m_vkPhysicalDevice = VK_NULL_HANDLE;
+        m_vkSwapchainFormat = VK_FORMAT_UNDEFINED;
+        m_vkSwapchainExtent = {};
+        m_vkSwapchainImages.clear();
+        m_currentFrame = 0;
+
         m_initialized = false;
         m_initializedHandle = nullptr;
     }
@@ -1908,6 +1949,34 @@ namespace Rv
 
     bool VulkanWindow::event(QEvent* event)
     {
+        //
+        //  This must be handled before every guard below (including the
+        //  m_stopProcessingEvents / missing-device early-outs): it is the only
+        //  point at which the Vulkan objects can still legally be destroyed.
+        //
+        //  Qt sends SurfaceAboutToBeDestroyed from QWindow::destroy(), just
+        //  before it deletes the QPlatformWindow -- and the VkSurfaceKHR, the
+        //  swapchain and the X11 drawable behind them all die with it. Anything
+        //  released later is released against a surface that no longer exists,
+        //  which is a segfault inside the driver rather than an error code.
+        //
+        //  On quit that "later" is the destructor: QWindowContainer's own
+        //  destructor calls window->destroy() and only then deletes the window,
+        //  so ~VulkanWindow always runs on a dead surface. The same applies on
+        //  the reparent path, where Qt replaces the top-level QWidgetWindow
+        //  (adding a QWebEngineView is the usual trigger). exposeEvent()'s
+        //  handle() != m_initializedHandle check notices that one, but only
+        //  after the fact; this notices it in time.
+        //
+        if (event->type() == QEvent::PlatformSurface)
+        {
+            if (static_cast<QPlatformSurfaceEvent*>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
+            {
+                releaseVulkanResources();
+            }
+            return QWindow::event(event);
+        }
+
         // The device (and its translator) is wired by the hosting VulkanView
         // just after construction; ignore any events that arrive before then.
         if (!m_videoDevice)

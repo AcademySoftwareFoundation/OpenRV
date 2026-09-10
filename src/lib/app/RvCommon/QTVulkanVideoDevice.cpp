@@ -474,6 +474,22 @@ namespace Rv
         m_sharedHeight[slot] = 0;
     }
 
+    void QTVulkanVideoDevice::releaseSharedGLObjects()
+    {
+        //  No context means nothing was ever imported.
+        if (!m_glContext || !m_offscreenSurface)
+        {
+            return;
+        }
+
+        m_glContext->makeCurrent(m_offscreenSurface);
+        for (uint32_t i = 0; i < VulkanWindow::FRAMES_IN_FLIGHT; ++i)
+        {
+            cleanupSharedGLObjects(i);
+        }
+        m_glContext->doneCurrent();
+    }
+
     void QTVulkanVideoDevice::ensureCpuFallbackTarget(int w, int h) const
     {
         if (m_cpuFlipFbo && m_cpuFlipWidth == w && m_cpuFlipHeight == h)
