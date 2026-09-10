@@ -152,7 +152,7 @@ class _AnnotationSlider(QtWidgets.QSlider):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
     _HANDLE_LENGTH = 18
-    _GROOVE_MARGIN = 3
+    _GROOVE_MARGIN = 0
 
     def _value_at(self, y):
         span = max(1, self.height() - 2 * self._GROOVE_MARGIN - self._HANDLE_LENGTH)

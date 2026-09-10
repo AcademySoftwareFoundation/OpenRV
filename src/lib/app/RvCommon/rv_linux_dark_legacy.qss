@@ -1133,19 +1133,36 @@ margin: 0px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider {
+background: transparent;
 min-width: 32px;
 max-width: 32px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
-width: 2px;
-margin: 3px 0px;
+width: 3px;
+margin: 0px;
+border: none;
+background: transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::sub-page:vertical {
+background-color: rgb(153, 153, 153);
+background-clip: padding;
+border-left: 1px solid transparent;
+border-right: 1px solid transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical {
+background-color: rgb(42, 42, 255);
+border-radius: 1px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
 width: 10px;
 height: 10px;
 margin: 0px -8px;
+background-color: rgb(42, 42, 255);
+border: 4px solid rgb(50, 50, 50);
 border-radius: 9px;
 }
 
