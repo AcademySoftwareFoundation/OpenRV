@@ -107,9 +107,14 @@ namespace Rv
 
         virtual void setPhysicalDevice(VideoDevice* d);
 
-        // Device pixel ratio for high DPI displays
-        // For reference: https://doc.qt.io/qt-6/highdpi.html
-        float devicePixelRatio() const override { return m_devicePixelRatio; }
+        //
+        //  Device pixel ratio for high DPI displays.
+        //  For reference: https://doc.qt.io/qt-6/highdpi.html
+        //
+        //  Window-backed devices report the live ratio of their own surface
+        //  rather than the cached m_devicePixelRatio; see the definition.
+        //
+        float devicePixelRatio() const override;
 
     protected:
         QTGLVideoDevice(const std::string& name, QOpenGLWidget* view);

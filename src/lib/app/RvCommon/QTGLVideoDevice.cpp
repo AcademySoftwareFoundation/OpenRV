@@ -27,6 +27,20 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
+    namespace
+    {
+        //
+        //  RV_NO_QT_HDPI_SUPPORT pins the ratio to 1 so RV renders at logical
+        //  size on HDPI displays. main.cpp clears Qt's own scaling environment
+        //  variables when it is set, so the two have to agree.
+        //
+        bool qtHighDPISupportDisabled()
+        {
+            static const bool disabled = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+            return disabled;
+        }
+    } // namespace
+
     QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
         , m_view(view)
@@ -144,6 +158,35 @@ namespace Rv
         return 0;
     }
 
+    float QTGLVideoDevice::devicePixelRatio() const
+    {
+        if (qtHighDPISupportDisabled())
+        {
+            return 1.0f;
+        }
+
+        //
+        //  Take the ratio straight from the surface Qt sized the default
+        //  framebuffer with. m_devicePixelRatio is a cache refreshed only from
+        //  setPhysicalDevice(), which is only reached when the window moves and
+        //  the screen lookup succeeds -- so dragging RV to a display with a
+        //  different scale factor could leave every size derived from this
+        //  device (width()/height(), and through them the render geometry and
+        //  the default GLFBO) on the old ratio, with glViewport then covering
+        //  the wrong part of the surface.
+        //
+        //  Only the window-backed control viewport is switched over: it is the
+        //  one that follows the user between displays. The widget-backed
+        //  presentation and worker devices keep the cached value.
+        //
+        if (m_window)
+        {
+            return static_cast<float>(m_window->devicePixelRatio());
+        }
+
+        return m_devicePixelRatio;
+    }
+
     void QTGLVideoDevice::setPhysicalDevice(VideoDevice* d)
     {
         TwkGLF::GLVideoDevice::setPhysicalDevice(d);
@@ -153,8 +196,7 @@ namespace Rv
         // may differ from the logical pixel ratio on a per screen basis.
         m_devicePixelRatio = 1.0f;
 
-        static bool noQtHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
-        if (noQtHighDPISupport)
+        if (qtHighDPISupportDisabled())
         {
             return;
         }
