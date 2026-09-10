@@ -153,6 +153,13 @@ namespace TwkMovie
         m_session->makeActive();
         m_session->postInitialize();
 
+        //
+        //  No display groups are involved here either, so keep evaluating the
+        //  command line expressions at the same point postInitialize() used to.
+        //
+
+        m_session->evalCommandLineScripts();
+
         TwkMath::Vec2i size = m_session->maxSize();
         m_session->setRendererType("Composite");
 

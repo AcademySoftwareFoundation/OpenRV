@@ -104,6 +104,16 @@ def prepare() -> None:
                 return "15.0.0-based-macos-universal.7z"
             elif major_minor_version_str == "17.0":
                 return "17.0.1-based-macos-universal.7z"
+            elif major_minor_version_str == "18.0":
+                return "18.1.7-based-macos-universal.7z"
+            elif major_minor_version_str == "19.0":
+                return "19.1.6-based-macos-universal.7z"
+            elif major_minor_version_str == "20.0":
+                return "20.1.3-based-macos-universal.7z"
+            elif major_minor_version_str == "21.0":
+                return "21.1.2-based-macos-universal.7z"
+            elif major_minor_version_str == "22.0":
+                return "22.1.2-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
