@@ -96,9 +96,11 @@ IF(RV_TARGET_LINUX
     VulkanView.cpp
     VulkanWindow.cpp
     QTVulkanVideoDevice.cpp
+    VulkanDesktopVideoDevice.cpp
     RvCommon/VulkanView.h
     RvCommon/VulkanWindow.h
     RvCommon/QTVulkanVideoDevice.h
+    RvCommon/VulkanDesktopVideoDevice.h
   )
 ENDIF()
 
@@ -174,7 +176,7 @@ IF(NOT
    (RV_TARGET_LINUX
     OR RV_TARGET_WINDOWS)
 )
-  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/VulkanWindow.h" "RvCommon/QTVulkanVideoDevice.h")
+  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/VulkanWindow.h" "RvCommon/QTVulkanVideoDevice.h" "RvCommon/VulkanDesktopVideoDevice.h")
 ENDIF()
 
 FOREACH(
