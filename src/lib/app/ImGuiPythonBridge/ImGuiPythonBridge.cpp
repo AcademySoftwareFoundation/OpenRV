@@ -5,35 +5,38 @@
 
 namespace Rv
 {
-    static bool s_shuttingDown = false;
+    std::vector<ImGuiPythonBridge::PyObjectPtr>* ImGuiPythonBridge::g_callbacks = new std::vector<ImGuiPythonBridge::PyObjectPtr>();
 
     void ImGuiPythonBridge::PyObjectDeleter::operator()(PyObject* obj) const
     {
-        if (obj && !s_shuttingDown && Py_IsInitialized())
+        if (obj && Py_IsInitialized())
         {
+            PyGILState_STATE gstate = PyGILState_Ensure();
             Py_DECREF(obj);
+            PyGILState_Release(gstate);
         }
     }
 
-    std::vector<ImGuiPythonBridge::PyObjectPtr> ImGuiPythonBridge::s_callbacks;
-
     void ImGuiPythonBridge::registerCallback(PyObject* callable)
     {
-        if (PyCallable_Check(callable))
+        if (g_callbacks && PyCallable_Check(callable))
         {
             Py_INCREF(callable);
-            s_callbacks.emplace_back(callable);
+            g_callbacks->emplace_back(callable);
         }
     }
 
     void ImGuiPythonBridge::unregisterCallback(PyObject* callable)
     {
-        for (auto it = s_callbacks.begin(); it != s_callbacks.end();)
+        if (!g_callbacks)
+            return;
+
+        for (auto it = g_callbacks->begin(); it != g_callbacks->end();)
         {
             if (PyObject_RichCompareBool(it->get(), callable, Py_EQ))
             {
                 // Deleter will handle Py_DECREF automatically.
-                it = s_callbacks.erase(it);
+                it = g_callbacks->erase(it);
                 return;
             }
             else
@@ -46,12 +49,12 @@ namespace Rv
     void ImGuiPythonBridge::callCallbacks()
     {
         // Early exit optimization - avoid Python overhead if no callbacks registered
-        if (s_callbacks.empty())
+        if (!g_callbacks || g_callbacks->empty())
         {
             return;
         }
 
-        for (auto& cb : s_callbacks)
+        for (auto& cb : *g_callbacks)
         {
             PyGILState_STATE gstate = PyGILState_Ensure();
             PyObject* result = PyObject_CallObject(cb.get(), nullptr);
@@ -62,24 +65,23 @@ namespace Rv
         }
     }
 
-    int ImGuiPythonBridge::nbCallbacks() { return (int)s_callbacks.size(); }
+    int ImGuiPythonBridge::nbCallbacks() { return g_callbacks ? (int)g_callbacks->size() : 0; }
 
-    void ImGuiPythonBridge::clearCallbacks()
+    void ImGuiPythonBridge::init()
     {
-        s_shuttingDown = true;
+        if (!g_callbacks)
+            g_callbacks = new std::vector<PyObjectPtr>();
+    }
 
-        // During shutdown, we cannot safely call Py_DECREF, so we just release
-        // the smart pointers without calling their deleters and let Python
-        // handle cleanup during interpreter shutdown.
-        for (auto& ptr : s_callbacks)
-        {
-            if (ptr)
-            {
-                // Release without calling Py_DECREF.
-                ptr.release();
-            }
-        }
+    void ImGuiPythonBridge::shutdown()
+    {
+        if (!g_callbacks)
+            return;
 
-        s_callbacks.clear();
+        // Null before delete: during destruction, PyObjectDeleter calls
+        // Py_DECREF which can trigger __del__ -> unregisterCallback re-entrancy.
+        auto* tmp = g_callbacks;
+        g_callbacks = nullptr;
+        delete tmp;
     }
 } // namespace Rv
