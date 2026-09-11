@@ -41,6 +41,7 @@ SET(_sources
     MemPool.cpp
     FNV1a.cpp
     Log.cpp
+    PlaybackDiagnostics.cpp
     Clock.cpp
     sgcHopImplementation.cpp
     sgcHopTools.cpp

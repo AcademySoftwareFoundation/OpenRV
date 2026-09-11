@@ -42,6 +42,7 @@
 #include <TwkUtil/SystemInfo.h>
 #include <TwkUtil/Timer.h>
 #include <TwkUtil/Log.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
 #include <TwkUtil/sgcJobDispatcher.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -278,6 +279,7 @@ namespace IPCore
         , m_topologyChanged(false)
         , m_cacheTimingOutput(false)
         , m_evalSlowMedia(false)
+        , m_evalHasFastMedia(false)
         , m_jobDispatcher(nullptr)
     {
         pthread_mutex_init(&m_internalLock, NULL);
@@ -1624,10 +1626,50 @@ IPGraph::findNodesByAbstractPath(int frame,
         bool isCached = m_fbcache.isFrameCached(frame);
         PROFILE_SAMPLE(frameCachedTestEnd);
 
+        //
+        //  Cache hit/miss verification for playback stutter. Once per newly
+        //  presented frame, capture whether the frame the display asked for was
+        //  actually resident in the look-ahead cache and, if not, how "full"
+        //  the cache was and how many contiguous frames ahead were cached (the
+        //  runway). A miss here forces an on-the-fly decode on the display
+        //  thread below (the visible stall). Captured while the cache lock is
+        //  still held so the numbers are consistent.
+        //
+        const bool diagCache = forDisplay && m_newFrame && TwkUtil::PlaybackDiagnostics::enabled();
+        bool diagHit = isCached;
+        size_t diagUsed = 0, diagCap = 0;
+        bool diagOverflow = false;
+        int diagRunway = 0, diagDisplayInc = 0;
+        if (diagCache)
+        {
+            diagUsed = m_fbcache.used();
+            diagCap = m_fbcache.capacity();
+            diagOverflow = m_fbcache.overflowing();
+            diagDisplayInc = m_fbcache.displayInc();
+            diagRunway = m_fbcache.cachedRunwayAhead(frame, diagDisplayInc, 300);
+        }
+        double diagOtfDecodeMs = 0.0;
+
         TWK_CACHE_UNLOCK(m_fbcache, "");
         // DB ("evaluateAtFrame f " << frame << " forDisplay " << forDisplay <<
         // " isCached " << isCached);
         PROFILE_SAMPLE(cacheTestEnd);
+
+        //
+        //  Emits the displaycache verification row. Called at every exit point
+        //  of this function that returns a display image so a miss is never
+        //  lost. diagOtfDecodeMs is filled in by the miss branch below.
+        //
+        auto emitDiagCache = [&]()
+        {
+            if (!diagCache)
+                return;
+            const double pct = diagCap ? (100.0 * double(diagUsed) / double(diagCap)) : 0.0;
+            ostringstream extra;
+            extra << "hit=" << (diagHit ? 1 : 0) << ";full=" << pct << ";overflow=" << (diagOverflow ? 1 : 0) << ";runway=" << diagRunway
+                  << ";used=" << diagUsed << ";cap=" << diagCap << ";otfDecodeMs=" << diagOtfDecodeMs;
+            TwkUtil::PlaybackDiagnostics::instance().record("displaycache", 0, frame, pct, extra.str());
+        };
 
         if (isCached)
         {
@@ -1698,6 +1740,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 {
                 }
 
+                emitDiagCache();
                 return make_pair(EvalBufferNeedsRefill, img);
             }
             catch (std::exception& exc)
@@ -1749,7 +1792,19 @@ IPGraph::findNodesByAbstractPath(int frame,
             try
             {
                 DBL(DB_CACHE, "overrun: evaling in display thread, frame " << frame);
+
+                //  This is the on-the-fly decode on the display thread caused by
+                //  a look-ahead cache miss. Time it so we can attribute the
+                //  on-screen stall directly to the missing frame.
+                TwkUtil::Timer diagOtfTimer;
+                if (diagCache)
+                    diagOtfTimer.start();
+
                 img = evaluate(frame, IPNode::DisplayCacheEvalThread);
+
+                if (diagCache)
+                    diagOtfDecodeMs = diagOtfTimer.elapsed() * 1000.0;
+
                 if (willPause)
                     status = EvalBufferNeedsRefill;
             }
@@ -1831,6 +1886,7 @@ IPGraph::findNodesByAbstractPath(int frame,
             }
         }
 
+        emitDiagCache();
         return make_pair(status, img);
     }
 
@@ -2057,7 +2113,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         m_threadGroupSingle->dispatch(0, 0);
 
-        if (!m_evalSlowMedia)
+        if (parallelCachingAllowed())
         {
             for (size_t i = 1; i < m_threadData.size(); i++)
             {
@@ -2107,7 +2163,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                 if (m_threadGroupSingle)
                     m_threadGroupSingle->awaken_all_workers();
 
-                if (m_threadGroup && !m_evalSlowMedia)
+                if (m_threadGroup && parallelCachingAllowed())
                     m_threadGroup->awaken_all_workers();
             }
         }
@@ -2360,7 +2416,16 @@ IPGraph::findNodesByAbstractPath(int frame,
                     try
                     {
                         TestEvalResult r = testEvaluate(frame, IPNode::CacheEvalThread, id);
-                        poorPerf = r.poorRandomAccessPerformance;
+                        //  Only serialize this frame onto the single caching
+                        //  thread if it has slow-random-access video AND no fast
+                        //  image source that could be decoded in parallel. When
+                        //  a slow movie (commonly present just for its audio/
+                        //  reference track) is composited with a fast EXR image
+                        //  sequence, keep the fast images decoding across all
+                        //  caching threads instead of dragging them onto thread
+                        //  1. Each thread uses its own movie reader, so parallel
+                        //  access to the slow movie remains thread-safe.
+                        poorPerf = r.poorRandomAccessPerformance && !r.hasFastVideoSource;
                     }
                     catch (std::exception& exc)
                     {
@@ -2374,8 +2439,33 @@ IPGraph::findNodesByAbstractPath(int frame,
                     }
                     DB("after testEvaluate, skipThisFrame " << skipThisFrame);
 
+                    //  As soon as we see any fast (non-poor-random-access)
+                    //  frame, allow the parallel caching thread group to run so
+                    //  fast sources (e.g. EXR) are not penalized by the presence
+                    //  of a single slow-random-access source (e.g. an h264 MOV)
+                    //  elsewhere in the session. Genuinely slow-source frames
+                    //  are still serialized onto thread 1 by the skip below.
+                    if (!poorPerf && !m_evalHasFastMedia)
+                    {
+                        m_evalHasFastMedia = true;
+                        if (TwkUtil::PlaybackDiagnostics::enabled())
+                        {
+                            TwkUtil::PlaybackDiagnostics::instance().record("parallelcache", int(id), frame, 1.0, "state=on");
+                        }
+                    }
+
                     if (id == 1)
                     {
+                        //  Log slow-media transitions. When this turns on, RV
+                        //  restricts caching to this single thread (thread 1)
+                        //  and switches to block caching, which serializes image
+                        //  decode and is a common cause of playback stutter.
+                        if (poorPerf != m_evalSlowMedia && TwkUtil::PlaybackDiagnostics::enabled())
+                        {
+                            TwkUtil::PlaybackDiagnostics::instance().record("slowmedia", int(id), frame, poorPerf ? 1.0 : 0.0,
+                                                                            poorPerf ? "state=on" : "state=off");
+                        }
+
                         m_evalSlowMedia = poorPerf;
                         if (maxGroupSize != getMaxGroupSize(poorPerf))
                         //
@@ -2511,7 +2601,41 @@ IPGraph::findNodesByAbstractPath(int frame,
                 try
                 {
                     DB("thread " << id << " evaluate frame " << frame << ", overflowing " << m_fbcache.overflowing());
+
+                    //  Time the per-frame background decode so playback stutter
+                    //  can be attributed to slow image (e.g. EXR) decoding. This
+                    //  is where the actual disk read + decode happens during
+                    //  look-ahead/region caching.
+                    //
+                    //  We also record how many caching threads are decoding
+                    //  concurrently at the moment this decode starts. If the
+                    //  per-decode time grows with concurrency, the reader
+                    //  threads are oversubscribing a shared resource (most
+                    //  likely the OpenEXR global thread pool: N reader threads
+                    //  x M EXR threads each thrash the CPU), so adding reader
+                    //  threads does not scale throughput. If the time is flat
+                    //  across concurrency levels, the decode is genuinely
+                    //  CPU-bound per frame and needs real parallelism instead.
+                    static std::atomic<int> s_activeDecodes(0);
+                    const bool diag = TwkUtil::PlaybackDiagnostics::enabled();
+                    TwkUtil::Timer decodeTimer;
+                    int diagConcurrency = 0;
+                    if (diag)
+                    {
+                        decodeTimer.start();
+                        diagConcurrency = ++s_activeDecodes; // includes this thread
+                    }
+
                     IPImage* img = evaluate(frame, IPNode::CacheEvalThread, id);
+
+                    if (diag)
+                    {
+                        --s_activeDecodes;
+                        ostringstream extra;
+                        extra << "concurrency=" << diagConcurrency;
+                        TwkUtil::PlaybackDiagnostics::instance().record("decode", int(id), frame, decodeTimer.elapsed() * 1000.0,
+                                                                        extra.str());
+                    }
 
                     TWK_CACHE_LOCK(m_fbcache, "");
                     DB("thread " << id << " evaluate frame " << frame << " ok ");
@@ -2986,6 +3110,16 @@ IPGraph::findNodesByAbstractPath(int frame,
                     cerr << "DEBUG: audio cache miss, zeroing buffer!" << endl;
                 }
 
+                //  Record audio starvation independently of -debug audio so a
+                //  stutter run can be captured with a single env var. A steady
+                //  stream of these means the audio decode/cache can't keep up.
+                if (TwkUtil::PlaybackDiagnostics::enabled())
+                {
+                    ostringstream extra;
+                    extra << "startSample=" << inbuffer.startSample();
+                    TwkUtil::PlaybackDiagnostics::instance().record("cachemiss", -1, -1, 0.0, extra.str());
+                }
+
                 inbuffer.zero();
                 found = true;
             }
@@ -3021,6 +3155,11 @@ IPGraph::findNodesByAbstractPath(int frame,
             if (AudioRenderer::debug)
             {
                 cerr << "DEBUG: audio locked out -- skipping" << endl;
+            }
+
+            if (TwkUtil::PlaybackDiagnostics::enabled())
+            {
+                TwkUtil::PlaybackDiagnostics::instance().record("audiolocked", -1, -1, 0.0);
             }
 
             inbuffer.zero();
@@ -3429,6 +3568,11 @@ IPGraph::findNodesByAbstractPath(int frame,
     {
         if (n == root())
         {
+            //  Media set changed: recompute whether any fast media is present.
+            //  The caching threads will set this back to true within a frame if
+            //  a fast (non-poor-random-access) source exists.
+            m_evalHasFastMedia = false;
+
             TwkApp::GenericStringEvent event("media-change", this, "");
             sendEvent(event);
             m_nodeMediaChangedSignal(n);
