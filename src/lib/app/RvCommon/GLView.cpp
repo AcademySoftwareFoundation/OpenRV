@@ -20,6 +20,7 @@
 #include <IPCore/Session.h>
 #include <QtWidgets/QVBoxLayout>
 #include <QOpenGLContext>
+#include <QResizeEvent>
 #include <QTimer>
 #include <iostream>
 #include <sstream>
@@ -154,6 +155,44 @@ namespace Rv
         //
         watchParentWindow();
         QTimer::singleShot(0, this, &GLView::watchParentWindow);
+    }
+
+    void GLView::resizeEvent(QResizeEvent* event)
+    {
+        QWidget::resizeEvent(event);
+
+        //
+        //  Report viewport size changes to the UI layer as the "view-resized"
+        //  generic event, contents "oldW oldH|newW newH". Mu and Python
+        //  handlers rely on it -- rvui.mu binds it to implement "Lock Pixel
+        //  Scale During Resize" -- and it is part of the documented event API,
+        //  so the sizes stay in this widget's logical pixels, as they were when
+        //  the viewport was a QOpenGLWidget and this was emitted from
+        //  GLView::event().
+        //
+        //  The layout gives the container (and therefore the GL window) this
+        //  widget's full extent, so our geometry is the viewport's geometry.
+        //
+
+        if (!isVisible())
+            return;
+
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (!session)
+            return;
+
+        //
+        //  Qt reports an invalid old size on the very first resize; there is no
+        //  previous scale to preserve then, so there is nothing to report.
+        //
+        const QSize oldSize = event->oldSize();
+        if (oldSize.width() == -1 || oldSize.height() == -1)
+            return;
+
+        ostringstream contents;
+        contents << oldSize.width() << " " << oldSize.height() << "|" << event->size().width() << " " << event->size().height();
+
+        session->userGenericEvent("view-resized", contents.str());
     }
 
     void GLView::watchParentWindow()
