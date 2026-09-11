@@ -333,6 +333,15 @@ namespace IPCore
         void setPhysicalDevices(const VideoModules&);
 
         //
+        //  Re-point the existing DisplayGroupIPNodes at a rebuilt set of
+        //  physical devices, keeping each group (and its colour pipeline)
+        //  alive. Use this, not setPhysicalDevices(), when the devices were
+        //  recreated but the monitors behind them did not change -- see the
+        //  implementation for why the difference matters.
+        //
+        void refreshPhysicalDevices(const VideoModules&);
+
+        //
         //  Create a NodeValidation object on the stack. A node validation
         //  context will become current. When complete the former context
         //  will become current again.
@@ -763,6 +772,7 @@ namespace IPCore
         void promoteFBsInFrameRange(int beg, int mid, int end, TwkUtil::Timer t);
 
         void setPhysicalDevicesInternal(const VideoModules&);
+        void refreshPhysicalDevicesInternal(const VideoModules&);
 
         void dispatchCachingThreadsSafely();
 
