@@ -393,7 +393,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
 
 
 def get_mingw64_path_on_windows(winpath: str) -> str:
-    """
+    r"""
     On Windows: returns the mingw64 path corresponding to the windows passed as parameter.
     On other platforms: simply returns the path passed as parameter
     :param string winpath: winpath to be translated. Example: C:\git\OpenRV\_build
