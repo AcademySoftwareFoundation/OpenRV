@@ -146,11 +146,12 @@ namespace Rv
         mutable std::array<int, VulkanWindow::FRAMES_IN_FLIGHT> m_sharedHeight{};
 
         // Which present path this device last reported: -1 nothing yet,
-        // 0 CPU-fallback, 1 GPU-interop. Per-device, and reported on every
-        // transition rather than latched on the first frame, because the first
-        // syncBuffers() can run before that window's Vulkan is initialized --
-        // latching there reports CPU-fallback for a device that then spends its
-        // whole life on interop.
+        // 0 CPU-fallback, 1 GPU-interop. Per-device, because the presentation
+        // output has its own device and can land on a different path than the
+        // viewport -- and reported on every transition rather than latched on
+        // the first frame, because the first syncBuffers() can run before that
+        // window's Vulkan is initialized. Latching there reports CPU-fallback
+        // for a device that then spends its whole life on interop.
         mutable int m_loggedPresentPath{-1};
 
         // Latched once any GL call on the interop path reports an error. The

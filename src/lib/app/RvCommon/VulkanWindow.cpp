@@ -50,6 +50,57 @@
 namespace Rv
 {
     using namespace std;
+
+    //  Accumulators for the -debug gpu frame-time report in render(). One
+    //  VulkanWindow drives the frame loop, so file statics are sufficient.
+    static unsigned int s_diagFrames = 0;
+    static double s_diagRenderMs = 0.0;
+    static double s_diagMainPresentMs = 0.0;
+    static double s_diagOutPresentMs = 0.0;
+    static double s_diagFenceWaitMs = 0.0;
+    static double s_diagAcquireMs = 0.0;
+    //  Wall clock between successive render() entries: the loop period.
+    static double s_diagLoopMs = 0.0;
+    static TwkUtil::Timer s_diagLoopTimer;
+    //  addSyncSample()/postRender() run inside render() but after the presents,
+    //  so they are part of the frame period without being part of "total".
+    static double s_diagPostRenderMs = 0.0;
+    //  Pointer side of the same report. handler = time spent inside the
+    //  Mu/annotation handler for one pointer event; eventToRender = age of the
+    //  newest pointer event when the frame answering it starts rendering, so it
+    //  includes the handler and any wait in the event loop.
+    static double s_diagPointerHandlerMs = 0.0;
+    static unsigned int s_diagPointerEvents = 0;
+    static double s_diagPointerAgeMs = 0.0;
+    static unsigned int s_diagPointerAgeSamples = 0;
+    static TwkUtil::Timer s_diagPointerTimer;
+    static bool s_diagPointerPending = false;
+
+    //  eventToRetire: age of the pointer event a frame answered, measured when
+    //  that frame's GPU work retires. This is the end-to-end interactive
+    //  latency; eventToRender covers only the input half of it.
+    //
+    //  Closing a sample out needs an absolute clock, because a frame retires
+    //  some frames after the event that produced it, so one free-running timer
+    //  is read as a timestamp source.
+    static TwkUtil::Timer s_diagClock;
+
+    static double diagNow()
+    {
+        if (!s_diagClock.isRunning())
+            s_diagClock.start();
+        return s_diagClock.elapsed();
+    }
+
+    //  Timestamp of the pointer event the frame currently being rendered
+    //  answers (-1 when this frame answers no new event), handed to the
+    //  in-flight slot when that frame is submitted.
+    static double s_diagFrameEventTime = -1.0;
+    static std::array<double, VulkanWindow::FRAMES_IN_FLIGHT> s_diagSlotEventTime{};
+    static std::array<bool, VulkanWindow::FRAMES_IN_FLIGHT> s_diagSlotArmed{};
+    static double s_diagEventToRetireMs = 0.0;
+    static unsigned int s_diagEventToRetireSamples = 0;
+
     using namespace TwkApp;
     using namespace IPCore;
 
@@ -670,6 +721,80 @@ namespace Rv
         // vkDestroySurfaceKHR if needed. For safety we don't destroy instance/surface here, they are tied to Qt.
     }
 
+    //
+    //  Present mode
+    //
+    //  FIFO everywhere, which is what a viewport and a presentation output
+    //  both want: every image scanned out, none torn.
+    //
+    //  The env overrides are for measurement. Note that MAILBOX only differs
+    //  from FIFO once the loop is fast enough to fill a swapchain queue; below
+    //  that, both acquires return immediately and the mode is not observable.
+    //
+    //      RV_VULKAN_PRESENT_MODE         (control viewport)
+    //      RV_VULKAN_OUTPUT_PRESENT_MODE  (passive presentation output)
+    //  with values fifo | relaxed | mailbox | immediate.
+    //
+    static const char* presentModeName(VkPresentModeKHR m)
+    {
+        switch (m)
+        {
+        case VK_PRESENT_MODE_IMMEDIATE_KHR:
+            return "IMMEDIATE";
+        case VK_PRESENT_MODE_MAILBOX_KHR:
+            return "MAILBOX";
+        case VK_PRESENT_MODE_FIFO_KHR:
+            return "FIFO";
+        case VK_PRESENT_MODE_FIFO_RELAXED_KHR:
+            return "FIFO_RELAXED";
+        default:
+            return "(other)";
+        }
+    }
+
+    static bool presentModeFromName(const char* name, VkPresentModeKHR& mode)
+    {
+        if (!name)
+            return false;
+        const string n(name);
+        if (n == "fifo")
+            mode = VK_PRESENT_MODE_FIFO_KHR;
+        else if (n == "relaxed")
+            mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+        else if (n == "mailbox")
+            mode = VK_PRESENT_MODE_MAILBOX_KHR;
+        else if (n == "immediate")
+            mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        else
+            return false;
+        return true;
+    }
+
+    //  FIFO is the only mode required to be supported, so it is always the
+    //  last resort of the preference list.
+    static VkPresentModeKHR choosePresentMode(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool passiveOutput)
+    {
+        uint32_t count = 0;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, nullptr);
+        std::vector<VkPresentModeKHR> available(count);
+        if (count)
+            vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, available.data());
+
+        const auto supported = [&](VkPresentModeKHR m) { return std::find(available.begin(), available.end(), m) != available.end(); };
+
+        VkPresentModeKHR forced = VK_PRESENT_MODE_FIFO_KHR;
+        if (presentModeFromName(getenv(passiveOutput ? "RV_VULKAN_OUTPUT_PRESENT_MODE" : "RV_VULKAN_PRESENT_MODE"), forced))
+        {
+            if (supported(forced))
+                return forced;
+            cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(forced) << " is unsupported; using FIFO" << endl;
+            return VK_PRESENT_MODE_FIFO_KHR;
+        }
+
+        (void)passiveOutput;
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
+
     bool VulkanWindow::createSwapchain()
     {
         if (!m_vkDevice || !m_vkSurface)
@@ -820,10 +945,28 @@ namespace Rv
             return false;
         }
 
+        //  A doc-less window is a passive presentation output; see
+        //  choosePresentMode().
+        const VkPresentModeKHR presentMode = choosePresentMode(m_vkPhysicalDevice, m_vkSurface, /*passiveOutput*/ m_doc == nullptr);
+
         uint32_t imageCount = capabilities.minImageCount + 1;
+        //  MAILBOX only stays non-blocking with an image to spare: one being
+        //  scanned out, one queued as the newest-wins candidate, one to render
+        //  into. With fewer, acquire blocks and the mode buys nothing.
+        if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR && imageCount < 3)
+        {
+            imageCount = 3;
+        }
         if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount)
         {
             imageCount = capabilities.maxImageCount;
+        }
+
+        if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: VulkanWindow: createSwapchain: " << (m_doc ? "control viewport" : "presentation output")
+                 << ": presentMode=" << presentModeName(presentMode) << "  images=" << imageCount
+                 << " (surface min=" << capabilities.minImageCount << " max=" << capabilities.maxImageCount << ")" << endl;
         }
 
         VkSwapchainCreateInfoKHR createInfo = {};
@@ -838,7 +981,7 @@ namespace Rv
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         createInfo.preTransform = capabilities.currentTransform;
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        createInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR; // VSync
+        createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         // Warm recreate: hand the retiring swapchain to the driver so it can reuse
         // its backing resources (much cheaper than a cold create on every resize).
@@ -1095,6 +1238,17 @@ namespace Rv
         m_sharedCapacityH[slot] = 0;
     }
 
+    //
+    //  A best-effort present that skipped has to be retried, or the output is
+    //  left showing the frame before the one just composited -- and nothing
+    //  else will come back for it, because the control viewport only renders
+    //  when the session asks. The OpenGL output never needed this: its
+    //  m_view->update() is a dirty flag Qt is obliged to honour eventually.
+    //
+    //  QWindow::requestUpdate() coalesces, so at most one retry is ever
+    //  outstanding. render() picks it up in the passive-output branch and
+    //  re-presents the frame already sitting in the device's FBO.
+    //
     void VulkanWindow::drainSharedSemaphores(uint32_t slot)
     {
         // No shared image for this slot yet -> the GL side never signaled/waited
@@ -1581,17 +1735,36 @@ namespace Rv
         if (!m_vkDevice || !m_vkSharedImage[slot] || !m_vkSwapchain)
             return;
 
+        //  Split the present cost into fence-wait vs acquire, the only two
+        //  blocking calls here, so GPU back-pressure can be told apart from
+        //  swapchain/vblank back-pressure. Main viewport only.
+        const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
+        Timer diagTimer;
+
         // Start-of-frame throttle: wait for this slot's previous frame to finish
         // before reusing its acquire semaphore and per-frame resources. This
         // replaces the old end-of-frame block; with FIFO acquire back-pressure it
         // is what paces the loop to display refresh while still allowing
         // FRAMES_IN_FLIGHT frames outstanding.
+        if (diagPresent)
+            diagTimer.start();
+
         vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+
+        if (diagPresent)
+            s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
 
         // Acquire image
         uint32_t imageIndex;
+        if (diagPresent)
+            diagTimer.start();
+
         VkResult result =
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
+
+        if (diagPresent)
+            s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
+
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
             // The GL side already signaled glReady[slot]/waited vkReady[slot] this
@@ -1743,6 +1916,15 @@ namespace Rv
                 requestGLFallback();
             }
             return;
+        }
+
+        //  Hand this frame's pointer-event timestamp to the slot so
+        //  eventToRetire can be closed out when the fence signals.
+        if (m_doc && s_diagFrameEventTime >= 0.0)
+        {
+            s_diagSlotEventTime[slot] = s_diagFrameEventTime;
+            s_diagSlotArmed[slot] = true;
+            s_diagFrameEventTime = -1.0;
         }
 
         // The frame is committed to the GPU; advance the ring now so the next
@@ -2013,6 +2195,37 @@ namespace Rv
         if (!session)
             return;
 
+        //  See s_diagLoopTimer.
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            if (s_diagLoopTimer.isRunning())
+                s_diagLoopMs += s_diagLoopTimer.elapsed() * 1000.0;
+            s_diagLoopTimer.start();
+
+            if (s_diagPointerPending)
+            {
+                s_diagPointerAgeMs += s_diagPointerTimer.elapsed() * 1000.0;
+                ++s_diagPointerAgeSamples;
+                s_diagPointerPending = false;
+                //  This frame answers that event; presentSharedImage() pins the
+                //  timestamp to the slot it submits into.
+                s_diagFrameEventTime = diagNow() - s_diagPointerTimer.elapsed();
+            }
+
+            //  Close out any slot whose GPU work has retired since last frame.
+            //  vkGetFenceStatus does not block, so this costs two calls a frame
+            //  and works at any pipeline depth, with one frame of quantisation.
+            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+            {
+                if (s_diagSlotArmed[i] && m_vkDevice && m_vkFence[i] && vkGetFenceStatus(m_vkDevice, m_vkFence[i]) == VK_SUCCESS)
+                {
+                    s_diagEventToRetireMs += (diagNow() - s_diagSlotEventTime[i]) * 1000.0;
+                    ++s_diagEventToRetireSamples;
+                    s_diagSlotArmed[i] = false;
+                }
+            }
+        }
+
         if (m_doc && session && m_videoDevice)
         {
             m_videoDevice->makeCurrent();
@@ -2031,7 +2244,16 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            //  Frame-time breakdown; see the report at the end of render().
+            const bool diagTiming = IPCore::ImageRenderer::debugGpu();
+            Timer diagTimer;
+            if (diagTiming)
+                diagTimer.start();
+
             session->render();
+
+            if (diagTiming)
+                s_diagRenderMs += diagTimer.elapsed() * 1000.0;
 
             if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
             {
@@ -2062,7 +2284,15 @@ namespace Rv
             //  Skipping it leaves the main window on a stale frame once
             //  presentation mode is on.
             //
+            const bool diagPresent = IPCore::ImageRenderer::debugGpu();
+            Timer diagPresentTimer;
+            if (diagPresent)
+                diagPresentTimer.start();
+
             m_videoDevice->syncBuffers();
+
+            if (diagPresent)
+                s_diagMainPresentMs += diagPresentTimer.elapsed() * 1000.0;
 
             //
             //  In presentation mode the output is a distinct fullscreen window
@@ -2070,7 +2300,13 @@ namespace Rv
             //
             if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
             {
+                if (diagPresent)
+                    diagPresentTimer.start();
+
                 session->outputVideoDevice()->syncBuffers();
+
+                if (diagPresent)
+                    s_diagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
 
                 //
                 //  Presenting the output device made *its* offscreen GL context
@@ -2087,8 +2323,59 @@ namespace Rv
 
         if (session)
         {
+            //  See s_diagPostRenderMs.
+            const bool diagPost = IPCore::ImageRenderer::debugGpu();
+            Timer diagPostTimer;
+            if (diagPost)
+                diagPostTimer.start();
+
             session->addSyncSample();
             session->postRender();
+
+            if (diagPost)
+                s_diagPostRenderMs += diagPostTimer.elapsed() * 1000.0;
+        }
+
+        //
+        //  Report an averaged breakdown every 60 frames: where the frame goes
+        //  (session render vs viewport present vs output present), and what the
+        //  pointer sees end to end.
+        //
+        if (IPCore::ImageRenderer::debugGpu() && m_doc)
+        {
+            if (++s_diagFrames >= 60)
+            {
+                const double n = double(s_diagFrames);
+                const double loopMs = s_diagLoopMs / n;
+                cout << "INFO: VulkanWindow frame avg over " << s_diagFrames
+                     << " [tiling=" << (m_sharedImageInfo[0].optimalTiling ? "OPTIMAL" : "LINEAR") << "]"
+                     << ": session->render()=" << (s_diagRenderMs / n) << "ms  mainPresent=" << (s_diagMainPresentMs / n)
+                     << "ms  outputPresent=" << (s_diagOutPresentMs / n)
+                     << "ms  total=" << ((s_diagRenderMs + s_diagMainPresentMs + s_diagOutPresentMs) / n)
+                     << "ms   [mainPresent breakdown: fenceWait=" << (s_diagFenceWaitMs / n) << "ms acquire=" << (s_diagAcquireMs / n)
+                     << "ms]"
+                     << "  postRender=" << (s_diagPostRenderMs / n) << "ms  frameInterval=" << loopMs << "ms ("
+                     << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)"
+                     << "  pointer: events=" << s_diagPointerEvents
+                     << " handler=" << (s_diagPointerEvents ? s_diagPointerHandlerMs / s_diagPointerEvents : 0.0)
+                     << "ms eventToRender=" << (s_diagPointerAgeSamples ? s_diagPointerAgeMs / s_diagPointerAgeSamples : 0.0)
+                     << "ms eventToRetire=" << (s_diagEventToRetireSamples ? s_diagEventToRetireMs / s_diagEventToRetireSamples : 0.0)
+                     << "ms" << endl;
+                s_diagFrames = 0;
+                s_diagRenderMs = 0.0;
+                s_diagMainPresentMs = 0.0;
+                s_diagOutPresentMs = 0.0;
+                s_diagFenceWaitMs = 0.0;
+                s_diagAcquireMs = 0.0;
+                s_diagLoopMs = 0.0;
+                s_diagPostRenderMs = 0.0;
+                s_diagPointerHandlerMs = 0.0;
+                s_diagPointerEvents = 0;
+                s_diagPointerAgeMs = 0.0;
+                s_diagPointerAgeSamples = 0;
+                s_diagEventToRetireMs = 0.0;
+                s_diagEventToRetireSamples = 0;
+            }
         }
 
         m_eventProcessingTimer.start();
@@ -2267,7 +2554,14 @@ namespace Rv
             //  only to drop modifier state that went stale while the keyboard
             //  was elsewhere.
             //
-            m_videoDevice->translator().resetModifiers();
+            //  Guarded: a passive presentation output window is built with no
+            //  event widget, so its device has no translator (the general
+            //  hasTranslator() check below this switch is too late).
+            //
+            if (m_videoDevice->hasTranslator())
+            {
+                m_videoDevice->translator().resetModifiers();
+            }
             break;
 
         case QEvent::Enter:
@@ -2381,7 +2675,28 @@ namespace Rv
         if (session)
             session->setEventVideoDevice(videoDevice());
 
-        if (m_videoDevice->translator().sendQTEvent(event, activationTime))
+        //  See s_diagPointerHandlerMs. A drag arrives here and is dispatched
+        //  synchronously into Mu, so this call *is* the handler's cost.
+        const bool diagPointer =
+            IPCore::ImageRenderer::debugGpu()
+            && (event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::TabletMove);
+        Timer diagPointerTimer;
+        if (diagPointer)
+        {
+            diagPointerTimer.start();
+            s_diagPointerTimer.start();
+            s_diagPointerPending = true;
+        }
+
+        const bool handled = m_videoDevice->translator().sendQTEvent(event, activationTime);
+
+        if (diagPointer)
+        {
+            s_diagPointerHandlerMs += diagPointerTimer.elapsed() * 1000.0;
+            ++s_diagPointerEvents;
+        }
+
+        if (handled)
         {
             event->accept();
             return true;
