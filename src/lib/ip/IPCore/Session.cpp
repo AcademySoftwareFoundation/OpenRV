@@ -628,6 +628,10 @@ namespace IPCore
     Session::~Session()
     {
         m_beingDeleted = true;
+        if (m_currentSession == this)
+        {
+            m_currentSession = nullptr;
+        }
 
         breakVideoDeviceConnections();
 

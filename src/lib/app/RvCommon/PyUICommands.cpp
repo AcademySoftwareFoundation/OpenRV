@@ -260,6 +260,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         PyEventObject* event;
         PyObject* pylist;
@@ -290,6 +295,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
         int x, y;
         PyObject* pylist;
@@ -311,6 +321,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         void* rvDoc = (void*)s->opaquePointer();
 
         PyObject* ret = Py_None;
@@ -328,6 +343,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
 
         PyObject* ret = Py_None;
 
@@ -347,6 +367,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         void* rvDoc = (void*)s->opaquePointer();
 
         PyObject* ret = Py_None;
@@ -367,6 +392,11 @@ namespace Rv
     {
         PyLockObject locker;
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         PyObject* ret = Py_None;
 
         if (RvDocument* rvDoc = (RvDocument*)s->opaquePointer())
@@ -385,6 +415,11 @@ namespace Rv
     static PyObject* javascriptExport(PyObject* self, PyObject* args)
     {
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         uint64_t pointer;
 
@@ -402,6 +437,11 @@ namespace Rv
     static PyObject* javascriptExport(PyObject* self, PyObject* args)
     {
         Session* s = Session::currentSession();
+        if (!s)
+        {
+            PyErr_SetString(PyExc_RuntimeError, "no current session");
+            return NULL;
+        }
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
         uint64_t pointer;
 
