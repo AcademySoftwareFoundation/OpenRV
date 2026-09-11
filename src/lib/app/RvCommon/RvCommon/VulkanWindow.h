@@ -137,6 +137,12 @@ namespace Rv
         // -- see the best-effort present in presentSharedImage().
         bool isPassiveOutput() const { return m_doc == nullptr; }
 
+        //  Best-effort gate for a passive presentation output, called by
+        //  QTVulkanVideoDevice::syncBuffers() *before* it does any GL work.
+        //  False means skip this frame entirely; a retry is armed internally so
+        //  the frame is not lost. Always true for the control viewport.
+        bool canPresentNow();
+
         const SharedImageInfo* getSharedImageInfo(int w, int h);
         void presentSharedImage();
 
@@ -171,6 +177,7 @@ namespace Rv
     private:
         bool initVulkan();
         void cleanupVulkan();
+        void requestBestEffortRetry();
         bool createSwapchain();
         void cleanupSwapchain();
 
@@ -195,6 +202,9 @@ namespace Rv
         QEvent::Type m_lastKeyType;
         Timer m_activityTimer;
         Timer m_activationTimer;
+        //  Time since a passive output last actually presented; drives the
+        //  forward-progress guard in canPresentNow().
+        Timer m_lastPresentTimer;
         QTimer m_eventProcessingTimer;
 
         // Vulkan state

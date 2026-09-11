@@ -1300,6 +1300,63 @@ namespace Rv
     //  outstanding. render() picks it up in the passive-output branch and
     //  re-presents the frame already sitting in the device's FBO.
     //
+    //
+    //  Best-effort gate for a passive presentation output.
+    //
+    //  The OpenGL presentation path gets this for free: its syncBuffers() is a
+    //  QOpenGLWidget::update() that Qt coalesces and drops when it falls
+    //  behind, so the second display skips frames under load rather than
+    //  deepening the GPU queue. The Vulkan path queues its work
+    //  unconditionally, and at a 4K output that work is what the control
+    //  viewport ends up waiting for in vkWaitForFences.
+    //
+    //  Gate on whether this device's *own* GPU work has caught up, not on
+    //  whether the swapchain is full -- with a slower loop than display the
+    //  queue always has room, so a swapchain-full test never fires.
+    //
+    //  Called before any GL work, so a skipped frame costs nothing -- in
+    //  particular no GL semaphore has been signaled yet, so there is nothing to
+    //  rebalance.
+    //
+    bool VulkanWindow::canPresentNow()
+    {
+        if (!isPassiveOutput())
+            return true;
+
+        //  Nothing allocated yet: let the frame through so syncBuffers() can
+        //  build the swapchain and shared image.
+        if (!m_vkDevice || !m_vkSwapchain)
+            return true;
+
+        //
+        //  Forward progress. Under sustained GPU pressure the catch-up test
+        //  below can be false indefinitely, which would freeze the presentation
+        //  display rather than merely thin it out. Qt's update() is a dirty flag
+        //  it must eventually service; matching that behaviour means forcing a
+        //  blocking frame through once the output has gone stale for longer than
+        //  a few refreshes.
+        //
+        static const double kMaxStaleSeconds = 0.1;
+        if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds)
+            return true;
+
+        //  waitAll with a zero timeout: every in-flight frame of this device
+        //  must have retired, not just the one two frames back that this slot
+        //  happens to own.
+        const VkResult r = vkWaitForFences(m_vkDevice, FRAMES_IN_FLIGHT, m_vkFence.data(), VK_TRUE, 0);
+        if (r == VK_SUCCESS)
+            return true;
+
+        requestBestEffortRetry();
+        return false;
+    }
+
+    void VulkanWindow::requestBestEffortRetry()
+    {
+        if (!m_stopProcessingEvents && isExposed())
+            requestUpdate();
+    }
+
     void VulkanWindow::drainSharedSemaphores(uint32_t slot)
     {
         // No shared image for this slot yet -> the GL side never signaled/waited
@@ -1792,18 +1849,47 @@ namespace Rv
         const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
         Timer diagTimer;
 
-        // Start-of-frame throttle: wait for this slot's previous frame to finish
-        // before reusing its acquire semaphore and per-frame resources. This
-        // replaces the old end-of-frame block; with FIFO acquire back-pressure it
-        // is what paces the loop to display refresh while still allowing
-        // FRAMES_IN_FLIGHT frames outstanding.
+        //
+        //  Best-effort present for a passive presentation output.
+        //
+        //  This function has exactly two blocking calls, the fence wait and the
+        //  acquire, and on the control viewport they are the throttle: FIFO
+        //  acquire back-pressure plus the start-of-frame fence is what paces
+        //  the loop to display refresh.
+        //
+        //  A presentation output should not be part of that. render() presents
+        //  the control viewport and then the output inside one frame, so a
+        //  second blocking pair puts a second display's vblank in the loop's
+        //  path. The OpenGL output is never in it: DesktopVideoDevice's
+        //  syncBuffers() is a coalesced QOpenGLWidget::update() on an empty
+        //  paintGL() that Qt drops when it falls behind.
+        //
+        //  So do the same explicitly -- poll with a zero timeout and skip the
+        //  frame when the swapchain cannot take an image right now, leaving the
+        //  output on its previous frame as a dropped Qt update would. See
+        //  canPresentNow() for the gate that fires first, before any GL work.
+        //
+        const bool bestEffort = isPassiveOutput();
+        const uint64_t waitTimeout = bestEffort ? 0 : UINT64_MAX;
+
         if (diagPresent)
             diagTimer.start();
 
-        vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+        VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout);
 
         if (diagPresent)
             s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
+
+        if (fenceResult == VK_TIMEOUT)
+        {
+            //  The GL side already signaled glReady[slot] and waited vkReady[slot]
+            //  for this frame, so the pair has to be rebalanced before bailing --
+            //  same contract as the VK_ERROR_OUT_OF_DATE_KHR path below. The slot
+            //  is deliberately not advanced: the next frame retries this one.
+            drainSharedSemaphores(slot);
+            requestBestEffortRetry();
+            return;
+        }
 
         // Acquire image
         uint32_t imageIndex;
@@ -1811,10 +1897,21 @@ namespace Rv
             diagTimer.start();
 
         VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
 
         if (diagPresent)
             s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
+
+        if (result == VK_NOT_READY || result == VK_TIMEOUT)
+        {
+            //  No image free this frame. An acquire that fails this way leaves
+            //  m_vkImageAvailableSemaphore[slot] unsignaled, so nothing leaks --
+            //  which is why the skip has to happen here and not after a
+            //  successful acquire.
+            drainSharedSemaphores(slot);
+            requestBestEffortRetry();
+            return;
+        }
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
@@ -1995,6 +2092,11 @@ namespace Rv
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
 
+        //  This device has presented; the forward-progress guard in
+        //  canPresentNow() measures staleness from here.
+        m_lastPresentTimer.stop();
+        m_lastPresentTimer.start();
+
         //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
         //  present is queued so the driver still gets the frame as early as
         //  possible; this only stops the CPU running a second frame ahead. The
@@ -2045,8 +2147,19 @@ namespace Rv
 
         // Start-of-frame throttle (matches presentSharedImage): wait for this
         // slot's previous frame to finish before reusing its staging buffer,
-        // acquire semaphore and command resources.
-        vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+        // acquire semaphore and command resources. A passive presentation output
+        // polls instead of blocking and skips the frame -- see the best-effort
+        // present in presentSharedImage() for why.
+        const bool bestEffort = isPassiveOutput();
+        const uint64_t waitTimeout = bestEffort ? 0 : UINT64_MAX;
+
+        if (vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout) == VK_TIMEOUT)
+        {
+            //  Unlike the interop path there are no GL<->Vulkan semaphores to
+            //  rebalance here: presentCpuFallback() hands over plain pixels.
+            requestBestEffortRetry();
+            return;
+        }
 
         size_t size = w * h * 4;
 
@@ -2094,7 +2207,14 @@ namespace Rv
         // Acquire image
         uint32_t imageIndex;
         VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, UINT64_MAX, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
+            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
+        if (result == VK_NOT_READY || result == VK_TIMEOUT)
+        {
+            // Best-effort: no image free this frame, leave the output on the one
+            // it is already showing and come back for it.
+            requestBestEffortRetry();
+            return;
+        }
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
             handleSwapchainOutOfDate();
@@ -2210,6 +2330,11 @@ namespace Rv
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
 
+        //  This device has presented; the forward-progress guard in
+        //  canPresentNow() measures staleness from here.
+        m_lastPresentTimer.stop();
+        m_lastPresentTimer.start();
+
         //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
         //  present is queued so the driver still gets the frame as early as
         //  possible; this only stops the CPU running a second frame ahead. The
@@ -2259,6 +2384,22 @@ namespace Rv
         //
         if (!m_initialized)
         {
+            return;
+        }
+
+        //
+        //  A passive presentation output never drives the frame loop below: it
+        //  is composited into and presented by its owning
+        //  VulkanDesktopVideoDevice, in-frame, from the control viewport's
+        //  render(). The only reason it gets an UpdateRequest of its own is a
+        //  best-effort present that was skipped (see requestBestEffortRetry),
+        //  so re-present what the device already composited -- the same handoff
+        //  exposeEvent() uses.
+        //
+        if (isPassiveOutput())
+        {
+            if (m_videoDevice)
+                m_videoDevice->syncBuffers();
             return;
         }
 
