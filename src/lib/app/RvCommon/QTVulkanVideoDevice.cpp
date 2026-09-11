@@ -599,6 +599,37 @@ namespace Rv
         return true;
     }
 
+    bool QTVulkanVideoDevice::glDeviceMatchesVulkan() const
+    {
+        if (m_glVulkanDeviceMatch != -1)
+            return m_glVulkanDeviceMatch == 1;
+        if (!m_glContext || !m_window || !m_window->isInitialized())
+            return false;
+
+        using GetUnsignedByteIndexedProc = void(GLAPIENTRY*)(GLenum, GLuint, GLubyte*);
+        const auto getUnsignedByteIndexed =
+            reinterpret_cast<GetUnsignedByteIndexedProc>(m_glContext->getProcAddress("glGetUnsignedBytei_vEXT"));
+
+        GLint deviceCount = 0;
+        if (getUnsignedByteIndexed)
+            glGetIntegerv(GL_NUM_DEVICE_UUIDS_EXT, &deviceCount);
+
+        bool matched = false;
+        for (GLint i = 0; i < deviceCount && !matched; ++i)
+        {
+            std::array<GLubyte, GL_UUID_SIZE_EXT> uuid{};
+            getUnsignedByteIndexed(GL_DEVICE_UUID_EXT, static_cast<GLuint>(i), uuid.data());
+            matched = m_window->physicalDeviceMatchesUUID(uuid.data(), uuid.size());
+        }
+
+        m_glVulkanDeviceMatch = matched ? 1 : 0;
+        if (!matched && ImageRenderer::debugGpu())
+        {
+            cout << "INFO: QTVulkanVideoDevice: GL/Vulkan device UUIDs do not match or are unavailable; using CPU fallback." << endl;
+        }
+        return matched;
+    }
+
     void QTVulkanVideoDevice::presentCpuFallback(int w, int h) const
     {
         TwkGLF::GLFBO* fbo = m_fbo;
@@ -655,6 +686,12 @@ namespace Rv
         if (w <= 0 || h <= 0)
             return;
 
+        // A presentation device can be primed before its window receives the
+        // first expose event. There is no swapchain to present to yet; wait for
+        // exposeEvent(), which initializes Vulkan and calls syncBuffers() again.
+        if (!m_window->isInitialized())
+            return;
+
         //
         //  Best-effort gate for a passive presentation output: skip the whole
         //  frame while this device's own GPU work is still in flight, rather
@@ -677,11 +714,12 @@ namespace Rv
         // while the GL context is current. If the driver does not expose them,
         // skip the Vulkan-side export work entirely and fall through to the
         // CPU pack-and-upload path below.
-        const bool glInteropAvailable = !forceCpuPresentation() && !m_interopDisabled && loadGLInteropExtensions();
+        const bool glInteropAvailable =
+            !forceCpuPresentation() && !m_interopDisabled && loadGLInteropExtensions() && glDeviceMatchesVulkan();
         const VulkanWindow::SharedImageInfo* sharedInfo = glInteropAvailable ? m_window->getSharedImageInfo(w, h) : nullptr;
 #else
         const bool glInteropAvailable = !forceCpuPresentation() && !m_interopDisabled && GLEW_EXT_memory_object && GLEW_EXT_semaphore
-                                        && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
+                                        && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd && glDeviceMatchesVulkan();
         const VulkanWindow::SharedImageInfo* sharedInfo = glInteropAvailable ? m_window->getSharedImageInfo(w, h) : nullptr;
 #endif
 
