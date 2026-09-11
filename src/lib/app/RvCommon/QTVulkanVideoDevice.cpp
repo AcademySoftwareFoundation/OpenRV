@@ -349,12 +349,41 @@ namespace Rv
                 m_fboColorTex = 0;
             }
 
+            //
+            //  RGBA16F for the control viewport, RGB10_A2 for a passive
+            //  presentation output.
+            //
+            //  The control viewport needs the half-float depth: session->render()
+            //  composites the whole main view into this FBO across multiple
+            //  blended passes. A passive output never does -- it is only ever a
+            //  blit destination for the inherited
+            //  transfer()/transfer2()/fillWithTexture(), which hand over an
+            //  already-composited frame.
+            //
+            //  Keeping it at 16F there costs two full passes' worth of bandwidth
+            //  at a 4K output: transfer() writes 8 bytes/px (66 MB) and
+            //  syncBuffers() reads all of it back to convert down to the
+            //  10-bit shared image. Matching the shared image's format halves
+            //  both, and the conversion happens once, in the blit that was
+            //  already going to run. The final output is 10-bit either way, so
+            //  no precision is lost that the present did not already discard.
+            //
+            const bool passiveOutput = m_window && m_window->isPassiveOutput();
+            const GLenum fboFormat = passiveOutput ? GL_RGB10_A2 : GL_RGBA16F_ARB;
+
             glGenTextures(1, &m_fboColorTex);
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
-            glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA16F_ARB, newW, newH, 0, GL_RGBA, GL_FLOAT, nullptr);
+            if (passiveOutput)
+            {
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, newW, newH, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+            }
+            else
+            {
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, newW, newH, 0, GL_RGBA, GL_FLOAT, nullptr);
+            }
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-            m_fbo = new TwkGLF::GLFBO(newW, newH, GL_RGBA16F_ARB);
+            m_fbo = new TwkGLF::GLFBO(newW, newH, fboFormat);
             m_fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
