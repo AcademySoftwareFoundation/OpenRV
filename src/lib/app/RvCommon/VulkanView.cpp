@@ -44,7 +44,19 @@ namespace Rv
         //  Embed the native window in the widget tree.
         //
         m_container = QWidget::createWindowContainer(m_vulkanWindow, this);
-        m_container->setFocusPolicy(Qt::StrongFocus);
+
+        //
+        //  A doc-less view is a passive presentation output owned by a
+        //  VulkanDesktopVideoDevice: it is composited into and presented by
+        //  that device and must never take part in input handling. Giving it
+        //  focus is actively harmful -- a second top-level that accepts focus
+        //  fights the main window for activation, and the resulting
+        //  WindowActivate storm starves the event loop (observed as annotation
+        //  strokes never receiving their drag events).
+        //
+        const bool passiveOutput = (m_doc == nullptr);
+
+        m_container->setFocusPolicy(passiveOutput ? Qt::NoFocus : Qt::StrongFocus);
 
         //
         //  Create the platform surface up-front: Qt can only hand out a
@@ -85,12 +97,26 @@ namespace Rv
             //
             str << UI_APPLICATION_NAME " Presentation (Vulkan)" << "/" << static_cast<const void*>(this);
         }
-        m_videoDevice = new QTVulkanVideoDevice(nullptr, str.str(), m_vulkanWindow, m_container);
+        //
+        //  No event widget for a passive output: QTVulkanVideoDevice only
+        //  builds a QTTranslator when given one, and VulkanWindow::event()
+        //  bails at !hasTranslator(), so this makes the whole window inert for
+        //  input instead of relying on each handler to notice it has no doc.
+        //
+        m_videoDevice = new QTVulkanVideoDevice(nullptr, str.str(), m_vulkanWindow, passiveOutput ? nullptr : m_container);
         m_vulkanWindow->setVideoDevice(m_videoDevice);
-        m_vulkanWindow->setEventWidget(m_container);
+        m_vulkanWindow->setEventWidget(passiveOutput ? nullptr : m_container);
 
         setObjectName((m_doc && m_doc->session()) ? m_doc->session()->name().c_str() : "no session");
-        setFocusProxy(m_container);
+
+        if (!passiveOutput)
+        {
+            setFocusProxy(m_container);
+        }
+        else
+        {
+            setFocusPolicy(Qt::NoFocus);
+        }
 
         //
         //  Realize the top-level's window now, and watch for Qt replacing it.

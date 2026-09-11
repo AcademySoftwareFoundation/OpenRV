@@ -64,6 +64,26 @@ namespace Rv
         //  and the translator has to be installed by hand.
         //
         setViewDevice(m_vulkanView->videoDevice());
+
+        //
+        //  Never take focus or activation. This is a second-display output
+        //  surface, not something the user interacts with: a focusable
+        //  top-level here fights the main window for activation, and the
+        //  resulting WindowActivate storm saturates the event loop -- which is
+        //  what stopped annotation strokes from ever receiving their drag
+        //  events. WA_ShowWithoutActivating keeps show() from stealing
+        //  activation; WindowDoesNotAcceptFocus keeps the window manager from
+        //  handing it back later.
+        //
+        m_vulkanView->setAttribute(Qt::WA_ShowWithoutActivating, true);
+        m_vulkanView->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
+
+        //
+        //  The base class allocates a translator alongside its ScreenView (see
+        //  setViewWidget), so one is created here for parity. It is inert:
+        //  DesktopVideoDevice::translator() has no callers, and the view is
+        //  built without an event widget so it produces no events of its own.
+        //
         m_translator = new QTTranslator(this, m_vulkanView);
 
         //
@@ -132,25 +152,28 @@ namespace Rv
         //
         //  Deliberately empty -- do NOT present from here.
         //
-        //  Session::askForRedraw() calls redraw() on the control device and on
-        //  the output device, and it is called from arbitrary places, including
-        //  from inside a mouse-motion handler while an annotation stroke is
-        //  being drawn with the main view's GL context current.
+        //  Note that Session::askForRedraw() cannot actually reach this: it
+        //  casts the output device to TwkGLF::GLVideoDevice, and every desktop
+        //  output device derives from TwkGLF::GLBindableVideoDevice, a sibling
+        //  class. The override is defence, not a hot path -- but the behaviour
+        //  it defends against is real, because redraw() is also reachable from
+        //  DesktopVideoDevice::syncBuffers() and from arbitrary callers,
+        //  including from inside a mouse-motion handler while an annotation
+        //  stroke is being drawn with the main view's GL context current.
         //
         //  Presenting here means QTVulkanVideoDevice::syncBuffers(), which
         //  makes its own offscreen context current and does not restore the
         //  previous one. That silently steals the context from whatever was
         //  mid-draw: the first stroke point lands, then every later GL call
         //  goes to the presentation device's context and the stroke stops. It
-        //  would also run a full vsync-blocking swapchain present per motion
-        //  event.
+        //  would also run a swapchain present per motion event.
         //
-        //  Nothing is lost by doing nothing. askForRedraw() also redraws the
-        //  control device, which schedules VulkanWindow::render(); that renders
-        //  the frame, composites into this device through the inherited
-        //  transfer(), and then presents this device in-frame via
-        //  syncBuffers(). A doc-less presentation window additionally presents
-        //  once on expose, so it is never left blank.
+        //  Nothing is lost by doing nothing. askForRedraw() redraws the control
+        //  device, which schedules VulkanWindow::render(); that renders the
+        //  frame, composites into this device through the inherited transfer(),
+        //  and then presents this device in-frame via syncBuffers(). A doc-less
+        //  presentation window additionally presents once on expose, so it is
+        //  never left blank.
         //
         //  The base does effectively the same thing: its m_view->update() only
         //  asks Qt to composite a QOpenGLWidget whose paintGL() is empty.
