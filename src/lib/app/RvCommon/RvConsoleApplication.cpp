@@ -16,6 +16,7 @@ namespace Rv
         , m_pyLibrary(INTERNAL_APPLICATION_NAME)
     {
         m_pyLibrary.setName("py-media-library");
+        m_pyLibrary.start();
     }
 
 } // namespace Rv

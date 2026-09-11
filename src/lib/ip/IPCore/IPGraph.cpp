@@ -2741,7 +2741,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
         if (ok)
         {
-            m_audioThreadGroup.maybe_dispatch(evalAudioThreadTrampoline, this, true);
+            m_audioThreadGroup.maybe_dispatch(evalAudioThreadTrampoline, this);
         }
     }
 

@@ -29,7 +29,6 @@
 
 #include <TwkGLF/GLFBO.h>
 #include <TwkGLF/GLFence.h>
-#include <stl_ext/thread_group.h>
 #include <deque>
 #include <BlackMagicDevices/StereoVideoFrame.h>
 
@@ -96,7 +95,6 @@ namespace BlackMagicDevices
         using GLFence = TwkGLF::GLFence;
         using GLFBO = TwkGLF::GLFBO;
         using BufferVector = std::vector<unsigned char*>;
-        using ThreadGroup = stl_ext::thread_group;
         using AudioBuffer = std::vector<int>;
         using StereoFrameMap = std::map<IDeckLinkMutableVideoFrame*, std::unique_ptr<StereoVideoFrame::Provider>>;
         using DLVideoFrameDeque = std::deque<IDeckLinkMutableVideoFrame*>;

@@ -817,9 +817,8 @@ namespace TwkMediaLibrary
         //  ASync/Parallel Task API
         //
 
-        static void threadTrampoline(Library*);
         void threadMain();
-
+        void start();
         void addTask(Task*) const;
         void cancelTask(const Task*) const;
         void cancelTasks(const TaskVector&) const;
