@@ -1138,23 +1138,74 @@ namespace Rv
             return disabled;
         }
 
-        // NVIDIA 550+ drivers return blank pixels to OpenGL for LINEAR shared
-        // images >= ~2 MiB (forum thread #349436). Allocating the shared image with
-        // VK_IMAGE_TILING_OPTIMAL avoids that broken linear path and restores
-        // correct zero-copy interop, so OPTIMAL is the default on NVIDIA. Both the
-        // GL and Vulkan sides here are the same NVIDIA driver/GPU, so the
-        // vendor-private optimal layout matches on import without needing explicit
-        // DRM-format-modifier negotiation. AMD/Intel keep the existing LINEAR path.
-        // Set RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND to revert NVIDIA to LINEAR
-        // (reproduces the blank-image bug, for debugging).
+        // How many frames the control viewport may keep in flight. Default 1:
+        // block on this frame's fence before returning, rather than letting the
+        // next frame's start-of-frame wait absorb it two frames later.
+        // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 restores the deeper pipeline.
         //
-        // The vendor decides this, not the platform: NVIDIA ships one driver core
-        // behind both GL and Vulkan on Windows as well as Linux, and the shared
-        // image is always well past the threshold because getSharedImageInfo()
-        // allocates at screen capacity -- ~8 MiB for a 1080p A2B10G10R10 image,
-        // ~33 MiB at 4K. The AMD rationale for LINEAR is specific to Mesa, where
-        // GL and Vulkan are separate drivers (radeonsi vs RADV) so
-        // GL_OPTIMAL_TILING_EXT carries no cross-driver layout guarantee.
+        // Depth is latency, not throughput, and separating the two is what
+        // fixed the "annotation trails the cursor in presentation mode" bug.
+        // Both backends ran presentation mode at a similar frame interval, so
+        // throughput was never the difference; what differed was how old the
+        // displayed pixels were. With two frames in flight the screen answers
+        // input from two frames back, and the OpenGL path is effectively one
+        // deep because paintGL() draws and Qt's following swap waits on that
+        // same work.
+        //
+        // Giving up the second frame costs no measurable frame rate here
+        // because the loop is GPU-bound either way, and it buys a whole frame:
+        // measured on a 4K presentation output, eventToRetire settled to
+        // eventToRender + one frame interval, with no queue left behind it.
+        unsigned int maxFramesInFlight()
+        {
+            static const unsigned int depth = []
+            {
+                const unsigned int kDefault = 1;
+                const char* v = getenv("RV_VULKAN_MAX_FRAMES_IN_FLIGHT");
+                if (!v)
+                    return kDefault;
+                const int n = atoi(v);
+                if (n < 1 || n > static_cast<int>(VulkanWindow::FRAMES_IN_FLIGHT))
+                {
+                    cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::FRAMES_IN_FLIGHT
+                         << "; using " << kDefault << endl;
+                    return kDefault;
+                }
+                return static_cast<unsigned int>(n);
+            }();
+            return depth;
+        }
+
+        // Tiling for the GL<->Vulkan shared image: OPTIMAL on NVIDIA, LINEAR
+        // everywhere else.
+        //
+        // NVIDIA needs OPTIMAL. Its 550+ drivers return blank pixels to OpenGL
+        // for LINEAR shared images >= ~2 MiB (forum thread #349436), and
+        // OPTIMAL avoids that broken linear path. It is safe there because the
+        // GL and Vulkan sides are the same driver, so the vendor-private
+        // optimal layout matches on import. Set
+        // RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND to revert NVIDIA to
+        // LINEAR (reproduces the blank-image bug, for debugging).
+        //
+        // The vendor decides this, not the platform: NVIDIA ships one driver
+        // core behind both GL and Vulkan on Windows as well as Linux, which is
+        // why the check below covers both, and the shared image is always well
+        // past the threshold because getSharedImageInfo() allocates at screen
+        // capacity -- ~8 MiB for a 1080p A2B10G10R10 image, ~33 MiB at 4K.
+        //
+        // Everywhere else LINEAR is not conservatism, it is the only correct
+        // choice: OPTIMAL was measured on AMD (RADV PHOENIX2, Mesa) and renders
+        // tile-pattern garbage -- sparse tile-aligned fragments of the frame,
+        // the rest dropped. Under Mesa, GL and Vulkan are different drivers
+        // (radeonsi vs RADV) and GL_OPTIMAL_TILING_EXT carries no cross-driver
+        // layout guarantee, so the importer reads a layout the exporter never
+        // wrote. Making OPTIMAL usable off NVIDIA means negotiating the layout
+        // explicitly with VK_EXT_image_drm_format_modifier.
+        //
+        // This costs real time at a 4K presentation output -- the GL side blits
+        // a full frame into the linear image and Vulkan blits it back out every
+        // present, both without their tiled fast paths -- so it is worth
+        // revisiting, but not by flipping this flag.
         bool useOptimalTilingForInterop(VkPhysicalDevice dev)
         {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
@@ -1943,6 +1994,16 @@ namespace Rv
         presentInfo.pImageIndices = &imageIndex;
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
+
+        //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
+        //  present is queued so the driver still gets the frame as early as
+        //  possible; this only stops the CPU running a second frame ahead. The
+        //  passive output is excluded -- it is best-effort by design and must
+        //  never block the loop.
+        if (maxFramesInFlight() == 1 && !isPassiveOutput())
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+        }
         // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
         // can be reported persistently by some X11/RADV compositors; recreating
         // on it every frame caused a swapchain-recreate loop that starved the Qt
@@ -2148,6 +2209,16 @@ namespace Rv
         presentInfo.pImageIndices = &imageIndex;
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
+
+        //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
+        //  present is queued so the driver still gets the frame as early as
+        //  possible; this only stops the CPU running a second frame ahead. The
+        //  passive output is excluded -- it is best-effort by design and must
+        //  never block the loop.
+        if (maxFramesInFlight() == 1 && !isPassiveOutput())
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
+        }
         // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
         // can be reported persistently by some X11/RADV compositors; recreating
         // on it every frame caused a swapchain-recreate loop that starved the Qt
@@ -2347,8 +2418,8 @@ namespace Rv
             {
                 const double n = double(s_diagFrames);
                 const double loopMs = s_diagLoopMs / n;
-                cout << "INFO: VulkanWindow frame avg over " << s_diagFrames
-                     << " [tiling=" << (m_sharedImageInfo[0].optimalTiling ? "OPTIMAL" : "LINEAR") << "]"
+                cout << "INFO: VulkanWindow frame avg over " << s_diagFrames << " [depth=" << maxFramesInFlight()
+                     << " tiling=" << (m_sharedImageInfo[0].optimalTiling ? "OPTIMAL" : "LINEAR") << "]"
                      << ": session->render()=" << (s_diagRenderMs / n) << "ms  mainPresent=" << (s_diagMainPresentMs / n)
                      << "ms  outputPresent=" << (s_diagOutPresentMs / n)
                      << "ms  total=" << ((s_diagRenderMs + s_diagMainPresentMs + s_diagOutPresentMs) / n)
