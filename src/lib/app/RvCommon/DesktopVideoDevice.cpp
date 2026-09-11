@@ -13,6 +13,11 @@
 #include <lcms2.h>
 #endif
 
+#ifdef PLATFORM_DARWIN
+#include <ApplicationServices/ApplicationServices.h>
+#include <ColorSync/ColorSync.h>
+#endif
+
 #include <RvCommon/DesktopVideoDevice.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -906,6 +911,51 @@ namespace Rv
 
             delete path;
             ReleaseDC(hwnd, hdc);
+        }
+        else
+        {
+            m_colorProfile = ColorProfile();
+        }
+
+        return m_colorProfile;
+    }
+#endif
+
+#ifdef PLATFORM_DARWIN
+    TwkApp::VideoDevice::ColorProfile DesktopVideoDevice::colorProfile() const
+    {
+        //
+        //  Get the display's color sync profile
+        //
+
+        CGDirectDisplayID displayIDs[20];
+        uint32_t displayCount = 0;
+        CGGetOnlineDisplayList(20, displayIDs, &displayCount);
+
+        if (m_screen < 0 || m_screen >= static_cast<int>(displayCount))
+        {
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        CGDirectDisplayID cgScreen = displayIDs[m_screen];
+
+        if (ColorSyncProfileRef iccRef = ColorSyncProfileCreateWithDisplayID(cgScreen))
+        {
+            m_colorProfile.type = ICCProfile;
+
+            CFStringRef desc = ColorSyncProfileCopyDescriptionString(iccRef);
+            CFIndex n = CFStringGetLength(desc);
+            std::vector<char> buffer(n * 4 + 1);
+            CFStringGetCString(desc, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
+            m_colorProfile.description = &buffer.front();
+
+            CFURLRef url = ColorSyncProfileGetURL(iccRef, NULL);
+            CFStringRef urlstr = CFURLGetString(url);
+            buffer.resize(CFStringGetLength(urlstr) * 4 + 1);
+            CFStringGetCString(urlstr, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
+
+            m_colorProfile.url = &buffer.front();
         }
         else
         {
