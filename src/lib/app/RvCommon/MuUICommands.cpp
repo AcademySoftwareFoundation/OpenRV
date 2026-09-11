@@ -9,7 +9,11 @@
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
+#endif
+
 #include <TwkGLF/GL.h>
+
+#ifdef PLATFORM_WINDOWS
 #include <TwkGLF/GLVBO.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLState.h>
@@ -38,6 +42,7 @@
 #include <MuLang/StringType.h>
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/SettingsValueType.h>
+#include <TwkGLF/GLVideoDevice.h>
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtWidgets/QFileIconProvider>
@@ -383,9 +388,6 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
-
-        GLView* glview = dynamic_cast<GLView*>(w);
 
         Mu::Vector4f v;
         v[0] = 0;
@@ -393,7 +395,7 @@ namespace Rv
         v[2] = 0;
         v[3] = 0;
 
-        if (glview != NULL)
+        if (TwkGLF::GLVideoDevice* device = doc->viewVideoDevice())
         {
             float x = NODE_ARG(0, float);
             float y = NODE_ARG(1, float);
@@ -401,17 +403,15 @@ namespace Rv
             int ix = (int)(x + 0.5f);
             int iy = (int)(y + 0.5f);
 
-            QImage image = glview->readPixels(ix, iy, 1, 1);
-
-            if ((image.width() > 0) && (image.height() > 0))
+            if (ix >= 0 && iy >= 0 && static_cast<size_t>(ix) < device->width() && static_cast<size_t>(iy) < device->height())
             {
-                QRgb rgba = image.pixel(0, 0);
-                QColor qc(rgba);
-
-                v[0] = qc.redF();
-                v[1] = qc.greenF();
-                v[2] = qc.blueF();
-                v[3] = qc.alphaF();
+                device->makeCurrent();
+                GLubyte rgba[4] = {};
+                glReadPixels(ix, iy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
+                v[0] = static_cast<float>(rgba[0]) / 255.0f;
+                v[1] = static_cast<float>(rgba[1]) / 255.0f;
+                v[2] = static_cast<float>(rgba[2]) / 255.0f;
+                v[3] = static_cast<float>(rgba[3]) / 255.0f;
             }
         }
 

@@ -939,14 +939,27 @@ namespace Rv
             return;
         }
 
-        cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to OpenGL." << endl;
+        Rv::Options& opts = Options::sharedOptions();
+        const bool requestedTenBit =
+            opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2;
+        if (requestedTenBit)
+            cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to 8-bit OpenGL." << endl;
+        else
+            cout << "INFO: Switching the main view from Vulkan to OpenGL for the requested display depth." << endl;
 
         VulkanView* oldVulkanView = m_vulkanView;
         m_vulkanView = nullptr;
 
         oldVulkanView->stopProcessingEvents();
 
-        Rv::Options& opts = Options::sharedOptions();
+        // A runtime Vulkan failure cannot be recovered by asking Qt/OpenGL for
+        // the same 10/10/10/2 surface that required Vulkan in the first place.
+        // Preserve the user's persisted 10-bit intent, but make this recovery
+        // view explicitly 8-bit so it is valid and usable.
+        const int fallbackRedBits = requestedTenBit ? 8 : opts.dispRedBits;
+        const int fallbackGreenBits = requestedTenBit ? 8 : opts.dispGreenBits;
+        const int fallbackBlueBits = requestedTenBit ? 8 : opts.dispBlueBits;
+        const int fallbackAlphaBits = requestedTenBit ? 8 : opts.dispAlphaBits;
         const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
 
         GLView* newGLView = nullptr;
@@ -954,7 +967,7 @@ namespace Rv
         {
             newGLView =
                 new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
+                           true, fallbackRedBits, fallbackGreenBits, fallbackBlueBits, fallbackAlphaBits, !m_startupResize);
         }
         else
         {
@@ -962,8 +975,8 @@ namespace Rv
             RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
             QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
             newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                   opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
-                                   opts.dispAlphaBits, !m_startupResize);
+                                   opts.vsync != 0 && !m_vsyncDisabled, true, fallbackRedBits, fallbackGreenBits, fallbackBlueBits,
+                                   fallbackAlphaBits, !m_startupResize);
         }
 
         newGLView->setContentSize(oldVulkanView->sizeHint().width(), oldVulkanView->sizeHint().height());

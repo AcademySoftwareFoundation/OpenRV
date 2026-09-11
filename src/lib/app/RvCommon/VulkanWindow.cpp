@@ -18,6 +18,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
+#include <QtCore/QVersionNumber>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
@@ -33,6 +34,7 @@
 #include <algorithm>
 #include <climits>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #ifdef PLATFORM_WINDOWS
@@ -111,6 +113,53 @@ namespace Rv
     // preferred when the surface offers it, but many Linux/RADV surfaces only
     // advertise A2R10G10B10.
     static bool isTenBitFormat(VkFormat f) { return f == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || f == VK_FORMAT_A2R10G10B10_UNORM_PACK32; }
+
+    static bool findGraphicsPresentQueue(VkPhysicalDevice device, VkSurfaceKHR surface, uint32_t& familyIndex)
+    {
+        uint32_t familyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, nullptr);
+        std::vector<VkQueueFamilyProperties> families(familyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, families.data());
+
+        for (uint32_t i = 0; i < familyCount; ++i)
+        {
+            VkBool32 presentSupport = VK_FALSE;
+            if (vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport) == VK_SUCCESS
+                && (families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
+            {
+                familyIndex = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static bool surfaceHasTenBitFormat(VkPhysicalDevice device, VkSurfaceKHR surface)
+    {
+        uint32_t formatCount = 0;
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
+            return false;
+
+        std::vector<VkSurfaceFormatKHR> formats(formatCount);
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, formats.data()) != VK_SUCCESS)
+            return false;
+
+        return std::any_of(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format) { return isTenBitFormat(format.format); });
+    }
+
+    static bool deviceHasExtension(VkPhysicalDevice device, const char* name)
+    {
+        uint32_t extensionCount = 0;
+        if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr) != VK_SUCCESS)
+            return false;
+
+        std::vector<VkExtensionProperties> extensions(extensionCount);
+        if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data()) != VK_SUCCESS)
+            return false;
+
+        return std::any_of(extensions.begin(), extensions.end(),
+                           [name](const VkExtensionProperties& extension) { return strcmp(extension.extensionName, name) == 0; });
+    }
 
     static const char* formatName(VkFormat f)
     {
@@ -203,6 +252,22 @@ namespace Rv
 
     float VulkanWindow::devicePixelRatioF() const { return static_cast<float>(QWindow::devicePixelRatio()); }
 
+    bool VulkanWindow::physicalDeviceMatchesUUID(const unsigned char* uuid, size_t size) const
+    {
+        if (!m_vkPhysicalDevice || !uuid || size != VK_UUID_SIZE)
+            return false;
+
+        VkPhysicalDeviceIDProperties idProperties = {};
+        idProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES;
+
+        VkPhysicalDeviceProperties2 properties = {};
+        properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        properties.pNext = &idProperties;
+        vkGetPhysicalDeviceProperties2(m_vkPhysicalDevice, &properties);
+
+        return std::equal(idProperties.deviceUUID, idProperties.deviceUUID + VK_UUID_SIZE, uuid);
+    }
+
     //--------------------------------------------------------------------------
     // Vulkan Initialisation
     //--------------------------------------------------------------------------
@@ -255,6 +320,10 @@ namespace Rv
         static QVulkanInstance* instance = []() -> QVulkanInstance*
         {
             auto* inst = new QVulkanInstance();
+            // Device UUID matching uses vkGetPhysicalDeviceProperties2, which
+            // is core in Vulkan 1.1. QVulkanInstance otherwise defaults to a
+            // 1.0 instance even though the presentation code targets 1.1.
+            inst->setApiVersion(QVersionNumber(1, 1));
             if (!inst->create())
             {
                 cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << endl;
@@ -333,31 +402,19 @@ namespace Rv
             {
                 VkPhysicalDevice dev = devices[di];
 
-                uint32_t formatCount = 0;
-                if (vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
-                {
-                    continue;
-                }
-                std::vector<VkSurfaceFormatKHR> formats(formatCount);
-                vkGetPhysicalDeviceSurfaceFormatsKHR(dev, dummySurface, &formatCount, formats.data());
-
-                bool has10bit = false;
-                for (const auto& fmt : formats)
-                {
-                    if (isTenBitFormat(fmt.format))
-                    {
-                        has10bit = true;
-                        any10bit = true;
-                        break;
-                    }
-                }
+                uint32_t queueFamily = 0;
+                const bool canPresent =
+                    deviceHasExtension(dev, VK_KHR_SWAPCHAIN_EXTENSION_NAME) && findGraphicsPresentQueue(dev, dummySurface, queueFamily);
+                const bool has10bit = canPresent && surfaceHasTenBitFormat(dev, dummySurface);
+                any10bit = any10bit || has10bit;
 
                 VkPhysicalDeviceProperties props = {};
                 vkGetPhysicalDeviceProperties(dev, &props);
                 if (ImageRenderer::debugGpu())
                 {
                     cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
-                         << "': 10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
+                         << "': graphics+present=" << (canPresent ? "YES" : "NO") << "  10-bit surface format=" << (has10bit ? "YES" : "NO")
+                         << endl;
                 }
             }
 
@@ -443,30 +500,19 @@ namespace Rv
 
         for (VkPhysicalDevice dev : devices)
         {
-            uint32_t queueFamilyCount = 0;
-            vkGetPhysicalDeviceQueueFamilyProperties(dev, &queueFamilyCount, nullptr);
-            std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-            vkGetPhysicalDeviceQueueFamilyProperties(dev, &queueFamilyCount, queueFamilies.data());
-
-            for (uint32_t i = 0; i < queueFamilyCount; i++)
+            uint32_t queueFamily = 0;
+            if (findGraphicsPresentQueue(dev, m_vkSurface, queueFamily) && surfaceHasTenBitFormat(dev, m_vkSurface))
             {
-                VkBool32 presentSupport = false;
-                vkGetPhysicalDeviceSurfaceSupportKHR(dev, i, m_vkSurface, &presentSupport);
-                if ((queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
-                {
-                    m_vkPhysicalDevice = dev;
-                    m_queueFamilyIndex = i;
-                    foundQueue = true;
-                    break;
-                }
-            }
-            if (foundQueue)
+                m_vkPhysicalDevice = dev;
+                m_queueFamilyIndex = queueFamily;
+                foundQueue = true;
                 break;
+            }
         }
 
         if (!foundQueue)
         {
-            cerr << "ERROR: VulkanWindow: initVulkan: No physical device with graphics and present support found." << endl;
+            cerr << "ERROR: VulkanWindow: initVulkan: No physical device with graphics, present, and 10-bit surface support found." << endl;
             return false;
         }
 
@@ -489,16 +535,31 @@ namespace Rv
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &queuePriority;
 
-        std::vector<const char*> deviceExtensions = {
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        if (!deviceHasExtension(m_vkPhysicalDevice, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
+        {
+            cerr << "ERROR: VulkanWindow: selected device does not support VK_KHR_swapchain." << endl;
+            return false;
+        }
+
 #ifdef PLATFORM_WINDOWS
-            VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
-            VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME,
+        const char* externalMemoryExtension = VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME;
+        const char* externalSemaphoreExtension = VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME;
 #else
-            VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME,
-            VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME,
+        const char* externalMemoryExtension = VK_KHR_EXTERNAL_MEMORY_FD_EXTENSION_NAME;
+        const char* externalSemaphoreExtension = VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME;
 #endif
-        };
+        m_externalInteropSupported = deviceHasExtension(m_vkPhysicalDevice, externalMemoryExtension)
+                                     && deviceHasExtension(m_vkPhysicalDevice, externalSemaphoreExtension);
+        if (m_externalInteropSupported)
+        {
+            deviceExtensions.push_back(externalMemoryExtension);
+            deviceExtensions.push_back(externalSemaphoreExtension);
+        }
+        else if (ImageRenderer::debugGpu())
+        {
+            cout << "INFO: VulkanWindow: external memory/semaphore extensions unavailable; using CPU fallback." << endl;
+        }
 
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -585,7 +646,7 @@ namespace Rv
         return true;
     }
 
-    // Reset acquire semaphore and rebuild swapchain/shared image at the new size.
+    // Rebuild all Vulkan state after the native surface is lost.
     void VulkanWindow::handleSurfaceLost()
     {
         //
@@ -628,6 +689,11 @@ namespace Rv
         if (m_videoDevice)
         {
             m_videoDevice->releaseSharedGLObjects();
+
+            //  The next initVulkan() may land on a different VkPhysicalDevice,
+            //  so the GL/Vulkan device-UUID match has to be probed again
+            //  rather than reused from the device just torn down.
+            m_videoDevice->resetInteropDeviceMatch();
         }
 
         for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
@@ -657,28 +723,12 @@ namespace Rv
             return;
         }
 
-        VkSemaphoreCreateInfo semaphoreInfo = {};
-        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
-        {
-            if (m_vkImageAvailableSemaphore[i])
-            {
-                vkDestroySemaphore(m_vkDevice, m_vkImageAvailableSemaphore[i], nullptr);
-                m_vkImageAvailableSemaphore[i] = VK_NULL_HANDLE;
-            }
-            if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore[i]) != VK_SUCCESS)
-            {
-                m_vkImageAvailableSemaphore[i] = VK_NULL_HANDLE;
-                requestGLFallback();
-                return;
-            }
-        }
-
         // Recreate only the swapchain, not the shared image. The shared image is
         // a content-sized TRANSFER_SRC image, independent of the window-sized
-        // swapchain; createSwapchain() reuses the old swapchain (oldSwapchain) so
-        // this is a warm recreate. The next render()'s getSharedImageInfo() will
-        // rebuild the shared image only if the content size actually changed.
+        // swapchain. Keep the acquire semaphores too: they are per-frame
+        // resources, not swapchain resources, and can still be referenced by
+        // queued submissions when OUT_OF_DATE is reported. createSwapchain()
+        // waits for the device before retiring swapchain-owned resources.
         if (!createSwapchain())
         {
             requestGLFallback();
@@ -716,6 +766,7 @@ namespace Rv
             m_vkDevice = VK_NULL_HANDLE;
         }
         m_vkQueue = VK_NULL_HANDLE;
+        m_externalInteropSupported = false;
         // Surface is managed by QVulkanInstance? We shouldn't destroy it here if QVulkanInstance owns it, but wait, we got it from
         // surfaceForWindow. Actually QVulkanWindow destroys it. We can just leave it for QVulkanInstance to clean up, or we can
         // vkDestroySurfaceKHR if needed. For safety we don't destroy instance/surface here, they are tied to Qt.
@@ -808,13 +859,25 @@ namespace Rv
         }
 
         VkSurfaceCapabilitiesKHR capabilities;
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &capabilities);
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &capabilities) != VK_SUCCESS)
+        {
+            requestGLFallback();
+            return false;
+        }
 
         // Negotiate 10-bit format
-        uint32_t formatCount;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr);
+        uint32_t formatCount = 0;
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
+        {
+            requestGLFallback();
+            return false;
+        }
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data());
+        if (vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data()) != VK_SUCCESS)
+        {
+            requestGLFallback();
+            return false;
+        }
 
         //
         //  Unconditional but once per window: a handful of lines, and the pair
@@ -935,9 +998,13 @@ namespace Rv
         m_vkSwapchainFormat = surfaceFormat.format;
 
         m_vkSwapchainExtent = capabilities.currentExtent;
-        if (m_vkSwapchainExtent.width == 0xFFFFFFFF)
+        if (m_vkSwapchainExtent.width == UINT32_MAX)
         {
-            m_vkSwapchainExtent = {(uint32_t)width(), (uint32_t)height()};
+            const qreal dpr = devicePixelRatio();
+            const uint32_t pixelWidth = static_cast<uint32_t>(std::max<qreal>(1.0, width() * dpr));
+            const uint32_t pixelHeight = static_cast<uint32_t>(std::max<qreal>(1.0, height() * dpr));
+            m_vkSwapchainExtent = {std::clamp(pixelWidth, capabilities.minImageExtent.width, capabilities.maxImageExtent.width),
+                                   std::clamp(pixelHeight, capabilities.minImageExtent.height, capabilities.maxImageExtent.height)};
         }
         if (m_vkSwapchainExtent.width == 0 || m_vkSwapchainExtent.height == 0)
         {
@@ -977,10 +1044,31 @@ namespace Rv
         createInfo.imageColorSpace = surfaceFormat.colorSpace;
         createInfo.imageExtent = m_vkSwapchainExtent;
         createInfo.imageArrayLayers = 1;
-        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+        if (!(capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
+        {
+            cout << "WARNING: VulkanWindow: surface does not support transfer-destination swapchain images; requesting OpenGL fallback"
+                 << endl;
+            requestGLFallback();
+            return false;
+        }
+        createInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
         createInfo.preTransform = capabilities.currentTransform;
+        const VkCompositeAlphaFlagBitsKHR compositeAlphaPreference[] = {
+            VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
+            VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
+            VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
+            VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR,
+        };
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        for (const VkCompositeAlphaFlagBitsKHR alpha : compositeAlphaPreference)
+        {
+            if (capabilities.supportedCompositeAlpha & alpha)
+            {
+                createInfo.compositeAlpha = alpha;
+                break;
+            }
+        }
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
         // Warm recreate: hand the retiring swapchain to the driver so it can reuse
@@ -1331,10 +1419,9 @@ namespace Rv
         //
         //  Forward progress. Under sustained GPU pressure the catch-up test
         //  below can be false indefinitely, which would freeze the presentation
-        //  display rather than merely thin it out. Qt's update() is a dirty flag
-        //  it must eventually service; matching that behaviour means forcing a
-        //  blocking frame through once the output has gone stale for longer than
-        //  a few refreshes.
+        //  display rather than merely thin it out. Once stale, let syncBuffers()
+        //  reach the present functions; they convert their normal zero-timeout
+        //  polling into one blocking present.
         //
         static const double kMaxStaleSeconds = 0.1;
         if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds)
@@ -1386,7 +1473,7 @@ namespace Rv
 
     const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int w, int h)
     {
-        if (!m_vkDevice)
+        if (!m_vkDevice || !m_externalInteropSupported)
             return nullptr;
 
         // Build/return the shared image for the current in-flight ring slot.
@@ -1870,7 +1957,9 @@ namespace Rv
         //  canPresentNow() for the gate that fires first, before any GL work.
         //
         const bool bestEffort = isPassiveOutput();
-        const uint64_t waitTimeout = bestEffort ? 0 : UINT64_MAX;
+        static const double kMaxStaleSeconds = 0.1;
+        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
+        const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
         if (diagPresent)
             diagTimer.start();
@@ -1888,6 +1977,11 @@ namespace Rv
             //  is deliberately not advanced: the next frame retries this one.
             drainSharedSemaphores(slot);
             requestBestEffortRetry();
+            return;
+        }
+        if (fenceResult != VK_SUCCESS)
+        {
+            requestGLFallback();
             return;
         }
 
@@ -2042,7 +2136,10 @@ namespace Rv
 
         // Wait for GL to finish writing (glReady) AND swapchain image to be available
         VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore[slot], m_vkImageAvailableSemaphore[slot]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        // Both waits protect transfer operations. The acquired swapchain image
+        // is first touched by its TRANSFER_DST layout transition, so waiting at
+        // COLOR_ATTACHMENT_OUTPUT would not block that earlier stage.
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
         submitInfo.waitSemaphoreCount = 2;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
@@ -2117,7 +2214,7 @@ namespace Rv
             handleSwapchainOutOfDate();
             return;
         }
-        if (presentResult != VK_SUCCESS)
+        if (presentResult != VK_SUCCESS && presentResult != VK_SUBOPTIMAL_KHR)
         {
             if (presentResult == VK_ERROR_DEVICE_LOST)
             {
@@ -2138,6 +2235,9 @@ namespace Rv
         if (!m_vkDevice)
             return;
 
+        const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
+        Timer diagTimer;
+
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
         {
             // Warm recreate via oldSwapchain (createSwapchain retires the old one).
@@ -2151,13 +2251,26 @@ namespace Rv
         // polls instead of blocking and skips the frame -- see the best-effort
         // present in presentSharedImage() for why.
         const bool bestEffort = isPassiveOutput();
-        const uint64_t waitTimeout = bestEffort ? 0 : UINT64_MAX;
+        static const double kMaxStaleSeconds = 0.1;
+        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
+        const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
-        if (vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout) == VK_TIMEOUT)
+        if (diagPresent)
+            diagTimer.start();
+        const VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout);
+        if (diagPresent)
+            s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
+
+        if (fenceResult == VK_TIMEOUT)
         {
             //  Unlike the interop path there are no GL<->Vulkan semaphores to
             //  rebalance here: presentCpuFallback() hands over plain pixels.
             requestBestEffortRetry();
+            return;
+        }
+        if (fenceResult != VK_SUCCESS)
+        {
+            requestGLFallback();
             return;
         }
 
@@ -2206,8 +2319,12 @@ namespace Rv
 
         // Acquire image
         uint32_t imageIndex;
+        if (diagPresent)
+            diagTimer.start();
         VkResult result =
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
+        if (diagPresent)
+            s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
         if (result == VK_NOT_READY || result == VK_TIMEOUT)
         {
             // Best-effort: no image free this frame, leave the output on the one
@@ -2295,7 +2412,9 @@ namespace Rv
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         VkSemaphore waitSemaphores[] = {m_vkImageAvailableSemaphore[slot]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        // The acquired image is first used by a TRANSFER_DST layout transition
+        // and vkCmdCopyBufferToImage, not as a color attachment.
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
         submitInfo.pWaitDstStageMask = waitStages;
@@ -2313,6 +2432,13 @@ namespace Rv
                 requestGLFallback();
             }
             return;
+        }
+
+        if (m_doc && s_diagFrameEventTime >= 0.0)
+        {
+            s_diagSlotEventTime[slot] = s_diagFrameEventTime;
+            s_diagSlotArmed[slot] = true;
+            s_diagFrameEventTime = -1.0;
         }
 
         // Frame committed; advance the ring (imageIndex/slot below are locals).
@@ -2355,7 +2481,7 @@ namespace Rv
             handleSwapchainOutOfDate();
             return;
         }
-        if (presentResult != VK_SUCCESS)
+        if (presentResult != VK_SUCCESS && presentResult != VK_SUBOPTIMAL_KHR)
         {
             if (presentResult == VK_ERROR_DEVICE_LOST)
             {
