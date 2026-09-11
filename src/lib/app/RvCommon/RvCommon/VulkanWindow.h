@@ -13,6 +13,7 @@
 #include <vulkan/vulkan.h>
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 
 QT_BEGIN_NAMESPACE
@@ -77,6 +78,10 @@ namespace Rv
         // VK_FORMAT_UNDEFINED before the swapchain is created.
         VkFormat swapchainFormat() const { return m_vkSwapchainFormat; }
 
+        // True when uuid identifies the physical device backing this window.
+        // Used by the GL bridge to refuse external-memory interop across GPUs.
+        bool physicalDeviceMatchesUUID(const unsigned char* uuid, size_t size) const;
+
         //
         //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
         //
@@ -118,12 +123,10 @@ namespace Rv
             int dedicated{0};
         };
 
-        // Number of frames the present path keeps in flight. Per-frame Vulkan
-        // sync objects and the GL<->Vulkan shared resources are stored in rings
-        // of this size and indexed by currentFrame(). 2 pipelines the present so
-        // a frame's GL work + submit can begin before the prior present retires;
-        // the throttle is FIFO acquire back-pressure + the start-of-frame fence
-        // wait (no per-frame end-of-frame block).
+        // Capacity of the present-resource ring. Per-frame Vulkan sync objects
+        // and GL<->Vulkan shared resources are indexed by currentFrame().
+        // Runtime depth defaults to one for interactive latency;
+        // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 enables both slots.
         static constexpr uint32_t FRAMES_IN_FLIGHT = 2;
 
         // Index of the in-flight ring slot the next/current frame uses. The GL
@@ -225,6 +228,7 @@ namespace Rv
         //  window yet. Once per window, not once per swapchain recreate.
         bool m_loggedSurfaceFormatList{false};
 
+        bool m_externalInteropSupported{false};
         VkCommandPool m_vkCommandPool{VK_NULL_HANDLE};
 
         VkSwapchainKHR m_vkSwapchain{VK_NULL_HANDLE};
@@ -285,7 +289,7 @@ namespace Rv
         // pair cannot desync across the skipped frame.
         void drainSharedSemaphores(uint32_t slot);
 
-        // Recreate swapchain (and shared image) after OUT_OF_DATE / SUBOPTIMAL.
+        // Recreate the swapchain after OUT_OF_DATE. SUBOPTIMAL remains usable.
         void handleSwapchainOutOfDate();
 
         // Tear down and re-initialize after Qt destroyed and recreated the

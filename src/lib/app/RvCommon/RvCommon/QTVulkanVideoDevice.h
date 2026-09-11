@@ -50,6 +50,8 @@ namespace Rv
 
         void setEventWidget(QWidget* widget);
 
+        void resetInteropDeviceMatch() const { m_glVulkanDeviceMatch = -1; }
+
         const QTTranslator& translator() const { return *m_translator; }
 
         bool hasTranslator() const { return m_translator != nullptr; }
@@ -153,6 +155,9 @@ namespace Rv
         // window's Vulkan is initialized. Latching there reports CPU-fallback
         // for a device that then spends its whole life on interop.
         mutable int m_loggedPresentPath{-1};
+        // -1 until queried, 0 when GL and Vulkan use different/unidentifiable
+        // physical devices, 1 when their device UUIDs match.
+        mutable int m_glVulkanDeviceMatch{-1};
 
         // Latched once any GL call on the interop path reports an error. The
         // GL<->Vulkan bridge has no way to notice that an import silently
@@ -168,6 +173,7 @@ namespace Rv
         bool interopGLFailed(const char* what) const;
 
         void cleanupSharedGLObjects(uint32_t slot) const;
+        bool glDeviceMatchesVulkan() const;
 
         // CPU-fallback GL state (used only when GPU interop is unavailable or
         // refused). A flipped RGB10_A2 blit target lets GL pack the 10-bit pixels
