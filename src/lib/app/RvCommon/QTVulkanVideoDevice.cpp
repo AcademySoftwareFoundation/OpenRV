@@ -655,6 +655,17 @@ namespace Rv
         if (w <= 0 || h <= 0)
             return;
 
+        //
+        //  Best-effort gate for a passive presentation output: skip the whole
+        //  frame while this device's own GPU work is still in flight, rather
+        //  than queueing another full-resolution blit behind it. Checked here,
+        //  ahead of the GL work below, so a skipped frame costs nothing -- the
+        //  blit into the shared image is the single most expensive thing in
+        //  this function at a 4K output. Always true for the control viewport.
+        //
+        if (m_window->isPassiveOutput() && !m_window->canPresentNow())
+            return;
+
         if (!m_glContext->makeCurrent(m_offscreenSurface))
             return;
 
