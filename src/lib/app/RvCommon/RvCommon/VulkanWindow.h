@@ -131,6 +131,12 @@ namespace Rv
         // the Vulkan slot for the frame being rendered.
         uint32_t currentFrame() const { return m_currentFrame; }
 
+        // A doc-less window is a passive presentation output: it is composited
+        // into and presented by its owning VulkanDesktopVideoDevice and never
+        // drives the frame loop. It must therefore never block that loop either
+        // -- see the best-effort present in presentSharedImage().
+        bool isPassiveOutput() const { return m_doc == nullptr; }
+
         const SharedImageInfo* getSharedImageInfo(int w, int h);
         void presentSharedImage();
 
