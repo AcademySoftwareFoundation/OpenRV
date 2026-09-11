@@ -31,9 +31,11 @@ The package provides a basic menu fashioned after the OCIO display example progr
 In order to use the ocio_source_setup package you need to do the following:
 
 * Find the “OpenColorIO Basic Color Management” package in the Packages tab of the preferences. Make sure the “load” button next to the package name is activated and restart RV.
-* Set the OCIO environment variable to the path to your config file.
+* Set the OCIO environment variable to the path to your config file
 * Start RV and load an image with the color space in the name.
 * Note the "OCIO" top-level menu that appears when you use RV this way. You can use this menu to chose a Linearizing transform, or Display transform, from those provided by your config.
+* Note that the OCIO package will load the previously loaded config on restart.
+
 
 The OpenColorIO mailing list and website is a good place to get help about config files, documentation, and general operation.
 
