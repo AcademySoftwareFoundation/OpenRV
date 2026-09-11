@@ -1993,21 +1993,28 @@ namespace Rv
         //  registry so it references the newly created device pointers.
         //  rebuildDevices() deleted the old per-screen devices and
         //  createDesktopVideoDevices() made new ones, but the graph's
-        //  DisplayGroupIPNodes -- built once at startup by setPhysicalDevices
-        //  -- still hold the destroyed pointers. Without this, a later
-        //  setOutputVideoDevice(newDevice) -> connectDisplayGroup ->
+        //  DisplayGroupIPNodes still hold the destroyed pointers. Without this,
+        //  a later setOutputVideoDevice(newDevice) -> connectDisplayGroup ->
         //  findDisplayGroupByDevice(newDevice) matches nothing and silently
         //  no-ops, so the presentation output is never rendered and the second
         //  display stays black.
         //
-        //  This mirrors the startup sequence, and must run on every real
-        //  rebuild even when presentation is currently off: the device pointers
-        //  can change while presentation is disabled and only be bound as the
-        //  output later (the reported 10 -> 8 -> 10 -> enable repro).
+        //  This must run on every real rebuild even when presentation is
+        //  currently off: the device pointers can change while presentation is
+        //  disabled and only be bound as the output later (the reported
+        //  10 -> 8 -> 10 -> enable repro).
+        //
+        //  refreshPhysicalDevices(), not setPhysicalDevices(): the latter is the
+        //  startup path and deletes every display group, which also throws away
+        //  its colour pipeline. Doing that here reset the main view's transfer
+        //  function from sRGB to None on every 8/10-bit switch, along with any
+        //  assigned display profile. The monitors have not changed at this
+        //  point -- only the device objects in front of them -- so the groups
+        //  should be re-pointed, not rebuilt.
         //
         if (rebuilt && session)
         {
-            session->graph().setPhysicalDevices(videoModules());
+            session->graph().refreshPhysicalDevices(videoModules());
             session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
         }
 
