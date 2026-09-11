@@ -1,0 +1,46 @@
+package: Color Profile Setup
+author: Autodesk, Inc.
+organization: Autodesk, Inc.
+version: 1.0
+requires: ''
+rv: 4.0
+openrv: 1.0.0
+optional: true
+system: true
+hidden: false
+
+modes:
+  - file: color_profile_setup.py
+    menu: ''
+    shortcut: ''
+    event: ''
+    load: immediate
+
+description: |
+    <p>
+    Automatically inserts the SYNLinearize (source linearization) and
+    SYNDisplay (display color management) OCIO nodes based on embedded ICC
+    color profiles and the display's system profile, replacing the manual,
+    key-bound script that previously had to be run by hand.
+    </p>
+
+    <p>
+    Source media carrying an embedded ICC profile has its
+    RVLinearizePipelineGroup switched to a SYNLinearize node whose
+    inTransform.data is set to the profile blob. Each RVDisplayGroup whose
+    device has a system ICC profile has its display pipeline switched to a
+    SYNDisplay node pointed at that profile.
+    </p>
+
+    <p>
+    For rvio parity, the display transform is baked into the RVOutputGroup(s)
+    at session-write time (RVDisplayGroup is not persisted, and rvio renders
+    through the output group), so an exported session renders identically in
+    rvio.
+    </p>
+
+    <p>
+    The feature is opt-in and self-contained: enable it via the
+    "Automatic Color Profile Setup" checkbox under the package's menu. The
+    setting is stored in the package's own preferences and is off by default.
+    </p>
