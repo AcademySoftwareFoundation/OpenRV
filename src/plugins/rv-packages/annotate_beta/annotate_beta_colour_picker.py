@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 try:
-    from PySide2 import QtCore, QtWidgets, QtGui
+    from PySide2 import QtCore, QtGui, QtWidgets
 except ImportError:
-    from PySide6 import QtCore, QtWidgets, QtGui
+    from PySide6 import QtCore, QtGui, QtWidgets
 
 _PRESETS = [
     "#FF3B30",  # red

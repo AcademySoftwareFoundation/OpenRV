@@ -6,4 +6,4 @@
 
 
 def hook_function(in_timeline, argument_map=None):
-    print("Warning: Unhandled effect (named {})".format(in_timeline.effect_name))
+    print(f"Warning: Unhandled effect (named {in_timeline.effect_name})")

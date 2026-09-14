@@ -95,33 +95,17 @@ class CDL(otio.schema.Effect):
     saturation = otio.core.serializable_field("saturation", required_type=float, doc=("Saturation: expects a float"))
 
     def __str__(self):
-        return 'CDL("{}", "{}", "{}", "{}", "{}", "{}", "{}")'.format(
-            str(self.name),
-            str(self.effect_name),
-            str(self.visible),
-            str(self.slope),
-            str(self.offset),
-            str(self.power),
-            str(self.saturation),
-        )
+        return f'CDL("{self.name!s}", "{self.effect_name!s}", "{self.visible!s}", "{self.slope!s}", "{self.offset!s}", "{self.power!s}", "{self.saturation!s}")'
 
     def __repr__(self):
         return (
             "otio.schema.CDL("
-            "name={}, "
-            "effect_name={}, "
-            "visible={}, "
-            "slope={}, "
-            "offset={}, "
-            "power={}, "
-            "saturation={} "
-            ")".format(
-                repr(self.name),
-                repr(self.effect_name),
-                repr(self.visible),
-                repr(self.slope),
-                repr(self.offset),
-                repr(self.power),
-                repr(self.saturation),
-            )
+            f"name={self.name!r}, "
+            f"effect_name={self.effect_name!r}, "
+            f"visible={self.visible!r}, "
+            f"slope={self.slope!r}, "
+            f"offset={self.offset!r}, "
+            f"power={self.power!r}, "
+            f"saturation={self.saturation!r} "
+            ")"
         )

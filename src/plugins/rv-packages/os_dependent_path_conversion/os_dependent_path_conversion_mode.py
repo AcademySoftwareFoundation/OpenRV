@@ -3,9 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import rvtypes
 import platform
 import re
+
+from rv import rvtypes
 
 
 class OSDependentPathConversionModeMinorMode(rvtypes.MinorMode):

@@ -9,15 +9,13 @@ try:
     from PySide2 import QtGui, QtWidgets
     from PySide2.QtGui import *
     from PySide2.QtWidgets import *
-    from shiboken2 import wrapInstance
-    from shiboken2 import getCppPointer
+    from shiboken2 import getCppPointer, wrapInstance
 except ImportError:
     try:
         from PySide6 import QtGui, QtWidgets
         from PySide6.QtGui import *
         from PySide6.QtWidgets import *
-        from shiboken6 import wrapInstance
-        from shiboken6 import getCppPointer
+        from shiboken6 import getCppPointer, wrapInstance
     except ImportError:
         pass
 
