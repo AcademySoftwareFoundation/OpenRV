@@ -215,11 +215,9 @@ namespace IPCore
                     // M is a Y-flip scale (no rotation), so mirror into the
                     // overlay chain as well.
                     left->transformMatrix = M * left->transformMatrix;
-                    left->overlayTransformMatrix =
-                        M * left->overlayTransformMatrix;
+                    left->overlayTransformMatrix = M * left->overlayTransformMatrix;
                     right->transformMatrix = M * right->transformMatrix;
-                    right->overlayTransformMatrix =
-                        M * right->overlayTransformMatrix;
+                    right->overlayTransformMatrix = M * right->overlayTransformMatrix;
                 }
             }
             catch (...)
@@ -298,8 +296,7 @@ namespace IPCore
                     // M is a Y-flip scale (no rotation), so mirror into the
                     // overlay chain as well.
                     image->transformMatrix = M * image->transformMatrix;
-                    image->overlayTransformMatrix =
-                        M * image->overlayTransformMatrix;
+                    image->overlayTransformMatrix = M * image->overlayTransformMatrix;
                 }
                 image->useBackground = true;
 

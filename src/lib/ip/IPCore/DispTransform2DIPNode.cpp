@@ -73,15 +73,13 @@ namespace IPCore
                 for (; child; child = child->next)
                 {
                     child->transformMatrix = M * child->transformMatrix;
-                    child->overlayTransformMatrix =
-                        M * child->overlayTransformMatrix;
+                    child->overlayTransformMatrix = M * child->overlayTransformMatrix;
                 }
             }
             else
             {
                 root->transformMatrix = M * root->transformMatrix;
-                root->overlayTransformMatrix =
-                    M * root->overlayTransformMatrix;
+                root->overlayTransformMatrix = M * root->overlayTransformMatrix;
             }
             return root;
         }

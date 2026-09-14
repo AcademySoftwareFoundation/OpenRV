@@ -1544,8 +1544,7 @@ namespace IPCore
                 //  pan/zoom. For normal (annotation) paint commands we keep
                 //  the historical behavior and use imageMatrix.
                 //
-                const Mat44f model =
-                    context.useOverlayMatrix ? root->overlayImageMatrix : root->imageMatrix;
+                const Mat44f model = context.useOverlayMatrix ? root->overlayImageMatrix : root->imageMatrix;
                 const Mat44f proj = root->projectionMatrix;
 
                 CommandContext commandContext(proj, model, fbo, textureFBO, currentFBO, context.glState, context.hasStencil,

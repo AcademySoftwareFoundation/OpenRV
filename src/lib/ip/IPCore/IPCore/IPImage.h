@@ -396,8 +396,8 @@ namespace IPCore
         //  Geometric State
         //
 
-        const MovieInfo* info;         // original source info
-        Matrix transformMatrix;        // image geometry transform (rotation, etc)
+        const MovieInfo* info;  // original source info
+        Matrix transformMatrix; // image geometry transform (rotation, etc)
         //
         //  overlayTransformMatrix mirrors transformMatrix, but any nodes that
         //  contribute an arbitrary rotation (i.e. Transform2DIPNode) may

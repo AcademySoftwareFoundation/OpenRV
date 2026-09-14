@@ -124,8 +124,7 @@ namespace IPCore
                                     // safe to mirror the cached transform into
                                     // the overlay chain -- it never contains an
                                     // arbitrary rotation of its own.
-                                    img->overlayTransformMatrix(rowIndex, colIndex) =
-                                        transformMatrixAtt->value()[rowIndex * 4 + colIndex];
+                                    img->overlayTransformMatrix(rowIndex, colIndex) = transformMatrixAtt->value()[rowIndex * 4 + colIndex];
                                 }
                             }
                         }

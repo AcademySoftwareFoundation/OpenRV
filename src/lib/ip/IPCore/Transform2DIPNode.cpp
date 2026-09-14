@@ -89,9 +89,8 @@ namespace IPCore
         //  so that overlays follow user scale/translate but do not rotate
         //  with the image.
         //
-        IPNode::Matrix
-        buildLocalMatrix(int flip, int flop, TwkMath::Vec2f scale, float rotDeg,
-                         TwkMath::Vec2f translate, bool includeRotate)
+        IPNode::Matrix buildLocalMatrix(int flip, int flop, TwkMath::Vec2f scale, float rotDeg, TwkMath::Vec2f translate,
+                                        bool includeRotate)
         {
             using namespace TwkMath;
 
@@ -142,10 +141,8 @@ namespace IPCore
         //  The order here is important. We want to do all scaling
         //  followed by rotation followed by translation.
         //
-        return buildLocalMatrix(propertyValue(m_flip, 0), propertyValue(m_flop, 0),
-                                propertyValue(m_scale, Vec2f(1, 1)),
-                                propertyValue(m_rotate, 0.0f),
-                                propertyValue(m_translate, Vec2f(0, 0)),
+        return buildLocalMatrix(propertyValue(m_flip, 0), propertyValue(m_flop, 0), propertyValue(m_scale, Vec2f(1, 1)),
+                                propertyValue(m_rotate, 0.0f), propertyValue(m_translate, Vec2f(0, 0)),
                                 /*includeRotate=*/true);
     }
 
@@ -174,8 +171,7 @@ namespace IPCore
         {
             if (IPNode* sn = g->sessionNode())
             {
-                if (IntProperty* p =
-                        sn->property<IntProperty>("matte", "rotateWithImage"))
+                if (IntProperty* p = sn->property<IntProperty>("matte", "rotateWithImage"))
                 {
                     if (p->size())
                         rotateOverlayWithImage = p->front() != 0;
@@ -183,15 +179,11 @@ namespace IPCore
             }
         }
 
-        Matrix M_overlay =
-            rotateOverlayWithImage
-                ? M
-                : buildLocalMatrix(propertyValue(m_flip, 0),
-                                   propertyValue(m_flop, 0),
-                                   propertyValue(m_scale, Vec2f(1, 1)),
-                                   propertyValue(m_rotate, 0.0f),
-                                   propertyValue(m_translate, Vec2f(0, 0)),
-                                   /*includeRotate=*/false);
+        Matrix M_overlay = rotateOverlayWithImage
+                               ? M
+                               : buildLocalMatrix(propertyValue(m_flip, 0), propertyValue(m_flop, 0), propertyValue(m_scale, Vec2f(1, 1)),
+                                                  propertyValue(m_rotate, 0.0f), propertyValue(m_translate, Vec2f(0, 0)),
+                                                  /*includeRotate=*/false);
 
         //
         //  Transform2DIPNode still handles the visible box for wipes,
@@ -256,16 +248,14 @@ namespace IPCore
                 if (root->children->width >= root->width || root->children->height >= root->height)
                 {
                     child->transformMatrix = M * child->transformMatrix;
-                    child->overlayTransformMatrix =
-                        M_overlay * child->overlayTransformMatrix;
+                    child->overlayTransformMatrix = M_overlay * child->overlayTransformMatrix;
                 }
             }
         }
         else
         {
             root->transformMatrix = M * root->transformMatrix;
-            root->overlayTransformMatrix =
-                M_overlay * root->overlayTransformMatrix;
+            root->overlayTransformMatrix = M_overlay * root->overlayTransformMatrix;
         }
 
         if (stencilBox)

@@ -61,8 +61,7 @@ namespace IPCore
                 img->transformMatrix = img->transformMatrix * S * T;
                 // Stereo offset is scale + translate; mirror into the overlay
                 // chain so mattes and other overlays stay locked to the eye.
-                img->overlayTransformMatrix =
-                    img->overlayTransformMatrix * S * T;
+                img->overlayTransformMatrix = img->overlayTransformMatrix * S * T;
             }
         }
 
