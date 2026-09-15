@@ -106,10 +106,16 @@ namespace Rv
             int strideWidth{0};    // GL texture width = capacity rowPitch / 4
             int capacityHeight{0}; // allocated image height (>= height); GL texture height
             // Non-zero when the shared image uses VK_IMAGE_TILING_OPTIMAL (the
-            // default on NVIDIA Linux, which avoids the blank large-image bug); GL
+            // default on NVIDIA, which avoids the blank large-image bug); GL
             // must then import with GL_OPTIMAL_TILING_EXT instead of
             // GL_LINEAR_TILING_EXT.
             int optimalTiling{0};
+            // Non-zero when the exported memory is a dedicated allocation
+            // (VkMemoryDedicatedAllocateInfo), which the driver may require for
+            // an image created with an external handle type. EXT_memory_object
+            // requires the two sides to agree, so GL must set
+            // GL_DEDICATED_MEMORY_OBJECT_EXT exactly when this is set.
+            int dedicated{0};
         };
 
         // Number of frames the present path keeps in flight. Per-frame Vulkan
@@ -192,6 +198,17 @@ namespace Rv
         VkDevice m_vkDevice{VK_NULL_HANDLE};
         VkQueue m_vkQueue{VK_NULL_HANDLE};
         uint32_t m_queueFamilyIndex{0};
+        //  Last (format, colorSpace) pair reported by createSwapchain().
+        //  createSwapchain() runs on every resize step, so the choice is logged
+        //  only when it actually changes. Default-initialized to
+        //  VK_FORMAT_UNDEFINED, which no accepted format equals, so the first
+        //  swapchain always reports.
+        VkSurfaceFormatKHR m_loggedSurfaceFormat{};
+
+        //  Whether the surface's full format list has been dumped for this
+        //  window yet. Once per window, not once per swapchain recreate.
+        bool m_loggedSurfaceFormatList{false};
+
         VkCommandPool m_vkCommandPool{VK_NULL_HANDLE};
 
         VkSwapchainKHR m_vkSwapchain{VK_NULL_HANDLE};

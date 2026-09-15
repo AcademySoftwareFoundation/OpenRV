@@ -297,6 +297,11 @@ namespace Rv
         if (!qtVkInst)
         {
             qtVkInst = new QVulkanInstance();
+            //  The dedicated-allocation query in getSharedImageInfo() uses
+            //  vkGetImageMemoryRequirements2, which is core in Vulkan 1.1.
+            //  QVulkanInstance otherwise creates a 1.0 instance, which would put
+            //  that call out of contract.
+            qtVkInst->setApiVersion(QVersionNumber(1, 1));
             if (!qtVkInst->create())
             {
                 cerr << "ERROR: VulkanWindow: QVulkanInstance create failed" << endl;
@@ -369,13 +374,14 @@ namespace Rv
         }
 
         {
+            //  Unconditional: runs once per window init, and pairing this name
+            //  against QTVulkanVideoDevice's GL_RENDERER is how a hybrid-GPU
+            //  machine (GL on the iGPU, Vulkan on the dGPU) is spotted from a
+            //  plain QA log.
             VkPhysicalDeviceProperties props = {};
             vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &props);
-            if (ImageRenderer::debugGpu())
-            {
-                cout << "INFO: VulkanWindow: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
-                     << " available)" << endl;
-            }
+            cout << "INFO: VulkanWindow: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
+                 << " available)" << endl;
         }
 
         // Create Logical Device
@@ -639,8 +645,17 @@ namespace Rv
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
         vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, formats.data());
 
-        if (ImageRenderer::debugGpu())
+        //
+        //  Unconditional but once per window: a handful of lines, and the pair
+        //  that matters is not the format alone but which colour space each
+        //  10-bit entry is offered with, plus the order they come in. Vendor
+        //  ordering differences in this exact list are what made a black
+        //  NVIDIA viewport look like a working AMD one.
+        //
+        if (!m_loggedSurfaceFormatList)
         {
+            m_loggedSurfaceFormatList = true;
+
             cout << "INFO: VulkanWindow: createSwapchain: surface offers " << formatCount << " format(s):" << endl;
             for (uint32_t i = 0; i < formats.size(); ++i)
             {
@@ -657,22 +672,59 @@ namespace Rv
         // Linux/RADV), accept it too: the opposite R/B order is handled where
         // pixels are packed (CPU fallback) and by a component-wise blit (GPU
         // interop), so red and blue are not swapped.
-        for (const auto& fmt : formats)
+        //
+        // The colour space has to be matched as carefully as the format. A
+        // 10-bit format is commonly advertised more than once, paired with a
+        // different VkColorSpaceKHR each time, and the enumeration order is
+        // vendor-specific: with the display in HDR mode NVIDIA lists
+        // A2B10G10R10 + HDR10_ST2084 ahead of A2B10G10R10 + SRGB_NONLINEAR,
+        // while AMD lists SRGB_NONLINEAR first. Taking the first format match
+        // therefore gave NVIDIA a PQ swapchain fed with sRGB-encoded pixels,
+        // which crushes everything below mid-grey to a couple of nits -- the
+        // whole viewport, RV's own overlays included, reads as black.
+        //
+        // RV's renderer emits sRGB, so SRGB_NONLINEAR is the only correct
+        // pairing. Honouring an HDR colour space would mean re-encoding the
+        // shader output to that transfer function, which is a colour-pipeline
+        // change, not a swapchain choice.
+        //
+        const auto findTenBit = [&formats](VkFormat wanted, bool requireSrgbNonlinear, VkSurfaceFormatKHR& out) -> bool
         {
-            if (fmt.format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
+            for (const auto& fmt : formats)
             {
-                surfaceFormat = fmt;
+                if (fmt.format != wanted)
+                {
+                    continue;
+                }
+                if (requireSrgbNonlinear && fmt.colorSpace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+                {
+                    continue;
+                }
+                out = fmt;
+                return true;
+            }
+            return false;
+        };
+
+        for (const VkFormat wanted : {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32})
+        {
+            if (findTenBit(wanted, true, surfaceFormat))
+            {
                 found10bit = true;
                 break;
             }
         }
+
+        // No 10-bit format is paired with SRGB_NONLINEAR on this surface. Take
+        // the 10-bit format anyway rather than dropping to the 8-bit OpenGL
+        // path: the depth is what the user asked for, and the colour space is
+        // reported below so a wrong-looking image is traceable to it.
         if (!found10bit)
         {
-            for (const auto& fmt : formats)
+            for (const VkFormat wanted : {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32})
             {
-                if (fmt.format == VK_FORMAT_A2R10G10B10_UNORM_PACK32)
+                if (findTenBit(wanted, false, surfaceFormat))
                 {
-                    surfaceFormat = fmt;
                     found10bit = true;
                     break;
                 }
@@ -681,9 +733,24 @@ namespace Rv
 
         if (found10bit)
         {
-            if (ImageRenderer::debugGpu())
+            //  Unconditional, and the colour space is part of it: the format
+            //  alone was never enough to explain a black NVIDIA viewport.
+            //  Latched, because createSwapchain() re-runs on every resize step.
+            if (surfaceFormat.format != m_loggedSurfaceFormat.format || surfaceFormat.colorSpace != m_loggedSurfaceFormat.colorSpace)
             {
-                cout << "INFO: VulkanWindow: createSwapchain: chose " << formatName(surfaceFormat.format) << " (10-bit OK)" << endl;
+                m_loggedSurfaceFormat = surfaceFormat;
+
+                cout << "INFO: VulkanWindow: createSwapchain: chose " << formatName(surfaceFormat.format)
+                     << " colorSpace=" << surfaceFormat.colorSpace
+                     << (surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR ? " (SRGB_NONLINEAR)" : " (NOT SRGB_NONLINEAR)")
+                     << " (10-bit OK)" << endl;
+
+                if (surfaceFormat.colorSpace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+                {
+                    cout << "WARNING: VulkanWindow: no 10-bit surface format is paired with SRGB_NONLINEAR on this surface. RV emits "
+                            "sRGB, so the image may look wrong (dark or washed out)."
+                         << endl;
+                }
             }
         }
         else
@@ -870,7 +937,19 @@ namespace Rv
             return disabled;
         }
 
-        // NVIDIA Linux 550+ drivers return blank pixels to OpenGL for LINEAR shared
+        // Reverts the shared image to a plain (non-dedicated) allocation, the
+        // behaviour before the dedicated-allocation query was added. The
+        // dedicated path is what the spec asks for and what a driver reporting
+        // requiresDedicatedAllocation needs for an externally-shared image, but
+        // it changes a code path that already worked, so keep a way to rule it
+        // out on a machine without a rebuild.
+        bool dedicatedAllocationDisabled()
+        {
+            static const bool disabled = getenv("RV_VULKAN_DISABLE_DEDICATED_ALLOCATION") != nullptr;
+            return disabled;
+        }
+
+        // NVIDIA 550+ drivers return blank pixels to OpenGL for LINEAR shared
         // images >= ~2 MiB (forum thread #349436). Allocating the shared image with
         // VK_IMAGE_TILING_OPTIMAL avoids that broken linear path and restores
         // correct zero-copy interop, so OPTIMAL is the default on NVIDIA. Both the
@@ -879,9 +958,17 @@ namespace Rv
         // DRM-format-modifier negotiation. AMD/Intel keep the existing LINEAR path.
         // Set RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND to revert NVIDIA to LINEAR
         // (reproduces the blank-image bug, for debugging).
+        //
+        // The vendor decides this, not the platform: NVIDIA ships one driver core
+        // behind both GL and Vulkan on Windows as well as Linux, and the shared
+        // image is always well past the threshold because getSharedImageInfo()
+        // allocates at screen capacity -- ~8 MiB for a 1080p A2B10G10R10 image,
+        // ~33 MiB at 4K. The AMD rationale for LINEAR is specific to Mesa, where
+        // GL and Vulkan are separate drivers (radeonsi vs RADV) so
+        // GL_OPTIMAL_TILING_EXT carries no cross-driver layout guarantee.
         bool useOptimalTilingForInterop(VkPhysicalDevice dev)
         {
-#if defined(PLATFORM_LINUX)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
             return !nvidiaInteropWorkaroundDisabled() && isNvidiaPhysicalDevice(dev);
 #else
             (void)dev;
@@ -1036,15 +1123,17 @@ namespace Rv
 
         cleanupSharedImage(slot);
 
-        if (ImageRenderer::debugGpu())
-        {
-            cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x"
-                 << capH << " for request " << w << "x" << h << endl;
-        }
-
         // OPTIMAL tiling on NVIDIA (the fix for the blank large-image bug); LINEAR
         // elsewhere. See useOptimalTilingForInterop().
         const bool optimalTiling = useOptimalTilingForInterop(m_vkPhysicalDevice);
+
+        //  Unconditional, and reported after the tiling decision so it can name
+        //  it. The shared image is allocated at screen capacity, so this fires
+        //  about once per ring slot per session rather than per resize, and the
+        //  tiling it reports is exactly the fact that separates a working NVIDIA
+        //  viewport from a black one.
+        cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
+             << " for request " << w << "x" << h << " tiling=" << (optimalTiling ? "OPTIMAL" : "LINEAR") << endl;
 
         // 1. Create Shared Image
         VkExternalMemoryImageCreateInfo extMemInfo = {};
@@ -1139,8 +1228,38 @@ namespace Rv
         info.capacityHeight = capH; // GL imports the texture at capacity dimensions
         info.optimalTiling = optimalTiling ? 1 : 0;
 
-        VkMemoryRequirements memReqs;
-        vkGetImageMemoryRequirements(m_vkDevice, m_vkSharedImage[slot], &memReqs);
+        //
+        //  Ask through the 2-variant so the dedicated-allocation requirement can
+        //  be read. An image created with an external handle type is reported
+        //  requiresDedicatedAllocation by some drivers (AMD's Windows driver
+        //  does), and binding non-dedicated memory to such an image is invalid
+        //  -- the GL import of it then yields a texture with undefined (in
+        //  practice all-zero) contents and no error on any path. Honor whatever
+        //  this driver asks for rather than forcing dedicated everywhere.
+        //
+        VkMemoryDedicatedRequirements dedicatedReqs = {};
+        dedicatedReqs.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS;
+
+        VkMemoryRequirements2 memReqs2 = {};
+        memReqs2.sType = VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2;
+        memReqs2.pNext = &dedicatedReqs;
+
+        VkImageMemoryRequirementsInfo2 memReqsInfo = {};
+        memReqsInfo.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2;
+        memReqsInfo.image = m_vkSharedImage[slot];
+
+        vkGetImageMemoryRequirements2(m_vkDevice, &memReqsInfo, &memReqs2);
+
+        const VkMemoryRequirements& memReqs = memReqs2.memoryRequirements;
+        const bool useDedicated =
+            !dedicatedAllocationDisabled() && (dedicatedReqs.requiresDedicatedAllocation || dedicatedReqs.prefersDedicatedAllocation);
+
+        info.dedicated = useDedicated ? 1 : 0;
+
+        cout << "INFO: VulkanWindow: getSharedImageInfo: shared image slot " << slot
+             << " memory = " << (useDedicated ? "dedicated" : "non-dedicated")
+             << " (driver requires=" << (dedicatedReqs.requiresDedicatedAllocation ? "yes" : "no")
+             << " prefers=" << (dedicatedReqs.prefersDedicatedAllocation ? "yes" : "no") << ")" << endl;
 
         VkExportMemoryAllocateInfo exportAllocInfo = {};
         exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
@@ -1150,9 +1269,19 @@ namespace Rv
         exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
 #endif
 
+        //  Chained ahead of the export info when in use; both live to the
+        //  vkAllocateMemory call below.
+        VkMemoryDedicatedAllocateInfo dedicatedAllocInfo = {};
+        dedicatedAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO;
+        dedicatedAllocInfo.image = m_vkSharedImage[slot];
+        if (useDedicated)
+        {
+            dedicatedAllocInfo.pNext = &exportAllocInfo;
+        }
+
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext = &exportAllocInfo;
+        allocInfo.pNext = useDedicated ? static_cast<void*>(&dedicatedAllocInfo) : static_cast<void*>(&exportAllocInfo);
         allocInfo.allocationSize = memReqs.size;
         allocInfo.memoryTypeIndex = findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
         if (allocInfo.memoryTypeIndex == UINT32_MAX)
