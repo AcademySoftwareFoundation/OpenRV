@@ -94,6 +94,7 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2025")
   )
   SET(RV_DEPS_PYSIDE_ARCHIVE_URL
       "https://mirrors.ocf.berkeley.edu/qt/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_PYSIDE_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_PYSIDE_VERSION}.zip"
+      "https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-${RV_DEPS_PYSIDE_VERSION}-src/pyside-setup-everywhere-src-${RV_DEPS_PYSIDE_VERSION}.zip"
   )
 
   # Python https://www.python.org/downloads/source/

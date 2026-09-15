@@ -36,7 +36,24 @@ QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
 
-LIBCLANG_URL_BASE = "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_"
+LIBCLANG_URL_BASES = [
+    "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_",
+    "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_",
+]
+
+
+def download_libclang(filename_suffix: str, file_path: str) -> bool:
+    """
+    Try downloading a libclang archive from each mirror in LIBCLANG_URL_BASES in turn.
+
+    Returns True as soon as one mirror succeeds, False if all of them fail.
+    """
+    for url_base in LIBCLANG_URL_BASES:
+        download_url = url_base + filename_suffix
+        if download_file(download_url, file_path):
+            return True
+        print(f"WARNING: Could not download {download_url}")
+    return False
 
 
 def test_python_distribution(python_home: str) -> None:
@@ -126,7 +143,6 @@ def prepare() -> None:
     elif system == "Windows":
         clang_filename_suffix = "19.1.0-based-windows-vs2019_64.7z"
 
-    download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
 
     # if we have a failed download, clean it up and redownload.
@@ -136,14 +152,13 @@ def prepare() -> None:
 
     # download it if necessary
     if os.path.exists(libclang_zip) is False:
-        download_ok = download_file(download_url, libclang_zip)
+        download_ok = download_libclang(clang_filename_suffix, libclang_zip)
         if not download_ok and fallback_clang_filename_suffix:
-            fallback_download_url = LIBCLANG_URL_BASE + fallback_clang_filename_suffix
-            print(f"WARNING: Could not download or version does not exist: {download_url}")
-            print(f"WARNING: Attempting to fallback on known version: {fallback_download_url}...")
-            download_ok = download_file(fallback_download_url, libclang_zip)
+            print(f"WARNING: Could not download or version does not exist: {clang_filename_suffix}")
+            print(f"WARNING: Attempting to fallback on known version: {fallback_clang_filename_suffix}...")
+            download_ok = download_libclang(fallback_clang_filename_suffix, libclang_zip)
         if not download_ok:
-            print(f"ERROR: Could not download or version does not exist: {download_url}")
+            print(f"ERROR: Could not download or version does not exist: {clang_filename_suffix}")
 
     # clean up previous failed extraction
     libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
