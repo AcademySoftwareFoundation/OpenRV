@@ -68,7 +68,7 @@ RVIO supports all of the same movie, image, and audio formats that RV does inclu
 | -copyright *string*       | Output copyright (movie files, default="")                                                                                                                   |
 | -debug *string*           | Debug category                                                                                                                                               |
 | -version                  | Show RVIO version number                                                                                                                                     |
-| -exrcpus *int*            | EXR thread count (default=*platform dependant*)                                                                                                              |
+| -exrcpus *int*            | EXR decoder thread count (default = number of logical cores)                                                                                                 |
 | -exrRGBA                  | EXR use basic RGBA interface (default=false)                                                                                                                 |
 | -exrInherit               | EXR guesses channel inheritance (default=false)                                                                                                              |
 | -exrIOMethod int [int]    | EXR I/O Method (0=standard, 1=buffered, 2=unbuffered, 3=MemoryMap, 4=AsyncBuffered, 5=AsyncUnbuffered, default=0) and optional chunk size (default=61440)    |

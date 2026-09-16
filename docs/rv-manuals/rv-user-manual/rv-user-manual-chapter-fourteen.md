@@ -150,7 +150,14 @@ When decoding EXR files, you have the option of setting both the number of reade
 
 If you want to stream EXR files you may want to reserve some of your cores for decoding. The number of EXR decoding threads can be changed from the Preferences > Formats > OpenEXR. Always check performances with **Automatic Threads** activated.
 
-If this doesn't work, deselect **Automatic Threads** and increase the number in Reader/Decoder Threads by 1. Check performances, and increase by thread count by 1. Repeat until performances are acceptable, but don't go over the number of logical cores of your workstation minus 1 (if you have 16 logical cores, don't go over 15) or your system will become unstable. If performances are still degraded, you need to look elsewhere, such as upgrading your hardware.
+When **Automatic Threads** is enabled, RV chooses the OpenEXR decoder thread count from the number of logical processors on your system:
+
+* On systems with **more than 16 logical processors**, RV uses **half** of the logical processors. All EXR decodes share a single OpenEXR thread pool, so dedicating every core to decoding can starve RV's playback/UI, audio, and caching threads and cause dropped frames — especially with DWA/DWAB-compressed EXRs. Reserving roughly half the cores (which is approximately the physical core count on hyper-threaded machines) leaves enough headroom for smooth playback.
+* On systems with **16 or fewer logical processors**, RV uses all but one logical processor.
+
+Advanced: you can override the Automatic value without changing the preference by setting the `RV_EXR_AUTO_MAX_THREADS` environment variable to the desired thread count.
+
+If this doesn't work, deselect **Automatic Threads** and increase the number in Reader/Decoder Threads by 1. Check performances, and increase the thread count by 1. Repeat until performance is acceptable. Note that on systems with many logical cores, using close to the maximum (logical cores minus 1) can make playback *worse*, not better: the decoder threads compete with RV's playback/UI threads, so the system may drop frames or become unstable. A good starting point on high-core machines is around half your logical cores. If performance is still degraded, you need to look elsewhere, such as upgrading your hardware.
 
 ### About File I/O and Decoding Latency
 

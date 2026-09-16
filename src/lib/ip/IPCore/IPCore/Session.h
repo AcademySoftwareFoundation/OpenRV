@@ -1270,6 +1270,14 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
+        //  Diagnostic: number of redraw requests posted from the heartbeat
+        //  (Session::update -> redrawImmediately -> QPaintDeviceWindow::update
+        //  -> requestUpdate). Compared against the actual paint (render_v2)
+        //  cadence this tells us whether a display stall is RV failing to
+        //  request paints (event-loop/timer starvation) or Qt deferring the
+        //  window's update request (which some platforms gate on the display
+        //  refresh, so a low count is not on its own proof of starvation).
+        long long m_diagRedrawRequests;
         std::vector<std::string> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;

@@ -634,3 +634,117 @@ void swap_bytes_32bit_MP(size_t width, size_t height, const uint32_t* FASTMEMCPY
         curY += curHeight;
     }
 }
+
+//------------------------------------------------------------------------------
+//  RGB -> RGBA expansion (inserts an opaque alpha component).
+//
+//  GPUs have no fast DMA path for 3-component float texture uploads
+//  (GL_RGB16F/GL_RGB32F): the driver expands RGB->RGBA per pixel, which is
+//  slow. Expanding on the CPU here lets the upload use the native
+//  GL_RGBA16F/GL_RGBA32F transfer path.
+//
+void expand_rgb_to_rgba_16bit(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                              uint16_t* FASTMEMCPYRESTRICT outBuf, uint16_t alpha)
+{
+    for (size_t row = 0; row < height; row++)
+    {
+        const uint16_t* FASTMEMCPYRESTRICT p0 = reinterpret_cast<const uint16_t * FASTMEMCPYRESTRICT>(inBuf + row * inRowBytes);
+        uint16_t* FASTMEMCPYRESTRICT p1 = outBuf + row * width * 4;
+        for (size_t x = 0; x < width; x++, p0 += 3, p1 += 4)
+        {
+            p1[0] = p0[0];
+            p1[1] = p0[1];
+            p1[2] = p0[2];
+            p1[3] = alpha;
+        }
+    }
+}
+
+void expand_rgb_to_rgba_32bit(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                              uint32_t* FASTMEMCPYRESTRICT outBuf, uint32_t alpha)
+{
+    for (size_t row = 0; row < height; row++)
+    {
+        const uint32_t* FASTMEMCPYRESTRICT p0 = reinterpret_cast<const uint32_t * FASTMEMCPYRESTRICT>(inBuf + row * inRowBytes);
+        uint32_t* FASTMEMCPYRESTRICT p1 = outBuf + row * width * 4;
+        for (size_t x = 0; x < width; x++, p0 += 3, p1 += 4)
+        {
+            p1[0] = p0[0];
+            p1[1] = p0[1];
+            p1[2] = p0[2];
+            p1[3] = alpha;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+//
+template <typename T> class ExpandRGBToRGBATask : public Task
+{
+public:
+    ExpandRGBToRGBATask(TaskGroup* group, size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                        T* FASTMEMCPYRESTRICT outBuf, T alpha)
+        : Task(group)
+        , _width(width)
+        , _height(height)
+        , _inBuf(inBuf)
+        , _inRowBytes(inRowBytes)
+        , _outBuf(outBuf)
+        , _alpha(alpha)
+    {
+    }
+
+    virtual ~ExpandRGBToRGBATask() {}
+
+    virtual void execute()
+    {
+        if (sizeof(T) == 2)
+            expand_rgb_to_rgba_16bit(_width, _height, _inBuf, _inRowBytes, reinterpret_cast<uint16_t*>(_outBuf),
+                                     static_cast<uint16_t>(_alpha));
+        else
+            expand_rgb_to_rgba_32bit(_width, _height, _inBuf, _inRowBytes, reinterpret_cast<uint32_t*>(_outBuf),
+                                     static_cast<uint32_t>(_alpha));
+    }
+
+    const size_t _width;
+    const size_t _height;
+    const uint8_t* FASTMEMCPYRESTRICT _inBuf;
+    const size_t _inRowBytes;
+    T* FASTMEMCPYRESTRICT _outBuf;
+    const T _alpha;
+};
+
+template <typename T>
+static void expand_rgb_to_rgba_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                  T* FASTMEMCPYRESTRICT outBuf, T alpha)
+{
+    HOP_PROF_FUNC();
+
+    const size_t numThreads = std::max<size_t>(1, TwkFB::ThreadPool::getNumThreads());
+    const size_t taskHeight = std::max<size_t>(1, height / numThreads);
+    const size_t outRowElems = width * 4;
+
+    size_t curY = 0;
+    TaskGroup taskGroup;
+
+    while (curY < height)
+    {
+        const uint8_t* FASTMEMCPYRESTRICT curInBuf = inBuf + curY * inRowBytes;
+        T* FASTMEMCPYRESTRICT curOutBuf = outBuf + curY * outRowElems;
+        const size_t curHeight = std::min(taskHeight, height - curY);
+        TwkFB::ThreadPool::addTask(new ExpandRGBToRGBATask<T>(&taskGroup, width, curHeight, curInBuf, inRowBytes, curOutBuf, alpha));
+        curY += curHeight;
+    }
+}
+
+void expand_rgb_to_rgba_16bit_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                 uint16_t* FASTMEMCPYRESTRICT outBuf, uint16_t alpha)
+{
+    expand_rgb_to_rgba_MP<uint16_t>(width, height, inBuf, inRowBytes, outBuf, alpha);
+}
+
+void expand_rgb_to_rgba_32bit_MP(size_t width, size_t height, const uint8_t* FASTMEMCPYRESTRICT inBuf, size_t inRowBytes,
+                                 uint32_t* FASTMEMCPYRESTRICT outBuf, uint32_t alpha)
+{
+    expand_rgb_to_rgba_MP<uint32_t>(width, height, inBuf, inRowBytes, outBuf, alpha);
+}

@@ -42,6 +42,8 @@
 #include <TwkUtil/sgcHopTools.h>
 #include <TwkUtil/SystemInfo.h>
 #include <TwkUtil/ThreadName.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
+#include <TwkUtil/Clock.h>
 #include <assert.h>
 #include <half.h>
 #include <iostream>
@@ -59,6 +61,8 @@
 #include <limits>
 #include <stdexcept>
 #include <algorithm>
+#include <cstdint>
+#include <vector>
 
 #ifdef PLATFORM_DARWIN
 #include <OpenCL/cl.h>
@@ -111,6 +115,10 @@ namespace IPCore
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
     static ENVVAR_INT(evMaxConcurrentPBOs, "RV_RENDERING_MAX_CONCURRENT_PBOS", 10);
+    //  Upload 3-channel half/float images as native RGBA16F/RGBA32F (fast GPU
+    //  DMA) instead of GL_RGB16F/GL_RGB32F (per-pixel driver expansion on
+    //  upload). Set RV_EXPAND_RGB_TO_RGBA=0 to restore the legacy RGB path.
+    static ENVVAR_BOOL(evExpandRGBToRGBA, "RV_EXPAND_RGB_TO_RGBA", true);
 
 #define NOT_A_FRAME (std::numeric_limits<int>::min())
 #define NOT_A_COORDINATE (GLuint(-1))
@@ -3180,7 +3188,14 @@ namespace IPCore
         s.uncropX = image->uncropX;
         s.uncropY = image->uncropY;
         s.planar = image->planes.size() > 1;
-        s.numChannels = s.planar ? image->planes.size() : (image->planes.size() ? image->planes.front().tile->channels : 4);
+        //  Report the logical source channel count. For RGB half/float images
+        //  uploaded via the RGBA-expansion fast path the texture has 4 channels
+        //  but the image is still logically 3-channel (opaque alpha), so undo
+        //  the expansion here to keep externally-visible semantics unchanged.
+        s.numChannels =
+            s.planar
+                ? image->planes.size()
+                : (image->planes.size() ? (image->planes.front().tile->expandRGBToRGBA ? 3 : image->planes.front().tile->channels) : 4);
         s.pixelAspect = image->pixelAspect;
         s.initPixelAspect = image->initPixelAspect;
         s.device = (VideoDevice*)context.device;
@@ -3861,11 +3876,36 @@ namespace IPCore
     bool ImageRenderer::compatible(const FrameBuffer* fb, const TextureDescription* tex) const
     {
         //
+        //  Build the description this fb would produce and compare against the
+        //  existing texture. We must compare against the *derived* description
+        //  (not the raw fb) because the destination geometry can differ from
+        //  the source -- e.g. 3-channel RGB half/float is expanded to a
+        //  4-channel RGBA texture (see initializeTextureFormat), so the
+        //  texture's channels/pixelSize/format intentionally differ from the fb.
+        //
+        TextureDescription b;
+        initializeTextureFormat(fb, &b);
+
+        //
         //  Check for basic geometry
         //
-        if (fb->height() != tex->height || fb->width() != tex->width || fb->depth() != tex->depth || fb->numChannels() != tex->channels
-            || fb->pixelSize() != tex->pixelSize || fb->uncropWidth() != tex->uncropWidth || fb->uncropHeight() != tex->uncropHeight
-            || fb->uncropX() != tex->uncropX || fb->uncropY() != tex->uncropY)
+        if (b.height != tex->height || b.width != tex->width || b.depth != tex->depth || b.channels != tex->channels
+            || b.pixelSize != tex->pixelSize || b.uncropWidth != tex->uncropWidth || b.uncropHeight != tex->uncropHeight
+            || b.uncropX != tex->uncropX || b.uncropY != tex->uncropY)
+        {
+            return false;
+        }
+
+        //
+        //  An expanded (3ch RGB -> 4ch RGBA) texture and a genuine 4-channel
+        //  RGBA texture produce identical destination geometry/format, but the
+        //  *upload path* differs (one expands the source, one does not). The
+        //  Compatible-reuse path in getTexture() does not re-run
+        //  initializeTextureFormat, so it would leave tex->expandRGBToRGBA
+        //  stale and make uploadPlane read the source with the wrong channel
+        //  stride -> corruption. Never cross-reuse between the two.
+        //
+        if (b.expandRGBToRGBA != tex->expandRGBToRGBA)
         {
             return false;
         }
@@ -3873,9 +3913,6 @@ namespace IPCore
         //
         //  Check further
         //
-        TextureDescription b;
-        initializeTextureFormat(fb, &b);
-
         if (tex->channelType != b.channelType || tex->internalFormat != b.internalFormat || tex->format != b.format
             || tex->alignment != b.alignment)
         {
@@ -4013,6 +4050,7 @@ namespace IPCore
         d->channels = fb->numChannels();
         d->pixelSize = fb->pixelSize();
         d->swapBytes = false;
+        d->expandRGBToRGBA = false;
         d->uncropWidth = fb->uncropWidth();
         d->uncropHeight = fb->uncropHeight();
         d->uncropX = fb->uncropX();
@@ -4184,6 +4222,34 @@ namespace IPCore
                 break;
             }
 
+            //
+            //  3-component float texture uploads (GL_RGB16F/GL_RGB32F) have no
+            //  native DMA path on real GPUs: the driver expands RGB->RGBA per
+            //  pixel on upload, which is far slower than a native RGBA transfer
+            //  (and worse when it also forces the slow non-PBO path). Allocate
+            //  the texture as RGBA and expand RGB->RGBA on the CPU in
+            //  uploadPlane() so we ride the native GL_RGBA16F/RGBA32F fast path.
+            //  The extra opaque alpha is harmless (shaders sample .rgb). Only
+            //  applies to hardware float paths; software renderer already uses
+            //  an RGBA internal format above.
+            //  Only the GL_TEXTURE_RECTANGLE path in uploadPlane() implements
+            //  the RGB->RGBA expansion. Normalized-coordinate textures
+            //  (GL_TEXTURE_1D/2D/3D, e.g. 3D color LUTs) go through
+            //  upload{1,2,3}DTexture() which upload the source as-is, so they
+            //  must keep the real RGB format or they would be corrupted.
+            if (evExpandRGBToRGBA.getValue() && !m_softwareGLRenderer && d->target == GL_TEXTURE_RECTANGLE
+                && (d->channelType == GL_HALF_FLOAT_ARB || d->channelType == GL_FLOAT))
+            {
+                d->expandRGBToRGBA = true;
+                d->format = GL_RGBA;
+                d->channels = 4;
+                d->pixelSize = (d->channelType == GL_HALF_FLOAT_ARB) ? 8 : 16;
+                d->internalFormat = (d->channelType == GL_HALF_FLOAT_ARB) ? GL_RGBA16F_ARB : GL_RGBA32F_ARB;
+                //  Destination rows are tightly packed RGBA (8 or 16 bytes/px),
+                //  both multiples of 8, so an 8-byte unpack alignment is valid.
+                d->alignment = 8;
+            }
+
             break;
 
         case 4:
@@ -4244,22 +4310,14 @@ namespace IPCore
         const size_t totalBytes = d->width * d->height * d->depth * d->pixelSize;
         d->id = m_glState->createGLTexture(totalBytes);
 
-        // Note: The minimum size restriction is to prevent an NVIDIA driver
-        // issue The problem is that once a PBO has been used for a transfer <
-        // 128KB it becomes slow when used for larger transfers.
-        // --
-        // Note: The upper limit restriction set on the number of concurrent
-        // PBOs is to prevent an explosion of PBOs allocated when the user
-        // switches to a large layout say with over 20 clips. These extra PBOs
-        // can really stress a system and also make the default layout slow to
-        // appear due to the time it takes to allocate all those extra PBOs.
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && totalBytes > 128 * 1024
-                            && m_uploadedTextures.size() < evMaxConcurrentPBOs.getValue();
-        if (usePBO)
-        {
-            d->pPBOToGPU = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
-        }
+        //  NOTE: The staging PBO used to be allocated here and stored on the
+        //  TextureDescription, which pinned one pool buffer for the whole cache
+        //  lifetime of the texture (~10+ frames). With a large look-ahead cache
+        //  that starved the small fixed pool, forcing most large streaming
+        //  frames onto the slow synchronous client-memory upload path. The PBO
+        //  is now acquired transiently in uploadPlane() and released back to the
+        //  pool immediately after the upload is issued, so a handful of buffers
+        //  can serve an unbounded streaming cache. See uploadPlane().
     }
 
     void ImageRenderer::assignAuxImages(const IPImage* img)
@@ -4576,6 +4634,14 @@ namespace IPCore
 
         ProfilerGuard guard(m_profilingState);
 
+        //  Per-upload diagnostic (Option A): measures the CPU-side submission
+        //  time of a single plane upload and records whether the PBO fast path
+        //  was taken plus the frame geometry/bytes. Combined with the
+        //  RV_DIAG_GLFINISH per-paint GPU total (GLView), this distinguishes a
+        //  slow-but-correct DMA from a fallback/non-PBO upload path.
+        const bool diagUpload = TwkUtil::PlaybackDiagnostics::enabled();
+        const double diagUploadStart = diagUpload ? TwkUtil::SystemClock().now() : 0.0;
+
         if (fb->coordinateType() == FrameBuffer::NormalizedCoordinates)
         {
             GLuint pixelInterpolation = GL_LINEAR;
@@ -4640,8 +4706,26 @@ namespace IPCore
         // We should support non-contiguous pixel data in the PBO path.
         const bool contiguousData = (fb->scanlineSize() / fb->pixelSize()) == fb->width();
 
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes && contiguousData;
+        //  Transient staging PBO: acquire it from the pool for this single
+        //  upload (the 128KB minimum avoids an NVIDIA driver slowdown where a
+        //  PBO first used for a tiny transfer stays slow for large ones). It is
+        //  released immediately after the upload is issued (see below), so a
+        //  small pool of buffers can serve an unbounded streaming cache instead
+        //  of one buffer being pinned per resident texture for its cache life.
+        const bool pboEligible = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
+                                 && fb->scanlinePixelPadding() == 0 && contiguousData && totalBytes > 128 * 1024;
+
+        if (pboEligible && !d->pPBOToGPU)
+        {
+            auto pbo = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
+            //  pop() hands back a zero-sized wrapper when the pool is exhausted
+            //  or the request exceeds the max PBO size; fall back to the
+            //  client-memory path in that case.
+            if (pbo->getSize() >= totalBytes)
+                d->pPBOToGPU = pbo;
+        }
+
+        const bool usePBO = pboEligible && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes;
 
         bool updateOnly = d->uploaded ? true : false;
 
@@ -4665,7 +4749,21 @@ namespace IPCore
                 TWK_THROW_STREAM(RenderFailedExc, "glMapBuffer FAILED" << estring);
             }
 
-            FastMemcpy_MP(b, p, totalBytes);
+            if (d->expandRGBToRGBA)
+            {
+                //  Expand RGB->RGBA directly into the mapped PBO (no extra
+                //  staging copy) so the GPU gets a native RGBA transfer.
+                if (d->channelType == GL_HALF_FLOAT_ARB)
+                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(b),
+                                                static_cast<uint16_t>(0x3C00));
+                else
+                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(b),
+                                                static_cast<uint32_t>(0x3F800000));
+            }
+            else
+            {
+                FastMemcpy_MP(b, p, totalBytes);
+            }
 
             d->pPBOToGPU->unmap();
             d->pPBOToGPU->bind();
@@ -4675,7 +4773,9 @@ namespace IPCore
 
                 glBindTexture(d->target, d->id);
                 TWK_GLDEBUG;
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, d->width + fb->scanlinePixelPadding());
+                //  Expanded data in the PBO is tightly packed RGBA (no source
+                //  scanline padding), so the row length is just the width.
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, d->expandRGBToRGBA ? d->width : (d->width + fb->scanlinePixelPadding()));
                 TWK_GLDEBUG;
                 glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
                 TWK_GLDEBUG;
@@ -4727,14 +4827,37 @@ namespace IPCore
 
             d->pPBOToGPU->unbind();
             d->uploaded = true;
+
+            //  Return the staging PBO to the pool right away so the next frame's
+            //  upload can recycle it instead of it being pinned to this cached
+            //  texture. The pool fences the buffer, so it will not be handed out
+            //  again until this upload's DMA has completed -- releasing now is
+            //  safe and is what lets a small pool serve the whole stream.
+            d->pPBOToGPU.reset();
         }
         else
         {
             HOP_PROF("ImageRenderer::uploadPlane() - !usePBO");
 
+            if (d->expandRGBToRGBA)
+            {
+                //  No PBO available: expand RGB->RGBA into a reusable per-thread
+                //  scratch buffer and upload that (still a native RGBA
+                //  transfer, just synchronous from client memory).
+                static thread_local std::vector<unsigned char> expandScratch;
+                expandScratch.resize(totalBytes);
+                if (d->channelType == GL_HALF_FLOAT_ARB)
+                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(expandScratch.data()),
+                                                static_cast<uint16_t>(0x3C00));
+                else
+                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(expandScratch.data()),
+                                                static_cast<uint32_t>(0x3F800000));
+                p = expandScratch.data();
+            }
+
             glBindTexture(d->target, d->id);
             TWK_GLDEBUG;
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, fb->scanlineSize() / fb->pixelSize());
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, d->expandRGBToRGBA ? d->width : (fb->scanlineSize() / fb->pixelSize()));
             TWK_GLDEBUG;
             glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
             TWK_GLDEBUG;
@@ -4798,6 +4921,20 @@ namespace IPCore
             d->uploaded = true;
         }
         HOP_CALL(glFinish();)
+
+        if (diagUpload)
+        {
+            const double cpuMs = (TwkUtil::SystemClock().now() - diagUploadStart) * 1000.0;
+            const double mbytes = totalBytes / (1024.0 * 1024.0);
+            //  cpuThroughput is the effective GB/s of just the CPU submission
+            //  (map+memcpy for PBO, or glTexImage2D client-copy for non-PBO).
+            //  A slow value with usePBO=0 means we fell into the fallback path.
+            const double gbPerSec = (cpuMs > 0.0) ? (mbytes / 1024.0) / (cpuMs / 1000.0) : 0.0;
+            std::ostringstream extra;
+            extra << "w=" << iw << ";h=" << ih << ";ch=" << d->channels << ";type=" << d->channelType << ";pxsz=" << d->pixelSize
+                  << ";mb=" << mbytes << ";pbo=" << (usePBO ? 1 : 0) << ";update=" << (updateOnly ? 1 : 0) << ";cpuGBps=" << gbPerSec;
+            TwkUtil::PlaybackDiagnostics::instance().record("upload", -1, -1, cpuMs, extra.str());
+        }
     }
 
     //----------------------------------------------------------------------

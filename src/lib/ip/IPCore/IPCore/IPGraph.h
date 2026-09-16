@@ -770,6 +770,15 @@ namespace IPCore
 
         int getMaxGroupSize(bool slowMedia) const;
 
+        //
+        //  Whether the parallel caching thread group (ids 2..N) is allowed to
+        //  run. We only restrict caching to the single thread when *all* media
+        //  is slow-random-access. As soon as any fast media is present we let
+        //  the parallel threads help; genuinely slow-source frames are still
+        //  serialized onto thread 1 by the per-frame skip in evalThreadMain.
+        //
+        bool parallelCachingAllowed() const { return m_evalHasFastMedia || !m_evalSlowMedia; }
+
         //--------------------------------------------------------------------------
         // Audio related helper methods
         //
@@ -867,6 +876,7 @@ namespace IPCore
         VoidSignal m_mediaLoadingSetEmptySignal;
         NodeSignal m_nodeWillRemoveSignal;
         std::atomic_bool m_evalSlowMedia;
+        std::atomic_bool m_evalHasFastMedia;
         void* m_jobDispatcher; // opaque pointer SGC::JobDispatcher
         std::atomic_bool m_clearAudioCacheRequested;
 
