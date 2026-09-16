@@ -323,6 +323,19 @@ int main(int argc, char* argv[])
     // Device.
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
+    // Share GL resources across every QOpenGLContext in the process, matching
+    // what the non-macOS entry point (src/bin/apps/rv/main.cpp) has always
+    // done. Without it QGuiApplication never builds a global share context, so
+    // every context RV creates (the viewport window, the second-output
+    // ScreenView, the multithreaded-upload worker device, the QOpenGLWidget
+    // panels) lives in a share group of its own. RV caches GL objects by
+    // content rather than per context (BasicGLProgram's shader cache, the
+    // TwkGLText font cache), so an id handed out by one context is later used
+    // under another, where it names nothing: glUseProgram()/glTexSubImage2D()
+    // then fail, and in a debug build FTGL turns that into an abort().
+    // Must be set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
     // On macOS, ensure that the widget-based implementation is used instead of the native dialog.
     // Rationale:
     // - This prevents this Tahoe specific Qt bug (dialog buttons not clickable on macOS 26 Tahoe) :
