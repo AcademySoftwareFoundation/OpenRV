@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Detect if VFX2023 (OpenSSL 1.1.1) or VFX2024+ (OpenSSL 3+).
+python_version=$("python" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+minor_version=$(echo "$python_version" | cut -d. -f2)
+
+is_python_vfx2023=0 # VFX2023 Python 3.10
+is_python_vfx2024=0 # VFX2024 Python 3.11
+
+if [ "$minor_version" -gt 10 ]; then
+    is_python_vfx2024=1
+else
+    is_python_vfx2023=1
+fi
+
+is_python_vfx2023=1
+echo $is_python_vfx2023
+echo $is_python_vfx2024
+
+if [ -z "$RV_USE_SYSTEM_OPENSSL" ]; then
+    required_openssl_found=""
+    if [ "$is_python_vfx2023" -eq 1 ]; then
+        required_openssl_found=$(openssl version | grep 1.1.1)
+        echo "here"
+        echo $required_openssl_found
+    fi
+
+    if [ -z "$required_openssl_found" ]; then
+        LD_LIBRARY_PATH="$RV_HOME/lib/OpenSSL:$LD_LIBRARY_PATH"
+        echo "here2"
+        echo $LD_LIBRARY_PATH
+    fi
+fi
