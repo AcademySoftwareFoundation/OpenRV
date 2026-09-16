@@ -39,6 +39,7 @@
 #include <QtGui/QtGui>
 #include <RvApp/PyCommandsModule.h>
 #include <TwkApp/Event.h>
+#include <RvCommon/GLWindow.h>
 #include <RvCommon/GLView.h> // WINDOWS NEEDS THIS LAST
 
 namespace Rv
@@ -343,6 +344,25 @@ namespace Rv
         return ret;
     }
 
+    static PyObject* sessionGLWindow(PyObject* /*self*/, PyObject* /*args*/)
+    {
+        PyLockObject lock;
+        Session* session = Session::currentSession();
+
+        PyObject* pyObject = Py_None;
+
+        if (auto* rvDocument = static_cast<RvDocument*>(session->opaquePointer()))
+        {
+            if (auto* glwindow = static_cast<void*>(rvDocument->view()->glWindow()))
+            {
+                pyObject = PyLong_FromVoidPtr(glwindow);
+            }
+        }
+
+        Py_XINCREF(pyObject);
+        return pyObject;
+    }
+
     static PyObject* sessionTopToolBar(PyObject* self, PyObject* args)
     {
         PyLockObject locker;
@@ -466,6 +486,8 @@ namespace Rv
         {"sessionWindow", sessionWindow, METH_NOARGS, ""},
 
         {"sessionGLView", sessionGLView, METH_NOARGS, ""},
+
+        {"sessionGLWindow", sessionGLWindow, METH_NOARGS, ""},
 
         {"sessionTopToolBar", sessionTopToolBar, METH_NOARGS, ""},
 
