@@ -33,8 +33,6 @@ namespace TwkMovie
         // if (!m_movie->isThreadSafe()) throw runtime_exception();
         m_info = movies.front()->info();
         m_threadSafe = false;
-        pthread_mutex_init(&m_mapLock, 0);
-        pthread_mutex_init(&m_runLock, 0);
         m_threadData.resize(movies.size());
 
         for (size_t i = 0; i < m_threadData.size(); i++)
@@ -60,13 +58,7 @@ namespace TwkMovie
             for (size_t q = 0; q < i->second.size(); q++)
                 delete i->second[q];
         }
-
-        pthread_mutex_destroy(&m_mapLock);
     }
-
-    void ThreadedMovie::lock() { m_threadGroup.lock(m_mapLock); }
-
-    void ThreadedMovie::unlock() { m_threadGroup.unlock(m_mapLock); }
 
     void ThreadedMovie::threadMain()
     {
@@ -83,117 +75,122 @@ namespace TwkMovie
         ThreadData* td = 0;
         pthread_t self = pthread_self();
 
-        m_threadGroup.lock(m_runLock);
-
-        //
-        //  If we already have a ThreadData for this thread use it
-        //
-
-        for (size_t i = 0; !td && i < m_threadData.size(); i++)
         {
-            ThreadData& d = m_threadData[i];
+            std::lock_guard<std::mutex> guard(m_runLock);
 
-            if (d.init && pthread_equal(d.thread, self))
+            //
+            //  If we already have a ThreadData for this thread use it
+            //
+
+            for (size_t i = 0; !td && i < m_threadData.size(); i++)
             {
-                d.running = true;
-                td = &d;
+                ThreadData& d = m_threadData[i];
+
+                if (d.init && pthread_equal(d.thread, self))
+                {
+                    d.running = true;
+                    td = &d;
+                }
+            }
+
+            //
+            //  If we don't have a ThreadData find an available one and use
+            //  that
+            //
+
+            bool first = false;
+
+            for (size_t i = 0; !td && i < m_threadData.size(); i++)
+            {
+                ThreadData& d = m_threadData[i];
+
+                if (!d.init)
+                {
+                    d.init = true;
+                    first = true;
+                    d.thread = self;
+                    d.running = true;
+                    td = &d;
+                }
             }
         }
-
-        //
-        //  If we don't have a ThreadData find an available one and use
-        //  that
-        //
-
-        bool first = false;
-
-        for (size_t i = 0; !td && i < m_threadData.size(); i++)
-        {
-            ThreadData& d = m_threadData[i];
-
-            if (!d.init)
-            {
-                d.init = true;
-                first = true;
-                d.thread = self;
-                d.running = true;
-                td = &d;
-            }
-        }
-
-        m_threadGroup.unlock(m_runLock);
 
         if (m_initialize)
             m_initialize();
 
         do
         {
-            lock();
-            const size_t current = m_currentIndex;
-            const size_t requested = m_requestIndex;
+            size_t current, requested;
+            int frame;
+            bool exists;
 
-            if (current - requested < threads * 2 && current < m_frames.size())
             {
-                //
-                //  Bump the current index for the next thread
-                //
+                std::lock_guard<std::mutex> guard(m_mapLock);
+                current = m_currentIndex;
+                requested = m_requestIndex;
 
-                m_currentIndex++;
-                const int frame = m_frames[current];
-                bool exists = m_map.count(frame) > 0;
-                unlock();
-
-                if (!exists)
+                if (current - requested < threads * 2 && current < m_frames.size())
                 {
-                    td->request.frame = frame;
-                    td->request.missing = false;
-                    FrameBufferVector fbs;
+                    //
+                    //  Bump the current index for the next thread
+                    //
 
-                    try
-                    {
-                        // cout << "thread " << td->id << " @ frame " <<
-                        // td->request.frame << endl;
-                        td->movie->imagesAtFrame(td->request, fbs);
-                    }
-                    catch (std::exception& exc)
-                    {
-                        cerr << "WARNING: an exception was raised evaluting "
-                                "frame "
-                             << frame << ":" << endl;
-                        cerr << exc.what() << endl;
-                        unlock();
-                        break;
-                    }
-
-                    lock();
-                    m_map[frame] = fbs;
-                    unlock();
+                    m_currentIndex++;
+                    frame = m_frames[current];
+                    exists = m_map.count(frame) > 0;
                 }
                 else
                 {
-                    // cout << "thread " << td->id << " @ frame " <<
-                    // td->request.frame
-                    //<< " already in cache"
+                    // cout << "thread " << td->id << " finished, current = " <<
+                    // current
+                    //<< ", requested = " << requested
                     //<< endl;
+                    break;
+                }
+            }
+
+            if (!exists)
+            {
+                td->request.frame = frame;
+                td->request.missing = false;
+                FrameBufferVector fbs;
+
+                try
+                {
+                    // cout << "thread " << td->id << " @ frame " <<
+                    // td->request.frame << endl;
+                    td->movie->imagesAtFrame(td->request, fbs);
+                }
+                catch (std::exception& exc)
+                {
+                    cerr << "WARNING: an exception was raised evaluting "
+                            "frame "
+                         << frame << ":" << endl;
+                    cerr << exc.what() << endl;
+                    break;
+                }
+
+                {
+                    std::lock_guard<std::mutex> guard(m_mapLock);
+                    m_map[frame] = std::move(fbs);
                 }
             }
             else
             {
-                unlock();
-                // cout << "thread " << td->id << " finished, current = " <<
-                // current
-                //<< ", requested = " << requested
+                // cout << "thread " << td->id << " @ frame " <<
+                // td->request.frame
+                //<< " already in cache"
                 //<< endl;
-                break;
             }
+
         } while (1);
 
-        m_threadGroup.lock(m_runLock);
-        td->running = false;
-
-        bool allFramesDone = (m_currentIndex >= m_frames.size());
-
-        m_threadGroup.unlock(m_runLock);
+        bool allFramesDone;
+        {
+            std::lock_guard<std::mutex> guard(m_runLock);
+            td->running = false;
+            allFramesDone = (m_currentIndex >= m_frames.size());
+        }
 
         if (allFramesDone && m_finalize != nullptr)
         {
@@ -250,13 +247,15 @@ namespace TwkMovie
 
         int frame = request.frame;
         const size_t n = m_threadGroup.num_threads();
+        size_t current, requested;
 
         dispatchAll();
 
-        lock();
-        size_t current = m_currentIndex;
-        size_t requested = m_requestIndex;
-        unlock();
+        {
+            std::lock_guard<std::mutex> guard(m_mapLock);
+            current = m_currentIndex;
+            requested = m_requestIndex;
+        }
 
 #if 0
     if (frame != m_frames[requested])
@@ -270,18 +269,23 @@ namespace TwkMovie
 
         for (size_t count = 0; true; count++)
         {
-            lock();
-            FBMap::iterator i = m_map.find(frame);
-            FBMap::iterator e = m_map.end();
-            unlock();
-
-            if (i != e)
+            bool found = false;
             {
-                fbs = i->second;
-                lock();
-                m_map.erase(i);
-                // cout << "consumed frame " << frame << endl;
-                unlock();
+                std::lock_guard<std::mutex> guard(m_mapLock);
+                FBMap::iterator i = m_map.find(frame);
+                FBMap::iterator e = m_map.end();
+
+                if (i != e)
+                {
+                    fbs = i->second;
+                    m_map.erase(i);
+                    // cout << "consumed frame " << frame << endl;
+                    found = true;
+                }
+            }
+
+            if (found)
+            {
                 dispatchAll();
                 break;
             }
@@ -303,9 +307,10 @@ namespace TwkMovie
             }
         }
 
-        lock();
-        m_requestIndex++;
-        unlock();
+        {
+            std::lock_guard<std::mutex> guard(m_mapLock);
+            m_requestIndex++;
+        }
     }
 
     void ThreadedMovie::identifiersAtFrame(const ReadRequest& request, IdentifierVector& ids)

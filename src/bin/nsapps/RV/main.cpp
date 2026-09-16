@@ -56,7 +56,6 @@
 #include <thread>
 #include <signal.h>
 #include <stdlib.h>
-#include <stl_ext/thread_group.h>
 #include <string.h>
 #include <errno.h>
 #include <vector>
@@ -84,7 +83,7 @@ extern void rvThirdPartyCustomization(TwkApp::Bundle& bundle, char* licarg);
 #if NDEBUG
 // #error ********* NO VERSION INFORMATION ***********
 #else
-#warning********* NO VERSION INFORMATION ***********
+#warning ********* NO VERSION INFORMATION ***********
 #endif
 #endif
 
