@@ -1535,7 +1535,16 @@ namespace IPCore
                 const Mat44f& O = root->orientationMatrix;
                 const Mat44f& MP = root->placementMatrix;
                 const Mat44f I = (O * MP).inverted();
-                const Mat44f model = root->imageMatrix;
+                //
+                //  For overlay commands (mattes, HUD rectangles, text, etc.)
+                //  we use the image's overlayImageMatrix, which is the same
+                //  as imageMatrix except that any arbitrary rotation applied
+                //  by Transform2DIPNode has been intentionally left out. This
+                //  keeps mattes fixed to the frame while still tracking user
+                //  pan/zoom. For normal (annotation) paint commands we keep
+                //  the historical behavior and use imageMatrix.
+                //
+                const Mat44f model = context.useOverlayMatrix ? root->overlayImageMatrix : root->imageMatrix;
                 const Mat44f proj = root->projectionMatrix;
 
                 CommandContext commandContext(proj, model, fbo, textureFBO, currentFBO, context.glState, context.hasStencil,
