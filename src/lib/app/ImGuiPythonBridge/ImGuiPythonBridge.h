@@ -18,7 +18,8 @@ namespace Rv
         static void unregisterCallback(PyObject* callable);
         static void callCallbacks();
         static int nbCallbacks();
-        static void clearCallbacks();
+        static void init();
+        static void shutdown(); // Must be called before Py_Finalize()
 
         struct PyObjectDeleter
         {
@@ -28,7 +29,7 @@ namespace Rv
         using PyObjectPtr = std::unique_ptr<PyObject, PyObjectDeleter>;
 
     private:
-        static std::vector<PyObjectPtr> s_callbacks;
+        static std::vector<PyObjectPtr>* g_callbacks;
     };
 } // namespace Rv
 
