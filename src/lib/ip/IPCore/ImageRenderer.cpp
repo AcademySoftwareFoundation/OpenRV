@@ -631,6 +631,36 @@ namespace IPCore
         controlDevice().glDevice->makeCurrent();
     }
 
+    void ImageRenderer::declareGLProperties(IPNode* node)
+    {
+        // Declare all opengl.* property slots with empty/zero defaults.
+        // No GL context is required. The real values are filled later by
+        // queryGLIntoContainer() once a context is current.
+        node->declareProperty<StringProperty>("opengl.GL_VERSION", string(""), 0, false);
+        node->declareProperty<IntProperty>("opengl.majorVersion", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.minorVersion", 0, 0, false);
+        node->declareProperty<StringProperty>("opengl.GL_SHADING_LANGUAGE_VERSION", string(""), 0, false);
+        node->declareProperty<StringProperty>("opengl.GL_VENDOR", string(""), 0, false);
+        node->declareProperty<StringProperty>("opengl.GL_RENDERER", string(""), 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_SIZE", 0, 0, false);
+#ifdef GL_MAX_TEXTURE_BUFFER_SIZE
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_BUFFER_SIZE", 0, 0, false);
+#endif
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_IMAGE_UNITS", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_COORDS", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_TEXTURE_UNITS", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_VERTEX_ATTRIBS", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_DRAW_BUFFERS", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.GL_MAX_SAMPLES", 0, 0, false);
+#ifdef GL_MAX_RECTANGLE_TEXTURE_SIZE
+        node->declareProperty<IntProperty>("opengl.GL_MAX_RECTANGLE_TEXTURE_SIZE", 0, 0, false);
+#endif
+        node->declareProperty<IntProperty>("opengl.GL_MAX_3D_TEXTURE_SIZE", 0, 0, false);
+        node->createProperty<StringProperty>("opengl.GL_EXTENSIONS");
+        node->declareProperty<IntProperty>("opengl.glsl.majorVersion", 0, 0, false);
+        node->declareProperty<IntProperty>("opengl.glsl.minorVersion", 0, 0, false);
+    }
+
     void ImageRenderer::queryGLIntoContainer(IPNode* node)
     {
         const string glver = TwkGLF::safeGLGetString(GL_VERSION);
