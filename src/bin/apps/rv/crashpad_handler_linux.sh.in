@@ -6,6 +6,14 @@
 #
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 LOG_DIR="${RV_CRASH_DUMPS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/@RV_INTERNAL_ORGANIZATION_NAME@/@RV_INTERNAL_APPLICATION_NAME@/Crashes}"
+LOG_FILE="${LOG_DIR}/crashpad_handler.log"
 mkdir -p "$LOG_DIR"
 ulimit -t 120
-exec "${SCRIPT_DIR}/crashpad_handler" "$@" 2>>"${LOG_DIR}/crashpad_handler.log"
+# Start marker. The shell redirection below creates the log file even when the
+# exec fails, so an existing-but-empty log is ambiguous on its own: it can mean
+# either "handler ran and had nothing to say" (the normal case, crashpad_handler
+# is silent on success) or "crashpad_handler was never exec'd". The marker
+# disambiguates the two, and records the pid the handler will run under (exec
+# preserves it) so a kernel OOM kill can be attributed.
+echo "[wrapper] $(date -u '+%Y-%m-%dT%H:%M:%SZ') crashpad_handler starting pid=$$" >>"$LOG_FILE"
+exec "${SCRIPT_DIR}/crashpad_handler" "$@" 2>>"$LOG_FILE"

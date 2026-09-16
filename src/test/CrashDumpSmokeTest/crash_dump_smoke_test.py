@@ -31,10 +31,25 @@ import contextlib
 import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 import time
+
+# Written by the platform wrapper next to the dumps (see
+# crashpad_handler_linux.sh.in / crashpad_handler_macos.sh.in).
+HANDLER_LOG_NAME = "crashpad_handler.log"
+
+# Start marker the Linux wrapper writes just before exec'ing crashpad_handler.
+WRAPPER_MARKER_PATTERN = re.compile(r"^\[wrapper\].*\bpid=(\d+)", re.MULTILINE)
+
+# Startup facts worth recording for correlation with capture failures. Neither
+# has predicted a failure so far: the WebEngine warning appears on passing runs
+# too, and the OpenGL warning count varies between healthy runs (0 on Release,
+# 1 or 2 on Debug). Reported, not judged. See log_startup_signature().
+STARTUP_OPENGL_WARNING = "QOpenGLWidget is not supported on this platform."
+STARTUP_WEBENGINE_WARNING = "WebEngineContext is used before"
 
 # Annotation keys that MUST appear (non-empty) in the dump. "platform" is set at
 # init for every dump and is present even headless, so it is a reliable signal
@@ -44,9 +59,22 @@ REQUIRED_ANNOTATIONS = ("platform",)
 # Reported for information only (not asserted) -- empty under offscreen Qt.
 INFO_ANNOTATIONS = ("mu_function", "mu_script_file", "py_function")
 
+# Set to a non-empty, non-zero value to launch RV under a batch gdb that dumps
+# the startup crash's stack. Diagnostic only: gdb becomes the tracer, so
+# Crashpad cannot ptrace RV and no dump is written. Used by the crash-dump
+# stress workflow, not by the normal ctest invocation.
+GDB_ENV_VAR = "RV_CRASH_SMOKE_GDB"
+
+# Printed by the Mu function immediately before crash(). Nothing else in the
+# test can tell the deliberate crash apart from RV dying on the way to it: all
+# the test sees is a non-zero exit code. Mu's print writes to cout with an
+# explicit flush (MuLang/StringType.cpp, print_void_string), so the sentinel
+# survives the SIGSEGV that follows and no marker file is needed.
+CRASH_SENTINEL = "RV_CRASH_SMOKE_REACHED_CRASH"
+
 # crash() is invoked from a named Mu function so mu_function has a value in a
 # display-backed run (informational here).
-CRASH_EVAL = "function: rvCrashSmokeTest (void;) { crash(); } rvCrashSmokeTest();"
+CRASH_EVAL = f'function: rvCrashSmokeTest (void;) {{ print("{CRASH_SENTINEL}\\n"); crash(); }} rvCrashSmokeTest();'
 
 
 def log(msg):
@@ -56,6 +84,124 @@ def log(msg):
 def find_dumps(crash_dir):
     # Crashpad writes new reports under <dir>/pending/<uuid>.dmp.
     return glob.glob(os.path.join(crash_dir, "**", "*.dmp"), recursive=True)
+
+
+def resource_snapshot(path):
+    """Return a free-disk / free-memory summary for path.
+
+    Both kinds of starvation can silently cost us the dump: no space for the
+    handler to write it, or not enough memory, so that the kernel kills the
+    handler before the crash happens. The numbers are logged before the launch
+    and again if no dump shows up, so the two can be compared.
+    """
+    parts = []
+    try:
+        usage = shutil.disk_usage(path)
+        parts.append(f"disk free {usage.free // (1 << 20)} MiB of {usage.total // (1 << 20)} MiB")
+    except OSError as exc:
+        parts.append(f"disk usage unavailable ({exc})")
+
+    try:
+        with open("/proc/meminfo", "r", encoding="utf-8") as fh:
+            match = re.search(r"^MemAvailable:\s+(\d+) kB", fh.read(), re.MULTILINE)
+        if match:
+            parts.append(f"memory available {int(match.group(1)) // 1024} MiB")
+    except OSError:
+        pass  # No /proc (macOS/Windows): disk numbers alone will have to do.
+
+    return ", ".join(parts)
+
+
+def read_handler_log(crash_dir):
+    """Return (size, tail, handler_pid) for the handler log, or None if absent.
+
+    The wrappers create the log through a shell redirection, so the file
+    existing proves only that the wrapper ran. The "[wrapper] ... starting"
+    marker is written just before the exec, so its absence means
+    crashpad_handler itself never started; a failing exec reports its error
+    into the same log, right after the marker. handler_pid is None when the
+    marker is missing (that includes macOS and Windows, whose wrappers do not
+    write one).
+    """
+    handler_log = os.path.join(crash_dir, HANDLER_LOG_NAME)
+    if not os.path.isfile(handler_log):
+        return None
+
+    with open(handler_log, "rb") as fh:
+        fh.seek(0, os.SEEK_END)
+        size = fh.tell()
+        fh.seek(max(0, size - 8192))
+        tail = fh.read().decode("utf-8", errors="replace")
+
+    match = WRAPPER_MARKER_PATTERN.search(tail)
+    return size, tail, int(match.group(1)) if match else None
+
+
+def log_handler_log_summary(crash_dir):
+    """Log a one-line handler-log summary on the success path.
+
+    Cheap continuous proof that the marker mechanism still works, so we find
+    out it has broken here rather than on the one run where the dump is
+    missing and the log is the only evidence we have.
+
+    The byte count is the useful part. A healthy capture writes about 7 KB,
+    almost entirely repeated "read out of range" from process_memory_range and
+    a couple of missing-cpufreq errors, which is routine minidump-writing
+    noise. A failing run writes the marker and nothing else, so the size alone
+    distinguishes them; the failure path prints the contents.
+    """
+    entry = read_handler_log(crash_dir)
+    if entry is None:
+        log(f"{HANDLER_LOG_NAME}: absent")
+        return
+
+    size, _, handler_pid = entry
+    marker = f"marker present (handler pid {handler_pid})" if handler_pid is not None else "no marker"
+    log(f"{HANDLER_LOG_NAME}: {size} bytes, {marker}")
+
+
+def report_handler_log(crash_dir):
+    """Log the handler's own log in full, and return the pid it reported."""
+    entry = read_handler_log(crash_dir)
+    if entry is None:
+        log(f"{HANDLER_LOG_NAME} does not exist: the handler wrapper never ran.")
+        return None
+
+    size, tail, handler_pid = entry
+    log(f"{HANDLER_LOG_NAME} ({size} bytes, last 8 KiB):")
+    for line in tail.splitlines():
+        log(f"  | {line}")
+
+    if handler_pid is None:
+        log("  -> no wrapper start marker: crashpad_handler was never exec'd.")
+        return None
+
+    log(f"  -> wrapper reached exec with pid {handler_pid}; lines after it are the exec error or handler stderr.")
+    return handler_pid
+
+
+def report_oom_kills(handler_pid):
+    """Log any kernel OOM activity, which would explain a handler that died."""
+    if not sys.platform.startswith("linux"):
+        return
+
+    try:
+        completed = subprocess.run(["dmesg"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=30)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        log(f"dmesg unavailable ({exc}); cannot check for OOM kills.")
+        return
+
+    text = completed.stdout.decode("utf-8", errors="replace")
+    hits = [line for line in text.splitlines() if re.search(r"Out of memory|oom-kill|Killed process", line)]
+    if not hits:
+        log("dmesg reports no OOM kills.")
+        return
+
+    log("dmesg OOM activity (last 10 matching lines):")
+    for line in hits[-10:]:
+        log(f"  | {line}")
+    if handler_pid is not None and any(str(handler_pid) in line for line in hits):
+        log(f"  -> handler pid {handler_pid} appears in the OOM kill log.")
 
 
 @contextlib.contextmanager
@@ -116,6 +262,71 @@ def annotation_value(dump_text, key):
     return "" if found_empty else None
 
 
+def shebang_argv(path):
+    """Return the interpreter argv for a #! script, or [] for a real binary.
+
+    On Linux the staged "rv" is a tcsh wrapper that sets RV_HOME and the
+    library paths before exec'ing rv.bin, and gdb cannot load a script as an
+    executable. Running the interpreter instead keeps that setup intact; gdb
+    follows the exec into rv.bin on its own.
+    """
+    try:
+        with open(path, "rb") as fh:
+            first = fh.readline(256)
+    except OSError:
+        return []
+    if not first.startswith(b"#!"):
+        return []
+    return first[2:].decode("utf-8", errors="replace").strip().split()
+
+
+def gdb_launch_command(rv_binary, eval_arg):
+    """Wrap the RV launch in a batch gdb that prints the crash backtrace."""
+    program = shebang_argv(rv_binary) + [rv_binary, "-eval", eval_arg]
+    return [
+        "gdb",
+        "-batch",
+        "-nx",
+        "-ex",
+        "set confirm off",
+        "-ex",
+        "set pagination off",
+        # Debug builds have deep stacks; keep the output readable.
+        "-ex",
+        "set backtrace limit 40",
+        "-ex",
+        "run",
+        "-ex",
+        r"echo \n=== gdb: crashing thread ===\n",
+        "-ex",
+        "bt full",
+        "-ex",
+        r"echo \n=== gdb: all threads ===\n",
+        "-ex",
+        "thread apply all bt",
+        "--args",
+        *program,
+    ]
+
+
+def log_startup_signature(rv_output):
+    """Log the startup facts that might correlate with a missing dump.
+
+    Rocky 8 intermittently fails QtWebEngine/OpenGL initialization, which shows
+    up as a WebEngineContext warning. That looked like it might explain the
+    missing dumps, but it does not: the warning has since appeared on runs
+    where the crash was captured normally, on both Debug and Release. The
+    OpenGL widget warning count is not a signature either, having been seen as
+    0, 1 and 2 on runs that passed.
+
+    So neither is treated as a fault here. They are printed every run so the
+    two can be correlated once there are enough samples.
+    """
+    webengine_failed = STARTUP_WEBENGINE_WARNING in rv_output
+    opengl_warnings = rv_output.count(STARTUP_OPENGL_WARNING)
+    log(f"Startup signature: webengine-init-failed={webengine_failed}, opengl-warnings={opengl_warnings}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rv-binary", required=True, help="Path to the RV main executable to drive.")
@@ -153,31 +364,58 @@ def main():
         if sys.platform.startswith("linux") and os.geteuid() == 0:
             env.setdefault("QTWEBENGINE_DISABLE_SANDBOX", "1")
 
-        log(f"Launching: {args.rv_binary} -eval '{CRASH_EVAL}'")
+        gdb_mode = os.environ.get(GDB_ENV_VAR, "") not in ("", "0")
+        if gdb_mode:
+            command = gdb_launch_command(args.rv_binary, CRASH_EVAL)
+            log("GDB mode: launching RV under gdb to capture the startup backtrace.")
+            log("  gdb is the tracer, so Crashpad cannot ptrace RV and no dump will be")
+            log("  written. This mode diagnoses the startup crash; it does not test capture.")
+        else:
+            command = [args.rv_binary, "-eval", CRASH_EVAL]
+
+        log(f"Launching: {' '.join(command)}")
         log(f"Crash dir: {crash_dir}")
+        log(f"Resources before launch: {resource_snapshot(crash_dir)}")
         try:
             with macos_crash_dialog_suppressed():
                 proc = subprocess.run(
-                    [args.rv_binary, "-eval", CRASH_EVAL],
+                    command,
                     env=env,
                     timeout=args.launch_timeout,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                 )
             rc = proc.returncode
+        except FileNotFoundError as exc:
+            log(
+                f"FAIL: could not launch ({exc}). Is gdb installed?" if gdb_mode else f"FAIL: could not launch ({exc})."
+            )
+            return 1
         except subprocess.TimeoutExpired:
             log(f"FAIL: RV did not exit within {args.launch_timeout}s (no crash?).")
             return 1
 
         # A captured crash makes the process exit abnormally (non-zero).
         log(f"RV exited with code {rc}")
-        if proc.stdout:
+        rv_output = proc.stdout.decode("utf-8", errors="replace") if proc.stdout else ""
+        if rv_output:
             log("RV output (last 8 KiB):")
-            tail = proc.stdout[-8192:]
-            if isinstance(tail, bytes):
-                tail = tail.decode("utf-8", errors="replace")
-            for line in tail.splitlines():
+            for line in rv_output[-8192:].splitlines():
                 log(f"  | {line}")
+            # Checked against the whole output, not just the printed tail.
+            log_startup_signature(rv_output)
+        reached_crash = CRASH_SENTINEL in rv_output
+        log(f"Reached crash(): {reached_crash}")
+
+        if gdb_mode:
+            # Under gdb the exit code is gdb's and no dump can be written, so
+            # the only question is whether the startup crash reproduced.
+            if reached_crash:
+                log("RV reached crash() normally; the startup crash did not reproduce.")
+                return 0
+            log("REPRODUCED: RV died before reaching crash(). Backtrace is in the output above.")
+            return 1
+
         if rc == 0:
             log("FAIL: RV exited cleanly; the crash was not triggered.")
             return 1
@@ -192,21 +430,24 @@ def main():
             time.sleep(0.5)
 
         if not dumps:
-            handler_log = os.path.join(crash_dir, "crashpad_handler.log")
-            if os.path.isfile(handler_log):
-                log("crashpad_handler.log (last 8 KiB):")
-                with open(handler_log, "rb") as fh:
-                    fh.seek(0, os.SEEK_END)
-                    size = fh.tell()
-                    fh.seek(max(0, size - 8192))
-                    tail = fh.read().decode("utf-8", errors="replace")
-                for line in tail.splitlines():
-                    log(f"  | {line}")
-            log(f"FAIL: no .dmp produced in {crash_dir} within {args.dump_timeout}s.")
+            # A missing dump is almost never a bug in the capture code itself;
+            # it is the handler process being absent, starved or killed. Report
+            # enough about its state to tell those apart from the CI log alone.
+            handler_pid = report_handler_log(crash_dir)
+            log(f"Resources after failure: {resource_snapshot(crash_dir)}")
+            report_oom_kills(handler_pid)
+            if reached_crash:
+                log("FAIL: crash() ran and no .dmp was produced: the crash handler dropped it.")
+            else:
+                log("FAIL: RV died before reaching crash(), so this is an RV startup crash,")
+                log("      not a crash handler failure. The dump is missing because nothing")
+                log("      asked for one.")
+            log(f"No .dmp in {crash_dir} within {args.dump_timeout}s.")
             return 1
 
         dump = max(dumps, key=os.path.getmtime)
         log(f"Found dump: {dump}")
+        log_handler_log_summary(crash_dir)
 
         if not have_dump_tool:
             log("PASS: dump produced (minidump_dump not provided; annotation verification skipped).")
