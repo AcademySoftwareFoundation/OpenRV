@@ -172,6 +172,7 @@ The PACKAGE file is a [YAML](http://www.yaml.org/) file providing information ab
 | rv | version number | • | The minimum version of commercial RV which this package is compatible with |
 | openrv | version number | • | The minimum version of Open RV which this package is compatible with |
 | requires | zip file name list | | Any other packages (as zip file names) which are required in order to install/load this package |
+| excludes | package base name list | | Any other packages (as base names, separated by spaces) which cannot be loaded at the same time as this package. Making this package loadable in the package manager will unload any excluded package that is currently loaded. The exclusion is mutual, so only one of the two packages needs to declare it |
 | icon | PNG file name | | The name of an file with an icon for this package |
 | imageio | file list | | List of files in package which implement Image I/O |
 | movieio | file list | | List of files in package which implement Movie I/O |

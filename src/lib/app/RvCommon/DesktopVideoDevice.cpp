@@ -157,10 +157,10 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
-        QSurfaceFormat fmt = shareDevice()->widget()->format();
+        QSurfaceFormat fmt = shareDevice()->glSurfaceFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->widget(), Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->glShareContext(), Qt::Window);
         setViewWidget(vw);
 
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
@@ -747,11 +747,11 @@ namespace Rv
 
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
-    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare,
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,
                                                Qt::WindowFlags flags)
         : QOpenGLWidget(parent, flags)
     {
-        m_glViewShare = glViewShare;
+        m_glShareContext = glShareContext;
         setFormat(fmt);
 
         // Important: set PartialUpdate, because otherwise
@@ -764,9 +764,9 @@ namespace Rv
     {
         QOpenGLWidget::initializeGL();
 
-        if (m_glViewShare && context() && context()->isValid())
+        if (m_glShareContext && context() && context()->isValid())
         {
-            context()->setShareContext(m_glViewShare->context());
+            context()->setShareContext(m_glShareContext);
         }
     }
 

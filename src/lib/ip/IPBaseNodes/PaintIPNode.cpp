@@ -4,7 +4,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 #include <IPBaseNodes/PaintIPNode.h>
-#include <IPCore/BrushTextureManager.h>
 #include <IPCore/PaintCommand.h>
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/Exception.h>
@@ -335,6 +334,10 @@ namespace IPCore
         const IntProperty* startFrameP = c->property<IntProperty>("startFrame");
         const IntProperty* durationP = c->property<IntProperty>("duration");
 
+        const FloatProperty* hardnessP = c->property<FloatProperty>("hardness");
+        const StringProperty* tipTextureP = c->property<StringProperty>("tipTexture");
+        const IntProperty* blendModeP = c->property<IntProperty>("blendMode");
+
         const float width = widthP && widthP->size() ? widthP->front() : 0.01f;
         const Vec4f color = colorP && colorP->size() ? colorP->front() : Vec4f(1.0, 1.0, 1.0, 1.0);
         const string brush = brushP && brushP->size() ? brushP->front() : string("circle");
@@ -349,6 +352,10 @@ namespace IPCore
         const int startFrame = (startFrameP != nullptr && startFrameP->size() != 0) ? startFrameP->front() : getStartFrame(*c);
         const int duration = (durationP != nullptr && durationP->size() != 0) ? durationP->front() : 1;
 
+        const float hardness = hardnessP && hardnessP->size() ? hardnessP->front() : 100.0f;
+        const string tipTexture = tipTextureP && tipTextureP->size() ? tipTextureP->front() : string();
+        const unsigned int blendMode = blendModeP && blendModeP->size() ? blendModeP->front() : Paint::PolyLine::BlendNormal;
+
         p.width = width;
         p.color = color;
         p.brush = brush;
@@ -362,9 +369,14 @@ namespace IPCore
         p.eye = eye;
         p.startFrame = startFrame;
         p.duration = duration;
+        p.hardness = hardness;
+        p.tipTexture = tipTexture;
+        p.stampBlendMode = (Paint::PolyLine::StampBlendMode)blendMode;
 
-        // Classify the brush type once — drives all downstream data paths.
-        const bool isStampBrush = Paint::BrushTextureManager::instance().get(brush).isStamp;
+        // Classify the brush type once — drives all downstream data paths. The
+        // legacy "circle"/"gauss" names stay on the ribbon (non-stamp) path;
+        // everything else (including future UI-driven brushes) is stamp-based.
+        const bool isStampBrush = (brush != "circle" && brush != "gauss");
 
         // Per-point widths are present when widthP has one entry per point.
         // Allow widthP to lag pointsP by one: the Mu layer inserts the point and

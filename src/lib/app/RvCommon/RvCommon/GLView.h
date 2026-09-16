@@ -8,55 +8,75 @@
 #ifndef __rv_qt__GLView__h__
 #define __rv_qt__GLView__h__
 #include <TwkGLF/GL.h>
-#include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QtWidgets/QWidget>
 #include <QSurfaceFormat>
-#include <QOffscreenSurface>
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
-#include <TwkUtil/Timer.h>
-#include <boost/thread/thread.hpp>
+#include <QImage>
+#include <QSize>
+
+class QOpenGLContext;
+class QWindow;
 
 namespace Rv
 {
     class RvDocument;
     class QTGLVideoDevice;
+    class GLWindow;
 
-    class GLView
-        : public QOpenGLWidget
-        , protected QOpenGLFunctions
+    //
+    //  GLView
+    //
+    //  Host QWidget that embeds the native GL viewport (GLWindow) via
+    //  QWidget::createWindowContainer(). GLView keeps the public API the rest
+    //  of RV expects -- view()->context()/format()/makeCurrent()/videoDevice()
+    //  etc. -- by delegating to the GLWindow.
+    //
+    //  Crucially, GLView is no longer a QOpenGLWidget. That keeps the top-level
+    //  QMainWindow off the OpenGL RHI backend (so docked QWebEngineView panels
+    //  render on the platform default backend), and lets the viewport present
+    //  on its own native surface instead of via the full-window widget
+    //  composite.
+    //
+
+    class GLView : public QWidget
     {
         Q_OBJECT
 
     public:
-        typedef TwkUtil::Timer Timer;
-
         GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo = false, bool vsync = true,
                bool doubleBuffer = true, int red = 0, int green = 0, int blue = 0, int alpha = 0, bool noResize = true);
-        ~GLView();
+        ~GLView() override;
 
         static QSurfaceFormat rvGLFormat(bool stereo = false, bool vsync = true, bool doubleBuffer = true, int red = 8, int green = 8,
                                          int blue = 8, int alpha = 8);
 
-        void absolutePosition(int& x, int& y) const;
+        GLWindow* glWindow() const { return m_glWindow; }
 
         QTGLVideoDevice* videoDevice() const { return m_videoDevice; }
 
+        //
+        //  Delegated QOpenGLWidget-compatible API still used across RV.
+        //
+        QOpenGLContext* context() const;
+        QSurfaceFormat format() const;
+        void makeCurrent();
+
+        //  Compatibility shim for the former QOpenGLWidget::isValid(): the
+        //  native GL window is created up-front, so the viewport is considered
+        //  valid once the window exists.
+        bool isValid() const;
+
+        void absolutePosition(int& x, int& y) const;
+
         void stopProcessingEvents();
 
-        virtual bool event(QEvent*);
-        virtual bool eventFilter(QObject* object, QEvent* event);
-
-        bool firstPaintCompleted() const { return m_firstPaintCompleted; };
+        bool firstPaintCompleted() const;
 
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }
 
         void setMinimumContentSize(int w, int h) { m_msize = QSize(w, h); }
 
-        virtual QSize sizeHint() const;
-        virtual QSize minimumSizeHint() const;
-
-        void* syncClosure() const { return m_syncThreadData; }
+        QSize sizeHint() const override;
+        QSize minimumSizeHint() const override;
 
         QImage readPixels(int x, int y, int w, int h);
 
@@ -64,39 +84,49 @@ namespace Rv
         // For reference: https://doc.qt.io/qt-6/highdpi.html
         float devicePixelRatio() const;
 
-    public slots:
-        void eventProcessingTimeout();
+    private:
+        //
+        //  Keeping the viewport window alive across top-level window churn.
+        //
+        //  createWindowContainer() transfers ownership of the viewport window to
+        //  the container, which parents it to the top-level QWidgetWindow. Qt
+        //  destroys and recreates that QWidgetWindow when a widget is reparented
+        //  into the window -- QWidget::setParent() -> destroy() -> ~QWidgetWindow
+        //  -- as happens when a plugin adds a QWebEngineView to a layout, and
+        //  ~QObject deletes its child QWindows, viewport included. Nothing in Qt
+        //  puts it back, and QWindowContainer then dereferences the window it no
+        //  longer has on the next layout pass.
+        //
+        //  QObject::destroyed is emitted at the top of ~QObject, before
+        //  deleteChildren() runs, so watching the parent window gives us a
+        //  moment where the viewport can still be detached and kept -- which is
+        //  much cheaper than rebuilding it, and keeps the GL context, the device
+        //  wiring and the uploaded textures intact.
+        //
+        void watchParentWindow();
+        void parentWindowDestroyed();
+        void reattachGLWindow();
 
     protected:
-        void initializeGL();
-        void resizeGL(int w, int h);
-        void paintGL();
-        bool validateReadPixels(int x, int y, int w, int h);
-        void debugSaveFramebuffer();
+        void showEvent(QShowEvent*) override;
 
     private:
         RvDocument* m_doc;
-        boost::thread m_swapThread;
+        GLWindow* m_glWindow;
+        QWidget* m_container;
         QTGLVideoDevice* m_videoDevice;
-        unsigned int m_lastKey;
-        QEvent::Type m_lastKeyType;
-        Timer m_activityTimer;
-        Timer m_renderTimer;
-        QTimer m_eventProcessingTimer;
-        bool m_userActive;
-        size_t m_renderCount;
-        Timer m_activationTimer;
-        bool m_firstPaintCompleted;
         QSize m_csize;
         QSize m_msize;
-        int m_red;
-        int m_green;
-        int m_blue;
-        int m_alpha;
-        bool m_postFirstNonEmptyRender;
-        bool m_stopProcessingEvents;
-        void* m_syncThreadData;
         QOpenGLContext* m_sharedContext;
+
+        //
+        //  The parent QWindow whose destruction is being watched, plus the
+        //  connection to it so it can be rewired when the viewport window is
+        //  re-parented. See watchParentWindow().
+        //
+        QWindow* m_watchedParentWindow;
+        QMetaObject::Connection m_watchedParentConnection;
+        bool m_reattachPending;
     };
 
 } // namespace Rv

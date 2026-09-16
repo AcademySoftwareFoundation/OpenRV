@@ -4,72 +4,61 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 #pragma once
-#include <IPCore/PaintCommand.h>
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace IPCore
 {
     namespace Paint
     {
 
-        /// Resolved properties for one catalogue brush entry.
-        struct BrushInfo
-        {
-            unsigned int textureId = 0; ///< GL texture name; 0 = procedural
-            PolyLine::StampBlendMode blendMode = PolyLine::BlendNormal;
-            bool softShader = false; ///< use soft Gaussian shader
-            bool isStamp = false;    ///< true when the catalogue entry has a tip texture
-            std::string tipFile;     ///< tip PNG filename relative to catalogue dir (empty = procedural)
-        };
-
-        /// Singleton that loads the brush catalogue JSON and uploads tip textures to GL.
+        /// Caches GL textures for brush tip PNGs, keyed by filename.
+        ///
+        /// Tip files live in a flat directory (RV_BRUSH_DIR env var, or
+        /// assets/brushes inside the application bundle) and are uploaded to GL
+        /// lazily on first use. Per-stroke brush behavior (hardness, blend mode,
+        /// which tip to use) comes from the stroke's own properties, set by the
+        /// UI — this class only resolves a tip filename to a GL texture.
         ///
         /// Usage:
-        ///   // On the GL thread, once per application lifetime:
-        ///   BrushTextureManager::instance().load();
+        ///   // On the GL thread, at render time:
+        ///   unsigned int texId = BrushTextureManager::instance().getTexture(tipFile);
         ///
-        ///   // At stroke-creation time (any thread):
-        ///   BrushInfo info = BrushTextureManager::instance().get(brushName);
+        ///   // For a UI tip picker, any thread, no GL required:
+        ///   std::vector<std::string> tips = BrushTextureManager::instance().listTipFiles();
         ///
         class BrushTextureManager
         {
         public:
             static BrushTextureManager& instance();
 
-            /// Upload tip PNGs as GL textures for any catalogue entries that have them.
-            /// Must be called on the active GL thread. Safe to call multiple times —
-            /// only the first call has any effect.
-            /// Catalogue metadata (isStamp, blendMode, softShader) is parsed lazily
-            /// on the first call to get(), so this need not be called first.
-            void load();
+            /// Return the GL texture name for @p tipFile, uploading it from disk
+            /// on first request and caching the result (including failures, as 0).
+            /// Must be called on the active GL thread. Returns 0 if tipFile is
+            /// empty or the PNG can't be loaded.
+            unsigned int getTexture(const std::string& tipFile);
 
-            /// Return resolved info for @p name, or a default BrushInfo if not found.
-            /// Parses catalogue.json on the first call (any thread; no GL required).
-            BrushInfo get(const std::string& name);
+            /// List available tip PNG filenames in the brush tip directory, for
+            /// UI pickers. No GL required; safe to call from any thread.
+            std::vector<std::string> listTipFiles() const;
 
             /// Release all GL textures. Call before GL context teardown.
             void clear();
 
-            bool isLoaded() const { return m_texturesLoaded; }
-
-            /// Resolve the brush catalogue directory: RV_BRUSH_DIR env var, or the
-            /// assets/brushes directory inside the application bundle (Contents/Resources on macOS).
-            static std::string catalogueDir();
+            /// Resolve the brush tip directory: RV_BRUSH_DIR env var, or the
+            /// assets/brushes directory inside the application bundle
+            /// (Contents/Resources on macOS).
+            static std::string tipDir();
 
         private:
             BrushTextureManager() = default;
 
             ~BrushTextureManager() { clear(); }
 
-            /// Parse catalogue.json and populate m_brushes metadata (no GL).
-            /// Thread-safe via m_parseOnce; idempotent after first call.
-            void parseCatalogue();
-
-            std::unordered_map<std::string, BrushInfo> m_brushes;
-            std::once_flag m_parseOnce;
-            bool m_texturesLoaded{false};
+            std::mutex m_mutex;
+            std::unordered_map<std::string, unsigned int> m_textures;
         };
 
     } // namespace Paint

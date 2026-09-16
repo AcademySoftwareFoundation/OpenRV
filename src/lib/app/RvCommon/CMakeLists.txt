@@ -48,6 +48,7 @@ SET(_sources
     RvApplication.cpp
     DiagnosticsView.cpp
     GLView.cpp
+    GLWindow.cpp
     TwkQTAction.cpp
     MediaDirModel.cpp
     RvNetworkDialog.cpp

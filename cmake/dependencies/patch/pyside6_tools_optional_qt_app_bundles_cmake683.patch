@@ -1,0 +1,27 @@
+--- a/sources/pyside-tools/CMakeLists.txt
++++ b/sources/pyside-tools/CMakeLists.txt
+@@ -79,13 +79,17 @@
+     endforeach()
+ 
+     foreach(directory ${directories})
+-        install(DIRECTORY "${directory}"
+-                DESTINATION bin
+-                FILE_PERMISSIONS
+-                OWNER_EXECUTE OWNER_WRITE OWNER_READ
+-                GROUP_EXECUTE GROUP_READ
+-                WORLD_EXECUTE WORLD_READ
+-                PATTERN "android_utilities.py" EXCLUDE) # excluding the symlink
++        if(EXISTS ${directory})
++            install(DIRECTORY "${directory}"
++                    DESTINATION bin
++                    FILE_PERMISSIONS
++                    OWNER_EXECUTE OWNER_WRITE OWNER_READ
++                    GROUP_EXECUTE GROUP_READ
++                    WORLD_EXECUTE WORLD_READ
++                    PATTERN "android_utilities.py" EXCLUDE) # excluding the symlink
++        else()
++            message(WARNING "${directory} does not exist. Hence, the matching pyside6 tool will not work")
++        endif()
+     endforeach()
+ 
+     # dealing with android_utilities.py
