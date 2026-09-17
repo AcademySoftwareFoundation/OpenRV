@@ -109,6 +109,12 @@ namespace Rv
         mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedWidth{};
         mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedHeight{};
 
+        // Latched once the GL side fails to import a Vulkan-exported shared
+        // image. Without this the next frame re-attempts the same import with
+        // the same configuration and fails identically, once per frame. The
+        // session stays on the CPU readback path instead.
+        mutable bool m_glInteropFailed{false};
+
         void cleanupSharedGLObjects(uint32_t slot) const;
 
         // CPU-fallback GL state (used only when GPU interop is unavailable or

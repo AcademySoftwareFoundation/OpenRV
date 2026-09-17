@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <string>
 #ifdef PLATFORM_WINDOWS
 // WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
 // <winsock.h>, which otherwise collides with the <winsock2.h> already
@@ -97,6 +98,7 @@ typedef void(GLAPIENTRY* PFNGLDELETEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, const GL
 typedef void(GLAPIENTRY* PFNGLTEXSTORAGEMEM2DEXTPROC_RV)(GLenum target, GLsizei levels, GLenum internalFormat, GLsizei width,
                                                          GLsizei height, GLuint memory, GLuint64 offset);
 typedef void(GLAPIENTRY* PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV)(GLuint memory, GLuint64 size, GLenum handleType, void* handle);
+typedef void(GLAPIENTRY* PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV)(GLuint memoryObject, GLenum pname, const GLint* params);
 typedef void(GLAPIENTRY* PFNGLGENSEMAPHORESEXTPROC_RV)(GLsizei n, GLuint* semaphores);
 typedef void(GLAPIENTRY* PFNGLDELETESEMAPHORESEXTPROC_RV)(GLsizei n, const GLuint* semaphores);
 typedef void(GLAPIENTRY* PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV)(GLuint semaphore, GLenum handleType, void* handle);
@@ -111,6 +113,7 @@ namespace
     PFNGLDELETEMEMORYOBJECTSEXTPROC_RV g_glDeleteMemoryObjectsEXT = nullptr;
     PFNGLTEXSTORAGEMEM2DEXTPROC_RV g_glTexStorageMem2DEXT = nullptr;
     PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV g_glImportMemoryWin32HandleEXT = nullptr;
+    PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV g_glMemoryObjectParameterivEXT = nullptr;
     PFNGLGENSEMAPHORESEXTPROC_RV g_glGenSemaphoresEXT = nullptr;
     PFNGLDELETESEMAPHORESEXTPROC_RV g_glDeleteSemaphoresEXT = nullptr;
     PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV g_glImportSemaphoreWin32HandleEXT = nullptr;
@@ -132,6 +135,8 @@ namespace
         g_glTexStorageMem2DEXT = reinterpret_cast<PFNGLTEXSTORAGEMEM2DEXTPROC_RV>(wglGetProcAddress("glTexStorageMem2DEXT"));
         g_glImportMemoryWin32HandleEXT =
             reinterpret_cast<PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportMemoryWin32HandleEXT"));
+        g_glMemoryObjectParameterivEXT =
+            reinterpret_cast<PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV>(wglGetProcAddress("glMemoryObjectParameterivEXT"));
         g_glGenSemaphoresEXT = reinterpret_cast<PFNGLGENSEMAPHORESEXTPROC_RV>(wglGetProcAddress("glGenSemaphoresEXT"));
         g_glDeleteSemaphoresEXT = reinterpret_cast<PFNGLDELETESEMAPHORESEXTPROC_RV>(wglGetProcAddress("glDeleteSemaphoresEXT"));
         g_glImportSemaphoreWin32HandleEXT =
@@ -139,9 +144,13 @@ namespace
         g_glWaitSemaphoreEXT = reinterpret_cast<PFNGLWAITSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glWaitSemaphoreEXT"));
         g_glSignalSemaphoreEXT = reinterpret_cast<PFNGLSIGNALSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glSignalSemaphoreEXT"));
 
+        // glMemoryObjectParameterivEXT is required, not optional: without it
+        // the GL side cannot mark an imported memory object dedicated, and a
+        // dedicated Vulkan export imported as non-dedicated corrupts the image.
         g_glInteropAvailable = g_glCreateMemoryObjectsEXT && g_glDeleteMemoryObjectsEXT && g_glTexStorageMem2DEXT
-                               && g_glImportMemoryWin32HandleEXT && g_glGenSemaphoresEXT && g_glDeleteSemaphoresEXT
-                               && g_glImportSemaphoreWin32HandleEXT && g_glWaitSemaphoreEXT && g_glSignalSemaphoreEXT;
+                               && g_glImportMemoryWin32HandleEXT && g_glMemoryObjectParameterivEXT && g_glGenSemaphoresEXT
+                               && g_glDeleteSemaphoresEXT && g_glImportSemaphoreWin32HandleEXT && g_glWaitSemaphoreEXT
+                               && g_glSignalSemaphoreEXT;
 
         // Identify the GL driver alongside the interop probe result. Useful when
         // the Windows GL context happens to be the Microsoft GDI Generic
@@ -176,6 +185,7 @@ namespace
 #define glDeleteMemoryObjectsEXT g_glDeleteMemoryObjectsEXT
 #define glTexStorageMem2DEXT g_glTexStorageMem2DEXT
 #define glImportMemoryWin32HandleEXT g_glImportMemoryWin32HandleEXT
+#define glMemoryObjectParameterivEXT g_glMemoryObjectParameterivEXT
 #define glGenSemaphoresEXT g_glGenSemaphoresEXT
 #define glDeleteSemaphoresEXT g_glDeleteSemaphoresEXT
 #define glImportSemaphoreWin32HandleEXT g_glImportSemaphoreWin32HandleEXT
@@ -582,36 +592,40 @@ namespace Rv
         // while the GL context is current. If the driver does not expose them,
         // skip the Vulkan-side export work entirely and fall through to the
         // CPU pack-and-upload path below.
-        const bool glInteropAvailable = !forceCpuPresentation() && loadGLInteropExtensions();
+        const bool glInteropAvailable = !forceCpuPresentation() && !m_glInteropFailed && loadGLInteropExtensions();
         const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
 #else
-        const bool glInteropAvailable =
-            !forceCpuPresentation() && GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
+        const bool glInteropAvailable = !forceCpuPresentation() && !m_glInteropFailed && GLEW_EXT_memory_object && GLEW_EXT_semaphore
+                                        && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
         const VulkanView::SharedImageInfo* sharedInfo = glInteropAvailable ? m_view->getSharedImageInfo(w, h) : nullptr;
 #endif
-
-        static bool firstFrameLogged = false;
-        if (!firstFrameLogged)
-        {
-            firstFrameLogged = true;
-            if (ImageRenderer::debugGpu())
-            {
-                const VkFormat scFmt = m_view ? m_view->swapchainFormat() : VK_FORMAT_UNDEFINED;
-                cout << "INFO: QTVulkanVideoDevice: syncBuffers: first frame path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback")
-                     << "  swapchainFormat=" << scFmt
-                     << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32   ? " (A2B10G10R10 / 10-bit)"
-                         : scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
-                         : scFmt == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
-                                                                       : " (NOT 10-bit)")
-                     << endl;
-            }
-        }
 
         if (!sharedInfo)
         {
             // No zero-copy interop this frame: pack + present via the CPU fallback.
             // The GL-packed RGB10_A2 readback handles the Y flip and the swapchain
             // channel order (A2B10G10R10 / A2R10G10B10) without a per-pixel loop.
+            //
+            // Report the specific reason so the startup record is conclusive for
+            // someone reading only a log: a bare "CPU fallback" does not say
+            // whether interop was forced off, unavailable in GL, or refused by
+            // the Vulkan-side capability probe.
+            std::string reason;
+            if (forceCpuPresentation())
+            {
+                reason = "RV_VULKAN_FORCE_CPU_PRESENT is set";
+            }
+            else if (!glInteropAvailable)
+            {
+                reason = "the GL driver does not expose the EXT_memory_object / EXT_semaphore interop entry points";
+            }
+            else
+            {
+                const VulkanView::InteropConfig& c = m_view->interopConfig();
+                reason = c.rejectReason.empty() ? "the Vulkan side declined to allocate a shared image" : c.rejectReason;
+            }
+            m_view->reportPresentPath(VulkanView::PresentPath::CpuReadback, reason);
+
             presentCpuFallback(w, h);
             return;
         }
@@ -625,7 +639,23 @@ namespace Rv
         {
             cleanupSharedGLObjects(slot);
 
+            // Clear any pre-existing GL error so the check after the import
+            // sequence attributes only this sequence's failures.
+            while (glGetError() != GL_NO_ERROR)
+            {
+            }
+
             glCreateMemoryObjectsEXT(1, &m_glMemoryObject[slot]);
+
+            // Mirror the Vulkan side's dedicated-allocation decision. This must
+            // be set on the memory object BEFORE glTexStorageMem2DEXT, and must
+            // match the export exactly: a dedicated Vulkan allocation imported
+            // as non-dedicated (or the reverse) produces a corrupted image
+            // rather than an error. NVIDIA's OPAQUE_WIN32 path requires it.
+            {
+                const GLint dedicated = sharedInfo->dedicatedAllocation ? GL_TRUE : GL_FALSE;
+                glMemoryObjectParameterivEXT(m_glMemoryObject[slot], GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
+            }
 #ifdef PLATFORM_WINDOWS
             // Windows GL import does NOT take ownership of the HANDLE; the
             // Vulkan side and this GL side each keep their own reference.
@@ -650,7 +680,12 @@ namespace Rv
             glGenTextures(1, &m_glSharedTexture[slot]);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture[slot]);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT, sharedInfo->optimalTiling ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
+            // Import with the tiling the Vulkan side actually created the image
+            // with. Importing OPTIMAL-tiled memory as LINEAR leaves the image's
+            // large-scale structure recognizable but scrambles pixels within
+            // each tile.
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
+                            sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
 
             // Allocate the imported texture at the image's capacity dimensions
             // (stride width x capacity height); the FBO blit below writes only the
@@ -686,10 +721,36 @@ namespace Rv
             glImportSemaphoreFdEXT(m_vkReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
 #endif
 
+            // The import sequence fails by producing a GL error and an unusable
+            // texture rather than by any return value, so check explicitly. A
+            // silently failed import is what presents as a corrupted viewport;
+            // dropping to the CPU rung instead keeps the image correct.
+            const GLenum importError = glGetError();
+            if (importError != GL_NO_ERROR)
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: GL import of the Vulkan shared image failed (GL error 0x" << std::hex << importError
+                     << std::dec << ", tiling=" << (sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? "OPTIMAL" : "LINEAR")
+                     << ", dedicated=" << (sharedInfo->dedicatedAllocation ? "yes" : "no") << "); using the CPU readback path instead."
+                     << endl;
+                cleanupSharedGLObjects(slot);
+                m_glInteropFailed = true;
+                m_view->reportPresentPath(VulkanView::PresentPath::CpuReadback, "GL import of the shared image raised a GL error");
+                presentCpuFallback(w, h);
+                return;
+            }
+
             // Cache the imported capacity so we re-import only when it grows.
             m_sharedWidth[slot] = sharedInfo->strideWidth;
             m_sharedHeight[slot] = sharedInfo->capacityHeight;
+
+            m_view->reportGLImportState(sharedInfo->tiling, sharedInfo->dedicatedAllocation);
         }
+
+        // Import succeeded (or was already valid from a previous frame): this
+        // frame presents zero-copy. Emitting here rather than before the import
+        // means the record reflects the path actually taken, and can report the
+        // GL side's settings alongside the Vulkan side's.
+        m_view->reportPresentPath(VulkanView::PresentPath::ZeroCopy, std::string());
 
         // Wait for Vulkan to be ready
         GLuint waitSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
