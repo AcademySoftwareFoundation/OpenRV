@@ -1695,6 +1695,15 @@ int utf8Main(int argc, char* argv[])
             if (Rv::RvSession* s = dynamic_cast<Rv::RvSession*>(IPCore::App()->documents()[i]))
             {
                 s->postInitialize();
+
+                //
+                //  rvio has no display groups to wait for, so the command line
+                //  expressions are evaluated right away, as they were when
+                //  postInitialize() still did this itself.
+                //
+
+                s->evalCommandLineScripts();
+
                 //
                 //  We show the user no cache stats, so don't bother to compute
                 //  them.

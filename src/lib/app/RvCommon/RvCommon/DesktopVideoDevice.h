@@ -18,6 +18,7 @@
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
 #include <QOpenGLWidget>
+#include <QOpenGLContext>
 #include <QGuiApplication>
 
 namespace Rv
@@ -57,13 +58,19 @@ namespace Rv
         class ScreenView : public QOpenGLWidget
         {
         public:
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLWidget* glViewShare, Qt::WindowFlags flags);
+            //
+            //  glShareContext is the control view's GL context to share with
+            //  (so blits/FBOs are usable across the two surfaces). It comes
+            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
+            //  the control view may be a QOpenGLWidget or a QOpenGLWindow.
+            //
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
-            QOpenGLWidget* m_glViewShare = nullptr;
+            QOpenGLContext* m_glShareContext = nullptr;
         };
 
     public:

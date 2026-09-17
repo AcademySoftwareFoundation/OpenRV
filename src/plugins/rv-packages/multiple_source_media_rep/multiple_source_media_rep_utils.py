@@ -123,6 +123,32 @@ def get_extension_from_info_file(info_file):
     return "" if not info_file else "URL" if is_url(info_file) else info_file.split(".")[-1].upper()
 
 
+def get_source_at_pixel(point):
+    """
+    Returns the RVFileSource node of the image rendered under the given pointer
+    position (in event space), or an empty string if the pointer is not over any
+    source image.
+    """
+    try:
+        infos = rvc.imagesAtPixel(point, None, True)
+    except Exception:
+        return ""
+
+    for info in infos:
+        if not info.get("inside"):
+            continue
+        node = info.get("node")
+        if not node:
+            continue
+        group = rvc.nodeGroup(node)
+        if group and rvc.nodeType(group) == "RVSourceGroup":
+            sources = rve.nodesInGroupOfType(group, "RVFileSource")
+            if sources:
+                return sources[0]
+
+    return ""
+
+
 def get_common_source_media_infos(sources):
     """
     Returns the common infos shared by all the source nodes specified.

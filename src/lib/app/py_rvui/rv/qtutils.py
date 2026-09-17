@@ -36,12 +36,16 @@ def sessionWindow():
 
 def sessionGLView():
     """
-    Returns the QOpenGLWidget for the current RV session GL view.
+    Returns the QWidget hosting the current RV session GL view.
+
+    Note: as of the native-GL-window change (Direction C) the session view is a
+    plain QWidget host (it embeds the GL surface via createWindowContainer), no
+    longer a QOpenGLWidget.
     """
 
     rvPyLongPtr = rv.commands.sessionGLView()
     if rvPyLongPtr is not None:
-        return wrapInstance(rvPyLongPtr, QOpenGLWidget)
+        return wrapInstance(rvPyLongPtr, QWidget)
     else:
         return None
 

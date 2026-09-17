@@ -6,15 +6,14 @@
 #include <IPCore/BrushTextureManager.h>
 #include <TwkApp/Bundle.h>
 #include <TwkGLF/GL.h>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <QDir>
+#include <QFileInfo>
+#include <QString>
+#include <QStringList>
 #include <png.h>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
-#include <mutex>
 #include <vector>
 
 namespace IPCore
@@ -23,17 +22,6 @@ namespace IPCore
     {
 
         // ── helpers ───────────────────────────────────────────────────────────────────
-
-        static PolyLine::StampBlendMode blendFromString(const QString& s)
-        {
-            if (s == "additive")
-                return PolyLine::BlendAdditive;
-            if (s == "marker")
-                return PolyLine::BlendMarker;
-            if (s == "eraser")
-                return PolyLine::BlendEraser;
-            return PolyLine::BlendNormal;
-        }
 
         /// Load an 8-bit grayscale PNG and upload it as a GL_LUMINANCE texture.
         /// Returns the GL texture name, or 0 on failure.
@@ -117,7 +105,7 @@ namespace IPCore
             return s;
         }
 
-        std::string BrushTextureManager::catalogueDir()
+        std::string BrushTextureManager::tipDir()
         {
             if (const char* env = std::getenv("RV_BRUSH_DIR"))
                 return env;
@@ -133,83 +121,46 @@ namespace IPCore
             return "";
         }
 
-        void BrushTextureManager::parseCatalogue()
+        unsigned int BrushTextureManager::getTexture(const std::string& tipFile)
         {
-            std::call_once(m_parseOnce,
-                           [this]()
-                           {
-                               const QString qdir = QString::fromStdString(catalogueDir());
-                               const QString catPath = qdir + "/catalogue.json";
+            if (tipFile.empty())
+                return 0;
 
-                               QFile f(catPath);
-                               if (!f.open(QIODevice::ReadOnly))
-                               {
-                                   std::cerr << "[BrushTextureManager] catalogue not found: " << catPath.toStdString() << "\n";
-                                   return;
-                               }
+            std::lock_guard<std::mutex> lock(m_mutex);
+            const auto it = m_textures.find(tipFile);
+            if (it != m_textures.end())
+                return it->second;
 
-                               QJsonParseError err;
-                               const QJsonDocument doc = QJsonDocument::fromJson(f.readAll(), &err);
-                               if (doc.isNull())
-                               {
-                                   std::cerr << "[BrushTextureManager] JSON parse error: " << err.errorString().toStdString() << "\n";
-                                   return;
-                               }
+            const QString path = QString::fromStdString(tipDir()) + "/" + QString::fromStdString(tipFile);
+            const unsigned int texId = uploadGrayscalePng(path.toStdString());
+            if (!texId)
+                std::cerr << "[BrushTextureManager] failed to load tip: " << path.toStdString() << "\n";
 
-                               for (const QJsonValue& v : doc.object().value("brushes").toArray())
-                               {
-                                   const QJsonObject entry = v.toObject();
-                                   const std::string name = entry.value("name").toString().toStdString();
-                                   const QString tip = entry.value("tip").toString();
-                                   const QString blend = entry.value("blend").toString("normal");
-                                   const bool soft = entry.value("soft").toBool(false);
-
-                                   BrushInfo& info = m_brushes[name];
-                                   info.blendMode = blendFromString(blend);
-                                   info.softShader = soft;
-                                   info.isStamp = !tip.isEmpty();
-                                   info.tipFile = tip.toStdString();
-                               }
-                           }); // call_once
+            m_textures[tipFile] = texId; // cache failures too, so a bad path isn't retried every frame
+            return texId;
         }
 
-        void BrushTextureManager::load()
+        std::vector<std::string> BrushTextureManager::listTipFiles() const
         {
-            if (m_texturesLoaded)
-                return;
-            m_texturesLoaded = true;
-
-            parseCatalogue();
-
-            const QString qdir = QString::fromStdString(catalogueDir());
-            for (auto& kv : m_brushes)
-            {
-                if (kv.second.isStamp && !kv.second.tipFile.empty() && !kv.second.textureId)
-                {
-                    const std::string tipPath = (qdir + "/" + QString::fromStdString(kv.second.tipFile)).toStdString();
-                    kv.second.textureId = uploadGrayscalePng(tipPath);
-                    if (!kv.second.textureId)
-                        std::cerr << "[BrushTextureManager] failed to load tip: " << tipPath << "\n";
-                }
-            }
-        }
-
-        BrushInfo BrushTextureManager::get(const std::string& name)
-        {
-            parseCatalogue();
-            const auto it = m_brushes.find(name);
-            return (it != m_brushes.end()) ? it->second : BrushInfo{};
+            std::vector<std::string> files;
+            const QDir dir(QString::fromStdString(tipDir()));
+            for (const QFileInfo& fi : dir.entryInfoList(QStringList() << "*.png", QDir::Files, QDir::Name))
+                files.push_back(fi.fileName().toStdString());
+            return files;
         }
 
         void BrushTextureManager::clear()
         {
-            for (auto& kv : m_brushes)
+            std::lock_guard<std::mutex> lock(m_mutex);
+            for (auto& kv : m_textures)
             {
-                if (kv.second.textureId)
-                    glDeleteTextures(1, &kv.second.textureId);
-                kv.second.textureId = 0;
+                if (kv.second)
+                {
+                    GLuint texId = kv.second;
+                    glDeleteTextures(1, &texId);
+                }
             }
-            m_texturesLoaded = false;
+            m_textures.clear();
         }
 
     } // namespace Paint

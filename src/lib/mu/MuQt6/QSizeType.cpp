@@ -207,7 +207,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
         const QSize arg1 = getqtype<QSizeType>(param_size);
-        return makeqtype<QSizeType>(c, arg0.operator+=(arg1), "qt.QSize");
+        return makeqtype<QSizeType>(c, arg0 += arg1, "qt.QSize");
     }
 
     Pointer qt_QSize_operatorMinus_EQ__QSize_QSize_QSize(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_size)
@@ -215,7 +215,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
         const QSize arg1 = getqtype<QSizeType>(param_size);
-        return makeqtype<QSizeType>(c, arg0.operator-=(arg1), "qt.QSize");
+        return makeqtype<QSizeType>(c, arg0 -= arg1, "qt.QSize");
     }
 
     Pointer qt_QSize_operatorSlash_EQ__QSize_QSize_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
@@ -223,7 +223,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QSize arg0 = getqtype<QSizeType>(param_this);
         qreal arg1 = (double)(param_divisor);
-        return makeqtype<QSizeType>(c, arg0.operator/=(arg1), "qt.QSize");
+        return makeqtype<QSizeType>(c, arg0 /= arg1, "qt.QSize");
     }
 
     static NODE_IMPLEMENTATION(_n_QSize0, Pointer) { NODE_RETURN(qt_QSize_QSize_QSize_QSize(NODE_THREAD, NONNIL_NODE_ARG(0, Pointer))); }

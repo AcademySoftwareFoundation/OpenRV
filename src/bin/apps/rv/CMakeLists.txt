@@ -20,9 +20,17 @@ SET(CMAKE_AUTORCC
     ON
 )
 
+SET(_rv_qt_components
+    Core Gui Widgets OpenGL
+)
+IF(RV_TARGET_WINDOWS)
+  # Quick: for QQuickWindow::setGraphicsApi(), which main.cpp uses to put Qt Quick on the same graphics API RV's windows composite with.
+  LIST(APPEND _rv_qt_components Quick)
+ENDIF()
+
 FIND_PACKAGE(
   ${RV_QT_PACKAGE_NAME}
-  COMPONENTS Core Gui Widgets OpenGL
+  COMPONENTS ${_rv_qt_components}
   REQUIRED
 )
 
@@ -76,6 +84,14 @@ IF(NOT RV_TARGET_WINDOWS)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PRIVATE Qt::OpenGL
+  )
+ENDIF()
+
+IF(RV_TARGET_WINDOWS)
+  # QQuickWindow::setGraphicsApi() in main.cpp; Windows only, since Qt Quick already defaults to OpenGL elsewhere.
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE Qt::Quick
   )
 ENDIF()
 

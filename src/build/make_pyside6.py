@@ -36,7 +36,24 @@ QT_OUTPUT_DIR = ""
 PYTHON_OUTPUT_DIR = ""
 OPENSSL_OUTPUT_DIR = ""
 
-LIBCLANG_URL_BASE = "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_"
+LIBCLANG_URL_BASES = [
+    "https://mirrors.ocf.berkeley.edu/qt/development_releases/prebuilt/libclang/libclang-release_",
+    "https://download.qt.io/development_releases/prebuilt/libclang/libclang-release_",
+]
+
+
+def download_libclang(filename_suffix: str, file_path: str) -> bool:
+    """
+    Try downloading a libclang archive from each mirror in LIBCLANG_URL_BASES in turn.
+
+    Returns True as soon as one mirror succeeds, False if all of them fail.
+    """
+    for url_base in LIBCLANG_URL_BASES:
+        download_url = url_base + filename_suffix
+        if download_file(download_url, file_path):
+            return True
+        print(f"WARNING: Could not download {download_url}")
+    return False
 
 
 def test_python_distribution(python_home: str) -> None:
@@ -104,6 +121,16 @@ def prepare() -> None:
                 return "15.0.0-based-macos-universal.7z"
             elif major_minor_version_str == "17.0":
                 return "17.0.1-based-macos-universal.7z"
+            elif major_minor_version_str == "18.0":
+                return "18.1.7-based-macos-universal.7z"
+            elif major_minor_version_str == "19.0":
+                return "19.1.6-based-macos-universal.7z"
+            elif major_minor_version_str == "20.0":
+                return "20.1.3-based-macos-universal.7z"
+            elif major_minor_version_str == "21.0":
+                return "21.1.2-based-macos-universal.7z"
+            elif major_minor_version_str == "22.0":
+                return "22.1.2-based-macos-universal.7z"
             return None
 
         clang_version = get_clang_version()
@@ -116,7 +143,6 @@ def prepare() -> None:
     elif system == "Windows":
         clang_filename_suffix = "19.1.0-based-windows-vs2019_64.7z"
 
-    download_url = LIBCLANG_URL_BASE + clang_filename_suffix
     libclang_zip = os.path.join(TEMP_DIR, "libclang.7z")
 
     # if we have a failed download, clean it up and redownload.
@@ -126,14 +152,13 @@ def prepare() -> None:
 
     # download it if necessary
     if os.path.exists(libclang_zip) is False:
-        download_ok = download_file(download_url, libclang_zip)
+        download_ok = download_libclang(clang_filename_suffix, libclang_zip)
         if not download_ok and fallback_clang_filename_suffix:
-            fallback_download_url = LIBCLANG_URL_BASE + fallback_clang_filename_suffix
-            print(f"WARNING: Could not download or version does not exist: {download_url}")
-            print(f"WARNING: Attempting to fallback on known version: {fallback_download_url}...")
-            download_ok = download_file(fallback_download_url, libclang_zip)
+            print(f"WARNING: Could not download or version does not exist: {clang_filename_suffix}")
+            print(f"WARNING: Attempting to fallback on known version: {fallback_clang_filename_suffix}...")
+            download_ok = download_libclang(fallback_clang_filename_suffix, libclang_zip)
         if not download_ok:
-            print(f"ERROR: Could not download or version does not exist: {download_url}")
+            print(f"ERROR: Could not download or version does not exist: {clang_filename_suffix}")
 
     # clean up previous failed extraction
     libclang_tmp = os.path.join(TEMP_DIR, "libclang-tmp")
@@ -177,6 +202,42 @@ def prepare() -> None:
                 )
 
                 cmakelist.write(new_line)
+
+    # PySide6/shiboken6's generated bindings trigger thousands of
+    # -Wcast-function-type-mismatch warnings from the intentional PyMethodDef
+    # function-pointer cast pattern used throughout CPython's C API. This warning
+    # is Clang-specific (GCC doesn't recognize the flag and fails with an
+    # unrecognized command-line option error), so only silence it when building
+    # with Clang, mirroring upstream's existing GNU-only -Wno-cast-function-type.
+    shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake")
+    old_shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake.old")
+    if os.path.exists(old_shiboken_helpers_path):
+        os.remove(old_shiboken_helpers_path)
+
+    os.rename(shiboken_helpers_path, old_shiboken_helpers_path)
+    with open(old_shiboken_helpers_path) as old_shiboken_helpers:
+        old_content = old_shiboken_helpers.read()
+
+    new_content = old_content.replace(
+        'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} -Wno-cast-function-type")\n'
+        "    endif()",
+        'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} -Wno-cast-function-type")\n'
+        '    elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")\n'
+        '        set (gcc_warnings_options "${gcc_warnings_options} '
+        '-Wno-cast-function-type-mismatch")\n'
+        "    endif()",
+    )
+
+    if new_content == old_content:
+        raise RuntimeError(
+            f"Failed to patch {shiboken_helpers_path}: the expected compiler-id block was not found. "
+            "Upstream ShibokenHelpers.cmake likely changed; update the search string."
+        )
+
+    with open(shiboken_helpers_path, "w") as shiboken_helpers:
+        shiboken_helpers.write(new_content)
 
 
 def remove_broken_shortcuts(python_home: str) -> None:

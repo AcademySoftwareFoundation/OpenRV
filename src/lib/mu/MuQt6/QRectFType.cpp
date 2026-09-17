@@ -598,7 +598,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRectF arg0 = getqtype<QRectFType>(param_this);
         const QRectF arg1 = getqtype<QRectFType>(param_rectangle);
-        return makeqtype<QRectFType>(c, arg0.operator&(arg1), "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0 & arg1, "qt.QRectF");
     }
 
     Pointer qt_QRectF_operatorPipe__QRectF_QRectF_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
@@ -606,7 +606,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRectF arg0 = getqtype<QRectFType>(param_this);
         const QRectF arg1 = getqtype<QRectFType>(param_rectangle);
-        return makeqtype<QRectFType>(c, arg0.operator|(arg1), "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0 | arg1, "qt.QRectF");
     }
 
     Pointer qt_QRectF_operatorPipe_EQ__QRectF_QRectF_QRectF(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
@@ -614,7 +614,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRectF arg0 = getqtype<QRectFType>(param_this);
         const QRectF arg1 = getqtype<QRectFType>(param_rectangle);
-        return makeqtype<QRectFType>(c, arg0.operator|=(arg1), "qt.QRectF");
+        return makeqtype<QRectFType>(c, arg0 |= arg1, "qt.QRectF");
     }
 
     static NODE_IMPLEMENTATION(_n_QRectF0, Pointer)
