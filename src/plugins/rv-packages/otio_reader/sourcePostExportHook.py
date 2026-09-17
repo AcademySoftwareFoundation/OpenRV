@@ -16,19 +16,25 @@ def hook_function(in_timeline, argument_map):
         return
 
     source = extra_commands.nodesInGroupOfType(source_group, "RVSource")[0]
-    linearize = extra_commands.associatedNode("RVLinearize", source)
+    for nodeType in ("RVLinearize", "RVColor"):
+        node = extra_commands.associatedNode(nodeType, source)
+        if not commands.propertyExists(f"{node}.CDL.active"):
+            continue
 
-    if commands.getIntProperty("{}.CDL.active".format(linearize))[0] != 0:
+        active = commands.getIntProperty(f"{node}.CDL.active")
+        if not active or active[0] == 0:
+            continue
+
         cdl = otio.schemadef.CDL.CDL(
-            name=extra_commands.uiName(linearize),
-            slope=commands.getFloatProperty("{}.CDL.slope".format(linearize)),
-            power=commands.getFloatProperty("{}.CDL.power".format(linearize)),
-            offset=commands.getFloatProperty("{}.CDL.offset".format(linearize)),
-            saturation=commands.getFloatProperty("{}.CDL.saturation".format(linearize))[0],
+            name=extra_commands.uiName(node),
+            slope=commands.getFloatProperty(f"{node}.CDL.slope"),
+            power=commands.getFloatProperty(f"{node}.CDL.power"),
+            offset=commands.getFloatProperty(f"{node}.CDL.offset"),
+            saturation=commands.getFloatProperty(f"{node}.CDL.saturation")[0],
             visible=True,
         )
 
-        cdl.metadata.update(get_otio_metadata("{}.CDL".format(linearize)))
+        cdl.metadata.update(get_otio_metadata(f"{node}.CDL"))
         clip.effects.append(cdl)
 
     # for releases >= 0.15

@@ -734,6 +734,16 @@ namespace Rv
         doc->raise();
 #endif
 
+        //
+        //  Create the session now that the viewport window exists and its GL
+        //  context has been created by show(). This must happen here rather
+        //  than from GLWindow::initializeGL(): loading packages creates web
+        //  panels, and adding a QWebEngineView makes Qt destroy the main
+        //  window's native subtree -- including the viewport window -- which
+        //  is fatal if a GLWindow method is still on the call stack.
+        //
+        doc->initializeSession();
+
         // doc->ensurePolished();
         Rv::RvSession* s = doc->session();
 
@@ -927,6 +937,17 @@ namespace Rv
         {
             s->userGenericEvent("after-progressive-loading", "");
         }
+
+        //
+        //  Evaluate the -eval / -pyeval command line expressions last, once the
+        //  display groups exist and the session is fully initialized, so that
+        //  sources added by those expressions go through the same setup as
+        //  sources added interactively. Doing this any earlier means the source
+        //  setup packages have no RVDisplayGroup to configure and the view
+        //  settings of those sources are silently left unset.
+        //
+
+        s->evalCommandLineScripts();
 
         return doc;
     }

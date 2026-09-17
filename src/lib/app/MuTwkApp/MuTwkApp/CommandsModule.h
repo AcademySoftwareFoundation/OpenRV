@@ -43,6 +43,8 @@ namespace TwkApp
         static NODE_DECLARATION(bindRegex, void);
         static NODE_DECLARATION(unbind, void);
         static NODE_DECLARATION(unbindRegex, void);
+        static NODE_DECLARATION(rebind, void);
+        static NODE_DECLARATION(rebindRegex, void);
         static NODE_DECLARATION(setTableBBox, void);
         static NODE_DECLARATION(pushEventTable, void);
         static NODE_DECLARATION(popEventTable, void);

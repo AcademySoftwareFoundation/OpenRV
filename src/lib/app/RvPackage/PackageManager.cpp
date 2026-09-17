@@ -20,6 +20,21 @@
 
 #include <QRegularExpression>
 
+namespace
+{
+    QString baseNameFromPackageFileName(const QString& fileName)
+    {
+        QRegularExpressionMatch match = QRegularExpression(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)").match(fileName);
+
+        if (!match.hasMatch())
+        {
+            match = QRegularExpression(R"((.*)\.zip)").match(fileName);
+        }
+
+        return match.hasMatch() ? match.captured(1) : QString();
+    }
+} // namespace
+
 namespace Rv
 {
     using namespace std;
@@ -250,6 +265,11 @@ namespace Rv
                 }
             }
 
+            for (const int exclusion : package.exclusions)
+            {
+                allowLoading(m_packages[exclusion], false, depth + 1);
+            }
+
             m_doNotLoadPackages.removeOne(package.file);
 
             if (package.optional && !m_optLoadPackages.contains(package.file))
@@ -361,9 +381,7 @@ namespace Rv
         if (package.installing)
             return true;
 
-        QStringList deps = package.
-                               requires
-            .split(" ", Qt::SkipEmptyParts);
+        QStringList deps = package.requiresList.split(" ", Qt::SkipEmptyParts);
         QStringList missing;
         QStringList notinstalled;
         QFileInfo info(package.file);
@@ -738,10 +756,7 @@ namespace Rv
             entry.menu = mode.menu;
             entry.shortcut = mode.shortcut;
             entry.event = mode.event;
-            entry.
-                requires
-            = mode.
-                  requires;
+            entry.requiresList = mode.requiresList;
             entry.rvversion = package.rvversion;
             entry.openrvversion = package.openrvversion;
             entry.optional = package.optional;
@@ -812,30 +827,17 @@ namespace Rv
         QFileInfo info(package.file);
         QDir rdir = info.absoluteDir();
         rdir.cdUp();
-        QDir mudir = rdir;
-        QDir pydir = rdir;
-        QDir supportdir = rdir;
-        QDir imgdir = rdir;
-        QDir movdir = rdir;
-        QDir libdir = rdir;
-        QDir nodedir = rdir;
-        QDir profdir = rdir;
 
-        mudir.cd("Mu");
-        pydir.cd("Python");
-        supportdir.cd("SupportFiles");
-        imgdir.cd("ImageFormats");
-        movdir.cd("MovieFormats");
-        libdir.cd("lib");
-        nodedir.cd("Nodes");
-        profdir.cd("Nodes");
+        const QString pname = package.baseName;
 
-        QFileInfo pfile(package.file);
-        QString pname = package.baseName;
-
-        if (!supportdir.exists(pname))
-            supportdir.mkdir(pname);
-        supportdir.cd(pname);
+        QDir mudir(rdir.filePath("Mu"));
+        QDir pydir(rdir.filePath("Python"));
+        QDir supportdir(rdir.filePath("SupportFiles/" + pname));
+        QDir imgdir(rdir.filePath("ImageFormats"));
+        QDir movdir(rdir.filePath("MovieFormats"));
+        QDir libdir(rdir.filePath("lib"));
+        QDir nodedir(rdir.filePath("Nodes"));
+        QDir profdir(rdir.filePath("Profiles"));
 
         // Skip dependency check if requested
         if (!m_skipDependencyCheck)
@@ -988,8 +990,10 @@ namespace Rv
         // Remove the dangling supportdir
         //
 
-        if (!supportdir.removeRecursively())
+        if (!pname.isEmpty() && supportdir.exists() && !supportdir.removeRecursively())
+        {
             notremoved.push_back(supportdir.absolutePath());
+        }
 
         //
         // Report what was unremovable
@@ -1246,9 +1250,7 @@ namespace Rv
                                     else if (pname == "icon")
                                         m.icon = v;
                                     else if (pname == "requires")
-                                    m.
-                                        requires
-                                    = v.split(" ");
+                                        m.requiresList = v.split(" ");
                                 }
 
                                 valueState = false;
@@ -1297,17 +1299,24 @@ namespace Rv
                                     package.contact = v;
                                 else if (pname == "version")
                                     package.version = v;
+                                else if (pname == "excludes")
+                                    package.excludes = v;
                                 else if (pname == "requires")
-                                package.
-                                    requires
-                                = v;
-                                else if (pname == "rv") package.rvversion = v;
-                                else if (pname == "openrv") package.openrvversion = v;
-                                else if (pname == "imageio") package.imageio = v.split(" ");
-                                else if (pname == "movieio") package.movieio = v.split(" ");
-                                else if (pname == "hidden") package.hidden = v == "true";
-                                else if (pname == "system") package.system = v == "true";
-                                else if (pname == "optional") package.optional = v == "true";
+                                    package.requiresList = v;
+                                else if (pname == "rv")
+                                    package.rvversion = v;
+                                else if (pname == "openrv")
+                                    package.openrvversion = v;
+                                else if (pname == "imageio")
+                                    package.imageio = v.split(" ");
+                                else if (pname == "movieio")
+                                    package.movieio = v.split(" ");
+                                else if (pname == "hidden")
+                                    package.hidden = v == "true";
+                                else if (pname == "system")
+                                    package.system = v == "true";
+                                else if (pname == "optional")
+                                    package.optional = v == "true";
                                 valueState = false;
                             }
                         }
@@ -1351,20 +1360,7 @@ namespace Rv
                                       });
                     }
 
-                    QRegularExpression rvpkgRE(R"((.*)-[0-9]+\.[0-9]+\.rvpkg)");
-                    QRegularExpression zipRE(R"((.*)\.zip)");
-
-                    QRegularExpressionMatch match = rvpkgRE.match(finfo.fileName());
-                    if (!match.hasMatch())
-                    {
-                        match = zipRE.match(finfo.fileName());
-                    }
-                    if (match.hasMatch())
-                    {
-                        pname = match.captured(1);
-                    }
-
-                    package.baseName = pname;
+                    package.baseName = baseNameFromPackageFileName(finfo.fileName());
                 }
             }
         }
@@ -1414,9 +1410,7 @@ namespace Rv
 
                     int requiresIndex = index;
                     for (int i = requiresIndex; i < parts.size(); i++)
-                    entry.
-                        requires
-                        .push_back(parts[i]);
+                        entry.requiresList.push_back(parts[i]);
 
                     list.push_back(entry);
                 }
@@ -1462,11 +1456,11 @@ namespace Rv
                     line += QString(",") + e.openrvversion;
                 }
 
-                if (!e.requires.empty())
+                if (!e.requiresList.empty())
                 {
-                    for (int q = 0; q < e.requires.size(); q++)
+                    for (int q = 0; q < e.requiresList.size(); q++)
                     {
-                        line += QString(",%1").arg(e.requires[q]);
+                        line += QString(",%1").arg(e.requiresList[q]);
                     }
                 }
 
@@ -1506,13 +1500,14 @@ namespace Rv
                 if (i == m_packageMap.end())
                 {
                     m_packages.push_back(Package());
-                    m_packages.back().file = line;
+                    m_packages.back().file = path;
+                    m_packages.back().baseName = baseNameFromPackageFileName(QFileInfo(path).fileName());
                     m_packages.back().installed = installed;
                     m_packages.back().zipFile = false;
                     m_packages.back().name = "Missing Package";
                     m_packages.back().description = "<p><i>The original zip file for this package is "
                                                     "missing</i></p>";
-                    m_packageMap.insert(line, m_packages.size() - 1);
+                    m_packageMap.insert(path, m_packages.size() - 1);
                 }
                 else
                 {
@@ -1554,12 +1549,10 @@ namespace Rv
 
     void PackageManager::findPackageDependencies()
     {
-        for (size_t i = 0; i < m_packages.size(); i++)
+        for (int i = 0; i < m_packages.size(); i++)
         {
             Package& package = m_packages[i];
-            QStringList deps = package.
-                                   requires
-                .split(" ", Qt::SkipEmptyParts);
+            QStringList deps = package.requiresList.split(" ", Qt::SkipEmptyParts);
 
             for (size_t q = 0; q < deps.size(); q++)
             {
@@ -1571,6 +1564,28 @@ namespace Rv
                     package.uses.push_back(di);
                     if (!m_packages[di].compatible)
                         package.compatible = false;
+                }
+            }
+
+            const auto excludedPackages = package.excludes.split(" ", Qt::SkipEmptyParts);
+
+            for (const auto& excludedPackage : excludedPackages)
+            {
+                const int packageIndex = findPackageIndexByZip(excludedPackage);
+
+                if (packageIndex == -1 || packageIndex == i)
+                {
+                    continue;
+                }
+
+                if (!package.exclusions.contains(packageIndex))
+                {
+                    package.exclusions.push_back(packageIndex);
+                }
+
+                if (!m_packages[packageIndex].exclusions.contains(i))
+                {
+                    m_packages[packageIndex].exclusions.push_back(i);
                 }
             }
         }
@@ -1863,7 +1878,7 @@ namespace Rv
 
                     m_packages.erase(m_packages.begin() + q);
 
-                    if (!QFile::remove(files[i]))
+                    if (incomingFI.exists() && !QFile::remove(files[i]))
                     {
                         cerr << "ERROR: " << files[i].toUtf8().constData() << " not removed" << endl;
                     }
@@ -1881,6 +1896,7 @@ namespace Rv
         {
             m_packages[q].usedBy.clear();
             m_packages[q].uses.clear();
+            m_packages[q].exclusions.clear();
         }
 
         findPackageDependencies();

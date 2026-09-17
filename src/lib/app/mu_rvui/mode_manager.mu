@@ -217,12 +217,10 @@ class: ModeManagerMode : MinorMode
             // Note: We only return the disabled state here. The "category-event-blocked" event
             // is sent by toggleModeEntry() when the user actually tries to invoke the action,
             // not when just checking if the menu item should be disabled.
-            if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
-            {
-                return DisabledMenuState;
-            }
-    
-            if (!commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager")
+            bool isAnnotationDisabled = !commands.isEventCategoryEnabled("annotate_category") && (entry.name == "annotate_mode" || entry.name == "annotate_beta_mode");
+            bool isSessionManagerDisabled = !commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager";
+
+            if (isAnnotationDisabled || isSessionManagerDisabled)
             {
                 return DisabledMenuState;
             }
@@ -439,18 +437,21 @@ class: ModeManagerMode : MinorMode
     \: toggleModeEntry (void; Event event, ModeEntry entry, ModeManagerMode mm)
     {
         // Special handling of mode toggling if certain categories of actions are disabled.
-        if (!commands.isEventCategoryEnabled("annotate_category") && entry.name == "annotate_mode")
+        bool isAnnotationDisabled = !commands.isEventCategoryEnabled("annotate_category") && (entry.name == "annotate_mode" || entry.name == "annotate_beta_mode");
+        bool isSessionManagerDisabled = !commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager";
+
+        if (isAnnotationDisabled)
         {
             sendInternalEvent("category-event-blocked", "annotate_category");
             return;
         }
 
-        if (!commands.isEventCategoryEnabled("sessionmanager_category") && entry.name == "session_manager")
+        if (isSessionManagerDisabled)
         {
             sendInternalEvent("category-event-blocked", "sessionmanager_category");
             return;
         }
-            
+
         mm.toggleEntry(entry);
     }
 
@@ -698,15 +699,26 @@ class: ModeManagerMode : MinorMode
 
         Menu top;
 
-        for_each (m; _modes)
+        for_each (mode; _modes)
         {
-            if (m.menu neq nil) top.push_back(parseMenuEntry(m));
-
-            if (m.event neq nil)
+            if (mode.menu neq nil)
             {
-                bind(m.event, \: (void; Event ev)
+                top.push_back(parseMenuEntry(mode));
+            }
+
+            if (mode.event neq nil)
+            {
+                bind(mode.event, \: (void; Event event)
                 {
-                    toggleModeEntry(ev, m, this);
+                    toggleModeEntry(event, mode, this);
+                });
+            }
+
+            if (mode.name == "annotate_mode" || mode.name == "annotate_beta_mode")
+            {
+                bind("toggle-annotate-toolbar", \: (void; Event event)
+                {
+                    toggleModeEntry(event, mode, this);
                 });
             }
         }
@@ -755,8 +767,40 @@ class: ModeManagerMode : MinorMode
 
         let vnode = viewNode(),
             vtype = nodeType(vnode),
-            name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "",
-            entry = findModeEntry(name);
+            name  = if vtype.substr(0,2) == "RV" then vtype.substr(2,0) + "_edit_mode" else "";
+
+        //
+        //  Avoid redundant deactivate->reactivate churn when the view-edit-mode
+        //  is not actually changing. Toggling an edit mode is expensive (it
+        //  rebuilds menus/event tables), and clearSession re-sets the same
+        //  default view twice with force=true -- so without this the same edit
+        //  mode is toggled off then on up to four times per clear for no net
+        //  change. On the 'before' event, event.contents() holds the node we
+        //  are switching TO while viewNode() is still the OLD view; if both map
+        //  to the same edit mode, skip the deactivation. The matching 'after'
+        //  event then finds the mode already active and no-ops in activateEntry.
+        //
+        if (!on)
+        {
+            try
+            {
+                let toName = event.contents();
+                if (toName != "")
+                {
+                    let toType     = nodeType(toName),
+                        toEditMode = if toType.substr(0,2) == "RV"
+                                        then toType.substr(2,0) + "_edit_mode"
+                                        else "";
+                    if (toEditMode == name)
+                    {
+                        return;
+                    }
+                }
+            }
+            catch (exception exc) { let ignore = exc; }
+        }
+
+        let entry = findModeEntry(name);
 
         if (entry neq nil)
         {

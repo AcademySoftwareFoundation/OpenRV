@@ -86,10 +86,9 @@ SET(RV_DEPS_APPLE_PRORES_VERSION_INCLUDE_DIR
     ${_include_dir}
     CACHE STRING "Path to installed includes for ${_target}"
 )
-ADD_DEPENDENCIES(Apple::ProRes ${_prores_lib})
-IF(RV_TARGET_WINDOWS)
-  ADD_DEPENDENCIES(Apple::ProRes ${_target})
-ENDIF()
+# ${_target} is the ExternalProject that downloads and extracts the SDK. Dependencies added to an IMPORTED target are followed transitively by its consumers, so
+# this orders MovieFFMpeg's compiles after the extraction.
+ADD_DEPENDENCIES(Apple::ProRes ${_target})
 
 SET(RV_DEPS_APPLE_PRORES_VERSION
     ${_version}
