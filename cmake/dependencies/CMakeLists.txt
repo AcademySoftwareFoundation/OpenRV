@@ -55,6 +55,12 @@ IF(NOT DEFINED RV_DEPS_LIST)
   )
 ENDIF()
 
+# JPEG XL support is optional: set JXL_ROOT to a pre-installed library to enable.
+SET(JXL_ROOT
+    ""
+    CACHE PATH "Root of a pre-installed jxl library used by OpenImageIO"
+)
+
 FIND_PACKAGE(Git QUIET)
 IF(GIT_FOUND
    AND EXISTS "${PROJECT_SOURCE_DIR}/.git"
@@ -118,6 +124,7 @@ ADD_SUBDIRECTORY(../../src/pub/lcms src/pub/lcms) # required by raw
 INCLUDE(raw) # depends on jpeg, zlib
 INCLUDE(openjpeg) # depends on zlib, tiff, png
 INCLUDE(openjph)
+INCLUDE(jxl)
 INCLUDE(webp)
 INCLUDE(openexr)
 IF(RV_DEPS_OPENEXR_FOUND)
@@ -174,6 +181,9 @@ MESSAGE(STATUS "Using OpenColorIO   ${RV_DEPS_OCIO_VERSION}")
 MESSAGE(STATUS "Using OpenImageIO   ${RV_DEPS_OIIO_VERSION}")
 MESSAGE(STATUS "Using OpenJpeg:     ${RV_DEPS_OPENJPEG_VERSION}")
 MESSAGE(STATUS "Using OpenJPH:      ${RV_DEPS_OPENJPH_VERSION}")
+IF(JXL_ROOT)
+  MESSAGE(STATUS "Using JPEG XL:      ${RV_DEPS_JXL_VERSION}")
+ENDIF()
 MESSAGE(STATUS "Using OpenSSL:      ${RV_DEPS_OPENSSL_VERSION}")
 IF(RV_TARGET_WINDOWS)
   MESSAGE(STATUS "Using PCRE2:        ${RV_DEPS_PCRE2_VERSION}")

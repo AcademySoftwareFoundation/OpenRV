@@ -258,6 +258,12 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-Dopenjph_ROOT=${RV_DEPS_OPENJPH_ROOT_DIR}")
 
+IF(RV_DEPS_JXL_ROOT_DIR)
+  LIST(APPEND _configure_options "-DJXL_ROOT=${RV_DEPS_JXL_ROOT_DIR}")
+ELSE()
+  LIST(APPEND _configure_options "-DUSE_JXL=OFF")
+ENDIF()
+
 # OIIO tools are not needed.
 LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
