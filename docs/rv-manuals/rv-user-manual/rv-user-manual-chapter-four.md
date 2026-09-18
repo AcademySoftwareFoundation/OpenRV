@@ -602,6 +602,7 @@ To override bindings, copy the file $RV_HOME/scripts/rv/rvrc.mu to ~/.rvrc.mu.
 |         |          |           | ↓     |       |       |           | Toggle Play            |
 |         |          |           |       | ↓     |       |           | Toggle Play Direction  |
 |         |          |           | ⇄     |       |       |           | Scrub Frames           |
+|         |          |           |       |       | ⇄     |           | Scrub Frames 10x       |
 |         |          |           |       |       |       | ⇄         | Scrub Frames           |
 |         | •        |           |       |       |       | ⇄         | Scrub Frames 10x       |
 | •       | •        |           |       |       |       | ⇄         | Scrub Frames 100x      |
