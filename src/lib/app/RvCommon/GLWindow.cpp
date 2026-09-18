@@ -41,11 +41,13 @@ namespace Rv
 
     namespace
     {
+#ifdef PLATFORM_LINUX
         string envOrUnset(const char* name)
         {
             const char* value = std::getenv(name);
             return value ? value : "<unset>";
         }
+#endif
 
         string formatSummary(const QSurfaceFormat& f)
         {
@@ -78,7 +80,7 @@ namespace Rv
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
 
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (ImageRenderer::debugGpu())
         {
             cout << "INFO: GLWindow requested QSurfaceFormat: " << formatSummary(format()) << endl;
@@ -133,7 +135,7 @@ namespace Rv
 
             QSurfaceFormat f = context()->format();
 
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
             static bool baselineLogged = false;
             if (ImageRenderer::debugGpu() && !baselineLogged)
             {
@@ -169,10 +171,12 @@ namespace Rv
                 cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
                 cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
                 cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
+#ifdef PLATFORM_LINUX
                 cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE")
                      << ", WAYLAND_DISPLAY=" << envOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << envOrUnset("DISPLAY")
                      << ", XDG_CURRENT_DESKTOP=" << envOrUnset("XDG_CURRENT_DESKTOP")
                      << ", DESKTOP_SESSION=" << envOrUnset("DESKTOP_SESSION") << endl;
+#endif
                 cout << "INFO: GLWindow runtime baseline end" << endl;
             }
 #endif
