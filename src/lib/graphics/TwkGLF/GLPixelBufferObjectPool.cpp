@@ -8,6 +8,7 @@
 
 #include <TwkGLF/GLPixelBufferObjectPool.h>
 
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLSyncObject.h>
 
 #include <TwkUtil/EnvVar.h>
@@ -500,6 +501,34 @@ namespace TwkGLF
             _cleanupNoLock(_usedPool);
         }
 
+        //
+        //  Release every buffer now, rather than at destruction.
+        //
+        //  The two pools are file-scope statics, so their destructors run
+        //  after main() has returned -- with Qt gone and no GL context
+        //  obtainable, which makes every glDeleteBuffers() in there a silent
+        //  no-op. UninitPBOPools() exists to release these while the
+        //  application is still up; until now it only flipped a flag and left
+        //  the buffers to that unreachable destructor.
+        //
+        //  Empty the containers and reset the accounting as well as deleting:
+        //  the destructor still runs later, and would otherwise walk the same
+        //  entries a second time.
+        //
+        void clear()
+        {
+            std::unique_lock<decltype(_mutex)> guard(_mutex);
+
+            _cleanupNoLock(_freePool);
+            _cleanupNoLock(_usedPool);
+
+            _freePool.clear();
+            _usedPool.clear();
+
+            _allocSize = 0;
+            _allocNbBuffers = 0;
+        }
+
         void setSoftMaxSize(size_t softMaxSize)
         {
             std::unique_lock<decltype(_mutex)> guard(_mutex);
@@ -825,6 +854,7 @@ namespace TwkGLF
                 if (gPoolToGPUInitialized)
                 {
                     gPoolToGPUInitialized = false;
+                    gPoolToGPU.clear();
                 }
             }
             else
@@ -832,6 +862,7 @@ namespace TwkGLF
                 if (gPoolFromGPUInitialized)
                 {
                     gPoolFromGPUInitialized = false;
+                    gPoolFromGPU.clear();
                 }
             }
         }
@@ -922,11 +953,24 @@ namespace TwkGLF
     //
     void UninitPBOPools()
     {
+        //
+        //  This is called from main() once the event loop has returned, so
+        //  the views and their contexts are already gone and nothing is
+        //  current. The scope supplies the fallback teardown context -- still
+        //  available here, since the QApplication outlives this call -- so
+        //  that the buffers released below are genuinely released.
+        //
+        const GLContextScope contextScope;
+
         if (prefetchUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::TO_GPU);
+        }
 
         if (writeBehindUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::FROM_GPU);
+        }
     }
 
 } // namespace TwkGLF
