@@ -7,6 +7,7 @@
 //******************************************************************************
 
 #include <RvCommon/QTUtils.h>
+#include <RvCommon/RvApplication.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
 #include <spdlog/common.h>
@@ -101,6 +102,18 @@ namespace Rv
         setWindowTitle(UI_APPLICATION_NAME " Console");
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         setSizeGripEnabled(true);
+
+        //
+        //  A log window must never be what keeps RV alive.
+        //
+        //  RV has no explicit quit anywhere; it relies entirely on Qt's
+        //  quitOnLastWindowClosed. Qt counts every visible top-level widget
+        //  that has WA_QuitOnClose, which is on by default, so leaving this
+        //  dialog open -- whether the user opened it or output reopened it --
+        //  was enough to stop exec() from ever returning once the session
+        //  window had gone.
+        //
+        setAttribute(Qt::WA_QuitOnClose, false);
         bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
         // setAttribute(Qt::WA_MacBrushedMetal);
 
@@ -275,7 +288,16 @@ namespace Rv
                 }
             }
 
-            if (shouldShow)
+            //
+            //  Not on the way out. This runs from a queued event, so it lands
+            //  after the last document's destructor has already closed this
+            //  window, and shutdown emits plenty of output for it to react to.
+            //  Re-showing here put the console back on screen as the only
+            //  visible window, which -- with no explicit quit anywhere in RV
+            //  -- meant quitOnLastWindowClosed never fired and exec() never
+            //  returned. The console stayed up and the process hung.
+            //
+            if (shouldShow && !(RvApp() && RvApp()->isShuttingDown()))
             {
                 show();
                 raise();
