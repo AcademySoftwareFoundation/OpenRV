@@ -19,6 +19,7 @@
 #include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/BasicGLProgram.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -182,6 +183,15 @@ namespace IPCore
 
     void ImageRenderer::Device::clearFBOs()
     {
+        //
+        //  The ring buffer holds GLFBOs, so this is GL destruction and needs
+        //  a context like any other. ~ImageRenderer reaches it after the
+        //  renderer's device pointers have been cleared, which is why the
+        //  scope may have to fall back to its own context; glDevice is still
+        //  worth offering for the callers that reach here with one alive.
+        //
+        const TwkGLF::GLContextScope contextScope(glDevice);
+
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
         {
             FBOVector& views = fboRingBuffer[i].views;
@@ -478,6 +488,17 @@ namespace IPCore
             m_uploadThread.join();
         }
 
+        //
+        //  Everything from here down deletes GL objects -- the FBO pool and
+        //  program cache via clearState(), the program cache object itself,
+        //  each device's FBO ring buffer, then the GL state. Session tears the
+        //  renderer down after its device pointers have been cleared, so the
+        //  members below have nothing to offer and the scope falls back to its
+        //  own context. Holding one here means it is acquired once rather than
+        //  once per inner scope.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearState();
 
         // clean up
@@ -610,6 +631,15 @@ namespace IPCore
 
     void ImageRenderer::clearState()
     {
+        //
+        //  One scope around the whole of it. flushImageFBOs() opens its own,
+        //  but that one closes when it returns -- and flushProgramCache()
+        //  after it deletes GL programs, which needs a context just as much.
+        //  Holding it here keeps the inner scopes as no-ops and leaves no gap
+        //  between them.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearRenderedImages();
 
         // clear state will unbind the FBO currently bound
