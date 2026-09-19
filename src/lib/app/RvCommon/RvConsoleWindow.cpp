@@ -133,12 +133,41 @@ namespace Rv
             m_consoleBuf->sync();
         processTextBuffer();
 
-#if defined(NDEBUG) || !defined(PLATFORM_WINDOWS)
+        //
+        //  Put cout/cerr back, and take the buffer down with us.
+        //
+        //  Guard on having installed the redirect rather than on a second
+        //  #if. The install above is compiled in when NDEBUG *or*
+        //  PLATFORM_WINDOWS; this restore used to ask for NDEBUG or
+        //  *!*PLATFORM_WINDOWS. A Windows debug build is the one combination
+        //  where those disagree, so there the redirect went in and never came
+        //  out: ConsoleBuf stayed on cout/cerr with m_console pointing at this
+        //  destroyed window.
+        //
+        //  main() deletes RvApplication before finalizePython(), and
+        //  Py_Finalize's GC can still write -- a ResourceWarning from an
+        //  unclosed socket, say. That write reached ConsoleBuf, followed
+        //  m_console into freed memory, and locked a QMutex whose bits happened
+        //  to read "contended", which never resolves. That is the hang on exit.
+        //
+        //  m_stdoutBuf/m_stderrBuf are non-null only if the install ran, and
+        //  processLastTextBuffer() nulls them if it got here first, so this is
+        //  correct in every build and safe to run twice.
+        //
         if (m_stdoutBuf)
+        {
             cout.rdbuf(m_stdoutBuf);
+            m_stdoutBuf = nullptr;
+        }
+
         if (m_stderrBuf)
+        {
             cerr.rdbuf(m_stderrBuf);
-#endif
+            m_stderrBuf = nullptr;
+        }
+
+        delete m_consoleBuf;
+        m_consoleBuf = nullptr;
     }
 
     void RvConsoleWindow::processTimer()
