@@ -7,6 +7,8 @@
 //******************************************************************************
 #ifndef __TwkGLF__GL__h__
 #define __TwkGLF__GL__h__
+#include <string_view>
+
 #include <TwkMath/Vec4.h>
 #include <TwkMath/Vec3.h>
 #include <TwkMath/Vec2.h>
@@ -99,10 +101,26 @@ struct GLPushMatrix
 //  DEBUG macro
 //
 
+//
+//  Is any GL context current, Qt's or a natively-bound one? Declared outside
+//  the NDEBUG guard below because callers other than the debug macro need it to
+//  decide whether GL work can land at all.
+//
+bool twkGlAnyContextIsCurrent();
+
+//
+//  Declared in every build, for the same reason. TWK_GLDEBUG below still
+//  compiles out under NDEBUG -- polling glGetError() at every instrumented call
+//  site is a debug-only cost -- but the "no current GL context" report this
+//  also emits is not instrumentation. It fires only when GL work is being
+//  issued that cannot land, which is a fault in a release build too, and the
+//  caller that has to say so (GLFBO's destructor) is compiled in both.
+//
+bool twkGlPrintError(std::string_view file, std::string_view function, const int line, std::string_view msg);
+
 #ifdef NDEBUG
 #define TWK_GLDEBUG ;
 #else
-bool twkGlPrintError(std::string_view file, std::string_view function, const int line, std::string_view msg);
 #define TWK_GLDEBUG twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
 #define TWK_GLDEBUG_MSG(msg) twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, msg);
 #endif

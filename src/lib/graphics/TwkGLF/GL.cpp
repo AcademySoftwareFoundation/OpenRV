@@ -12,6 +12,8 @@ using namespace std;
 
 #include <QOpenGLContext>
 
+#include <atomic>
+
 namespace
 {
 
@@ -211,8 +213,55 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
+//
+//  Is any GL context current?
+//
+//  QOpenGLContext::currentContext() only knows about contexts Qt made current,
+//  and TwkGLFFBO's FBOVideoDevice creates and binds its own natively
+//  (wglMakeCurrent / glXMakeCurrent / CGLSetCurrentContext). Trusting Qt alone
+//  would claim "no context" there while a perfectly good one is current, and
+//  would suppress the real GL errors the debug macro exists to print.
+//  glGetString() returns null only when nothing at all is current -- on every
+//  platform, for either kind of context -- so it settles the cases Qt cannot
+//  see. It is only reached when Qt says no, and it is a cached string lookup
+//  rather than a round trip.
+//
+bool twkGlAnyContextIsCurrent()
+{
+    return QOpenGLContext::currentContext() != nullptr || glGetString(GL_VERSION) != nullptr;
+}
+
 bool twkGlPrintError(std::string_view file, std::string_view function, const int line, const std::string_view msg)
 {
+    //
+    //  Check that some context is current before asking glGetError() anything.
+    //  With no context current, glGetError() says nothing about this call: on
+    //  Windows it returns GL_INVALID_OPERATION for every call, for as long as
+    //  no context is current. Left unchecked, one missing context is reported
+    //  as a GL error at every TWK_GLDEBUG that follows it, which buries the
+    //  real fault under a dozen copies of itself and pins it on whichever
+    //  innocent line happens to check next -- the reason a missing context in
+    //  presentation teardown used to surface as an error in makeCurrent(), a
+    //  frame late and in the wrong place.
+    //
+    //  Report once per episode, at the first site to notice, and reset when a
+    //  context comes back so a later episode is not silently swallowed.
+    //
+    static std::atomic<bool> noContextReported{false};
+
+    if (!twkGlAnyContextIsCurrent())
+    {
+        if (!noContextReported.exchange(true))
+        {
+            std::cerr << "GL_ERROR: " << shorterPath(file).data() << "::" << function.data() << ":" << line
+                      << " [no current GL context -- this GL call, and any until a context is made current, did nothing]" << std::endl;
+        }
+
+        return false;
+    }
+
+    noContextReported = false;
+
     if (GLuint err = glGetError())
     {
         std::cerr << "GL_ERROR: " << shorterPath(file).data() << "::" << function.data() << ":" << line << " [" << TwkGLF::errorString(err)
