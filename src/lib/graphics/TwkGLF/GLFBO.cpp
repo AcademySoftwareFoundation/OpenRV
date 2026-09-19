@@ -14,6 +14,8 @@
 #include <QOpenGLContext>
 #include <QImage>
 
+#include <cassert>
+
 /// #define NDEBUG
 
 namespace TwkGLF
@@ -83,7 +85,45 @@ namespace TwkGLF
 
     GLFBO::~GLFBO()
     {
-        if (m_id && m_ownsFBOHandle)
+        //
+        //  Does this destructor have any GL work to do at all?
+        //
+        //  Not every GLFBO owns GL names. The GLFBO(const GLVideoDevice*)
+        //  constructor builds a handle *onto* whatever the device has bound --
+        //  m_id is 0, m_ownsFBOHandle is false, there is no PBO -- so
+        //  destroying one issues nothing and needs no context. Asking about
+        //  the context before asking this would report a leak that cannot
+        //  happen, on the ordinary path where a device outlives its window.
+        //
+        const bool ownsHandles = (m_id != 0 && m_ownsFBOHandle);
+        const bool issuesGL = ownsHandles || (m_pbo != 0);
+
+        //
+        //  Backstop, for the FBOs that do own something. With no context
+        //  current every GL call below is a silent no-op: this object goes
+        //  away, the driver's does not, and nothing says so. Report it at this
+        //  line -- rather than letting the stuck GL_INVALID_OPERATION surface
+        //  at whichever unrelated call site checks glGetError() next -- and do
+        //  not pretend the names were released.
+        //
+        //  With GLContextScope on the teardown paths this should never fire.
+        //  It is here so that the next path which forgets announces itself
+        //  where the fault is, instead of a frame later somewhere else.
+        //
+        //  It reports and carries on rather than asserting. A leaked FBO is
+        //  worth a line of output; it is not worth aborting a shutdown that
+        //  would otherwise have completed, least of all in the debug build
+        //  someone is using to diagnose that shutdown.
+        //
+        bool canIssueGL = true;
+
+        if (issuesGL && !twkGlAnyContextIsCurrent())
+        {
+            twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
+            canIssueGL = false;
+        }
+
+        if (canIssueGL && ownsHandles)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             TWK_GLDEBUG;
@@ -115,11 +155,23 @@ namespace TwkGLF
 
         if (m_pbo)
         {
-            if (m_fence)
+            //
+            //  Waiting on a fence with no context current cannot complete --
+            //  there is nothing to signal it -- so skip the wait rather than
+            //  risk blocking here. The fence object itself is still ours to
+            //  delete either way.
+            //
+            if (m_fence && canIssueGL)
+            {
                 m_fence->wait();
+            }
             delete m_fence;
-            glDeleteBuffers(1, &m_pbo);
-            TWK_GLDEBUG;
+
+            if (canIssueGL)
+            {
+                glDeleteBuffers(1, &m_pbo);
+                TWK_GLDEBUG;
+            }
         }
     }
 
