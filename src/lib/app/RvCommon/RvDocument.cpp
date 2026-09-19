@@ -632,6 +632,15 @@ namespace Rv
             //  Then this is the last document, so shutdown network
             //
 
+            //
+            //  Say so before closing anything. The closes below are not the
+            //  end of the output -- tearing down the session produces plenty
+            //  more -- and the console's auto-show runs from a queued event,
+            //  so it would otherwise reopen after being closed here and, being
+            //  the last visible window, keep the application alive forever.
+            //
+            RvApp()->setShuttingDown();
+
             if (RvNetworkDialog* d = RvApp()->networkWindow())
             {
                 if (d->serverRunning())
@@ -649,6 +658,14 @@ namespace Rv
             RvSettings::cleanupGlobalSettings();
         }
 
+        //
+        //  ~Session deletes the renderer, and ~ImageRenderer tears down every
+        //  FBO that ImageFBOManager still holds. Those deletes need a context
+        //  and cannot ask for one -- the two setters above nulled the
+        //  renderer's device pointers, so by now it has nothing left to ask.
+        //  TwkGLF::GLContextScope inside ImageFBOManager covers it with the
+        //  fallback teardown context, so there is nothing to arrange here.
+        //
         delete m_session;
 
         delete m_menuTimer;

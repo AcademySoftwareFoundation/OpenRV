@@ -99,6 +99,19 @@ namespace Rv
         RvPreferences* prefDialog();
         RvProfileManager* profileManager();
 
+        //
+        //  Has the last document begun tearing down?
+        //
+        //  Set once, on the way out, so that code running from queued events
+        //  during shutdown can tell it is too late to put something back on
+        //  screen. The console uses it: its auto-show is driven by output, and
+        //  shutdown produces plenty of that after the windows have been asked
+        //  to close.
+        //
+        bool isShuttingDown() const { return m_shuttingDown; }
+
+        void setShuttingDown() { m_shuttingDown = true; }
+
         bool networkDialogRunning() const { return m_networkDialog ? true : false; }
 
         void processNetworkOpts(bool startup = true);
@@ -177,6 +190,7 @@ namespace Rv
         RvWebManager* m_webManager;
         TwkApp::VideoDevice* m_presentationDevice;
         bool m_presentationMode;
+        bool m_shuttingDown{false};
         mutable pthread_mutex_t m_deleteLock;
         std::string m_executableNameCaps;
         DesktopVideoModule* m_desktopModule;
