@@ -21,6 +21,10 @@
 #include <QOpenGLContext>
 #include <QGuiApplication>
 
+#ifdef PLATFORM_DARWIN
+#include <CoreGraphics/CGDirectDisplay.h>
+#endif
+
 namespace Rv
 {
 
@@ -251,10 +255,19 @@ namespace Rv
 
         bool maybeFramePacked(const TwkApp::VideoDevice::VideoFormat&) const;
 
+#ifdef PLATFORM_DARWIN
+        //
+        //  Builds a ColorProfile from a CoreGraphics display's ColorSync
+        //  profile. Shared by this class and the CoreGraphics device
+        //  subclasses, which each resolve their own CGDirectDisplayID.
+        //
+        static ColorProfile colorProfileForDisplay(CGDirectDisplayID displayID);
+#endif
+
     private:
         void addDataFormatAtDepth(size_t depth, DesktopStereoMode m);
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_DARWIN)
         virtual ColorProfile colorProfile() const;
 #endif
 

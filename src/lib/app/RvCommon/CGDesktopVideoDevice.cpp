@@ -458,31 +458,7 @@ namespace Rv
 
     TwkApp::VideoDevice::ColorProfile CGDesktopVideoDevice::colorProfile() const
     {
-        //
-        //  Get the display's color sync profile
-        //
-
-        if (ColorSyncProfileRef iccRef = ColorSyncProfileCreateWithDisplayID(m_cgScreen))
-        {
-            m_colorProfile.type = ICCProfile;
-
-            CFStringRef desc = ColorSyncProfileCopyDescriptionString(iccRef);
-            CFIndex n = CFStringGetLength(desc);
-            vector<char> buffer(n * 4 + 1);
-            CFStringGetCString(desc, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
-            m_colorProfile.description = &buffer.front();
-
-            CFURLRef url = ColorSyncProfileGetURL(iccRef, NULL);
-            CFStringRef urlstr = CFURLGetString(url);
-            buffer.resize(CFStringGetLength(urlstr) * 4 + 1);
-            CFStringGetCString(urlstr, &buffer.front(), buffer.size(), kCFStringEncodingUTF8);
-
-            m_colorProfile.url = &buffer.front();
-        }
-        else
-        {
-            m_colorProfile = ColorProfile();
-        }
+        m_colorProfile = colorProfileForDisplay(m_cgScreen);
 
         return m_colorProfile;
     }
