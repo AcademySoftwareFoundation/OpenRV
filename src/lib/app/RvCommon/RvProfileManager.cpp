@@ -33,6 +33,13 @@ namespace Rv
         , m_createDialog(0)
     {
         m_ui.setupUi(this);
+
+        //
+        //  Auxiliary window: never the reason RV stays alive. See
+        //  RvConsoleWindow's constructor for why that matters.
+        //
+        setAttribute(Qt::WA_QuitOnClose, false);
+
         loadModel();
 
         m_createDialogUI.setupUi(m_createDialog = new QDialog(this, Qt::Sheet));

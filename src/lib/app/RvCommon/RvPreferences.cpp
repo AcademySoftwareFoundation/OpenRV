@@ -128,6 +128,12 @@ namespace Rv
         connect(m_ui.exrNumThreadsEdit, SIGNAL(textChanged(const QString&)), this, SLOT(exrThreadNumChanged(const QString&)));
         setWindowTitle(UI_APPLICATION_NAME " Preferences");
 
+        //
+        //  Auxiliary window: never the reason RV stays alive. See
+        //  RvConsoleWindow's constructor for why that matters.
+        //
+        setAttribute(Qt::WA_QuitOnClose, false);
+
 #ifndef PLATFORM_DARWIN
         m_ui.appleClientStorageToggle->setEnabled(false);
 #endif
