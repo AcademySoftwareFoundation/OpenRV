@@ -167,6 +167,33 @@ namespace IPCore
 
         void detachAudioOutputDevice();
 
+        //
+        //  Can work be handed to this thread and waited on?
+        //
+        //  Qt::BlockingQueuedConnection blocks until the target thread's
+        //  event loop runs the call, so that loop has to exist and has to
+        //  belong to somebody else. A thread that never started, whose
+        //  createAudioOutput() failed, or that has already left exec() has no
+        //  loop, and waiting on one never returns -- a process that will not
+        //  exit rather than one that exits late. Calling from the audio
+        //  thread itself would deadlock outright.
+        //
+        bool canBlockOnAudioThread() const;
+
+        //
+        //  wait(), bounded. An unbounded wait on a thread that will not
+        //  finish is the same hang by another route; a late exit is worth
+        //  more than a perfect one. Reports once if the bound is reached.
+        //
+        void waitForAudioThreadToFinish();
+
+        //
+        //  Delete the output objects and null them. Idempotent, so it can be
+        //  run on the audio thread and then again afterwards to catch
+        //  whatever that could not reach.
+        //
+        void deleteAudioOutputObjects();
+
     private:
         QMutex m_mutex;
 
