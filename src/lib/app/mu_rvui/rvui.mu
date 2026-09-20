@@ -3122,6 +3122,33 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     };
 }
 
+\: matteRotateWithImageState (int;)
+{
+    // Read #Session.matte.rotateWithImage; default 0 == matte does not
+    // rotate with the image (the new, VFX-review-friendly default).
+    try
+    {
+        let v = getIntProperty("#Session.matte.rotateWithImage").front();
+        return if v != 0 then CheckedMenuState else UncheckedMenuState;
+    }
+    catch (...) { ; }
+    return UncheckedMenuState;
+}
+
+\: toggleMatteRotateWithImage (void; Event event)
+{
+    // Toggle whether the matte (and other overlay-batch geometry) rotates
+    // with the image when the user applies an arbitrary rotation via
+    // #RVTransform2D.transform.rotate. Default (0) is off, meaning the
+    // matte stays fixed to the frame; scale/translate still track.
+    int cur = 0;
+    try { cur = getIntProperty("#Session.matte.rotateWithImage").front(); }
+    catch (...) { ; }
+    setIntProperty("#Session.matte.rotateWithImage",
+                   int[]{if cur != 0 then 0 else 1}, true);
+    redraw();
+}
+
 \: setBGPattern (void; Event event, string bgmethod)
 {
     setBGMethod(bgmethod);
@@ -6162,7 +6189,9 @@ global bool debugGC = false;
             menuItem("2.35", "", "viewmode_category", ~setMatte(2.35), matteAspectState(2.35)),
             menuItem("2.40", "", "viewmode_category", ~setMatte(2.40), matteAspectState(2.40)),
             menuSeparator(),
-            menuItem("Custom...", "", "viewmode_category", enterMatte, matteAspectState(-1.0))
+            menuItem("Custom...", "", "viewmode_category", enterMatte, matteAspectState(-1.0)),
+            menuSeparator(),
+            menuItem("Rotate Matte With Image", "", "viewmode_category", toggleMatteRotateWithImage, matteRotateWithImageState)
             }),
         subMenu("Matte Opacity", MenuItem[] {
             menuItem("33%", "", "viewmode_category", ~setMatteOpacity(0.33), matteOpacityState(0.33)),

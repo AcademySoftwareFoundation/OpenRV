@@ -5017,8 +5017,15 @@ namespace IPCore
                     paintContext.commands.push_back(root->commands[i]);
                 }
                 // render overlay commands
+                //
+                // Overlay commands (mattes, HUD rectangles, text, windows)
+                // must use the rotation-stripped overlayImageMatrix so they
+                // stay fixed to the frame during arbitrary rotation while
+                // still tracking user pan/zoom.
                 paintContext.updateCache = false;
+                paintContext.useOverlayMatrix = true;
                 Paint::renderPaintCommands(paintContext);
+                paintContext.useOverlayMatrix = false;
 
                 if (paintContext.commandExecuted % 2 == 0)
                 {
@@ -5034,7 +5041,8 @@ namespace IPCore
                 {
                     paintContext.commands.push_back(root->commands[i]);
                 }
-                // now render annotations
+                // now render annotations (user paint strokes rotate with the
+                // image, so leave useOverlayMatrix false here).
                 paintContext.updateCache = true;
                 Paint::renderPaintCommands(paintContext);
             }
@@ -5058,7 +5066,13 @@ namespace IPCore
                     {
                         paintContext.commands.push_back(root->commands[i]);
                     }
+                    // Re-render overlay commands as the "initial render"
+                    // backdrop for erase strokes. Use the overlay modelview
+                    // so the recomposed backdrop matches what was originally
+                    // drawn on screen (rotation stripped).
+                    paintContext.useOverlayMatrix = true;
                     Paint::renderPaintCommands(paintContext);
+                    paintContext.useOverlayMatrix = false;
 
                     if (paintContext.commandExecuted % 2 == 0)
                     {
