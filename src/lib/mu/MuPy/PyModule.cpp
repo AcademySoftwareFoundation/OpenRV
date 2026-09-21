@@ -69,6 +69,44 @@ namespace Mu
 
     static vector<Converter>* externalConverters = 0;
 
+    template <typename VecT, size_t N> VecT pySequenceToVec(Mu::MuLangContext* c, Mu::Process* p, PyObject* pobj)
+    {
+        if (!PySequence_Check(pobj))
+        {
+            throw std::invalid_argument("expecting sequence of length " + std::to_string(N));
+        }
+
+        Py_ssize_t size = PySequence_Size(pobj);
+        if (size != static_cast<Py_ssize_t>(N))
+        {
+            throw std::invalid_argument("expecting sequence of length " + std::to_string(N));
+        }
+
+        VecT vec;
+        for (Py_ssize_t i = 0; i < static_cast<Py_ssize_t>(N); ++i)
+        {
+            PyObject* item = PySequence_GetItem(pobj, i); // new reference
+            if (!item)
+            {
+                throw std::invalid_argument("failed to get sequence item");
+            }
+
+            try
+            {
+                // convert each element to float using existing py2mu
+                Value v = PyModule::py2mu(c, p, c->floatType(), item);
+                vec[static_cast<size_t>(i)] = v._float;
+                Py_DECREF(item);
+            }
+            catch (...)
+            {
+                Py_XDECREF(item);
+                throw;
+            }
+        }
+        return vec;
+    }
+
     void PyModule::addConverterFunctions(MuToPyObjectConverter m2p, PyObjectToMuConverter p2m, MuOpaqueToPyObjectConverter mo2p,
                                          PyObjectToMuOpaqueConverter p2mo)
     {
@@ -480,48 +518,18 @@ namespace Mu
         }
         else if (t == c->vec2fType())
         {
-            if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 2)
-            {
-                Vector2f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
-                return Value(vec);
-            }
-            else
-            {
-                throw invalid_argument("expecting (float, float) tuple");
-            }
+            Vector2f vec = pySequenceToVec<Vector2f, 2>(c, p, pobj);
+            return Value(vec);
         }
         else if (t == c->vec3fType())
         {
-            if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 3)
-            {
-                Vector3f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
-                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))._float;
-                return Value(vec);
-            }
-            else
-            {
-                throw invalid_argument("expecting (float, float, float) tuple");
-            }
+            Vector3f vec = pySequenceToVec<Vector3f, 3>(c, p, pobj);
+            return Value(vec);
         }
         else if (t == c->vec4fType())
         {
-            if (PyTuple_Check(pobj) && PyTuple_Size(pobj) == 4)
-            {
-                Vector4f vec;
-                vec[0] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 0))._float;
-                vec[1] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 1))._float;
-                vec[2] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 2))._float;
-                vec[3] = py2mu(c, p, c->floatType(), PyTuple_GetItem(pobj, 3))._float;
-                return Value(vec);
-            }
-            else
-            {
-                throw invalid_argument("expecting (float, float, float, float) tuple");
-            }
+            Vector4f vec = pySequenceToVec<Vector4f, 4>(c, p, pobj);
+            return Value(vec);
         }
         else if (const TupleType* ttype = dynamic_cast<const TupleType*>(t))
         {
@@ -529,32 +537,52 @@ namespace Mu
             {
                 return Value(Pointer(0));
             }
-            else if (PyTuple_Check(pobj))
+            else if (PySequence_Check(pobj))
             {
-                const size_t n = PyTuple_Size(pobj);
                 const TupleType::Types& types = ttype->tupleFieldTypes();
+                const size_t n = types.size();
 
-                if (n == types.size())
+                Py_ssize_t seqSize = PySequence_Size(pobj);
+                if (seqSize < 0)
                 {
-                    ClassInstance* mutuple = ClassInstance::allocate(ttype);
+                    throw invalid_argument("failed to get sequence size");
+                }
 
-                    for (size_t i = 0; i < n; i++)
+                if (static_cast<size_t>(seqSize) != n)
+                {
+                    throw invalid_argument("wrong size tuple/sequence");
+                }
+
+                ClassInstance* mutuple = ClassInstance::allocate(ttype);
+
+                for (size_t i = 0; i < n; ++i)
+                {
+                    PyObject* item = PySequence_GetItem(pobj, static_cast<Py_ssize_t>(i)); // new reference
+                    if (!item)
                     {
-                        Value pyval = py2mu(c, p, types[i], PyTuple_GetItem(pobj, i));
-                        ValuePointer ptr = types[i]->machineRep()->valuePointer(pyval);
-                        memcpy(mutuple->field(i), ptr, types[i]->machineRep()->size());
+                        throw invalid_argument("failed to get sequence item");
                     }
 
-                    return Value(mutuple);
+                    try
+                    {
+                        const Type* ftype = types[i];
+                        Value pyval = py2mu(c, p, ftype, item);
+                        ValuePointer ptr = ftype->machineRep()->valuePointer(pyval);
+                        memcpy(mutuple->field(i), ptr, ftype->machineRep()->size());
+                        Py_DECREF(item);
+                    }
+                    catch (...)
+                    {
+                        Py_XDECREF(item);
+                        throw;
+                    }
                 }
-                else
-                {
-                    throw invalid_argument("wrong size tuple");
-                }
+
+                return Value(mutuple);
             }
             else
             {
-                throw invalid_argument("expecting tuple");
+                throw invalid_argument("expecting tuple-compatible sequence");
             }
         }
         else if (const ListType* ltype = dynamic_cast<const ListType*>(t))
@@ -563,25 +591,44 @@ namespace Mu
             {
                 return Value(Pointer(0));
             }
-            else if (PyList_Check(pobj))
+            else if (PySequence_Check(pobj))
             {
-                const size_t n = PyList_Size(pobj);
+                const Py_ssize_t n = PySequence_Size(pobj);
+                if (n < 0)
+                {
+                    throw invalid_argument("failed to get sequence size");
+                }
+
                 const Type* etype = ltype->elementType();
                 List list(p, ltype);
 
-                for (size_t i = 0; i < n; i++)
+                for (Py_ssize_t i = 0; i < n; i++)
                 {
-                    list.appendDefaultValue();
-                    Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
-                    ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
-                    memcpy(list.valuePointer(), ptr, etype->machineRep()->size());
-                }
+                    PyObject* item = PySequence_GetItem(pobj, i); // new reference
+                    if (!item)
+                    {
+                        throw invalid_argument("failed to get sequence item");
+                    }
 
+                    try
+                    {
+                        list.appendDefaultValue();
+                        Value pyval = py2mu(c, p, etype, item);
+                        ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
+                        memcpy(list.valuePointer(), ptr, etype->machineRep()->size());
+                        Py_DECREF(item);
+                    }
+                    catch (...)
+                    {
+                        Py_XDECREF(item);
+                        throw;
+                    }
+                }
                 return Value(list.head());
             }
             else
             {
-                throw invalid_argument("expecting list");
+                throw invalid_argument("expecting python sequence");
             }
         }
         else if (const DynamicArrayType* atype = dynamic_cast<const DynamicArrayType*>(t))
@@ -590,25 +637,46 @@ namespace Mu
             {
                 return Value(Pointer(0));
             }
-            else if (PyList_Check(pobj))
+            else if (PySequence_Check(pobj))
             {
-                const size_t n = PyList_Size(pobj);
+                Py_ssize_t n = PySequence_Size(pobj);
+                if (n < 0)
+                {
+                    throw invalid_argument("failed to get sequence size");
+                }
+
                 const Type* etype = atype->elementType();
                 DynamicArray* array = new DynamicArray(atype, 1);
                 array->resize(n);
-
-                for (size_t i = 0; i < n; i++)
+                for (Py_ssize_t i = 0; i < n; i++)
                 {
-                    Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
-                    ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
-                    memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
+                    PyObject* item = PySequence_GetItem(pobj, i); // New reference
+                    if (!item)
+                    {
+                        delete array;
+                        throw invalid_argument("failed to get sequence item");
+                    }
+
+                    try
+                    {
+                        Value pyval = py2mu(c, p, etype, item);
+                        ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
+                        memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
+                        Py_DECREF(item);
+                    }
+                    catch (...)
+                    {
+                        Py_XDECREF(item);
+                        delete array;
+                        throw;
+                    }
                 }
 
                 return Value(array);
             }
             else
             {
-                throw invalid_argument("expecting dynamic array");
+                throw invalid_argument("expecting python sequence");
             }
         }
         else if (const FixedArrayType* atype = dynamic_cast<const FixedArrayType*>(t))
@@ -617,28 +685,46 @@ namespace Mu
             {
                 return Value(Pointer(0));
             }
-            else if (PyList_Check(pobj))
+            else if (PySequence_Check(pobj))
             {
                 const size_t n = atype->fixedSize();
 
-                if (n == PyList_Size(pobj))
+                Py_ssize_t seqSize = PySequence_Size(pobj);
+                if (seqSize < 0)
                 {
-                    const Type* etype = atype->elementType();
-                    FixedArray* array = static_cast<FixedArray*>(ClassInstance::allocate(atype));
+                    throw invalid_argument("failed to get sequence size");
+                }
 
-                    for (size_t i = 0; i < n; i++)
+                if (static_cast<size_t>(seqSize) != n)
+                {
+                    throw invalid_argument("wrong sequence size for fixed array");
+                }
+
+                const Type* etype = atype->elementType();
+                FixedArray* array = static_cast<FixedArray*>(ClassInstance::allocate(atype));
+
+                for (size_t i = 0; i < n; ++i)
+                {
+                    PyObject* item = PySequence_GetItem(pobj, static_cast<Py_ssize_t>(i)); // new reference
+                    if (!item)
                     {
-                        Value pyval = py2mu(c, p, etype, PyList_GetItem(pobj, i));
-                        ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
-                        memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
+                        throw invalid_argument("failed to get sequence item");
                     }
 
-                    return Value(array);
+                    try
+                    {
+                        Value pyval = py2mu(c, p, etype, item);
+                        ValuePointer ptr = etype->machineRep()->valuePointer(pyval);
+                        memcpy(array->elementPointer(i), ptr, etype->machineRep()->size());
+                        Py_DECREF(item);
+                    }
+                    catch (...)
+                    {
+                        Py_XDECREF(item);
+                        throw;
+                    }
                 }
-                else
-                {
-                    throw invalid_argument("wrong list size");
-                }
+                return Value(array);
             }
             else
             {
