@@ -33,6 +33,7 @@
 
 #include <QOpenGLContext>
 #include <QScreen>
+#include <vector>
 
 // #define DEBUG_NO_FULLSCREEN
 
@@ -861,33 +862,48 @@ namespace Rv
         // XXX The following steps are not Unicode safe
         //
 
+        m_colorProfile = ColorProfile();
+
         // Get the context for this screen
         const QList<QScreen*> screens = QGuiApplication::screens();
 
         // Ensure the screen index is valid.
         if (m_screen < 0 || m_screen >= screens.size())
         {
-            m_colorProfile = ColorProfile();
             return m_colorProfile;
         }
 
-        QScreen* targetScreen = screens[m_screen];
+        const QScreen* targetScreen = screens[m_screen];
         QWindow* windowOnTargetScreen = nullptr;
-        const QList<QWindow*> windows = QGuiApplication::topLevelWindows();
 
-        // Check all windows to find one on the target screen.
-        for (QWindow* window : windows)
+        //
+        //  Find a window on the target screen to borrow a device context from,
+        //  and consider only windows that are *already* realized.
+        //
+        //  QWindow::winId() creates the platform window when there is none,
+        //  and this loop walks every top-level QWindow in the process --
+        //  including ones that must never be realized. Every QQuickWidget, so
+        //  every QWebEngineView panel and Live Review among them, owns a
+        //  parentless offscreen QQuickWindow that Qt is explicit about ("Do
+        //  not call create() on offscreenWindow", qquickwidget.cpp). Handing it
+        //  a platform window trips Q_ASSERT(!d->offscreenWindow->handle()) at
+        //  the end of QQuickWidget::createFramebufferObject() and aborts RV the
+        //  moment that panel is first shown. Any already-realized window on the
+        //  screen reports the same monitor profile, so there is nothing to gain
+        //  by creating one.
+        //
+        for (QWindow* window : QGuiApplication::topLevelWindows())
         {
-            if (window->screen() == targetScreen)
+            if (window->handle() && window->screen() == targetScreen)
             {
                 windowOnTargetScreen = window;
+                break;
             }
         }
 
         if (!windowOnTargetScreen)
         {
             // Return empty profile if no window is found on the screen.
-            m_colorProfile = ColorProfile();
             return m_colorProfile;
         }
 
@@ -897,36 +913,38 @@ namespace Rv
         if (hdc)
         {
             // Look for the profile path
-            unsigned long pathLen;
+            DWORD pathLen = 0;
             GetICMProfile(hdc, &pathLen, NULL);
-            char* path = new char[pathLen];
 
-            if (GetICMProfile(hdc, &pathLen, path))
+            std::vector<char> path(pathLen > 0 ? pathLen : 1);
+
+            if (pathLen > 0 && GetICMProfile(hdc, &pathLen, path.data()))
             {
                 // If we found a profile lets set the type,
                 // url, and description
 
                 m_colorProfile.type = ICCProfile;
 
-                unsigned long maxLen = 2084;
-                char* url = new char[maxLen];
-                UrlCreateFromPath(path, url, &maxLen, NULL);
-                m_colorProfile.url = url;
+                DWORD maxLen = 2084;
+                std::vector<char> url(maxLen);
+                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, NULL)))
+                {
+                    m_colorProfile.url = url.data();
+                }
 
-                char desc[256];
-                cmsHPROFILE profile = cmsOpenProfileFromFile(path, "r");
-                cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, 256);
-                m_colorProfile.description = desc;
-
-                delete url;
+                //  cmsOpenProfileFromFile returns null when the path the driver
+                //  reported is gone or unreadable; cmsGetProfileInfoASCII would
+                //  dereference it.
+                if (cmsHPROFILE profile = cmsOpenProfileFromFile(path.data(), "r"))
+                {
+                    char desc[256] = {0};
+                    cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, sizeof(desc));
+                    m_colorProfile.description = desc;
+                    cmsCloseProfile(profile);
+                }
             }
 
-            delete path;
             ReleaseDC(hwnd, hdc);
-        }
-        else
-        {
-            m_colorProfile = ColorProfile();
         }
 
         return m_colorProfile;
