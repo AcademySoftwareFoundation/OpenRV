@@ -33,6 +33,8 @@
 
 #include <QOpenGLContext>
 #include <QScreen>
+#include <QVBoxLayout>
+
 #include <vector>
 
 // #define DEBUG_NO_FULLSCREEN
@@ -82,21 +84,22 @@ namespace Rv
 
     void DesktopVideoDevice::redraw() const
     {
-        if (m_view)
+        if (m_view && m_view->glWindow())
         {
             ScopedLock lock(m_mutex);
-            QSize s = m_view->size();
-            m_view->update();
+            //  Update the GL surface, not the container: only the window has
+            //  anything to present.
+            m_view->glWindow()->update();
         }
     }
 
     void DesktopVideoDevice::redrawImmediately() const
     {
-        if (m_view && m_view->isVisible())
+        if (m_view && m_view->glWindow() && m_view->isVisible())
         {
             ScopedLock lock(m_mutex);
             TWK_GLDEBUG;
-            m_view->update();
+            m_view->glWindow()->update();
             TWK_GLDEBUG;
         }
         else
@@ -121,7 +124,21 @@ namespace Rv
         // later.
         GLint svFboId = m_viewDevice->fboID();
         if (svFboId == 0)
+        {
+            //  Report the stall once, not once per frame.
+            if (!m_transferStalled)
+            {
+                m_transferStalled = true;
+                cerr << "WARNING: DesktopVideoDevice: '" << name() << "' present stalled: the GL surface has no backing FBO yet"
+                     << " (fboID()==0), so nothing can be composited into it. The output will hold its last frame until the"
+                     << " surface paints." << endl;
+            }
             return;
+        }
+
+        //  Re-arm the stall report, silently: the interesting event is the
+        //  next stall, not the recovery from this one.
+        m_transferStalled = false;
 
         // Switch to the ScreenView's OpenGL context.
         m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
@@ -175,13 +192,37 @@ namespace Rv
         //
         const QTGLVideoDevice* share = shareDevice();
 
+        //
+        //  Realize the share device's GL context before copying its format and
+        //  creating ours.
+        //
+        //  A QOpenGLWindow creates its QOpenGLContext lazily, on the first
+        //  makeCurrent/paint -- creating the platform window is not enough. So
+        //  when this runs right after a main-view backend swap (RvDocument's
+        //  swap paths call RvApplication::rebuildDesktopVideoDevices, which
+        //  re-opens the presentation output in the same call frame), the new
+        //  main view's context does not exist yet: glShareContext() is null and
+        //  glSurfaceFormat() is not yet the format we are going to have to
+        //  share with. Building our context from that is how this device can
+        //  end up outside the renderer's share group, which makes the
+        //  renderer's output textures unreachable and the display black.
+        //
+        if (share)
+        {
+            share->makeCurrent();
+        }
+
         QSurfaceFormat fmt = share ? share->glSurfaceFormat() : QSurfaceFormat::defaultFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
         ScreenView* vw = new ScreenView(fmt, 0, share ? share->glShareContext() : nullptr, Qt::Window);
         setViewWidget(vw);
 
-        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
+        //
+        //  The GL surface is the embedded window; the container widget is what
+        //  handles events and coordinate translation. Same split as GLView.
+        //
+        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw->glWindow(), vw);
         setViewDevice(vd);
 
         QRect g = screenGeometry();
@@ -198,9 +239,21 @@ namespace Rv
         viewWidget()->setGeometry(g);
 
         viewWidget()->show();
-        //        QCoreApplication::processEvents(); // force the window to
-        //        show. m_share->makeCurrent();
 
+        //
+        //  Deliberately no makeCurrent() here to "prime" the context.
+        //
+        //  VulkanDesktopVideoDevice::open() can end that way because
+        //  QTVulkanVideoDevice::makeCurrent() builds its own offscreen FBO on
+        //  demand. A PartialUpdateBlit QOpenGLWindow cannot: its makeCurrent()
+        //  binds the backing FBO that Qt only creates on the first paint, so
+        //  calling it before this window has painted dereferences a null FBO
+        //  inside Qt and takes the process down.
+        //
+        //  Nothing needs priming anyway -- show() drives the expose that
+        //  creates the FBO, and transfer() skips any frame where fboID() is
+        //  still 0 and picks up the next one.
+        //
         TWK_GLDEBUG;
     }
 
@@ -214,7 +267,7 @@ namespace Rv
         m_translator = 0;
     }
 
-    void DesktopVideoDevice::setViewWidget(QOpenGLWidget* widget)
+    void DesktopVideoDevice::setViewWidget(ScreenView* widget)
     {
         m_view = widget;
         m_translator = new QTTranslator(this, m_view);
@@ -222,8 +275,48 @@ namespace Rv
 
     void DesktopVideoDevice::makeCurrent() const
     {
-        if (m_view)
-            m_view->makeCurrent();
+        //
+        //  Route through the view device rather than the widget: the GL context
+        //  belongs to the embedded ScreenWindow, and QTGLVideoDevice::
+        //  makeCurrent() knows how to bind it (and its default FBO).
+        //
+        if (!m_viewDevice)
+        {
+            return;
+        }
+
+        //
+        //  Not before the surface has produced its backing FBO. The GL surface
+        //  here is a PartialUpdateBlit QOpenGLWindow, whose makeCurrent() binds
+        //  that FBO, and Qt creates it on the first paint -- so calling this
+        //  earlier crashes inside Qt on a null FBO rather than failing softly.
+        //
+        //  fboID() is the cheap, null-safe way to ask whether the surface is
+        //  ready (QOpenGLWindow::defaultFramebufferObject() returns 0 until the
+        //  FBO exists). transfer() gates on the same test, so a frame that
+        //  arrives too early is skipped rather than lost.
+        //
+        //  A surface that is gone is a different matter from one that has not
+        //  painted yet. fboID() is 0 for both, but with no platform window
+        //  QTGLVideoDevice::makeCurrent() takes its offscreen path, which binds
+        //  the context to a QOffscreenSurface and never touches that backing
+        //  FBO -- so it cannot crash the way the pre-first-paint case can.
+        //  Teardown needs exactly that path: releaseFBOClones() calls this
+        //  before deleting the clones, and blocking it here is what left
+        //  ~GLFBO running with no context at all while quitting. transfer()
+        //  keeps the stricter test on purpose -- a vanished surface has nothing
+        //  to present to, so skipping the frame there is right.
+        //
+        const QTGLVideoDevice* glViewDevice = dynamic_cast<const QTGLVideoDevice*>(m_viewDevice);
+        const QOpenGLWindow* surfaceWindow = glViewDevice ? glViewDevice->window() : nullptr;
+        const bool surfaceGone = surfaceWindow && !surfaceWindow->handle();
+
+        if (!surfaceGone && m_viewDevice->fboID() == 0)
+        {
+            return;
+        }
+
+        m_viewDevice->makeCurrent();
     }
 
     void DesktopVideoDevice::setupModelviewAndProjection(float w, float h, GLPipeline* glPipeline) const
@@ -303,6 +396,17 @@ namespace Rv
         //
 
         ScopedLock lock(m_mutex);
+
+        //
+        //  Same readiness gate as transfer(): the GL surface has no backing FBO
+        //  until it has painted once, and binding its context before then
+        //  crashes inside Qt. Skip the frame; the next one will land.
+        //
+        if (m_viewDevice->fboID() == 0)
+        {
+            return;
+        }
+
         m_viewDevice->makeCurrent();
         TWK_GLDEBUG;
         const float w = m_viewDevice->width();
@@ -765,33 +869,89 @@ namespace Rv
 
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
-    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,
-                                               Qt::WindowFlags flags)
-        : QOpenGLWidget(parent, flags)
+    DesktopVideoDevice::ScreenWindow::ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext)
+        //
+        //  The share context goes in here, at construction, because that is the
+        //  only point where sharing can be established -- QOpenGLContext ties
+        //  its share group at create() time. A null share context leaves
+        //  QOpenGLWindow to use Qt's global share context, which is also the
+        //  renderer's group.
+        //
+        //  PartialUpdateBlit keeps a backing FBO and does not clear before
+        //  paintGL(); see the class comment.
+        //
+        : QOpenGLWindow(glShareContext, QOpenGLWindow::PartialUpdateBlit)
+        , m_glShareContext(glShareContext)
     {
-        m_glShareContext = glShareContext;
         setFormat(fmt);
-
-        // Important: set PartialUpdate, because otherwise
-        // before every call to paintGL Qt will call glClear(),
-        // thereby erasing the FBO we just transferred pixels to.
-        setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     }
 
-    void DesktopVideoDevice::ScreenView::initializeGL()
+    void DesktopVideoDevice::ScreenWindow::initializeGL()
     {
-        QOpenGLWidget::initializeGL();
+        QOpenGLWindow::initializeGL();
 
-        if (m_glShareContext && context() && context()->isValid())
+        //
+        //  Confirm the sharing actually happened. Everything the presentation
+        //  output does depends on it and nothing else reports it: a mismatch is
+        //  invisible from the outside and shows up only as a black second
+        //  display.
+        //
+        //  Note this deliberately does NOT call context()->setShareContext().
+        //  That only takes effect on the *next* create(), and the context is
+        //  already created by the time initializeGL() runs, so it never did
+        //  what it looked like it did -- it only left a stale share request
+        //  behind for a later re-create to fail on.
+        //
+        const QOpenGLContext* ours = context();
+        const QOpenGLContext* global = QOpenGLContext::globalShareContext();
+        const QOpenGLContext* wanted = m_glShareContext ? m_glShareContext : global;
+
+        if (!wanted)
         {
-            context()->setShareContext(m_glShareContext);
+            cerr << "ERROR: DesktopVideoDevice::ScreenWindow: no context to share with;"
+                 << " Qt::AA_ShareOpenGLContexts must be set before the QApplication is created." << endl;
+        }
+        else if (ours && ours->shareGroup() != wanted->shareGroup())
+        {
+            cerr << "ERROR: DesktopVideoDevice::ScreenWindow: GL context did not join the renderer's share group"
+                 << " (ours=" << static_cast<const void*>(ours->shareGroup())
+                 << " wanted=" << static_cast<const void*>(wanted->shareGroup())
+                 << "); the renderer's textures cannot be reached from this context, so this"
+                 << " presentation output would render black." << endl;
         }
     }
 
-    void DesktopVideoDevice::ScreenView::paintGL()
+    void DesktopVideoDevice::ScreenWindow::paintGL()
     {
-        // This method is explicitely empty because this widget's FBO is
+        // This method is explicitely empty because this window's FBO is
         // written to by the transfer/transfer2() method
+    }
+
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,
+                                               Qt::WindowFlags flags)
+        : QWidget(parent, flags)
+    {
+        m_glWindow = new ScreenWindow(fmt, glShareContext);
+
+        //
+        //  Embed the native GL window in the widget tree, exactly as GLView
+        //  does for the main view. The container is a plain QWidget, so this
+        //  top-level is not forced onto the OpenGL RHI backend -- which is what
+        //  put a top-level QOpenGLWidget in its own share group.
+        //
+        m_container = QWidget::createWindowContainer(m_glWindow, this);
+
+        //
+        //  Realize the platform surface up front: a QOpenGLWindow has no GL
+        //  context until its window surface exists, and the device primes the
+        //  context (makeCurrent) during open() before this is ever shown.
+        //
+        m_glWindow->create();
+
+        QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
+        layout->addWidget(m_container);
     }
 
     //----------------------------------------------------------------------
