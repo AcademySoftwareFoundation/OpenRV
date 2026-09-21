@@ -240,6 +240,15 @@ namespace TwkGLF
         void check() const;
 
         //
+        //  Non-throwing completeness test, for callers that assemble an FBO
+        //  from attachments they do not own and have to be able to reject the
+        //  result. An FBO built around a foreign texture name can come out
+        //  incomplete without any call failing outright, and blitting from it
+        //  then fails every frame far from the cause.
+        //
+        bool isComplete() const;
+
+        //
         //  Copy uses glBlitFramebuffer to do the work. The entire image
         //  is copyed from the window of one to the other (so if aspect
         //  ratios differ the image will be stretched/squashed).
