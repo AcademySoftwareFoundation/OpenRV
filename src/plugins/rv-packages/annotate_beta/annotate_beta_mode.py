@@ -1,21 +1,19 @@
 # Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from rv import commands, extra_commands, rvtypes, qtutils
-
-from PySide6 import QtCore, QtWidgets, QtGui
-
+from annotate_beta_engine import _DRAWING_TOOLS, TABLE_NAME, AnnotateDrawEngine
 from annotate_beta_widget import (
-    AnnotateToolbarDockWidget,
-    TOOL_PEN,
-    TOOL_TEXT,
+    COLOR_MOD_ADDITIVE,
+    COLOR_MOD_DARKEN,
     TOOL_AIRBRUSH,
     TOOL_ERASER,
     TOOL_EYEDROPPER,
-    COLOR_MOD_ADDITIVE,
-    COLOR_MOD_DARKEN,
+    TOOL_PEN,
+    TOOL_TEXT,
+    AnnotateToolbarDockWidget,
 )
-from annotate_beta_engine import AnnotateDrawEngine, TABLE_NAME, _DRAWING_TOOLS
+from PySide6 import QtCore, QtGui, QtWidgets
+from rv import commands, extra_commands, qtutils, rvtypes
 
 _DEFAULT_COLOR_HEX = "#ffdc00"
 _DEFAULT_SIZE = 32

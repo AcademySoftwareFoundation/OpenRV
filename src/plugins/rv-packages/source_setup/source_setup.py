@@ -3,13 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import rvtypes
-from rv import commands
-from rv import extra_commands
-
 import os
-import re
 import platform
+import re
+
+from rv import commands, extra_commands, rvtypes
 from six.moves.urllib.parse import urlparse
 
 
@@ -110,7 +108,7 @@ class SourceSetupMode(rvtypes.MinorMode):
             return
 
         if srcAttrs is None:
-            print(("ERROR: SourceSetup: source %s/%s has no attributes" % (source, fileName)))
+            print("ERROR: SourceSetup: source %s/%s has no attributes" % (source, fileName))
             return
 
         attrDict = dict(zip([i[0] for i in srcAttrs], [j[1] for j in srcAttrs]))
@@ -131,7 +129,7 @@ class SourceSetupMode(rvtypes.MinorMode):
             "EXIF/Gamma": "EXIFGamma",
             "ARRI-Image/DataSpace": "ARRIDataSpace",
         }
-        for key in attrMap.keys():
+        for key in attrMap:
             try:
                 srcInfo[attrMap[key]] = attrDict[key]
             except KeyError:
@@ -140,7 +138,7 @@ class SourceSetupMode(rvtypes.MinorMode):
         if len(srcData) > 0:
             dataDict = dict(zip([i[0] for i in srcData], [j[1] for j in srcData]))
             dataMap = {"ColorSpace/ICC/Data": "ICCProfileData"}
-            for key in dataMap.keys():
+            for key in dataMap:
                 try:
                     srcInfo[dataMap[key]] = dataDict[key]
                 except KeyError:
@@ -252,7 +250,7 @@ class SourceSetupMode(rvtypes.MinorMode):
             #  Get around maya bugs
             #
 
-            print(("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName))
+            print("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName)
             self.setPixelAspect(lensNode, 1.0)
 
         if srcInfo["JPEGPixelAspect"] != "" and srcInfo["JPEGDensity"] != "":
@@ -266,7 +264,7 @@ class SourceSetupMode(rvtypes.MinorMode):
                 #  Maya JPEG -- fix pixel aspect
                 #
 
-                print(("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName))
+                print("WARNING: Assuming %s was created by Maya with a bad pixel aspect ratio\n" % fileName)
                 self.setPixelAspect(lensNode, 1.0)
 
         #
@@ -421,7 +419,7 @@ class SourceSetupMode(rvtypes.MinorMode):
         elif tf == "" and cs != "Linear":
             tolinear = False
         else:
-            print(("WARNING: Unknown TransferFunction '%s'" % tf))
+            print("WARNING: Unknown TransferFunction '%s'" % tf)
 
         commands.setIntProperty(node + ".color.sRGB2linear", [sRGB], True)
         commands.setIntProperty(node + ".color.logtype", [logT], True)

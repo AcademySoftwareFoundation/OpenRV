@@ -3,10 +3,8 @@
 
 import os
 
-from PySide6 import QtCore, QtWidgets, QtGui
-
 from annotate_beta_color_picker import ColorPickerSection
-
+from PySide6 import QtCore, QtGui, QtWidgets
 
 # Tool identifiers
 TOOL_CURSOR = "cursor"

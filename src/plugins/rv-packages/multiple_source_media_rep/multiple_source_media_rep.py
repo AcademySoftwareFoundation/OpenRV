@@ -16,12 +16,11 @@ except ImportError:
     except ImportError:
         pass
 
-from rv import rvtypes, qtutils
+import multiple_source_media_rep_utils as utils
+from multiple_source_media_rep_logger import package_logger
 from rv import commands as rvc
 from rv import extra_commands as rve
-
-from multiple_source_media_rep_logger import package_logger
-import multiple_source_media_rep_utils as utils
+from rv import qtutils, rvtypes
 
 
 class MediaRepresentationItem(QtWidgets.QWidgetAction):
@@ -34,7 +33,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
     _label = None
 
     def __init__(self, parent):
-        super(MediaRepresentationItem, self).__init__(parent)
+        super().__init__(parent)
         self._build_ui()
 
     def _build_ui(self):
@@ -90,7 +89,7 @@ class MediaRepresentationItem(QtWidgets.QWidgetAction):
         self.parentWidget().hide()
 
     def setChecked(self, value):
-        super(MediaRepresentationItem, self).setChecked(value)
+        super().setChecked(value)
         self._check_mark.setVisible(value)
 
 
@@ -175,7 +174,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         expectedNumberOfArgs = 3
         if len(args) != expectedNumberOfArgs:
             package_logger.error(
-                "source-media-unavailable has {} parameters, expected={}".format(len(args), expectedNumberOfArgs)
+                f"source-media-unavailable has {len(args)} parameters, expected={expectedNumberOfArgs}"
             )
             return
 
@@ -187,15 +186,13 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         fallbackMediaRepName = self._getFallbackMediaRepName(sourceNodeName, mediaRepName)
 
         package_logger.debug(
-            "sourceMediaUnavailable()-sourceNodeName={}, mediaRepName={}, fallbackMediaRepName={}".format(
-                sourceNodeName, mediaRepName, fallbackMediaRepName
-            )
+            f"sourceMediaUnavailable()-sourceNodeName={sourceNodeName}, mediaRepName={mediaRepName}, fallbackMediaRepName={fallbackMediaRepName}"
         )
 
         # Select the fallback media rep
         if fallbackMediaRepName is not None:
-            fallbackNoticeText = "{} ({}) is not available, falling back to {}".format(
-                mediaRepName, mediaRepPath, fallbackMediaRepName
+            fallbackNoticeText = (
+                f"{mediaRepName} ({mediaRepPath}) is not available, falling back to {fallbackMediaRepName}"
             )
             rve.displayFeedback(fallbackNoticeText, 3.0)
             package_logger.info(fallbackNoticeText)
@@ -328,7 +325,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         for switch_node in switch_nodes:
             reps_and_nodes = rvc.sourceMediaRepsAndNodes(switch_node)
             for rep, source_node in reps_and_nodes:
-                if rep in reps_and_source_nodes.keys():
+                if rep in reps_and_source_nodes:
                     reps_and_source_nodes[rep].append(source_node)
                 else:
                     reps_and_source_nodes[rep] = [source_node]
@@ -336,7 +333,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         # Fetch the resolution and extension for all the media reps.
         # The menu items are composed of the media rep name, the extension and
         # the resolution.
-        for rep in reps_and_source_nodes.keys():
+        for rep in reps_and_source_nodes:
             source_media_infos = utils.get_common_source_media_infos(reps_and_source_nodes[rep])
 
             action = MediaRepresentationItem(menu)
