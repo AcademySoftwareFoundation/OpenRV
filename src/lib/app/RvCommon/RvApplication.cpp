@@ -1988,7 +1988,7 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
-    void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice)
+    void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
     {
         if (!m_desktopModule)
             return;
@@ -2011,7 +2011,7 @@ namespace Rv
         //  share-device rebind below still runs, so a main-view swap that keeps
         //  the same backend is honored.
         //
-        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice);
+        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
 
         //
         //  Re-bind the controller's current main-view device as the share

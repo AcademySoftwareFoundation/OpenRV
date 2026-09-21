@@ -1288,10 +1288,16 @@ namespace Rv
 
     std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
     {
+        return createDesktopVideoDevices(module, shareDevice, shouldUseVulkanPresentation());
+    }
+
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
+                                                                            bool useVulkan)
+    {
         std::vector<VideoDevice*> devices;
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        const bool useVulkan = shouldUseVulkanPresentation();
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
+        (void)useVulkan;
 #endif
 
         const auto screens = QGuiApplication::screens();

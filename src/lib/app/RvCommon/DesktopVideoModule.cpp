@@ -42,14 +42,16 @@ namespace Rv
 
     DesktopVideoModule::~DesktopVideoModule() {}
 
-    bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice)
+    bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan)
     {
         //
-        //  Decide the target backend once (the probe behind it is memoized) and
-        //  compare it to the backend the current devices were built with. On
-        //  platforms without Vulkan both are false, so this is always a no-op.
+        //  targetVulkan is the live main-view backend, decided by the caller.
+        //  Compare it to the backend the current devices were built with. On
+        //  platforms without Vulkan it is always false, so this is a no-op.
         //
-        const bool targetVulkan = DesktopVideoDevice::shouldUseVulkanPresentation();
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
+        targetVulkan = false;
+#endif
 
         bool currentVulkan = false;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
@@ -89,7 +91,7 @@ namespace Rv
         }
         m_devices.clear();
 
-        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
+        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice, targetVulkan);
 
         return true;
     }
