@@ -1034,7 +1034,7 @@ namespace Rv
         //  selected screen, so the second display follows the main view back to
         //  OpenGL instead of being left mismatched (black).
         //
-        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice());
+        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice(), false);
 
         //
         //  Defer the delete. This is reached from a queued callback posted by
@@ -1139,7 +1139,7 @@ namespace Rv
         //  ScreenView falls back to the default surface format and
         //  Qt::AA_ShareOpenGLContexts still puts every context in one group.
         //
-        RvApp()->rebuildDesktopVideoDevices(nullptr);
+        RvApp()->rebuildDesktopVideoDevices(nullptr, true);
 
         m_vulkanView->videoDevice()->translator().setCurrentModifiers(cur);
 
@@ -1260,7 +1260,7 @@ namespace Rv
         //  share device and the presentation output are still re-bound to the
         //  new GLView.
         //
-        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice());
+        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice(), false);
 
         m_glView->videoDevice()->translator().setCurrentModifiers(cur);
         m_oldGLView = oldGLView;

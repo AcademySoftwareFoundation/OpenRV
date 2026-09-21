@@ -153,7 +153,12 @@ namespace Rv
         //  no GL device to share. Fixes the frozen presentation bit depth and
         //  the black second display on a backend mismatch.
         //
-        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice);
+        //  mainViewIsVulkan is the backend the calling document's main view has
+        //  just settled on. It is passed rather than re-derived from the
+        //  display-depth preference because only the caller knows which widget
+        //  actually exists now.
+        //
+        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 

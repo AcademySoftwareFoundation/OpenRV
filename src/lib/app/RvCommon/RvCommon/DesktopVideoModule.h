@@ -30,12 +30,17 @@ namespace Rv
         virtual ~DesktopVideoModule();
 
         //
-        //  Re-evaluate the presentation backend (GL ScreenView vs Vulkan
-        //  swapchain) against the current display-depth preference and rebuild
-        //  the per-screen devices to match, using shareDevice as the new GL
+        //  Rebuild the per-screen presentation devices onto targetVulkan (GL
+        //  ScreenView vs Vulkan swapchain), using shareDevice as the new GL
         //  share device. This is the post-startup analogue of the
         //  constructor's one-time createDesktopVideoDevices call, needed
         //  because the backend decision is no longer frozen at launch.
+        //
+        //  targetVulkan is supplied by the caller rather than re-derived here:
+        //  it must be the backend the main view is *actually* running, which
+        //  the persisted display-depth preference does not reliably reflect
+        //  (see DesktopVideoDevice::shouldUseVulkanPresentation). A presentation
+        //  output on the opposite backend to the viewport is a black display.
         //
         //  A cleanly open device is closed -- releasing its Vulkan swapchain or
         //  GL ScreenView -- before it is destroyed. To avoid a needless
@@ -50,7 +55,7 @@ namespace Rv
         //  because the devices destroyed here may be referenced as the session
         //  output.
         //
-        bool rebuildDevices(const QTGLVideoDevice* shareDevice);
+        bool rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan);
 
         virtual std::string name() const;
         virtual void open();
