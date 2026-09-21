@@ -2043,6 +2043,17 @@ namespace Rv
         {
             m_globalSettingsP->sync();
             delete m_globalSettingsP;
+
+            //
+            //  Clear it: globalSettings() only allocates when this is null, so
+            //  leaving it dangling means every later caller gets a reference to
+            //  freed memory and dies dereferencing the destroyed QSettings
+            //  inside it. RvDocument calls this while closing the last
+            //  document, and anything that saves settings after that point --
+            //  RvConsoleWindow::done() closing the console dialog, for one --
+            //  then crashes on the way out.
+            //
+            m_globalSettingsP = 0;
         }
     }
 
