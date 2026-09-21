@@ -144,23 +144,15 @@ namespace Rv
         m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
                                      // font current, etc etc.
 
-        // Next, because we can't blit from FBOs belonging to different
-        // contexts, check to see if we already have an clone of the source FBO
-        // associated to the view's context.
-        GLFBO* svSourceFbo = m_fboMap[sourceFbo];
+        // Because we can't blit from FBOs belonging to different contexts, use
+        // a clone of the source FBO associated to the view's context.
+        // cloneForSource() creates and caches it on first use, reusing the
+        // source FBO's color attachment because color attachments *can* be
+        // shared for the blit operation.
+        GLFBO* svSourceFbo = cloneForSource(sourceFbo);
         if (!svSourceFbo)
         {
-            // We don't yet have a clone of the source FBO living in the context
-            // of the ScreenView. Therefore, we now create this new clone FBO
-            // with the dimensions/format as the source.
-            // Afterwards, associate the source FBO's color attachment to the
-            // clone's color attachment, because color attachments *can* be
-            // shared for the blit operation
-            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
-
-            svSourceFbo->attachColorTexture(sourceFbo->colorTarget(0),
-                                            sourceFbo->colorID(0)); // PB: What's colorId ?
-            m_fboMap[sourceFbo] = svSourceFbo;
+            return;
         }
 
         // Finally, create a temporary GLFBO with the ID of the ScreenView's FBO
@@ -412,21 +404,12 @@ namespace Rv
         const float w = m_viewDevice->width();
         const float h = m_viewDevice->height();
 
-        GLFBO* local_fbo1 = m_fboMap[fbo1];
-        GLFBO* local_fbo2 = m_fboMap[fbo2];
+        GLFBO* local_fbo1 = cloneForSource(fbo1);
+        GLFBO* local_fbo2 = cloneForSource(fbo2);
 
-        if (!local_fbo1)
+        if (!local_fbo1 || !local_fbo2)
         {
-            local_fbo1 = new GLFBO(fbo1->width(), fbo1->height(), fbo1->primaryColorFormat());
-            local_fbo1->attachColorTexture(fbo1->colorTarget(0), fbo1->colorID(0));
-            m_fboMap[fbo1] = local_fbo1;
-        }
-
-        if (!local_fbo2)
-        {
-            local_fbo2 = new GLFBO(fbo2->width(), fbo2->height(), fbo2->primaryColorFormat());
-            local_fbo2->attachColorTexture(fbo2->colorTarget(0), fbo2->colorID(0));
-            m_fboMap[fbo2] = local_fbo2;
+            return;
         }
 
         const GLFBO *leftFBO = local_fbo1, *rightFBO = local_fbo2;
@@ -641,9 +624,142 @@ namespace Rv
 
     bool DesktopVideoDevice::isDualStereo() const { return isStereo(); }
 
-    void DesktopVideoDevice::unbind() const
+    TwkGLF::GLFBO* DesktopVideoDevice::cloneForSource(const GLFBO* sourceFbo) const
+    {
+        if (!sourceFbo)
+        {
+            return nullptr;
+        }
+
+        FBOMap::iterator i = m_fboMap.find(sourceFbo);
+
+        if (i != m_fboMap.end())
+        {
+            GLFBO* cached = i->second;
+
+            //
+            //  m_fboMap is keyed on the raw source pointer, and the renderer
+            //  deletes and reallocates those (ImageRenderer::Device::clearFBOs
+            //  / ImageFBOManager::newImageFBO), so the same address can come
+            //  back as a different FBO. Re-verify the clone still mirrors the
+            //  texture and size it was built from before trusting it.
+            //
+            const bool stillMatches = cached && cached->colorID(0) == sourceFbo->colorID(0)
+                                      && cached->colorTarget(0) == sourceFbo->colorTarget(0) && cached->width() == sourceFbo->width()
+                                      && cached->height() == sourceFbo->height();
+
+            if (stillMatches)
+            {
+                return cached;
+            }
+
+            delete cached;
+            m_fboMap.erase(i);
+        }
+
+        //
+        //  Build the clone in this device's context around the source's colour
+        //  texture. The texture belongs to the control context; if it has been
+        //  destroyed since, attaching it leaves the FBO incomplete rather than
+        //  failing loudly, so check before caching. Caching an incomplete clone
+        //  is what turns a transient error into a permanently black output --
+        //  nothing ever invalidates it and every later frame blits from it.
+        //
+        GLFBO* clone = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
+
+        clone->attachColorTexture(sourceFbo->colorTarget(0), sourceFbo->colorID(0));
+
+        if (!clone->isComplete())
+        {
+            //
+            //  Latched per source texture: this is called every frame, and the
+            //  interesting event is the transition, not the repetition.
+            //
+            const GLuint badTex = sourceFbo->colorID(0);
+            if (m_reportedBadSourceTex != badTex)
+            {
+                m_reportedBadSourceTex = badTex;
+
+                cerr << "WARNING: DesktopVideoDevice: '" << name() << "' could not mirror the renderer's " << sourceFbo->width() << "x"
+                     << sourceFbo->height() << " FBO (source colour texture " << badTex << " is not usable in this context); skipping"
+                     << " until it changes." << endl;
+
+                //
+                //  Which of the two possible causes this is: the texture does
+                //  not exist any more (deleted, or never created because no
+                //  context was current when the renderer made it), or it exists
+                //  but in a context that does not share with ours. glIsTexture
+                //  answers the first; the share-group pointers answer the
+                //  second. Without this the two are indistinguishable from the
+                //  outside and each costs a build-and-repro cycle to guess at.
+                //
+                const QOpenGLContext* cur = QOpenGLContext::currentContext();
+                const QTGLVideoDevice* share = shareDevice();
+                const QOpenGLContext* shareCtx = share ? share->glShareContext() : nullptr;
+
+                cerr << "WARNING: DesktopVideoDevice:   glIsTexture(" << badTex << ")=" << (glIsTexture(badTex) ? "true" : "false")
+                     << "  srcTarget=0x" << hex << sourceFbo->colorTarget(0) << "  srcFormat=0x" << sourceFbo->primaryColorFormat() << dec
+                     << "  (GL_TEXTURE_2D=0x" << hex << GL_TEXTURE_2D << " GL_TEXTURE_RECTANGLE_ARB=0x" << GL_TEXTURE_RECTANGLE_ARB << dec
+                     << ")" << endl;
+                cerr << "WARNING: DesktopVideoDevice:   currentContext=" << static_cast<const void*>(cur)
+                     << " shareGroup=" << static_cast<const void*>(cur ? cur->shareGroup() : nullptr)
+                     << "  rendererShareContext=" << static_cast<const void*>(shareCtx)
+                     << " shareGroup=" << static_cast<const void*>(shareCtx ? shareCtx->shareGroup() : nullptr)
+                     << "  globalShare=" << static_cast<const void*>(QOpenGLContext::globalShareContext()) << endl;
+            }
+
+            delete clone;
+            return nullptr;
+        }
+
+        m_reportedBadSourceTex = 0;
+
+        m_fboMap[sourceFbo] = clone;
+
+        return clone;
+    }
+
+    void DesktopVideoDevice::releaseFBOClones() const
     {
         ScopedLock lock(m_mutex);
+
+        if (m_fboMap.empty())
+        {
+            return;
+        }
+
+        //
+        //  ~GLFBO deletes the FBO handle, so a context has to be current or
+        //  the delete is a no-op that also poisons glGetError() for the next
+        //  unrelated call site. Make this device's view context current the
+        //  same way transfer() does.
+        //
+        //  If the view is already gone there is nothing to make current and
+        //  the FBO names died with that context anyway; free the wrappers so
+        //  the memory is not leaked and let the (harmless) GL no-ops happen.
+        //  Phase-ordered callers never land here -- close() calls this before
+        //  destroying the view -- so it is a backstop, not a normal path.
+        //
+        //
+        //  Through the virtual, so each subclass binds its own surface -- and
+        //  so the "surface not ready yet" guard in there applies. If it cannot
+        //  make a context current there is nothing cached to free either: the
+        //  clones are only ever created by a transfer() that got that far.
+        //
+        makeCurrent();
+
+        //
+        //  Deleting these without a context current frees nothing -- the
+        //  handles leak and ~GLFBO reports an error nowhere near the cause --
+        //  so say it rather than leaving it to be inferred from a stray
+        //  GL_ERROR later. By construction this should not happen: close()
+        //  calls us while the view is alive.
+        //
+        if (!QOpenGLContext::currentContext())
+        {
+            cerr << "WARNING: DesktopVideoDevice: '" << name() << "' released " << m_fboMap.size()
+                 << " FBO clone(s) WITHOUT a current context -- the GL handles leaked." << endl;
+        }
 
         for (FBOMap::iterator i = m_fboMap.begin(); i != m_fboMap.end(); ++i)
         {
@@ -652,6 +768,8 @@ namespace Rv
 
         m_fboMap.clear();
     }
+
+    void DesktopVideoDevice::unbind() const { releaseFBOClones(); }
 
     size_t DesktopVideoDevice::numVideoFormats() const { return m_videoFormats.size(); }
 

@@ -225,7 +225,36 @@ namespace Rv
 
         virtual void unbind() const;
 
-        virtual void clearCaches() const {}
+        virtual void clearCaches() const { releaseFBOClones(); }
+
+        //
+        //  Delete the per-context FBO clones in m_fboMap.
+        //
+        //  These alias textures owned by the renderer's control context, so
+        //  they must be destroyed while *this* device's view context is still
+        //  alive and current -- deleting them afterwards issues GL calls with
+        //  no context current. Callers that are about to tear the view down
+        //  (close()) must therefore call this first. Safe to call repeatedly
+        //  and safe to call when nothing was ever cached.
+        //
+        void releaseFBOClones() const;
+
+        //
+        //  Return this context's clone of a source FBO owned by the renderer's
+        //  control context, creating and caching it on first use.
+        //
+        //  FBOs are not shared between contexts but textures are, so the clone
+        //  wraps the source's colour texture. Two things make that fragile and
+        //  are handled here: the cache is keyed on the source pointer, which
+        //  the renderer frees and reallocates (so a cached clone is re-verified
+        //  against the source it is meant to mirror), and the borrowed texture
+        //  name can be dead by the time we attach it (so an incomplete clone is
+        //  discarded instead of cached and blitted from every frame).
+        //
+        //  Returns null if no usable clone could be built; callers must skip
+        //  the transfer for this frame.
+        //
+        TwkGLF::GLFBO* cloneForSource(const TwkGLF::GLFBO* sourceFbo) const;
 
         //
         //  Configurations
@@ -326,6 +355,10 @@ namespace Rv
         ScreenView* m_view;
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
+
+        //  Source colour texture last reported as unusable by cloneForSource(),
+        //  so the report fires on the transition rather than every frame.
+        mutable GLuint m_reportedBadSourceTex{0};
 
         //  Latches the "the surface has no backing FBO" report, so a present
         //  path that is stalled for many frames says so once.
