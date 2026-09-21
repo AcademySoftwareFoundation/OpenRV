@@ -95,6 +95,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         self._update_tool_availability()
         self._update_undo_redo_buttons()
+        self._engine.set_tags()
 
     def deactivate(self):
         self._pop_shape_table()
@@ -103,6 +104,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._dock.hide()
         if self._auto_save_settings:
             self._save_configure_settings()
+        self._engine.remove_tags()
         rvtypes.MinorMode.deactivate(self)
 
     # ------------------------------------------------------------------
@@ -494,6 +496,24 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         w.set_tool_enabled(TOOL_TEXT, text_on)
         w.set_tool_enabled(TOOL_EYEDROPPER, sample_on)
 
+    def _on_node_inputs_changed(self, event):
+        node = event.contents()
+        view_node = commands.viewNode()
+
+        if view_node and node == view_node:
+            self._engine.remove_tags()
+            self._engine.set_tags()
+
+        event.reject()
+
+    def _on_before_graph_view_change(self, event):
+        self._engine.remove_tags()
+        event.reject()
+
+    def _on_after_graph_view_change(self, event):
+        self._engine.set_tags()
+        event.reject()
+
     def _on_category_state_changed(self, event):
         self._update_tool_availability()
         event.reject()
@@ -591,6 +611,9 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             ("key-down--control--y", self._on_redo_event, "Redo"),
             ("key-down--meta--z", self._on_undo_event, "Undo (mac)"),
             ("key-down--meta--shift--z", self._on_redo_event, "Redo (mac)"),
+            ("graph-node-inputs-changed", self._on_node_inputs_changed, "Update UI"),
+            ("before-graph-view-change", self._on_before_graph_view_change, "Update UI"),
+            ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
             ("event-category-state-changed", self._on_category_state_changed, "Update tool availability"),
             ("set-current-annotate-mode-node", self._on_set_current_annotate_node, "Set preferred paint node"),
             (
