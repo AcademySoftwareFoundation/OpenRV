@@ -319,16 +319,32 @@ namespace Rv
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
 
         //
-        //  Effective presentation-backend decision, shared by
-        //  createDesktopVideoDevices (the initial build) and
-        //  DesktopVideoModule::rebuildDevices (live re-evaluation) so both
-        //  agree on one GL-vs-Vulkan rule. True when the second-display output
-        //  should be delivered through a Vulkan swapchain -- a 10-bit request
-        //  that this machine's Vulkan can actually present -- false for the
-        //  OpenGL ScreenView path. Always false on macOS.
+        //  As above, but with the backend decided by the caller rather than
+        //  re-derived from the persisted display-depth preference. Use this
+        //  whenever the main view is already live: its backend is the ground
+        //  truth, and the preference can disagree with it (see
+        //  shouldUseVulkanPresentation).
+        //
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
+                                                                   bool useVulkan);
+
+        //
+        //  Effective presentation-backend decision for the *initial* build,
+        //  when there is no main view yet to ask. True when the second-display
+        //  output should be delivered through a Vulkan swapchain -- a 10-bit
+        //  request that this machine's Vulkan can actually present -- false for
+        //  the OpenGL ScreenView path. Always false on macOS.
         //
         //  The underlying VulkanView::supports10BitPresentation() probe is
-        //  memoized, so this is cheap to call on every rebuild request.
+        //  memoized, so this is cheap to call.
+        //
+        //  NOTE: this reads the persisted intent in Options, which is NOT the
+        //  same thing as the backend the main view is actually running. The two
+        //  diverge (a 10-bit request that fell back to GL at runtime keeps its
+        //  10-bit intent on purpose), and a presentation output built on the
+        //  other backend than the viewport is a black second display. Once a
+        //  view exists, pass its backend explicitly instead -- see
+        //  RvApplication::rebuildDesktopVideoDevices.
         //
         static bool shouldUseVulkanPresentation();
 
