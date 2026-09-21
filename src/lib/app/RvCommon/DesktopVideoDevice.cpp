@@ -251,12 +251,46 @@ namespace Rv
 
     void DesktopVideoDevice::close()
     {
-        delete m_view;
+        //
+        //  Before the view (and its GL context) goes away: the cached FBO
+        //  clones can only be deleted while that context is alive.
+        //
+        releaseFBOClones();
+
+        //
+        //  The device before the view that owns its context.
+        //
+        //  ~GLVideoDevice deletes this device's GL text context, and
+        //  ~GLTextContext deletes the FTGL fonts, which delete GL textures.
+        //  Deleting the view first destroys the window and the context those
+        //  textures live in, so those deletes reached nothing and the textures
+        //  leaked -- every time presentation mode was switched off, not only
+        //  at exit. releaseFBOClones() above has just made this device's
+        //  context current, so in this order they land.
+        //
         delete m_viewDevice;
+        delete m_view;
         delete m_translator;
         m_view = 0;
         m_viewDevice = 0;
         m_translator = 0;
+
+        //
+        //  Hand the main view's context back before leaving.
+        //
+        //  releaseFBOClones() above made *this* device's context current, and
+        //  the deletes just destroyed it, so right now nothing is current at
+        //  all. Whatever tears down GL objects next -- the renderer's own FBOs,
+        //  later in this same shutdown -- would then run against no context,
+        //  which is futile and reports errors nowhere near the cause.
+        //
+        //  This is the restore that transfer() documents it relies on its
+        //  callers to perform, done here for the teardown path.
+        //
+        if (m_share)
+        {
+            m_share->makeCurrent();
+        }
     }
 
     void DesktopVideoDevice::setViewWidget(ScreenView* widget)

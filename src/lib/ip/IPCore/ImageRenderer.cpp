@@ -1344,8 +1344,44 @@ namespace IPCore
         //  unique device pair (controller and output).
         //
 
+        //
+        //  m_outputDevice.glDevice is a dynamic_cast to GLVideoDevice, and that
+        //  is null for every GLBindableVideoDevice output -- presentation, AJA,
+        //  NDI -- because GLVideoDevice and GLBindableVideoDevice are siblings
+        //  (both derive TwkApp::VideoDevice directly), not base and derived.
+        //  With no fallback, everything below here tears down FBOs, fences and
+        //  textures with no context current at all. That is what makes quitting
+        //  out of presentation mode log a long tail of GL_INVALID_OPERATION
+        //  starting in ~GLFBO: once no context is current, glGetError() keeps
+        //  returning that same error, so a single lost context is worth a great
+        //  many messages.
+        //
+        //  The control device's context is the right one to fall back to. It
+        //  owns the FBOs cleared below -- for a bindable output the renderer
+        //  draws in the control context on purpose, see the comment above --
+        //  and it is what the rest of this function already relies on further
+        //  down, where defaultFBO() happens to make it current as a side
+        //  effect.
+        //
         if (m_outputDevice.glDevice)
+        {
             m_outputDevice.glDevice->makeCurrent();
+        }
+        else if (m_controlDevice.glDevice)
+        {
+            m_controlDevice.glDevice->makeCurrent();
+        }
+        else
+        {
+            static bool reported = false;
+            if (!reported)
+            {
+                reported = true;
+                cerr << "ERROR: ImageRenderer::setOutputDevice: neither the output nor the control device is a GLVideoDevice; "
+                        "the GL objects released below have no current context"
+                     << endl;
+            }
+        }
         TWK_GLDEBUG;
 
         if (d)
