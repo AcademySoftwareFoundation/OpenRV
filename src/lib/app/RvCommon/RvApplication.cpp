@@ -1801,16 +1801,56 @@ namespace Rv
         else
         {
             const VideoDevice* d = session->outputVideoDevice();
+            const bool separateOutput = d && d != session->controlVideoDevice();
 
-            if (d != session->controlVideoDevice())
+            //
+            //  Unbind before closing, never the other way round. close()
+            //  destroys the device's view and with it the GL context that owns
+            //  every FBO the renderer cloned for that device. Dropping the
+            //  session's reference first means ImageRenderer::setOutputDevice()
+            //  -- which calls unbind() on the outgoing device -- still runs
+            //  while that context is alive. Closing first left it deleting GL
+            //  objects with no context current, which is undiagnosable from the
+            //  outside: it shows up as GL_INVALID_OPERATION at innocent call
+            //  sites and leaves a permanently incomplete FBO cached in the
+            //  device, i.e. a black presentation output for the rest of the
+            //  session.
+            //
+            session->setOutputVideoDevice(session->controlVideoDevice());
+
+            if (separateOutput)
             {
                 const_cast<VideoDevice*>(d)->close();
 #ifdef PLATFORM_DARWIN
                 // rvDoc->setDoubleBuffer(true);
 #endif
-            }
 
-            session->setOutputVideoDevice(session->controlVideoDevice());
+                //
+                //  Put the main view's context back, whatever backend it is.
+                //
+                //  close() destroyed the presentation device's view and its
+                //  context, so nothing is current on return. DesktopVideoDevice
+                //  tries to restore from its share device, but that is a
+                //  QTGLVideoDevice and is null whenever the main view is
+                //  Vulkan -- so on the Vulkan path nothing was made current at
+                //  all, and the next code to touch GL did so against no
+                //  context. That is not a teardown path, so GLContextScope does
+                //  not cover it: it surfaced as ImageRenderer's
+                //  queryGLIntoContainer() reading an empty GL_VERSION (which is
+                //  what prints the bogus "Could not retrieve OpenGL version.
+                //  Make sure you have installed the Nvidia drivers.") and as a
+                //  no-context report on the next entry into this function.
+                //
+                //  Do it here rather than inside close(): the session knows its
+                //  control device, both backends derive from GLVideoDevice, and
+                //  this is the moment the device is authoritative.
+                //
+                if (const TwkGLF::GLVideoDevice* mainView =
+                        dynamic_cast<const TwkGLF::GLVideoDevice*>(session->controlVideoDevice()))
+                {
+                    mainView->makeCurrent();
+                }
+            }
 
 #if 0
         if (opts.vsync && !rvDoc->vsyncDisabled())

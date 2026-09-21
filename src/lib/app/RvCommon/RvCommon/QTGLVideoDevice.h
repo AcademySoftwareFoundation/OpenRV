@@ -11,6 +11,7 @@
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
 #include <QOpenGLWindow>
+#include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QPointer>
 #include <QSurfaceFormat>
@@ -136,6 +137,18 @@ namespace Rv
         //  it, redraw() would call update() on a freed QOpenGLWindow.
         //
         QPointer<QOpenGLWindow> m_window;
+        //
+        //  A surface to fall back on when m_window's platform surface is gone
+        //  but its QOpenGLContext is not, which is the state Qt leaves this
+        //  device in while shutting down: the native window is destroyed before
+        //  the C++ object, so makeCurrent() has nothing to bind and every GL
+        //  deletion in the teardown below silently does nothing.
+        //
+        //  Created while the window is still healthy, never during shutdown --
+        //  a QOffscreenSurface needs the platform plugin to hand out a surface,
+        //  which is not something to ask for on the way out.
+        //
+        mutable QOffscreenSurface* m_teardownSurface{nullptr};
         QTTranslator* m_translator;
     };
 

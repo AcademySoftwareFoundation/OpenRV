@@ -128,6 +128,12 @@ namespace Rv
         //  Vulkan/interop resources. Chaining to DesktopVideoDevice::close()
         //  here would delete the device a second time.
         //
+        //  Because we do not chain, the base's FBO-clone teardown has to be
+        //  invoked explicitly -- and it has to run before setViewDevice(nullptr),
+        //  since it needs that device to make the GL context current.
+        //
+        releaseFBOClones();
+
         setViewDevice(nullptr);
 
         delete m_vulkanView;
