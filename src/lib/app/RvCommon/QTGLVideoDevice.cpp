@@ -29,11 +29,8 @@ namespace Rv
 
     namespace
     {
-        //
         //  RV_NO_QT_HDPI_SUPPORT pins the ratio to 1 so RV renders at logical
-        //  size on HDPI displays. main.cpp clears Qt's own scaling environment
-        //  variables when it is set, so the two have to agree.
-        //
+        //  size on HDPI displays.
         bool qtHighDPISupportDisabled()
         {
             static const bool disabled = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
@@ -165,20 +162,10 @@ namespace Rv
             return 1.0f;
         }
 
-        //
-        //  Take the ratio straight from the surface Qt sized the default
-        //  framebuffer with. m_devicePixelRatio is a cache refreshed only from
-        //  setPhysicalDevice(), which is only reached when the window moves and
-        //  the screen lookup succeeds -- so dragging RV to a display with a
-        //  different scale factor could leave every size derived from this
-        //  device (width()/height(), and through them the render geometry and
-        //  the default GLFBO) on the old ratio, with glViewport then covering
-        //  the wrong part of the surface.
-        //
-        //  Only the window-backed control viewport is switched over: it is the
-        //  one that follows the user between displays. The widget-backed
-        //  presentation and worker devices keep the cached value.
-        //
+        //  m_devicePixelRatio is a cache refreshed only from
+        //  setPhysicalDevice(), so it can disagree with the surface while the
+        //  window moves between displays. Widget-backed presentation and
+        //  worker devices keep the cache.
         if (m_window)
         {
             return static_cast<float>(m_window->devicePixelRatio());

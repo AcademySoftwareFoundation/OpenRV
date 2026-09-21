@@ -40,18 +40,8 @@ namespace Rv
 
     namespace
     {
-        //
-        //  Sets a flag for the duration of a scope.
-        //
-        //  Holds a reference to the caller's flag, so the destructor clears the
-        //  one and only copy of it on every exit path, including an exception
-        //  thrown from a nested Qt or script callback. Copying is deleted
-        //  because the first destructor to run would clear the flag while the
-        //  other guard still believes it holds it.
-        //
-        //  Declare it as a named local: an unnamed temporary is destroyed at
-        //  the end of its own statement and guards nothing.
-        //
+        //  Sets a flag for the duration of a scope. Declare it as a named
+        //  local: an unnamed temporary guards nothing.
         struct ScopedFlag
         {
             explicit ScopedFlag(bool& f)
@@ -83,7 +73,7 @@ namespace Rv
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
-        , m_devicePixelRatio(1.0f)
+        , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
         , m_syncingDevicePixelRatio(false)
         , m_sharedContext(sharedContext)
     {
@@ -96,16 +86,8 @@ namespace Rv
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
 
-        m_devicePixelRatio = static_cast<float>(devicePixelRatio());
-
-        //
-        //  Moving to another display is the usual way the ratio changes.
-        //  QWindow emits screenChanged() recursively, so this embedded viewport
-        //  gets it when the top level is dragged to another monitor.
-        //
-        //  Queued: screenChanged() is emitted before devicePixelRatio() reports
-        //  the new value, so a direct call would always see the old ratio.
-        //
+        //  Queued: screenChanged() is emitted before devicePixelRatio()
+        //  reports the new value.
         connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
     }
 
@@ -179,59 +161,32 @@ namespace Rv
 
     void GLWindow::syncDevicePixelRatio()
     {
-        const float dpr = static_cast<float>(devicePixelRatio());
+        const auto currentRatio = static_cast<float>(devicePixelRatio());
 
-        //
-        //  Compare with a tolerance rather than exactly. Only macOS, which
-        //  reports whole-number ratios, has been tested; a platform that
-        //  derives the ratio from fractional scaling (Windows at 125%, 150%)
-        //  can return values that differ in the last bits from one call to the
-        //  next. An exact comparison would never take the early return there,
-        //  and since the work below ends in requestUpdate() (and the session notification) 
-        //  that brings us back here, that would spin continuously. 
-        //  The tolerance is far below any real difference in scale factor between two displays.
-        //
-        if (std::abs(dpr - m_devicePixelRatio) < 1e-4f || m_syncingDevicePixelRatio)
+        //  Below any real difference between two displays, above the
+        //  last-bit jitter a fractionally scaled ratio can show.
+        constexpr float DevicePixelRatioTolerance = 1e-4f;
+
+        if (std::abs(currentRatio - m_devicePixelRatio) < DevicePixelRatioTolerance || m_syncingDevicePixelRatio)
         {
             return;
         }
 
-        //  The resize below and the session notification both feed back into
-        //  this window (geometry events, redraw requests, Mu/Python render
-        //  handlers), and we are called from the event handler they run through.
+        //  Everything below re-enters this function.
         const ScopedFlag syncing(m_syncingDevicePixelRatio);
 
-        m_devicePixelRatio = dpr;
+        m_devicePixelRatio = currentRatio;
 
-        //
-        //  Re-establish the native drawable at the new scale.
-        //
-        //  Qt sizes the surface from the *logical* geometry, and the only thing
-        //  that pushes a new size down to the platform window is a geometry
-        //  change. Moving to a display with a different scale factor leaves the
-        //  logical geometry alone, so nothing re-establishes the drawable: it
-        //  stays at the old pixel size while everything derived from the device
-        //  (glViewport, the default GLFBO, the render geometry) correctly uses
-        //  the new one. GL then clips the frame to the stale surface, which is
-        //  the magnified-corner symptom. Verified with a glReadPixels bounds
-        //  probe: before the poke the surface is logical-sized, after it is not.
-        //
-        //  A one-pixel round trip is the portable way to force that push, and it
-        //  is the same remedy RvDocument::showEvent() already applies to the
-        //  first-show case of this bug. Poking the viewport window rather than
-        //  the whole document keeps it off the main window's layout.
-        //
+        //  Qt only pushes a new surface size down on a change of *logical*
+        //  geometry, so a DPI change leaves the drawable at the old pixel size
+        //  and GL clips the frame to it. A one-pixel round trip forces the
+        //  push; RvDocument::showEvent() does the same on first show.
         const QSize restore = size();
         resize(restore.width() + 1, restore.height());
         resize(restore);
 
-        //
-        //  Notify the session as a resize would: it flushes the renderer's
-        //  image FBOs and fires the "view-size-changed" render event. The poke
-        //  above re-enters resizeGL() and does this too on platforms that
-        //  deliver the resize synchronously, but not on the ones that do not,
-        //  and the notification is idempotent.
-        //
+        //  Flushes the renderer's image FBOs and fires "view-size-changed".
+        //  Idempotent: resizeGL() does it too where the poke is synchronous.
         if (m_doc)
         {
             m_doc->viewSizeChanged(width(), height());
@@ -346,26 +301,9 @@ namespace Rv
 
     bool GLWindow::event(QEvent* event)
     {
-        //
-        //  Keep the drawable in step with the device pixel ratio before the
-        //  frame is painted, never after.
-        //
-        //  QPaintDeviceWindow::event() paints inline and returns without
-        //  chaining, so this is the last point we get before paintGL(), and
-        //  QOpenGLWindowPrivate::beginPaint() runs in between. It makes the
-        //  context current, which is where Qt applies a pending drawable
-        //  update, and sets glViewport from the live ratio. Correcting here
-        //  means the poke's NSViewFrameDidChange lands in time for that;
-        //  correcting afterwards, as a queued call, always costs one presented
-        //  frame at the wrong scale, which is visible as a jump when dragging
-        //  across a display boundary.
-        //
-        //  Both paint events matter: requestUpdate() produces UpdateRequest,
-        //  while a backing-scale change reaches us as Paint, because AppKit's
-        //  viewDidChangeBackingProperties only calls setNeedsDisplay. Move is
-        //  here because dragging across a boundary is what changes the scale,
-        //  and catching it there beats waiting for the repaint.
-        //
+        //  Before the base class paints, else one frame presents at the wrong
+        //  scale. UpdateRequest comes from requestUpdate(), Paint from a
+        //  backing-scale change.
         switch (event->type())
         {
         case QEvent::UpdateRequest:

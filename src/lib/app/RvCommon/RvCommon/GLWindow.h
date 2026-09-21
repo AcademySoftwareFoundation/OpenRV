@@ -79,12 +79,8 @@ namespace Rv
         void paintGL() override;
 
     private:
-        //
-        //  Re-establish the surface and notify the session when the device
-        //  pixel ratio changes without a change of logical size. This is what
-        //  moving to a display with a different scale factor does, and which Qt
-        //  reports through no resize of its own. See the definition.
-        //
+        //  Re-establish the surface when the device pixel ratio changes
+        //  without a change of logical size. See the definition.
         void syncDevicePixelRatio();
 
         RvDocument* m_doc;
