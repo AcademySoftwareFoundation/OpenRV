@@ -350,7 +350,19 @@ namespace IPCore
         // so that the QTAudioOuput and QTAudioIODevice
         // is created within run()'s execution thread.
         if (!createAudioOutput())
+        {
+            //
+            //  Release whatever was allocated before the failure, here, on the
+            //  thread that owns it. Returning without exec() means no event
+            //  loop ever runs on this thread, so detachAudioOutputDevice()
+            //  could not marshal the deletion onto it -- its
+            //  BlockingQueuedConnection would have no loop to run on. Clearing
+            //  the pointers leaves it nothing to do.
+            //
+            deleteAudioOutputObjects();
+
             return;
+        }
 
         exec();
     }
