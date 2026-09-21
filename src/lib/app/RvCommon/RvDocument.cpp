@@ -1442,6 +1442,37 @@ namespace Rv
             return;
         }
 #endif
+        //
+        //  Persist the requested depth before anything below can early-return.
+        //
+        //  The 10-bit and the Vulkan-live branches above both write Options and
+        //  QSettings first; this branch -- OpenGL already live -- used to write
+        //  neither, and it returns early whenever the GL context already has the
+        //  requested depth. Selecting 8-bit here was therefore a no-op on the
+        //  very state that other subsystems read back as "the requested display
+        //  depth", leaving Options claiming 10-bit for the rest of the session.
+        //
+        {
+            const int bits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 10 : 0);
+            const int alphaBits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 2 : 0);
+
+            Rv::Options& opts = Options::sharedOptions();
+            opts.dispRedBits = bits;
+            opts.dispGreenBits = bits;
+            opts.dispBlueBits = bits;
+            opts.dispAlphaBits = alphaBits;
+
+            {
+                RV_QSETTINGS;
+                settings.beginGroup("Display");
+                settings.setValue("dispRedBits", bits);
+                settings.setValue("dispGreenBits", bits);
+                settings.setValue("dispBlueBits", bits);
+                settings.setValue("dispAlphaBits", alphaBits);
+                settings.endGroup();
+            }
+        }
+
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;
