@@ -17,7 +17,7 @@
 
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLContext>
 #include <QGuiApplication>
 
@@ -55,22 +55,70 @@ namespace Rv
     class DesktopVideoDevice : public TwkGLF::GLBindableVideoDevice
     {
     public:
-        class ScreenView : public QOpenGLWidget
+        //
+        //  The GL surface the presentation output composites into.
+        //
+        //  This is a QOpenGLWindow rather than a QOpenGLWidget on purpose. The
+        //  whole transfer() design depends on this context sharing with the
+        //  renderer's: transfer() wraps the renderer's output FBO colour
+        //  texture in a local FBO (see cloneForSource), and a texture is only
+        //  visible across contexts in the same share group.
+        //
+        //  A *top-level* QOpenGLWidget does not give us that. In Qt 6 it is
+        //  composited through its own top-level window's RHI backing store and
+        //  takes that window's GL context as its share parent, not the
+        //  application's global share context -- so it can land in a private
+        //  share group, and the renderer's textures then do not exist as far as
+        //  it is concerned (glIsTexture() false for a live texture), every
+        //  transfer() is refused and the second display stays black. Whether it
+        //  happened to land in the right group varied run to run, which is what
+        //  made the black presentation output intermittent.
+        //
+        //  QOpenGLWindow takes the context to share with as a constructor
+        //  argument, before the context is created -- the only point at which
+        //  sharing can be established. This mirrors GLView/GLWindow, which is
+        //  the main view and demonstrably sits in the renderer's group.
+        //
+        //  PartialUpdateBlit, not the default NoPartialUpdate: it keeps a
+        //  backing FBO (so QTGLVideoDevice::fboID() is non-zero, which
+        //  transfer() requires) and does not clear before paintGL(), which
+        //  would erase the pixels transfer() just blitted in.
+        //
+        class ScreenWindow : public QOpenGLWindow
         {
         public:
-            //
-            //  glShareContext is the control view's GL context to share with
-            //  (so blits/FBOs are usable across the two surfaces). It comes
-            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
-            //  the control view may be a QOpenGLWidget or a QOpenGLWindow.
-            //
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+            ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
             QOpenGLContext* m_glShareContext = nullptr;
+        };
+
+        //
+        //  Plain QWidget container holding the ScreenWindow, so the device can
+        //  keep driving the output through the QWidget API it already uses
+        //  (move/setGeometry/setWindowState/show/fullscreen on a given screen).
+        //  Same arrangement as GLView around GLWindow.
+        //
+        class ScreenView : public QWidget
+        {
+        public:
+            //
+            //  glShareContext is the control view's GL context to share with
+            //  (so blits/FBOs are usable across the two surfaces). It comes
+            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
+            //  the control view may be a QOpenGLWidget or a QOpenGLWindow. A
+            //  null share context falls back to Qt's global share context.
+            //
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+
+            ScreenWindow* glWindow() const { return m_glWindow; }
+
+        private:
+            ScreenWindow* m_glWindow = nullptr;
+            QWidget* m_container = nullptr;
         };
 
     public:
@@ -208,9 +256,9 @@ namespace Rv
 
         //  From QTGLVideoDevice
 
-        void setViewWidget(QOpenGLWidget*);
+        void setViewWidget(ScreenView*);
 
-        QOpenGLWidget* viewWidget() const { return m_view; }
+        ScreenView* viewWidget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -275,9 +323,13 @@ namespace Rv
     protected:
         const QTGLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
-        QOpenGLWidget* m_view;
+        ScreenView* m_view;
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
+
+        //  Latches the "the surface has no backing FBO" report, so a present
+        //  path that is stalled for many frames says so once.
+        mutable bool m_transferStalled{false};
         TwkGLF::GLState* m_glGlobalState;
         DesktopVideoFormats m_videoFormats;
         DesktopDataFormats m_dataFormats;
