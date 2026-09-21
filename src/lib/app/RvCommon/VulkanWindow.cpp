@@ -1484,7 +1484,27 @@ namespace Rv
         // change. This is independent of the grow-only shared image below: a drag
         // still recreates the (warm) swapchain each step, but no longer rebuilds
         // or re-exports the shared image.
-        if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
+        //
+        // The test is against the *surface's* extent, not against the caller's
+        // requested size. createSwapchain() takes its extent from
+        // capabilities.currentExtent, so it cannot be driven to match a request
+        // that disagrees with the surface: comparing to the request instead
+        // meant that any caller whose size was off by even a pixel -- e.g. a
+        // presentation output that sampled a devicePixelRatio belonging to the
+        // screen it was created on rather than the one it was moved to --
+        // recreated the swapchain on *every frame*, forever and silently, since
+        // both surface-format reports are latched.
+        VkExtent2D surfaceExtent = m_vkSwapchainExtent;
+        {
+            VkSurfaceCapabilitiesKHR caps = {};
+            if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &caps) == VK_SUCCESS
+                && caps.currentExtent.width != UINT32_MAX)
+            {
+                surfaceExtent = caps.currentExtent;
+            }
+        }
+
+        if (!m_vkSwapchain || m_vkSwapchainExtent.width != surfaceExtent.width || m_vkSwapchainExtent.height != surfaceExtent.height)
         {
             // Warm recreate via oldSwapchain (createSwapchain retires the old one).
             if (!createSwapchain())
@@ -1505,9 +1525,15 @@ namespace Rv
         // componentwise max of the request, the screen size, and the current
         // capacity, so it grows monotonically and the common drag-to-fullscreen
         // case allocates at most once.
+        //
+        //  This window's own screen, not the primary one: a presentation output
+        //  lives on a second display, and sizing its headroom from the primary
+        //  screen is both wrong and, when the primary is the smaller of the two,
+        //  useless as headroom.
+        //
         int screenW = 0;
         int screenH = 0;
-        if (QScreen* scr = QGuiApplication::primaryScreen())
+        if (QScreen* scr = screen() ? screen() : QGuiApplication::primaryScreen())
         {
             const qreal dpr = scr->devicePixelRatio();
             screenW = static_cast<int>(scr->geometry().width() * dpr);
@@ -2091,20 +2117,32 @@ namespace Rv
         // two formats. Whether the (linear-tiled) shared image can be a blit
         // source is checked at shared-image creation; if not, that path is
         // refused and syncBuffers() uses the CPU fallback instead.
+        //
+        //  The destination is bounded by the swapchain, never by the shared
+        //  image. They are normally the same size, but the shared image is
+        //  sized from the caller's request and a stale devicePixelRatio can
+        //  inflate that (a 3840x2160 output asking for 5760x3240), which would
+        //  otherwise write outside the swapchain image -- invalid usage, so
+        //  undefined contents or a faulted submit rather than a visible error.
+        //
         if (m_vkSwapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
         {
+            //  vkCmdCopyImage cannot scale, so clamp to the overlapping region.
             VkImageCopy region = {};
             region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             region.srcSubresource.layerCount = 1;
             region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             region.dstSubresource.layerCount = 1;
-            region.extent = {(uint32_t)info.width, (uint32_t)info.height, 1};
+            region.extent = {std::min((uint32_t)info.width, m_vkSwapchainExtent.width),
+                             std::min((uint32_t)info.height, m_vkSwapchainExtent.height), 1};
 
             vkCmdCopyImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
         }
         else
         {
+            //  vkCmdBlitImage can scale, so fill the swapchain from the used
+            //  sub-region of the shared image instead of truncating.
             VkImageBlit blit = {};
             blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             blit.srcSubresource.layerCount = 1;
@@ -2113,7 +2151,7 @@ namespace Rv
             blit.srcOffsets[0] = {0, 0, 0};
             blit.srcOffsets[1] = {info.width, info.height, 1};
             blit.dstOffsets[0] = {0, 0, 0};
-            blit.dstOffsets[1] = {info.width, info.height, 1};
+            blit.dstOffsets[1] = {(int32_t)m_vkSwapchainExtent.width, (int32_t)m_vkSwapchainExtent.height, 1};
 
             vkCmdBlitImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_NEAREST);
