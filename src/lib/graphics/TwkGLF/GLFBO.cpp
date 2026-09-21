@@ -526,6 +526,19 @@ namespace TwkGLF
         }
     }
 
+    bool GLFBO::isComplete() const
+    {
+        //
+        //  GLFBO must be bound for glCheckFramebufferStatus()
+        //
+        bind();
+
+        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        TWK_GLDEBUG;
+
+        return status == GL_FRAMEBUFFER_COMPLETE_EXT;
+    }
+
     void GLFBO::bindColorTexture(size_t i) const
     {
         assert(i < m_attachments.size());
@@ -583,6 +596,13 @@ namespace TwkGLF
         destinationGLFBO->bind(GL_DRAW_FRAMEBUFFER_EXT);
 
         glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        //
+        //  Without this, an incomplete read/draw framebuffer here raises
+        //  GL_INVALID_FRAMEBUFFER_OPERATION that nothing pops until the next
+        //  frame's makeCurrent(), which reports it against an unrelated call
+        //  site one frame late. Attribute it where it happens.
+        //
+        TWK_GLDEBUG;
 
         HOP_CALL(glFinish();)
     }
