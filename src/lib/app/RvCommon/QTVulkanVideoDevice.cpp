@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <string>
 #ifdef PLATFORM_WINDOWS
 // WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
 // <winsock.h>, which otherwise collides with the <winsock2.h> already
@@ -752,6 +753,36 @@ namespace Rv
             // No zero-copy interop this frame: pack + present via the CPU fallback.
             // The GL-packed RGB10_A2 readback handles the Y flip and the swapchain
             // channel order (A2B10G10R10 / A2R10G10B10) without a per-pixel loop.
+            //
+            //  Report the specific reason so the startup record is conclusive
+            //  for someone reading only a log: a bare "CPU fallback" does not
+            //  say whether interop was forced off, demoted by an earlier GL
+            //  failure, unavailable in the GL driver, or refused by the
+            //  Vulkan-side capability probe.
+            std::string reason;
+            if (forceCpuPresentation())
+            {
+                reason = "RV_VULKAN_FORCE_CPU_PRESENT is set";
+            }
+            else if (m_interopDisabled)
+            {
+                reason = "an earlier GL call on the interop path failed; the device is demoted for the rest of the session";
+            }
+            else if (!glDeviceMatchesVulkan())
+            {
+                reason = "the GL context and the Vulkan device are different GPUs, so external-memory interop is unsafe";
+            }
+            else if (!glInteropAvailable)
+            {
+                reason = "the GL driver does not expose the EXT_memory_object / EXT_semaphore interop entry points";
+            }
+            else
+            {
+                const VulkanWindow::InteropConfig& c = m_window->interopConfig();
+                reason = c.rejectReason.empty() ? "the Vulkan side declined to allocate a shared image" : c.rejectReason;
+            }
+            m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, reason);
+
             presentCpuFallback(w, h);
             return;
         }
@@ -776,9 +807,11 @@ namespace Rv
             //  EXT_memory_object requires both sides to agree on whether the
             //  allocation is dedicated, and the parameter has to be set before
             //  the import. This follows whatever the Vulkan side allocated.
-            if (sharedInfo->dedicated)
+            //  Set explicitly in both directions rather than only when
+            //  dedicated: a mismatch corrupts the image rather than raising an
+            //  error, so the value is stated instead of left at a default.
             {
-                const GLint dedicated = GL_TRUE;
+                const GLint dedicated = sharedInfo->dedicatedAllocation ? GL_TRUE : GL_FALSE;
                 glMemoryObjectParameterivEXT(m_glMemoryObject[slot], GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
             }
 #ifdef PLATFORM_WINDOWS
@@ -805,7 +838,12 @@ namespace Rv
             glGenTextures(1, &m_glSharedTexture[slot]);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture[slot]);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT, sharedInfo->optimalTiling ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
+            //  Import with the tiling the Vulkan side actually created the image
+            //  with. Importing OPTIMAL-tiled memory as LINEAR leaves the
+            //  image's large-scale structure recognizable but scrambles pixels
+            //  within each tile.
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
+                            sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
 
             // Allocate the imported texture at the image's capacity dimensions
             // (stride width x capacity height); the FBO blit below writes only the
@@ -854,6 +892,7 @@ namespace Rv
                 {
                     cleanupSharedGLObjects(s);
                 }
+                m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "GL import of the shared image raised a GL error");
                 presentCpuFallback(w, h);
                 return;
             }
@@ -861,7 +900,17 @@ namespace Rv
             // Cache the imported capacity so we re-import only when it grows.
             m_sharedWidth[slot] = sharedInfo->strideWidth;
             m_sharedHeight[slot] = sharedInfo->capacityHeight;
+
+            //  Let the Vulkan side's startup record show what GL actually
+            //  imported, so the two sides can be compared in one place rather
+            //  than only what Vulkan intended being visible.
+            m_window->reportGLImportState(sharedInfo->tiling, sharedInfo->dedicatedAllocation);
         }
+
+        //  Import succeeded (or was already valid from a previous frame): this
+        //  frame presents zero-copy. Reported here rather than before the
+        //  import so the record reflects the path actually taken.
+        m_window->reportPresentPath(VulkanWindow::PresentPath::ZeroCopy, std::string());
 
         //  Drain before the handshake, not after.
         //
