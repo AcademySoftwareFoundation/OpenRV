@@ -30,6 +30,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         rvtypes.MinorMode.__init__(self)
 
         self._dock = None
+        self._dock_area = QtCore.Qt.LeftDockWidgetArea
+        self._top_level = True
         self._shape_table_pushed = False
 
         # Current tool state — drawing engine reads these
@@ -103,6 +105,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._dock.hide()
         if self._auto_save_settings:
             self._save_configure_settings()
+            self._save_dock_settings()
         rvtypes.MinorMode.deactivate(self)
 
     # ------------------------------------------------------------------
@@ -134,35 +137,34 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _load_settings(self):
         """Read per-tool state from RV settings and apply to the in-memory dicts and widget."""
-        g = _SETTINGS_GROUP
         for tool in _ALL_TOOLS:
-            hex_col = self._read(g, f"{tool}_color", _DEFAULT_COLOR_HEX)
+            hex_col = self._read(_SETTINGS_GROUP, f"{tool}_color", _DEFAULT_COLOR_HEX)
             color = QtGui.QColor(hex_col)
             self._tool_colors[tool] = color if color.isValid() else QtGui.QColor(_DEFAULT_COLOR_HEX)
-            self._tool_sizes[tool] = int(self._read(g, f"{tool}_size", _DEFAULT_SIZE))
-            self._tool_opacities[tool] = int(self._read(g, f"{tool}_opacity", _DEFAULT_OPACITY))
-            self._tool_color_modifiers[tool] = self._read(g, f"{tool}_color_modifier", "normal")
-            self._tool_filled[tool] = bool(self._read(g, f"{tool}_filled", False))
+            self._tool_sizes[tool] = int(self._read(_SETTINGS_GROUP, f"{tool}_size", _DEFAULT_SIZE))
+            self._tool_opacities[tool] = int(self._read(_SETTINGS_GROUP, f"{tool}_opacity", _DEFAULT_OPACITY))
+            self._tool_color_modifiers[tool] = self._read(_SETTINGS_GROUP, f"{tool}_color_modifier", "normal")
+            self._tool_filled[tool] = bool(self._read(_SETTINGS_GROUP, f"{tool}_filled", False))
 
-        saved_tool = self._read(g, "active_tool", TOOL_PEN)
+        saved_tool = self._read(_SETTINGS_GROUP, "active_tool", TOOL_PEN)
         if saved_tool in _ALL_TOOLS:
             self._tool = saved_tool
 
-        self._eraser_brush = self._read(g, "eraser_brush", "circle")
+        self._eraser_brush = self._read(_SETTINGS_GROUP, "eraser_brush", "circle")
 
-        self._font_family = self._read(g, "font_family", "Helvetica")
-        self._font_size = self._read(g, "font_size", "medium")
-        self._font_bold = bool(self._read(g, "font_bold", False))
-        self._font_italic = bool(self._read(g, "font_italic", False))
-        self._font_underline = bool(self._read(g, "font_underline", False))
+        self._font_family = self._read(_SETTINGS_GROUP, "font_family", "Helvetica")
+        self._font_size = self._read(_SETTINGS_GROUP, "font_size", "medium")
+        self._font_bold = bool(self._read(_SETTINGS_GROUP, "font_bold", False))
+        self._font_italic = bool(self._read(_SETTINGS_GROUP, "font_italic", False))
+        self._font_underline = bool(self._read(_SETTINGS_GROUP, "font_underline", False))
 
         # Configure settings
-        self._store_on_src = bool(self._read(g, "cfg_store_on_src", False))
-        self._auto_mark = bool(self._read(g, "cfg_auto_mark", False))
-        self._link_tool_colors = bool(self._read(g, "cfg_link_tool_colors", False))
-        self._sync_whole_strokes = bool(self._read(g, "cfg_sync_whole_strokes", True))
-        self._scale_brush = bool(self._read(g, "cfg_scale_brush", True))
-        self._auto_save_settings = bool(self._read(g, "cfg_auto_save_settings", True))
+        self._store_on_src = bool(self._read(_SETTINGS_GROUP, "cfg_store_on_src", False))
+        self._auto_mark = bool(self._read(_SETTINGS_GROUP, "cfg_auto_mark", False))
+        self._link_tool_colors = bool(self._read(_SETTINGS_GROUP, "cfg_link_tool_colors", False))
+        self._sync_whole_strokes = bool(self._read(_SETTINGS_GROUP, "cfg_sync_whole_strokes", True))
+        self._scale_brush = bool(self._read(_SETTINGS_GROUP, "cfg_scale_brush", True))
+        self._auto_save_settings = bool(self._read(_SETTINGS_GROUP, "cfg_auto_save_settings", True))
         self._sync_auto_start = self._read_sync_auto_start()
 
         # Apply the saved state for the active tool to the live variables and widget.
@@ -189,29 +191,28 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _save_tool_state(self, tool):
         """Persist color/size/opacity for one tool."""
-        g = _SETTINGS_GROUP
         color = self._tool_colors.get(tool, QtGui.QColor(_DEFAULT_COLOR_HEX))
-        try:
-            commands.writeSettings(g, f"{tool}_color", color.name())
-            commands.writeSettings(g, f"{tool}_size", self._tool_sizes.get(tool, _DEFAULT_SIZE))
-            commands.writeSettings(g, f"{tool}_opacity", self._tool_opacities.get(tool, _DEFAULT_OPACITY))
-            commands.writeSettings(g, f"{tool}_color_modifier", self._tool_color_modifiers.get(tool, "normal"))
-            commands.writeSettings(g, f"{tool}_filled", self._tool_filled.get(tool, False))
-        except Exception as e:
-            print(f"[annotate_beta] settings write error: {e}")
+        commands.writeSettings(_SETTINGS_GROUP, f"{tool}_color", color.name())
+        commands.writeSettings(_SETTINGS_GROUP, f"{tool}_size", self._tool_sizes.get(tool, _DEFAULT_SIZE))
+        commands.writeSettings(_SETTINGS_GROUP, f"{tool}_opacity", self._tool_opacities.get(tool, _DEFAULT_OPACITY))
+        commands.writeSettings(
+            _SETTINGS_GROUP, f"{tool}_color_modifier", self._tool_color_modifiers.get(tool, "normal")
+        )
+        commands.writeSettings(_SETTINGS_GROUP, f"{tool}_filled", self._tool_filled.get(tool, False))
 
     def _save_configure_settings(self):
         """Persist Configure submenu settings."""
-        g = _SETTINGS_GROUP
-        try:
-            commands.writeSettings(g, "cfg_store_on_src", self._store_on_src)
-            commands.writeSettings(g, "cfg_auto_mark", self._auto_mark)
-            commands.writeSettings(g, "cfg_link_tool_colors", self._link_tool_colors)
-            commands.writeSettings(g, "cfg_sync_whole_strokes", self._sync_whole_strokes)
-            commands.writeSettings(g, "cfg_scale_brush", self._scale_brush)
-            commands.writeSettings(g, "cfg_auto_save_settings", self._auto_save_settings)
-        except Exception as e:
-            print(f"[annotate_beta] configure settings write error: {e}")
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_store_on_src", self._store_on_src)
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_auto_mark", self._auto_mark)
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_link_tool_colors", self._link_tool_colors)
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_sync_whole_strokes", self._sync_whole_strokes)
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_scale_brush", self._scale_brush)
+        commands.writeSettings(_SETTINGS_GROUP, "cfg_auto_save_settings", self._auto_save_settings)
+
+    def _save_dock_settings(self):
+        """Persist dock settings."""
+        commands.writeSettings(_SETTINGS_GROUP, "dock_area", self._dock_area.value)
+        commands.writeSettings(_SETTINGS_GROUP, "top_level", self._top_level)
 
     def _read_sync_auto_start(self):
         """Return True if this mode is in the Sync extraModes list."""
@@ -250,14 +251,22 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         sw = qtutils.sessionWindow()
         self._dock = AnnotateToolbarDockWidget(sw)
         self._dock.close_requested.connect(self._on_close_requested)
-        sw.addDockWidget(QtCore.Qt.RightDockWidgetArea, self._dock)
-        self._dock.hide()  # Start hidden; user opens via Annotation menu
+
+        self._dock.dockLocationChanged.connect(self._on_dock_location_changed)
+        self._dock_area = QtCore.Qt.DockWidgetArea(
+            self._read(_SETTINGS_GROUP, "dock_area", QtCore.Qt.LeftDockWidgetArea.value)
+        )
+
+        self._dock.topLevelChanged.connect(self._on_top_level_changed)
+        self._top_level = bool(self._read(_SETTINGS_GROUP, "top_level", True))
+
+        sw.addDockWidget(self._dock_area, self._dock)
         sw.resizeDocks([self._dock], [115], QtCore.Qt.Horizontal)
 
         for existing in sw.findChildren(QtWidgets.QDockWidget):
             if existing is self._dock:
                 continue
-            if sw.dockWidgetArea(existing) == QtCore.Qt.RightDockWidgetArea:
+            if sw.dockWidgetArea(existing) == self._dock_area:
                 sw.tabifyDockWidget(existing, self._dock)
                 break
 
@@ -370,10 +379,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_eraser_brush_changed(self, brush):
         self._eraser_brush = brush
-        try:
-            commands.writeSettings(_SETTINGS_GROUP, "eraser_brush", brush)
-        except Exception as e:
-            print(f"[annotate_beta] settings write error: {e}")
+        commands.writeSettings(_SETTINGS_GROUP, "eraser_brush", brush)
 
     def _on_filled_changed(self, v):
         self._filled = v
@@ -442,14 +448,22 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _show_toolbar(self):
         self._dock.show()
+        if self._top_level and not self._dock.isFloating():
+            self._dock.setFloating(True)
         self._dock.raise_()
 
     def _on_close_requested(self):
-        """Closing the panel."""
         if self.isActive():
             self.toggle()
         else:
             self._dock.hide()
+
+    def _on_dock_location_changed(self, area: QtCore.Qt.DockWidgetArea):
+        if area is not QtCore.Qt.NoDockWidgetArea:
+            self._dock_area = area
+
+    def _on_top_level_changed(self, top_level: bool):
+        self._top_level = top_level
 
     def _hide_color_picker(self):
         if self._dock:
