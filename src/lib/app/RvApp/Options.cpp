@@ -71,7 +71,8 @@ namespace Rv
         else if (name == "threads")
             stl_ext::thread_group::debug_all(true);
         else if (name == "gpu")
-            ImageRenderer::reportGL(true);
+            // Enables GLView format baseline, ImageRenderer GL reporting, and Vulkan presentation/interop diagnostics.
+            ImageRenderer::debugGpu(true);
         else if (name == "audio")
         {
             AudioRenderer::setDebug(true);
