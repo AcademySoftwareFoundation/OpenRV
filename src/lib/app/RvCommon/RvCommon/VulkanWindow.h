@@ -15,6 +15,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 class QPlatformWindow;
@@ -78,6 +80,68 @@ namespace Rv
         // VK_FORMAT_UNDEFINED before the swapchain is created.
         VkFormat swapchainFormat() const { return m_vkSwapchainFormat; }
 
+        //
+        //  Presentation path taken this session. RV prefers ZeroCopy, degrades
+        //  to CpuReadback (slower, still 10-bit), and only then to OpenGL
+        //  (which forgoes 10-bit). See emitPresentationRecord().
+        //
+        enum class PresentPath
+        {
+            Undetermined,
+            ZeroCopy,    // GL renders straight into a Vulkan-exported image
+            CpuReadback, // GL packs RGB10_A2 to host memory, Vulkan uploads it
+            OpenGL       // Vulkan abandoned; RvDocument swaps in GLView
+        };
+
+        //  Resolved GL<->Vulkan interop configuration. Negotiated once per
+        //  device from what the driver reports exportable, never from GPU
+        //  vendor identity or host platform. Both the Vulkan export and the GL
+        //  import read their settings from this one struct so the two sides
+        //  cannot disagree -- a disagreement about tiling or dedicated
+        //  allocation corrupts the image rather than raising an error.
+        struct InteropConfig
+        {
+            bool supported{false};
+            VkFormat format{VK_FORMAT_A2B10G10R10_UNORM_PACK32};
+            VkImageTiling tiling{VK_IMAGE_TILING_LINEAR};
+            VkImageUsageFlags usage{0};
+
+            // Probe-time floor for dedicated allocation: true when the handle
+            // type reports DEDICATED_ONLY, which is a hard requirement. The
+            // softer "prefers dedicated" signal belongs to a concrete image
+            // rather than to the format, so it is read per-image from
+            // VkMemoryDedicatedRequirements at allocation time and recorded in
+            // SharedImageInfo::dedicatedAllocation, which is what the GL side
+            // mirrors.
+            bool dedicatedAllocation{false};
+
+            // Raw VkExternalMemoryFeatureFlags the winning candidate reported,
+            // so a log read by someone without the machine can tell whether
+            // dedicated allocation was required by the handle type or merely
+            // preferred by the image.
+            VkExternalMemoryFeatureFlags externalFeatures{0};
+
+            // Set when an RV_VULKAN_FORCE_* override displaced what the probe
+            // would otherwise have chosen; the record reports both values.
+            bool tilingOverridden{false};
+            bool dedicatedOverridden{false};
+            VkImageTiling probedTiling{VK_IMAGE_TILING_LINEAR};
+            bool probedDedicated{false};
+
+            // Why no candidate was usable (empty when supported is true).
+            std::string rejectReason;
+            // Per-candidate probe outcome, one entry per candidate tried.
+            std::vector<std::string> candidateLog;
+        };
+
+        const InteropConfig& interopConfig() const { return m_interopConfig; }
+
+        // Record the path actually taken, and the GL side's view of the shared
+        // image, then emit the one-per-session startup record. Called by
+        // QTVulkanVideoDevice once the first frame establishes which path ran.
+        void reportPresentPath(PresentPath path, const std::string& reason);
+        void reportGLImportState(VkImageTiling tiling, bool dedicated);
+
         // True when uuid identifies the physical device backing this window.
         // Used by the GL bridge to refuse external-memory interop across GPUs.
         bool physicalDeviceMatchesUUID(const unsigned char* uuid, size_t size) const;
@@ -110,17 +174,20 @@ namespace Rv
             int height{0};         // used sub-region height presented this frame
             int strideWidth{0};    // GL texture width = capacity rowPitch / 4
             int capacityHeight{0}; // allocated image height (>= height); GL texture height
-            // Non-zero when the shared image uses VK_IMAGE_TILING_OPTIMAL (the
-            // default on NVIDIA, which avoids the blank large-image bug); GL
-            // must then import with GL_OPTIMAL_TILING_EXT instead of
-            // GL_LINEAR_TILING_EXT.
-            int optimalTiling{0};
-            // Non-zero when the exported memory is a dedicated allocation
+            // The negotiated tiling this image was actually created with. GL
+            // must import with the matching GL_{OPTIMAL,LINEAR}_TILING_EXT:
+            // importing OPTIMAL-tiled memory as LINEAR yields an image whose
+            // large-scale structure survives but whose pixels are scrambled
+            // within each tile.
+            VkImageTiling tiling{VK_IMAGE_TILING_LINEAR};
+
+            // Whether the export used a dedicated allocation
             // (VkMemoryDedicatedAllocateInfo), which the driver may require for
             // an image created with an external handle type. EXT_memory_object
             // requires the two sides to agree, so GL must set
-            // GL_DEDICATED_MEMORY_OBJECT_EXT exactly when this is set.
-            int dedicated{0};
+            // GL_DEDICATED_MEMORY_OBJECT_EXT to exactly this before
+            // glTexStorageMem2DEXT; a mismatch corrupts the image.
+            bool dedicatedAllocation{false};
         };
 
         // Capacity of the present-resource ring. Per-frame Vulkan sync objects
@@ -183,6 +250,18 @@ namespace Rv
         void requestBestEffortRetry();
         bool createSwapchain();
         void cleanupSwapchain();
+
+        // Probe the driver for an exportable shared-image configuration and
+        // resolve m_interopConfig. Runs exactly once per device, at device
+        // creation -- not per shared-image slot and not again on resize.
+        void negotiateInteropConfig();
+
+        // Emit the one-per-session startup record describing the negotiated
+        // configuration and the path taken. Unconditional: it must not be
+        // gated on ImageRenderer::debugGpu(), because Windows/NVIDIA is
+        // verified by QA against a build, and a log that needs a debug flag
+        // set in advance costs a whole verification round.
+        void emitPresentationRecord();
 
         RvDocument* m_doc;
         QTVulkanVideoDevice* m_videoDevice;
@@ -309,6 +388,22 @@ namespace Rv
         bool presentationAllowed() const;
 
         bool m_glFallbackRequested{false};
+
+        // Negotiated interop configuration and the state behind the startup
+        // record. m_interopNegotiated guards the once-per-device probe;
+        // m_recordEmitted guards the once-per-session record.
+        InteropConfig m_interopConfig;
+        bool m_interopNegotiated{false};
+        bool m_recordEmitted{false};
+
+        PresentPath m_presentPath{PresentPath::Undetermined};
+        std::string m_presentPathReason;
+
+        // What the GL side reported importing, so the record can show the two
+        // sides agreeing (or not) rather than only what Vulkan intended.
+        bool m_glImportReported{false};
+        VkImageTiling m_glImportTiling{VK_IMAGE_TILING_LINEAR};
+        bool m_glImportDedicated{false};
     };
 
 } // namespace Rv
