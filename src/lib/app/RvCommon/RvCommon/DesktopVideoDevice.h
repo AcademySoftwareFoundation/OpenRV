@@ -156,18 +156,19 @@ namespace Rv
         //
         //
 
-        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const QTGLVideoDevice* glViewShared);
+        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const TwkGLF::GLVideoDevice* glViewShared);
 
         virtual ~DesktopVideoDevice();
 
         virtual void redraw() const;
         virtual void redrawImmediately() const;
 
-        const QTGLVideoDevice* shareDevice() const { return m_share; }
+        //  The main view's GL or Metal device (null on Vulkan).
+        const TwkGLF::GLVideoDevice* shareDevice() const { return m_share; }
 
         void setViewDevice(TwkGLF::GLVideoDevice* d) { m_viewDevice = d; }
 
-        void setShareDevice(QTGLVideoDevice* d) { m_share = d; }
+        void setShareDevice(TwkGLF::GLVideoDevice* d) { m_share = d; }
 
         //
         //  These can differ from the usual output versions in the case of
@@ -273,19 +274,19 @@ namespace Rv
         bool useFullScreen() const;
         QRect screenGeometry() const;
 
-        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const TwkGLF::GLVideoDevice* shareDevice);
 
         //  As above, with the backend supplied by the caller. Use once the main view is live.
-        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                   bool useVulkan);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const TwkGLF::GLVideoDevice* shareDevice,
+                                                                   bool useNative);
 
         //
         //  Presentation backend for the initial build: true for a 10-bit request
-        //  this machine's Vulkan can present. Reads the persisted preference,
-        //  which can differ from the live main-view backend, so it must not be
-        //  used once a view exists. Always false on macOS.
+        //  this machine can present natively (Vulkan on Linux and Windows, Metal
+        //  on macOS). Reads the persisted preference, which can differ from the
+        //  live main-view backend, so it must not be used once a view exists.
         //
-        static bool shouldUseVulkanPresentation();
+        static bool shouldUseNativePresentation();
 
         //  True when the persisted display depth is RGB 10 + A 2.
         static bool tenBitDisplayRequested();
@@ -308,7 +309,7 @@ namespace Rv
 #endif
 
     protected:
-        const QTGLVideoDevice* m_share;
+        const TwkGLF::GLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
         ScreenView* m_view;
         DesktopStereoMode m_stereoMode;

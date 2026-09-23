@@ -30,6 +30,10 @@
 #include <RvCommon/VulkanDesktopVideoDevice.h>
 #include <RvCommon/VulkanView.h>
 #endif
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <RvCommon/MetalDesktopVideoDevice.h>
+#include <RvCommon/MetalView.h>
+#endif
 
 #include <QOpenGLContext>
 #include <QScreen>
@@ -46,7 +50,7 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
-    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m, const std::string& name, int screen, const QTGLVideoDevice* glViewShared)
+    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m, const std::string& name, int screen, const TwkGLF::GLVideoDevice* glViewShared)
         : GLBindableVideoDevice(m, name, ImageOutput | NormalizedCoordinates)
         , m_viewDevice(0)
         , m_share(glViewShared)
@@ -167,10 +171,11 @@ namespace Rv
         TWK_GLDEBUG;
 
         //
-        //  No share device on the Vulkan main-view path; AA_ShareOpenGLContexts
-        //  still puts every context in one share group.
+        //  No GL share device on the Vulkan (null) or Metal (QTMetalVideoDevice)
+        //  main-view path; AA_ShareOpenGLContexts still puts every context in
+        //  one share group.
         //
-        const QTGLVideoDevice* share = shareDevice();
+        const QTGLVideoDevice* share = dynamic_cast<const QTGLVideoDevice*>(shareDevice());
 
         //
         //  QOpenGLWindow creates its context lazily, so realize the share
@@ -621,7 +626,7 @@ namespace Rv
 
                 // Distinguish a dead texture (glIsTexture) from a share-group mismatch.
                 const QOpenGLContext* cur = QOpenGLContext::currentContext();
-                const QTGLVideoDevice* share = shareDevice();
+                const QTGLVideoDevice* share = dynamic_cast<const QTGLVideoDevice*>(shareDevice());
                 const QOpenGLContext* shareCtx = share ? share->glShareContext() : nullptr;
 
                 cerr << "WARNING: DesktopVideoDevice:   glIsTexture(" << badTex << ")=" << (glIsTexture(badTex) ? "true" : "false")
@@ -1098,28 +1103,40 @@ namespace Rv
         return opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2;
     }
 
-    bool DesktopVideoDevice::shouldUseVulkanPresentation()
+    bool DesktopVideoDevice::shouldUseNativePresentation()
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //  Same rule as the main view in RvDocument.
         return tenBitDisplayRequested() && VulkanView::supports10BitPresentation();
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        const bool useNative = tenBitDisplayRequested() && MetalView::supports10BitPresentation();
+
+        static const bool debugPresent = getenv("RV_METAL_DEBUG_PRESENT") != nullptr;
+        if (debugPresent)
+        {
+            cout << "INFO: DesktopVideoDevice::shouldUseNativePresentation: -> "
+                 << (useNative ? "Metal (10-bit)" : "OpenGL ScreenView (8-bit)") << endl;
+        }
+
+        return useNative;
 #else
         return false;
 #endif
     }
 
-    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                            const TwkGLF::GLVideoDevice* shareDevice)
     {
-        return createDesktopVideoDevices(module, shareDevice, shouldUseVulkanPresentation());
+        return createDesktopVideoDevices(module, shareDevice, shouldUseNativePresentation());
     }
 
-    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                            bool useVulkan)
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                            const TwkGLF::GLVideoDevice* shareDevice, bool useNative)
     {
         std::vector<VideoDevice*> devices;
 
-#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
-        (void)useVulkan;
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        (void)useNative;
 #endif
 
         const auto screens = QGuiApplication::screens();
@@ -1135,9 +1152,15 @@ namespace Rv
 
             DesktopVideoDevice* sd = nullptr;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-            if (useVulkan)
+            if (useNative)
             {
                 sd = new VulkanDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
+            else
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            if (useNative)
+            {
+                sd = new MetalDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
             }
             else
 #endif

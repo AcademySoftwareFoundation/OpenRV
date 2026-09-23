@@ -18,6 +18,7 @@
 #include <RvCommon/GLView.h> // WINDOWS: include AFTER other stuff
 #include <RvCommon/QTGLVideoDevice.h>
 #include <RvCommon/DesktopVideoModule.h>
+#include <IPCore/DisplayGroupIPNode.h>
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtNetwork/QtNetwork>
@@ -875,8 +876,13 @@ namespace Rv
 
             try
             {
-                // DesktopVideoDevice only needs the share device at open().
-                QTGLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
+                // DesktopVideoDevice only needs the share device at open(). It
+                // is the main view's GL or Metal device, and null on Vulkan.
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+                TwkGLF::GLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
+#else
+                TwkGLF::GLVideoDevice* shareDevice = doc->viewVideoDevice();
+#endif
                 addVideoModule(m_desktopModule = new DesktopVideoModule(0, shareDevice));
             }
             catch (...)
@@ -903,7 +909,11 @@ namespace Rv
         //  we're on (video device) so make sure the primary display group is
         //  correct.
         //
-        doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
+        // controlVideoDevice() is briefly null while a view is being rebuilt.
+        if (const TwkApp::VideoDevice* controlDevice = doc->session()->controlVideoDevice())
+        {
+            doc->session()->graph().setPrimaryDisplayGroup(controlDevice);
+        }
 
         if (RvApp()->documents().size() == 1 && opts.present)
         {
@@ -1956,7 +1966,7 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
-    void RvApplication::rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
+    void RvApplication::rebuildDesktopVideoDevices(RvSession* session, TwkGLF::GLVideoDevice* shareDevice, bool mainViewIsNative)
     {
         if (!m_desktopModule)
         {
@@ -1969,7 +1979,7 @@ namespace Rv
 
         // Returns false when the backend is unchanged; the share device is
         // still rebound below.
-        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
+        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsNative);
 
         const VideoModule::VideoDevices& devices = m_desktopModule->devices();
         for (VideoDevice* device : devices)
@@ -1989,7 +1999,46 @@ namespace Rv
         if (rebuilt && session)
         {
             session->graph().refreshPhysicalDevices(videoModules());
-            session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
+
+            // Move the control device's cached physical device to its
+            // same-screen replacement before the retired devices are purged.
+            RvDocument* rvDoc = reinterpret_cast<RvDocument*>(session->opaquePointer());
+            if (TwkGLF::GLVideoDevice* controlDevice = rvDoc ? rvDoc->viewVideoDevice() : nullptr)
+            {
+                const VideoModule::VideoDevices& retired = m_desktopModule->retiredDevices();
+
+                for (size_t i = 0; i < retired.size(); i++)
+                {
+                    const DesktopVideoDevice* oldDevice = dynamic_cast<const DesktopVideoDevice*>(retired[i]);
+                    if (!oldDevice || controlDevice->physicalDevice() != oldDevice)
+                    {
+                        continue;
+                    }
+
+                    for (size_t j = 0; j < devices.size(); j++)
+                    {
+                        DesktopVideoDevice* candidate = dynamic_cast<DesktopVideoDevice*>(devices[j]);
+                        if (candidate && candidate->qtScreen() == oldDevice->qtScreen())
+                        {
+                            controlDevice->setPhysicalDevice(candidate);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (const TwkApp::VideoDevice* controlDevice = session->controlVideoDevice())
+            {
+                session->graph().setPrimaryDisplayGroup(controlDevice);
+            }
+        }
+
+        // Destroy the replaced devices only now that nothing references them:
+        // closing one pumps the event loop and repaints through the graph.
+        if (rebuilt)
+        {
+            m_desktopModule->purgeRetiredDevices();
         }
 
         // The callers reset the session output device, so re-open and re-bind it.

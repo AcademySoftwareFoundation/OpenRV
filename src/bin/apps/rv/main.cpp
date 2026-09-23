@@ -376,8 +376,9 @@ int utf8Main(int argc, char* argv[])
     // without an explicit, ordering-sensitive setShareContext() call. Must be
     // set before the QApplication is constructed.
     //
-    // The Vulkan path also relies on it: QTVulkanVideoDevice::ensureGLContext()
-    // has no GLView to share with, so it joins this global group.
+    // The Vulkan and Metal paths also rely on it: QTVulkanVideoDevice and
+    // QTMetalVideoDevice have no GLView to share with, so their offscreen GL
+    // contexts join this global group.
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
 #ifdef PLATFORM_WINDOWS
