@@ -238,7 +238,11 @@ def download_file(url, file_path):
     """
 
     print(f"Downloading {url} into {file_path}")
-    req = requests.get(url, stream=True)
+    try:
+        req = requests.get(url, stream=True)
+    except requests.exceptions.RequestException as e:
+        print(f"WARNING: Could not connect to {url}: {e}")
+        return False
 
     with open(file_path, "wb") as file:
         total = req.headers.get("content-length")
