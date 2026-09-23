@@ -94,7 +94,6 @@ namespace Rv
         int m_alpha;
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
-        QOpenGLContext* m_sharedContext;
     };
 
 } // namespace Rv

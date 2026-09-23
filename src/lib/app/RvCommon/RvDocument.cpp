@@ -203,6 +203,15 @@ namespace Rv
                                   opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
         }
 
+        //
+        //  Realize the viewport's GL context before anything does GL work with
+        //  it. Qt would not create it until the window's first expose, which is
+        //  after initializeSession() sets up the renderer. Done here rather than
+        //  inside GLView's constructor because it can reach RvDocument through
+        //  the resize (viewSizeChanged), and m_glView has to be assigned first.
+        //
+        m_glView->ensureViewportContext();
+
         // Create DiagnosticsView as a dockable widget (lazy initialization).
         m_diagnosticsView = new DiagnosticsView(nullptr, m_glView->format());
 
@@ -837,6 +846,7 @@ namespace Rv
         m_stackedLayout->addWidget(newGLView);
         m_stackedLayout->removeWidget(oldGLView);
         m_glView = newGLView;
+        m_glView->ensureViewportContext();
         m_glView->show();
         m_glView->setFocus(Qt::OtherFocusReason);
 

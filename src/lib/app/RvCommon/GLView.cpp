@@ -19,7 +19,9 @@
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
 #include <QtWidgets/QVBoxLayout>
+#include <QCoreApplication>
 #include <QOpenGLContext>
+#include <QResizeEvent>
 #include <QTimer>
 #include <iostream>
 #include <sstream>
@@ -302,6 +304,34 @@ namespace Rv
 
         if (m_doc && m_doc->session())
             m_doc->session()->askForRedraw();
+    }
+
+    void GLView::ensureViewportContext()
+    {
+        if (!m_glWindow || m_glWindow->isValid())
+            return;
+
+        //
+        //  Qt builds the window's QOpenGLContext in
+        //  QOpenGLWindowPrivate::initialize(), and only ever runs that from the
+        //  first resize or paint event. For a window embedded with
+        //  createWindowContainer that is its first expose, which arrives well
+        //  after RV has finished its startup GL setup. Without this the
+        //  window has no context yet, QOpenGLWindow::makeCurrent() returns
+        //  without doing anything (it early-outs on !isValid()), and all of that
+        //  setup runs against whatever unrelated context happened to be current.
+        //  Shader programs are cached process-wide by source, so the program ids
+        //  that produced would then be used forever in the viewport context,
+        //  where they name nothing: glUseProgram() fails on every frame.
+        //
+        //  Delivering the resize ourselves runs initialize() synchronously,
+        //  which is the only way to get the context built ahead of time through
+        //  public API.
+        //
+        m_glWindow->create();
+
+        QResizeEvent event(m_glWindow->size(), QSize());
+        QCoreApplication::sendEvent(m_glWindow, &event);
     }
 
     QOpenGLContext* GLView::context() const { return m_glWindow ? m_glWindow->context() : nullptr; }
