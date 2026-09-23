@@ -376,7 +376,7 @@ namespace Rv
         //  sharedVulkanInstance), so it tears down nothing that could corrupt
         //  RADV's WSI state ahead of a later VulkanWindow init; memoization is
         //  then just an optimization that avoids re-running the device scan on
-        //  every DesktopVideoDevice::shouldUseVulkanPresentation() call.
+        //  every DesktopVideoDevice::shouldUseNativePresentation() call.
         //
         static const bool cached = []() -> bool
         {

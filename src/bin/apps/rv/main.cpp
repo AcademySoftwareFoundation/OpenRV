@@ -375,10 +375,12 @@ int utf8Main(int argc, char* argv[])
     // worker device -- share textures/FBOs with the main viewport context
     // without an explicit, ordering-sensitive setShareContext() call.
     //
-    // It is also what makes the Vulkan presentation path work: there is no
-    // GLView to chain from there, so QTVulkanVideoDevice::ensureGLContext()
-    // joins this global group instead. Without it, FTGL font-atlas glyph
-    // uploads land in a context where the atlas texture has no storage.
+    // It is also what makes the Vulkan and Metal presentation paths work:
+    // there is no GLView to chain from there, so the offscreen GL context
+    // owned by QTVulkanVideoDevice / QTMetalVideoDevice joins this global
+    // group instead. Without it, FTGL font-atlas glyph uploads land in a
+    // context where the atlas texture has no storage, and the diagnostics
+    // panel's ImGui font atlas fails to upload so the panel renders blank.
     //
     // Must be set before the QApplication is constructed.
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);

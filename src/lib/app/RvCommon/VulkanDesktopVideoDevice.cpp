@@ -15,7 +15,7 @@ namespace Rv
     using namespace std;
 
     VulkanDesktopVideoDevice::VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen,
-                                                       const QTGLVideoDevice* shareDevice)
+                                                       const TwkGLF::GLVideoDevice* shareDevice)
         : DesktopVideoDevice(module, name, screen, shareDevice)
         , m_vulkanView(nullptr)
     {
@@ -27,7 +27,7 @@ namespace Rv
         //  and humanReadableID() show.
         //
         //  Claiming 10 here is sound: this class is only instantiated when
-        //  DesktopVideoDevice::shouldUseVulkanPresentation() is true, which
+        //  DesktopVideoDevice::shouldUseNativePresentation() is true, which
         //  already required the 10-bit surface-format probe to succeed.
         //
         //  addDefaultDataFormats() appends the same six stereo modes in the

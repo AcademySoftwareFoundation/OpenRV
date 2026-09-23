@@ -12,6 +12,9 @@
 #include <RvCommon/VulkanDesktopVideoDevice.h>
 #endif
 #include <IPCore/ImageRenderer.h>
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <RvCommon/MetalDesktopVideoDevice.h>
+#endif
 #include <stl_ext/string_algo.h>
 #include <QtGui/QtGui>
 #include <map>
@@ -34,7 +37,7 @@ namespace Rv
 
     static bool useQtOnDarwinArm() { return true; }
 
-    DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np, QTGLVideoDevice* shareDevice)
+    DesktopVideoModule::DesktopVideoModule(NativeDisplayPtr np, TwkGLF::GLVideoDevice* shareDevice)
         : VideoModule()
     {
         m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice);
@@ -42,24 +45,29 @@ namespace Rv
 
     DesktopVideoModule::~DesktopVideoModule() {}
 
-    bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan)
+    bool DesktopVideoModule::rebuildDevices(const TwkGLF::GLVideoDevice* shareDevice, bool targetNative)
     {
         //
-        //  targetVulkan is the live main-view backend, decided by the caller.
+        //  targetNative is the live main-view backend, decided by the caller.
         //  Compare it to the backend the current devices were built with. On
-        //  platforms without Vulkan it is always false, so this is a no-op.
+        //  platforms without a native presentation backend it is always false,
+        //  so this is a no-op.
         //
-#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
-        targetVulkan = false;
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        targetNative = false;
 #endif
 
-        bool currentVulkan = false;
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        bool currentNative = false;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
         for (size_t i = 0; i < m_devices.size(); ++i)
         {
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
             if (dynamic_cast<VulkanDesktopVideoDevice*>(m_devices[i]))
+#else
+            if (dynamic_cast<MetalDesktopVideoDevice*>(m_devices[i]))
+#endif
             {
-                currentVulkan = true;
+                currentNative = true;
                 break;
             }
         }
@@ -70,30 +78,57 @@ namespace Rv
         //  does not go through a needless teardown. The caller still re-binds
         //  the share device on the existing devices.
         //
-        if (!m_devices.empty() && currentVulkan == targetVulkan)
+        if (!m_devices.empty() && currentNative == targetNative)
         {
             return false;
         }
 
         //
         //  Backend changed (or this is the first build after an empty list):
-        //  release the old devices cleanly. close() frees the Vulkan swapchain
-        //  or GL ScreenView before the device is destroyed, mirroring the
-        //  normal exit path, so no swapchain or interop resources leak.
+        //  swap in the new devices and RETIRE the old ones rather than
+        //  destroying them here.
         //
-        for (size_t i = 0; i < m_devices.size(); ++i)
-        {
-            if (m_devices[i]->isOpen())
-            {
-                m_devices[i]->close();
-            }
-            delete m_devices[i];
-        }
+        //  Destroying them now would be a use-after-free: closing an open device
+        //  deletes its top-level presentation window, and destroying a visible
+        //  native window pumps the event loop (the newly uncovered main window
+        //  repaints synchronously). That repaint walks the IP graph, whose
+        //  DisplayGroupIPNodes still hold pointers to these very devices --
+        //  DisplayGroupIPNode::imageDevice() then dereferences freed memory.
+        //
+        //  So the caller (RvApplication::rebuildDesktopVideoDevices) refreshes
+        //  the graph's display groups against the new device pointers first, and
+        //  only then calls purgeRetiredDevices().
+        //
+        m_retiredDevices.insert(m_retiredDevices.end(), m_devices.begin(), m_devices.end());
         m_devices.clear();
 
-        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice, targetVulkan);
+        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice, targetNative);
 
         return true;
+    }
+
+    void DesktopVideoModule::purgeRetiredDevices()
+    {
+        //
+        //  Destroy the devices retired by the last rebuildDevices(). close()
+        //  frees the Vulkan swapchain, IOSurface ring or GL ScreenView before
+        //  the device is destroyed, mirroring the normal exit path, so nothing
+        //  leaks.
+        //
+        //  Take a local copy first: close() destroys a native window, which
+        //  pumps the event loop and can re-enter this module.
+        //
+        VideoDevices retired;
+        retired.swap(m_retiredDevices);
+
+        for (size_t i = 0; i < retired.size(); ++i)
+        {
+            if (retired[i]->isOpen())
+            {
+                retired[i]->close();
+            }
+            delete retired[i];
+        }
     }
 
     string DesktopVideoModule::name() const { return "Desktop"; }

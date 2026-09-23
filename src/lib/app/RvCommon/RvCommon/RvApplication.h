@@ -28,6 +28,11 @@ namespace TwkApp
     class VideoModule;
 }
 
+namespace TwkGLF
+{
+    class GLVideoDevice;
+}
+
 namespace Rv
 {
     class RvDocument;
@@ -148,17 +153,19 @@ namespace Rv
         //
         //  Invoked from the RvDocument backend-transition points
         //  (setDisplayOutput / swapGLViewToVulkan / fallbackVulkanToGLView /
-        //  rebuildGLView). shareDevice is the controller's new main-view GL
-        //  device, or null when the main view has moved to Vulkan and there is
-        //  no GL device to share. Fixes the frozen presentation bit depth and
-        //  the black second display on a backend mismatch.
+        //  swapGLViewToMetal / fallbackMetalToGLView / rebuildGLView).
+        //  shareDevice is the controller's new main-view device (see
+        //  DesktopVideoDevice::shareDevice), or null when the main view has
+        //  moved to Vulkan and there is no GL device to share. Fixes the frozen
+        //  presentation bit depth and the black second display on a backend
+        //  mismatch.
         //
-        //  mainViewIsVulkan is the backend the calling document's main view has
-        //  just settled on. It is passed rather than re-derived from the
-        //  display-depth preference because only the caller knows which widget
-        //  actually exists now.
+        //  mainViewIsNative is the backend the calling document's main view
+        //  has just settled on (Vulkan or Metal rather than OpenGL). It is
+        //  passed rather than re-derived from the display-depth preference
+        //  because only the caller knows which widget actually exists now.
         //
-        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
+        void rebuildDesktopVideoDevices(TwkGLF::GLVideoDevice* shareDevice, bool mainViewIsNative);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 

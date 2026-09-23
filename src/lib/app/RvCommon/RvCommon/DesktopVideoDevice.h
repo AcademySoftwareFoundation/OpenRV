@@ -184,18 +184,26 @@ namespace Rv
         //
         //
 
-        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const QTGLVideoDevice* glViewShared);
+        DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const TwkGLF::GLVideoDevice* glViewShared);
 
         virtual ~DesktopVideoDevice();
 
         virtual void redraw() const;
         virtual void redrawImmediately() const;
 
-        const QTGLVideoDevice* shareDevice() const { return m_share; }
+        //
+        //  The share device is the controller's main view device. It may be a
+        //  QTGLVideoDevice (GL main view) or a QTMetalVideoDevice (10-bit Metal
+        //  main view), so it is typed as their common base
+        //  TwkGLF::GLVideoDevice rather than QTGLVideoDevice. It is null on the
+        //  Vulkan main-view path.
+        //
+
+        const TwkGLF::GLVideoDevice* shareDevice() const { return m_share; }
 
         void setViewDevice(TwkGLF::GLVideoDevice* d) { m_viewDevice = d; }
 
-        void setShareDevice(QTGLVideoDevice* d) { m_share = d; }
+        void setShareDevice(TwkGLF::GLVideoDevice* d) { m_share = d; }
 
         //
         //  These can differ from the usual output versions in the case of
@@ -316,27 +324,29 @@ namespace Rv
         bool useFullScreen() const;
         QRect screenGeometry() const;
 
-        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const TwkGLF::GLVideoDevice* shareDevice);
 
         //
         //  As above, but with the backend decided by the caller rather than
         //  re-derived from the persisted display-depth preference. Use this
         //  whenever the main view is already live: its backend is the ground
         //  truth, and the preference can disagree with it (see
-        //  shouldUseVulkanPresentation).
+        //  shouldUseNativePresentation).
         //
-        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                   bool useVulkan);
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const TwkGLF::GLVideoDevice* shareDevice,
+                                                                   bool useNative);
 
         //
         //  Effective presentation-backend decision for the *initial* build,
         //  when there is no main view yet to ask. True when the second-display
-        //  output should be delivered through a Vulkan swapchain -- a 10-bit
-        //  request that this machine's Vulkan can actually present -- false for
-        //  the OpenGL ScreenView path. Always false on macOS.
+        //  output should be delivered through the platform's native 10-bit
+        //  path -- a Vulkan swapchain on Linux and Windows, an IOSurface-backed
+        //  CALayer (MetalDesktopVideoDevice) on macOS -- for a 10-bit request
+        //  this machine can actually present; false for the OpenGL ScreenView
+        //  path.
         //
-        //  The underlying VulkanView::supports10BitPresentation() probe is
-        //  memoized, so this is cheap to call.
+        //  The underlying supports10BitPresentation() probes are memoized, so
+        //  this is cheap to call.
         //
         //  NOTE: this reads the persisted intent in Options, which is NOT the
         //  same thing as the backend the main view is actually running. The two
@@ -346,7 +356,7 @@ namespace Rv
         //  view exists, pass its backend explicitly instead -- see
         //  RvApplication::rebuildDesktopVideoDevices.
         //
-        static bool shouldUseVulkanPresentation();
+        static bool shouldUseNativePresentation();
 
     protected:
         void addDefaultDataFormats(size_t bits = 8);
@@ -366,7 +376,7 @@ namespace Rv
 #endif
 
     protected:
-        const QTGLVideoDevice* m_share;
+        const TwkGLF::GLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
         ScreenView* m_view;
         DesktopStereoMode m_stereoMode;

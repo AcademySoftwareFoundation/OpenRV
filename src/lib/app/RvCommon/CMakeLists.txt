@@ -66,7 +66,11 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp)
+  LIST(APPEND _sources DisplayLink.cpp MetalView.mm QTMetalVideoDevice.mm MetalDesktopVideoDevice.cpp)
+  SET_SOURCE_FILES_PROPERTIES(
+    MetalView.mm
+    PROPERTIES COMPILE_FLAGS "-fobjc-arc"
+  )
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
@@ -170,7 +174,24 @@ FILE(
   RvCommon/*.h
 )
 IF(NOT RV_TARGET_DARWIN)
-  LIST(REMOVE_ITEM _files_to_moc "RvCommon/DisplayLink.h" "RvCommon/CGDesktopVideoDevice.h")
+  LIST(
+    REMOVE_ITEM
+    _files_to_moc
+    "RvCommon/DisplayLink.h"
+    "RvCommon/CGDesktopVideoDevice.h"
+    "RvCommon/MetalView.h"
+    "RvCommon/QTMetalVideoDevice.h"
+    "RvCommon/MetalDesktopVideoDevice.h"
+  )
+ENDIF()
+
+# Platform-specific defines to forward to the MOC executable so that platform-guarded Q_OBJECT declarations (e.g. MetalView.h, DisplayLink.h) are visible to
+# MOC.
+SET(_moc_platform_defines
+    ""
+)
+IF(RV_TARGET_DARWIN)
+  LIST(APPEND _moc_platform_defines "-DPLATFORM_DARWIN" "-DUSE_METAL")
 ENDIF()
 IF(NOT
    (RV_TARGET_LINUX
@@ -192,14 +213,14 @@ FOREACH(
   IF(RV_VFX_PLATFORM STREQUAL CY2023)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
-      COMMAND ${Qt5Core_MOC_EXECUTABLE} -DRV_VFX_CY2023 -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      COMMAND ${Qt5Core_MOC_EXECUTABLE} -DRV_VFX_CY2023 ${_moc_platform_defines} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
   ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
-      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_${RV_VFX_PLATFORM} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_${RV_VFX_PLATFORM} ${_moc_platform_defines} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
@@ -440,7 +461,11 @@ IF(RV_TARGET_DARWIN)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC TwkGLFCoreGraphics
-    PRIVATE "-framework CoreVideo"
+    PRIVATE "-framework CoreVideo" "-framework QuartzCore" "-framework IOSurface" "-framework AppKit" "-framework Metal"
+  )
+  TARGET_COMPILE_DEFINITIONS(
+    ${_target}
+    PUBLIC USE_METAL
   )
 ENDIF()
 

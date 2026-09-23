@@ -32,7 +32,8 @@ namespace Rv
     class VulkanDesktopVideoDevice : public DesktopVideoDevice
     {
     public:
-        VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen, const QTGLVideoDevice* shareDevice);
+        VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen,
+                                 const TwkGLF::GLVideoDevice* shareDevice);
         ~VulkanDesktopVideoDevice() override;
 
         //
