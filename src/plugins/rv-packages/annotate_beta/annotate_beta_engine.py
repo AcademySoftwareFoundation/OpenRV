@@ -1122,6 +1122,7 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def undo(self):
+        self.commit_text_if_active()
         if not self._undo_stack:
             return
         paint_node, frame, node_name = self._undo_stack.pop()
@@ -1138,6 +1139,7 @@ class AnnotateDrawEngine:
         commands.sendInternalEvent("undo-paint", self._uuid_for(node_name))
 
     def redo(self):
+        self.commit_text_if_active()
         if not self._redo_stack:
             return
         paint_node, frame, node_name = self._redo_stack.pop()
