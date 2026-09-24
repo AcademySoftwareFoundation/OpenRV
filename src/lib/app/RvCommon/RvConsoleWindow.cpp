@@ -7,6 +7,7 @@
 //******************************************************************************
 
 #include <RvCommon/QTUtils.h>
+#include <RvCommon/RvApplication.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
 #include <spdlog/common.h>
@@ -101,6 +102,18 @@ namespace Rv
         setWindowTitle(UI_APPLICATION_NAME " Console");
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         setSizeGripEnabled(true);
+
+        //
+        //  A log window must never be what keeps RV alive.
+        //
+        //  RV has no explicit quit anywhere; it relies entirely on Qt's
+        //  quitOnLastWindowClosed. Qt counts every visible top-level widget
+        //  that has WA_QuitOnClose, which is on by default, so leaving this
+        //  dialog open -- whether the user opened it or output reopened it --
+        //  was enough to stop exec() from ever returning once the session
+        //  window had gone.
+        //
+        setAttribute(Qt::WA_QuitOnClose, false);
         bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
         // setAttribute(Qt::WA_MacBrushedMetal);
 
@@ -133,12 +146,41 @@ namespace Rv
             m_consoleBuf->sync();
         processTextBuffer();
 
-#if defined(NDEBUG) || !defined(PLATFORM_WINDOWS)
+        //
+        //  Put cout/cerr back, and take the buffer down with us.
+        //
+        //  Guard on having installed the redirect rather than on a second
+        //  #if. The install above is compiled in when NDEBUG *or*
+        //  PLATFORM_WINDOWS; this restore used to ask for NDEBUG or
+        //  *!*PLATFORM_WINDOWS. A Windows debug build is the one combination
+        //  where those disagree, so there the redirect went in and never came
+        //  out: ConsoleBuf stayed on cout/cerr with m_console pointing at this
+        //  destroyed window.
+        //
+        //  main() deletes RvApplication before finalizePython(), and
+        //  Py_Finalize's GC can still write -- a ResourceWarning from an
+        //  unclosed socket, say. That write reached ConsoleBuf, followed
+        //  m_console into freed memory, and locked a QMutex whose bits happened
+        //  to read "contended", which never resolves. That is the hang on exit.
+        //
+        //  m_stdoutBuf/m_stderrBuf are non-null only if the install ran, and
+        //  processLastTextBuffer() nulls them if it got here first, so this is
+        //  correct in every build and safe to run twice.
+        //
         if (m_stdoutBuf)
+        {
             cout.rdbuf(m_stdoutBuf);
+            m_stdoutBuf = nullptr;
+        }
+
         if (m_stderrBuf)
+        {
             cerr.rdbuf(m_stderrBuf);
-#endif
+            m_stderrBuf = nullptr;
+        }
+
+        delete m_consoleBuf;
+        m_consoleBuf = nullptr;
     }
 
     void RvConsoleWindow::processTimer()
@@ -246,7 +288,16 @@ namespace Rv
                 }
             }
 
-            if (shouldShow)
+            //
+            //  Not on the way out. This runs from a queued event, so it lands
+            //  after the last document's destructor has already closed this
+            //  window, and shutdown emits plenty of output for it to react to.
+            //  Re-showing here put the console back on screen as the only
+            //  visible window, which -- with no explicit quit anywhere in RV
+            //  -- meant quitOnLastWindowClosed never fired and exec() never
+            //  returned. The console stayed up and the process hung.
+            //
+            if (shouldShow && !(RvApp() && RvApp()->isShuttingDown()))
             {
                 show();
                 raise();

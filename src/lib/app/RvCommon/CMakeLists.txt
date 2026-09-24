@@ -66,7 +66,11 @@ SET(_sources
 # IF(RV_TARGET_DARWIN) LIST(APPEND _sources CGDesktopVideoDevice.cpp CGDesktopVideoDeviceArm.cpp DisplayLink.cpp) ENDIF()
 
 IF(RV_TARGET_DARWIN)
-  LIST(APPEND _sources DisplayLink.cpp)
+  LIST(APPEND _sources DisplayLink.cpp MetalView.mm QTMetalVideoDevice.mm MetalDesktopVideoDevice.cpp)
+  SET_SOURCE_FILES_PROPERTIES(
+    MetalView.mm
+    PROPERTIES COMPILE_FLAGS "-fobjc-arc"
+  )
 ENDIF()
 
 IF(RV_TARGET_DARWIN)
@@ -79,6 +83,29 @@ IF(RV_TARGET_LINUX
 )
   QUOTE_FILE(_filename INPUT_FILENAME "rv_linux_dark.qss" CPP_SYMBOL "rv_linux_dark")
   LIST(APPEND _sources ${_filename})
+ENDIF()
+
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  # Vulkan is fetched via cmake/dependencies/vulkan.cmake on Linux and Windows. No VULKAN_SDK environment variable or setup-env.sh is required.
+  IF(NOT TARGET Vulkan::Vulkan)
+    MESSAGE(FATAL_ERROR "Vulkan::Vulkan target is missing; cmake/dependencies/vulkan.cmake should provide it on Linux and Windows")
+  ENDIF()
+  MESSAGE(STATUS "Vulkan: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
+  LIST(
+    APPEND
+    _sources
+    VulkanBuildProbe.cpp
+    VulkanView.cpp
+    VulkanWindow.cpp
+    QTVulkanVideoDevice.cpp
+    VulkanDesktopVideoDevice.cpp
+    RvCommon/VulkanView.h
+    RvCommon/VulkanWindow.h
+    RvCommon/QTVulkanVideoDevice.h
+    RvCommon/VulkanDesktopVideoDevice.h
+  )
 ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
@@ -147,7 +174,30 @@ FILE(
   RvCommon/*.h
 )
 IF(NOT RV_TARGET_DARWIN)
-  LIST(REMOVE_ITEM _files_to_moc "RvCommon/DisplayLink.h" "RvCommon/CGDesktopVideoDevice.h")
+  LIST(
+    REMOVE_ITEM
+    _files_to_moc
+    "RvCommon/DisplayLink.h"
+    "RvCommon/CGDesktopVideoDevice.h"
+    "RvCommon/MetalView.h"
+    "RvCommon/QTMetalVideoDevice.h"
+    "RvCommon/MetalDesktopVideoDevice.h"
+  )
+ENDIF()
+
+# Platform-specific defines to forward to the MOC executable so that platform-guarded Q_OBJECT declarations (e.g. MetalView.h, DisplayLink.h) are visible to
+# MOC.
+SET(_moc_platform_defines
+    ""
+)
+IF(RV_TARGET_DARWIN)
+  LIST(APPEND _moc_platform_defines "-DPLATFORM_DARWIN" "-DUSE_METAL")
+ENDIF()
+IF(NOT
+   (RV_TARGET_LINUX
+    OR RV_TARGET_WINDOWS)
+)
+  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/VulkanWindow.h" "RvCommon/QTVulkanVideoDevice.h" "RvCommon/VulkanDesktopVideoDevice.h")
 ENDIF()
 
 FOREACH(
@@ -163,14 +213,14 @@ FOREACH(
   IF(RV_VFX_PLATFORM STREQUAL CY2023)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
-      COMMAND ${Qt5Core_MOC_EXECUTABLE} -DRV_VFX_CY2023 -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      COMMAND ${Qt5Core_MOC_EXECUTABLE} -DRV_VFX_CY2023 ${_moc_platform_defines} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
   ELSEIF(RV_VFX_PLATFORM STRGREATER_EQUAL CY2024)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${outfile}
-      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_${RV_VFX_PLATFORM} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
+      COMMAND ${QT_MOC_EXECUTABLE} -DRV_VFX_${RV_VFX_PLATFORM} ${_moc_platform_defines} -I ${CMAKE_CURRENT_SOURCE_DIR} -o ${outfile} ${infile}
       MAIN_DEPENDENCY ${infile}
       VERBATIM
     )
@@ -411,7 +461,11 @@ IF(RV_TARGET_DARWIN)
   TARGET_LINK_LIBRARIES(
     ${_target}
     PUBLIC TwkGLFCoreGraphics
-    PRIVATE "-framework CoreVideo"
+    PRIVATE "-framework CoreVideo" "-framework QuartzCore" "-framework IOSurface" "-framework AppKit" "-framework Metal"
+  )
+  TARGET_COMPILE_DEFINITIONS(
+    ${_target}
+    PUBLIC USE_METAL
   )
 ENDIF()
 
@@ -451,6 +505,27 @@ IF(RV_TARGET_LINUX)
     ${_target}
     PRIVATE X11 ${_rvcommon_link_libraries}
   )
+ENDIF()
+
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE Vulkan::Vulkan
+  )
+  # Activate the Win32-specific bits of <vulkan/vulkan.h>: VK_KHR_external_memory_win32 and VK_KHR_external_semaphore_win32 (struct types, enum values, and
+  # PFN_vkGet*Win32HandleKHR typedefs are gated behind this macro). Linux does not need an equivalent define because the FD external-handle symbols live in
+  # vulkan_core.h and are unconditionally exported.
+  IF(RV_TARGET_WINDOWS)
+    # WIN32_LEAN_AND_MEAN: vulkan_win32.h unconditionally includes <windows.h>; without WIN32_LEAN_AND_MEAN that drags in legacy winsock.h, which collides with
+    # the winsock2.h pulled in via Qt headers (ws2def.h struct redefinition errors). Promote the existing per-file convention to target scope so every RvCommon
+    # TU that transitively includes vulkan.h is safe.
+    TARGET_COMPILE_DEFINITIONS(
+      ${_target}
+      PRIVATE VK_USE_PLATFORM_WIN32_KHR WIN32_LEAN_AND_MEAN
+    )
+  ENDIF()
 ENDIF()
 
 IF(RV_TARGET_WINDOWS)

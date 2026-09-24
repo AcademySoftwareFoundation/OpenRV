@@ -27,9 +27,20 @@ namespace TwkApp
     class Menu;
 }
 
+namespace TwkGLF
+{
+    class GLVideoDevice;
+}
+
 namespace Rv
 {
     class GLView;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    class VulkanView;
+#endif
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    class MetalView;
+#endif
     class DiagnosticsView;
     class DesktopVideoModule;
     class DesktopVideoDevice;
@@ -72,6 +83,42 @@ namespace Rv
         QMenu* mainPopup() const { return m_mainPopup; }
 
         GLView* view() const;
+        QWidget* viewWidget() const;
+
+        //
+        //  Active presentation video device for whichever backend is in use
+        //  (the OpenGL GLView, the Vulkan VulkanView on Linux and Windows, or
+        //  the Metal MetalView on macOS). Returns nullptr if no view has been
+        //  created yet. Prefer this over view()->videoDevice() in
+        //  backend-neutral code so the Vulkan/Metal paths (where view() is
+        //  null) stay crash-safe.
+        //
+        TwkGLF::GLVideoDevice* viewVideoDevice() const;
+
+        // True once close has been accepted or the document is being destroyed.
+        bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        VulkanView* vulkanView() const;
+
+        // Replace a live VulkanView with GLView after a runtime Vulkan failure.
+        void fallbackVulkanToGLView();
+
+        // Promote a live GLView to a VulkanView so a 10-bit request applies
+        // immediately -- the forward mirror of fallbackVulkanToGLView.
+        void swapGLViewToVulkan();
+#endif
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* metalView() const;
+
+        //  Promote a live GLView to a MetalView so a 10-bit request applies
+        //  immediately (the forward mirror of fallbackMetalToGLView). The
+        //  MetalView's offscreen GL context is created synchronously, so this
+        //  uses build-and-verify ordering: the working GLView is kept until the
+        //  MetalView confirms its context is ready, and on failure the swap is
+        //  abandoned with the GLView left in place.
+        void swapGLViewToMetal();
+#endif
 
         const QAction* lastPopupAction() const { return m_lastPopupAction; }
 
@@ -142,6 +189,11 @@ namespace Rv
         void frameChanged();
         void resetSizePolicy();
         void lazyDeleteGLView();
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //  Runtime fallback: replace a failed MetalView with an OpenGL GLView.
+        //  A slot so MetalView::render() can trigger it via a queued connection.
+        void fallbackMetalToGLView();
+#endif
 
     private:
         void purgeMenus();
@@ -165,6 +217,16 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        void setActiveViewContentSize(int w, int h);
+        void setActiveViewMinimumContentSize(int w, int h);
+
+        //  Constructs the OpenGL view (m_glView) and makes it the active
+        //  m_viewWidget. This is the 8-bit display path, and the fallback when
+        //  native 10-bit presentation is unavailable or not requested.
+        void createGLView();
+
+        bool activeViewFirstPaintCompleted() const;
+
     private:
         RvSession* m_session;
         QMenu* m_rvMenu;
@@ -175,6 +237,13 @@ namespace Rv
         QDockWidget* m_diagnosticsDock;
         GLView* m_glView;
         GLView* m_oldGLView;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        VulkanView* m_vulkanView;
+#endif
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        MetalView* m_metalView;
+#endif
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;

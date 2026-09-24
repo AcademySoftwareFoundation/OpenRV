@@ -24,8 +24,22 @@
 #include <TwkFB/FrameBuffer.h>
 #include <TwkFB/IO.h>
 
+#include <RvApp/Options.h>
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#include <RvCommon/VulkanDesktopVideoDevice.h>
+#include <RvCommon/VulkanView.h>
+#endif
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <RvCommon/MetalDesktopVideoDevice.h>
+#include <RvCommon/MetalView.h>
+#endif
+
 #include <QOpenGLContext>
 #include <QScreen>
+#include <QVBoxLayout>
+
+#include <vector>
 
 // #define DEBUG_NO_FULLSCREEN
 
@@ -36,7 +50,7 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
-    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m, const std::string& name, int screen, const QTGLVideoDevice* glViewShared)
+    DesktopVideoDevice::DesktopVideoDevice(VideoModule* m, const std::string& name, int screen, const TwkGLF::GLVideoDevice* glViewShared)
         : GLBindableVideoDevice(m, name, ImageOutput | NormalizedCoordinates)
         , m_viewDevice(0)
         , m_share(glViewShared)
@@ -74,21 +88,22 @@ namespace Rv
 
     void DesktopVideoDevice::redraw() const
     {
-        if (m_view)
+        if (m_view && m_view->glWindow())
         {
             ScopedLock lock(m_mutex);
-            QSize s = m_view->size();
-            m_view->update();
+            //  Update the GL surface, not the container: only the window has
+            //  anything to present.
+            m_view->glWindow()->update();
         }
     }
 
     void DesktopVideoDevice::redrawImmediately() const
     {
-        if (m_view && m_view->isVisible())
+        if (m_view && m_view->glWindow() && m_view->isVisible())
         {
             ScopedLock lock(m_mutex);
             TWK_GLDEBUG;
-            m_view->update();
+            m_view->glWindow()->update();
             TWK_GLDEBUG;
         }
         else
@@ -113,29 +128,35 @@ namespace Rv
         // later.
         GLint svFboId = m_viewDevice->fboID();
         if (svFboId == 0)
+        {
+            //  Report the stall once, not once per frame.
+            if (!m_transferStalled)
+            {
+                m_transferStalled = true;
+                cerr << "WARNING: DesktopVideoDevice: '" << name() << "' present stalled: the GL surface has no backing FBO yet"
+                     << " (fboID()==0), so nothing can be composited into it. The output will hold its last frame until the"
+                     << " surface paints." << endl;
+            }
             return;
+        }
+
+        //  Re-arm the stall report, silently: the interesting event is the
+        //  next stall, not the recovery from this one.
+        m_transferStalled = false;
 
         // Switch to the ScreenView's OpenGL context.
         m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
                                      // font current, etc etc.
 
-        // Next, because we can't blit from FBOs belonging to different
-        // contexts, check to see if we already have an clone of the source FBO
-        // associated to the view's context.
-        GLFBO* svSourceFbo = m_fboMap[sourceFbo];
+        // Because we can't blit from FBOs belonging to different contexts, use
+        // a clone of the source FBO associated to the view's context.
+        // cloneForSource() creates and caches it on first use, reusing the
+        // source FBO's color attachment because color attachments *can* be
+        // shared for the blit operation.
+        GLFBO* svSourceFbo = cloneForSource(sourceFbo);
         if (!svSourceFbo)
         {
-            // We don't yet have a clone of the source FBO living in the context
-            // of the ScreenView. Therefore, we now create this new clone FBO
-            // with the dimensions/format as the source.
-            // Afterwards, associate the source FBO's color attachment to the
-            // clone's color attachment, because color attachments *can* be
-            // shared for the blit operation
-            svSourceFbo = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
-
-            svSourceFbo->attachColorTexture(sourceFbo->colorTarget(0),
-                                            sourceFbo->colorID(0)); // PB: What's colorId ?
-            m_fboMap[sourceFbo] = svSourceFbo;
+            return;
         }
 
         // Finally, create a temporary GLFBO with the ID of the ScreenView's FBO
@@ -157,13 +178,48 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
-        QSurfaceFormat fmt = shareDevice()->glSurfaceFormat();
+        //
+        //  There is no OpenGL share device when the main view presents through
+        //  a native backend: on the Vulkan path the share device is null, and
+        //  on the Metal path it is the QTMetalVideoDevice, which has no Qt GL
+        //  surface to copy a format or share context from. Fall back to the
+        //  default surface format and no explicit share context --
+        //  Qt::AA_ShareOpenGLContexts (set in main.cpp) already puts every
+        //  QOpenGLContext in one resource-sharing group.
+        //
+        const QTGLVideoDevice* share = dynamic_cast<const QTGLVideoDevice*>(shareDevice());
+
+        //
+        //  Realize the share device's GL context before copying its format and
+        //  creating ours.
+        //
+        //  A QOpenGLWindow creates its QOpenGLContext lazily, on the first
+        //  makeCurrent/paint -- creating the platform window is not enough. So
+        //  when this runs right after a main-view backend swap (RvDocument's
+        //  swap paths call RvApplication::rebuildDesktopVideoDevices, which
+        //  re-opens the presentation output in the same call frame), the new
+        //  main view's context does not exist yet: glShareContext() is null and
+        //  glSurfaceFormat() is not yet the format we are going to have to
+        //  share with. Building our context from that is how this device can
+        //  end up outside the renderer's share group, which makes the
+        //  renderer's output textures unreachable and the display black.
+        //
+        if (share)
+        {
+            share->makeCurrent();
+        }
+
+        QSurfaceFormat fmt = share ? share->glSurfaceFormat() : QSurfaceFormat::defaultFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->glShareContext(), Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, 0, share ? share->glShareContext() : nullptr, Qt::Window);
         setViewWidget(vw);
 
-        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);
+        //
+        //  The GL surface is the embedded window; the container widget is what
+        //  handles events and coordinate translation. Same split as GLView.
+        //
+        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw->glWindow(), vw);
         setViewDevice(vd);
 
         QRect g = screenGeometry();
@@ -180,23 +236,69 @@ namespace Rv
         viewWidget()->setGeometry(g);
 
         viewWidget()->show();
-        //        QCoreApplication::processEvents(); // force the window to
-        //        show. m_share->makeCurrent();
 
+        //
+        //  Deliberately no makeCurrent() here to "prime" the context.
+        //
+        //  VulkanDesktopVideoDevice::open() can end that way because
+        //  QTVulkanVideoDevice::makeCurrent() builds its own offscreen FBO on
+        //  demand. A PartialUpdateBlit QOpenGLWindow cannot: its makeCurrent()
+        //  binds the backing FBO that Qt only creates on the first paint, so
+        //  calling it before this window has painted dereferences a null FBO
+        //  inside Qt and takes the process down.
+        //
+        //  Nothing needs priming anyway -- show() drives the expose that
+        //  creates the FBO, and transfer() skips any frame where fboID() is
+        //  still 0 and picks up the next one.
+        //
         TWK_GLDEBUG;
     }
 
     void DesktopVideoDevice::close()
     {
-        delete m_view;
+        //
+        //  Before the view (and its GL context) goes away: the cached FBO
+        //  clones can only be deleted while that context is alive.
+        //
+        releaseFBOClones();
+
+        //
+        //  The device before the view that owns its context.
+        //
+        //  ~GLVideoDevice deletes this device's GL text context, and
+        //  ~GLTextContext deletes the FTGL fonts, which delete GL textures.
+        //  Deleting the view first destroys the window and the context those
+        //  textures live in, so those deletes reached nothing and the textures
+        //  leaked -- every time presentation mode was switched off, not only
+        //  at exit. releaseFBOClones() above has just made this device's
+        //  context current, so in this order they land.
+        //
         delete m_viewDevice;
+        delete m_view;
         delete m_translator;
         m_view = 0;
         m_viewDevice = 0;
         m_translator = 0;
+
+        //
+        //  Hand the main view's context back before leaving.
+        //
+        //  releaseFBOClones() above made *this* device's context current, and
+        //  the deletes just destroyed it, so right now nothing is current at
+        //  all. Whatever tears down GL objects next -- the renderer's own FBOs,
+        //  later in this same shutdown -- would then run against no context,
+        //  which is futile and reports errors nowhere near the cause.
+        //
+        //  This is the restore that transfer() documents it relies on its
+        //  callers to perform, done here for the teardown path.
+        //
+        if (m_share)
+        {
+            m_share->makeCurrent();
+        }
     }
 
-    void DesktopVideoDevice::setViewWidget(QOpenGLWidget* widget)
+    void DesktopVideoDevice::setViewWidget(ScreenView* widget)
     {
         m_view = widget;
         m_translator = new QTTranslator(this, m_view);
@@ -204,8 +306,48 @@ namespace Rv
 
     void DesktopVideoDevice::makeCurrent() const
     {
-        if (m_view)
-            m_view->makeCurrent();
+        //
+        //  Route through the view device rather than the widget: the GL context
+        //  belongs to the embedded ScreenWindow, and QTGLVideoDevice::
+        //  makeCurrent() knows how to bind it (and its default FBO).
+        //
+        if (!m_viewDevice)
+        {
+            return;
+        }
+
+        //
+        //  Not before the surface has produced its backing FBO. The GL surface
+        //  here is a PartialUpdateBlit QOpenGLWindow, whose makeCurrent() binds
+        //  that FBO, and Qt creates it on the first paint -- so calling this
+        //  earlier crashes inside Qt on a null FBO rather than failing softly.
+        //
+        //  fboID() is the cheap, null-safe way to ask whether the surface is
+        //  ready (QOpenGLWindow::defaultFramebufferObject() returns 0 until the
+        //  FBO exists). transfer() gates on the same test, so a frame that
+        //  arrives too early is skipped rather than lost.
+        //
+        //  A surface that is gone is a different matter from one that has not
+        //  painted yet. fboID() is 0 for both, but with no platform window
+        //  QTGLVideoDevice::makeCurrent() takes its offscreen path, which binds
+        //  the context to a QOffscreenSurface and never touches that backing
+        //  FBO -- so it cannot crash the way the pre-first-paint case can.
+        //  Teardown needs exactly that path: releaseFBOClones() calls this
+        //  before deleting the clones, and blocking it here is what left
+        //  ~GLFBO running with no context at all while quitting. transfer()
+        //  keeps the stricter test on purpose -- a vanished surface has nothing
+        //  to present to, so skipping the frame there is right.
+        //
+        const QTGLVideoDevice* glViewDevice = dynamic_cast<const QTGLVideoDevice*>(m_viewDevice);
+        const QOpenGLWindow* surfaceWindow = glViewDevice ? glViewDevice->window() : nullptr;
+        const bool surfaceGone = surfaceWindow && !surfaceWindow->handle();
+
+        if (!surfaceGone && m_viewDevice->fboID() == 0)
+        {
+            return;
+        }
+
+        m_viewDevice->makeCurrent();
     }
 
     void DesktopVideoDevice::setupModelviewAndProjection(float w, float h, GLPipeline* glPipeline) const
@@ -285,26 +427,28 @@ namespace Rv
         //
 
         ScopedLock lock(m_mutex);
+
+        //
+        //  Same readiness gate as transfer(): the GL surface has no backing FBO
+        //  until it has painted once, and binding its context before then
+        //  crashes inside Qt. Skip the frame; the next one will land.
+        //
+        if (m_viewDevice->fboID() == 0)
+        {
+            return;
+        }
+
         m_viewDevice->makeCurrent();
         TWK_GLDEBUG;
         const float w = m_viewDevice->width();
         const float h = m_viewDevice->height();
 
-        GLFBO* local_fbo1 = m_fboMap[fbo1];
-        GLFBO* local_fbo2 = m_fboMap[fbo2];
+        GLFBO* local_fbo1 = cloneForSource(fbo1);
+        GLFBO* local_fbo2 = cloneForSource(fbo2);
 
-        if (!local_fbo1)
+        if (!local_fbo1 || !local_fbo2)
         {
-            local_fbo1 = new GLFBO(fbo1->width(), fbo1->height(), fbo1->primaryColorFormat());
-            local_fbo1->attachColorTexture(fbo1->colorTarget(0), fbo1->colorID(0));
-            m_fboMap[fbo1] = local_fbo1;
-        }
-
-        if (!local_fbo2)
-        {
-            local_fbo2 = new GLFBO(fbo2->width(), fbo2->height(), fbo2->primaryColorFormat());
-            local_fbo2->attachColorTexture(fbo2->colorTarget(0), fbo2->colorID(0));
-            m_fboMap[fbo2] = local_fbo2;
+            return;
         }
 
         const GLFBO *leftFBO = local_fbo1, *rightFBO = local_fbo2;
@@ -519,9 +663,142 @@ namespace Rv
 
     bool DesktopVideoDevice::isDualStereo() const { return isStereo(); }
 
-    void DesktopVideoDevice::unbind() const
+    TwkGLF::GLFBO* DesktopVideoDevice::cloneForSource(const GLFBO* sourceFbo) const
+    {
+        if (!sourceFbo)
+        {
+            return nullptr;
+        }
+
+        FBOMap::iterator i = m_fboMap.find(sourceFbo);
+
+        if (i != m_fboMap.end())
+        {
+            GLFBO* cached = i->second;
+
+            //
+            //  m_fboMap is keyed on the raw source pointer, and the renderer
+            //  deletes and reallocates those (ImageRenderer::Device::clearFBOs
+            //  / ImageFBOManager::newImageFBO), so the same address can come
+            //  back as a different FBO. Re-verify the clone still mirrors the
+            //  texture and size it was built from before trusting it.
+            //
+            const bool stillMatches = cached && cached->colorID(0) == sourceFbo->colorID(0)
+                                      && cached->colorTarget(0) == sourceFbo->colorTarget(0) && cached->width() == sourceFbo->width()
+                                      && cached->height() == sourceFbo->height();
+
+            if (stillMatches)
+            {
+                return cached;
+            }
+
+            delete cached;
+            m_fboMap.erase(i);
+        }
+
+        //
+        //  Build the clone in this device's context around the source's colour
+        //  texture. The texture belongs to the control context; if it has been
+        //  destroyed since, attaching it leaves the FBO incomplete rather than
+        //  failing loudly, so check before caching. Caching an incomplete clone
+        //  is what turns a transient error into a permanently black output --
+        //  nothing ever invalidates it and every later frame blits from it.
+        //
+        GLFBO* clone = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
+
+        clone->attachColorTexture(sourceFbo->colorTarget(0), sourceFbo->colorID(0));
+
+        if (!clone->isComplete())
+        {
+            //
+            //  Latched per source texture: this is called every frame, and the
+            //  interesting event is the transition, not the repetition.
+            //
+            const GLuint badTex = sourceFbo->colorID(0);
+            if (m_reportedBadSourceTex != badTex)
+            {
+                m_reportedBadSourceTex = badTex;
+
+                cerr << "WARNING: DesktopVideoDevice: '" << name() << "' could not mirror the renderer's " << sourceFbo->width() << "x"
+                     << sourceFbo->height() << " FBO (source colour texture " << badTex << " is not usable in this context); skipping"
+                     << " until it changes." << endl;
+
+                //
+                //  Which of the two possible causes this is: the texture does
+                //  not exist any more (deleted, or never created because no
+                //  context was current when the renderer made it), or it exists
+                //  but in a context that does not share with ours. glIsTexture
+                //  answers the first; the share-group pointers answer the
+                //  second. Without this the two are indistinguishable from the
+                //  outside and each costs a build-and-repro cycle to guess at.
+                //
+                const QOpenGLContext* cur = QOpenGLContext::currentContext();
+                const QTGLVideoDevice* share = dynamic_cast<const QTGLVideoDevice*>(shareDevice());
+                const QOpenGLContext* shareCtx = share ? share->glShareContext() : nullptr;
+
+                cerr << "WARNING: DesktopVideoDevice:   glIsTexture(" << badTex << ")=" << (glIsTexture(badTex) ? "true" : "false")
+                     << "  srcTarget=0x" << hex << sourceFbo->colorTarget(0) << "  srcFormat=0x" << sourceFbo->primaryColorFormat() << dec
+                     << "  (GL_TEXTURE_2D=0x" << hex << GL_TEXTURE_2D << " GL_TEXTURE_RECTANGLE_ARB=0x" << GL_TEXTURE_RECTANGLE_ARB << dec
+                     << ")" << endl;
+                cerr << "WARNING: DesktopVideoDevice:   currentContext=" << static_cast<const void*>(cur)
+                     << " shareGroup=" << static_cast<const void*>(cur ? cur->shareGroup() : nullptr)
+                     << "  rendererShareContext=" << static_cast<const void*>(shareCtx)
+                     << " shareGroup=" << static_cast<const void*>(shareCtx ? shareCtx->shareGroup() : nullptr)
+                     << "  globalShare=" << static_cast<const void*>(QOpenGLContext::globalShareContext()) << endl;
+            }
+
+            delete clone;
+            return nullptr;
+        }
+
+        m_reportedBadSourceTex = 0;
+
+        m_fboMap[sourceFbo] = clone;
+
+        return clone;
+    }
+
+    void DesktopVideoDevice::releaseFBOClones() const
     {
         ScopedLock lock(m_mutex);
+
+        if (m_fboMap.empty())
+        {
+            return;
+        }
+
+        //
+        //  ~GLFBO deletes the FBO handle, so a context has to be current or
+        //  the delete is a no-op that also poisons glGetError() for the next
+        //  unrelated call site. Make this device's view context current the
+        //  same way transfer() does.
+        //
+        //  If the view is already gone there is nothing to make current and
+        //  the FBO names died with that context anyway; free the wrappers so
+        //  the memory is not leaked and let the (harmless) GL no-ops happen.
+        //  Phase-ordered callers never land here -- close() calls this before
+        //  destroying the view -- so it is a backstop, not a normal path.
+        //
+        //
+        //  Through the virtual, so each subclass binds its own surface -- and
+        //  so the "surface not ready yet" guard in there applies. If it cannot
+        //  make a context current there is nothing cached to free either: the
+        //  clones are only ever created by a transfer() that got that far.
+        //
+        makeCurrent();
+
+        //
+        //  Deleting these without a context current frees nothing -- the
+        //  handles leak and ~GLFBO reports an error nowhere near the cause --
+        //  so say it rather than leaving it to be inferred from a stray
+        //  GL_ERROR later. By construction this should not happen: close()
+        //  calls us while the view is alive.
+        //
+        if (!QOpenGLContext::currentContext())
+        {
+            cerr << "WARNING: DesktopVideoDevice: '" << name() << "' released " << m_fboMap.size()
+                 << " FBO clone(s) WITHOUT a current context -- the GL handles leaked." << endl;
+        }
 
         for (FBOMap::iterator i = m_fboMap.begin(); i != m_fboMap.end(); ++i)
         {
@@ -530,6 +807,8 @@ namespace Rv
 
         m_fboMap.clear();
     }
+
+    void DesktopVideoDevice::unbind() const { releaseFBOClones(); }
 
     size_t DesktopVideoDevice::numVideoFormats() const { return m_videoFormats.size(); }
 
@@ -747,33 +1026,89 @@ namespace Rv
 
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
-    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,
-                                               Qt::WindowFlags flags)
-        : QOpenGLWidget(parent, flags)
+    DesktopVideoDevice::ScreenWindow::ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext)
+        //
+        //  The share context goes in here, at construction, because that is the
+        //  only point where sharing can be established -- QOpenGLContext ties
+        //  its share group at create() time. A null share context leaves
+        //  QOpenGLWindow to use Qt's global share context, which is also the
+        //  renderer's group.
+        //
+        //  PartialUpdateBlit keeps a backing FBO and does not clear before
+        //  paintGL(); see the class comment.
+        //
+        : QOpenGLWindow(glShareContext, QOpenGLWindow::PartialUpdateBlit)
+        , m_glShareContext(glShareContext)
     {
-        m_glShareContext = glShareContext;
         setFormat(fmt);
-
-        // Important: set PartialUpdate, because otherwise
-        // before every call to paintGL Qt will call glClear(),
-        // thereby erasing the FBO we just transferred pixels to.
-        setUpdateBehavior(QOpenGLWidget::PartialUpdate);
     }
 
-    void DesktopVideoDevice::ScreenView::initializeGL()
+    void DesktopVideoDevice::ScreenWindow::initializeGL()
     {
-        QOpenGLWidget::initializeGL();
+        QOpenGLWindow::initializeGL();
 
-        if (m_glShareContext && context() && context()->isValid())
+        //
+        //  Confirm the sharing actually happened. Everything the presentation
+        //  output does depends on it and nothing else reports it: a mismatch is
+        //  invisible from the outside and shows up only as a black second
+        //  display.
+        //
+        //  Note this deliberately does NOT call context()->setShareContext().
+        //  That only takes effect on the *next* create(), and the context is
+        //  already created by the time initializeGL() runs, so it never did
+        //  what it looked like it did -- it only left a stale share request
+        //  behind for a later re-create to fail on.
+        //
+        const QOpenGLContext* ours = context();
+        const QOpenGLContext* global = QOpenGLContext::globalShareContext();
+        const QOpenGLContext* wanted = m_glShareContext ? m_glShareContext : global;
+
+        if (!wanted)
         {
-            context()->setShareContext(m_glShareContext);
+            cerr << "ERROR: DesktopVideoDevice::ScreenWindow: no context to share with;"
+                 << " Qt::AA_ShareOpenGLContexts must be set before the QApplication is created." << endl;
+        }
+        else if (ours && ours->shareGroup() != wanted->shareGroup())
+        {
+            cerr << "ERROR: DesktopVideoDevice::ScreenWindow: GL context did not join the renderer's share group"
+                 << " (ours=" << static_cast<const void*>(ours->shareGroup())
+                 << " wanted=" << static_cast<const void*>(wanted->shareGroup())
+                 << "); the renderer's textures cannot be reached from this context, so this"
+                 << " presentation output would render black." << endl;
         }
     }
 
-    void DesktopVideoDevice::ScreenView::paintGL()
+    void DesktopVideoDevice::ScreenWindow::paintGL()
     {
-        // This method is explicitely empty because this widget's FBO is
+        // This method is explicitely empty because this window's FBO is
         // written to by the transfer/transfer2() method
+    }
+
+    DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,
+                                               Qt::WindowFlags flags)
+        : QWidget(parent, flags)
+    {
+        m_glWindow = new ScreenWindow(fmt, glShareContext);
+
+        //
+        //  Embed the native GL window in the widget tree, exactly as GLView
+        //  does for the main view. The container is a plain QWidget, so this
+        //  top-level is not forced onto the OpenGL RHI backend -- which is what
+        //  put a top-level QOpenGLWidget in its own share group.
+        //
+        m_container = QWidget::createWindowContainer(m_glWindow, this);
+
+        //
+        //  Realize the platform surface up front: a QOpenGLWindow has no GL
+        //  context until its window surface exists, and the device primes the
+        //  context (makeCurrent) during open() before this is ever shown.
+        //
+        m_glWindow->create();
+
+        QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
+        layout->addWidget(m_container);
     }
 
     //----------------------------------------------------------------------
@@ -844,33 +1179,48 @@ namespace Rv
         // XXX The following steps are not Unicode safe
         //
 
+        m_colorProfile = ColorProfile();
+
         // Get the context for this screen
         const QList<QScreen*> screens = QGuiApplication::screens();
 
         // Ensure the screen index is valid.
         if (m_screen < 0 || m_screen >= screens.size())
         {
-            m_colorProfile = ColorProfile();
             return m_colorProfile;
         }
 
-        QScreen* targetScreen = screens[m_screen];
+        const QScreen* targetScreen = screens[m_screen];
         QWindow* windowOnTargetScreen = nullptr;
-        const QList<QWindow*> windows = QGuiApplication::topLevelWindows();
 
-        // Check all windows to find one on the target screen.
-        for (QWindow* window : windows)
+        //
+        //  Find a window on the target screen to borrow a device context from,
+        //  and consider only windows that are *already* realized.
+        //
+        //  QWindow::winId() creates the platform window when there is none,
+        //  and this loop walks every top-level QWindow in the process --
+        //  including ones that must never be realized. Every QQuickWidget, so
+        //  every QWebEngineView panel and Live Review among them, owns a
+        //  parentless offscreen QQuickWindow that Qt is explicit about ("Do
+        //  not call create() on offscreenWindow", qquickwidget.cpp). Handing it
+        //  a platform window trips Q_ASSERT(!d->offscreenWindow->handle()) at
+        //  the end of QQuickWidget::createFramebufferObject() and aborts RV the
+        //  moment that panel is first shown. Any already-realized window on the
+        //  screen reports the same monitor profile, so there is nothing to gain
+        //  by creating one.
+        //
+        for (QWindow* window : QGuiApplication::topLevelWindows())
         {
-            if (window->screen() == targetScreen)
+            if (window->handle() && window->screen() == targetScreen)
             {
                 windowOnTargetScreen = window;
+                break;
             }
         }
 
         if (!windowOnTargetScreen)
         {
             // Return empty profile if no window is found on the screen.
-            m_colorProfile = ColorProfile();
             return m_colorProfile;
         }
 
@@ -880,45 +1230,96 @@ namespace Rv
         if (hdc)
         {
             // Look for the profile path
-            unsigned long pathLen;
+            DWORD pathLen = 0;
             GetICMProfile(hdc, &pathLen, NULL);
-            char* path = new char[pathLen];
 
-            if (GetICMProfile(hdc, &pathLen, path))
+            std::vector<char> path(pathLen > 0 ? pathLen : 1);
+
+            if (pathLen > 0 && GetICMProfile(hdc, &pathLen, path.data()))
             {
                 // If we found a profile lets set the type,
                 // url, and description
 
                 m_colorProfile.type = ICCProfile;
 
-                unsigned long maxLen = 2084;
-                char* url = new char[maxLen];
-                UrlCreateFromPath(path, url, &maxLen, NULL);
-                m_colorProfile.url = url;
+                DWORD maxLen = 2084;
+                std::vector<char> url(maxLen);
+                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, NULL)))
+                {
+                    m_colorProfile.url = url.data();
+                }
 
-                char desc[256];
-                cmsHPROFILE profile = cmsOpenProfileFromFile(path, "r");
-                cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, 256);
-                m_colorProfile.description = desc;
-
-                delete url;
+                //  cmsOpenProfileFromFile returns null when the path the driver
+                //  reported is gone or unreadable; cmsGetProfileInfoASCII would
+                //  dereference it.
+                if (cmsHPROFILE profile = cmsOpenProfileFromFile(path.data(), "r"))
+                {
+                    char desc[256] = {0};
+                    cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, sizeof(desc));
+                    m_colorProfile.description = desc;
+                    cmsCloseProfile(profile);
+                }
             }
 
-            delete path;
             ReleaseDC(hwnd, hdc);
-        }
-        else
-        {
-            m_colorProfile = ColorProfile();
         }
 
         return m_colorProfile;
     }
 #endif
 
-    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice)
+    bool DesktopVideoDevice::shouldUseNativePresentation()
+    {
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        //
+        //  Presentation-output backend selection, matching the main view's rule
+        //  in RvDocument: a 10-bit display request (RGB 10 + A 2) that this
+        //  machine can actually present natively routes the second-display
+        //  output through the platform's 10-bit path -- a Vulkan swapchain on
+        //  Linux and Windows, an IOSurface-backed CALayer on macOS -- avoiding
+        //  the 8-bit truncation of the OpenGL ScreenView path. Everything else
+        //  stays on the OpenGL DesktopVideoDevice.
+        //
+        //  supports10BitPresentation() is memoized, so this is cheap to re-call
+        //  whenever the display output format or the main-view backend changes.
+        //
+        const Options& opts = Options::sharedOptions();
+        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+
+#if defined(PLATFORM_DARWIN)
+        const bool useNative = want10bit && MetalView::supports10BitPresentation();
+
+        static const bool debugPresent = getenv("RV_METAL_DEBUG_PRESENT") != nullptr;
+        if (debugPresent)
+        {
+            cout << "INFO: DesktopVideoDevice::shouldUseNativePresentation: disp bits " << opts.dispRedBits << "/" << opts.dispGreenBits
+                 << "/" << opts.dispBlueBits << "/" << opts.dispAlphaBits << " want10bit=" << (want10bit ? 1 : 0) << " -> "
+                 << (useNative ? "Metal (10-bit)" : "OpenGL ScreenView (8-bit)") << endl;
+        }
+
+        return useNative;
+#else
+        return want10bit && VulkanView::supports10BitPresentation();
+#endif
+#else
+        return false;
+#endif
+    }
+
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                            const TwkGLF::GLVideoDevice* shareDevice)
+    {
+        return createDesktopVideoDevices(module, shareDevice, shouldUseNativePresentation());
+    }
+
+    std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module,
+                                                                            const TwkGLF::GLVideoDevice* shareDevice, bool useNative)
     {
         std::vector<VideoDevice*> devices;
+
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        (void)useNative;
+#endif
 
         const auto screens = QGuiApplication::screens();
         for (int screen = 0; screen < screens.size(); screen++)
@@ -931,7 +1332,23 @@ namespace Rv
                 name = QString("Screen %1").arg(screen);
             }
 
-            DesktopVideoDevice* sd = new DesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            DesktopVideoDevice* sd = nullptr;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+            if (useNative)
+            {
+                sd = new VulkanDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
+            else
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+            if (useNative)
+            {
+                sd = new MetalDesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
+            else
+#endif
+            {
+                sd = new DesktopVideoDevice(module, name.toUtf8().constData(), screen, shareDevice);
+            }
 
             devices.push_back(sd);
         }

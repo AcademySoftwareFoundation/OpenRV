@@ -2043,6 +2043,17 @@ namespace Rv
         {
             m_globalSettingsP->sync();
             delete m_globalSettingsP;
+
+            //
+            //  Clear it: globalSettings() only allocates when this is null, so
+            //  leaving it dangling means every later caller gets a reference to
+            //  freed memory and dies dereferencing the destroyed QSettings
+            //  inside it. RvDocument calls this while closing the last
+            //  document, and anything that saves settings after that point --
+            //  RvConsoleWindow::done() closing the console dialog, for one --
+            //  then crashes on the way out.
+            //
+            m_globalSettingsP = 0;
         }
     }
 
@@ -2193,6 +2204,19 @@ namespace Rv
         QSettings* qs = new QSettings(format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
                                       PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME);
         qs->setFallbacksEnabled(false);
+
+#ifdef PLATFORM_WINDOWS
+        // Qt's atomic write (temp-file + rename) can fail with AccessError when Windows
+        // security software holds RV.ini open at the moment of the rename. Writing
+        // directly to the file avoids that failure point. Available since Qt 5.13.
+        qs->setAtomicSyncRequired(false);
+#endif
+
+        // Qt IniFormat on Windows does not create the parent directory automatically.
+        // Create it here so sync() does not fail with AccessError (err: 1).
+        QDir settingsDir(QFileInfo(qs->fileName()).absolutePath());
+        if (!settingsDir.exists())
+            settingsDir.mkpath(".");
 
         if (qs->status() != QSettings::NoError)
         {

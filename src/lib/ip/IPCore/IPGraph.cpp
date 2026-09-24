@@ -684,9 +684,26 @@ namespace IPCore
         //  VideoModules can be initialized late.
         //
 
-        for (size_t i = 0; i < m_displayGroups.size(); i++)
+        //
+        //  Work from a copy: ~DisplayGroupIPNode calls
+        //  IPGraph::removeDisplayGroup(this), which erases the node from
+        //  m_displayGroups. Indexing m_displayGroups directly while deleting
+        //  from it therefore skips every other entry, leaving orphaned
+        //  DisplayGroupIPNodes still wired to m_rootNode and still holding
+        //  pointers to devices the caller is about to destroy. Walking the graph
+        //  afterwards then dereferences freed memory in
+        //  DisplayGroupIPNode::imageDevice(). This only shows up when
+        //  setPhysicalDevices() is called a second time with more than one real
+        //  display group (e.g. rebuilding the desktop devices for a live
+        //  8/10-bit backend switch); at startup the list holds only the default
+        //  group, which is never deleted.
+        //
+
+        const DisplayGroups groups = m_displayGroups;
+
+        for (size_t i = 0; i < groups.size(); i++)
         {
-            DisplayGroupIPNode* node = m_displayGroups[i];
+            DisplayGroupIPNode* node = groups[i];
 
             if (node == m_defaultOutputGroup)
             {
@@ -702,11 +719,11 @@ namespace IPCore
             }
         }
 
-        for (size_t i = 0; i < m_displayGroups.size(); i++)
+        for (size_t i = 0; i < groups.size(); i++)
         {
-            if (m_displayGroups[i] != m_defaultOutputGroup)
+            if (groups[i] != m_defaultOutputGroup)
             {
-                delete m_displayGroups[i];
+                delete groups[i];
             }
         }
 
@@ -744,6 +761,188 @@ namespace IPCore
         displayGroup->setInputs1(m_viewGroupNode);
 
         m_rootNode->appendInput(displayGroup);
+    }
+
+    void IPGraph::refreshPhysicalDevices(const VideoModules& modules)
+    {
+        beginGraphEdit();
+        refreshPhysicalDevicesInternal(modules);
+        endGraphEdit();
+    }
+
+    void IPGraph::refreshPhysicalDevicesInternal(const VideoModules& modules)
+    {
+        //
+        //  Re-point the existing display groups at a rebuilt set of physical
+        //  devices, rather than rebuilding the groups the way
+        //  setPhysicalDevicesInternal() does.
+        //
+        //  That function is the startup path: it deletes every
+        //  DisplayGroupIPNode and makes new ones, and a new display group comes
+        //  with a new colorPipeline holding default contents. Using it as a
+        //  refresh therefore discards the display colour state -- the transfer
+        //  function and any assigned display profile. That is what reset the
+        //  main view from sRGB to None on every 8/10-bit switch: swapping the
+        //  main-view backend rebuilds the desktop devices, behind the very same
+        //  monitors, and took the colour pipeline with it.
+        //
+        //  Devices are matched to groups by (module name, device name), the
+        //  same key display profiles are stored under, and stable across a
+        //  rebuild precisely because the monitors have not changed.
+        //
+
+        std::vector<TwkApp::VideoDevice*> devices;
+
+        for (size_t i = 0; i < modules.size(); i++)
+        {
+            const TwkApp::VideoModule::VideoDevices& mdevices = modules[i]->devices();
+            devices.insert(devices.end(), mdevices.begin(), mdevices.end());
+        }
+
+        //
+        //  With nothing to match on either side there is no state worth
+        //  preserving, and setPhysicalDevicesInternal() already handles the
+        //  empty-modules (defaultOutputGroup) case correctly.
+        //
+        if (devices.empty() || m_displayGroups.empty())
+        {
+            setPhysicalDevicesInternal(modules);
+            return;
+        }
+
+        std::vector<bool> deviceMatched(devices.size(), false);
+        DisplayGroups survivors;
+        DisplayGroups doomed;
+
+        for (size_t gi = 0; gi < m_displayGroups.size(); gi++)
+        {
+            DisplayGroupIPNode* group = m_displayGroups[gi];
+
+            if (group == m_defaultOutputGroup)
+            {
+                survivors.push_back(group);
+                continue;
+            }
+
+            //
+            //  Match on the stored names, never on physicalDevice(): that
+            //  pointer refers to a device the caller has already destroyed.
+            //
+            const StringProperty* nameProp = group->property<StringProperty>("device.name");
+            const StringProperty* moduleProp = group->property<StringProperty>("device.moduleName");
+            const string groupName = (nameProp && !nameProp->empty()) ? nameProp->front() : "";
+            const string groupModule = (moduleProp && !moduleProp->empty()) ? moduleProp->front() : "";
+
+            size_t match = devices.size();
+
+            for (size_t di = 0; di < devices.size(); di++)
+            {
+                if (deviceMatched[di])
+                    continue;
+
+                const string deviceModule = devices[di]->module() ? devices[di]->module()->name() : "";
+
+                if (devices[di]->name() == groupName && deviceModule == groupModule)
+                {
+                    match = di;
+                    break;
+                }
+            }
+
+            if (match == devices.size())
+            {
+                //
+                //  Nothing answers to this group's device any more -- a monitor
+                //  was unplugged, or a module stopped advertising it.
+                //
+                if (m_rootNode->isInput(group))
+                {
+                    m_rootNode->removeInput(group);
+                }
+                group->willDelete();
+                group->disconnectInputs();
+                doomed.push_back(group);
+                continue;
+            }
+
+            deviceMatched[match] = true;
+            group->setPhysicalVideoDevice(devices[match]);
+
+            //
+            //  Drop a stale output pointer. The device it named was just
+            //  destroyed, and findDisplayGroupByDevice() compares pointers --
+            //  a dangling one can alias a freshly allocated device at the same
+            //  address and hand back the wrong group. The control device is
+            //  still alive and is not in the module list, so it is kept.
+            //
+            if (group->outputDevice() && group->outputDevice() != m_controlDevice)
+            {
+                bool stillPresent = false;
+
+                for (size_t di = 0; di < devices.size(); di++)
+                {
+                    if (devices[di] == group->outputDevice())
+                    {
+                        stillPresent = true;
+                        break;
+                    }
+                }
+
+                if (!stillPresent)
+                {
+                    group->setOutputVideoDevice(0);
+                }
+            }
+
+            survivors.push_back(group);
+        }
+
+        //
+        //  Publish the surviving set before deleting anything: ~DisplayGroupIPNode
+        //  calls back into removeDisplayGroup().
+        //
+        m_displayGroups = survivors;
+
+        for (size_t i = 0; i < doomed.size(); i++)
+        {
+            delete doomed[i];
+            m_topologyChanged = true;
+        }
+
+        //
+        //  Devices that no existing group describes are genuinely new.
+        //
+        for (size_t di = 0; di < devices.size(); di++)
+        {
+            if (deviceMatched[di])
+                continue;
+
+            size_t n = m_displayGroups.size();
+            string name;
+
+            do
+            {
+                ostringstream str;
+                str << "displayGroup" << n++;
+                name = str.str();
+            } while (findNode(name));
+
+            m_displayGroups.push_back(newDisplayGroup(name, devices[di]));
+        }
+
+        //
+        //  The primary may have been deleted above, so re-establish the view
+        //  connection and the root input for whichever group leads now.
+        //
+        if (DisplayGroupIPNode* displayGroup = primaryDisplayGroup())
+        {
+            displayGroup->setInputs1(m_viewGroupNode);
+
+            if (!m_rootNode->isInput(displayGroup))
+            {
+                m_rootNode->appendInput(displayGroup);
+            }
+        }
     }
 
     void IPGraph::setPrimaryDisplayGroup(DisplayGroupIPNode* node)
@@ -798,7 +997,36 @@ namespace IPCore
             if (newDevice)
             {
                 dnode->setOutputVideoDevice(newDevice);
-                dnode->setPhysicalVideoDevice(newDevice->physicalDevice());
+
+                //
+                //  Only adopt a physical device the new device actually knows.
+                //
+                //  VideoDevice's constructor seeds m_physicalDevice with the
+                //  device itself, and a viewport device only learns the monitor
+                //  it sits on when it first renders (setAbsolutePosition ->
+                //  deviceFromPosition). The one caller of this is
+                //  Session::setControlVideoDevice(), which during a main-view
+                //  backend swap runs on a view that has never rendered -- so
+                //  physicalDevice() is still that view.
+                //
+                //  Adopting it anyway rewrote the group's device.name from the
+                //  monitor ("Dell Inc. DELL U2725QE DP-1") to the viewport's own
+                //  name ("RV Main Window (Vulkan)/0x..."). The group then
+                //  described no physical device, so the rebuild that follows
+                //  discarded it and its colour pipeline with it -- which is why
+                //  the display transfer function fell back from sRGB to None on
+                //  every 8/10-bit switch. Keeping the old value is right: the
+                //  monitor has not changed, only the object drawing to it, and
+                //  refreshPhysicalDevices() re-points the pointer by name.
+                //
+                if (const VideoDevice* physical = newDevice->physicalDevice())
+                {
+                    if (physical != newDevice)
+                    {
+                        dnode->setPhysicalVideoDevice(physical);
+                    }
+                }
+
                 m_deviceChangedSignal(oldDevice, newDevice);
             }
         }

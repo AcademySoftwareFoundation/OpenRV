@@ -517,10 +517,25 @@ namespace TwkContainer
         }
     }
 
+    //
+    //  An empty property has no storage to point at. front() on an empty
+    //  container is undefined behaviour -- and a hard assert ("front() called
+    //  on empty vector") in an MSVC debug build -- so report the absence with
+    //  a null pointer instead. Callers that pair data()/rawData() with size()
+    //  then do the right thing for free: a zero-length copy out of or into a
+    //  cleared property becomes a no-op rather than a crash. Release builds
+    //  already returned null here for any property that never held a value,
+    //  so this only makes the existing behaviour well defined.
+    //
     template <class Container, size_t xsize, size_t ysize, size_t zsize, size_t wsize, Property::Layout layout>
     typename TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::const_value_pointer
     TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::data() const
     {
+        if (m_container.empty())
+        {
+            return nullptr;
+        }
+
         return &(m_container.front());
     }
 
@@ -528,6 +543,11 @@ namespace TwkContainer
     typename TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::value_pointer
     TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::data()
     {
+        if (m_container.empty())
+        {
+            return nullptr;
+        }
+
         return &(m_container.front());
     }
 

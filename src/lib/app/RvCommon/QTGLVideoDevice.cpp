@@ -19,7 +19,10 @@
 #include <TwkApp/Application.h>
 #include <TwkApp/VideoModule.h>
 
+#include <QOpenGLContext>
 #include <QScreen>
+
+#include <iostream>
 
 namespace Rv
 {
@@ -70,7 +73,11 @@ namespace Rv
         assert(view);
     }
 
-    QTGLVideoDevice::~QTGLVideoDevice() { delete m_translator; }
+    QTGLVideoDevice::~QTGLVideoDevice()
+    {
+        delete m_translator;
+        delete m_teardownSurface;
+    }
 
     void QTGLVideoDevice::setWidget(QOpenGLWidget* widget)
     {
@@ -104,20 +111,35 @@ namespace Rv
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        if (m_window)
+        //
+        //  The handle() test belongs in this condition, not nested inside it:
+        //  QOpenGLWindow creates its GL context lazily on the first
+        //  makeCurrent() and only if the platform window (surface) exists, so a
+        //  live m_window with a dead surface can make nothing current. Nested,
+        //  that case fell through every branch and returned silently.
+        //
+        if (m_window && m_window->handle())
         {
-            // QOpenGLWindow creates its GL context lazily on the first
-            // makeCurrent(), provided the platform window (surface) exists.
-            if (m_window->handle())
-            {
-                m_window->makeCurrent();
-                TWK_GLDEBUG;
+            m_window->makeCurrent();
+            TWK_GLDEBUG;
 
-                GLint surfaceFBO = m_window->defaultFramebufferObject();
-                if (surfaceFBO != 0)
-                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
-                TWK_GLDEBUG;
+            //
+            //  Build the teardown surface now, while there is a live context to
+            //  copy a compatible format from. See m_teardownSurface.
+            //
+            if (!m_teardownSurface && m_window->context())
+            {
+                m_teardownSurface = new QOffscreenSurface();
+                m_teardownSurface->setFormat(m_window->context()->format());
+                m_teardownSurface->create();
             }
+
+            GLint surfaceFBO = m_window->defaultFramebufferObject();
+            if (surfaceFBO != 0)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
+            }
+            TWK_GLDEBUG;
         }
         else if (m_view && m_view->context() && m_view->context()->isValid())
         {
@@ -126,8 +148,45 @@ namespace Rv
 
             GLint widgetFBO = m_view->defaultFramebufferObject();
             if (widgetFBO != 0)
+            {
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
+            }
             TWK_GLDEBUG;
+        }
+        else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
+                 && m_window->context()->makeCurrent(m_teardownSurface))
+        {
+            //
+            //  The platform surface is gone but the context is not, so bind it
+            //  to the offscreen surface instead. GL object deletion needs a
+            //  current context, not a visible one, so this lets the teardown
+            //  actually free what it is trying to free.
+            //
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            //
+            //  There is no surface left to make current. m_window is a
+            //  QPointer, so it self-nulls once the QOpenGLWindow is destroyed,
+            //  and m_view is null in the native-window port -- which means this
+            //  function can quietly do nothing while its caller carries on
+            //  believing it has a context. That is how GL teardown ends up
+            //  running with no context at all. Say so once instead.
+            //
+            static bool reported = false;
+            if (!reported)
+            {
+                reported = true;
+                cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
+                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface")) << " widget=" << (m_view ? "alive" : "null")
+                     << " currentContext=" << (QOpenGLContext::currentContext() ? "yes" : "none")
+                     //  Whether the context outlives the surface decides if a
+                     //  QOffscreenSurface could be used to make it current for
+                     //  teardown, the way QTVulkanVideoDevice already does.
+                     << " ownContext=" << (m_window && m_window->context() ? "alive" : "null")
+                     << "); the caller's GL work has no current context" << endl;
+            }
         }
 
         if (!isWorkerDevice())
@@ -199,13 +258,13 @@ namespace Rv
             if (m_view->isVisible())
             {
 #ifdef PLATFORM_DARWIN
-                // Make sure that the QGLWidget gets redrawn by updateGL() even
+                // Make sure that the view gets redrawn by update() even
                 // when completely overlapped by another window.
-                // Note that on macOS, Qt correctly detects when the QGLWidget
+                // Note that on macOS, Qt correctly detects when the view
                 // is completely overlapped by another window and in which case
                 // resets the Qt::WA_Mapped attribute. This will prevent the
                 // GLView::paintGL() operation from being called by
-                // m_view->updateGL(), which will result in automatically
+                // m_view->update(), which will result in automatically
                 // interrupting any video playback that might be in progress
                 // while the RV window is completely overlapped. This is an
                 // undesirable behaviour during a review session, especially if

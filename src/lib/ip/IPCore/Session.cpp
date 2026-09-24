@@ -21,7 +21,12 @@
 #include <IPCore/Profile.h>
 #include <IPCore/NodeManager.h>
 #include <IPCore/FBCache.h>
+#if defined(PLATFORM_DARWIN)
+#include <TwkGLF/GL.h>
+#include <TwkGLF/GLVideoDevice.h>
+#endif
 #include <TwkApp/Event.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkContainer/GTOReader.h>
 #include <TwkContainer/GTOWriter.h>
 #include <TwkContainer/PropertyContainer.h>
@@ -741,7 +746,7 @@ namespace IPCore
             else if (name == "threads")
                 stl_ext::thread_group::debug_all(true);
             else if (name == "gpu")
-                ImageRenderer::reportGL(true);
+                ImageRenderer::debugGpu(true);
             else if (name == "audio")
                 AudioRenderer::setDebug(true);
             else if (name == "audioverbose")
@@ -1144,6 +1149,18 @@ namespace IPCore
 
     void Session::clearVideoDeviceCaches()
     {
+        //
+        //  Everything below destroys GL objects -- each device's cached FBO
+        //  clones, then the renderer's entire ImageFBO pool via clearState() ->
+        //  flushImageFBOs(). Nothing guarantees a context on entry: this runs
+        //  from a RenderContextChangeEvent and from shutdown, not only from
+        //  inside a render where one happens to be bound.
+        //
+        //  We know our control device, so hand it over rather than making the
+        //  scope fall back to its own context.
+        //
+        const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(m_controlVideoDevice));
+
         if (m_controlVideoDevice)
             m_controlVideoDevice->clearCaches();
         if (m_outputVideoDevice)
@@ -1156,6 +1173,15 @@ namespace IPCore
     {
         if (d == m_outputVideoDevice || d == m_controlVideoDevice)
         {
+            //
+            //  This arrives from the view's resize, not from a render, so
+            //  there is no context current -- and leaving presentation mode
+            //  resizes the main view, which is how a whole FBO pool came to be
+            //  deleted into nothing at exit. The device that changed size is
+            //  right here, so use its context.
+            //
+            const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(d));
+
             m_renderer->flushImageFBOs();
         }
 
@@ -3098,6 +3124,23 @@ namespace IPCore
 
     void Session::queryAndStoreGLInfo()
     {
+#if defined(PLATFORM_DARWIN)
+        // Darwin Metal hybrid path: IPCore renders through an offscreen GL context
+        // owned by QTMetalVideoDevice.  Make the control device's context current
+        // when available; defer until the first render if it is not ready yet
+        // (queryGLFinished() stays false).
+        if (const TwkGLF::GLVideoDevice* glDev = dynamic_cast<const TwkGLF::GLVideoDevice*>(controlVideoDevice()))
+        {
+            glDev->makeCurrent();
+        }
+        else
+        {
+            return;
+        }
+
+        if (TwkGLF::safeGLGetString(GL_VERSION).empty())
+            return;
+#endif
         ImageRenderer::queryGL();
         ImageRenderer::queryGLIntoContainer(graph().sessionNode());
     }
@@ -4801,7 +4844,7 @@ namespace IPCore
 
     void Session::userRender(const VideoDevice* d, const char* eventName, const string& contents)
     {
-        if (ImageRenderer::reportGL())
+        if (ImageRenderer::debugGpu())
         {
             // these calls are expensive should only be called in debug mode
 
@@ -4825,7 +4868,7 @@ namespace IPCore
 
         m_currentSession = s;
 
-        if (ImageRenderer::reportGL())
+        if (ImageRenderer::debugGpu())
         {
             if (GLuint err = glGetError())
             {

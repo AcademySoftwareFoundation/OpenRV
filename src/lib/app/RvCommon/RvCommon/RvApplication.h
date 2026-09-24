@@ -28,6 +28,11 @@ namespace TwkApp
     class VideoModule;
 }
 
+namespace TwkGLF
+{
+    class GLVideoDevice;
+}
+
 namespace Rv
 {
     class RvDocument;
@@ -99,6 +104,19 @@ namespace Rv
         RvPreferences* prefDialog();
         RvProfileManager* profileManager();
 
+        //
+        //  Has the last document begun tearing down?
+        //
+        //  Set once, on the way out, so that code running from queued events
+        //  during shutdown can tell it is too late to put something back on
+        //  screen. The console uses it: its auto-show is driven by output, and
+        //  shutdown produces plenty of that after the windows have been asked
+        //  to close.
+        //
+        bool isShuttingDown() const { return m_shuttingDown; }
+
+        void setShuttingDown() { m_shuttingDown = true; }
+
         bool networkDialogRunning() const { return m_networkDialog ? true : false; }
 
         void processNetworkOpts(bool startup = true);
@@ -125,6 +143,29 @@ namespace Rv
 
         void setPresentationMode(bool);
         bool isInPresentationMode();
+
+        //
+        //  Re-evaluate and rebuild the desktop presentation devices so their
+        //  backend follows the current display-depth preference and the main
+        //  view's live backend, then re-bind the share device and, if
+        //  presentation mode is on, re-open the presentation output on the
+        //  selected screen.
+        //
+        //  Invoked from the RvDocument backend-transition points
+        //  (setDisplayOutput / swapGLViewToVulkan / fallbackVulkanToGLView /
+        //  swapGLViewToMetal / fallbackMetalToGLView / rebuildGLView).
+        //  shareDevice is the controller's new main-view device (see
+        //  DesktopVideoDevice::shareDevice), or null when the main view has
+        //  moved to Vulkan and there is no GL device to share. Fixes the frozen
+        //  presentation bit depth and the black second display on a backend
+        //  mismatch.
+        //
+        //  mainViewIsNative is the backend the calling document's main view
+        //  has just settled on (Vulkan or Metal rather than OpenGL). It is
+        //  passed rather than re-derived from the display-depth preference
+        //  because only the caller knows which widget actually exists now.
+        //
+        void rebuildDesktopVideoDevices(TwkGLF::GLVideoDevice* shareDevice, bool mainViewIsNative);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 
@@ -161,6 +202,7 @@ namespace Rv
         RvWebManager* m_webManager;
         TwkApp::VideoDevice* m_presentationDevice;
         bool m_presentationMode;
+        bool m_shuttingDown{false};
         mutable pthread_mutex_t m_deleteLock;
         std::string m_executableNameCaps;
         DesktopVideoModule* m_desktopModule;

@@ -19,6 +19,7 @@
 #include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/BasicGLProgram.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -134,7 +135,22 @@ namespace IPCore
             //
             setThreadName("PBO Upload");
 
+            if (!renderer->uploadThreadDevice())
+            {
+                renderer->setUseThreadedUpload(false);
+                return;
+            }
+
             renderer->uploadThreadDevice()->makeCurrent();
+
+            if (TwkGLF::safeGLGetString(GL_VERSION).empty())
+            {
+                std::cerr << "ERROR: [ImageRenderer] upload thread GL context init failed; "
+                             "disabling threaded upload\n";
+                renderer->setUseThreadedUpload(false);
+                renderer->notifyDraw();
+                return;
+            }
 
             while (true)
             {
@@ -155,6 +171,14 @@ namespace IPCore
                 // probably not significant.
                 //
                 renderer->manager()->insertTextureFence(renderer->uploadRootHash());
+
+                // The fence was created on THIS (worker) GL context. glClientWaitSync's
+                // GL_SYNC_FLUSH_COMMANDS_BIT on the main thread only flushes the main
+                // context, not this one, so without an explicit flush here the sync
+                // object never reaches the GPU and the main thread stalls on the 10s
+                // fence timeout every frame. Flushing publishes the uploads + fence so
+                // the waiter wakes immediately.
+                glFlush();
 
                 // signal renderer to proceed
                 renderer->notifyDraw();
@@ -182,6 +206,15 @@ namespace IPCore
 
     void ImageRenderer::Device::clearFBOs()
     {
+        //
+        //  The ring buffer holds GLFBOs, so this is GL destruction and needs
+        //  a context like any other. ~ImageRenderer reaches it after the
+        //  renderer's device pointers have been cleared, which is why the
+        //  scope may have to fall back to its own context; glDevice is still
+        //  worth offering for the callers that reach here with one alive.
+        //
+        const TwkGLF::GLContextScope contextScope(glDevice);
+
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
         {
             FBOVector& views = fboRingBuffer[i].views;
@@ -247,7 +280,7 @@ namespace IPCore
     bool ImageRenderer::m_defaultAllowPBOs = true;
     bool ImageRenderer::m_fragmentProgram = true;
     bool ImageRenderer::m_ycbcrApple = false;
-    bool ImageRenderer::m_reportGL = false;
+    bool ImageRenderer::m_debugGpu = false;
     bool ImageRenderer::m_softwareGLRenderer = false;
     int ImageRenderer::m_ALUinsnLimit = 0;
     int ImageRenderer::m_tempLimit = 0;
@@ -478,6 +511,17 @@ namespace IPCore
             m_uploadThread.join();
         }
 
+        //
+        //  Everything from here down deletes GL objects -- the FBO pool and
+        //  program cache via clearState(), the program cache object itself,
+        //  each device's FBO ring buffer, then the GL state. Session tears the
+        //  renderer down after its device pointers have been cleared, so the
+        //  members below have nothing to offer and the scope falls back to its
+        //  own context. Holding one here means it is acquired once rather than
+        //  once per inner scope.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearState();
 
         // clean up
@@ -610,6 +654,15 @@ namespace IPCore
 
     void ImageRenderer::clearState()
     {
+        //
+        //  One scope around the whole of it. flushImageFBOs() opens its own,
+        //  but that one closes when it returns -- and flushProgramCache()
+        //  after it deletes GL programs, which needs a context just as much.
+        //  Holding it here keeps the inner scopes as no-ops and leaves no gap
+        //  between them.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearRenderedImages();
 
         // clear state will unbind the FBO currently bound
@@ -625,9 +678,21 @@ namespace IPCore
 
     void ImageRenderer::createGLContexts()
     {
-        m_setGLContext = true;
         delete m_uploadThreadDevice;
         m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
+        if (!m_uploadThreadDevice)
+        {
+            static bool logged = false;
+            if (!logged)
+            {
+                logged = true;
+                std::cerr << "WARNING: [ImageRenderer] threaded GPU upload unavailable; "
+                             "falling back to synchronous upload\n";
+            }
+            setUseThreadedUpload(false);
+            return;
+        }
+        m_setGLContext = true;
         controlDevice().glDevice->makeCurrent();
     }
 
@@ -852,7 +917,7 @@ namespace IPCore
         m_maxH = maxt;
         m_maxW = maxt;
 
-        if (m_reportGL)
+        if (m_debugGpu)
         {
             cout << "INFO: GL version            = " << glver << endl;
             cout << "INFO: GLSL version          = " << glslver << endl;
@@ -1314,8 +1379,44 @@ namespace IPCore
         //  unique device pair (controller and output).
         //
 
+        //
+        //  m_outputDevice.glDevice is a dynamic_cast to GLVideoDevice, and that
+        //  is null for every GLBindableVideoDevice output -- presentation, AJA,
+        //  NDI -- because GLVideoDevice and GLBindableVideoDevice are siblings
+        //  (both derive TwkApp::VideoDevice directly), not base and derived.
+        //  With no fallback, everything below here tears down FBOs, fences and
+        //  textures with no context current at all. That is what makes quitting
+        //  out of presentation mode log a long tail of GL_INVALID_OPERATION
+        //  starting in ~GLFBO: once no context is current, glGetError() keeps
+        //  returning that same error, so a single lost context is worth a great
+        //  many messages.
+        //
+        //  The control device's context is the right one to fall back to. It
+        //  owns the FBOs cleared below -- for a bindable output the renderer
+        //  draws in the control context on purpose, see the comment above --
+        //  and it is what the rest of this function already relies on further
+        //  down, where defaultFBO() happens to make it current as a side
+        //  effect.
+        //
         if (m_outputDevice.glDevice)
+        {
             m_outputDevice.glDevice->makeCurrent();
+        }
+        else if (m_controlDevice.glDevice)
+        {
+            m_controlDevice.glDevice->makeCurrent();
+        }
+        else
+        {
+            static bool reported = false;
+            if (!reported)
+            {
+                reported = true;
+                cerr << "ERROR: ImageRenderer::setOutputDevice: neither the output nor the control device is a GLVideoDevice; "
+                        "the GL objects released below have no current context"
+                     << endl;
+            }
+        }
         TWK_GLDEBUG;
 
         if (d)
@@ -1558,11 +1659,17 @@ namespace IPCore
         {
             createGLContexts();
 
-            // upload thread initialization
-            m_uploadThread = Thread(uploadThreadTrampoline, this); // func and data
+            if (!GLContextNotSet())
+            {
+                // upload thread initialization
+                m_uploadThread = Thread(uploadThreadTrampoline, this);
+            }
         }
 
-        notifyUpload();
+        if (useThreadedUpload())
+        {
+            notifyUpload();
+        }
     }
 
     void ImageRenderer::renderBegin(const InternalRenderContext& context)
@@ -1602,6 +1709,11 @@ namespace IPCore
                     }
                     m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
 
+                    // Texture object creation (glGenTextures, PBO alloc) must run
+                    // on the control device's GL context — especially on the Metal
+                    // offscreen path where nothing else guarantees it is current.
+                    controlDevice().glDevice->makeCurrent();
+
                     //
                     // traverse our IPTree, and create gl textures/buffers for
                     // all texture uploads the upload thread will need the
@@ -1626,6 +1738,13 @@ namespace IPCore
 
                     prepareTextureDescriptionsForUpload(uploadRoot);
                     setupUploadThread(uploadRoot);
+
+                    // Worker creation may fail (e.g. Metal offscreen share setup);
+                    // fall back to synchronous upload for this frame.
+                    if (!useThreadedUpload())
+                    {
+                        prefetch(uploadRoot);
+                    }
                 }
                 else
                 {
@@ -2414,7 +2533,7 @@ namespace IPCore
         //  or waiting for the sync to complete before continuing.
         //
         //  NOTE: I still think its possible to get stomped on -- you can
-        //  tell if that's happen by setting m_reportGL (-debug gpu in RV)
+        //  tell if that's happen by setting m_debugGpu (-debug gpu in RV)
         //  which will cause some debug code to clear to blue. If you see
         //  blue flashing on the pres device that's the problem.
         //
@@ -2446,7 +2565,7 @@ namespace IPCore
         {
             clearBackground(fbo);
 
-            if (m_reportGL && !controller)
+            if (m_debugGpu && !controller)
             {
                 glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
                 TWK_GLDEBUG;
