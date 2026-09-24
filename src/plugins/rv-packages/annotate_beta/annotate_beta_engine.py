@@ -589,6 +589,7 @@ class AnnotateDrawEngine:
     def _cancel_text(self):
         if self._text_node:
             try:
+                self._update_text_display(cursor=False)
                 self._remove_from_order(self._text_paint_node, self._text_frame, self._text_node)
                 commands.setIntProperty(f"{self._text_node}.softDeleted", [1], True)
                 commands.redraw()
