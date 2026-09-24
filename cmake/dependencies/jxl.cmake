@@ -1,89 +1,177 @@
 #
-# Copyright (C) 2026  Autodesk, Inc. All Rights Reserved.
-#
 # SPDX-License-Identifier: Apache-2.0
 #
 
 #
-# [libjxl -- Sources](https://github.com/libjxl/libjxl)
+# Official sources: https://github.com/libjxl/libjxl
 #
-# [libjxl -- Documentation](https://libjxl.readthedocs.io/en/latest/)
+# Build instructions: https://github.com/libjxl/libjxl/blob/main/BUILDING.md
 #
-# [libjxl -- Build instructions](https://github.com/libjxl/libjxl/blob/main/BUILDING.md)
+# libjxl is built from source. Rather than resolving highway, brotli, and skcms as separate RV dependencies, this module lets libjxl build its own pinned
+# third_party submodules (see build/jxl.cmake).
 #
 
-IF(NOT JXL_ROOT)
-  RETURN()
+RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JXL" "${RV_DEPS_JXL_VERSION}" "make" "")
+
+# libjxl ships CMake CONFIG files (JxlConfig.cmake) that create jxl::jxl and jxl::jxl_threads. Fall back to pkg-config (libjxl) when CONFIG is unavailable.
+RV_FIND_DEPENDENCY(
+  TARGET
+  ${_target}
+  PACKAGE
+  Jxl
+  VERSION
+  ${_version}
+  PKG_CONFIG_NAME
+  libjxl
+  DEPS_LIST_TARGETS
+  jxl::jxl
+  jxl::jxl_threads
+)
+
+# jxl library naming (shared across the build and found paths).
+IF(RV_TARGET_WINDOWS)
+  RV_MAKE_STANDARD_LIB_NAME("jxl" "${RV_DEPS_JXL_VERSION}" "SHARED" "")
+  SET(_libname
+      "jxl.lib"
+  )
+  SET(_implibpath
+      ${_lib_dir}/${_libname}
+  )
+ELSE()
+  RV_MAKE_STANDARD_LIB_NAME("jxl" "${RV_DEPS_JXL_VERSION}" "SHARED" "")
 ENDIF()
 
-# Find out the libjxl version from the header file
-IF(RV_DEPS_JXL_INCLUDE_DIR)
-  FILE(
-    STRINGS "${RV_DEPS_JXL_INCLUDE_DIR}/jxl/version.h" TMP
-    REGEX "^#define JPEGXL_MAJOR_VERSION .*$"
+# jxl_threads library naming.
+IF(RV_TARGET_WINDOWS)
+  SET(_threads_libname
+      "jxl_threads.lib"
   )
-  STRING(REGEX MATCHALL "[0-9]+" JPEGXL_MAJOR_VERSION ${TMP})
-  FILE(
-    STRINGS "${RV_DEPS_JXL_INCLUDE_DIR}/jxl/version.h" TMP
-    REGEX "^#define JPEGXL_MINOR_VERSION .*$"
+  SET(_threads_implibpath
+      ${_lib_dir}/${_threads_libname}
   )
-  STRING(REGEX MATCHALL "[0-9]+" JPEGXL_MINOR_VERSION ${TMP})
-  FILE(
-    STRINGS "${RV_DEPS_JXL_INCLUDE_DIR}/jxl/version.h" TMP
-    REGEX "^#define JPEGXL_PATCH_VERSION .*$"
+  SET(_threads_libpath
+      ${_bin_dir}/jxl_threads${CMAKE_SHARED_LIBRARY_SUFFIX}
   )
-  STRING(REGEX MATCHALL "[0-9]+" JPEGXL_PATCH_VERSION ${TMP})
-  SET(RV_DEPS_JXL_VERSION
-      "${JPEGXL_MAJOR_VERSION}.${JPEGXL_MINOR_VERSION}.${JPEGXL_PATCH_VERSION}"
+ELSE()
+  SET(_threads_libname
+      "${CMAKE_SHARED_LIBRARY_PREFIX}jxl_threads${CMAKE_SHARED_LIBRARY_SUFFIX}"
+  )
+  SET(_threads_libpath
+      ${_lib_dir}/${_threads_libname}
   )
 ENDIF()
 
-RV_CREATE_STANDARD_DEPS_VARIABLES("RV_DEPS_JXL" "${RV_DEPS_JXL_VERSION}" "" "")
-RV_SHOW_STANDARD_DEPS_VARIABLES()
+IF(NOT ${_target}_FOUND)
+  INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/jxl.cmake)
 
-# Resolve libjxl and libjxl_threads under the caller-provided JXL_ROOT.
-FIND_LIBRARY(
-  RV_DEPS_JXL_LIBRARY
-  NAMES jxl
-  PATHS "${JXL_ROOT}/lib" "${JXL_ROOT}/lib64"
-  NO_DEFAULT_PATH
-)
-FIND_LIBRARY(
-  RV_DEPS_JXL_THREADS_LIBRARY
-  NAMES jxl_threads
-  PATHS "${JXL_ROOT}/lib" "${JXL_ROOT}/lib64"
-  NO_DEFAULT_PATH
-)
+  # A single staging call copies the whole install lib dir, so libjxl_cms and the bundled brotli runtime libraries (libbrotli*) that libjxl links against are
+  # staged alongside libjxl automatically. highway and skcms are compiled statically into libjxl, so they produce no separate shared libraries.
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} LIBNAME ${_libname})
 
-IF(NOT RV_DEPS_JXL_LIBRARY
-   OR NOT RV_DEPS_JXL_THREADS_LIBRARY
-)
-  MESSAGE(WARNING "JXL_ROOT=${JXL_ROOT} but libjxl or libjxl_threads were not found under ${JXL_ROOT}/lib[64]; JPEG XL will be disabled in OpenImageIO.")
-  # Leave RV_DEPS_JXL_ROOT_DIR unset so oiio.cmake disables the format.
-  UNSET(RV_DEPS_JXL_ROOT_DIR)
-  RETURN()
+  IF(NOT RV_TARGET_WINDOWS)
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      SONAME
+      ${_libname}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl_threads
+      TYPE
+      SHARED
+      LOCATION
+      ${_threads_libpath}
+      SONAME
+      ${_threads_libname}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+  ELSE()
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl
+      TYPE
+      SHARED
+      LOCATION
+      ${_libpath}
+      IMPLIB
+      ${_implibpath}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl_threads
+      TYPE
+      SHARED
+      LOCATION
+      ${_threads_libpath}
+      IMPLIB
+      ${_threads_implibpath}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+      ADD_TO_DEPS_LIST
+    )
+  ENDIF()
+ELSE()
+  # A pre-built libjxl was found (CONFIG or pkg-config). Create the jxl::* targets from the resolved install when CONFIG did not already provide them.
+  IF(NOT TARGET jxl::jxl)
+    SET(_jxl_found_lib
+        "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}jxl${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl
+      TYPE
+      SHARED
+      LOCATION
+      ${_jxl_found_lib}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+    )
+    LIST(APPEND RV_DEPS_LIST jxl::jxl)
+    RV_RESOLVE_DARWIN_INSTALL_NAME(jxl::jxl)
+  ENDIF()
+
+  IF(NOT TARGET jxl::jxl_threads)
+    SET(_jxl_threads_found_lib
+        "${_lib_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}jxl_threads${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    RV_ADD_IMPORTED_LIBRARY(
+      NAME
+      jxl::jxl_threads
+      TYPE
+      SHARED
+      LOCATION
+      ${_jxl_threads_found_lib}
+      INCLUDE_DIRS
+      ${_include_dir}
+      DEPENDS
+      ${_target}
+    )
+    LIST(APPEND RV_DEPS_LIST jxl::jxl_threads)
+    RV_RESOLVE_DARWIN_INSTALL_NAME(jxl::jxl_threads)
+  ENDIF()
+
+  RV_STAGE_DEPENDENCY_LIBS(TARGET ${_target} TARGET_LIBS jxl::jxl jxl::jxl_threads)
 ENDIF()
-
-SET(RV_DEPS_JXL_ROOT_DIR
-    "${JXL_ROOT}"
-)
-
-# Validate the resolved root actually exposes the headers OIIO compiles against.
-FIND_PATH(
-  RV_DEPS_JXL_INCLUDE_DIR
-  NAMES jxl/encode.h jxl/decode.h
-  PATHS "${RV_DEPS_JXL_ROOT_DIR}/include"
-  NO_DEFAULT_PATH
-)
-IF(NOT RV_DEPS_JXL_INCLUDE_DIR)
-  MESSAGE(
-    WARNING
-      "libjxl libraries were found (${RV_DEPS_JXL_LIBRARY}) but jxl/encode.h was not found under ${RV_DEPS_JXL_ROOT_DIR}/include; JPEG XL will be disabled in OpenImageIO."
-  )
-  UNSET(RV_DEPS_JXL_ROOT_DIR)
-  RETURN()
-ENDIF()
-
-MESSAGE(STATUS "Found libjxl:         ${RV_DEPS_JXL_LIBRARY}")
-MESSAGE(STATUS "Found libjxl_threads: ${RV_DEPS_JXL_THREADS_LIBRARY}")
-MESSAGE(STATUS "Using libjxl root:    ${RV_DEPS_JXL_ROOT_DIR}")

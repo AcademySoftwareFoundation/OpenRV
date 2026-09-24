@@ -196,6 +196,17 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB
     "62.3.0"
 )
 
+# libjxl https://github.com/libjxl/libjxl RV_DEPS_JXL_VERSION is the ABI/soname series used for library naming. libjxl is built from source via a recursive git
+# clone (see cmake/dependencies/jxl.cmake), so its highway/brotli/skcms sub-dependencies come from libjxl's own pinned third_party submodules rather than
+# separate RV dependencies.
+SET(RV_DEPS_JXL_VERSION
+    "0.12"
+)
+# Exact upstream release tag to clone; libjxl only tags full x.y.z releases.
+SET(RV_DEPS_JXL_GIT_TAG
+    "v0.12.0"
+)
+
 # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION
     "3.1.12.0"
