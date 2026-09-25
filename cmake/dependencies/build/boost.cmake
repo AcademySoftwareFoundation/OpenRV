@@ -81,6 +81,20 @@ IF(APPLE)
   ENDIF()
 ENDIF()
 
+# WINDOWS: bootstrap.bat DOES NOT PARSE --with-toolset. That spelling belongs to bootstrap.sh. On Windows the toolset is POSITIONAL (bootstrap.bat passes %*
+# straight to build.bat, which maps vc143 -> "msvc : 14.3"), so --with-toolset=msvc-14.3 arrives as an unrecognised option, build.bat falls back to guessing,
+# guess_toolset.bat asks vswhere for the newest Visual Studio, gets VS 2026 (v18) whose version it cannot map, and dies with "Unknown toolset: vcunk". Passing
+# vc143 positionally skips the guess and writes the same `using msvc : 14.3 ;` into project-config.jam that b2's toolset= wants.
+IF(RV_TARGET_WINDOWS)
+  SET(_boost_bootstrap_args
+      vc143
+  )
+ELSE()
+  SET(_boost_bootstrap_args
+      --with-toolset=${_toolset} --with-python=${_boost_python_bin}
+  )
+ENDIF()
+
 EXTERNALPROJECT_ADD(
   ${_target}
   DEPENDS Python::Python
@@ -91,7 +105,7 @@ EXTERNALPROJECT_ADD(
   INSTALL_DIR ${_install_dir}
   URL ${_download_url}
   URL_MD5 ${_download_hash}
-  CONFIGURE_COMMAND ${_bootstrap_command} --with-toolset=${_toolset} --with-python=${_boost_python_bin}
+  CONFIGURE_COMMAND ${_bootstrap_command} ${_boost_bootstrap_args}
   BUILD_COMMAND
     # Ref.: https://www.boost.org/doc/libs/1_70_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags Ref.:
     # https://www.boost.org/doc/libs/1_76_0/tools/build/doc/html/index.html#bbv2.builtin.features.cflags
