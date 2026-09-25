@@ -3,6 +3,8 @@
 
 import os
 
+from dataclasses import dataclass
+
 from PySide6 import QtCore, QtWidgets, QtGui
 
 from annotate_beta_color_picker import ColorPickerSection
@@ -22,41 +24,36 @@ TOOL_EYEDROPPER = "eyedropper"
 
 # Secondary panel page indices
 _PAGE_EMPTY = -1  # cursor, eyedropper
-_PAGE_BRUSH = 0  # arrow, line
+_PAGE_SIZE_OPACITY = 0  # arrow, line
 _PAGE_SHAPE = 1  # rect, circle
 _PAGE_TEXT = 2  # text
-_PAGE_PEN = 3  # pen and airbrush (size/opacity/blend mode)
+_PAGE_BLEND = 3  # pen and airbrush (size/opacity/blend mode)
 _PAGE_ERASER = 4  # eraser (brush type combo + size/opacity)
-
-_TOOL_PAGE = {
-    TOOL_CURSOR: _PAGE_EMPTY,
-    TOOL_EYEDROPPER: _PAGE_EMPTY,
-    TOOL_PEN: _PAGE_PEN,
-    TOOL_AIRBRUSH: _PAGE_PEN,
-    TOOL_ERASER: _PAGE_ERASER,
-    TOOL_ARROW: _PAGE_BRUSH,
-    TOOL_LINE: _PAGE_BRUSH,
-    TOOL_RECT: _PAGE_SHAPE,
-    TOOL_CIRCLE: _PAGE_SHAPE,
-    TOOL_TEXT: _PAGE_TEXT,
-}
 
 # Blend mode values passed to the mode/engine
 COLOR_MOD_NORMAL = "normal"
 COLOR_MOD_ADDITIVE = "additive"
 COLOR_MOD_DARKEN = "darken"
 
-_TOOL_TOOLTIP = {
-    TOOL_CURSOR: "Cursor",
-    TOOL_PEN: "Pen",
-    TOOL_AIRBRUSH: "Airbrush",
-    TOOL_ERASER: "Eraser",
-    TOOL_RECT: "Rectangle",
-    TOOL_CIRCLE: "Circle",
-    TOOL_ARROW: "Arrow",
-    TOOL_LINE: "Line",
-    TOOL_TEXT: "Text",
-    TOOL_EYEDROPPER: "Eyedropper",
+
+@dataclass
+class Tool:
+    page: int
+    tooltip: str
+    cursor: QtCore.Qt.CursorShape
+
+
+TOOLS = {
+    TOOL_CURSOR: Tool(page=_PAGE_EMPTY, tooltip="Cursor", cursor=QtCore.Qt.ArrowCursor),
+    TOOL_EYEDROPPER: Tool(page=_PAGE_EMPTY, tooltip="Eyedropper", cursor=QtCore.Qt.CrossCursor),
+    TOOL_PEN: Tool(page=_PAGE_BLEND, tooltip="Pen", cursor=QtCore.Qt.CrossCursor),
+    TOOL_AIRBRUSH: Tool(page=_PAGE_BLEND, tooltip="Airbrush", cursor=QtCore.Qt.CrossCursor),
+    TOOL_ERASER: Tool(page=_PAGE_ERASER, tooltip="Eraser", cursor=QtCore.Qt.CrossCursor),
+    TOOL_RECT: Tool(page=_PAGE_SHAPE, tooltip="Rectangle", cursor=QtCore.Qt.CrossCursor),
+    TOOL_CIRCLE: Tool(page=_PAGE_SHAPE, tooltip="Circle", cursor=QtCore.Qt.CrossCursor),
+    TOOL_ARROW: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Arrow", cursor=QtCore.Qt.CrossCursor),
+    TOOL_LINE: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Line", cursor=QtCore.Qt.CrossCursor),
+    TOOL_TEXT: Tool(page=_PAGE_TEXT, tooltip="Text", cursor=QtCore.Qt.IBeamCursor),
 }
 
 # ---------------------------------------------------------------------------
@@ -796,7 +793,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._stack.addWidget(self._eraser_panel)
 
     def set_page_for_tool(self, tool):
-        page = _TOOL_PAGE.get(tool, _PAGE_EMPTY)
+        page = TOOLS[tool].page
         self._stack.setVisible(page != _PAGE_EMPTY)
         if page != _PAGE_EMPTY:
             self._stack.setCurrentIndex(page)
@@ -872,7 +869,7 @@ class AnnotateToolStrip(_StyledWidget):
         self._buttons = {}
 
         def _add_tool(tool, grouppos="solo"):
-            btn = _tool_button(_TOOL_TOOLTIP[tool])
+            btn = _tool_button(TOOLS[tool].tooltip)
             _apply_icon(btn, tool)
             if grouppos != "solo":
                 btn.setProperty("grouppos", grouppos)

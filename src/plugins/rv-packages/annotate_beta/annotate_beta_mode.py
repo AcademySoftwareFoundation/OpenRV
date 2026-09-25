@@ -7,6 +7,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 from annotate_beta_widget import (
     AnnotateToolbarDockWidget,
+    TOOLS,
     TOOL_PEN,
     TOOL_TEXT,
     TOOL_AIRBRUSH,
@@ -22,7 +23,6 @@ _DEFAULT_SIZE = 32
 _DEFAULT_OPACITY = 50
 
 _SETTINGS_GROUP = "AnnotateBeta"
-_ALL_TOOLS = ("cursor", "pen", "airbrush", "eraser", "rect", "circle", "arrow", "line", "text", "eyedropper")
 
 
 class AnnotateBetaMode(rvtypes.MinorMode):
@@ -93,10 +93,12 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         if self._tool in _DRAWING_TOOLS:
             self._push_shape_table()
 
+        commands.setCursor(TOOLS[self._tool].cursor.value)
         self._update_tool_availability()
         self._update_undo_redo_buttons()
 
     def deactivate(self):
+        commands.setCursor(QtCore.Qt.ArrowCursor.value)
         self._pop_shape_table()
         self._engine.commit_text_if_active()
         self._dock.toolbar_widget.hide_popups()
@@ -135,7 +137,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _load_settings(self):
         """Read per-tool state from RV settings and apply to the in-memory dicts and widget."""
         g = _SETTINGS_GROUP
-        for tool in _ALL_TOOLS:
+        for tool in TOOLS:
             hex_col = self._read(g, f"{tool}_color", _DEFAULT_COLOR_HEX)
             color = QtGui.QColor(hex_col)
             self._tool_colors[tool] = color if color.isValid() else QtGui.QColor(_DEFAULT_COLOR_HEX)
@@ -145,7 +147,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._tool_filled[tool] = bool(self._read(g, f"{tool}_filled", False))
 
         saved_tool = self._read(g, "active_tool", TOOL_PEN)
-        if saved_tool in _ALL_TOOLS:
+        if saved_tool in TOOLS:
             self._tool = saved_tool
 
         self._eraser_brush = self._read(g, "eraser_brush", "circle")
@@ -341,17 +343,12 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             self._pop_shape_table()
 
-        # Eyedropper: crosshair cursor over the viewport while active.
-        sw = qtutils.sessionWindow()
-        if tool == TOOL_EYEDROPPER:
-            sw.setCursor(QtCore.Qt.CrossCursor)
-        else:
-            sw.unsetCursor()
+        commands.setCursor(TOOLS[tool].cursor.value)
 
     def _on_color_changed(self, color):
         self._color = color
         if self._link_tool_colors:
-            for tool in _ALL_TOOLS:
+            for tool in TOOLS:
                 self._tool_colors[tool] = QtGui.QColor(color)
                 self._save_tool_state(tool)
         else:
@@ -547,7 +544,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _cfg_toggle_link_colors(self, e):
         self._link_tool_colors = not self._link_tool_colors
         if self._link_tool_colors:
-            for tool in _ALL_TOOLS:
+            for tool in TOOLS:
                 self._tool_colors[tool] = QtGui.QColor(self._color)
                 self._save_tool_state(tool)
 
