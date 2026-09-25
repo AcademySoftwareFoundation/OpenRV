@@ -137,7 +137,7 @@ class AnnotateDrawEngine:
             ("before-session-write-copy", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("before-play-start", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("before-session-read", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-graph-view-changed", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-graph-view-change", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("key-down--escape", self.on_text_cancel, "Cancel text"),
         ]
 
@@ -230,6 +230,23 @@ class AnnotateDrawEngine:
     # Paint node resolution
     # ------------------------------------------------------------------
 
+    def set_tags(self):
+        view_node = commands.viewNode()
+        if view_node:
+            for node in commands.closestNodesOfType("RVPaint"):
+                annotate_tag = f"{node}.tag.annotate"
+                if not commands.propertyExists(annotate_tag):
+                    commands.newProperty(annotate_tag, commands.StringType, 1)
+                commands.setStringProperty(annotate_tag, [""], True)
+
+    def remove_tags(self):
+        view_node = commands.viewNode()
+        if view_node:
+            for node in commands.closestNodesOfType("RVPaint"):
+                annotate_tag = f"{node}.tag.annotate"
+                if commands.propertyExists(annotate_tag):
+                    commands.deleteProperty(annotate_tag)
+
     def _find_paint_node(self):
         try:
             frame = commands.frame()
@@ -265,10 +282,7 @@ class AnnotateDrawEngine:
             for info in infos:
                 if info.get("nodeType") == "RVPaint":
                     return info["node"], info["frame"]
-            all_paint = commands.nodesOfType("RVPaint")
-            if all_paint:
-                return all_paint[0], frame
-            return None, None
+            return None, frame
         except Exception:
             return None, None
 
@@ -349,7 +363,7 @@ class AnnotateDrawEngine:
             dpr = commands.devicePixelRatio()
             ip = (raw[0] * dpr, raw[1] * dpr)
 
-            pinfos = commands.imagesAtPixel(raw)
+            pinfos = commands.imagesAtPixel(raw, "annotate")
             if not pinfos:
                 return "", None
 
@@ -868,9 +882,13 @@ class AnnotateDrawEngine:
                 self._commit_text()
             name, pei = self._pointer_location(event)
             if not name:
+                event.reject()
                 return
             self._current_source_name = name
             paint_node, frame = self._find_paint_node()
+            if paint_node is None:
+                event.reject()
+                return
             self._text_active = True
             self._text_buffer = ""
             self._text_anchor = pei
