@@ -100,13 +100,8 @@ namespace Rv
         RvProfileManager* profileManager();
 
         //
-        //  Has the last document begun tearing down?
-        //
-        //  Set once, on the way out, so that code running from queued events
-        //  during shutdown can tell it is too late to put something back on
-        //  screen. The console uses it: its auto-show is driven by output, and
-        //  shutdown produces plenty of that after the windows have been asked
-        //  to close.
+        //  Set once the last document starts tearing down, so queued events
+        //  (e.g. the console's output-driven auto-show) do not reopen windows.
         //
         bool isShuttingDown() const { return m_shuttingDown; }
 
@@ -140,23 +135,11 @@ namespace Rv
         bool isInPresentationMode();
 
         //
-        //  Re-evaluate and rebuild the desktop presentation devices so their
-        //  backend follows the current display-depth preference and the main
-        //  view's live backend, then re-bind the share device and, if
-        //  presentation mode is on, re-open the presentation output on the
-        //  selected screen.
-        //
-        //  Invoked from the RvDocument backend-transition points
-        //  (setDisplayOutput / swapGLViewToVulkan / fallbackVulkanToGLView /
-        //  rebuildGLView). shareDevice is the controller's new main-view GL
-        //  device, or null when the main view has moved to Vulkan and there is
-        //  no GL device to share. Fixes the frozen presentation bit depth and
-        //  the black second display on a backend mismatch.
-        //
-        //  mainViewIsVulkan is the backend the calling document's main view has
-        //  just settled on. It is passed rather than re-derived from the
-        //  display-depth preference because only the caller knows which widget
-        //  actually exists now.
+        //  Rebuild the desktop presentation devices to match the main view's
+        //  backend, re-bind the share device, and re-open the presentation
+        //  output if presentation mode is on. shareDevice is null when the main
+        //  view is Vulkan. mainViewIsVulkan comes from the caller because only
+        //  it knows which view widget exists now.
         //
         void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
 

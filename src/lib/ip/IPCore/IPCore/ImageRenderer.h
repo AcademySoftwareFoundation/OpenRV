@@ -682,7 +682,7 @@ namespace IPCore
 
         static bool debugGpu() { return m_debugGpu; }
 
-        // Deprecated — use debugGpu() instead.
+        // Deprecated: use debugGpu() instead.
         static void reportGL(bool b) { debugGpu(b); }
 
         static bool reportGL() { return debugGpu(); }

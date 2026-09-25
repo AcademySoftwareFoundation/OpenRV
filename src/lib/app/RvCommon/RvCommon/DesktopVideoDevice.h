@@ -56,33 +56,10 @@ namespace Rv
     {
     public:
         //
-        //  The GL surface the presentation output composites into.
-        //
-        //  This is a QOpenGLWindow rather than a QOpenGLWidget on purpose. The
-        //  whole transfer() design depends on this context sharing with the
-        //  renderer's: transfer() wraps the renderer's output FBO colour
-        //  texture in a local FBO (see cloneForSource), and a texture is only
-        //  visible across contexts in the same share group.
-        //
-        //  A *top-level* QOpenGLWidget does not give us that. In Qt 6 it is
-        //  composited through its own top-level window's RHI backing store and
-        //  takes that window's GL context as its share parent, not the
-        //  application's global share context -- so it can land in a private
-        //  share group, and the renderer's textures then do not exist as far as
-        //  it is concerned (glIsTexture() false for a live texture), every
-        //  transfer() is refused and the second display stays black. Whether it
-        //  happened to land in the right group varied run to run, which is what
-        //  made the black presentation output intermittent.
-        //
-        //  QOpenGLWindow takes the context to share with as a constructor
-        //  argument, before the context is created -- the only point at which
-        //  sharing can be established. This mirrors GLView/GLWindow, which is
-        //  the main view and demonstrably sits in the renderer's group.
-        //
-        //  PartialUpdateBlit, not the default NoPartialUpdate: it keeps a
-        //  backing FBO (so QTGLVideoDevice::fboID() is non-zero, which
-        //  transfer() requires) and does not clear before paintGL(), which
-        //  would erase the pixels transfer() just blitted in.
+        //  QOpenGLWindow, not a top-level QOpenGLWidget: only a ctor-supplied
+        //  share context guarantees the renderer's share group, which
+        //  transfer() needs to see the renderer's textures. PartialUpdateBlit
+        //  keeps a backing FBO and does not clear before paintGL().
         //
         class ScreenWindow : public QOpenGLWindow
         {
@@ -96,12 +73,7 @@ namespace Rv
             QOpenGLContext* m_glShareContext = nullptr;
         };
 
-        //
-        //  Plain QWidget container holding the ScreenWindow, so the device can
-        //  keep driving the output through the QWidget API it already uses
-        //  (move/setGeometry/setWindowState/show/fullscreen on a given screen).
-        //  Same arrangement as GLView around GLWindow.
-        //
+        //  QWidget container for the ScreenWindow, as GLView is for GLWindow.
         class ScreenView : public QWidget
         {
         public:
@@ -228,31 +200,16 @@ namespace Rv
         virtual void clearCaches() const { releaseFBOClones(); }
 
         //
-        //  Delete the per-context FBO clones in m_fboMap.
-        //
-        //  These alias textures owned by the renderer's control context, so
-        //  they must be destroyed while *this* device's view context is still
-        //  alive and current -- deleting them afterwards issues GL calls with
-        //  no context current. Callers that are about to tear the view down
-        //  (close()) must therefore call this first. Safe to call repeatedly
-        //  and safe to call when nothing was ever cached.
+        //  Delete the FBO clones in m_fboMap. Must run while this device's view
+        //  context is still alive, so close() calls it first. Idempotent.
         //
         void releaseFBOClones() const;
 
         //
-        //  Return this context's clone of a source FBO owned by the renderer's
-        //  control context, creating and caching it on first use.
-        //
-        //  FBOs are not shared between contexts but textures are, so the clone
-        //  wraps the source's colour texture. Two things make that fragile and
-        //  are handled here: the cache is keyed on the source pointer, which
-        //  the renderer frees and reallocates (so a cached clone is re-verified
-        //  against the source it is meant to mirror), and the borrowed texture
-        //  name can be dead by the time we attach it (so an incomplete clone is
-        //  discarded instead of cached and blitted from every frame).
-        //
-        //  Returns null if no usable clone could be built; callers must skip
-        //  the transfer for this frame.
+        //  This context's cached clone of a renderer FBO, wrapping its colour
+        //  texture (FBOs are not shared across contexts, textures are). The
+        //  cache key is a pointer the renderer can reuse, so hits are
+        //  re-verified. Returns null if no complete clone could be built.
         //
         TwkGLF::GLFBO* cloneForSource(const TwkGLF::GLFBO* sourceFbo) const;
 
@@ -318,33 +275,15 @@ namespace Rv
 
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
 
-        //
-        //  As above, but with the backend decided by the caller rather than
-        //  re-derived from the persisted display-depth preference. Use this
-        //  whenever the main view is already live: its backend is the ground
-        //  truth, and the preference can disagree with it (see
-        //  shouldUseVulkanPresentation).
-        //
+        //  As above, with the backend supplied by the caller. Use once the main view is live.
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
                                                                    bool useVulkan);
 
         //
-        //  Effective presentation-backend decision for the *initial* build,
-        //  when there is no main view yet to ask. True when the second-display
-        //  output should be delivered through a Vulkan swapchain -- a 10-bit
-        //  request that this machine's Vulkan can actually present -- false for
-        //  the OpenGL ScreenView path. Always false on macOS.
-        //
-        //  The underlying VulkanView::supports10BitPresentation() probe is
-        //  memoized, so this is cheap to call.
-        //
-        //  NOTE: this reads the persisted intent in Options, which is NOT the
-        //  same thing as the backend the main view is actually running. The two
-        //  diverge (a 10-bit request that fell back to GL at runtime keeps its
-        //  10-bit intent on purpose), and a presentation output built on the
-        //  other backend than the viewport is a black second display. Once a
-        //  view exists, pass its backend explicitly instead -- see
-        //  RvApplication::rebuildDesktopVideoDevices.
+        //  Presentation backend for the initial build: true for a 10-bit request
+        //  this machine's Vulkan can present. Reads the persisted preference,
+        //  which can differ from the live main-view backend, so it must not be
+        //  used once a view exists. Always false on macOS.
         //
         static bool shouldUseVulkanPresentation();
 
@@ -372,12 +311,10 @@ namespace Rv
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
 
-        //  Source colour texture last reported as unusable by cloneForSource(),
-        //  so the report fires on the transition rather than every frame.
+        //  Last unusable source texture reported, so the report fires once per transition.
         mutable GLuint m_reportedBadSourceTex{0};
 
-        //  Latches the "the surface has no backing FBO" report, so a present
-        //  path that is stalled for many frames says so once.
+        //  Latches the "no backing FBO" report.
         mutable bool m_transferStalled{false};
         TwkGLF::GLState* m_glGlobalState;
         DesktopVideoFormats m_videoFormats;

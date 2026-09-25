@@ -756,22 +756,9 @@ namespace IPCore
     void IPGraph::refreshPhysicalDevicesInternal(const VideoModules& modules)
     {
         //
-        //  Re-point the existing display groups at a rebuilt set of physical
-        //  devices, rather than rebuilding the groups the way
-        //  setPhysicalDevicesInternal() does.
-        //
-        //  That function is the startup path: it deletes every
-        //  DisplayGroupIPNode and makes new ones, and a new display group comes
-        //  with a new colorPipeline holding default contents. Using it as a
-        //  refresh therefore discards the display colour state -- the transfer
-        //  function and any assigned display profile. That is what reset the
-        //  main view from sRGB to None on every 8/10-bit switch: swapping the
-        //  main-view backend rebuilds the desktop devices, behind the very same
-        //  monitors, and took the colour pipeline with it.
-        //
-        //  Devices are matched to groups by (module name, device name), the
-        //  same key display profiles are stored under, and stable across a
-        //  rebuild precisely because the monitors have not changed.
+        //  Unlike setPhysicalDevicesInternal(), keep the existing display groups
+        //  so their colour pipelines survive. Groups are matched to devices by
+        //  (module name, device name), which is stable while the monitors are.
         //
 
         std::vector<TwkApp::VideoDevice*> devices;
@@ -783,9 +770,7 @@ namespace IPCore
         }
 
         //
-        //  With nothing to match on either side there is no state worth
-        //  preserving, and setPhysicalDevicesInternal() already handles the
-        //  empty-modules (defaultOutputGroup) case correctly.
+        //  Nothing to preserve.
         //
         if (devices.empty() || m_displayGroups.empty())
         {
@@ -821,7 +806,9 @@ namespace IPCore
             for (size_t di = 0; di < devices.size(); di++)
             {
                 if (deviceMatched[di])
+                {
                     continue;
+                }
 
                 const string deviceModule = devices[di]->module() ? devices[di]->module()->name() : "";
 
@@ -835,8 +822,7 @@ namespace IPCore
             if (match == devices.size())
             {
                 //
-                //  Nothing answers to this group's device any more -- a monitor
-                //  was unplugged, or a module stopped advertising it.
+                //  The group's device is gone (e.g. a monitor was unplugged).
                 //
                 if (m_rootNode->isInput(group))
                 {
@@ -852,11 +838,9 @@ namespace IPCore
             group->setPhysicalVideoDevice(devices[match]);
 
             //
-            //  Drop a stale output pointer. The device it named was just
-            //  destroyed, and findDisplayGroupByDevice() compares pointers --
-            //  a dangling one can alias a freshly allocated device at the same
-            //  address and hand back the wrong group. The control device is
-            //  still alive and is not in the module list, so it is kept.
+            //  Drop a dangling output pointer: findDisplayGroupByDevice()
+            //  compares pointers and it could alias a new device. The control
+            //  device is still alive, so keep it.
             //
             if (group->outputDevice() && group->outputDevice() != m_controlDevice)
             {
@@ -873,7 +857,7 @@ namespace IPCore
 
                 if (!stillPresent)
                 {
-                    group->setOutputVideoDevice(0);
+                    group->setOutputVideoDevice(nullptr);
                 }
             }
 
@@ -893,12 +877,14 @@ namespace IPCore
         }
 
         //
-        //  Devices that no existing group describes are genuinely new.
+        //  Unmatched devices are new.
         //
         for (size_t di = 0; di < devices.size(); di++)
         {
             if (deviceMatched[di])
+            {
                 continue;
+            }
 
             size_t n = m_displayGroups.size();
             string name;
@@ -982,25 +968,9 @@ namespace IPCore
                 dnode->setOutputVideoDevice(newDevice);
 
                 //
-                //  Only adopt a physical device the new device actually knows.
-                //
-                //  VideoDevice's constructor seeds m_physicalDevice with the
-                //  device itself, and a viewport device only learns the monitor
-                //  it sits on when it first renders (setAbsolutePosition ->
-                //  deviceFromPosition). The one caller of this is
-                //  Session::setControlVideoDevice(), which during a main-view
-                //  backend swap runs on a view that has never rendered -- so
-                //  physicalDevice() is still that view.
-                //
-                //  Adopting it anyway rewrote the group's device.name from the
-                //  monitor ("Dell Inc. DELL U2725QE DP-1") to the viewport's own
-                //  name ("RV Main Window (Vulkan)/0x..."). The group then
-                //  described no physical device, so the rebuild that follows
-                //  discarded it and its colour pipeline with it -- which is why
-                //  the display transfer function fell back from sRGB to None on
-                //  every 8/10-bit switch. Keeping the old value is right: the
-                //  monitor has not changed, only the object drawing to it, and
-                //  refreshPhysicalDevices() re-points the pointer by name.
+                //  A view that has not rendered yet reports itself as its own
+                //  physical device. Keep the group's monitor in that case, or
+                //  its device.name no longer matches on refreshPhysicalDevices().
                 //
                 if (const VideoDevice* physical = newDevice->physicalDevice())
                 {
