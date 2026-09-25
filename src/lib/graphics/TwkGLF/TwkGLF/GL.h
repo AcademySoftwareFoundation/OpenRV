@@ -102,19 +102,13 @@ struct GLPushMatrix
 //
 
 //
-//  Is any GL context current, Qt's or a natively-bound one? Declared outside
-//  the NDEBUG guard below because callers other than the debug macro need it to
-//  decide whether GL work can land at all.
+//  Is any GL context current, Qt's or a natively-bound one?
 //
 bool twkGlAnyContextIsCurrent();
 
 //
-//  Declared in every build, for the same reason. TWK_GLDEBUG below still
-//  compiles out under NDEBUG -- polling glGetError() at every instrumented call
-//  site is a debug-only cost -- but the "no current GL context" report this
-//  also emits is not instrumentation. It fires only when GL work is being
-//  issued that cannot land, which is a fault in a release build too, and the
-//  caller that has to say so (GLFBO's destructor) is compiled in both.
+//  Declared in every build: GLFBO's destructor uses it to report a missing
+//  context in release builds too. TWK_GLDEBUG still compiles out under NDEBUG.
 //
 bool twkGlPrintError(std::string_view file, std::string_view function, const int line, std::string_view msg);
 

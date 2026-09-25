@@ -867,8 +867,7 @@ namespace Rv
 
         if (videoModules().empty())
         {
-            // With a non-OpenGL presentation backend view() returns null — no
-            // GL context to make current; presentation handles it per-frame.
+            // view() is null on a non-OpenGL backend.
             if (doc->view())
             {
                 doc->view()->makeCurrent();
@@ -876,10 +875,7 @@ namespace Rv
 
             try
             {
-                // With a non-OpenGL presentation backend view() is null — pass
-                // nullptr as the GL share device.  DesktopVideoDevice can still
-                // be created; it only needs the share device when open() is
-                // called later.
+                // DesktopVideoDevice only needs the share device at open().
                 QTGLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
                 addVideoModule(m_desktopModule = new DesktopVideoModule(0, shareDevice));
             }
@@ -907,7 +903,6 @@ namespace Rv
         //  we're on (video device) so make sure the primary display group is
         //  correct.
         //
-        // Use the session's control device — valid for any presentation backend.
         doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
 
         if (RvApp()->documents().size() == 1 && opts.present)
@@ -959,8 +954,6 @@ namespace Rv
         if (!m->isOpen())
         {
             RvDocument* doc = reinterpret_cast<RvDocument*>(documents().front()->opaquePointer());
-            // With a non-OpenGL presentation backend view() is null — no GL
-            // context to make current.
             if (doc->view())
             {
                 doc->view()->makeCurrent();
@@ -1709,7 +1702,6 @@ namespace Rv
 #endif
 
                 string optionArgs = setVideoDeviceStateFromSettings(d);
-                // With a non-OpenGL presentation backend view() is null — skip GL makeCurrent.
                 if (rvDoc->view())
                 {
                     rvDoc->view()->videoDevice()->makeCurrent();
@@ -1804,17 +1796,9 @@ namespace Rv
             const bool separateOutput = d && d != session->controlVideoDevice();
 
             //
-            //  Unbind before closing, never the other way round. close()
-            //  destroys the device's view and with it the GL context that owns
-            //  every FBO the renderer cloned for that device. Dropping the
-            //  session's reference first means ImageRenderer::setOutputDevice()
-            //  -- which calls unbind() on the outgoing device -- still runs
-            //  while that context is alive. Closing first left it deleting GL
-            //  objects with no context current, which is undiagnosable from the
-            //  outside: it shows up as GL_INVALID_OPERATION at innocent call
-            //  sites and leaves a permanently incomplete FBO cached in the
-            //  device, i.e. a black presentation output for the rest of the
-            //  session.
+            //  Unbind before closing: close() destroys the GL context owning the
+            //  FBOs the renderer cloned for this device, and unbind() must
+            //  release them while it is still alive.
             //
             session->setOutputVideoDevice(session->controlVideoDevice());
 
@@ -1826,27 +1810,11 @@ namespace Rv
 #endif
 
                 //
-                //  Put the main view's context back, whatever backend it is.
+                //  close() leaves no context current, and DesktopVideoDevice
+                //  cannot restore one when the main view is Vulkan (its share
+                //  device is null). Make the main view's context current.
                 //
-                //  close() destroyed the presentation device's view and its
-                //  context, so nothing is current on return. DesktopVideoDevice
-                //  tries to restore from its share device, but that is a
-                //  QTGLVideoDevice and is null whenever the main view is
-                //  Vulkan -- so on the Vulkan path nothing was made current at
-                //  all, and the next code to touch GL did so against no
-                //  context. That is not a teardown path, so GLContextScope does
-                //  not cover it: it surfaced as ImageRenderer's
-                //  queryGLIntoContainer() reading an empty GL_VERSION (which is
-                //  what prints the bogus "Could not retrieve OpenGL version.
-                //  Make sure you have installed the Nvidia drivers.") and as a
-                //  no-context report on the next entry into this function.
-                //
-                //  Do it here rather than inside close(): the session knows its
-                //  control device, both backends derive from GLVideoDevice, and
-                //  this is the moment the device is authoritative.
-                //
-                if (const TwkGLF::GLVideoDevice* mainView =
-                        dynamic_cast<const TwkGLF::GLVideoDevice*>(session->controlVideoDevice()))
+                if (const TwkGLF::GLVideoDevice* mainView = dynamic_cast<const TwkGLF::GLVideoDevice*>(session->controlVideoDevice()))
                 {
                     mainView->makeCurrent();
                 }
@@ -1991,34 +1959,21 @@ namespace Rv
     void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
     {
         if (!m_desktopModule)
+        {
             return;
+        }
 
-        //
-        //  Capture the presentation state before any teardown. The selected
-        //  screen is captured implicitly: it is Options::presentDevice, a
-        //  stable device name re-resolved after the rebuild via
-        //  findPresentationDevice, so we restore by name rather than by a
-        //  pointer the rebuild may have destroyed.
-        //
+        // The selected screen is restored by name (Options::presentDevice)
+        // since the rebuild may destroy the device it pointed to.
         const bool wasPresenting = m_presentationMode;
 
         TwkApp::Document* doc = TwkApp::Document::activeDocument();
         Rv::Session* session = doc ? static_cast<Rv::Session*>(doc) : nullptr;
 
-        //
-        //  Rebuild the per-screen devices for the current backend. This is a
-        //  no-op returning false when the backend has not changed; the
-        //  share-device rebind below still runs, so a main-view swap that keeps
-        //  the same backend is honored.
-        //
+        // Returns false when the backend is unchanged; the share device is
+        // still rebound below.
         const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
 
-        //
-        //  Re-bind the controller's current main-view device as the share
-        //  device on every (possibly newly created) desktop device. This runs
-        //  after the rebuild so it never writes to an about-to-be-destroyed
-        //  device.
-        //
         const VideoModule::VideoDevices& devices = m_desktopModule->devices();
         for (size_t i = 0; i < devices.size(); i++)
         {
@@ -2029,28 +1984,10 @@ namespace Rv
         }
 
         //
-        //  Refresh the session graph's per-physical-device display-group
-        //  registry so it references the newly created device pointers.
-        //  rebuildDevices() deleted the old per-screen devices and
-        //  createDesktopVideoDevices() made new ones, but the graph's
-        //  DisplayGroupIPNodes still hold the destroyed pointers. Without this,
-        //  a later setOutputVideoDevice(newDevice) -> connectDisplayGroup ->
-        //  findDisplayGroupByDevice(newDevice) matches nothing and silently
-        //  no-ops, so the presentation output is never rendered and the second
-        //  display stays black.
-        //
-        //  This must run on every real rebuild even when presentation is
-        //  currently off: the device pointers can change while presentation is
-        //  disabled and only be bound as the output later (the reported
-        //  10 -> 8 -> 10 -> enable repro).
-        //
-        //  refreshPhysicalDevices(), not setPhysicalDevices(): the latter is the
-        //  startup path and deletes every display group, which also throws away
-        //  its colour pipeline. Doing that here reset the main view's transfer
-        //  function from sRGB to None on every 8/10-bit switch, along with any
-        //  assigned display profile. The monitors have not changed at this
-        //  point -- only the device objects in front of them -- so the groups
-        //  should be re-pointed, not rebuilt.
+        //  Re-point the graph's display groups at the new device objects, even
+        //  with presentation off, or a later setOutputVideoDevice() finds no
+        //  group. refreshPhysicalDevices() keeps each group's colour pipeline,
+        //  unlike setPhysicalDevices().
         //
         if (rebuilt && session)
         {
@@ -2058,17 +1995,11 @@ namespace Rv
             session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
         }
 
-        //
-        //  Re-establish the presentation output. The backend-transition callers
-        //  reset the session output device to 0 while rebinding the control
-        //  device, which is the root of the black second display. If
-        //  presentation mode is on, re-open the presentation output on the
-        //  selected screen with the new backend and bind it as the session
-        //  output; a backend change also destroyed the old device, so this
-        //  replaces any stale reference.
-        //
+        // The callers reset the session output device, so re-open and re-bind it.
         if (!wasPresenting || !session)
+        {
             return;
+        }
 
         Rv::Options& opts = Rv::Options::sharedOptions();
         VideoDevice* d = findPresentationDevice(opts.presentDevice);

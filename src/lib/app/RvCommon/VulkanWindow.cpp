@@ -40,9 +40,8 @@
 #include <sstream>
 #include <string>
 #ifdef PLATFORM_WINDOWS
-// WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
-// <winsock.h>, which otherwise collides with the <winsock2.h> already
-// pulled in transitively by Qt headers above.
+// Keep <windows.h> from pulling in <winsock.h>, which collides with Qt's
+// <winsock2.h>.
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -52,57 +51,34 @@
 #endif
 
 //
-//  Environment variables recognized by the Vulkan presentation path
-//  ----------------------------------------------------------------
-//  These exist so a corrupted or failing display can be narrowed to a stage
-//  without a rebuild -- notably by a tester running a build on hardware the
-//  developer cannot access. Every override is reported in the startup record
-//  (see VulkanWindow::emitPresentationRecord), alongside the value negotiation
-//  would otherwise have chosen.
+//  Environment overrides, all reported in the startup record:
 //
-//    RV_VULKAN_FORCE_CPU_PRESENT
-//        Set (to any value) to skip GL<->Vulkan zero-copy interop entirely and
-//        present via the CPU readback path. Still 10-bit, just slower.
-//
-//    RV_VULKAN_FORCE_TILING = optimal | linear
-//        Override the negotiated shared-image tiling. The override is honored
-//        only if the driver reports that tiling as exportable; otherwise it is
-//        logged and refused, because presenting through a configuration whose
-//        correctness was not established is what this path is meant to avoid.
-//        An unrecognized value is logged and ignored (negotiation proceeds).
-//
-//    RV_VULKAN_FORCE_NO_DEDICATED
-//        Set (to any value) to suppress dedicated allocation even when the
-//        driver reports it as preferred. Refused when the driver reports
-//        DEDICATED_ONLY, since that is a requirement rather than a preference.
-//        RV_VULKAN_DISABLE_DEDICATED_ALLOCATION is kept as an older alias.
-//
-//  Both sides of the interop read their settings from one negotiated struct,
-//  so an override applies to the Vulkan export and the GL import together.
+//    RV_VULKAN_FORCE_CPU_PRESENT     skip zero-copy interop; CPU readback.
+//    RV_VULKAN_FORCE_TILING          optimal | linear; refused if the driver
+//                                    does not report it exportable.
+//    RV_VULKAN_FORCE_NO_DEDICATED    suppress preferred dedicated allocation;
+//                                    refused for DEDICATED_ONLY. Alias:
+//                                    RV_VULKAN_DISABLE_DEDICATED_ALLOCATION.
 //
 
 namespace Rv
 {
     using namespace std;
 
-    //  Accumulators for the -debug gpu frame-time report in render(). One
-    //  VulkanWindow drives the frame loop, so file statics are sufficient.
+    //  -debug gpu frame-time accumulators. Only one VulkanWindow drives the
+    //  frame loop, so file statics suffice.
     static unsigned int s_diagFrames = 0;
     static double s_diagRenderMs = 0.0;
     static double s_diagMainPresentMs = 0.0;
     static double s_diagOutPresentMs = 0.0;
     static double s_diagFenceWaitMs = 0.0;
     static double s_diagAcquireMs = 0.0;
-    //  Wall clock between successive render() entries: the loop period.
     static double s_diagLoopMs = 0.0;
     static TwkUtil::Timer s_diagLoopTimer;
-    //  addSyncSample()/postRender() run inside render() but after the presents,
-    //  so they are part of the frame period without being part of "total".
+    //  Post-present work: in the frame period but not in "total".
     static double s_diagPostRenderMs = 0.0;
-    //  Pointer side of the same report. handler = time spent inside the
-    //  Mu/annotation handler for one pointer event; eventToRender = age of the
-    //  newest pointer event when the frame answering it starts rendering, so it
-    //  includes the handler and any wait in the event loop.
+    //  handler: time in the pointer handler. eventToRender: age of the newest
+    //  pointer event when its frame starts rendering.
     static double s_diagPointerHandlerMs = 0.0;
     static unsigned int s_diagPointerEvents = 0;
     static double s_diagPointerAgeMs = 0.0;
@@ -110,40 +86,33 @@ namespace Rv
     static TwkUtil::Timer s_diagPointerTimer;
     static bool s_diagPointerPending = false;
 
-    //  eventToRetire: age of the pointer event a frame answered, measured when
-    //  that frame's GPU work retires. This is the end-to-end interactive
-    //  latency; eventToRender covers only the input half of it.
-    //
-    //  Closing a sample out needs an absolute clock, because a frame retires
-    //  some frames after the event that produced it, so one free-running timer
-    //  is read as a timestamp source.
+    //  eventToRetire: end-to-end latency, from the pointer event to its
+    //  frame's GPU retirement. Needs an absolute clock since retirement lags
+    //  by several frames.
     static TwkUtil::Timer s_diagClock;
 
     static double diagNow()
     {
         if (!s_diagClock.isRunning())
+        {
             s_diagClock.start();
+        }
         return s_diagClock.elapsed();
     }
 
-    //  Timestamp of the pointer event the frame currently being rendered
-    //  answers (-1 when this frame answers no new event), handed to the
-    //  in-flight slot when that frame is submitted.
+    //  Event time for the frame being rendered (-1 if none), handed to its
+    //  slot at submit.
     static double s_diagFrameEventTime = -1.0;
-    static std::array<double, VulkanWindow::FRAMES_IN_FLIGHT> s_diagSlotEventTime{};
-    static std::array<bool, VulkanWindow::FRAMES_IN_FLIGHT> s_diagSlotArmed{};
+    static std::array<double, VulkanWindow::kFramesInFlight> s_diagSlotEventTime{};
+    static std::array<bool, VulkanWindow::kFramesInFlight> s_diagSlotArmed{};
     static double s_diagEventToRetireMs = 0.0;
     static unsigned int s_diagEventToRetireSamples = 0;
 
     using namespace TwkApp;
     using namespace IPCore;
 
-    // Both A2B10G10R10 and A2R10G10B10 are 10-bit-per-channel packed formats;
-    // they differ only in R/B component order. Both are acceptable for 10-bit
-    // presentation -- the R/B order is handled where pixels are packed (CPU
-    // fallback) or blitted (GPU interop). A2B10G10R10 (== GL_RGB10_A2) is
-    // preferred when the surface offers it, but many Linux/RADV surfaces only
-    // advertise A2R10G10B10.
+    // R/B order is handled where pixels are packed or blitted. Many RADV
+    // surfaces only advertise A2R10G10B10.
     static bool isTenBitFormat(VkFormat f) { return f == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || f == VK_FORMAT_A2R10G10B10_UNORM_PACK32; }
 
     static bool findGraphicsPresentQueue(VkPhysicalDevice device, VkSurfaceKHR surface, uint32_t& familyIndex)
@@ -170,11 +139,15 @@ namespace Rv
     {
         uint32_t formatCount = 0;
         if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
+        {
             return false;
+        }
 
         std::vector<VkSurfaceFormatKHR> formats(formatCount);
         if (vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, formats.data()) != VK_SUCCESS)
+        {
             return false;
+        }
 
         return std::any_of(formats.begin(), formats.end(), [](const VkSurfaceFormatKHR& format) { return isTenBitFormat(format.format); });
     }
@@ -183,11 +156,15 @@ namespace Rv
     {
         uint32_t extensionCount = 0;
         if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr) != VK_SUCCESS)
+        {
             return false;
+        }
 
         std::vector<VkExtensionProperties> extensions(extensionCount);
         if (vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data()) != VK_SUCCESS)
+        {
             return false;
+        }
 
         return std::any_of(extensions.begin(), extensions.end(),
                            [name](const VkExtensionProperties& extension) { return strcmp(extension.extensionName, name) == 0; });
@@ -233,11 +210,6 @@ namespace Rv
         , m_lastKey(0)
         , m_lastKeyType(QEvent::None)
     {
-        //
-        //  This is a real QWindow, so the surface type and format can simply be
-        //  declared here -- no WA_NativeWindow / WA_PaintOnScreen dance, and no
-        //  waiting for a widget to grow a windowHandle().
-        //
         setSurfaceType(QSurface::VulkanSurface);
 
         QSurfaceFormat fmt;
@@ -255,19 +227,10 @@ namespace Rv
 
     VulkanWindow::~VulkanWindow()
     {
-        //
-        //  m_videoDevice is owned by the hosting VulkanView, not by this window
-        //  (see setVideoDevice); only the Vulkan resources are torn down here.
-        //
         m_videoDevice = nullptr;
 
-        //
-        //  Normally a no-op: the QEvent::PlatformSurface / SurfaceAboutToBeDestroyed
-        //  handler in event() has already released everything, because by the time
-        //  a QWindow reaches its destructor its surface is usually gone. This is
-        //  only the backstop for the paths where the window is deleted without
-        //  ever having had a platform window destroyed under it.
-        //
+        //  Usually a no-op: the SurfaceAboutToBeDestroyed handler in event()
+        //  already released everything.
         releaseVulkanResources();
     }
 
@@ -287,7 +250,9 @@ namespace Rv
     bool VulkanWindow::physicalDeviceMatchesUUID(const unsigned char* uuid, size_t size) const
     {
         if (!m_vkPhysicalDevice || !uuid || size != VK_UUID_SIZE)
+        {
             return false;
+        }
 
         VkPhysicalDeviceIDProperties idProperties = {};
         idProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES;
@@ -321,40 +286,23 @@ namespace Rv
         m_initialized = true;
         m_initializedHandle = handle();
 
-        //
-        //  NOTE: session initialization is deliberately NOT driven from here.
-        //  Loading packages creates web panels, and adding a QWebEngineView
-        //  makes Qt tear down the main window's native subtree -- destroying
-        //  this view while this method is still on the stack, so every later
-        //  member access is a use-after-free.
-        //  RvApplication::newSessionFromFiles() calls
-        //  RvDocument::initializeSession() after show() instead, with no view
-        //  callback in the call chain.
-        //
+        //  Session init must not run from here: loading packages can create a
+        //  QWebEngineView, which destroys this window while it is on the stack.
+        //  RvApplication::newSessionFromFiles() does it after show() instead.
     }
 
     //
-    //  One process-lifetime QVulkanInstance, shared by the 10-bit probe
-    //  (supports10BitPresentation) and every VulkanWindow (initVulkan). Created
-    //  lazily and never destroyed.
-    //
-    //  Tearing a VkInstance down and then creating or using another shortly
-    //  after corrupts RADV's shared X11/xcb WSI state and segfaults a
-    //  subsequent vkGetPhysicalDeviceSurfaceSupportKHR. That is exactly the
-    //  sequence a mid-session GL->Vulkan promotion produces: the probe runs,
-    //  drops its throwaway instance, and a VulkanWindow initializes moments
-    //  later. Keeping one instance alive for the whole process removes the
-    //  teardown entirely. initVulkan already relied on a never-destroyed
-    //  static instance, so this only extends the same lifetime to the probe.
+    //  One process-lifetime QVulkanInstance, shared by the 10-bit probe and
+    //  every VulkanWindow, never destroyed: destroying a VkInstance shortly
+    //  before another init corrupts RADV's X11 WSI state and segfaults in
+    //  vkGetPhysicalDeviceSurfaceSupportKHR.
     //
     static QVulkanInstance* sharedVulkanInstance()
     {
         static QVulkanInstance* instance = []() -> QVulkanInstance*
         {
             auto* inst = new QVulkanInstance();
-            // Device UUID matching uses vkGetPhysicalDeviceProperties2, which
-            // is core in Vulkan 1.1. QVulkanInstance otherwise defaults to a
-            // 1.0 instance even though the presentation code targets 1.1.
+            // 1.1 for vkGetPhysicalDeviceProperties2 (device UUID matching).
             inst->setApiVersion(QVersionNumber(1, 1));
             if (!inst->create())
             {
@@ -369,15 +317,7 @@ namespace Rv
 
     bool VulkanWindow::supports10BitPresentation()
     {
-        //
-        //  Memoized: 10-bit presentation support is a fixed hardware/driver
-        //  property, so probe at most once per process. The probe uses the
-        //  shared, never-destroyed instance and a leaked probe window (see
-        //  sharedVulkanInstance), so it tears down nothing that could corrupt
-        //  RADV's WSI state ahead of a later VulkanWindow init; memoization is
-        //  then just an optimization that avoids re-running the device scan on
-        //  every DesktopVideoDevice::shouldUseVulkanPresentation() call.
-        //
+        //  A fixed hardware property: probe once per process.
         static const bool cached = []() -> bool
         {
             QVulkanInstance* qtVkInst = sharedVulkanInstance();
@@ -392,12 +332,7 @@ namespace Rv
                 return false;
             }
 
-            //
-            //  Leak the probe window (process-lifetime, never shown).
-            //  Destroying its Vulkan surface right before a real VulkanWindow
-            //  init is part of the same WSI-teardown hazard as destroying the
-            //  instance, so it is never torn down either.
-            //
+            //  Leaked for the same RADV WSI reason as sharedVulkanInstance().
             static QWindow* dummyWindow = []() -> QWindow*
             {
                 auto* w = new QWindow();
@@ -450,11 +385,6 @@ namespace Rv
                 }
             }
 
-            //
-            //  The probe window, its surface and the shared instance are all
-            //  kept alive for the process lifetime, so nothing is torn down
-            //  here.
-            //
             if (ImageRenderer::debugGpu())
             {
                 cout << "INFO: VulkanWindow: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << endl;
@@ -467,13 +397,11 @@ namespace Rv
 
     bool VulkanWindow::initVulkan()
     {
-        // Create Instance
         VkApplicationInfo appInfo = {};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "RV VulkanWindow";
         appInfo.apiVersion = VK_API_VERSION_1_1;
 
-        // Need surface extensions
         std::vector<const char*> instanceExtensions = {
             VK_KHR_SURFACE_EXTENSION_NAME,
 #if defined(VK_USE_PLATFORM_WIN32_KHR)
@@ -487,9 +415,6 @@ namespace Rv
 #endif
         };
 
-        // Reuse the one process-lifetime instance, shared with the 10-bit probe.
-        // It is never destroyed: see sharedVulkanInstance for why tearing a
-        // VkInstance down near another init crashes RADV's WSI.
         QVulkanInstance* qtVkInst = sharedVulkanInstance();
         if (!qtVkInst)
         {
@@ -499,9 +424,7 @@ namespace Rv
 
         m_vkInstance = qtVkInst->vkInstance();
 
-        // Create Surface. The platform window must exist before Qt can hand out
-        // a VkSurfaceKHR for it; VulkanView::create()s it up front, but
-        // re-creating after a reparent can land here first.
+        // Re-creating after a reparent can get here before the platform window.
         if (!handle())
         {
             create();
@@ -516,7 +439,6 @@ namespace Rv
             return false;
         }
 
-        // Pick Physical Device
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
         if (deviceCount == 0)
@@ -549,17 +471,14 @@ namespace Rv
         }
 
         {
-            //  Unconditional: runs once per window init, and pairing this name
-            //  against QTVulkanVideoDevice's GL_RENDERER is how a hybrid-GPU
-            //  machine (GL on the iGPU, Vulkan on the dGPU) is spotted from a
-            //  plain QA log.
+            //  Unconditional: compared against GL_RENDERER to spot hybrid-GPU
+            //  machines.
             VkPhysicalDeviceProperties props = {};
             vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &props);
             cout << "INFO: VulkanWindow: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
                  << " available)" << endl;
         }
 
-        // Create Logical Device
         float queuePriority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -607,9 +526,6 @@ namespace Rv
 
         vkGetDeviceQueue(m_vkDevice, m_queueFamilyIndex, 0, &m_vkQueue);
 
-        //  Negotiate the GL<->Vulkan interop configuration once, here. It is a
-        //  property of the device, not of a shared-image slot or of the current
-        //  window size, so it must not be recomputed per slot or on resize.
         negotiateInteropConfig();
         if (ImageRenderer::debugGpu())
         {
@@ -623,7 +539,6 @@ namespace Rv
             return false;
         };
 
-        // Command pool
         VkCommandPoolCreateInfo poolInfo = {};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -633,18 +548,15 @@ namespace Rv
             return failInit();
         }
 
-        // Sync objects. The per-swapchain-image renderFinished semaphores live
-        // in createSwapchain (sized to the image count); here we create only the
-        // per-in-flight-slot acquire semaphores and frame fences.
+        // Per-image renderFinished semaphores are created in createSwapchain().
         VkSemaphoreCreateInfo semaphoreInfo = {};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-        // Per-in-flight-slot acquire semaphore + frame fence. Fences are created
-        // signaled so the first wait on a slot passes without a prior submit.
+        // Signaled so the first wait on a slot passes.
         VkFenceCreateInfo fenceInfo = {};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+        for (uint32_t i = 0; i < kFramesInFlight; ++i)
         {
             if (vkCreateSemaphore(m_vkDevice, &semaphoreInfo, nullptr, &m_vkImageAvailableSemaphore[i]) != VK_SUCCESS)
             {
@@ -668,9 +580,7 @@ namespace Rv
         }
         m_glFallbackRequested = true;
 
-        //  The OpenGL rung forgoes 10-bit, so it must be visible in the log
-        //  rather than inferred from the absence of a Vulkan record. Callers
-        //  that know why set m_presentPathReason before calling.
+        //  Logged explicitly since OpenGL forgoes 10-bit.
         reportPresentPath(PresentPath::OpenGL,
                           m_presentPathReason.empty() ? std::string("Vulkan presentation could not be established") : m_presentPathReason);
 
@@ -698,62 +608,33 @@ namespace Rv
     // Rebuild all Vulkan state after the native surface is lost.
     void VulkanWindow::handleSurfaceLost()
     {
-        //
-        //  The platform window was destroyed and recreated underneath us, so
-        //  the VkSurfaceKHR (and everything derived from it) belongs to a
-        //  window that no longer exists. Qt does this whenever the top-level
-        //  QWidgetWindow is replaced -- inserting a QWebEngineView is the
-        //  common trigger -- and VulkanView re-parents this window into the
-        //  new one afterwards (see VulkanView::reattachVulkanWindow).
-        //
-        //  Tear the Vulkan device down completely and re-initialize against the
-        //  new handle. A swapchain recreate is not enough: the surface handle
-        //  itself is stale, so vkGetPhysicalDeviceSurfaceCapabilitiesKHR and
-        //  vkCreateSwapchainKHR would both be querying a dead object.
-        //
+        //  Qt replaces the platform window when the top-level QWidgetWindow is
+        //  recreated (e.g. inserting a QWebEngineView). The VkSurfaceKHR itself
+        //  is stale, so a swapchain recreate is not enough.
         cout << "INFO: VulkanWindow: platform window recreated; rebuilding Vulkan surface" << endl;
 
         releaseVulkanResources();
     }
 
-    //
-    //  Release everything initVulkan()/createSwapchain()/getSharedImageInfo()
-    //  built, in dependency order, and return to the pre-initialize() state so
-    //  the next exposeEvent() re-initializes from scratch.
-    //
-    //  Ordering constraint: every one of these destroy calls is made against
-    //  objects the driver ties back to the presentation surface -- and the
-    //  VkSurfaceKHR is only valid while the platform window that produced it
-    //  lives. Callers must therefore reach here *before* the platform window is
-    //  destroyed, not after (see the QEvent::PlatformSurface handler).
-    //
     void VulkanWindow::releaseVulkanResources()
     {
-        //
-        //  The GL side imported this window's shared device memory and
-        //  semaphores as GL memory objects; drop those first so nothing on the
-        //  GL side is left aliasing memory freed just below. syncBuffers()
-        //  re-imports on the next frame if the window comes back.
-        //
+        //  Drop the GL imports first so GL never aliases memory freed below.
         if (m_videoDevice)
         {
             m_videoDevice->releaseSharedGLObjects();
 
-            //  The next initVulkan() may land on a different VkPhysicalDevice,
-            //  so the GL/Vulkan device-UUID match has to be probed again
-            //  rather than reused from the device just torn down.
+            //  The next initVulkan() may pick a different physical device.
             m_videoDevice->resetInteropDeviceMatch();
         }
 
-        for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+        for (uint32_t i = 0; i < kFramesInFlight; ++i)
         {
             cleanupSharedImage(i);
         }
         cleanupSwapchain();
         cleanupVulkan();
 
-        //  Owned by the platform window / QVulkanInstance, never destroyed here;
-        //  just forget it, since it does not outlive the window it came from.
+        //  Owned by QVulkanInstance; not destroyed here.
         m_vkSurface = VK_NULL_HANDLE;
         m_vkPhysicalDevice = VK_NULL_HANDLE;
         m_vkSwapchainFormat = VK_FORMAT_UNDEFINED;
@@ -772,12 +653,9 @@ namespace Rv
             return;
         }
 
-        // Recreate only the swapchain, not the shared image. The shared image is
-        // a content-sized TRANSFER_SRC image, independent of the window-sized
-        // swapchain. Keep the acquire semaphores too: they are per-frame
-        // resources, not swapchain resources, and can still be referenced by
-        // queued submissions when OUT_OF_DATE is reported. createSwapchain()
-        // waits for the device before retiring swapchain-owned resources.
+        // The shared image is content-sized and the acquire semaphores are
+        // per frame and may still be referenced by queued submissions, so only
+        // the swapchain is recreated.
         if (!createSwapchain())
         {
             requestGLFallback();
@@ -790,7 +668,7 @@ namespace Rv
         {
             vkDeviceWaitIdle(m_vkDevice);
 
-            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+            for (uint32_t i = 0; i < kFramesInFlight; ++i)
             {
                 if (m_vkImageAvailableSemaphore[i])
                 {
@@ -803,7 +681,6 @@ namespace Rv
                     m_vkFence[i] = VK_NULL_HANDLE;
                 }
             }
-            // m_vkRenderFinished are per-swapchain-image; freed in cleanupSwapchain.
 
             if (m_vkCommandPool)
             {
@@ -816,24 +693,13 @@ namespace Rv
         }
         m_vkQueue = VK_NULL_HANDLE;
         m_externalInteropSupported = false;
-        // Surface is managed by QVulkanInstance? We shouldn't destroy it here if QVulkanInstance owns it, but wait, we got it from
-        // surfaceForWindow. Actually QVulkanWindow destroys it. We can just leave it for QVulkanInstance to clean up, or we can
-        // vkDestroySurfaceKHR if needed. For safety we don't destroy instance/surface here, they are tied to Qt.
+        // The VkSurfaceKHR is owned by QVulkanInstance; do not destroy it here.
     }
 
     //
-    //  Present mode
-    //
-    //  FIFO everywhere, which is what a viewport and a presentation output
-    //  both want: every image scanned out, none torn.
-    //
-    //  The env overrides are for measurement. Note that MAILBOX only differs
-    //  from FIFO once the loop is fast enough to fill a swapchain queue; below
-    //  that, both acquires return immediately and the mode is not observable.
-    //
-    //      RV_VULKAN_PRESENT_MODE         (control viewport)
-    //      RV_VULKAN_OUTPUT_PRESENT_MODE  (passive presentation output)
-    //  with values fifo | relaxed | mailbox | immediate.
+    //  FIFO everywhere. For measurement, RV_VULKAN_PRESENT_MODE (control
+    //  viewport) and RV_VULKAN_OUTPUT_PRESENT_MODE (presentation output) take
+    //  fifo | relaxed | mailbox | immediate.
     //
     static const char* presentModeName(VkPresentModeKHR m)
     {
@@ -855,30 +721,42 @@ namespace Rv
     static bool presentModeFromName(const char* name, VkPresentModeKHR& mode)
     {
         if (!name)
+        {
             return false;
+        }
         const string n(name);
         if (n == "fifo")
+        {
             mode = VK_PRESENT_MODE_FIFO_KHR;
+        }
         else if (n == "relaxed")
+        {
             mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+        }
         else if (n == "mailbox")
+        {
             mode = VK_PRESENT_MODE_MAILBOX_KHR;
+        }
         else if (n == "immediate")
+        {
             mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        }
         else
+        {
             return false;
+        }
         return true;
     }
 
-    //  FIFO is the only mode required to be supported, so it is always the
-    //  last resort of the preference list.
     static VkPresentModeKHR choosePresentMode(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool passiveOutput)
     {
         uint32_t count = 0;
         vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, nullptr);
         std::vector<VkPresentModeKHR> available(count);
         if (count)
+        {
             vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &count, available.data());
+        }
 
         const auto supported = [&](VkPresentModeKHR m) { return std::find(available.begin(), available.end(), m) != available.end(); };
 
@@ -886,7 +764,9 @@ namespace Rv
         if (presentModeFromName(getenv(passiveOutput ? "RV_VULKAN_OUTPUT_PRESENT_MODE" : "RV_VULKAN_PRESENT_MODE"), forced))
         {
             if (supported(forced))
+            {
                 return forced;
+            }
             cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(forced) << " is unsupported; using FIFO" << endl;
             return VK_PRESENT_MODE_FIFO_KHR;
         }
@@ -914,7 +794,6 @@ namespace Rv
             return false;
         }
 
-        // Negotiate 10-bit format
         uint32_t formatCount = 0;
         if (vkGetPhysicalDeviceSurfaceFormatsKHR(m_vkPhysicalDevice, m_vkSurface, &formatCount, nullptr) != VK_SUCCESS || formatCount == 0)
         {
@@ -928,13 +807,8 @@ namespace Rv
             return false;
         }
 
-        //
-        //  Unconditional but once per window: a handful of lines, and the pair
-        //  that matters is not the format alone but which colour space each
-        //  10-bit entry is offered with, plus the order they come in. Vendor
-        //  ordering differences in this exact list are what made a black
-        //  NVIDIA viewport look like a working AMD one.
-        //
+        //  Unconditional, once per window: the colour space and order of each
+        //  10-bit entry are vendor-specific.
         if (!m_loggedSurfaceFormatList)
         {
             m_loggedSurfaceFormatList = true;
@@ -949,28 +823,9 @@ namespace Rv
 
         VkSurfaceFormatKHR surfaceFormat = formats[0];
         bool found10bit = false;
-        // Prefer A2B10G10R10 (== GL_RGB10_A2, the layout the GPU interop shared
-        // texture and CPU fallback packing produce natively) so the transfer is
-        // a plain copy. If the surface only offers A2R10G10B10 (common on
-        // Linux/RADV), accept it too: the opposite R/B order is handled where
-        // pixels are packed (CPU fallback) and by a component-wise blit (GPU
-        // interop), so red and blue are not swapped.
-        //
-        // The colour space has to be matched as carefully as the format. A
-        // 10-bit format is commonly advertised more than once, paired with a
-        // different VkColorSpaceKHR each time, and the enumeration order is
-        // vendor-specific: with the display in HDR mode NVIDIA lists
-        // A2B10G10R10 + HDR10_ST2084 ahead of A2B10G10R10 + SRGB_NONLINEAR,
-        // while AMD lists SRGB_NONLINEAR first. Taking the first format match
-        // therefore gave NVIDIA a PQ swapchain fed with sRGB-encoded pixels,
-        // which crushes everything below mid-grey to a couple of nits -- the
-        // whole viewport, RV's own overlays included, reads as black.
-        //
-        // RV's renderer emits sRGB, so SRGB_NONLINEAR is the only correct
-        // pairing. Honouring an HDR colour space would mean re-encoding the
-        // shader output to that transfer function, which is a colour-pipeline
-        // change, not a swapchain choice.
-        //
+        // Prefer A2B10G10R10 (== GL_RGB10_A2) so the transfer is a plain copy.
+        // RV emits sRGB, so require SRGB_NONLINEAR: in HDR mode NVIDIA lists a
+        // 10-bit HDR10_ST2084 entry first, which renders the viewport black.
         const auto findTenBit = [&formats](VkFormat wanted, bool requireSrgbNonlinear, VkSurfaceFormatKHR& out) -> bool
         {
             for (const auto& fmt : formats)
@@ -998,10 +853,7 @@ namespace Rv
             }
         }
 
-        // No 10-bit format is paired with SRGB_NONLINEAR on this surface. Take
-        // the 10-bit format anyway rather than dropping to the 8-bit OpenGL
-        // path: the depth is what the user asked for, and the colour space is
-        // reported below so a wrong-looking image is traceable to it.
+        // No SRGB_NONLINEAR pairing: keep 10-bit anyway and warn below.
         if (!found10bit)
         {
             for (const VkFormat wanted : {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32})
@@ -1016,9 +868,7 @@ namespace Rv
 
         if (found10bit)
         {
-            //  Unconditional, and the colour space is part of it: the format
-            //  alone was never enough to explain a black NVIDIA viewport.
-            //  Latched, because createSwapchain() re-runs on every resize step.
+            //  Unconditional, but only on change (runs on every resize).
             if (surfaceFormat.format != m_loggedSurfaceFormat.format || surfaceFormat.colorSpace != m_loggedSurfaceFormat.colorSpace)
             {
                 m_loggedSurfaceFormat = surfaceFormat;
@@ -1061,14 +911,11 @@ namespace Rv
             return false;
         }
 
-        //  A doc-less window is a passive presentation output; see
-        //  choosePresentMode().
         const VkPresentModeKHR presentMode = choosePresentMode(m_vkPhysicalDevice, m_vkSurface, /*passiveOutput*/ m_doc == nullptr);
 
         uint32_t imageCount = capabilities.minImageCount + 1;
-        //  MAILBOX only stays non-blocking with an image to spare: one being
-        //  scanned out, one queued as the newest-wins candidate, one to render
-        //  into. With fewer, acquire blocks and the mode buys nothing.
+        //  MAILBOX needs three images (scanout, queued, rendering) or acquire
+        //  blocks.
         if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR && imageCount < 3)
         {
             imageCount = 3;
@@ -1120,12 +967,10 @@ namespace Rv
         }
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
-        // Warm recreate: hand the retiring swapchain to the driver so it can reuse
-        // its backing resources (much cheaper than a cold create on every resize).
+        // Lets the driver reuse the retiring swapchain's resources on resize.
         createInfo.oldSwapchain = m_vkSwapchain;
 
-        // Create into a local handle so a failed create leaves the existing
-        // swapchain and command buffers intact (the fallback paths stay valid).
+        // A failed create leaves the existing swapchain intact.
         VkSwapchainKHR newSwapchain = VK_NULL_HANDLE;
         if (vkCreateSwapchainKHR(m_vkDevice, &createInfo, nullptr, &newSwapchain) != VK_SUCCESS)
         {
@@ -1133,14 +978,13 @@ namespace Rv
             return false;
         }
 
-        // New swapchain is live. Retire the old one only now: wait for its last
-        // submitted frame to finish, free its command buffers, then destroy it.
         if (m_vkSwapchain != VK_NULL_HANDLE)
         {
             vkDeviceWaitIdle(m_vkDevice);
             if (!m_vkCommandBuffers.empty())
             {
-                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, (uint32_t)m_vkCommandBuffers.size(), m_vkCommandBuffers.data());
+                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, static_cast<uint32_t>(m_vkCommandBuffers.size()),
+                                     m_vkCommandBuffers.data());
                 m_vkCommandBuffers.clear();
             }
             vkDestroySwapchainKHR(m_vkDevice, m_vkSwapchain, nullptr);
@@ -1156,7 +1000,7 @@ namespace Rv
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = m_vkCommandPool;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = (uint32_t)m_vkCommandBuffers.size();
+        allocInfo.commandBufferCount = static_cast<uint32_t>(m_vkCommandBuffers.size());
         if (vkAllocateCommandBuffers(m_vkDevice, &allocInfo, m_vkCommandBuffers.data()) != VK_SUCCESS)
         {
             cleanupSwapchain();
@@ -1164,13 +1008,14 @@ namespace Rv
             return false;
         }
 
-        // Per-swapchain-image present-wait semaphores + in-flight fence map. The
-        // device is idle here (the retire path above waited on it), so any old
-        // renderFinished semaphores from a previous swapchain are safe to destroy.
+        // The device is idle here, so old renderFinished semaphores are safe
+        // to destroy.
         for (VkSemaphore sem : m_vkRenderFinished)
         {
             if (sem)
+            {
                 vkDestroySemaphore(m_vkDevice, sem, nullptr);
+            }
         }
         m_vkRenderFinished.assign(imageCount, VK_NULL_HANDLE);
         VkSemaphoreCreateInfo rfInfo = {};
@@ -1184,7 +1029,6 @@ namespace Rv
                 return false;
             }
         }
-        // Fresh swapchain images: none are in flight yet.
         m_imagesInFlight.assign(imageCount, VK_NULL_HANDLE);
 
         return true;
@@ -1199,12 +1043,14 @@ namespace Rv
             for (VkSemaphore sem : m_vkRenderFinished)
             {
                 if (sem)
+                {
                     vkDestroySemaphore(m_vkDevice, sem, nullptr);
+                }
             }
             m_vkRenderFinished.clear();
             m_imagesInFlight.clear();
 
-            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+            for (uint32_t i = 0; i < kFramesInFlight; ++i)
             {
                 if (m_vkStagingBuffer[i])
                 {
@@ -1233,7 +1079,6 @@ namespace Rv
         }
     }
 
-    // Helper to find memory type
     uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
     {
         VkPhysicalDeviceMemoryProperties memProperties;
@@ -1250,7 +1095,6 @@ namespace Rv
 
     namespace
     {
-        // Read an env var that is treated as a boolean flag by presence.
         bool envFlagSet(const char* name) { return getenv(name) != nullptr; }
 
         const char* tilingName(VkImageTiling t)
@@ -1291,14 +1135,14 @@ namespace Rv
             }
         }
 
-        // Decode RV_VULKAN_FORCE_TILING. Returns false when unset or when the
-        // value is not recognized; an unrecognized value is reported rather
-        // than silently behaving as if the variable were unset.
+        // False when RV_VULKAN_FORCE_TILING is unset or unrecognized.
         bool forcedTilingRequested(VkImageTiling& out)
         {
             const char* v = getenv("RV_VULKAN_FORCE_TILING");
             if (!v)
+            {
                 return false;
+            }
 
             std::string s(v);
             std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(::tolower(c)); });
@@ -1319,12 +1163,8 @@ namespace Rv
             return false;
         }
 
-        // vkGetPhysicalDeviceImageFormatProperties2 is core in Vulkan 1.1 and
-        // available as a KHR alias on 1.0 loaders that expose
-        // VK_KHR_get_physical_device_properties2. Resolved through
-        // vkGetInstanceProcAddr rather than called directly so a 1.0-only
-        // loader degrades to "cannot establish exportability" instead of
-        // dispatching into an entry point it does not implement.
+        // Resolved dynamically (with the KHR alias) so a 1.0-only loader
+        // degrades to "not exportable" instead of crashing.
         PFN_vkGetPhysicalDeviceImageFormatProperties2 getImageFormatProperties2(VkInstance instance)
         {
             static PFN_vkGetPhysicalDeviceImageFormatProperties2 fn = nullptr;
@@ -1356,41 +1196,16 @@ namespace Rv
             return disabled;
         }
 
-        // Reverts the shared image to a plain (non-dedicated) allocation, the
-        // behaviour before the dedicated-allocation query was added. The
-        // dedicated path is what the spec asks for and what a driver reporting
-        // requiresDedicatedAllocation needs for an externally-shared image, but
-        // it changes a code path that already worked, so keep a way to rule it
-        // out on a machine without a rebuild.
         bool dedicatedAllocationDisabled()
         {
-            //  RV_VULKAN_FORCE_NO_DEDICATED is the documented name, matching
-            //  the other RV_VULKAN_FORCE_* overrides;
-            //  RV_VULKAN_DISABLE_DEDICATED_ALLOCATION is kept as an alias so
-            //  existing notes and scripts keep working.
             static const bool disabled =
                 getenv("RV_VULKAN_FORCE_NO_DEDICATED") != nullptr || getenv("RV_VULKAN_DISABLE_DEDICATED_ALLOCATION") != nullptr;
             return disabled;
         }
 
-        // How many frames the control viewport may keep in flight. Default 1:
-        // block on this frame's fence before returning, rather than letting the
-        // next frame's start-of-frame wait absorb it two frames later.
-        // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 restores the deeper pipeline.
-        //
-        // Depth is latency, not throughput, and separating the two is what
-        // fixed the "annotation trails the cursor in presentation mode" bug.
-        // Both backends ran presentation mode at a similar frame interval, so
-        // throughput was never the difference; what differed was how old the
-        // displayed pixels were. With two frames in flight the screen answers
-        // input from two frames back, and the OpenGL path is effectively one
-        // deep because paintGL() draws and Qt's following swap waits on that
-        // same work.
-        //
-        // Giving up the second frame costs no measurable frame rate here
-        // because the loop is GPU-bound either way, and it buys a whole frame:
-        // measured on a 4K presentation output, eventToRetire settled to
-        // eventToRender + one frame interval, with no queue left behind it.
+        // Frames the control viewport may keep in flight. Default 1: depth is
+        // input latency, and the loop is GPU-bound so a second frame buys no
+        // throughput. RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 restores the deeper ring.
         unsigned int maxFramesInFlight()
         {
             static const unsigned int depth = []
@@ -1398,11 +1213,13 @@ namespace Rv
                 const unsigned int kDefault = 1;
                 const char* v = getenv("RV_VULKAN_MAX_FRAMES_IN_FLIGHT");
                 if (!v)
-                    return kDefault;
-                const int n = atoi(v);
-                if (n < 1 || n > static_cast<int>(VulkanWindow::FRAMES_IN_FLIGHT))
                 {
-                    cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::FRAMES_IN_FLIGHT
+                    return kDefault;
+                }
+                const int n = atoi(v);
+                if (n < 1 || n > static_cast<int>(VulkanWindow::kFramesInFlight))
+                {
+                    cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::kFramesInFlight
                          << "; using " << kDefault << endl;
                     return kDefault;
                 }
@@ -1411,36 +1228,12 @@ namespace Rv
             return depth;
         }
 
-        // Tiling for the GL<->Vulkan shared image: OPTIMAL on NVIDIA, LINEAR
-        // everywhere else.
-        //
-        // NVIDIA needs OPTIMAL. Its 550+ drivers return blank pixels to OpenGL
-        // for LINEAR shared images >= ~2 MiB (forum thread #349436), and
-        // OPTIMAL avoids that broken linear path. It is safe there because the
-        // GL and Vulkan sides are the same driver, so the vendor-private
-        // optimal layout matches on import. Set
-        // RV_VULKAN_DISABLE_NVIDIA_INTEROP_WORKAROUND to revert NVIDIA to
-        // LINEAR (reproduces the blank-image bug, for debugging).
-        //
-        // The vendor decides this, not the platform: NVIDIA ships one driver
-        // core behind both GL and Vulkan on Windows as well as Linux, which is
-        // why the check below covers both, and the shared image is always well
-        // past the threshold because getSharedImageInfo() allocates at screen
-        // capacity -- ~8 MiB for a 1080p A2B10G10R10 image, ~33 MiB at 4K.
-        //
-        // Everywhere else LINEAR is not conservatism, it is the only correct
-        // choice: OPTIMAL was measured on AMD (RADV PHOENIX2, Mesa) and renders
-        // tile-pattern garbage -- sparse tile-aligned fragments of the frame,
-        // the rest dropped. Under Mesa, GL and Vulkan are different drivers
-        // (radeonsi vs RADV) and GL_OPTIMAL_TILING_EXT carries no cross-driver
-        // layout guarantee, so the importer reads a layout the exporter never
-        // wrote. Making OPTIMAL usable off NVIDIA means negotiating the layout
-        // explicitly with VK_EXT_image_drm_format_modifier.
-        //
-        // This costs real time at a 4K presentation output -- the GL side blits
-        // a full frame into the linear image and Vulkan blits it back out every
-        // present, both without their tiled fast paths -- so it is worth
-        // revisiting, but not by flipping this flag.
+        // Vendor heuristic: OPTIMAL on NVIDIA, LINEAR elsewhere. NVIDIA 550+
+        // returns blank pixels to GL for LINEAR shared images >= ~2 MiB
+        // (forum thread #349436); its GL and Vulkan share one driver, so the
+        // optimal layout matches on import. Under Mesa, GL and Vulkan are
+        // different drivers and OPTIMAL renders tile garbage (RADV PHOENIX2);
+        // making it usable there needs VK_EXT_image_drm_format_modifier.
         bool useOptimalTilingForInterop(VkPhysicalDevice dev)
         {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
@@ -1452,16 +1245,6 @@ namespace Rv
         }
     } // namespace
 
-    //
-    //  Probe the driver for an exportable shared-image configuration.
-    //
-    //  Runs once per device. The previous code chose OPTIMAL tiling when the
-    //  physical device reported vendorID 0x10DE and LINEAR otherwise, which
-    //  encoded one machine's observed behaviour as a rule about a whole
-    //  vendor. Asking the driver which configurations it will actually export
-    //  covers the same NVIDIA case without guessing about the others, and
-    //  produces a reason when nothing is usable.
-    //
     void VulkanWindow::negotiateInteropConfig()
     {
         if (m_interopNegotiated)
@@ -1472,11 +1255,8 @@ namespace Rv
 
         InteropConfig cfg;
         cfg.format = VK_FORMAT_A2B10G10R10_UNORM_PACK32; // == GL_RGB10_A2
-        //  Usage must cover every use on BOTH sides: Vulkan reads the image as
-        //  a transfer source, and GL attaches it to GL_COLOR_ATTACHMENT0 and
-        //  renders into it. Declaring only TRANSFER_SRC lets the driver pick an
-        //  internal compressed layout the GL import does not decode, which
-        //  corrupts the image rather than raising an error.
+        //  Must cover GL's use too (it renders into the image): with only
+        //  TRANSFER_SRC the driver may pick a compressed layout GL cannot read.
         cfg.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 #ifdef PLATFORM_WINDOWS
@@ -1496,9 +1276,8 @@ namespace Rv
             return;
         }
 
-        //  OPTIMAL first: it is the layout the driver is free to arrange for
-        //  its own access, and the one that fixed the blank large-image bug on
-        //  NVIDIA. LINEAR is the portable fallback.
+        //  OPTIMAL first (avoids NVIDIA's blank large-LINEAR-image bug);
+        //  LINEAR is the portable fallback.
         const VkImageTiling candidates[] = {VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_TILING_LINEAR};
 
         auto probeTiling = [&](VkImageTiling tiling, VkExternalMemoryFeatureFlags& features) -> bool
@@ -1553,14 +1332,7 @@ namespace Rv
                 continue;
             }
 
-            //  DEDICATED_ONLY is the only dedicated-allocation signal available
-            //  from the external-memory probe: it is a hard requirement of the
-            //  handle type. The softer "prefers dedicated" signal is a property
-            //  of a concrete image, not of the format, and is read per-image
-            //  from VkMemoryDedicatedRequirements at allocation time -- see
-            //  getSharedImageInfo(). This value is therefore the floor, and the
-            //  per-slot SharedImageInfo::dedicatedAllocation is the final
-            //  decision the GL side must mirror.
+            //  Only the floor; the per-image decision is in getSharedImageInfo().
             const bool dedicatedOnly = (features & VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT) != 0;
 
             cfg.supported = true;
@@ -1585,15 +1357,10 @@ namespace Rv
             return;
         }
 
-        //  Apply the diagnostic overrides last, so the record can report both
-        //  the negotiated value and the forced one. An override is honored only
-        //  when the driver reported that configuration as usable.
+        //  Overrides last, so the record reports both values.
         VkImageTiling forcedTiling = VK_IMAGE_TILING_LINEAR;
         if (forcedTilingRequested(forcedTiling) && forcedTiling != cfg.tiling)
         {
-            //  Re-probe the forced tiling rather than trusting the request:
-            //  presenting through an unverified configuration is exactly what
-            //  the fallback ladder exists to prevent.
             VkExternalMemoryFeatureFlags features = 0;
             if (probeTiling(forcedTiling, features))
             {
@@ -1624,8 +1391,7 @@ namespace Rv
         }
         else if (dedicatedAllocationDisabled())
         {
-            //  Nothing to relax at probe level, but the per-image decision in
-            //  getSharedImageInfo() still needs to know an override is active.
+            //  getSharedImageInfo() still needs to know the override is active.
             cfg.dedicatedOverridden = true;
         }
 
@@ -1646,13 +1412,6 @@ namespace Rv
         m_glImportReported = true;
     }
 
-    //
-    //  One record per session, emitted unconditionally. Windows/NVIDIA is
-    //  verified by testers against a produced build rather than by the
-    //  developer, so this has to be sufficient on its own to establish which
-    //  path ran and what was negotiated. Per-frame and per-candidate detail
-    //  stays behind ImageRenderer::debugGpu().
-    //
     void VulkanWindow::emitPresentationRecord()
     {
         if (m_recordEmitted)
@@ -1735,9 +1494,7 @@ namespace Rv
             o << "INFO:   Probe candidate: " << entry << "\n";
         }
 
-        //  Kept for comparison until the probe result is confirmed to agree
-        //  with the vendor heuristic on Linux/NVIDIA; the heuristic is removed
-        //  once it does.
+        //  TODO: remove once the probe is confirmed on Linux/NVIDIA.
         o << "INFO:   Legacy vendor heuristic would have chosen: "
           << (m_vkPhysicalDevice != VK_NULL_HANDLE && useOptimalTilingForInterop(m_vkPhysicalDevice) ? "OPTIMAL" : "LINEAR") << "\n";
 
@@ -1823,82 +1580,58 @@ namespace Rv
     }
 
     //
-    //  A best-effort present that skipped has to be retried, or the output is
-    //  left showing the frame before the one just composited -- and nothing
-    //  else will come back for it, because the control viewport only renders
-    //  when the session asks. The OpenGL output never needed this: its
-    //  m_view->update() is a dirty flag Qt is obliged to honour eventually.
-    //
-    //  QWindow::requestUpdate() coalesces, so at most one retry is ever
-    //  outstanding. render() picks it up in the passive-output branch and
-    //  re-presents the frame already sitting in the device's FBO.
-    //
-    //
-    //  Best-effort gate for a passive presentation output.
-    //
-    //  The OpenGL presentation path gets this for free: its syncBuffers() is a
-    //  QOpenGLWidget::update() that Qt coalesces and drops when it falls
-    //  behind, so the second display skips frames under load rather than
-    //  deepening the GPU queue. The Vulkan path queues its work
-    //  unconditionally, and at a 4K output that work is what the control
-    //  viewport ends up waiting for in vkWaitForFences.
-    //
-    //  Gate on whether this device's *own* GPU work has caught up, not on
-    //  whether the swapchain is full -- with a slower loop than display the
-    //  queue always has room, so a swapchain-full test never fires.
-    //
-    //  Called before any GL work, so a skipped frame costs nothing -- in
-    //  particular no GL semaphore has been signaled yet, so there is nothing to
-    //  rebalance.
+    //  Skip frames under load (as Qt does for the OpenGL output) instead of
+    //  deepening the GPU queue the control viewport then waits on. Gates on
+    //  this device's own GPU work; the swapchain queue always has room.
     //
     bool VulkanWindow::canPresentNow()
     {
         if (!isPassiveOutput())
+        {
             return true;
+        }
 
-        //  Nothing allocated yet: let the frame through so syncBuffers() can
-        //  build the swapchain and shared image.
         if (!m_vkDevice || !m_vkSwapchain)
+        {
             return true;
+        }
 
-        //
-        //  Forward progress. Under sustained GPU pressure the catch-up test
-        //  below can be false indefinitely, which would freeze the presentation
-        //  display rather than merely thin it out. Once stale, let syncBuffers()
-        //  reach the present functions; they convert their normal zero-timeout
-        //  polling into one blocking present.
-        //
+        //  Forward progress: under sustained load, force one blocking present
+        //  rather than freezing the output.
         static const double kMaxStaleSeconds = 0.1;
         if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds)
+        {
             return true;
+        }
 
-        //  waitAll with a zero timeout: every in-flight frame of this device
-        //  must have retired, not just the one two frames back that this slot
-        //  happens to own.
-        const VkResult r = vkWaitForFences(m_vkDevice, FRAMES_IN_FLIGHT, m_vkFence.data(), VK_TRUE, 0);
+        //  Every in-flight frame must have retired, not only this slot's.
+        const VkResult r = vkWaitForFences(m_vkDevice, kFramesInFlight, m_vkFence.data(), VK_TRUE, 0);
         if (r == VK_SUCCESS)
+        {
             return true;
+        }
 
         requestBestEffortRetry();
         return false;
     }
 
+    //  Re-present a skipped best-effort frame; requestUpdate() coalesces, so at
+    //  most one retry is pending.
     void VulkanWindow::requestBestEffortRetry()
     {
         if (!m_stopProcessingEvents && isExposed())
+        {
             requestUpdate();
+        }
     }
 
     void VulkanWindow::drainSharedSemaphores(uint32_t slot)
     {
-        // No shared image for this slot yet -> the GL side never signaled/waited
-        // its pair, so there is nothing to rebalance.
         if (!m_vkDevice || !m_vkGlReadySemaphore[slot] || !m_vkVkReadySemaphore[slot])
+        {
             return;
+        }
 
-        // Consume the pending glReady signal from the GL side and re-signal
-        // vkReady so the next use of this slot starts balanced (exactly what a
-        // normal present's submit would have done for the pair).
         VkSubmitInfo drain = {};
         drain.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore[slot]};
@@ -1913,32 +1646,24 @@ namespace Rv
 
         VkResult r = vkQueueSubmit(m_vkQueue, 1, &drain, VK_NULL_HANDLE);
         if (r == VK_ERROR_DEVICE_LOST)
+        {
             requestGLFallback();
+        }
     }
 
     const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int w, int h)
     {
         if (!m_vkDevice || !m_externalInteropSupported)
+        {
             return nullptr;
+        }
 
-        // Build/return the shared image for the current in-flight ring slot.
         const uint32_t slot = m_currentFrame;
         SharedImageInfo& info = m_sharedImageInfo[slot];
 
-        // The swapchain always tracks the window size, so recreate it on any size
-        // change. This is independent of the grow-only shared image below: a drag
-        // still recreates the (warm) swapchain each step, but no longer rebuilds
-        // or re-exports the shared image.
-        //
-        // The test is against the *surface's* extent, not against the caller's
-        // requested size. createSwapchain() takes its extent from
-        // capabilities.currentExtent, so it cannot be driven to match a request
-        // that disagrees with the surface: comparing to the request instead
-        // meant that any caller whose size was off by even a pixel -- e.g. a
-        // presentation output that sampled a devicePixelRatio belonging to the
-        // screen it was created on rather than the one it was moved to --
-        // recreated the swapchain on *every frame*, forever and silently, since
-        // both surface-format reports are latched.
+        // Compare against the surface extent, not the requested size:
+        // createSwapchain() can only match the surface, so a mismatched request
+        // would recreate the swapchain every frame.
         VkExtent2D surfaceExtent = m_vkSwapchainExtent;
         {
             VkSurfaceCapabilitiesKHR caps = {};
@@ -1951,14 +1676,13 @@ namespace Rv
 
         if (!m_vkSwapchain || m_vkSwapchainExtent.width != surfaceExtent.width || m_vkSwapchainExtent.height != surfaceExtent.height)
         {
-            // Warm recreate via oldSwapchain (createSwapchain retires the old one).
             if (!createSwapchain())
+            {
                 return nullptr;
+            }
         }
 
-        // Grow-only: if the request fits the slot's current allocated capacity,
-        // reuse the existing image/export and just update the used sub-region
-        // (presentSharedImage copies/blits info.width x info.height from it).
+        // Within capacity: reuse the export, update the used sub-region.
         if (m_vkSharedImage[slot] && w <= m_sharedCapacityW[slot] && h <= m_sharedCapacityH[slot])
         {
             info.width = w;
@@ -1966,16 +1690,8 @@ namespace Rv
             return &info;
         }
 
-        // Grow (or first allocation): rebuild at a capacity that is the
-        // componentwise max of the request, the screen size, and the current
-        // capacity, so it grows monotonically and the common drag-to-fullscreen
-        // case allocates at most once.
-        //
-        //  This window's own screen, not the primary one: a presentation output
-        //  lives on a second display, and sizing its headroom from the primary
-        //  screen is both wrong and, when the primary is the smaller of the two,
-        //  useless as headroom.
-        //
+        // Grow to at least this window's screen (not the primary: an output
+        // lives on a second display) so drag-to-fullscreen allocates once.
         int screenW = 0;
         int screenH = 0;
         if (QScreen* scr = screen() ? screen() : QGuiApplication::primaryScreen())
@@ -1989,11 +1705,6 @@ namespace Rv
 
         cleanupSharedImage(slot);
 
-        //  The interop configuration was negotiated once at device creation from
-        //  what the driver reports exportable. If nothing was exportable, refuse
-        //  the zero-copy path here so syncBuffers() takes the CPU readback rung
-        //  rather than presenting through a configuration whose correctness was
-        //  never established.
         if (!m_interopConfig.supported)
         {
             if (ImageRenderer::debugGpu())
@@ -2006,15 +1717,10 @@ namespace Rv
 
         const bool optimalTiling = m_interopConfig.tiling == VK_IMAGE_TILING_OPTIMAL;
 
-        //  Unconditional, and reported after the tiling decision so it can name
-        //  it. The shared image is allocated at screen capacity, so this fires
-        //  about once per ring slot per session rather than per resize, and the
-        //  tiling it reports is exactly the fact that separates a working NVIDIA
-        //  viewport from a black one.
+        //  Unconditional: fires about once per slot per session.
         cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
              << " for request " << w << "x" << h << " tiling=" << tilingName(m_interopConfig.tiling) << endl;
 
-        // 1. Create Shared Image
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
 #ifdef PLATFORM_WINDOWS
@@ -2027,25 +1733,14 @@ namespace Rv
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.pNext = &extMemInfo;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        // The shared image is imported into GL as GL_RGB10_A2, whose bit layout
-        // is A2B10G10R10, so the Vulkan side must use the matching format
-        // regardless of the swapchain format. When the swapchain is A2R10G10B10
-        // the difference is reconciled by a component-wise blit in
-        // presentSharedImage() (not a raw copy).
-        imageInfo.format = VK_FORMAT_A2B10G10R10_UNORM_PACK32; // matches GL_RGB10_A2
-        // Allocate at capacity; presentSharedImage transfers only the used
-        // info.width x info.height sub-region (anchored at origin 0,0).
-        imageInfo.extent = {(uint32_t)capW, (uint32_t)capH, 1};
+        // Matches GL_RGB10_A2 whatever the swapchain format; an A2R10G10B10
+        // swapchain is reconciled by a blit in presentSharedImage().
+        imageInfo.format = VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+        imageInfo.extent = {static_cast<uint32_t>(capW), static_cast<uint32_t>(capH), 1};
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.tiling = m_interopConfig.tiling;
-        //  Usage must cover every use on BOTH sides: Vulkan reads the image as a
-        //  transfer source, and GL attaches it to GL_COLOR_ATTACHMENT0 and
-        //  renders into it. Declaring only TRANSFER_SRC lets the driver pick an
-        //  internal compressed layout that the GL import does not decode, which
-        //  corrupts the image rather than raising an error. This is the usage
-        //  the probe established as exportable.
         imageInfo.usage = m_interopConfig.usage;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -2056,20 +1751,14 @@ namespace Rv
             return nullptr;
         }
 
-        // When the swapchain format differs from the shared image format
-        // (A2B10G10R10), presentSharedImage() reconciles them with a blit rather
-        // than a raw copy. That requires the shared image to be a valid blit
-        // source and the swapchain image a valid blit destination. If the driver
-        // does not support that, refuse the GPU-interop path so syncBuffers()
-        // uses the (channel-correct) CPU fallback instead.
+        // A format mismatch needs a blit; without blit support, use the CPU
+        // fallback.
         if (m_vkSwapchainFormat != VK_FORMAT_A2B10G10R10_UNORM_PACK32)
         {
             VkFormatProperties srcProps = {};
             VkFormatProperties dstProps = {};
             vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, VK_FORMAT_A2B10G10R10_UNORM_PACK32, &srcProps);
             vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
-            // The shared image's blit-source support depends on its actual tiling
-            // (OPTIMAL on NVIDIA, LINEAR elsewhere).
             const VkFormatFeatureFlags srcFeatures = optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
             const bool blitOk =
                 (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
@@ -2085,16 +1774,14 @@ namespace Rv
             }
         }
 
-        // rowPitch is only meaningful (and vkGetImageSubresourceLayout only valid)
-        // for LINEAR tiling. For OPTIMAL tiling the GL import uses the logical
-        // capacity width and lets the driver resolve the layout.
+        // vkGetImageSubresourceLayout is only valid for LINEAR tiling.
         if (optimalTiling)
         {
             info.strideWidth = capW;
         }
         else
         {
-            // Handle padded linear row pitch by matching the GL texture stride to Vulkan's rowPitch.
+            // Match the GL texture stride to a padded rowPitch.
             VkImageSubresource subresource = {};
             subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             subresource.mipLevel = 0;
@@ -2104,24 +1791,18 @@ namespace Rv
 
             if (layout.rowPitch % 4 != 0)
             {
-                // Cannot represent this stride as an integer pixel-width texture; fall back to CPU bridge.
+                // Not an integer pixel width; use the CPU fallback.
                 cleanupSharedImage(slot);
                 return nullptr;
             }
             info.strideWidth = static_cast<int>(layout.rowPitch / 4);
         }
-        info.capacityHeight = capH; // GL imports the texture at capacity dimensions
+        info.capacityHeight = capH;
         info.tiling = m_interopConfig.tiling;
 
-        //
-        //  Ask through the 2-variant so the dedicated-allocation requirement can
-        //  be read. An image created with an external handle type is reported
-        //  requiresDedicatedAllocation by some drivers (AMD's Windows driver
-        //  does), and binding non-dedicated memory to such an image is invalid
-        //  -- the GL import of it then yields a texture with undefined (in
-        //  practice all-zero) contents and no error on any path. Honor whatever
-        //  this driver asks for rather than forcing dedicated everywhere.
-        //
+        //  Some drivers (AMD on Windows) require dedicated memory for external
+        //  images; binding non-dedicated memory silently yields an all-zero GL
+        //  texture.
         VkMemoryDedicatedRequirements dedicatedReqs = {};
         dedicatedReqs.sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS;
 
@@ -2137,15 +1818,8 @@ namespace Rv
 
         const VkMemoryRequirements& memReqs = memReqs2.memoryRequirements;
 
-        //  Resolve the final dedicated-allocation decision for THIS image. The
-        //  probe supplied the floor (DEDICATED_ONLY, a requirement of the handle
-        //  type); "prefers dedicated" is a property of a concrete image and is
-        //  only available here. The GL side mirrors info.dedicatedAllocation, so
-        //  this is the single decision both sides use -- deciding it
-        //  independently is what corrupts the image.
-        //
-        //  An explicit override may only relax a preference, never a
-        //  requirement (DEDICATED_ONLY or requiresDedicatedAllocation).
+        //  The single decision GL mirrors. An override may relax a preference,
+        //  never a requirement.
         bool useDedicated =
             m_interopConfig.dedicatedAllocation || dedicatedReqs.requiresDedicatedAllocation || dedicatedReqs.prefersDedicatedAllocation;
         if (dedicatedAllocationDisabled() && !dedicatedReqs.requiresDedicatedAllocation
@@ -2161,19 +1835,12 @@ namespace Rv
              << " (driver requires=" << (dedicatedReqs.requiresDedicatedAllocation ? "yes" : "no")
              << " prefers=" << (dedicatedReqs.prefersDedicatedAllocation ? "yes" : "no") << ")" << endl;
 
-        //  Build the allocation pNext chain back to front, so each link is
-        //  attached exactly once regardless of which options are active:
-        //
+        //  pNext chain, built back to front:
         //    allocInfo -> exportAllocInfo [-> dedicatedAllocInfo] [-> exportWin32Info]
-        //
-        //  Every link lives until the vkAllocateMemory call below.
         void* chain = nullptr;
 
 #ifdef PLATFORM_WINDOWS
-        //  Required by the Vulkan specification for OPAQUE_WIN32 handles: the
-        //  export must state the access rights and security attributes the
-        //  handle is created with. Its absence is tolerated by some drivers but
-        //  is a real violation on the platform being debugged.
+        //  Required by the spec for OPAQUE_WIN32 handles.
         VkExportMemoryWin32HandleInfoKHR exportWin32Info = {};
         exportWin32Info.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_WIN32_HANDLE_INFO_KHR;
         exportWin32Info.pNext = chain;
@@ -2183,9 +1850,6 @@ namespace Rv
         chain = &exportWin32Info;
 #endif
 
-        //  Dedicated allocation when the driver requires or prefers it for this
-        //  image. NVIDIA's OPAQUE_WIN32 path in particular needs this paired
-        //  with GL_DEDICATED_MEMORY_OBJECT_EXT on the import side.
         VkMemoryDedicatedAllocateInfo dedicatedAllocInfo = {};
         if (useDedicated)
         {
@@ -2231,12 +1895,9 @@ namespace Rv
             return nullptr;
         }
 
-        // Export device memory as a platform-specific external handle
-        // (opaque FD on Linux, Win32 HANDLE on Windows). The receiving GL
-        // side imports this with the matching GL_EXT_memory_object_{fd,win32}
-        // extension so writes from GL land in this Vulkan image.
 #ifdef PLATFORM_WINDOWS
-        auto pfnGetMemoryWin32HandleKHR = (PFN_vkGetMemoryWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR");
+        auto pfnGetMemoryWin32HandleKHR =
+            reinterpret_cast<PFN_vkGetMemoryWin32HandleKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryWin32HandleKHR"));
         if (!pfnGetMemoryWin32HandleKHR)
         {
             cerr << "ERROR: VulkanWindow: vkGetMemoryWin32HandleKHR not found" << endl;
@@ -2257,7 +1918,7 @@ namespace Rv
             return nullptr;
         }
 #else
-        auto pfnGetMemoryFdKHR = (PFN_vkGetMemoryFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR");
+        auto pfnGetMemoryFdKHR = reinterpret_cast<PFN_vkGetMemoryFdKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR"));
         if (!pfnGetMemoryFdKHR)
         {
             cerr << "ERROR: VulkanWindow: vkGetMemoryFdKHR not found" << endl;
@@ -2279,7 +1940,6 @@ namespace Rv
         }
 #endif
 
-        // 2. Create Shared Semaphores
         VkExportSemaphoreCreateInfo exportSemInfo = {};
         exportSemInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
 #ifdef PLATFORM_WINDOWS
@@ -2300,10 +1960,9 @@ namespace Rv
             return nullptr;
         }
 
-        // Export the GL<->Vulkan sync semaphores as external handles.
 #ifdef PLATFORM_WINDOWS
         auto pfnGetSemaphoreWin32HandleKHR =
-            (PFN_vkGetSemaphoreWin32HandleKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreWin32HandleKHR");
+            reinterpret_cast<PFN_vkGetSemaphoreWin32HandleKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreWin32HandleKHR"));
         if (!pfnGetSemaphoreWin32HandleKHR)
         {
             cerr << "ERROR: VulkanWindow: vkGetSemaphoreWin32HandleKHR not found" << endl;
@@ -2341,7 +2000,7 @@ namespace Rv
         info.glReadySemaphoreHandle = glReadyHandle;
         info.vkReadySemaphoreHandle = vkReadyHandle;
 #else
-        auto pfnGetSemaphoreFdKHR = (PFN_vkGetSemaphoreFdKHR)vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR");
+        auto pfnGetSemaphoreFdKHR = reinterpret_cast<PFN_vkGetSemaphoreFdKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR"));
         if (!pfnGetSemaphoreFdKHR)
         {
             cerr << "ERROR: VulkanWindow: vkGetSemaphoreFdKHR not found" << endl;
@@ -2380,7 +2039,6 @@ namespace Rv
         info.vkReadySemaphoreFd = vkReadyFd;
 #endif
 
-        // Transition the shared image to TRANSFER_SRC optimal initially
         VkCommandBuffer cb = m_vkCommandBuffers[0];
         vkResetCommandBuffer(cb, 0);
 
@@ -2426,7 +2084,7 @@ namespace Rv
         }
         vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
 
-        // Signal vkReady initially so GL can start writing to it
+        // Signal vkReady so GL can write the first frame.
         VkSubmitInfo signalInfo = {};
         signalInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         signalInfo.signalSemaphoreCount = 1;
@@ -2442,7 +2100,6 @@ namespace Rv
             return nullptr;
         }
 
-        // Commit the new capacity only now that the (re)build fully succeeded.
         m_sharedCapacityW[slot] = capW;
         m_sharedCapacityH[slot] = capH;
 
@@ -2459,53 +2116,37 @@ namespace Rv
         const SharedImageInfo& info = m_sharedImageInfo[slot];
 
         if (!m_vkDevice || !m_vkSharedImage[slot] || !m_vkSwapchain)
+        {
             return;
+        }
 
-        //  Split the present cost into fence-wait vs acquire, the only two
-        //  blocking calls here, so GPU back-pressure can be told apart from
-        //  swapchain/vblank back-pressure. Main viewport only.
+        //  Fence wait vs acquire timing tells GPU from vblank back-pressure.
         const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
         Timer diagTimer;
 
-        //
-        //  Best-effort present for a passive presentation output.
-        //
-        //  This function has exactly two blocking calls, the fence wait and the
-        //  acquire, and on the control viewport they are the throttle: FIFO
-        //  acquire back-pressure plus the start-of-frame fence is what paces
-        //  the loop to display refresh.
-        //
-        //  A presentation output should not be part of that. render() presents
-        //  the control viewport and then the output inside one frame, so a
-        //  second blocking pair puts a second display's vblank in the loop's
-        //  path. The OpenGL output is never in it: DesktopVideoDevice's
-        //  syncBuffers() is a coalesced QOpenGLWidget::update() on an empty
-        //  paintGL() that Qt drops when it falls behind.
-        //
-        //  So do the same explicitly -- poll with a zero timeout and skip the
-        //  frame when the swapchain cannot take an image right now, leaving the
-        //  output on its previous frame as a dropped Qt update would. See
-        //  canPresentNow() for the gate that fires first, before any GL work.
-        //
+        //  The fence wait and acquire pace the control viewport to refresh. A
+        //  passive output polls instead, so a second display's vblank never
+        //  enters the loop; a skipped frame keeps the previous image.
         const bool bestEffort = isPassiveOutput();
         static const double kMaxStaleSeconds = 0.1;
         const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
         const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
         if (diagPresent)
+        {
             diagTimer.start();
+        }
 
         VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout);
 
         if (diagPresent)
+        {
             s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
+        }
 
         if (fenceResult == VK_TIMEOUT)
         {
-            //  The GL side already signaled glReady[slot] and waited vkReady[slot]
-            //  for this frame, so the pair has to be rebalanced before bailing --
-            //  same contract as the VK_ERROR_OUT_OF_DATE_KHR path below. The slot
-            //  is deliberately not advanced: the next frame retries this one.
+            //  The slot is not advanced: the next frame retries it.
             drainSharedSemaphores(slot);
             requestBestEffortRetry();
             return;
@@ -2516,23 +2157,24 @@ namespace Rv
             return;
         }
 
-        // Acquire image
         uint32_t imageIndex;
         if (diagPresent)
+        {
             diagTimer.start();
+        }
 
         VkResult result =
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
 
         if (diagPresent)
+        {
             s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
+        }
 
         if (result == VK_NOT_READY || result == VK_TIMEOUT)
         {
-            //  No image free this frame. An acquire that fails this way leaves
-            //  m_vkImageAvailableSemaphore[slot] unsignaled, so nothing leaks --
-            //  which is why the skip has to happen here and not after a
-            //  successful acquire.
+            //  Skip here, not after a successful acquire: a failed acquire
+            //  leaves the semaphore unsignaled.
             drainSharedSemaphores(slot);
             requestBestEffortRetry();
             return;
@@ -2540,9 +2182,6 @@ namespace Rv
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            // The GL side already signaled glReady[slot]/waited vkReady[slot] this
-            // frame; rebalance the pair before bailing so the next frame on this
-            // slot can't desync.
             drainSharedSemaphores(slot);
             handleSwapchainOutOfDate();
             return;
@@ -2557,16 +2196,12 @@ namespace Rv
             return;
         }
 
-        // If this swapchain image is still owned by another in-flight frame, wait
-        // for that frame's fence before rendering into it, then mark the image as
-        // now owned by this frame.
         if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
         {
             vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         }
         m_imagesInFlight[imageIndex] = m_vkFence[slot];
 
-        // Reset the frame fence only now, right before the submit that re-signals it.
         vkResetFences(m_vkDevice, 1, &m_vkFence[slot]);
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
@@ -2577,7 +2212,6 @@ namespace Rv
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
 
-        // Transition shared image from COLOR_ATTACHMENT_OPTIMAL to TRANSFER_SRC_OPTIMAL
         VkImageMemoryBarrier sharedBarrier = {};
         sharedBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         sharedBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -2614,22 +2248,9 @@ namespace Rv
 
         vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        // Transfer the shared image (always A2B10G10R10, == GL_RGB10_A2) to the
-        // swapchain image. When the swapchain is also A2B10G10R10 the layouts
-        // match and a raw copy is correct and cheapest. When the swapchain is
-        // A2R10G10B10 a raw copy would swap red and blue, so use a blit instead:
-        // vkCmdBlitImage converts per component (R->R, G->G, B->B) between the
-        // two formats. Whether the (linear-tiled) shared image can be a blit
-        // source is checked at shared-image creation; if not, that path is
-        // refused and syncBuffers() uses the CPU fallback instead.
-        //
-        //  The destination is bounded by the swapchain, never by the shared
-        //  image. They are normally the same size, but the shared image is
-        //  sized from the caller's request and a stale devicePixelRatio can
-        //  inflate that (a 3840x2160 output asking for 5760x3240), which would
-        //  otherwise write outside the swapchain image -- invalid usage, so
-        //  undefined contents or a faulted submit rather than a visible error.
-        //
+        // Same format: raw copy. A2R10G10B10: a raw copy would swap R and B,
+        // so blit (per-component conversion). The destination is bounded by
+        // the swapchain: a stale devicePixelRatio can inflate the request.
         if (m_vkSwapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
         {
             //  vkCmdCopyImage cannot scale, so clamp to the overlapping region.
@@ -2638,16 +2259,14 @@ namespace Rv
             region.srcSubresource.layerCount = 1;
             region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             region.dstSubresource.layerCount = 1;
-            region.extent = {std::min((uint32_t)info.width, m_vkSwapchainExtent.width),
-                             std::min((uint32_t)info.height, m_vkSwapchainExtent.height), 1};
+            region.extent = {std::min(static_cast<uint32_t>(info.width), m_vkSwapchainExtent.width),
+                             std::min(static_cast<uint32_t>(info.height), m_vkSwapchainExtent.height), 1};
 
             vkCmdCopyImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
         }
         else
         {
-            //  vkCmdBlitImage can scale, so fill the swapchain from the used
-            //  sub-region of the shared image instead of truncating.
             VkImageBlit blit = {};
             blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
             blit.srcSubresource.layerCount = 1;
@@ -2656,13 +2275,12 @@ namespace Rv
             blit.srcOffsets[0] = {0, 0, 0};
             blit.srcOffsets[1] = {info.width, info.height, 1};
             blit.dstOffsets[0] = {0, 0, 0};
-            blit.dstOffsets[1] = {(int32_t)m_vkSwapchainExtent.width, (int32_t)m_vkSwapchainExtent.height, 1};
+            blit.dstOffsets[1] = {static_cast<int32_t>(m_vkSwapchainExtent.width), static_cast<int32_t>(m_vkSwapchainExtent.height), 1};
 
             vkCmdBlitImage(cb, m_vkSharedImage[slot], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_vkSwapchainImages[imageIndex],
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_NEAREST);
         }
 
-        // Transition swapchain image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -2673,15 +2291,12 @@ namespace Rv
 
         vkEndCommandBuffer(cb);
 
-        // Submit
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        // Wait for GL to finish writing (glReady) AND swapchain image to be available
         VkSemaphore waitSemaphores[] = {m_vkGlReadySemaphore[slot], m_vkImageAvailableSemaphore[slot]};
-        // Both waits protect transfer operations. The acquired swapchain image
-        // is first touched by its TRANSFER_DST layout transition, so waiting at
-        // COLOR_ATTACHMENT_OUTPUT would not block that earlier stage.
+        // TRANSFER, not COLOR_ATTACHMENT_OUTPUT: the swapchain image is first
+        // touched by its TRANSFER_DST transition.
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
         submitInfo.waitSemaphoreCount = 2;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -2690,8 +2305,6 @@ namespace Rv
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cb;
 
-        // Signal the image's renderFinished (present waits on it) AND vkReady (so
-        // GL can write the next frame into this slot's shared image).
         VkSemaphore signalSemaphores[] = {m_vkRenderFinished[imageIndex], m_vkVkReadySemaphore[slot]};
         submitInfo.signalSemaphoreCount = 2;
         submitInfo.pSignalSemaphores = signalSemaphores;
@@ -2706,8 +2319,6 @@ namespace Rv
             return;
         }
 
-        //  Hand this frame's pointer-event timestamp to the slot so
-        //  eventToRetire can be closed out when the fence signals.
         if (m_doc && s_diagFrameEventTime >= 0.0)
         {
             s_diagSlotEventTime[slot] = s_diagFrameEventTime;
@@ -2715,12 +2326,8 @@ namespace Rv
             s_diagFrameEventTime = -1.0;
         }
 
-        // The frame is committed to the GPU; advance the ring now so the next
-        // frame uses the other slot. imageIndex/slot below are locals, so this is
-        // safe before the present call.
-        m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
+        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
 
-        // Present, waiting on the image's own renderFinished semaphore.
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
@@ -2732,26 +2339,17 @@ namespace Rv
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
 
-        //  This device has presented; the forward-progress guard in
-        //  canPresentNow() measures staleness from here.
         m_lastPresentTimer.stop();
         m_lastPresentTimer.start();
 
-        //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
-        //  present is queued so the driver still gets the frame as early as
-        //  possible; this only stops the CPU running a second frame ahead. The
-        //  passive output is excluded -- it is best-effort by design and must
-        //  never block the loop.
+        //  See maxFramesInFlight(). After the present so the driver gets the
+        //  frame early; never for the passive output.
         if (maxFramesInFlight() == 1 && !isPassiveOutput())
         {
             vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
         }
-        // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
-        // can be reported persistently by some X11/RADV compositors; recreating
-        // on it every frame caused a swapchain-recreate loop that starved the Qt
-        // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
-        // The submit above is tracked by m_vkFence[slot] (waited at the start of
-        // the next use of this slot), so no end-of-frame block is needed here.
+        // Recreate only on OUT_OF_DATE: some X11/RADV compositors report
+        // SUBOPTIMAL persistently.
         if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
             handleSwapchainOutOfDate();
@@ -2776,38 +2374,40 @@ namespace Rv
         const uint32_t slot = m_currentFrame;
 
         if (!m_vkDevice)
+        {
             return;
+        }
 
         const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
         Timer diagTimer;
 
-        if (!m_vkSwapchain || m_vkSwapchainExtent.width != (uint32_t)w || m_vkSwapchainExtent.height != (uint32_t)h)
+        if (!m_vkSwapchain || m_vkSwapchainExtent.width != static_cast<uint32_t>(w)
+            || m_vkSwapchainExtent.height != static_cast<uint32_t>(h))
         {
-            // Warm recreate via oldSwapchain (createSwapchain retires the old one).
             if (!createSwapchain())
+            {
                 return;
+            }
         }
 
-        // Start-of-frame throttle (matches presentSharedImage): wait for this
-        // slot's previous frame to finish before reusing its staging buffer,
-        // acquire semaphore and command resources. A passive presentation output
-        // polls instead of blocking and skips the frame -- see the best-effort
-        // present in presentSharedImage() for why.
+        // Same best-effort throttle as presentSharedImage().
         const bool bestEffort = isPassiveOutput();
         static const double kMaxStaleSeconds = 0.1;
         const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
         const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
         if (diagPresent)
+        {
             diagTimer.start();
+        }
         const VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, waitTimeout);
         if (diagPresent)
+        {
             s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
+        }
 
         if (fenceResult == VK_TIMEOUT)
         {
-            //  Unlike the interop path there are no GL<->Vulkan semaphores to
-            //  rebalance here: presentCpuFallback() hands over plain pixels.
             requestBestEffortRetry();
             return;
         }
@@ -2819,13 +2419,16 @@ namespace Rv
 
         size_t size = w * h * 4;
 
-        // Recreate this slot's staging buffer if needed
         if (size > m_stagingBufferSize[slot])
         {
             if (m_vkStagingBuffer[slot])
+            {
                 vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer[slot], nullptr);
+            }
             if (m_vkStagingBufferMemory[slot])
+            {
                 vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory[slot], nullptr);
+            }
 
             VkBufferCreateInfo bufferInfo = {};
             bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -2854,24 +2457,24 @@ namespace Rv
             m_stagingBufferSize[slot] = size;
         }
 
-        // Copy to staging buffer
         void* data;
         vkMapMemory(m_vkDevice, m_vkStagingBufferMemory[slot], 0, size, 0, &data);
         memcpy(data, pixels, size);
         vkUnmapMemory(m_vkDevice, m_vkStagingBufferMemory[slot]);
 
-        // Acquire image
         uint32_t imageIndex;
         if (diagPresent)
+        {
             diagTimer.start();
+        }
         VkResult result =
             vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_vkImageAvailableSemaphore[slot], VK_NULL_HANDLE, &imageIndex);
         if (diagPresent)
+        {
             s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
+        }
         if (result == VK_NOT_READY || result == VK_TIMEOUT)
         {
-            // Best-effort: no image free this frame, leave the output on the one
-            // it is already showing and come back for it.
             requestBestEffortRetry();
             return;
         }
@@ -2889,8 +2492,6 @@ namespace Rv
             return;
         }
 
-        // If this swapchain image is still owned by another in-flight frame, wait
-        // for its fence, then mark it owned by this frame.
         if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
         {
             vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -2907,7 +2508,6 @@ namespace Rv
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
 
-        // Transition image to transfer dst
         VkImageMemoryBarrier barrier = {};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -2925,7 +2525,6 @@ namespace Rv
 
         vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-        // Copy buffer to image
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;
         region.bufferRowLength = 0;
@@ -2935,12 +2534,11 @@ namespace Rv
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = {(uint32_t)w, (uint32_t)h, 1};
+        region.imageExtent = {static_cast<uint32_t>(w), static_cast<uint32_t>(h), 1};
 
         vkCmdCopyBufferToImage(cb, m_vkStagingBuffer[slot], m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
                                &region);
 
-        // Transition image to present
         barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         barrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
@@ -2951,12 +2549,9 @@ namespace Rv
 
         vkEndCommandBuffer(cb);
 
-        // Submit
         VkSubmitInfo submitInfo = {};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         VkSemaphore waitSemaphores[] = {m_vkImageAvailableSemaphore[slot]};
-        // The acquired image is first used by a TRANSFER_DST layout transition
-        // and vkCmdCopyBufferToImage, not as a color attachment.
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_TRANSFER_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -2984,10 +2579,8 @@ namespace Rv
             s_diagFrameEventTime = -1.0;
         }
 
-        // Frame committed; advance the ring (imageIndex/slot below are locals).
-        m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
+        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
 
-        // Present, waiting on the image's own renderFinished semaphore.
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
@@ -2999,26 +2592,16 @@ namespace Rv
 
         VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
 
-        //  This device has presented; the forward-progress guard in
-        //  canPresentNow() measures staleness from here.
         m_lastPresentTimer.stop();
         m_lastPresentTimer.start();
 
-        //  Depth-1 pipeline, opt-in: see maxFramesInFlight(). Done after the
-        //  present is queued so the driver still gets the frame as early as
-        //  possible; this only stops the CPU running a second frame ahead. The
-        //  passive output is excluded -- it is best-effort by design and must
-        //  never block the loop.
+        //  See maxFramesInFlight(). After the present so the driver gets the
+        //  frame early; never for the passive output.
         if (maxFramesInFlight() == 1 && !isPassiveOutput())
         {
             vkWaitForFences(m_vkDevice, 1, &m_vkFence[slot], VK_TRUE, UINT64_MAX);
         }
-        // Recreate only on OUT_OF_DATE. VK_SUBOPTIMAL_KHR still presents fine and
-        // can be reported persistently by some X11/RADV compositors; recreating
-        // on it every frame caused a swapchain-recreate loop that starved the Qt
-        // event loop (dead input, no fullscreen). Real resizes report OUT_OF_DATE.
-        // The submit is tracked by m_vkFence[slot] (waited at the next use of this
-        // slot), so no end-of-frame block is needed here.
+        // See presentSharedImage() on SUBOPTIMAL.
         if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
         {
             handleSwapchainOutOfDate();
@@ -3043,44 +2626,35 @@ namespace Rv
             return;
         }
 
-        //
-        //  Vulkan is not ready until the surface and swapchain exist, which
-        //  happens in initialize() on first expose. resizeEvent() also calls
-        //  requestUpdate(), so an UpdateRequest can land here before then --
-        //  newly reachable now that swapGLViewToVulkan() builds a VulkanView
-        //  mid-session. Presenting into a null device would fault; another
-        //  render is requested once initialized.
-        //
+        //  resizeEvent() can request an update before the first expose.
         if (!m_initialized)
         {
             return;
         }
 
-        //
-        //  A passive presentation output never drives the frame loop below: it
-        //  is composited into and presented by its owning
-        //  VulkanDesktopVideoDevice, in-frame, from the control viewport's
-        //  render(). The only reason it gets an UpdateRequest of its own is a
-        //  best-effort present that was skipped (see requestBestEffortRetry),
-        //  so re-present what the device already composited -- the same handoff
-        //  exposeEvent() uses.
-        //
+        //  A passive output only gets its own UpdateRequest from
+        //  requestBestEffortRetry(): re-present what is already composited.
         if (isPassiveOutput())
         {
             if (m_videoDevice)
+            {
                 m_videoDevice->syncBuffers();
+            }
             return;
         }
 
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (!session)
+        {
             return;
+        }
 
-        //  See s_diagLoopTimer.
         if (IPCore::ImageRenderer::debugGpu())
         {
             if (s_diagLoopTimer.isRunning())
+            {
                 s_diagLoopMs += s_diagLoopTimer.elapsed() * 1000.0;
+            }
             s_diagLoopTimer.start();
 
             if (s_diagPointerPending)
@@ -3088,15 +2662,11 @@ namespace Rv
                 s_diagPointerAgeMs += s_diagPointerTimer.elapsed() * 1000.0;
                 ++s_diagPointerAgeSamples;
                 s_diagPointerPending = false;
-                //  This frame answers that event; presentSharedImage() pins the
-                //  timestamp to the slot it submits into.
                 s_diagFrameEventTime = diagNow() - s_diagPointerTimer.elapsed();
             }
 
-            //  Close out any slot whose GPU work has retired since last frame.
-            //  vkGetFenceStatus does not block, so this costs two calls a frame
-            //  and works at any pipeline depth, with one frame of quantisation.
-            for (uint32_t i = 0; i < FRAMES_IN_FLIGHT; ++i)
+            //  Close out retired slots (non-blocking; one frame of quantisation).
+            for (uint32_t i = 0; i < kFramesInFlight; ++i)
             {
                 if (s_diagSlotArmed[i] && m_vkDevice && m_vkFence[i] && vkGetFenceStatus(m_vkDevice, m_vkFence[i]) == VK_SUCCESS)
                 {
@@ -3125,16 +2695,19 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
-            //  Frame-time breakdown; see the report at the end of render().
             const bool diagTiming = IPCore::ImageRenderer::debugGpu();
             Timer diagTimer;
             if (diagTiming)
+            {
                 diagTimer.start();
+            }
 
             session->render();
 
             if (diagTiming)
+            {
                 s_diagRenderMs += diagTimer.elapsed() * 1000.0;
+            }
 
             if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
             {
@@ -3156,72 +2729,60 @@ namespace Rv
 
         if (session && m_videoDevice)
         {
-            //
-            //  Always present the main (control) viewport's own swapchain.
-            //  Unlike the GL path, where QOpenGLWidget composites the control
-            //  widget after paintGL regardless, the Vulkan viewport only
-            //  appears via an explicit present -- so it must NOT be skipped
-            //  when a separate output (presentation) device is active.
-            //  Skipping it leaves the main window on a stale frame once
-            //  presentation mode is on.
-            //
+            //  Always present the control viewport, even with a separate output
+            //  device: unlike GL, nothing else composites it.
             const bool diagPresent = IPCore::ImageRenderer::debugGpu();
             Timer diagPresentTimer;
             if (diagPresent)
+            {
                 diagPresentTimer.start();
+            }
 
             m_videoDevice->syncBuffers();
 
             if (diagPresent)
+            {
                 s_diagMainPresentMs += diagPresentTimer.elapsed() * 1000.0;
+            }
 
-            //
-            //  In presentation mode the output is a distinct fullscreen window
-            //  that must also be presented this frame.
-            //
             if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
             {
                 if (diagPresent)
+                {
                     diagPresentTimer.start();
+                }
 
                 session->outputVideoDevice()->syncBuffers();
 
                 if (diagPresent)
+                {
                     s_diagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
+                }
 
-                //
-                //  Presenting the output device made *its* offscreen GL context
-                //  current and did not put ours back, so restore it before
-                //  postRender() and anything else that runs after this frame
-                //  expects the viewport's context. The GL output path never
-                //  needed this: its syncBuffers() is a QOpenGLWidget update(),
-                //  which schedules a composite without touching the current
-                //  context.
-                //
+                //  The output made its own GL context current; restore ours.
                 m_videoDevice->makeCurrent();
             }
         }
 
         if (session)
         {
-            //  See s_diagPostRenderMs.
             const bool diagPost = IPCore::ImageRenderer::debugGpu();
             Timer diagPostTimer;
             if (diagPost)
+            {
                 diagPostTimer.start();
+            }
 
             session->addSyncSample();
             session->postRender();
 
             if (diagPost)
+            {
                 s_diagPostRenderMs += diagPostTimer.elapsed() * 1000.0;
+            }
         }
 
-        //
-        //  Report an averaged breakdown every 60 frames: where the frame goes
-        //  (session render vs viewport present vs output present), and what the
-        //  pointer sees end to end.
-        //
+        //  Averaged -debug gpu breakdown every 60 frames.
         if (IPCore::ImageRenderer::debugGpu() && m_doc)
         {
             if (++s_diagFrames >= 60)
@@ -3275,13 +2836,6 @@ namespace Rv
             return;
         }
 
-        //
-        //  The VkSurfaceKHR is derived from the platform window, so it does not
-        //  survive Qt destroying and recreating it -- which happens when the
-        //  container re-parents the viewport after the top-level QWidgetWindow
-        //  is replaced (see VulkanView::reattachVulkanWindow). Rebuild the
-        //  surface and swapchain when we come back exposed on a new handle.
-        //
         if (m_initialized && handle() != m_initializedHandle)
         {
             handleSurfaceLost();
@@ -3292,14 +2846,8 @@ namespace Rv
             initialize();
         }
 
-        //
-        //  A doc-less window is a passive presentation output: it is rendered
-        //  into and presented by its owning VulkanDesktopVideoDevice, and
-        //  render() returns at `!session` so it never drives itself. Present
-        //  once here so a freshly exposed (or re-exposed) presentation surface
-        //  shows the last composited frame instead of staying blank until the
-        //  next main-view frame.
-        //
+        //  Show the last composited frame instead of blank until the next
+        //  main-view frame.
         if (!m_doc && m_initialized && m_videoDevice)
         {
             m_videoDevice->syncBuffers();
@@ -3312,13 +2860,12 @@ namespace Rv
     void VulkanWindow::resizeEvent(QResizeEvent* event)
     {
         if (m_doc)
+        {
             m_doc->viewSizeChanged(event->size().width(), event->size().height());
+        }
         QWindow::resizeEvent(event);
 
-        // Nothing repaints this native surface on resize, so drive a render now
-        // to recreate the swapchain at the new size and present immediately
-        // (instead of waiting for a mouse Enter event). QWindow::requestUpdate()
-        // coalesces, so a fast drag does not queue one heavy recreate per event.
+        // Nothing else repaints this surface on resize; requestUpdate() coalesces.
         if (!m_stopProcessingEvents)
         {
             requestUpdate();
@@ -3332,7 +2879,9 @@ namespace Rv
     void VulkanWindow::eventProcessingTimeout()
     {
         if (m_doc && m_doc->session())
+        {
             m_doc->session()->userGenericEvent("per-render-event-processing", "");
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -3342,23 +2891,10 @@ namespace Rv
     bool VulkanWindow::event(QEvent* event)
     {
         //
-        //  This must be handled before every guard below (including the
-        //  m_stopProcessingEvents / missing-device early-outs): it is the only
-        //  point at which the Vulkan objects can still legally be destroyed.
-        //
-        //  Qt sends SurfaceAboutToBeDestroyed from QWindow::destroy(), just
-        //  before it deletes the QPlatformWindow -- and the VkSurfaceKHR, the
-        //  swapchain and the X11 drawable behind them all die with it. Anything
-        //  released later is released against a surface that no longer exists,
-        //  which is a segfault inside the driver rather than an error code.
-        //
-        //  On quit that "later" is the destructor: QWindowContainer's own
-        //  destructor calls window->destroy() and only then deletes the window,
-        //  so ~VulkanWindow always runs on a dead surface. The same applies on
-        //  the reparent path, where Qt replaces the top-level QWidgetWindow
-        //  (adding a QWebEngineView is the usual trigger). exposeEvent()'s
-        //  handle() != m_initializedHandle check notices that one, but only
-        //  after the fact; this notices it in time.
+        //  Before every guard below: this is the last point the Vulkan objects
+        //  can legally be destroyed. The VkSurfaceKHR dies with the
+        //  QPlatformWindow, and QWindowContainer destroys it before deleting
+        //  this window, so releasing later segfaults inside the driver.
         //
         if (event->type() == QEvent::PlatformSurface)
         {
@@ -3369,10 +2905,10 @@ namespace Rv
             return QWindow::event(event);
         }
 
-        // The device (and its translator) is wired by the hosting VulkanView
-        // just after construction; ignore any events that arrive before then.
         if (!m_videoDevice)
+        {
             return QWindow::event(event);
+        }
 
         bool keyevent = false;
         Rv::Session* session = m_doc ? m_doc->session() : nullptr;
@@ -3384,7 +2920,9 @@ namespace Rv
         }
 
         if (event->type() == QEvent::WindowActivate)
+        {
             m_activationTimer.start();
+        }
 
         float activationTime = 0.0f;
         if (m_activationTimer.isRunning())
@@ -3395,7 +2933,9 @@ namespace Rv
                 m_activationTimer.stop();
             }
             if (event->type() == QEvent::MouseMove)
+            {
                 m_activationTimer.stop();
+            }
         }
 
         if (event->type() != QEvent::Paint)
@@ -3429,16 +2969,7 @@ namespace Rv
         switch (event->type())
         {
         case QEvent::FocusIn:
-            //
-            //  Qt has already made this the focus window by the time FocusIn is
-            //  delivered, so there is nothing to hand over here. The case exists
-            //  only to drop modifier state that went stale while the keyboard
-            //  was elsewhere.
-            //
-            //  Guarded: a passive presentation output window is built with no
-            //  event widget, so its device has no translator (the general
-            //  hasTranslator() check below this switch is too late).
-            //
+            //  Drop stale modifiers. A passive output has no translator.
             if (m_videoDevice->hasTranslator())
             {
                 m_videoDevice->translator().resetModifiers();
@@ -3446,24 +2977,14 @@ namespace Rv
             break;
 
         case QEvent::Enter:
-            //
-            //  Hovering hands the keyboard to the viewport as a *widget* focus
-            //  change, never as a window activation. QWidget::setFocus() only
-            //  delivers FocusIn when the top-level is already active; otherwise
-            //  it just records the window's focus_child and the keyboard
-            //  arrives once the user activates RV. That keeps a hover from
-            //  stealing activation from another top-level of ours (the Console)
-            //  or from another application entirely.
-            //
-            //  Skipped when this window already holds focus: QWindowContainer
-            //  clears the container's widget focus once it has handed focus
-            //  over, so a repeat FocusIn would take its "return to the normal
-            //  focus chain" branch and push the keyboard to the next widget in
-            //  the tab chain instead. This is why FocusIn above must not fall
-            //  through into this case.
-            //
+            //  A widget focus change, not a window activation, so hovering
+            //  never steals activation from another window. Skipped when
+            //  already focused: a repeat FocusIn makes QWindowContainer move
+            //  focus to the next widget in the tab chain.
             if (QGuiApplication::focusWindow() != this && m_eventWidget)
+            {
                 m_eventWidget->setFocus(Qt::MouseFocusReason);
+            }
             break;
 
         default:
@@ -3482,7 +3003,9 @@ namespace Rv
                 ostringstream contents;
                 contents << e->oldSize().width() << " " << e->oldSize().height() << "|" << e->size().width() << " " << e->size().height();
                 if (m_doc && session)
+                {
                     session->userGenericEvent("view-resized", contents.str());
+                }
             }
             return QWindow::event(event);
         }
@@ -3554,10 +3077,11 @@ namespace Rv
         }
 
         if (session)
+        {
             session->setEventVideoDevice(videoDevice());
+        }
 
-        //  See s_diagPointerHandlerMs. A drag arrives here and is dispatched
-        //  synchronously into Mu, so this call *is* the handler's cost.
+        //  Dispatch into Mu is synchronous, so this times the handler.
         const bool diagPointer =
             IPCore::ImageRenderer::debugGpu()
             && (event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::TabletMove);

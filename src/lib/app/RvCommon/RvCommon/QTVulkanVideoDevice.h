@@ -35,12 +35,8 @@ namespace Rv
     class QTVulkanVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        //
-        //  The presentation surface is a QWindow (embedded in the widget tree
-        //  via createWindowContainer); eventWidget is the container QWidget the
-        //  QTTranslator uses for coordinate mapping (height/mapToGlobal) and
-        //  mouse grab.
-        //
+        //  eventWidget is the window's container QWidget, used by QTTranslator
+        //  for coordinate mapping and mouse grab.
         QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanWindow* window, QWidget* eventWidget);
         virtual ~QTVulkanVideoDevice();
 
@@ -58,14 +54,8 @@ namespace Rv
 
         void setAbsolutePosition(int x, int y);
 
-        //
-        //  Drop every GL object imported from the window's Vulkan side (the
-        //  memory objects, their textures/FBOs and the shared semaphores), so
-        //  none of them outlives the Vulkan memory it aliases. Called by
-        //  VulkanWindow::releaseVulkanResources() before it frees that memory;
-        //  syncBuffers() re-imports on the next frame (it rebuilds whenever
-        //  m_glMemoryObject[slot] is 0).
-        //
+        //  Drop every GL object imported from the Vulkan side so none outlives
+        //  the memory it aliases. syncBuffers() re-imports on the next frame.
         void releaseSharedGLObjects();
 
         // VideoDevice API
@@ -96,15 +86,9 @@ namespace Rv
         const TwkGLF::GLFBO* defaultFBO() const override;
         std::string hardwareIdentification() const override;
 
-        //
-        //  GL id of the offscreen FBO once the context and FBO have been
-        //  created, else 0. Unlike defaultFBO() this does NOT force context
-        //  creation: it is a readiness probe. DesktopVideoDevice::transfer()
-        //  returns early while its view device reports 0, which is how the
-        //  first composite is deferred until the target exists -- so this must
-        //  be overridden for a VulkanDesktopVideoDevice presentation output to
-        //  ever receive a frame.
-        //
+        //  Readiness probe: the FBO id, or 0 before it exists. Unlike
+        //  defaultFBO() it does not create the context; DesktopVideoDevice::
+        //  transfer() waits for a non-zero id.
         GLuint fboID() const override;
 
     private:
@@ -112,13 +96,8 @@ namespace Rv
         // Makes the GL context current and binds the FBO on return.
         void ensureGLContext() const;
 
-        //
-        //  Guarded: the window is embedded via QWidget::createWindowContainer(),
-        //  which owns it, so Qt can delete it independently of this device (and
-        //  of the VulkanView that created both). A QPointer makes the
-        //  `if (m_window)` checks below actual liveness checks instead of null
-        //  checks.
-        //
+        //  The window container owns the window, so Qt can delete it
+        //  independently of this device.
         QPointer<VulkanWindow> m_window;
         QWidget* m_eventWidget;
         QTTranslator* m_translator;
@@ -128,7 +107,6 @@ namespace Rv
         float m_refresh{-1.0f};
         bool m_isOpen{false};
 
-        // Qt GL context + offscreen surface for GL rendering.
         mutable QOpenGLContext* m_glContext{nullptr};
         mutable QOffscreenSurface* m_offscreenSurface{nullptr};
         mutable TwkGLF::GLFBO* m_fbo{nullptr};
@@ -136,35 +114,23 @@ namespace Rv
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
 
-        // GPU Interop GL objects, ringed per in-flight slot to match VulkanWindow's
-        // per-slot Vulkan shared image/semaphores. Indexed by the Vulkan slot for
-        // the frame being rendered (VulkanWindow::currentFrame()).
-        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glMemoryObject{};
-        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glSharedTexture{};
-        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glReadySemaphore{};
-        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_vkReadySemaphore{};
-        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_drawFbo{};
-        mutable std::array<int, VulkanWindow::FRAMES_IN_FLIGHT> m_sharedWidth{};
-        mutable std::array<int, VulkanWindow::FRAMES_IN_FLIGHT> m_sharedHeight{};
+        // Interop GL objects, indexed by VulkanWindow::currentFrame().
+        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glMemoryObject{};
+        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glSharedTexture{};
+        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glReadySemaphore{};
+        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_vkReadySemaphore{};
+        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_drawFbo{};
+        mutable std::array<int, VulkanWindow::kFramesInFlight> m_sharedWidth{};
+        mutable std::array<int, VulkanWindow::kFramesInFlight> m_sharedHeight{};
 
-        // Which present path this device last reported: -1 nothing yet,
-        // 0 CPU-fallback, 1 GPU-interop. Per-device, because the presentation
-        // output has its own device and can land on a different path than the
-        // viewport -- and reported on every transition rather than latched on
-        // the first frame, because the first syncBuffers() can run before that
-        // window's Vulkan is initialized. Latching there reports CPU-fallback
-        // for a device that then spends its whole life on interop.
+        // Last reported present path: -1 none yet, 0 CPU-fallback, 1 GPU-interop.
         mutable int m_loggedPresentPath{-1};
         // -1 until queried, 0 when GL and Vulkan use different/unidentifiable
         // physical devices, 1 when their device UUIDs match.
         mutable int m_glVulkanDeviceMatch{-1};
 
-        // Latched once any GL call on the interop path reports an error. The
-        // GL<->Vulkan bridge has no way to notice that an import silently
-        // produced an unusable texture: the blit is dropped, Vulkan copies a
-        // never-written image, and the viewport is black with nothing logged.
-        // Demoting permanently to the CPU pack-and-upload path keeps the image
-        // correct (just slower) on a driver combination we have not seen.
+        // Latched once any GL call on the interop path fails; the device then
+        // stays on the CPU path.
         mutable bool m_interopDisabled{false};
 
         // Drain glGetError(); on error, report which step failed, latch
@@ -175,13 +141,8 @@ namespace Rv
         void cleanupSharedGLObjects(uint32_t slot) const;
         bool glDeviceMatchesVulkan() const;
 
-        // CPU-fallback GL state (used only when GPU interop is unavailable or
-        // refused). A flipped RGB10_A2 blit target lets GL pack the 10-bit pixels
-        // directly with glReadPixels(GL_UNSIGNED_INT_2_10_10_10_REV) and handle the
-        // Y flip, eliminating the per-pixel CPU pack loop. The readback format
-        // (GL_RGBA vs GL_BGRA) selects the swapchain's channel order
-        // (A2B10G10R10 / A2R10G10B10). Not ringed: the fallback is a synchronous
-        // readback, so a single reused target is sufficient.
+        // CPU-fallback target: a Y-flipped RGB10_A2 copy that glReadPixels packs
+        // directly. Not ringed, since the readback is synchronous.
         mutable GLuint m_cpuFlipFbo{0};
         mutable GLuint m_cpuFlipTex{0};
         mutable int m_cpuFlipWidth{0};
@@ -191,8 +152,6 @@ namespace Rv
         void ensureCpuFallbackTarget(int w, int h) const;
         void cleanupCpuFallbackTarget() const;
 
-        // Pack + present the framebuffer via the CPU fallback (GL-packed RGB10_A2
-        // readback). Used when no zero-copy interop path is available.
         void presentCpuFallback(int w, int h) const;
     };
 

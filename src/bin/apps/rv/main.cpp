@@ -373,14 +373,11 @@ int utf8Main(int argc, char* argv[])
     // documented QtWebEngine requirement, and it lets RV's auxiliary GL
     // surfaces -- the second-output ScreenView and the multithreaded-upload
     // worker device -- share textures/FBOs with the main viewport context
-    // without an explicit, ordering-sensitive setShareContext() call.
+    // without an explicit, ordering-sensitive setShareContext() call. Must be
+    // set before the QApplication is constructed.
     //
-    // It is also what makes the Vulkan presentation path work: there is no
-    // GLView to chain from there, so QTVulkanVideoDevice::ensureGLContext()
-    // joins this global group instead. Without it, FTGL font-atlas glyph
-    // uploads land in a context where the atlas texture has no storage.
-    //
-    // Must be set before the QApplication is constructed.
+    // The Vulkan path also relies on it: QTVulkanVideoDevice::ensureGLContext()
+    // has no GLView to share with, so it joins this global group.
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
 #ifdef PLATFORM_WINDOWS

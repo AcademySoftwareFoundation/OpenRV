@@ -86,34 +86,15 @@ namespace TwkGLF
     GLFBO::~GLFBO()
     {
         //
-        //  Does this destructor have any GL work to do at all?
-        //
-        //  Not every GLFBO owns GL names. The GLFBO(const GLVideoDevice*)
-        //  constructor builds a handle *onto* whatever the device has bound --
-        //  m_id is 0, m_ownsFBOHandle is false, there is no PBO -- so
-        //  destroying one issues nothing and needs no context. Asking about
-        //  the context before asking this would report a leak that cannot
-        //  happen, on the ordinary path where a device outlives its window.
+        //  A GLFBO wrapping a device's bound framebuffer owns no GL names and
+        //  needs no context to destroy.
         //
         const bool ownsHandles = (m_id != 0 && m_ownsFBOHandle);
         const bool issuesGL = ownsHandles || (m_pbo != 0);
 
         //
-        //  Backstop, for the FBOs that do own something. With no context
-        //  current every GL call below is a silent no-op: this object goes
-        //  away, the driver's does not, and nothing says so. Report it at this
-        //  line -- rather than letting the stuck GL_INVALID_OPERATION surface
-        //  at whichever unrelated call site checks glGetError() next -- and do
-        //  not pretend the names were released.
-        //
-        //  With GLContextScope on the teardown paths this should never fire.
-        //  It is here so that the next path which forgets announces itself
-        //  where the fault is, instead of a frame later somewhere else.
-        //
-        //  It reports and carries on rather than asserting. A leaked FBO is
-        //  worth a line of output; it is not worth aborting a shutdown that
-        //  would otherwise have completed, least of all in the debug build
-        //  someone is using to diagnose that shutdown.
+        //  With no context current the deletes below are silent no-ops. Report
+        //  the leak here (without asserting) and skip the GL calls.
         //
         bool canIssueGL = true;
 
@@ -156,10 +137,7 @@ namespace TwkGLF
         if (m_pbo)
         {
             //
-            //  Waiting on a fence with no context current cannot complete --
-            //  there is nothing to signal it -- so skip the wait rather than
-            //  risk blocking here. The fence object itself is still ours to
-            //  delete either way.
+            //  A fence wait with no context current can never complete.
             //
             if (m_fence && canIssueGL)
             {
@@ -596,12 +574,6 @@ namespace TwkGLF
         destinationGLFBO->bind(GL_DRAW_FRAMEBUFFER_EXT);
 
         glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
-        //
-        //  Without this, an incomplete read/draw framebuffer here raises
-        //  GL_INVALID_FRAMEBUFFER_OPERATION that nothing pops until the next
-        //  frame's makeCurrent(), which reports it against an unrelated call
-        //  site one frame late. Attribute it where it happens.
-        //
         TWK_GLDEBUG;
 
         HOP_CALL(glFinish();)

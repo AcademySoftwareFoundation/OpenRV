@@ -502,18 +502,9 @@ namespace TwkGLF
         }
 
         //
-        //  Release every buffer now, rather than at destruction.
-        //
-        //  The two pools are file-scope statics, so their destructors run
-        //  after main() has returned -- with Qt gone and no GL context
-        //  obtainable, which makes every glDeleteBuffers() in there a silent
-        //  no-op. UninitPBOPools() exists to release these while the
-        //  application is still up; until now it only flipped a flag and left
-        //  the buffers to that unreachable destructor.
-        //
-        //  Empty the containers and reset the accounting as well as deleting:
-        //  the destructor still runs later, and would otherwise walk the same
-        //  entries a second time.
+        //  Release every buffer while a context is still obtainable: the pools
+        //  are statics whose destructors run after Qt is gone. Emptying the
+        //  containers keeps that destructor from walking them again.
         //
         void clear()
         {
@@ -954,11 +945,7 @@ namespace TwkGLF
     void UninitPBOPools()
     {
         //
-        //  This is called from main() once the event loop has returned, so
-        //  the views and their contexts are already gone and nothing is
-        //  current. The scope supplies the fallback teardown context -- still
-        //  available here, since the QApplication outlives this call -- so
-        //  that the buffers released below are genuinely released.
+        //  Called after the event loop returns, when no view context is left.
         //
         const GLContextScope contextScope;
 

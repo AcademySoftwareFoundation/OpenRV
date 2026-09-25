@@ -15,19 +15,10 @@ namespace Rv
     //
     //  VulkanDesktopVideoDevice
     //
-    //  A desktop (second-display) presentation output device that delivers the
-    //  final frame through a Vulkan swapchain for true 10-bit output on Linux
-    //  and Windows, instead of the OpenGL ScreenView the base
-    //  DesktopVideoDevice uses.
-    //
-    //  It reuses the base class's frame handoff wholesale: the renderer's
-    //  transfer() / transfer2() composite (including every stereo mode) into
-    //  m_viewDevice->defaultFBO(), where m_viewDevice is the presentation
-    //  VulkanView's QTVulkanVideoDevice. The only backend-specific behaviour is
-    //  owning the Vulkan window and presenting it explicitly -- Vulkan has no
-    //  QOpenGLWidget auto-composite -- so this subclass overrides only the
-    //  window-lifecycle and present methods and inherits everything else
-    //  (transfer/transfer2/fillWithTexture/format/data-format/sync) unchanged.
+    //  A second-display presentation output that presents through a 10-bit
+    //  Vulkan swapchain on Linux and Windows. The inherited transfer() and
+    //  transfer2() composite into the view's QTVulkanVideoDevice; only the
+    //  window lifecycle and presentation are overridden.
     //
     class VulkanDesktopVideoDevice : public DesktopVideoDevice
     {
@@ -35,12 +26,8 @@ namespace Rv
         VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen, const QTGLVideoDevice* shareDevice);
         ~VulkanDesktopVideoDevice() override;
 
-        //
-        //  DesktopVideoDevice / VideoDevice API -- the backend-specific
-        //  overrides. Note that none of these chain to the base
-        //  implementation: the base drives m_view, a QOpenGLWidget, which is
-        //  never created here.
-        //
+        //  None of these chain to the base, which drives a QOpenGLWidget
+        //  (m_view) that is never created here.
         void open(const StringVector& args) override;
         void close() override;
         bool isOpen() const override;
@@ -51,11 +38,7 @@ namespace Rv
         void syncBuffers() const override;
 
     private:
-        //
-        //  The presentation output window. It owns its own QTVulkanVideoDevice
-        //  (VulkanView::videoDevice()), which is handed to the base
-        //  m_viewDevice so the inherited transfer()/transfer2() drive it.
-        //
+        //  Owns the QTVulkanVideoDevice used as the base m_viewDevice.
         VulkanView* m_vulkanView;
     };
 

@@ -23,11 +23,7 @@ namespace Rv
     class QTGLVideoDevice;
     class GLWindow;
 
-    //
-    //  -debug gpu (ImageRenderer::debugGpu()) diagnostics helpers, shared by
-    //  GLView (which logs the format it asks for) and GLWindow (which logs the
-    //  format and driver it actually got). Defined in GLView.cpp.
-    //
+    // -debug gpu helpers shared by GLView and GLWindow.
     std::string glDebugEnvOrUnset(const char* name);
     std::string glDebugFormatSummary(const QSurfaceFormat&);
 

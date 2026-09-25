@@ -35,14 +35,11 @@
 namespace Rv
 {
 
-    //  Accumulators for the -debug gpu frame-time report in paintGL(),
-    //  mirroring VulkanWindow's so the two backends can be compared.
+    //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
     static unsigned int s_glDiagFrames = 0;
     static double s_glDiagRenderMs = 0.0;
     static double s_glDiagOutPresentMs = 0.0;
-    //  Wall clock between successive paintGL() entries: the loop period. For
-    //  the GL path this includes the implicit buffer swap, which happens after
-    //  paintGL returns.
+    //  Time between paintGL() entries; includes the implicit swap after paintGL.
     static double s_glDiagLoopMs = 0.0;
     static TwkUtil::Timer s_glDiagLoopTimer;
 
@@ -116,12 +113,7 @@ namespace Rv
 
             QSurfaceFormat f = context()->format();
 
-            //
-            //  One-shot -debug gpu baseline: everything needed to answer "why
-            //  did I only get 8 bits per component" without a second run --
-            //  what was asked for, what Qt negotiated, what the driver is, and
-            //  which display server we are on.
-            //
+            //  One-shot -debug gpu baseline: requested vs negotiated format, driver and display server.
             static bool baselineLogged = false;
             if (ImageRenderer::debugGpu() && !baselineLogged)
             {
@@ -129,7 +121,9 @@ namespace Rv
 
                 QScreen* scr = screen();
                 if (!scr)
+                {
                     scr = QGuiApplication::primaryScreen();
+                }
 
                 const GLubyte* glVendor = glGetString(GL_VENDOR);
                 const GLubyte* glRenderer = glGetString(GL_RENDERER);
@@ -231,11 +225,12 @@ namespace Rv
             }
         }
 
-        //  See s_glDiagLoopTimer.
         if (IPCore::ImageRenderer::debugGpu())
         {
             if (s_glDiagLoopTimer.isRunning())
+            {
                 s_glDiagLoopMs += s_glDiagLoopTimer.elapsed() * 1000.0;
+            }
             s_glDiagLoopTimer.start();
         }
 
@@ -263,17 +258,19 @@ namespace Rv
             m_videoDevice->setAbsolutePosition(x, y);
 
             TWK_GLDEBUG;
-            //  Same breakdown as VulkanWindow, so the GL presentation path can
-            //  be compared like-for-like.
             const bool diagTiming = IPCore::ImageRenderer::debugGpu();
             Timer diagTimer;
             if (diagTiming)
+            {
                 diagTimer.start();
+            }
 
             session->render();
 
             if (diagTiming)
+            {
                 s_glDiagRenderMs += diagTimer.elapsed() * 1000.0;
+            }
             TWK_GLDEBUG;
 
             m_firstPaintCompleted = true;
@@ -308,22 +305,22 @@ namespace Rv
         if (session->outputVideoDevice() != m_videoDevice)
         {
             if (diagPresent)
+            {
                 diagPresentTimer.start();
+            }
 
             session->outputVideoDevice()->syncBuffers();
 
             if (diagPresent)
+            {
                 s_glDiagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
+            }
         }
 
         session->addSyncSample();
         session->postRender();
 
-        //
-        //  Note there is no "mainPresent" term here: QOpenGLWindow swaps the
-        //  control surface implicitly after paintGL returns, so that cost lands
-        //  outside this function.
-        //
+        //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
         if (IPCore::ImageRenderer::debugGpu())
         {
             if (++s_glDiagFrames >= 60)

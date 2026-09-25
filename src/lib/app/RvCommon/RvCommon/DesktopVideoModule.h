@@ -30,30 +30,11 @@ namespace Rv
         virtual ~DesktopVideoModule();
 
         //
-        //  Rebuild the per-screen presentation devices onto targetVulkan (GL
-        //  ScreenView vs Vulkan swapchain), using shareDevice as the new GL
-        //  share device. This is the post-startup analogue of the
-        //  constructor's one-time createDesktopVideoDevices call, needed
-        //  because the backend decision is no longer frozen at launch.
-        //
-        //  targetVulkan is supplied by the caller rather than re-derived here:
-        //  it must be the backend the main view is *actually* running, which
-        //  the persisted display-depth preference does not reliably reflect
-        //  (see DesktopVideoDevice::shouldUseVulkanPresentation). A presentation
-        //  output on the opposite backend to the viewport is a black display.
-        //
-        //  A cleanly open device is closed -- releasing its Vulkan swapchain or
-        //  GL ScreenView -- before it is destroyed. To avoid a needless
-        //  teardown and a transient on the second display, this is a no-op when
-        //  the effective backend has not changed; it then returns false and
-        //  leaves the devices untouched (the caller still re-binds the share
-        //  device). Returns true when the devices were actually rebuilt.
-        //
-        //  This deliberately does not touch the session's output video device.
-        //  The caller (RvApplication::rebuildDesktopVideoDevices) owns
-        //  re-binding the share device and re-opening the presentation output,
-        //  because the devices destroyed here may be referenced as the session
-        //  output.
+        //  Rebuild the per-screen presentation devices onto targetVulkan, the
+        //  backend the main view is actually running (not the persisted
+        //  preference). Returns false and leaves the devices untouched when the
+        //  backend has not changed. The caller re-binds the share device and
+        //  re-opens the session's presentation output.
         //
         bool rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan);
 

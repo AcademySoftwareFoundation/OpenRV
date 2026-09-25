@@ -183,13 +183,6 @@ namespace IPCore
 
     void ImageRenderer::Device::clearFBOs()
     {
-        //
-        //  The ring buffer holds GLFBOs, so this is GL destruction and needs
-        //  a context like any other. ~ImageRenderer reaches it after the
-        //  renderer's device pointers have been cleared, which is why the
-        //  scope may have to fall back to its own context; glDevice is still
-        //  worth offering for the callers that reach here with one alive.
-        //
         const TwkGLF::GLContextScope contextScope(glDevice);
 
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
@@ -489,13 +482,7 @@ namespace IPCore
         }
 
         //
-        //  Everything from here down deletes GL objects -- the FBO pool and
-        //  program cache via clearState(), the program cache object itself,
-        //  each device's FBO ring buffer, then the GL state. Session tears the
-        //  renderer down after its device pointers have been cleared, so the
-        //  members below have nothing to offer and the scope falls back to its
-        //  own context. Holding one here means it is acquired once rather than
-        //  once per inner scope.
+        //  Everything from here down deletes GL objects.
         //
         const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
 
@@ -632,11 +619,7 @@ namespace IPCore
     void ImageRenderer::clearState()
     {
         //
-        //  One scope around the whole of it. flushImageFBOs() opens its own,
-        //  but that one closes when it returns -- and flushProgramCache()
-        //  after it deletes GL programs, which needs a context just as much.
-        //  Holding it here keeps the inner scopes as no-ops and leaves no gap
-        //  between them.
+        //  Covers flushProgramCache() too, not just flushImageFBOs().
         //
         const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
 
@@ -1345,23 +1328,9 @@ namespace IPCore
         //
 
         //
-        //  m_outputDevice.glDevice is a dynamic_cast to GLVideoDevice, and that
-        //  is null for every GLBindableVideoDevice output -- presentation, AJA,
-        //  NDI -- because GLVideoDevice and GLBindableVideoDevice are siblings
-        //  (both derive TwkApp::VideoDevice directly), not base and derived.
-        //  With no fallback, everything below here tears down FBOs, fences and
-        //  textures with no context current at all. That is what makes quitting
-        //  out of presentation mode log a long tail of GL_INVALID_OPERATION
-        //  starting in ~GLFBO: once no context is current, glGetError() keeps
-        //  returning that same error, so a single lost context is worth a great
-        //  many messages.
-        //
-        //  The control device's context is the right one to fall back to. It
-        //  owns the FBOs cleared below -- for a bindable output the renderer
-        //  draws in the control context on purpose, see the comment above --
-        //  and it is what the rest of this function already relies on further
-        //  down, where defaultFBO() happens to make it current as a side
-        //  effect.
+        //  m_outputDevice.glDevice is null for GLBindableVideoDevice outputs
+        //  (presentation, AJA, NDI). Fall back to the control device, whose
+        //  context owns the FBOs released below.
         //
         if (m_outputDevice.glDevice)
         {
@@ -2480,7 +2449,7 @@ namespace IPCore
         //  or waiting for the sync to complete before continuing.
         //
         //  NOTE: I still think its possible to get stomped on -- you can
-        //  tell if that's happen by setting m_debugGpu (-debug gpu in RV)
+        //  tell if that has happened by setting m_debugGpu (-debug gpu in RV)
         //  which will cause some debug code to clear to blue. If you see
         //  blue flashing on the pres device that's the problem.
         //

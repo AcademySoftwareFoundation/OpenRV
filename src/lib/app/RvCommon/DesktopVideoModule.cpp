@@ -44,11 +44,6 @@ namespace Rv
 
     bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan)
     {
-        //
-        //  targetVulkan is the live main-view backend, decided by the caller.
-        //  Compare it to the backend the current devices were built with. On
-        //  platforms without Vulkan it is always false, so this is a no-op.
-        //
 #if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
         targetVulkan = false;
 #endif
@@ -65,22 +60,12 @@ namespace Rv
         }
 #endif
 
-        //
-        //  Backend unchanged: leave the devices in place so the second display
-        //  does not go through a needless teardown. The caller still re-binds
-        //  the share device on the existing devices.
-        //
         if (!m_devices.empty() && currentVulkan == targetVulkan)
         {
             return false;
         }
 
-        //
-        //  Backend changed (or this is the first build after an empty list):
-        //  release the old devices cleanly. close() frees the Vulkan swapchain
-        //  or GL ScreenView before the device is destroyed, mirroring the
-        //  normal exit path, so no swapchain or interop resources leak.
-        //
+        // close() releases the Vulkan swapchain or GL ScreenView before the delete.
         for (size_t i = 0; i < m_devices.size(); ++i)
         {
             if (m_devices[i]->isOpen())

@@ -103,16 +103,7 @@ namespace Rv
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         setSizeGripEnabled(true);
 
-        //
-        //  A log window must never be what keeps RV alive.
-        //
-        //  RV has no explicit quit anywhere; it relies entirely on Qt's
-        //  quitOnLastWindowClosed. Qt counts every visible top-level widget
-        //  that has WA_QuitOnClose, which is on by default, so leaving this
-        //  dialog open -- whether the user opened it or output reopened it --
-        //  was enough to stop exec() from ever returning once the session
-        //  window had gone.
-        //
+        // RV relies on quitOnLastWindowClosed; a log window must not keep it alive.
         setAttribute(Qt::WA_QuitOnClose, false);
         bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
         // setAttribute(Qt::WA_MacBrushedMetal);
@@ -147,25 +138,9 @@ namespace Rv
         processTextBuffer();
 
         //
-        //  Put cout/cerr back, and take the buffer down with us.
-        //
-        //  Guard on having installed the redirect rather than on a second
-        //  #if. The install above is compiled in when NDEBUG *or*
-        //  PLATFORM_WINDOWS; this restore used to ask for NDEBUG or
-        //  *!*PLATFORM_WINDOWS. A Windows debug build is the one combination
-        //  where those disagree, so there the redirect went in and never came
-        //  out: ConsoleBuf stayed on cout/cerr with m_console pointing at this
-        //  destroyed window.
-        //
-        //  main() deletes RvApplication before finalizePython(), and
-        //  Py_Finalize's GC can still write -- a ResourceWarning from an
-        //  unclosed socket, say. That write reached ConsoleBuf, followed
-        //  m_console into freed memory, and locked a QMutex whose bits happened
-        //  to read "contended", which never resolves. That is the hang on exit.
-        //
-        //  m_stdoutBuf/m_stderrBuf are non-null only if the install ran, and
-        //  processLastTextBuffer() nulls them if it got here first, so this is
-        //  correct in every build and safe to run twice.
+        //  Restore cout/cerr whenever the redirect was installed: Py_Finalize
+        //  can still write after this window is gone. The buffers are non-null
+        //  only if the install ran, so this is safe in every build and twice.
         //
         if (m_stdoutBuf)
         {
@@ -288,15 +263,7 @@ namespace Rv
                 }
             }
 
-            //
-            //  Not on the way out. This runs from a queued event, so it lands
-            //  after the last document's destructor has already closed this
-            //  window, and shutdown emits plenty of output for it to react to.
-            //  Re-showing here put the console back on screen as the only
-            //  visible window, which -- with no explicit quit anywhere in RV
-            //  -- meant quitOnLastWindowClosed never fired and exec() never
-            //  returned. The console stayed up and the process hung.
-            //
+            // Never re-show during shutdown: it would be the last visible window and block exit.
             if (shouldShow && !(RvApp() && RvApp()->isShuttingDown()))
             {
                 show();

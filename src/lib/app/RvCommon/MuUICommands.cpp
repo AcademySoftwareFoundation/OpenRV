@@ -1731,10 +1731,6 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        // Use the neutral view-widget accessor: doc->view() is the GL-only
-        // m_glView, which is null on the Vulkan/Metal presentation path. Wrapping
-        // a null QWidget* here makes the Mu side (e.g. the Session Manager event
-        // filter) dereference null and crash.
         QWidget* w = doc->viewWidget();
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);

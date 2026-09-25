@@ -87,8 +87,6 @@ namespace Rv
         if (m_view && m_view->glWindow())
         {
             ScopedLock lock(m_mutex);
-            //  Update the GL surface, not the container: only the window has
-            //  anything to present.
             m_view->glWindow()->update();
         }
     }
@@ -136,19 +134,13 @@ namespace Rv
             return;
         }
 
-        //  Re-arm the stall report, silently: the interesting event is the
-        //  next stall, not the recovery from this one.
         m_transferStalled = false;
 
         // Switch to the ScreenView's OpenGL context.
         m_viewDevice->makeCurrent(); // calls screenview's makeCurrent, sets the
                                      // font current, etc etc.
 
-        // Because we can't blit from FBOs belonging to different contexts, use
-        // a clone of the source FBO associated to the view's context.
-        // cloneForSource() creates and caches it on first use, reusing the
-        // source FBO's color attachment because color attachments *can* be
-        // shared for the blit operation.
+        // FBOs can't be blitted across contexts, so use this context's clone.
         GLFBO* svSourceFbo = cloneForSource(sourceFbo);
         if (!svSourceFbo)
         {
@@ -175,29 +167,15 @@ namespace Rv
         TWK_GLDEBUG;
 
         //
-        //  There is no GL share device when the main view presents through a
-        //  non-OpenGL backend (the Vulkan 10-bit path), where RvApplication
-        //  constructs the DesktopVideoModule with a null share device. Fall
-        //  back to the default surface format and no explicit share context --
-        //  Qt::AA_ShareOpenGLContexts (set in main.cpp) already puts every
-        //  QOpenGLContext in one resource-sharing group.
+        //  No share device on the Vulkan main-view path; AA_ShareOpenGLContexts
+        //  still puts every context in one share group.
         //
         const QTGLVideoDevice* share = shareDevice();
 
         //
-        //  Realize the share device's GL context before copying its format and
-        //  creating ours.
-        //
-        //  A QOpenGLWindow creates its QOpenGLContext lazily, on the first
-        //  makeCurrent/paint -- creating the platform window is not enough. So
-        //  when this runs right after a main-view backend swap (RvDocument's
-        //  swap paths call RvApplication::rebuildDesktopVideoDevices, which
-        //  re-opens the presentation output in the same call frame), the new
-        //  main view's context does not exist yet: glShareContext() is null and
-        //  glSurfaceFormat() is not yet the format we are going to have to
-        //  share with. Building our context from that is how this device can
-        //  end up outside the renderer's share group, which makes the
-        //  renderer's output textures unreachable and the display black.
+        //  QOpenGLWindow creates its context lazily, so realize the share
+        //  device's context (e.g. right after a backend swap) before copying
+        //  its format and share context.
         //
         if (share)
         {
@@ -210,10 +188,7 @@ namespace Rv
         ScreenView* vw = new ScreenView(fmt, 0, share ? share->glShareContext() : nullptr, Qt::Window);
         setViewWidget(vw);
 
-        //
-        //  The GL surface is the embedded window; the container widget is what
-        //  handles events and coordinate translation. Same split as GLView.
-        //
+        // GL surface is the embedded window; the container handles events, as in GLView.
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw->glWindow(), vw);
         setViewDevice(vd);
 
@@ -233,41 +208,17 @@ namespace Rv
         viewWidget()->show();
 
         //
-        //  Deliberately no makeCurrent() here to "prime" the context.
-        //
-        //  VulkanDesktopVideoDevice::open() can end that way because
-        //  QTVulkanVideoDevice::makeCurrent() builds its own offscreen FBO on
-        //  demand. A PartialUpdateBlit QOpenGLWindow cannot: its makeCurrent()
-        //  binds the backing FBO that Qt only creates on the first paint, so
-        //  calling it before this window has painted dereferences a null FBO
-        //  inside Qt and takes the process down.
-        //
-        //  Nothing needs priming anyway -- show() drives the expose that
-        //  creates the FBO, and transfer() skips any frame where fboID() is
-        //  still 0 and picks up the next one.
+        //  No makeCurrent() here: a PartialUpdateBlit window's backing FBO only
+        //  exists after the first paint, and binding it earlier crashes in Qt.
         //
         TWK_GLDEBUG;
     }
 
     void DesktopVideoDevice::close()
     {
-        //
-        //  Before the view (and its GL context) goes away: the cached FBO
-        //  clones can only be deleted while that context is alive.
-        //
         releaseFBOClones();
 
-        //
-        //  The device before the view that owns its context.
-        //
-        //  ~GLVideoDevice deletes this device's GL text context, and
-        //  ~GLTextContext deletes the FTGL fonts, which delete GL textures.
-        //  Deleting the view first destroys the window and the context those
-        //  textures live in, so those deletes reached nothing and the textures
-        //  leaked -- every time presentation mode was switched off, not only
-        //  at exit. releaseFBOClones() above has just made this device's
-        //  context current, so in this order they land.
-        //
+        // The device first: its font textures live in the view's context.
         delete m_viewDevice;
         delete m_view;
         delete m_translator;
@@ -275,18 +226,7 @@ namespace Rv
         m_viewDevice = 0;
         m_translator = 0;
 
-        //
-        //  Hand the main view's context back before leaving.
-        //
-        //  releaseFBOClones() above made *this* device's context current, and
-        //  the deletes just destroyed it, so right now nothing is current at
-        //  all. Whatever tears down GL objects next -- the renderer's own FBOs,
-        //  later in this same shutdown -- would then run against no context,
-        //  which is futile and reports errors nowhere near the cause.
-        //
-        //  This is the restore that transfer() documents it relies on its
-        //  callers to perform, done here for the teardown path.
-        //
+        // The current context was just destroyed; restore the main view's for later GL teardown.
         if (m_share)
         {
             m_share->makeCurrent();
@@ -301,37 +241,15 @@ namespace Rv
 
     void DesktopVideoDevice::makeCurrent() const
     {
-        //
-        //  Route through the view device rather than the widget: the GL context
-        //  belongs to the embedded ScreenWindow, and QTGLVideoDevice::
-        //  makeCurrent() knows how to bind it (and its default FBO).
-        //
         if (!m_viewDevice)
         {
             return;
         }
 
         //
-        //  Not before the surface has produced its backing FBO. The GL surface
-        //  here is a PartialUpdateBlit QOpenGLWindow, whose makeCurrent() binds
-        //  that FBO, and Qt creates it on the first paint -- so calling this
-        //  earlier crashes inside Qt on a null FBO rather than failing softly.
-        //
-        //  fboID() is the cheap, null-safe way to ask whether the surface is
-        //  ready (QOpenGLWindow::defaultFramebufferObject() returns 0 until the
-        //  FBO exists). transfer() gates on the same test, so a frame that
-        //  arrives too early is skipped rather than lost.
-        //
-        //  A surface that is gone is a different matter from one that has not
-        //  painted yet. fboID() is 0 for both, but with no platform window
-        //  QTGLVideoDevice::makeCurrent() takes its offscreen path, which binds
-        //  the context to a QOffscreenSurface and never touches that backing
-        //  FBO -- so it cannot crash the way the pre-first-paint case can.
-        //  Teardown needs exactly that path: releaseFBOClones() calls this
-        //  before deleting the clones, and blocking it here is what left
-        //  ~GLFBO running with no context at all while quitting. transfer()
-        //  keeps the stricter test on purpose -- a vanished surface has nothing
-        //  to present to, so skipping the frame there is right.
+        //  Binding before the first paint crashes in Qt (no backing FBO yet).
+        //  A destroyed surface is allowed through: makeCurrent() then uses the
+        //  offscreen teardown surface, which releaseFBOClones() relies on.
         //
         const QTGLVideoDevice* glViewDevice = dynamic_cast<const QTGLVideoDevice*>(m_viewDevice);
         const QOpenGLWindow* surfaceWindow = glViewDevice ? glViewDevice->window() : nullptr;
@@ -423,11 +341,7 @@ namespace Rv
 
         ScopedLock lock(m_mutex);
 
-        //
-        //  Same readiness gate as transfer(): the GL surface has no backing FBO
-        //  until it has painted once, and binding its context before then
-        //  crashes inside Qt. Skip the frame; the next one will land.
-        //
+        // Same readiness gate as transfer().
         if (m_viewDevice->fboID() == 0)
         {
             return;
@@ -671,13 +585,7 @@ namespace Rv
         {
             GLFBO* cached = i->second;
 
-            //
-            //  m_fboMap is keyed on the raw source pointer, and the renderer
-            //  deletes and reallocates those (ImageRenderer::Device::clearFBOs
-            //  / ImageFBOManager::newImageFBO), so the same address can come
-            //  back as a different FBO. Re-verify the clone still mirrors the
-            //  texture and size it was built from before trusting it.
-            //
+            // The renderer reallocates FBOs, so the same address can be a different FBO.
             const bool stillMatches = cached && cached->colorID(0) == sourceFbo->colorID(0)
                                       && cached->colorTarget(0) == sourceFbo->colorTarget(0) && cached->width() == sourceFbo->width()
                                       && cached->height() == sourceFbo->height();
@@ -692,12 +600,8 @@ namespace Rv
         }
 
         //
-        //  Build the clone in this device's context around the source's colour
-        //  texture. The texture belongs to the control context; if it has been
-        //  destroyed since, attaching it leaves the FBO incomplete rather than
-        //  failing loudly, so check before caching. Caching an incomplete clone
-        //  is what turns a transient error into a permanently black output --
-        //  nothing ever invalidates it and every later frame blits from it.
+        //  A dead source texture leaves the clone incomplete; never cache one,
+        //  or every later frame would blit from it.
         //
         GLFBO* clone = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
 
@@ -705,10 +609,7 @@ namespace Rv
 
         if (!clone->isComplete())
         {
-            //
-            //  Latched per source texture: this is called every frame, and the
-            //  interesting event is the transition, not the repetition.
-            //
+            // Report once per source texture; this runs every frame.
             const GLuint badTex = sourceFbo->colorID(0);
             if (m_reportedBadSourceTex != badTex)
             {
@@ -718,15 +619,7 @@ namespace Rv
                      << sourceFbo->height() << " FBO (source colour texture " << badTex << " is not usable in this context); skipping"
                      << " until it changes." << endl;
 
-                //
-                //  Which of the two possible causes this is: the texture does
-                //  not exist any more (deleted, or never created because no
-                //  context was current when the renderer made it), or it exists
-                //  but in a context that does not share with ours. glIsTexture
-                //  answers the first; the share-group pointers answer the
-                //  second. Without this the two are indistinguishable from the
-                //  outside and each costs a build-and-repro cycle to guess at.
-                //
+                // Distinguish a dead texture (glIsTexture) from a share-group mismatch.
                 const QOpenGLContext* cur = QOpenGLContext::currentContext();
                 const QTGLVideoDevice* share = shareDevice();
                 const QOpenGLContext* shareCtx = share ? share->glShareContext() : nullptr;
@@ -762,33 +655,9 @@ namespace Rv
             return;
         }
 
-        //
-        //  ~GLFBO deletes the FBO handle, so a context has to be current or
-        //  the delete is a no-op that also poisons glGetError() for the next
-        //  unrelated call site. Make this device's view context current the
-        //  same way transfer() does.
-        //
-        //  If the view is already gone there is nothing to make current and
-        //  the FBO names died with that context anyway; free the wrappers so
-        //  the memory is not leaked and let the (harmless) GL no-ops happen.
-        //  Phase-ordered callers never land here -- close() calls this before
-        //  destroying the view -- so it is a backstop, not a normal path.
-        //
-        //
-        //  Through the virtual, so each subclass binds its own surface -- and
-        //  so the "surface not ready yet" guard in there applies. If it cannot
-        //  make a context current there is nothing cached to free either: the
-        //  clones are only ever created by a transfer() that got that far.
-        //
+        // Through the virtual so each subclass binds its own surface.
         makeCurrent();
 
-        //
-        //  Deleting these without a context current frees nothing -- the
-        //  handles leak and ~GLFBO reports an error nowhere near the cause --
-        //  so say it rather than leaving it to be inferred from a stray
-        //  GL_ERROR later. By construction this should not happen: close()
-        //  calls us while the view is alive.
-        //
         if (!QOpenGLContext::currentContext())
         {
             cerr << "WARNING: DesktopVideoDevice: '" << name() << "' released " << m_fboMap.size()
@@ -1022,16 +891,6 @@ namespace Rv
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
     DesktopVideoDevice::ScreenWindow::ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext)
-        //
-        //  The share context goes in here, at construction, because that is the
-        //  only point where sharing can be established -- QOpenGLContext ties
-        //  its share group at create() time. A null share context leaves
-        //  QOpenGLWindow to use Qt's global share context, which is also the
-        //  renderer's group.
-        //
-        //  PartialUpdateBlit keeps a backing FBO and does not clear before
-        //  paintGL(); see the class comment.
-        //
         : QOpenGLWindow(glShareContext, QOpenGLWindow::PartialUpdateBlit)
         , m_glShareContext(glShareContext)
     {
@@ -1043,16 +902,8 @@ namespace Rv
         QOpenGLWindow::initializeGL();
 
         //
-        //  Confirm the sharing actually happened. Everything the presentation
-        //  output does depends on it and nothing else reports it: a mismatch is
-        //  invisible from the outside and shows up only as a black second
-        //  display.
-        //
-        //  Note this deliberately does NOT call context()->setShareContext().
-        //  That only takes effect on the *next* create(), and the context is
-        //  already created by the time initializeGL() runs, so it never did
-        //  what it looked like it did -- it only left a stale share request
-        //  behind for a later re-create to fail on.
+        //  Verify the share group; a mismatch only shows as a black display.
+        //  setShareContext() is useless here: the context is already created.
         //
         const QOpenGLContext* ours = context();
         const QOpenGLContext* global = QOpenGLContext::globalShareContext();
@@ -1085,19 +936,10 @@ namespace Rv
     {
         m_glWindow = new ScreenWindow(fmt, glShareContext);
 
-        //
-        //  Embed the native GL window in the widget tree, exactly as GLView
-        //  does for the main view. The container is a plain QWidget, so this
-        //  top-level is not forced onto the OpenGL RHI backend -- which is what
-        //  put a top-level QOpenGLWidget in its own share group.
-        //
+        // A plain QWidget container keeps this top-level off the OpenGL RHI backing store.
         m_container = QWidget::createWindowContainer(m_glWindow, this);
 
-        //
-        //  Realize the platform surface up front: a QOpenGLWindow has no GL
-        //  context until its window surface exists, and the device primes the
-        //  context (makeCurrent) during open() before this is ever shown.
-        //
+        // A QOpenGLWindow has no GL context until its platform surface exists.
         m_glWindow->create();
 
         QVBoxLayout* layout = new QVBoxLayout(this);
@@ -1189,20 +1031,9 @@ namespace Rv
         QWindow* windowOnTargetScreen = nullptr;
 
         //
-        //  Find a window on the target screen to borrow a device context from,
-        //  and consider only windows that are *already* realized.
-        //
-        //  QWindow::winId() creates the platform window when there is none,
-        //  and this loop walks every top-level QWindow in the process --
-        //  including ones that must never be realized. Every QQuickWidget, so
-        //  every QWebEngineView panel and Live Review among them, owns a
-        //  parentless offscreen QQuickWindow that Qt is explicit about ("Do
-        //  not call create() on offscreenWindow", qquickwidget.cpp). Handing it
-        //  a platform window trips Q_ASSERT(!d->offscreenWindow->handle()) at
-        //  the end of QQuickWidget::createFramebufferObject() and aborts RV the
-        //  moment that panel is first shown. Any already-realized window on the
-        //  screen reports the same monitor profile, so there is nothing to gain
-        //  by creating one.
+        //  Only already-realized windows: winId() would create a platform window
+        //  for QQuickWidget's offscreen QQuickWindow, which asserts in Qt
+        //  ("Do not call create() on offscreenWindow", qquickwidget.cpp).
         //
         for (QWindow* window : QGuiApplication::topLevelWindows())
         {
@@ -1239,14 +1070,12 @@ namespace Rv
 
                 DWORD maxLen = 2084;
                 std::vector<char> url(maxLen);
-                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, NULL)))
+                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, nullptr)))
                 {
                     m_colorProfile.url = url.data();
                 }
 
-                //  cmsOpenProfileFromFile returns null when the path the driver
-                //  reported is gone or unreadable; cmsGetProfileInfoASCII would
-                //  dereference it.
+                //  Null when the reported profile path is gone or unreadable.
                 if (cmsHPROFILE profile = cmsOpenProfileFromFile(path.data(), "r"))
                 {
                     char desc[256] = {0};
@@ -1266,17 +1095,7 @@ namespace Rv
     bool DesktopVideoDevice::shouldUseVulkanPresentation()
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        //
-        //  Presentation-output backend selection, matching the main view's rule
-        //  in RvDocument: a 10-bit display request (RGB 10 + A 2) that this
-        //  machine's Vulkan can actually present routes the second-display
-        //  output through a Vulkan swapchain for true 10-bit, avoiding the
-        //  8-bit truncation of the OpenGL ScreenView path. Everything else
-        //  stays on the OpenGL DesktopVideoDevice.
-        //
-        //  supports10BitPresentation() is memoized, so this is cheap to re-call
-        //  whenever the display output format or the main-view backend changes.
-        //
+        //  Same rule as the main view in RvDocument.
         const Options& opts = Options::sharedOptions();
         const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
 

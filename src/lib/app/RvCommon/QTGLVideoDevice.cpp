@@ -111,22 +111,13 @@ namespace Rv
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        //
-        //  The handle() test belongs in this condition, not nested inside it:
-        //  QOpenGLWindow creates its GL context lazily on the first
-        //  makeCurrent() and only if the platform window (surface) exists, so a
-        //  live m_window with a dead surface can make nothing current. Nested,
-        //  that case fell through every branch and returned silently.
-        //
+        // QOpenGLWindow creates its context lazily, and only if the platform surface exists.
         if (m_window && m_window->handle())
         {
             m_window->makeCurrent();
             TWK_GLDEBUG;
 
-            //
-            //  Build the teardown surface now, while there is a live context to
-            //  copy a compatible format from. See m_teardownSurface.
-            //
+            // Needs a live context to copy the format from.
             if (!m_teardownSurface && m_window->context())
             {
                 m_teardownSurface = new QOffscreenSurface();
@@ -156,34 +147,20 @@ namespace Rv
         else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
                  && m_window->context()->makeCurrent(m_teardownSurface))
         {
-            //
-            //  The platform surface is gone but the context is not, so bind it
-            //  to the offscreen surface instead. GL object deletion needs a
-            //  current context, not a visible one, so this lets the teardown
-            //  actually free what it is trying to free.
-            //
+            // Surface gone, context alive: GL deletion only needs a current context.
             TWK_GLDEBUG;
         }
         else
         {
-            //
-            //  There is no surface left to make current. m_window is a
-            //  QPointer, so it self-nulls once the QOpenGLWindow is destroyed,
-            //  and m_view is null in the native-window port -- which means this
-            //  function can quietly do nothing while its caller carries on
-            //  believing it has a context. That is how GL teardown ends up
-            //  running with no context at all. Say so once instead.
-            //
+            // Callers assume a current context afterwards, so report the failure once.
             static bool reported = false;
             if (!reported)
             {
                 reported = true;
                 cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
-                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface")) << " widget=" << (m_view ? "alive" : "null")
+                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface"))
+                     << " widget=" << (m_view ? "alive" : "null")
                      << " currentContext=" << (QOpenGLContext::currentContext() ? "yes" : "none")
-                     //  Whether the context outlives the surface decides if a
-                     //  QOffscreenSurface could be used to make it current for
-                     //  teardown, the way QTVulkanVideoDevice already does.
                      << " ownContext=" << (m_window && m_window->context() ? "alive" : "null")
                      << "); the caller's GL work has no current context" << endl;
             }
