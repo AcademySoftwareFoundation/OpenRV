@@ -52,7 +52,7 @@ namespace IPCore
         virtual void readCompleted(const std::string&, unsigned int);
         virtual void propertyChanged(const Property*);
 
-        void updateConfig();
+        void updateConfig(const bool initializing = false);
 
         bool useRawConfig() const { return m_useRawConfig; }
 
