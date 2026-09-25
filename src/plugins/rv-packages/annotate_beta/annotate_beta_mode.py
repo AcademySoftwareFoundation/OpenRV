@@ -93,12 +93,12 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         if self._tool in _DRAWING_TOOLS:
             self._push_shape_table()
 
-        self._set_cursor(TOOLS[self._tool].cursor)
+        commands.setCursor(TOOLS[self._tool].cursor.value)
         self._update_tool_availability()
         self._update_undo_redo_buttons()
 
     def deactivate(self):
-        self._set_cursor(QtCore.Qt.ArrowCursor)
+        commands.setCursor(QtCore.Qt.ArrowCursor.value)
         self._pop_shape_table()
         self._engine.commit_text_if_active()
         self._dock.toolbar_widget.hide_popups()
@@ -343,11 +343,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             self._pop_shape_table()
 
-        self._set_cursor(TOOLS[tool].cursor)
-
-    def _set_cursor(self, cursor):
-        session_window = qtutils.sessionGLWindow()
-        session_window.setCursor(cursor)
+        commands.setCursor(TOOLS[tool].cursor.value)
 
     def _on_color_changed(self, color):
         self._color = color

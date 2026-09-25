@@ -16,7 +16,6 @@ except ImportError:
         from PySide6 import QtGui, QtWidgets
         from PySide6.QtGui import *
         from PySide6.QtWidgets import *
-        from PySide6.QtOpenGL import QOpenGLWindow
         from shiboken6 import wrapInstance
         from shiboken6 import getCppPointer
     except ImportError:
@@ -47,18 +46,6 @@ def sessionGLView():
     rvPyLongPtr = rv.commands.sessionGLView()
     if rvPyLongPtr is not None:
         return wrapInstance(rvPyLongPtr, QWidget)
-    else:
-        return None
-
-
-def sessionGLWindow():
-    """
-    Returns the QOpenGLWindow for the current RV session GL view.
-    """
-
-    rvPyLongPtr = rv.commands.sessionGLWindow()
-    if rvPyLongPtr is not None:
-        return wrapInstance(rvPyLongPtr, QOpenGLWindow)
     else:
         return None
 

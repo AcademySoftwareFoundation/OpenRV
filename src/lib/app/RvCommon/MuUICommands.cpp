@@ -65,7 +65,6 @@
 #include <TwkUtil/User.h>
 #include <TwkUtil/File.h>
 #include <assert.h>
-#include <RvCommon/GLWindow.h>
 #include <RvCommon/GLView.h> // WINDOWS NEEDS THIS LAST
 // #include <RvCommon/SequenceFileEngine.h>
 #ifdef PLATFORM_WINDOWS
@@ -956,7 +955,7 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-        rvDoc->view()->glWindow()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        rvDoc->view()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
     }
 
     NODE_IMPLEMENTATION(alertPanel, int)
