@@ -35,7 +35,6 @@
 #include <Processing.NDI.Lib.h>
 
 #include <iostream>
-#include <stl_ext/thread_group.h>
 #include <deque>
 
 namespace NDI

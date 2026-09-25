@@ -81,18 +81,9 @@ namespace Mu
         , _continuation(0)
         , _applicationThread(appthread)
         , _returnValueType(0)
-        , _threadState(0)
     {
         GarbageCollector::init();
         _stack.reserve(_stackCapacity);
-
-#ifdef PLATFORM_DARWIN
-        _threadState = new size_t[sizeof(DARWIN_THREAD_STATE)];
-#endif
-
-#ifdef PLATFORM_LINUX
-        _threadState = (size_t*)(new ucontext_t);
-#endif
 
         if (isApplicationThread())
         {
@@ -131,14 +122,6 @@ namespace Mu
 
         _process->removeThread(this);
         _process = 0;
-
-#ifdef PLATFORM_DARWIN
-        delete[] _threadState;
-#endif
-
-#ifdef PLATFORM_LINUX
-        delete _threadState;
-#endif
     }
 
     void* Thread::trampoline(void* arg)
@@ -491,45 +474,6 @@ namespace Mu
 #endif
 #endif
         }
-    }
-
-    void* Thread::threadState()
-    {
-#ifdef PLATFORM_DARWIN
-        if (_alive)
-        {
-            mach_msg_type_number_t thread_state_count = DARWIN_THREAD_STATE_COUNT;
-            kern_return_t krc;
-            if ((krc = thread_get_state(pthread_mach_thread_np(_id), // <-- can't use self here
-                                        DARWIN_THREAD_STATE, (natural_t*)_threadState, &thread_state_count))
-                != KERN_SUCCESS)
-            {
-                return _threadState;
-            }
-            else
-            {
-                cerr << "Thread::threadState(): error obtaining thread state" << endl;
-            }
-        }
-#endif
-
-        return 0;
-    }
-
-    size_t Thread::threadStateSize()
-    {
-#if 0
-#ifdef PLATFORM_DARWIN
-    return sizeof(darwin_thread_state);
-#endif
-
-#ifdef PLATFORM_LINUX
-    return sizeof(ucontext);
-#endif
-
-#endif
-        /* AJG - baaaaad ! */
-        return sizeof(int);
     }
 
     void Thread::jump(int returnValue, int n, Value v)

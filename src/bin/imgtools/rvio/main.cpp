@@ -75,7 +75,6 @@
 #include <iostream>
 #include <sched.h>
 #include <cstdlib>
-#include <stl_ext/thread_group.h>
 #include <stl_ext/string_algo.h>
 #include <cstring>
 #include <vector>
