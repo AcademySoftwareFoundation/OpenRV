@@ -118,6 +118,7 @@ ADD_SUBDIRECTORY(../../src/pub/lcms src/pub/lcms) # required by raw
 INCLUDE(raw) # depends on jpeg, zlib
 INCLUDE(openjpeg) # depends on zlib, tiff, png
 INCLUDE(openjph)
+INCLUDE(jxl)
 INCLUDE(webp)
 INCLUDE(openexr)
 IF(RV_DEPS_OPENEXR_FOUND)
@@ -174,6 +175,7 @@ MESSAGE(STATUS "Using OpenColorIO   ${RV_DEPS_OCIO_VERSION}")
 MESSAGE(STATUS "Using OpenImageIO   ${RV_DEPS_OIIO_VERSION}")
 MESSAGE(STATUS "Using OpenJpeg:     ${RV_DEPS_OPENJPEG_VERSION}")
 MESSAGE(STATUS "Using OpenJPH:      ${RV_DEPS_OPENJPH_VERSION}")
+MESSAGE(STATUS "Using libjxl:       ${RV_DEPS_JXL_VERSION}")
 MESSAGE(STATUS "Using OpenSSL:      ${RV_DEPS_OPENSSL_VERSION}")
 IF(RV_TARGET_WINDOWS)
   MESSAGE(STATUS "Using PCRE2:        ${RV_DEPS_PCRE2_VERSION}")
