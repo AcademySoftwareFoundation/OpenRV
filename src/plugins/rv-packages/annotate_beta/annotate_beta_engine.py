@@ -858,10 +858,12 @@ class AnnotateDrawEngine:
                 self._commit_text()
             name, pei = self._pointer_location(event)
             if not name:
+                event.reject()
                 return
             self._current_source_name = name
             paint_node, frame = self._find_paint_node()
             if paint_node is None:
+                event.reject()
                 return
             self._text_active = True
             self._text_buffer = ""
