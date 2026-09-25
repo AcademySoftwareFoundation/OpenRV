@@ -24,10 +24,10 @@ TOOL_EYEDROPPER = "eyedropper"
 
 # Secondary panel page indices
 _PAGE_EMPTY = -1  # cursor, eyedropper
-_PAGE_BRUSH = 0  # arrow, line
+_PAGE_SIZE_OPACITY = 0  # arrow, line
 _PAGE_SHAPE = 1  # rect, circle
 _PAGE_TEXT = 2  # text
-_PAGE_PEN = 3  # pen and airbrush (size/opacity/blend mode)
+_PAGE_BLEND = 3  # pen and airbrush (size/opacity/blend mode)
 _PAGE_ERASER = 4  # eraser (brush type combo + size/opacity)
 
 # Blend mode values passed to the mode/engine
@@ -46,13 +46,13 @@ class Tool:
 TOOLS = {
     TOOL_CURSOR: Tool(page=_PAGE_EMPTY, tooltip="Cursor", cursor=QtCore.Qt.ArrowCursor),
     TOOL_EYEDROPPER: Tool(page=_PAGE_EMPTY, tooltip="Eyedropper", cursor=QtCore.Qt.CrossCursor),
-    TOOL_PEN: Tool(page=_PAGE_PEN, tooltip="Pen", cursor=QtCore.Qt.CrossCursor),
-    TOOL_AIRBRUSH: Tool(page=_PAGE_BRUSH, tooltip="Airbrush", cursor=QtCore.Qt.CrossCursor),
+    TOOL_PEN: Tool(page=_PAGE_BLEND, tooltip="Pen", cursor=QtCore.Qt.CrossCursor),
+    TOOL_AIRBRUSH: Tool(page=_PAGE_BLEND, tooltip="Airbrush", cursor=QtCore.Qt.CrossCursor),
     TOOL_ERASER: Tool(page=_PAGE_ERASER, tooltip="Eraser", cursor=QtCore.Qt.CrossCursor),
     TOOL_RECT: Tool(page=_PAGE_SHAPE, tooltip="Rectangle", cursor=QtCore.Qt.CrossCursor),
     TOOL_CIRCLE: Tool(page=_PAGE_SHAPE, tooltip="Circle", cursor=QtCore.Qt.CrossCursor),
-    TOOL_ARROW: Tool(page=_PAGE_SHAPE, tooltip="Arrow", cursor=QtCore.Qt.CrossCursor),
-    TOOL_LINE: Tool(page=_PAGE_SHAPE, tooltip="Line", cursor=QtCore.Qt.CrossCursor),
+    TOOL_ARROW: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Arrow", cursor=QtCore.Qt.CrossCursor),
+    TOOL_LINE: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Line", cursor=QtCore.Qt.CrossCursor),
     TOOL_TEXT: Tool(page=_PAGE_TEXT, tooltip="Text", cursor=QtCore.Qt.IBeamCursor),
 }
 
