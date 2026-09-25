@@ -99,6 +99,14 @@ namespace Rv
         RvPreferences* prefDialog();
         RvProfileManager* profileManager();
 
+        //
+        //  Set once the last document starts tearing down, so queued events
+        //  (e.g. the console's output-driven auto-show) do not reopen windows.
+        //
+        bool isShuttingDown() const { return m_shuttingDown; }
+
+        void setShuttingDown() { m_shuttingDown = true; }
+
         bool networkDialogRunning() const { return m_networkDialog ? true : false; }
 
         void processNetworkOpts(bool startup = true);
@@ -125,6 +133,15 @@ namespace Rv
 
         void setPresentationMode(bool);
         bool isInPresentationMode();
+
+        //
+        //  Rebuild the desktop presentation devices to match the main view's
+        //  backend, re-bind the share device, and re-open the presentation
+        //  output if presentation mode is on. shareDevice is null when the main
+        //  view is Vulkan. mainViewIsVulkan comes from the caller because only
+        //  it knows which view widget exists now.
+        //
+        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 
@@ -161,6 +178,7 @@ namespace Rv
         RvWebManager* m_webManager;
         TwkApp::VideoDevice* m_presentationDevice;
         bool m_presentationMode;
+        bool m_shuttingDown{false};
         mutable pthread_mutex_t m_deleteLock;
         std::string m_executableNameCaps;
         DesktopVideoModule* m_desktopModule;

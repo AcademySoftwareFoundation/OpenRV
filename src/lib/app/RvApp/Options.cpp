@@ -71,7 +71,7 @@ namespace Rv
         else if (name == "threads")
             stl_ext::thread_group::debug_all(true);
         else if (name == "gpu")
-            ImageRenderer::reportGL(true);
+            ImageRenderer::debugGpu(true);
         else if (name == "audio")
         {
             AudioRenderer::setDebug(true);

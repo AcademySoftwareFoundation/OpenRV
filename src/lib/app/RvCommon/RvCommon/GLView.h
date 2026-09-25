@@ -12,6 +12,7 @@
 #include <QSurfaceFormat>
 #include <QImage>
 #include <QSize>
+#include <string>
 
 class QOpenGLContext;
 class QWindow;
@@ -21,6 +22,10 @@ namespace Rv
     class RvDocument;
     class QTGLVideoDevice;
     class GLWindow;
+
+    // -debug gpu helpers shared by GLView and GLWindow.
+    std::string glDebugEnvOrUnset(const char* name);
+    std::string glDebugFormatSummary(const QSurfaceFormat&);
 
     //
     //  GLView

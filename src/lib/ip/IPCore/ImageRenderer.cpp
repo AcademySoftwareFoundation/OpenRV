@@ -19,6 +19,7 @@
 #include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/BasicGLProgram.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -182,6 +183,8 @@ namespace IPCore
 
     void ImageRenderer::Device::clearFBOs()
     {
+        const TwkGLF::GLContextScope contextScope(glDevice);
+
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
         {
             FBOVector& views = fboRingBuffer[i].views;
@@ -247,7 +250,7 @@ namespace IPCore
     bool ImageRenderer::m_defaultAllowPBOs = true;
     bool ImageRenderer::m_fragmentProgram = true;
     bool ImageRenderer::m_ycbcrApple = false;
-    bool ImageRenderer::m_reportGL = false;
+    bool ImageRenderer::m_debugGpu = false;
     bool ImageRenderer::m_softwareGLRenderer = false;
     int ImageRenderer::m_ALUinsnLimit = 0;
     int ImageRenderer::m_tempLimit = 0;
@@ -478,6 +481,11 @@ namespace IPCore
             m_uploadThread.join();
         }
 
+        //
+        //  Everything from here down deletes GL objects.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearState();
 
         // clean up
@@ -610,6 +618,11 @@ namespace IPCore
 
     void ImageRenderer::clearState()
     {
+        //
+        //  Covers flushProgramCache() too, not just flushImageFBOs().
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearRenderedImages();
 
         // clear state will unbind the FBO currently bound
@@ -852,7 +865,7 @@ namespace IPCore
         m_maxH = maxt;
         m_maxW = maxt;
 
-        if (m_reportGL)
+        if (m_debugGpu)
         {
             cout << "INFO: GL version            = " << glver << endl;
             cout << "INFO: GLSL version          = " << glslver << endl;
@@ -1314,8 +1327,30 @@ namespace IPCore
         //  unique device pair (controller and output).
         //
 
+        //
+        //  m_outputDevice.glDevice is null for GLBindableVideoDevice outputs
+        //  (presentation, AJA, NDI). Fall back to the control device, whose
+        //  context owns the FBOs released below.
+        //
         if (m_outputDevice.glDevice)
+        {
             m_outputDevice.glDevice->makeCurrent();
+        }
+        else if (m_controlDevice.glDevice)
+        {
+            m_controlDevice.glDevice->makeCurrent();
+        }
+        else
+        {
+            static bool reported = false;
+            if (!reported)
+            {
+                reported = true;
+                cerr << "ERROR: ImageRenderer::setOutputDevice: neither the output nor the control device is a GLVideoDevice; "
+                        "the GL objects released below have no current context"
+                     << endl;
+            }
+        }
         TWK_GLDEBUG;
 
         if (d)
@@ -2414,7 +2449,7 @@ namespace IPCore
         //  or waiting for the sync to complete before continuing.
         //
         //  NOTE: I still think its possible to get stomped on -- you can
-        //  tell if that's happen by setting m_reportGL (-debug gpu in RV)
+        //  tell if that has happened by setting m_debugGpu (-debug gpu in RV)
         //  which will cause some debug code to clear to blue. If you see
         //  blue flashing on the pres device that's the problem.
         //
@@ -2446,7 +2481,7 @@ namespace IPCore
         {
             clearBackground(fbo);
 
-            if (m_reportGL && !controller)
+            if (m_debugGpu && !controller)
             {
                 glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
                 TWK_GLDEBUG;

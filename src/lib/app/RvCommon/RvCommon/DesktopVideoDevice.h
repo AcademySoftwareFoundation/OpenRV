@@ -17,7 +17,7 @@
 
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLContext>
 #include <QGuiApplication>
 
@@ -55,22 +55,42 @@ namespace Rv
     class DesktopVideoDevice : public TwkGLF::GLBindableVideoDevice
     {
     public:
-        class ScreenView : public QOpenGLWidget
+        //
+        //  QOpenGLWindow, not a top-level QOpenGLWidget: only a ctor-supplied
+        //  share context guarantees the renderer's share group, which
+        //  transfer() needs to see the renderer's textures. PartialUpdateBlit
+        //  keeps a backing FBO and does not clear before paintGL().
+        //
+        class ScreenWindow : public QOpenGLWindow
         {
         public:
-            //
-            //  glShareContext is the control view's GL context to share with
-            //  (so blits/FBOs are usable across the two surfaces). It comes
-            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
-            //  the control view may be a QOpenGLWidget or a QOpenGLWindow.
-            //
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+            ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
             QOpenGLContext* m_glShareContext = nullptr;
+        };
+
+        //  QWidget container for the ScreenWindow, as GLView is for GLWindow.
+        class ScreenView : public QWidget
+        {
+        public:
+            //
+            //  glShareContext is the control view's GL context to share with
+            //  (so blits/FBOs are usable across the two surfaces). It comes
+            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
+            //  the control view may be a QOpenGLWidget or a QOpenGLWindow. A
+            //  null share context falls back to Qt's global share context.
+            //
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+
+            ScreenWindow* glWindow() const { return m_glWindow; }
+
+        private:
+            ScreenWindow* m_glWindow = nullptr;
+            QWidget* m_container = nullptr;
         };
 
     public:
@@ -177,7 +197,21 @@ namespace Rv
 
         virtual void unbind() const;
 
-        virtual void clearCaches() const {}
+        virtual void clearCaches() const { releaseFBOClones(); }
+
+        //
+        //  Delete the FBO clones in m_fboMap. Must run while this device's view
+        //  context is still alive, so close() calls it first. Idempotent.
+        //
+        void releaseFBOClones() const;
+
+        //
+        //  This context's cached clone of a renderer FBO, wrapping its colour
+        //  texture (FBOs are not shared across contexts, textures are). The
+        //  cache key is a pointer the renderer can reuse, so hits are
+        //  re-verified. Returns null if no complete clone could be built.
+        //
+        TwkGLF::GLFBO* cloneForSource(const TwkGLF::GLFBO* sourceFbo) const;
 
         //
         //  Configurations
@@ -208,9 +242,9 @@ namespace Rv
 
         //  From QTGLVideoDevice
 
-        void setViewWidget(QOpenGLWidget*);
+        void setViewWidget(ScreenView*);
 
-        QOpenGLWidget* viewWidget() const { return m_view; }
+        ScreenView* viewWidget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -241,6 +275,18 @@ namespace Rv
 
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
 
+        //  As above, with the backend supplied by the caller. Use once the main view is live.
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
+                                                                   bool useVulkan);
+
+        //
+        //  Presentation backend for the initial build: true for a 10-bit request
+        //  this machine's Vulkan can present. Reads the persisted preference,
+        //  which can differ from the live main-view backend, so it must not be
+        //  used once a view exists. Always false on macOS.
+        //
+        static bool shouldUseVulkanPresentation();
+
     protected:
         void addDefaultDataFormats(size_t bits = 8);
         void sortVideoFormatsByWidth();
@@ -261,9 +307,15 @@ namespace Rv
     protected:
         const QTGLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
-        QOpenGLWidget* m_view;
+        ScreenView* m_view;
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
+
+        //  Last unusable source texture reported, so the report fires once per transition.
+        mutable GLuint m_reportedBadSourceTex{0};
+
+        //  Latches the "no backing FBO" report.
+        mutable bool m_transferStalled{false};
         TwkGLF::GLState* m_glGlobalState;
         DesktopVideoFormats m_videoFormats;
         DesktopDataFormats m_dataFormats;

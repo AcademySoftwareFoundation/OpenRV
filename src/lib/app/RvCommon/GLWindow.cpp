@@ -19,19 +19,30 @@
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLContext>
-#include <QtGui/QGuiApplication>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <iostream>
 #include <sstream>
 
 namespace Rv
 {
+
+    //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
+    static unsigned int s_glDiagFrames = 0;
+    static double s_glDiagRenderMs = 0.0;
+    static double s_glDiagOutPresentMs = 0.0;
+    //  Time between paintGL() entries; includes the implicit swap after paintGL.
+    static double s_glDiagLoopMs = 0.0;
+    static TwkUtil::Timer s_glDiagLoopTimer;
+
     using namespace std;
     using namespace TwkApp;
     using namespace IPCore;
@@ -102,6 +113,52 @@ namespace Rv
 
             QSurfaceFormat f = context()->format();
 
+            //  One-shot -debug gpu baseline: requested vs negotiated format, driver and display server.
+            static bool baselineLogged = false;
+            if (ImageRenderer::debugGpu() && !baselineLogged)
+            {
+                baselineLogged = true;
+
+                QScreen* scr = screen();
+                if (!scr)
+                {
+                    scr = QGuiApplication::primaryScreen();
+                }
+
+                const GLubyte* glVendor = glGetString(GL_VENDOR);
+                const GLubyte* glRenderer = glGetString(GL_RENDERER);
+                const GLubyte* glVersion = glGetString(GL_VERSION);
+                const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+                cout << "INFO: GLWindow runtime baseline begin" << endl;
+                cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
+                cout << "INFO: Qt version: " << qVersion() << endl;
+                cout << "INFO: Constructor-requested color bits: rgba " << m_red << " " << m_green << " " << m_blue << " " << m_alpha
+                     << endl;
+                cout << "INFO: QOpenGLWindow::format() (post-negotiation): " << glDebugFormatSummary(format()) << endl;
+                cout << "INFO: Actual QOpenGLContext format: " << glDebugFormatSummary(f) << endl;
+                if (scr)
+                {
+                    cout << "INFO: Screen name: " << scr->name().toStdString() << ", depth: " << scr->depth() << endl;
+                }
+                else
+                {
+                    cout << "INFO: Screen name: <unknown>, depth: <unknown>" << endl;
+                }
+
+                cout << "INFO: GL vendor: " << (glVendor ? reinterpret_cast<const char*>(glVendor) : "<unknown>") << endl;
+                cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
+                cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
+                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
+#ifdef PLATFORM_LINUX
+                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << glDebugEnvOrUnset("XDG_SESSION_TYPE")
+                     << ", WAYLAND_DISPLAY=" << glDebugEnvOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << glDebugEnvOrUnset("DISPLAY")
+                     << ", XDG_CURRENT_DESKTOP=" << glDebugEnvOrUnset("XDG_CURRENT_DESKTOP")
+                     << ", DESKTOP_SESSION=" << glDebugEnvOrUnset("DESKTOP_SESSION") << endl;
+#endif
+                cout << "INFO: GLWindow runtime baseline end" << endl;
+            }
+
 #ifndef PLATFORM_DARWIN
             if (f.redBufferSize() != m_red && m_red != 0)
             {
@@ -168,6 +225,15 @@ namespace Rv
             }
         }
 
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            if (s_glDiagLoopTimer.isRunning())
+            {
+                s_glDiagLoopMs += s_glDiagLoopTimer.elapsed() * 1000.0;
+            }
+            s_glDiagLoopTimer.start();
+        }
+
         if (m_doc && session && m_videoDevice)
         {
             m_videoDevice->makeCurrent();
@@ -192,7 +258,19 @@ namespace Rv
             m_videoDevice->setAbsolutePosition(x, y);
 
             TWK_GLDEBUG;
+            const bool diagTiming = IPCore::ImageRenderer::debugGpu();
+            Timer diagTimer;
+            if (diagTiming)
+            {
+                diagTimer.start();
+            }
+
             session->render();
+
+            if (diagTiming)
+            {
+                s_glDiagRenderMs += diagTimer.elapsed() * 1000.0;
+            }
             TWK_GLDEBUG;
 
             m_firstPaintCompleted = true;
@@ -221,13 +299,44 @@ namespace Rv
         // If a separate output device is presenting, sync it. The control
         // (window) surface presents itself: QOpenGLWindow swaps automatically
         // after paintGL returns.
+        const bool diagPresent = IPCore::ImageRenderer::debugGpu();
+        Timer diagPresentTimer;
+
         if (session->outputVideoDevice() != m_videoDevice)
         {
+            if (diagPresent)
+            {
+                diagPresentTimer.start();
+            }
+
             session->outputVideoDevice()->syncBuffers();
+
+            if (diagPresent)
+            {
+                s_glDiagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
+            }
         }
 
         session->addSyncSample();
         session->postRender();
+
+        //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            if (++s_glDiagFrames >= 60)
+            {
+                const double n = double(s_glDiagFrames);
+                const double loopMs = s_glDiagLoopMs / n;
+                cout << "INFO: GLWindow frame avg over " << s_glDiagFrames << ": session->render()=" << (s_glDiagRenderMs / n)
+                     << "ms  outputPresent=" << (s_glDiagOutPresentMs / n)
+                     << "ms  total=" << ((s_glDiagRenderMs + s_glDiagOutPresentMs) / n) << "ms  frameInterval=" << loopMs << "ms ("
+                     << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)" << endl;
+                s_glDiagFrames = 0;
+                s_glDiagRenderMs = 0.0;
+                s_glDiagOutPresentMs = 0.0;
+                s_glDiagLoopMs = 0.0;
+            }
+        }
 
         m_eventProcessingTimer.start();
 

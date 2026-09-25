@@ -12,6 +12,8 @@ using namespace std;
 
 #include <QOpenGLContext>
 
+#include <atomic>
+
 namespace
 {
 
@@ -211,8 +213,34 @@ namespace TwkGLF
 
 } // namespace TwkGLF
 
+//
+//  Qt only knows about contexts it made current; FBOVideoDevice binds its own
+//  natively. glGetString() returns null only when no context at all is current.
+//
+bool twkGlAnyContextIsCurrent() { return QOpenGLContext::currentContext() != nullptr || glGetString(GL_VERSION) != nullptr; }
+
 bool twkGlPrintError(std::string_view file, std::string_view function, const int line, const std::string_view msg)
 {
+    //
+    //  With no context current, glGetError() is meaningless (Windows returns
+    //  GL_INVALID_OPERATION for every call). Report once per episode instead,
+    //  and reset when a context comes back.
+    //
+    static std::atomic<bool> noContextReported{false};
+
+    if (!twkGlAnyContextIsCurrent())
+    {
+        if (!noContextReported.exchange(true))
+        {
+            std::cerr << "GL_ERROR: " << shorterPath(file).data() << "::" << function.data() << ":" << line
+                      << " [no current GL context -- this GL call, and any until a context is made current, did nothing]" << std::endl;
+        }
+
+        return false;
+    }
+
+    noContextReported = false;
+
     if (GLuint err = glGetError())
     {
         std::cerr << "GL_ERROR: " << shorterPath(file).data() << "::" << function.data() << ":" << line << " [" << TwkGLF::errorString(err)

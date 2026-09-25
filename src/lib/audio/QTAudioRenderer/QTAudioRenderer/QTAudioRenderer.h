@@ -167,6 +167,22 @@ namespace IPCore
 
         void detachAudioOutputDevice();
 
+        //
+        //  True if a BlockingQueuedConnection call to this thread can return:
+        //  it is running an event loop and is not the calling thread.
+        //
+        bool canBlockOnAudioThread() const;
+
+        //
+        //  Bounded wait(); reports once if the bound is reached.
+        //
+        void waitForAudioThreadToFinish();
+
+        //
+        //  Delete the output objects and null them. Idempotent.
+        //
+        void deleteAudioOutputObjects();
+
     private:
         QMutex m_mutex;
 

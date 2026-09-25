@@ -240,6 +240,12 @@ namespace TwkGLF
         void check() const;
 
         //
+        //  Non-throwing completeness test, for FBOs built around foreign
+        //  attachments that can come out incomplete without any call failing.
+        //
+        bool isComplete() const;
+
+        //
         //  Copy uses glBlitFramebuffer to do the work. The entire image
         //  is copyed from the window of one to the other (so if aspect
         //  ratios differ the image will be stretched/squashed).

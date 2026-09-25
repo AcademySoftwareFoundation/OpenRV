@@ -238,6 +238,15 @@ namespace IPCore
         }
 #endif
 
+        //
+        //  A thread without a running event loop is not playing, and blocking
+        //  on it would never return.
+        //
+        if (!canBlockOnAudioThread())
+        {
+            return;
+        }
+
         QMetaObject::invokeMethod(m_audioOutput, "stopAudio", Qt::BlockingQueuedConnection);
     }
 
@@ -298,6 +307,14 @@ namespace IPCore
         }
 #endif
 
+        //
+        //  See emitStopAudio().
+        //
+        if (!canBlockOnAudioThread())
+        {
+            return;
+        }
+
         QMetaObject::invokeMethod(m_ioDevice, "stopDevice", Qt::BlockingQueuedConnection);
     }
 
@@ -330,7 +347,15 @@ namespace IPCore
         // so that the QTAudioOuput and QTAudioIODevice
         // is created within run()'s execution thread.
         if (!createAudioOutput())
+        {
+            //
+            //  No event loop will run here, so detachAudioOutputDevice() cannot
+            //  marshal the deletion onto this thread. Delete on the owner now.
+            //
+            deleteAudioOutputObjects();
+
             return;
+        }
 
         exec();
     }
@@ -382,20 +407,56 @@ namespace IPCore
             emitStopAudio();
         }
 
+        //
+        // Delete the output objects on the audio thread that owns them: on
+        // Windows, deleting them cross-thread trips QObject's cross-thread
+        // sendEvent() assertion (fatal in Qt6 debug builds).
+        //
+        if ((m_audioOutput || m_ioDevice) && canBlockOnAudioThread())
+        {
+            QObject* owner = m_audioOutput ? static_cast<QObject*>(m_audioOutput) : static_cast<QObject*>(m_ioDevice);
+
+            QMetaObject::invokeMethod(owner, [this]() { deleteAudioOutputObjects(); }, Qt::BlockingQueuedConnection);
+        }
+
         quit();
-        wait();
+        waitForAudioThreadToFinish();
 
-        if (m_audioOutput)
-        {
-            delete m_audioOutput;
-            m_audioOutput = 0;
-        }
+        //
+        //  Last resort for anything the marshalled delete could not reach.
+        //
+        deleteAudioOutputObjects();
+    }
 
-        if (m_ioDevice)
+    bool QTAudioThread::canBlockOnAudioThread() const
+    {
+        return isRunning() && eventDispatcher() != nullptr && QThread::currentThread() != this;
+    }
+
+    void QTAudioThread::waitForAudioThreadToFinish()
+    {
+        constexpr unsigned long audioThreadExitTimeoutMS = 5000;
+
+        if (!wait(audioThreadExitTimeoutMS))
         {
-            delete m_ioDevice;
-            m_ioDevice = 0;
+            static bool reported = false;
+
+            if (!reported)
+            {
+                reported = true;
+                std::cerr << "WARNING: audio thread did not exit within " << audioThreadExitTimeoutMS
+                          << " ms; continuing shutdown without it" << std::endl;
+            }
         }
+    }
+
+    void QTAudioThread::deleteAudioOutputObjects()
+    {
+        delete m_audioOutput;
+        m_audioOutput = nullptr;
+
+        delete m_ioDevice;
+        m_ioDevice = nullptr;
     }
 
     //

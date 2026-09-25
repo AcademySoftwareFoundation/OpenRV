@@ -867,11 +867,17 @@ namespace Rv
 
         if (videoModules().empty())
         {
-            doc->view()->makeCurrent();
+            // view() is null on a non-OpenGL backend.
+            if (doc->view())
+            {
+                doc->view()->makeCurrent();
+            }
 
             try
             {
-                addVideoModule(m_desktopModule = new DesktopVideoModule(0, doc->view()->videoDevice()));
+                // DesktopVideoDevice only needs the share device at open().
+                QTGLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
+                addVideoModule(m_desktopModule = new DesktopVideoModule(0, shareDevice));
             }
             catch (...)
             {
@@ -897,7 +903,7 @@ namespace Rv
         //  we're on (video device) so make sure the primary display group is
         //  correct.
         //
-        doc->session()->graph().setPrimaryDisplayGroup(doc->view()->videoDevice());
+        doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
 
         if (RvApp()->documents().size() == 1 && opts.present)
         {
@@ -948,7 +954,10 @@ namespace Rv
         if (!m->isOpen())
         {
             RvDocument* doc = reinterpret_cast<RvDocument*>(documents().front()->opaquePointer());
-            doc->view()->makeCurrent();
+            if (doc->view())
+            {
+                doc->view()->makeCurrent();
+            }
             m->open();
             //
             //  The open() may have added video devices, so make sure each
@@ -1693,7 +1702,10 @@ namespace Rv
 #endif
 
                 string optionArgs = setVideoDeviceStateFromSettings(d);
-                rvDoc->view()->videoDevice()->makeCurrent();
+                if (rvDoc->view())
+                {
+                    rvDoc->view()->videoDevice()->makeCurrent();
+                }
 
                 try
                 {
@@ -1781,16 +1793,32 @@ namespace Rv
         else
         {
             const VideoDevice* d = session->outputVideoDevice();
+            const bool separateOutput = d && d != session->controlVideoDevice();
 
-            if (d != session->controlVideoDevice())
+            //
+            //  Unbind before closing: close() destroys the GL context owning the
+            //  FBOs the renderer cloned for this device, and unbind() must
+            //  release them while it is still alive.
+            //
+            session->setOutputVideoDevice(session->controlVideoDevice());
+
+            if (separateOutput)
             {
                 const_cast<VideoDevice*>(d)->close();
 #ifdef PLATFORM_DARWIN
                 // rvDoc->setDoubleBuffer(true);
 #endif
-            }
 
-            session->setOutputVideoDevice(session->controlVideoDevice());
+                //
+                //  close() leaves no context current, and DesktopVideoDevice
+                //  cannot restore one when the main view is Vulkan (its share
+                //  device is null). Make the main view's context current.
+                //
+                if (const TwkGLF::GLVideoDevice* mainView = dynamic_cast<const TwkGLF::GLVideoDevice*>(session->controlVideoDevice()))
+                {
+                    mainView->makeCurrent();
+                }
+            }
 
 #if 0
         if (opts.vsync && !rvDoc->vsyncDisabled())
@@ -1926,6 +1954,85 @@ namespace Rv
         d->setFrameLatency(fl);
         d->setSwapStereoEyes(swapStereoEyes);
         return options.toUtf8().constData();
+    }
+
+    void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
+    {
+        if (!m_desktopModule)
+        {
+            return;
+        }
+
+        // The selected screen is restored by name (Options::presentDevice)
+        // since the rebuild may destroy the device it pointed to.
+        const bool wasPresenting = m_presentationMode;
+
+        TwkApp::Document* doc = TwkApp::Document::activeDocument();
+        Rv::Session* session = doc ? static_cast<Rv::Session*>(doc) : nullptr;
+
+        // Returns false when the backend is unchanged; the share device is
+        // still rebound below.
+        const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
+
+        const VideoModule::VideoDevices& devices = m_desktopModule->devices();
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+            {
+                dd->setShareDevice(shareDevice);
+            }
+        }
+
+        //
+        //  Re-point the graph's display groups at the new device objects, even
+        //  with presentation off, or a later setOutputVideoDevice() finds no
+        //  group. refreshPhysicalDevices() keeps each group's colour pipeline,
+        //  unlike setPhysicalDevices().
+        //
+        if (rebuilt && session)
+        {
+            session->graph().refreshPhysicalDevices(videoModules());
+            session->graph().setPrimaryDisplayGroup(session->controlVideoDevice());
+        }
+
+        // The callers reset the session output device, so re-open and re-bind it.
+        if (!wasPresenting || !session)
+        {
+            return;
+        }
+
+        Rv::Options& opts = Rv::Options::sharedOptions();
+        VideoDevice* d = findPresentationDevice(opts.presentDevice);
+        if (!d)
+        {
+            cerr << "ERROR: presentation device not found after rebuild." << endl;
+            session->setOutputVideoDevice(session->controlVideoDevice());
+            m_presentationMode = false;
+            return;
+        }
+
+        if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
+        {
+            dd->setShareDevice(shareDevice);
+        }
+
+        try
+        {
+            if (!d->isOpen())
+            {
+                string optionArgs = setVideoDeviceStateFromSettings(d);
+                StringVector vargs;
+                algorithm::split(vargs, optionArgs, is_any_of(string(" \t\n\r")), token_compress_on);
+                d->open(vargs);
+            }
+            session->setOutputVideoDevice(d);
+        }
+        catch (std::exception& exc)
+        {
+            cerr << "ERROR: failed to re-open presentation device after rebuild: " << exc.what() << endl;
+            session->setOutputVideoDevice(session->controlVideoDevice());
+            m_presentationMode = false;
+        }
     }
 
     bool RvApplication::isInPresentationMode() { return m_presentationMode; }

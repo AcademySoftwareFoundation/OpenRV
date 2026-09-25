@@ -19,7 +19,10 @@
 #include <TwkApp/Application.h>
 #include <TwkApp/VideoModule.h>
 
+#include <QOpenGLContext>
 #include <QScreen>
+
+#include <iostream>
 
 namespace Rv
 {
@@ -70,7 +73,11 @@ namespace Rv
         assert(view);
     }
 
-    QTGLVideoDevice::~QTGLVideoDevice() { delete m_translator; }
+    QTGLVideoDevice::~QTGLVideoDevice()
+    {
+        delete m_translator;
+        delete m_teardownSurface;
+    }
 
     void QTGLVideoDevice::setWidget(QOpenGLWidget* widget)
     {
@@ -104,20 +111,26 @@ namespace Rv
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        if (m_window)
+        // QOpenGLWindow creates its context lazily, and only if the platform surface exists.
+        if (m_window && m_window->handle())
         {
-            // QOpenGLWindow creates its GL context lazily on the first
-            // makeCurrent(), provided the platform window (surface) exists.
-            if (m_window->handle())
-            {
-                m_window->makeCurrent();
-                TWK_GLDEBUG;
+            m_window->makeCurrent();
+            TWK_GLDEBUG;
 
-                GLint surfaceFBO = m_window->defaultFramebufferObject();
-                if (surfaceFBO != 0)
-                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
-                TWK_GLDEBUG;
+            // Needs a live context to copy the format from.
+            if (!m_teardownSurface && m_window->context())
+            {
+                m_teardownSurface = new QOffscreenSurface();
+                m_teardownSurface->setFormat(m_window->context()->format());
+                m_teardownSurface->create();
             }
+
+            GLint surfaceFBO = m_window->defaultFramebufferObject();
+            if (surfaceFBO != 0)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
+            }
+            TWK_GLDEBUG;
         }
         else if (m_view && m_view->context() && m_view->context()->isValid())
         {
@@ -126,8 +139,31 @@ namespace Rv
 
             GLint widgetFBO = m_view->defaultFramebufferObject();
             if (widgetFBO != 0)
+            {
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
+            }
             TWK_GLDEBUG;
+        }
+        else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
+                 && m_window->context()->makeCurrent(m_teardownSurface))
+        {
+            // Surface gone, context alive: GL deletion only needs a current context.
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            // Callers assume a current context afterwards, so report the failure once.
+            static bool reported = false;
+            if (!reported)
+            {
+                reported = true;
+                cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
+                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface"))
+                     << " widget=" << (m_view ? "alive" : "null")
+                     << " currentContext=" << (QOpenGLContext::currentContext() ? "yes" : "none")
+                     << " ownContext=" << (m_window && m_window->context() ? "alive" : "null")
+                     << "); the caller's GL work has no current context" << endl;
+            }
         }
 
         if (!isWorkerDevice())
