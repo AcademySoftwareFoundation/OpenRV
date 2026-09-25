@@ -175,7 +175,9 @@ namespace IPCore
             };
 
             TextureDescription()
-                : uploaded(false)
+                : id(0)
+                , bufferId(0)
+                , uploaded(false)
                 , age(-1)
             {
             }
@@ -644,6 +646,7 @@ namespace IPCore
         //
 
         static void queryGL();
+        static void declareGLProperties(IPNode*);
         static void queryGLIntoContainer(IPNode*);
 
         static bool queryGLFinished() { return !m_queryInit; }

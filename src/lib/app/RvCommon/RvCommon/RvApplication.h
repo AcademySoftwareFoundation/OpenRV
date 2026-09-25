@@ -11,6 +11,7 @@
 #include <TwkMediaLibrary/Library.h>
 #include <PyMediaLibrary/PyMediaLibrary.h>
 #include <QtCore/QTimer>
+#include <QtCore/QPointer>
 #include <IPCore/Application.h>
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
@@ -148,7 +149,7 @@ namespace Rv
         QTimer* m_newTimer;
         QTimer* m_lazyBuildTimer;
         Timer m_fireTimer;
-        RvPreferences* m_prefDialog;
+        QPointer<RvPreferences> m_prefDialog;
         RvProfileManager* m_profileDialog;
         QMenuBar* m_macMenuBar;
         QMenu* m_macRVMenu;
