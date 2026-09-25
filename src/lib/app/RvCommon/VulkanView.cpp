@@ -34,35 +34,16 @@ namespace Rv
         , m_watchedParentWindow(nullptr)
         , m_reattachPending(false)
     {
-        //
-        //  Native Vulkan viewport window (renders + presents on its own
-        //  surface).
-        //
         m_vulkanWindow = new VulkanWindow(doc, noResize);
-
-        //
-        //  Embed the native window in the widget tree.
-        //
         m_container = QWidget::createWindowContainer(m_vulkanWindow, this);
 
-        //
-        //  A doc-less view is a passive presentation output owned by a
-        //  VulkanDesktopVideoDevice: it is composited into and presented by
-        //  that device and must never take part in input handling. Giving it
-        //  focus is actively harmful -- a second top-level that accepts focus
-        //  fights the main window for activation, and the resulting
-        //  WindowActivate storm starves the event loop (observed as annotation
-        //  strokes never receiving their drag events).
-        //
+        //  A doc-less view is a passive presentation output (see VulkanWindow.h).
         const bool passiveOutput = (m_doc == nullptr);
 
         m_container->setFocusPolicy(passiveOutput ? Qt::NoFocus : Qt::StrongFocus);
 
-        //
-        //  Create the platform surface up-front: Qt can only hand out a
-        //  VkSurfaceKHR for a window that has one, and RV queries the
-        //  presentation device during startup before the window is shown.
-        //
+        //  RV queries the presentation device before the window is shown, and
+        //  Qt only hands out a VkSurfaceKHR once the platform surface exists.
         m_vulkanWindow->create();
 
         QVBoxLayout* layout = new QVBoxLayout(this);
@@ -70,18 +51,9 @@ namespace Rv
         layout->setSpacing(0);
         layout->addWidget(m_container);
 
-        //
-        //  Last-resort guard: if the viewport window is destroyed anyway (i.e.
-        //  detaching it in parentWindowDestroyed() did not get there first),
-        //  make sure nothing here is left holding it.
-        //
+        //  Last-resort guard in case parentWindowDestroyed() did not detach it.
         connect(m_vulkanWindow, &QObject::destroyed, this, [this]() { m_vulkanWindow = nullptr; });
 
-        //
-        //  The device drives the Vulkan surface (the window) for presentation,
-        //  and uses the container QWidget for event / coordinate translation
-        //  (height-based y-flip, mapToGlobal, mouse grab).
-        //
         ostringstream str;
         if (m_doc)
         {
@@ -89,20 +61,11 @@ namespace Rv
         }
         else
         {
-            //
-            //  A doc-less view is a presentation output owned by a
-            //  VulkanDesktopVideoDevice. There can be one per screen and they
-            //  all carry a null doc, so keying the name on the doc would give
-            //  every one of them the same name; key it on the view instead.
-            //
+            //  One output per screen, all doc-less: key the name on the view.
             str << UI_APPLICATION_NAME " Presentation (Vulkan)" << "/" << static_cast<const void*>(this);
         }
-        //
-        //  No event widget for a passive output: QTVulkanVideoDevice only
-        //  builds a QTTranslator when given one, and VulkanWindow::event()
-        //  bails at !hasTranslator(), so this makes the whole window inert for
-        //  input instead of relying on each handler to notice it has no doc.
-        //
+        //  No event widget, so no QTTranslator: VulkanWindow::event() then
+        //  ignores all input for a passive output.
         m_videoDevice = new QTVulkanVideoDevice(nullptr, str.str(), m_vulkanWindow, passiveOutput ? nullptr : m_container);
         m_vulkanWindow->setVideoDevice(m_videoDevice);
         m_vulkanWindow->setEventWidget(passiveOutput ? nullptr : m_container);
@@ -118,47 +81,19 @@ namespace Rv
             setFocusPolicy(Qt::NoFocus);
         }
 
-        //
-        //  Realize the top-level's window now, and watch for Qt replacing it.
-        //
-        //  Unlike GLView this does not call createWinId() on the top level:
-        //  that exists there to pin the window's composition to OpenGL before
-        //  any render-to-texture widget joins the tree, and there is no such
-        //  API to pin here -- the viewport presents through Vulkan on its own
-        //  surface and composites with nothing.
-        //
         watchParentWindow();
     }
 
     VulkanView::~VulkanView()
     {
         //
-        //  Two things have to be undone before the device goes away, both of
-        //  them consequences of the viewport window outliving the widget tree
-        //  in the detached state (see parentWindowDestroyed()).
+        //  A detached viewport window (see parentWindowDestroyed()) outlives the
+        //  widget tree and holds a raw pointer to the device, and a detached
+        //  container is not deleted with this widget. Undo both here.
         //
-        //  The window holds a raw back-pointer to the device and would keep
-        //  using it -- VulkanWindow::event() and render() both dereference it
-        //  -- so clear that first. And while detached the container has no
-        //  parent widget, so it would not be destroyed along with this widget:
-        //  it would survive as a stray top-level owning the viewport window,
-        //  still pointing at a deleted device.
-        //
-        //  Everything below also has to happen before ~QWidget runs.
-        //
-        //  ~QWidget destroys the widget's own QWidgetWindow and its child
-        //  widgets, and both of those emit destroyed() -- at a point where the
-        //  VulkanView sub-object is already gone. Delivering either signal
-        //  there invokes a slot on an object that no longer dynamic_casts to
-        //  VulkanView, which is a hard Q_ASSERT_X in Qt
-        //  (qobjectdefs_impl.h assertObjectType) for the parentWindowDestroyed
-        //  member slot, and a write through a dangling `this` for the lambda
-        //  below.
-        //
-        //  A presentation output view is what makes this reachable: it is
-        //  top-level, so the window it watches is its own (see
-        //  watchParentWindow) and dies with it. The main view watches the
-        //  enclosing document window, which outlives it.
+        //  This must run before ~QWidget, which emits destroyed() from children
+        //  after the VulkanView sub-object is gone; delivering it to our slots
+        //  would trip Qt's assertObjectType or write through a dangling `this`.
         //
         if (m_watchedParentConnection)
         {
@@ -188,12 +123,8 @@ namespace Rv
     {
         QWidget::showEvent(event);
 
-        //
-        //  The container parents the viewport window to the top-level window
-        //  while being shown, so the parent to watch only becomes known here --
-        //  and one turn of the event loop later, since the container's own show
-        //  is nested inside this one.
-        //
+        //  The parent is only known once the container is shown, which is
+        //  nested inside this show, so also check one event-loop turn later.
         watchParentWindow();
         QTimer::singleShot(0, this, &VulkanView::watchParentWindow);
     }
@@ -201,54 +132,48 @@ namespace Rv
     void VulkanView::watchParentWindow()
     {
         //
-        //  Watch the top-level widget's window rather than the viewport
-        //  window's current parent: it is the object Qt destroys, and it is
-        //  knowable before the container gets around to re-parenting the
-        //  viewport into it.
-        //
-        //  Nothing to watch when this view is its own top level, as a
-        //  presentation output view is. The point of this is to survive Qt
-        //  replacing the *enclosing* window (see parentWindowDestroyed); a
-        //  standalone output window has no such enclosing tree, and watching
-        //  itself only creates a connection that fires while the view is being
-        //  destroyed.
+        //  Watch the top-level widget's window: it is what Qt destroys, and it
+        //  is known before the container re-parents the viewport into it. A
+        //  top-level view (a presentation output) has no enclosing window.
         //
         QWidget* topLevel = window();
         if (topLevel == this)
+        {
             return;
+        }
 
         QWindow* topLevelWindow = topLevel ? topLevel->windowHandle() : nullptr;
 
         if (topLevelWindow == m_watchedParentWindow)
+        {
             return;
+        }
 
         if (m_watchedParentConnection)
+        {
             disconnect(m_watchedParentConnection);
+        }
 
         m_watchedParentWindow = topLevelWindow;
 
         if (topLevelWindow)
+        {
             m_watchedParentConnection = connect(topLevelWindow, &QObject::destroyed, this, &VulkanView::parentWindowDestroyed);
+        }
     }
 
     void VulkanView::parentWindowDestroyed()
     {
         //
-        //  Emitted at the top of the window's ~QObject, before it deletes its
-        //  children, so detaching here is what saves the viewport from being
-        //  deleted along with it. The window becomes parentless for the moment;
-        //  it is hidden so it cannot flash on screen as a stray top-level, and
-        //  re-attached once the top-level has its new window.
+        //  Emitted before the window deletes its children, so detaching here
+        //  saves the viewport. It is hidden while parentless and re-attached
+        //  once the top-level has its new window.
         //
         QWindow* destroyedWindow = m_watchedParentWindow;
         m_watchedParentWindow = nullptr;
 
-        //
-        //  Only the viewport's actual parent matters. Before the container has
-        //  re-parented it, the viewport still belongs to QWindowContainer's
-        //  internal placeholder parent, and pulling it off that would break the
-        //  container's own bookkeeping.
-        //
+        //  Leave it alone while it still belongs to QWindowContainer's
+        //  placeholder parent.
         if (m_vulkanWindow && m_vulkanWindow->parent() == destroyedWindow)
         {
             m_vulkanWindow->hide();
@@ -256,24 +181,25 @@ namespace Rv
         }
 
         //
-        //  Take the container out of the widget tree for the duration as well.
-        //  Qt reaches window containers through QWindowContainer::parentWasMoved()
-        //  on every layout pass and dereferences the top-level's windowHandle()
-        //  without checking it -- and that is null from here until Qt recreates
-        //  the window. A layout pass runs before then, inside this same
-        //  reparent, so a container left in the tree faults there.
+        //  QWindowContainer::parentWasMoved() dereferences the top-level's
+        //  windowHandle() unchecked, and it is null until Qt recreates it, so
+        //  the container must leave the tree too.
         //
         if (m_container)
         {
             if (layout())
+            {
                 layout()->removeWidget(m_container);
+            }
 
             m_container->hide();
             m_container->setParent(nullptr);
         }
 
         if (m_reattachPending)
+        {
             return;
+        }
 
         m_reattachPending = true;
         QTimer::singleShot(0, this, &VulkanView::reattachVulkanWindow);
@@ -284,69 +210,68 @@ namespace Rv
         m_reattachPending = false;
 
         if (!m_vulkanWindow)
+        {
             return;
+        }
 
         QWidget* topLevel = window();
         QWindow* topLevelWindow = topLevel ? topLevel->windowHandle() : nullptr;
 
         if (!topLevelWindow)
         {
-            //
-            //  Qt recreates the top-level's window lazily (on the next show), so
-            //  keep waiting rather than forcing it here.
-            //
+            //  Qt recreates the top-level's window lazily; keep waiting.
             m_reattachPending = true;
             QTimer::singleShot(0, this, &VulkanView::reattachVulkanWindow);
             return;
         }
 
-        //
-        //  Put the container back first: re-parenting it makes QWindowContainer
-        //  re-adopt the viewport window into the new top-level window itself.
-        //
+        //  Re-parenting the container makes it re-adopt the viewport window.
         if (m_container)
         {
             m_container->setParent(this);
 
             if (layout())
+            {
                 layout()->addWidget(m_container);
+            }
 
             m_container->show();
             setFocusProxy(m_container);
         }
 
         if (m_vulkanWindow->parent() != topLevelWindow)
+        {
             m_vulkanWindow->setParent(topLevelWindow);
+        }
 
         m_vulkanWindow->show();
 
         watchParentWindow();
 
-        //
-        //  The container drives the viewport's geometry from its own, so nudge a
-        //  layout pass to put the re-attached window back in place.
-        //
         if (m_container)
         {
             m_container->updateGeometry();
 
             if (layout())
+            {
                 layout()->activate();
+            }
         }
 
-        //
-        //  Re-parenting gives the viewport a new platform window, which
-        //  invalidates the VkSurfaceKHR. VulkanWindow notices on its next
-        //  expose and rebuilds; asking for a redraw is what gets it there.
-        //
+        //  The new platform window invalidates the VkSurfaceKHR; the redraw
+        //  makes VulkanWindow rebuild it.
         if (m_doc && m_doc->session())
+        {
             m_doc->session()->askForRedraw();
+        }
     }
 
     void VulkanView::stopProcessingEvents()
     {
         if (m_vulkanWindow)
+        {
             m_vulkanWindow->stopProcessingEvents();
+        }
     }
 
     bool VulkanView::firstPaintCompleted() const { return m_vulkanWindow && m_vulkanWindow->firstPaintCompleted(); }

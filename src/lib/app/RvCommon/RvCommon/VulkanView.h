@@ -23,13 +23,8 @@ namespace Rv
     //
     //  Host QWidget that embeds the native Vulkan viewport (VulkanWindow) via
     //  QWidget::createWindowContainer(), and owns the QTVulkanVideoDevice that
-    //  drives it.
-    //
-    //  This is deliberately the same shape as GLView/GLWindow. Keeping the
-    //  viewport on a native window of its own -- rather than on a widget that
-    //  Qt composites into the top-level window -- is what keeps the main window
-    //  off a render-to-texture composite path, and it means the two backends
-    //  share one set of embedding and lifetime rules instead of two.
+    //  drives it. Mirrors GLView/GLWindow; the native window keeps the main
+    //  window off Qt's render-to-texture composite path.
     //
     class VulkanView : public QWidget
     {
@@ -43,9 +38,6 @@ namespace Rv
 
         QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
 
-        //
-        //  Delegated to the viewport window.
-        //
         void stopProcessingEvents();
 
         bool firstPaintCompleted() const;
@@ -64,32 +56,16 @@ namespace Rv
 
         QSize minimumSizeHint() const override { return m_msize; }
 
-        //
-        //  Probe for whether this machine's Vulkan can present a 10-bit format.
-        //  Forwards to VulkanWindow; see the note there.
-        //
+        //  See VulkanWindow::supports10BitPresentation().
         static bool supports10BitPresentation();
 
     private:
         //
-        //  Keeping the viewport window alive across top-level window churn.
-        //
-        //  createWindowContainer() transfers ownership of the viewport window to
-        //  the container, which parents it to the top-level QWidgetWindow. Qt
-        //  destroys and recreates that QWidgetWindow when a widget is reparented
-        //  into the window -- QWidget::setParent() -> destroy() -> ~QWidgetWindow
-        //  -- as happens when a plugin adds a QWebEngineView to a layout, and
-        //  ~QObject deletes its child QWindows, viewport included. Nothing in Qt
-        //  puts it back, and QWindowContainer then dereferences the window it no
-        //  longer has on the next layout pass.
-        //
-        //  QObject::destroyed is emitted at the top of ~QObject, before
-        //  deleteChildren() runs, so watching the parent window gives us a
-        //  moment where the viewport can still be detached and kept.
-        //
-        //  This mirrors GLView. The one Vulkan-specific consequence is that the
-        //  VkSurfaceKHR does not survive the platform window being recreated;
-        //  VulkanWindow detects that on the next expose and rebuilds.
+        //  Keep the viewport window alive across top-level window churn. Qt
+        //  recreates the top-level QWidgetWindow when a widget is reparented
+        //  into it (e.g. a plugin adding a QWebEngineView), deleting the child
+        //  viewport. destroyed() fires before children are deleted, so the
+        //  viewport is detached there and re-attached later (as in GLView).
         //
         void watchParentWindow();
         void parentWindowDestroyed();
@@ -106,11 +82,7 @@ namespace Rv
         QSize m_csize;
         QSize m_msize;
 
-        //
-        //  The parent QWindow whose destruction is being watched, plus the
-        //  connection to it so it can be rewired when the viewport window is
-        //  re-parented. See watchParentWindow().
-        //
+        //  See watchParentWindow().
         QWindow* m_watchedParentWindow;
         QMetaObject::Connection m_watchedParentConnection;
         bool m_reattachPending;

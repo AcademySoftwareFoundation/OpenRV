@@ -1146,14 +1146,7 @@ namespace IPCore
     void Session::clearVideoDeviceCaches()
     {
         //
-        //  Everything below destroys GL objects -- each device's cached FBO
-        //  clones, then the renderer's entire ImageFBO pool via clearState() ->
-        //  flushImageFBOs(). Nothing guarantees a context on entry: this runs
-        //  from a RenderContextChangeEvent and from shutdown, not only from
-        //  inside a render where one happens to be bound.
-        //
-        //  We know our control device, so hand it over rather than making the
-        //  scope fall back to its own context.
+        //  Runs from RenderContextChangeEvent and shutdown, outside a render.
         //
         const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(m_controlVideoDevice));
 
@@ -1170,11 +1163,7 @@ namespace IPCore
         if (d == m_outputVideoDevice || d == m_controlVideoDevice)
         {
             //
-            //  This arrives from the view's resize, not from a render, so
-            //  there is no context current -- and leaving presentation mode
-            //  resizes the main view, which is how a whole FBO pool came to be
-            //  deleted into nothing at exit. The device that changed size is
-            //  right here, so use its context.
+            //  Arrives from a resize, outside a render.
             //
             const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(d));
 

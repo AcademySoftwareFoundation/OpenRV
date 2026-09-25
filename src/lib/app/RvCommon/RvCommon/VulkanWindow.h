@@ -30,19 +30,13 @@ namespace Rv
     //
     //  VulkanWindow
     //
-    //  The RV viewport rendered as a *native* Vulkan surface, presenting 10-bit
-    //  images on Linux and Windows. All IPCore image processing runs in OpenGL
-    //  via a separate QOpenGLContext+QOffscreenSurface (see
-    //  QTVulkanVideoDevice); the Vulkan path is used only for final 10-bit
-    //  pixel delivery, to avoid the 8-bit truncation the OpenGL+Qt path is
-    //  subject to on both platforms.
+    //  The RV viewport as a native Vulkan surface, presenting 10-bit images on
+    //  Linux and Windows. IPCore still renders in OpenGL (see
+    //  QTVulkanVideoDevice); Vulkan only delivers the final pixels.
     //
-    //  It is a QWindow rather than a native-attribute QWidget, and it is
-    //  embedded in the widget hierarchy by VulkanView via
-    //  QWidget::createWindowContainer() -- the same shape GLWindow/GLView use.
-    //  Keeping every viewport backend on that one pattern is what keeps the
-    //  top-level QMainWindow off a render-to-texture composite path, which is
-    //  where the ~90 ms full-window present came from.
+    //  Embedded by VulkanView via QWidget::createWindowContainer(), like
+    //  GLWindow/GLView, which keeps the QMainWindow off Qt's render-to-texture
+    //  composite path.
     //
     class VulkanWindow : public QWindow
     {
@@ -56,13 +50,10 @@ namespace Rv
 
         QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
 
-        //  The device is created and owned by the hosting VulkanView (it needs
-        //  the container QWidget for event/coordinate translation), then handed
-        //  here. VulkanWindow does not take ownership.
+        //  Owned by the hosting VulkanView, not by this window.
         void setVideoDevice(QTVulkanVideoDevice* d) { m_videoDevice = d; }
 
-        //  The container QWidget the viewport is embedded in; used for focus
-        //  and for the popup-focus check in render().
+        //  The container QWidget; used for focus and the popup check in render().
         void setEventWidget(QWidget* widget) { m_eventWidget = widget; }
 
         void stopProcessingEvents();
@@ -75,16 +66,11 @@ namespace Rv
 
         float devicePixelRatioF() const;
 
-        // Format of the active swapchain image: VK_FORMAT_A2B10G10R10_UNORM_PACK32
-        // or VK_FORMAT_A2R10G10B10_UNORM_PACK32 (the two differ in R/B order).
-        // VK_FORMAT_UNDEFINED before the swapchain is created.
+        // A2B10G10R10 or A2R10G10B10 (R/B order differs); UNDEFINED before
+        // the swapchain exists.
         VkFormat swapchainFormat() const { return m_vkSwapchainFormat; }
 
-        //
-        //  Presentation path taken this session. RV prefers ZeroCopy, degrades
-        //  to CpuReadback (slower, still 10-bit), and only then to OpenGL
-        //  (which forgoes 10-bit). See emitPresentationRecord().
-        //
+        //  Presentation path taken, in order of preference.
         enum class PresentPath
         {
             Undetermined,
@@ -93,12 +79,10 @@ namespace Rv
             OpenGL       // Vulkan abandoned; RvDocument swaps in GLView
         };
 
-        //  Resolved GL<->Vulkan interop configuration. Negotiated once per
-        //  device from what the driver reports exportable, never from GPU
-        //  vendor identity or host platform. Both the Vulkan export and the GL
-        //  import read their settings from this one struct so the two sides
-        //  cannot disagree -- a disagreement about tiling or dedicated
-        //  allocation corrupts the image rather than raising an error.
+        //  GL<->Vulkan interop configuration, negotiated once per device from
+        //  what the driver reports exportable. Both the Vulkan export and the
+        //  GL import read it: a tiling or dedicated-allocation mismatch
+        //  silently corrupts the image.
         struct InteropConfig
         {
             bool supported{false};
@@ -106,19 +90,12 @@ namespace Rv
             VkImageTiling tiling{VK_IMAGE_TILING_LINEAR};
             VkImageUsageFlags usage{0};
 
-            // Probe-time floor for dedicated allocation: true when the handle
-            // type reports DEDICATED_ONLY, which is a hard requirement. The
-            // softer "prefers dedicated" signal belongs to a concrete image
-            // rather than to the format, so it is read per-image from
-            // VkMemoryDedicatedRequirements at allocation time and recorded in
-            // SharedImageInfo::dedicatedAllocation, which is what the GL side
-            // mirrors.
+            // True when the handle type reports DEDICATED_ONLY. The per-image
+            // "prefers dedicated" result lives in
+            // SharedImageInfo::dedicatedAllocation.
             bool dedicatedAllocation{false};
 
-            // Raw VkExternalMemoryFeatureFlags the winning candidate reported,
-            // so a log read by someone without the machine can tell whether
-            // dedicated allocation was required by the handle type or merely
-            // preferred by the image.
+            // Raw flags of the winning candidate, for the startup record.
             VkExternalMemoryFeatureFlags externalFeatures{0};
 
             // Set when an RV_VULKAN_FORCE_* override displaced what the probe
@@ -136,28 +113,17 @@ namespace Rv
 
         const InteropConfig& interopConfig() const { return m_interopConfig; }
 
-        // Record the path actually taken, and the GL side's view of the shared
-        // image, then emit the one-per-session startup record. Called by
-        // QTVulkanVideoDevice once the first frame establishes which path ran.
+        // Called by QTVulkanVideoDevice once the first frame establishes the
+        // path; emits the startup record.
         void reportPresentPath(PresentPath path, const std::string& reason);
         void reportGLImportState(VkImageTiling tiling, bool dedicated);
 
-        // True when uuid identifies the physical device backing this window.
-        // Used by the GL bridge to refuse external-memory interop across GPUs.
+        // Lets the GL bridge refuse external-memory interop across GPUs.
         bool physicalDeviceMatchesUUID(const unsigned char* uuid, size_t size) const;
 
-        //
-        //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
-        //
-
-        //  GPU Interop API
-        //
-        //  External handles to a Vulkan device-memory block (and its
-        //  GL<->Vulkan sync semaphores) that GL imports as a memory
-        //  object + semaphores. On Linux these are opaque file
-        //  descriptors; on Windows they are Win32 HANDLEs. Stored as
-        //  void* in the header to keep <windows.h> out of public Qt
-        //  includes; the .cpp casts to HANDLE.
+        //  External handles GL imports as a memory object and semaphores:
+        //  opaque FDs on Linux, Win32 HANDLEs on Windows (void* to keep
+        //  <windows.h> out of this header).
         struct SharedImageInfo
         {
 #ifdef PLATFORM_WINDOWS
@@ -174,43 +140,26 @@ namespace Rv
             int height{0};         // used sub-region height presented this frame
             int strideWidth{0};    // GL texture width = capacity rowPitch / 4
             int capacityHeight{0}; // allocated image height (>= height); GL texture height
-            // The negotiated tiling this image was actually created with. GL
-            // must import with the matching GL_{OPTIMAL,LINEAR}_TILING_EXT:
-            // importing OPTIMAL-tiled memory as LINEAR yields an image whose
-            // large-scale structure survives but whose pixels are scrambled
-            // within each tile.
+            // GL must import with the matching GL_{OPTIMAL,LINEAR}_TILING_EXT.
             VkImageTiling tiling{VK_IMAGE_TILING_LINEAR};
 
-            // Whether the export used a dedicated allocation
-            // (VkMemoryDedicatedAllocateInfo), which the driver may require for
-            // an image created with an external handle type. EXT_memory_object
-            // requires the two sides to agree, so GL must set
-            // GL_DEDICATED_MEMORY_OBJECT_EXT to exactly this before
-            // glTexStorageMem2DEXT; a mismatch corrupts the image.
+            // GL must set GL_DEDICATED_MEMORY_OBJECT_EXT to exactly this.
             bool dedicatedAllocation{false};
         };
 
-        // Capacity of the present-resource ring. Per-frame Vulkan sync objects
-        // and GL<->Vulkan shared resources are indexed by currentFrame().
-        // Runtime depth defaults to one for interactive latency;
-        // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 enables both slots.
-        static constexpr uint32_t FRAMES_IN_FLIGHT = 2;
+        // Ring capacity. Runtime depth defaults to 1 for latency;
+        // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 uses both slots.
+        static constexpr uint32_t kFramesInFlight = 2;
 
-        // Index of the in-flight ring slot the next/current frame uses. The GL
-        // side (QTVulkanVideoDevice) reads this to pair its own ring objects with
-        // the Vulkan slot for the frame being rendered.
+        // Ring slot for the current frame; the GL side pairs its objects to it.
         uint32_t currentFrame() const { return m_currentFrame; }
 
-        // A doc-less window is a passive presentation output: it is composited
-        // into and presented by its owning VulkanDesktopVideoDevice and never
-        // drives the frame loop. It must therefore never block that loop either
-        // -- see the best-effort present in presentSharedImage().
+        // A doc-less window is a passive presentation output, presented by its
+        // VulkanDesktopVideoDevice. It never drives or blocks the frame loop.
         bool isPassiveOutput() const { return m_doc == nullptr; }
 
-        //  Best-effort gate for a passive presentation output, called by
-        //  QTVulkanVideoDevice::syncBuffers() *before* it does any GL work.
-        //  False means skip this frame entirely; a retry is armed internally so
-        //  the frame is not lost. Always true for the control viewport.
+        //  Checked before any GL work. False means skip the frame (a retry is
+        //  armed). Always true for the control viewport.
         bool canPresentNow();
 
         const SharedImageInfo* getSharedImageInfo(int w, int h);
@@ -221,24 +170,14 @@ namespace Rv
 
         bool isInitialized() const { return m_initialized; }
 
-        //
-        //  Probe for whether this machine's Vulkan can present a 10-bit format
-        //  (A2B10G10R10 or A2R10G10B10). Used at RvDocument construction time to
-        //  decide whether a 10-bit display request should route to the Vulkan
-        //  path or fall back to OpenGL. Creates a throwaway QVulkanInstance +
-        //  dummy surface and queries the advertised surface formats; it never
-        //  throws — returns false if Vulkan is unavailable for any reason.
-        //
+        //  Whether Vulkan can present a 10-bit format here. Never throws.
         static bool supports10BitPresentation();
 
     public slots:
         void eventProcessingTimeout();
 
     protected:
-        //  Called once when the surface is first exposed.
         void initialize();
-
-        //  Called each time a new frame should be rendered.
         void render();
 
         void exposeEvent(QExposeEvent* event) override;
@@ -251,16 +190,10 @@ namespace Rv
         bool createSwapchain();
         void cleanupSwapchain();
 
-        // Probe the driver for an exportable shared-image configuration and
-        // resolve m_interopConfig. Runs exactly once per device, at device
-        // creation -- not per shared-image slot and not again on resize.
+        // Resolves m_interopConfig once per device (not per slot or resize).
         void negotiateInteropConfig();
 
-        // Emit the one-per-session startup record describing the negotiated
-        // configuration and the path taken. Unconditional: it must not be
-        // gated on ImageRenderer::debugGpu(), because Windows/NVIDIA is
-        // verified by QA against a build, and a log that needs a debug flag
-        // set in advance costs a whole verification round.
+        // Once per session. Unconditional: needed in logs without -debug gpu.
         void emitPresentationRecord();
 
         RvDocument* m_doc;
@@ -268,9 +201,8 @@ namespace Rv
 
         bool m_initialized;
 
-        // The QPlatformWindow the current VkSurfaceKHR was created against.
-        // Compared in exposeEvent() to detect that Qt replaced the platform
-        // window under us; see handleSurfaceLost().
+        // Platform window the VkSurfaceKHR was created against; see
+        // handleSurfaceLost().
         const QPlatformWindow* m_initializedHandle{nullptr};
 
         bool m_firstPaintCompleted;
@@ -284,27 +216,19 @@ namespace Rv
         QEvent::Type m_lastKeyType;
         Timer m_activityTimer;
         Timer m_activationTimer;
-        //  Time since a passive output last actually presented; drives the
-        //  forward-progress guard in canPresentNow().
+        //  Forward-progress guard for canPresentNow().
         Timer m_lastPresentTimer;
         QTimer m_eventProcessingTimer;
 
-        // Vulkan state
         VkInstance m_vkInstance{VK_NULL_HANDLE};
         VkSurfaceKHR m_vkSurface{VK_NULL_HANDLE};
         VkPhysicalDevice m_vkPhysicalDevice{VK_NULL_HANDLE};
         VkDevice m_vkDevice{VK_NULL_HANDLE};
         VkQueue m_vkQueue{VK_NULL_HANDLE};
         uint32_t m_queueFamilyIndex{0};
-        //  Last (format, colorSpace) pair reported by createSwapchain().
-        //  createSwapchain() runs on every resize step, so the choice is logged
-        //  only when it actually changes. Default-initialized to
-        //  VK_FORMAT_UNDEFINED, which no accepted format equals, so the first
-        //  swapchain always reports.
+        //  Logged only on change: createSwapchain() runs on every resize.
         VkSurfaceFormatKHR m_loggedSurfaceFormat{};
 
-        //  Whether the surface's full format list has been dumped for this
-        //  window yet. Once per window, not once per swapchain recreate.
         bool m_loggedSurfaceFormatList{false};
 
         bool m_externalInteropSupported{false};
@@ -317,55 +241,38 @@ namespace Rv
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
 
         // Per-in-flight-slot ring (indexed by m_currentFrame).
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkImageAvailableSemaphore{};
-        std::array<VkFence, FRAMES_IN_FLIGHT> m_vkFence{};
+        std::array<VkSemaphore, kFramesInFlight> m_vkImageAvailableSemaphore{};
+        std::array<VkFence, kFramesInFlight> m_vkFence{};
         uint32_t m_currentFrame{0};
 
-        // Per-swapchain-image (indexed by imageIndex, sized to the swapchain
-        // image count, (re)built in createSwapchain / freed in cleanupSwapchain).
-        // The present-wait semaphore MUST be tied to the image, not the frame:
-        // with 2 frames in flight the same image can be re-acquired while its
-        // prior present is still pending, and reusing a per-frame semaphore there
-        // trips the present-semaphore-reuse validation error. m_imagesInFlight
-        // records which frame fence currently owns each image so a re-acquired
-        // in-flight image is waited on before reuse.
+        // Per swapchain image. The present-wait semaphore must be per image,
+        // not per frame: an image can be re-acquired while its present is still
+        // pending. m_imagesInFlight holds the frame fence owning each image.
         std::vector<VkSemaphore> m_vkRenderFinished;
         std::vector<VkFence> m_imagesInFlight;
 
-        // CPU-fallback staging buffer, ringed per in-flight slot: the frame maps
-        // and overwrites it before acquiring, so with the per-frame block removed
-        // it must not alias a buffer whose copy from a still-in-flight frame is
-        // pending. The slot's frame fence (waited at frame start) gates reuse.
-        std::array<VkBuffer, FRAMES_IN_FLIGHT> m_vkStagingBuffer{};
-        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkStagingBufferMemory{};
-        std::array<size_t, FRAMES_IN_FLIGHT> m_stagingBufferSize{};
+        // CPU-fallback staging buffer, per slot so a frame never overwrites a
+        // buffer an in-flight copy still reads; the slot fence gates reuse.
+        std::array<VkBuffer, kFramesInFlight> m_vkStagingBuffer{};
+        std::array<VkDeviceMemory, kFramesInFlight> m_vkStagingBufferMemory{};
+        std::array<size_t, kFramesInFlight> m_stagingBufferSize{};
 
-        // Shared Image for GPU Interop, ringed per in-flight slot (indexed by
-        // m_currentFrame). SharedImageInfo's default member initializers give the
-        // correct unset state (FDs/handles = -1/nullptr), so value-initializing
-        // the array is safe.
-        std::array<VkImage, FRAMES_IN_FLIGHT> m_vkSharedImage{};
-        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkSharedImageMemory{};
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkGlReadySemaphore{};
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkVkReadySemaphore{};
-        std::array<SharedImageInfo, FRAMES_IN_FLIGHT> m_sharedImageInfo{};
+        // Shared interop image, per slot.
+        std::array<VkImage, kFramesInFlight> m_vkSharedImage{};
+        std::array<VkDeviceMemory, kFramesInFlight> m_vkSharedImageMemory{};
+        std::array<VkSemaphore, kFramesInFlight> m_vkGlReadySemaphore{};
+        std::array<VkSemaphore, kFramesInFlight> m_vkVkReadySemaphore{};
+        std::array<SharedImageInfo, kFramesInFlight> m_sharedImageInfo{};
 
-        // Grow-only allocated capacity of each slot's shared image. A resize
-        // within capacity reuses the existing allocation/export (no rebuild, no
-        // FD re-export, no GL re-import); the image is only reallocated when the
-        // request exceeds capacity, at which point capacity grows to the
-        // componentwise max of the request and the screen size (monotonic).
-        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityW{};
-        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityH{};
+        // Grow-only capacity: a resize within it reuses the export and the GL
+        // import.
+        std::array<int, kFramesInFlight> m_sharedCapacityW{};
+        std::array<int, kFramesInFlight> m_sharedCapacityH{};
 
         void cleanupSharedImage(uint32_t slot);
 
-        // Rebalance a slot's glReady/vkReady binary-semaphore pair when a frame is
-        // aborted at acquire time. The GL side (syncBuffers) has already signaled
-        // glReady[slot] and waited vkReady[slot] before the acquire result is
-        // known; if the frame returns without its normal submit, this issues a
-        // minimal submit that waits glReady[slot] and signals vkReady[slot] so the
-        // pair cannot desync across the skipped frame.
+        // GL has already signaled glReady and waited vkReady when an acquire
+        // fails; this minimal submit keeps the semaphore pair balanced.
         void drainSharedSemaphores(uint32_t slot);
 
         // Recreate the swapchain after OUT_OF_DATE. SUBOPTIMAL remains usable.
@@ -375,10 +282,8 @@ namespace Rv
         // platform window, which invalidates the VkSurfaceKHR.
         void handleSurfaceLost();
 
-        // Destroy every Vulkan object this window owns and return it to the
-        // pre-initialize() state. MUST run while the platform window (and hence
-        // the VkSurfaceKHR) is still alive -- see the QEvent::PlatformSurface
-        // handler in event().
+        // Must run while the platform window (and the VkSurfaceKHR) is still
+        // alive; see the QEvent::PlatformSurface handler in event().
         void releaseVulkanResources();
 
         // Queue a one-shot switch to GLView; no-op during shutdown.
@@ -389,9 +294,6 @@ namespace Rv
 
         bool m_glFallbackRequested{false};
 
-        // Negotiated interop configuration and the state behind the startup
-        // record. m_interopNegotiated guards the once-per-device probe;
-        // m_recordEmitted guards the once-per-session record.
         InteropConfig m_interopConfig;
         bool m_interopNegotiated{false};
         bool m_recordEmitted{false};
@@ -399,8 +301,7 @@ namespace Rv
         PresentPath m_presentPath{PresentPath::Undetermined};
         std::string m_presentPathReason;
 
-        // What the GL side reported importing, so the record can show the two
-        // sides agreeing (or not) rather than only what Vulkan intended.
+        // What GL reported importing, so the record shows both sides.
         bool m_glImportReported{false};
         VkImageTiling m_glImportTiling{VK_IMAGE_TILING_LINEAR};
         bool m_glImportDedicated{false};

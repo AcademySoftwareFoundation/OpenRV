@@ -240,13 +240,7 @@ namespace IPCore
     void ImageFBOManager::destroyImageFBO(ImageFBO* imageFBO)
     {
         //
-        //  Everything below deletes GL objects -- the fence, then the FBO and
-        //  its attachments -- so a context has to be current for any of it to
-        //  reach the driver. This is reached from destructors and from event
-        //  callbacks as well as from renders, so nothing upstream guarantees
-        //  one. flushImageFBOs() opens a scope of its own around the whole
-        //  loop; this one covers every other caller and costs a pointer
-        //  compare when a context is already current.
+        //  Reached from destructors and event callbacks, not only renders.
         //
         const TwkGLF::GLContextScope contextScope;
 
@@ -258,6 +252,7 @@ namespace IPCore
 
     void ImageFBOManager::gcImageFBOs(size_t fullSerialNum)
     {
+
         // Number of render cycles an unused regular FBO is kept before being freed.
         // A small grace window (roughly 200ms at 24fps) prevents thrashing when a
         // frame is temporarily skipped during cache warm-up or off-screen evaluation.
@@ -557,9 +552,7 @@ namespace IPCore
     void ImageFBOManager::flushImageFBOs()
     {
         //
-        //  One scope for the whole flush rather than one per FBO. Same
-        //  guarantee, but the fallback context -- if it is the one that ends
-        //  up being used -- is made current once instead of once per object.
+        //  Acquire once for the whole flush rather than per FBO.
         //
         const TwkGLF::GLContextScope contextScope;
 

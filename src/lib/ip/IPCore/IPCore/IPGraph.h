@@ -334,10 +334,8 @@ namespace IPCore
 
         //
         //  Re-point the existing DisplayGroupIPNodes at a rebuilt set of
-        //  physical devices, keeping each group (and its colour pipeline)
-        //  alive. Use this, not setPhysicalDevices(), when the devices were
-        //  recreated but the monitors behind them did not change -- see the
-        //  implementation for why the difference matters.
+        //  physical devices, keeping each group's colour pipeline. Use this
+        //  instead of setPhysicalDevices() when the monitors did not change.
         //
         void refreshPhysicalDevices(const VideoModules&);
 

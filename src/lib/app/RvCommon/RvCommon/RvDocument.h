@@ -83,11 +83,8 @@ namespace Rv
         QWidget* viewWidget() const;
 
         //
-        //  Active presentation video device for whichever backend is in use
-        //  (the OpenGL GLView or, on Linux, the Vulkan VulkanView). Returns
-        //  nullptr if no view has been created yet. Prefer this over
-        //  view()->videoDevice() in backend-neutral code so the Vulkan/Metal
-        //  paths (where view() is null) stay crash-safe.
+        //  Video device of the active view (GLView or VulkanView), or nullptr.
+        //  Prefer it over view()->videoDevice(): view() is null on Vulkan.
         //
         TwkGLF::GLVideoDevice* viewVideoDevice() const;
 
@@ -100,8 +97,7 @@ namespace Rv
         // Replace a live VulkanView with GLView after a runtime Vulkan failure.
         void fallbackVulkanToGLView();
 
-        // Promote a live GLView to a VulkanView so a 10-bit request applies
-        // immediately -- the forward mirror of fallbackVulkanToGLView.
+        // Promote a live GLView to a VulkanView so a 10-bit request applies immediately.
         void swapGLViewToVulkan();
 #endif
 

@@ -86,13 +86,9 @@
 #endif
 
 #ifdef PLATFORM_WINDOWS
-// The bundled GLEW under src/pub/glew (version 2.3.0) does not declare the
-// EXT_memory_object / EXT_semaphore (or their Win32 companions) entry points.
-// The Linux build uses a newer managed GLEW that does, so the Linux call sites
-// can resolve the symbols at link time. On Windows we declare the function
-// pointer typedefs locally and resolve them at first use via wglGetProcAddress;
-// if any are missing the GPU interop path is disabled and VulkanWindow falls
-// back to its CPU pack-and-upload presentation path.
+// The bundled Windows GLEW (2.3.0) does not declare the EXT_memory_object /
+// EXT_semaphore (+ _win32) entry points, so resolve them via wglGetProcAddress.
+// If any are missing, presentation falls back to the CPU path.
 typedef void(GLAPIENTRY* PFNGLCREATEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, GLuint* memoryObjects);
 typedef void(GLAPIENTRY* PFNGLDELETEMEMORYOBJECTSEXTPROC_RV)(GLsizei n, const GLuint* memoryObjects);
 typedef void(GLAPIENTRY* PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV)(GLuint memoryObject, GLenum pname, const GLint* params);
@@ -127,7 +123,9 @@ namespace
     bool loadGLInteropExtensions()
     {
         if (g_glInteropProbed)
+        {
             return g_glInteropAvailable;
+        }
         g_glInteropProbed = true;
 
         g_glCreateMemoryObjectsEXT = reinterpret_cast<PFNGLCREATEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glCreateMemoryObjectsEXT"));
@@ -149,16 +147,8 @@ namespace
                                && g_glDeleteSemaphoresEXT && g_glImportSemaphoreWin32HandleEXT && g_glWaitSemaphoreEXT
                                && g_glSignalSemaphoreEXT;
 
-        // Identify the GL driver alongside the interop probe result. Useful when
-        // the Windows GL context happens to be the Microsoft GDI Generic
-        // software renderer, in which case interop is expected to fail.
-        //
-        // Unconditional, and this probe runs at most once per process. Which GL
-        // driver the offscreen context landed on is half of any interop
-        // diagnosis -- the other half is the Vulkan device name logged by
-        // initVulkan() -- and it has to be in the log of a session that was not
-        // launched with -debug gpu.
-        //
+        // Unconditional (runs once): identifies the GL driver, e.g. the GDI
+        // Generic software renderer, which cannot do interop.
         const GLubyte* vendor = glGetString(GL_VENDOR);
         const GLubyte* renderer = glGetString(GL_RENDERER);
         const GLubyte* version = glGetString(GL_VERSION);
@@ -205,9 +195,6 @@ namespace Rv
     namespace
     {
         // Forces the CPU pack-and-upload present path regardless of GPU/driver.
-        // Useful for exercising the fallback, which the NVIDIA optimal-tiling fix
-        // otherwise makes rare. Read once. Platform-neutral (unlike the Windows-only
-        // GL-interop entry-point helpers above).
         bool forceCpuPresentation()
         {
             static const bool forced = getenv("RV_VULKAN_FORCE_CPU_PRESENT") != nullptr;
@@ -226,7 +213,6 @@ namespace Rv
 
     QTVulkanVideoDevice::~QTVulkanVideoDevice()
     {
-        // Delete the FBO and its colour texture while the GL context is current.
         if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject[0] || m_cpuFlipFbo))
         {
             m_glContext->makeCurrent(m_offscreenSurface);
@@ -237,8 +223,10 @@ namespace Rv
                 glDeleteTextures(1, &m_fboColorTex);
                 m_fboColorTex = 0;
             }
-            for (uint32_t i = 0; i < VulkanWindow::FRAMES_IN_FLIGHT; ++i)
+            for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
+            {
                 cleanupSharedGLObjects(i);
+            }
             cleanupCpuFallbackTarget();
             m_glContext->doneCurrent();
         }
@@ -273,11 +261,8 @@ namespace Rv
             m_glContext = new QOpenGLContext();
             m_glContext->setFormat(fmt);
 
-            // Join RV's global GL resource-sharing group (enabled via
-            // Qt::AA_ShareOpenGLContexts at startup). Without this the offscreen
-            // context is isolated and FTGL font-atlas textures created in
-            // another context have no storage here, so glyph uploads fail with
-            // GL_INVALID_OPERATION.
+            // Join the global share group, or FTGL font-atlas textures created
+            // elsewhere have no storage here and glyph uploads fail.
             m_glContext->setShareContext(QOpenGLContext::globalShareContext());
 
             if (!m_glContext->create())
@@ -305,11 +290,8 @@ namespace Rv
             m_glContext->makeCurrent(m_offscreenSurface);
             glewExperimental = GL_TRUE;
 #ifdef PLATFORM_WINDOWS
-            // The bundled Windows GLEW (src/pub/glew) has a Tweak-modified
-            // signature: glewInit(GLEWGetProcAddress F). Pass nullptr to use
-            // the default GL entry-point loader, matching every other Windows
-            // glewInit call site (rvio main.cpp, InitGL.cpp, FBOVideoDevice.cpp,
-            // NDIModule.cpp, BlackMagicModule.cpp, AJAModule.cpp).
+            // The bundled Windows GLEW's glewInit takes a loader; nullptr
+            // selects the default, as at the other Windows call sites.
             GLenum err = glewInit(nullptr);
 #else
             GLenum err = glewInit();
@@ -336,9 +318,13 @@ namespace Rv
         int newW = m_window ? static_cast<int>(m_window->width() * dpr + 0.5f) : 128;
         int newH = m_window ? static_cast<int>(m_window->height() * dpr + 0.5f) : 128;
         if (newW < 1)
+        {
             newW = 128;
+        }
         if (newH < 1)
+        {
             newH = 128;
+        }
 
         if (!m_fbo || m_fboWidth != newW || m_fboHeight != newH)
         {
@@ -350,25 +336,9 @@ namespace Rv
                 m_fboColorTex = 0;
             }
 
-            //
-            //  RGBA16F for the control viewport, RGB10_A2 for a passive
-            //  presentation output.
-            //
-            //  The control viewport needs the half-float depth: session->render()
-            //  composites the whole main view into this FBO across multiple
-            //  blended passes. A passive output never does -- it is only ever a
-            //  blit destination for the inherited
-            //  transfer()/transfer2()/fillWithTexture(), which hand over an
-            //  already-composited frame.
-            //
-            //  Keeping it at 16F there costs two full passes' worth of bandwidth
-            //  at a 4K output: transfer() writes 8 bytes/px (66 MB) and
-            //  syncBuffers() reads all of it back to convert down to the
-            //  10-bit shared image. Matching the shared image's format halves
-            //  both, and the conversion happens once, in the blit that was
-            //  already going to run. The final output is 10-bit either way, so
-            //  no precision is lost that the present did not already discard.
-            //
+            // The control viewport composites blended passes here, so it needs
+            // RGBA16F. A passive output only receives already-composited blits,
+            // so RGB10_A2 (the shared image's format) halves its bandwidth.
             const bool passiveOutput = m_window && m_window->isPassiveOutput();
             const GLenum fboFormat = passiveOutput ? GL_RGB10_A2 : GL_RGBA16F_ARB;
 
@@ -389,7 +359,9 @@ namespace Rv
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
             if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            {
                 cerr << "ERROR: QTVulkanVideoDevice: FBO incomplete: 0x" << hex << status << dec << endl;
+            }
 
             m_fboWidth = newW;
             m_fboHeight = newH;
@@ -428,12 +400,18 @@ namespace Rv
             if (refresh != m_refresh)
             {
                 if (refresh > 0)
+                {
                     m_refresh = refresh;
+                }
                 else if (IPCore::debugPlayback)
+                {
                     cout << "WARNING: ignoring intended desktop refresh rate = " << refresh << endl;
+                }
 
                 if (IPCore::debugPlayback)
+                {
                     cout << "INFO: new desktop refresh rate " << m_refresh << endl;
+                }
             }
         }
         m_x = x;
@@ -448,20 +426,26 @@ namespace Rv
 
         static bool noQtHighDPISupport = (getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr);
         if (noQtHighDPISupport)
+        {
             return;
+        }
 
         if (const DesktopVideoDevice* desktopDev = dynamic_cast<const DesktopVideoDevice*>(d))
         {
             const QList<QScreen*> screens = QGuiApplication::screens();
             if (desktopDev->qtScreen() < screens.size())
+            {
                 m_devicePixelRatio = screens[desktopDev->qtScreen()]->devicePixelRatio();
+            }
         }
     }
 
     float QTVulkanVideoDevice::devicePixelRatio() const
     {
         if (m_window)
+        {
             return static_cast<float>(m_window->devicePixelRatioF());
+        }
         return m_devicePixelRatio;
     }
 
@@ -527,7 +511,7 @@ namespace Rv
         }
 
         m_glContext->makeCurrent(m_offscreenSurface);
-        for (uint32_t i = 0; i < VulkanWindow::FRAMES_IN_FLIGHT; ++i)
+        for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
         {
             cleanupSharedGLObjects(i);
         }
@@ -537,7 +521,9 @@ namespace Rv
     void QTVulkanVideoDevice::ensureCpuFallbackTarget(int w, int h) const
     {
         if (m_cpuFlipFbo && m_cpuFlipWidth == w && m_cpuFlipHeight == h)
+        {
             return;
+        }
 
         cleanupCpuFallbackTarget();
 
@@ -584,14 +570,11 @@ namespace Rv
             return false;
         }
 
-        //  Drain the rest so the next step starts from a clean queue and cannot
-        //  be blamed for this one's error.
+        //  Drain the rest so the next step starts from a clean queue.
         while (glGetError() != GL_NO_ERROR)
         {
         }
 
-        //  Unconditional: this is the message that turns an undiagnosable black
-        //  viewport into a named failing call.
         cerr << "ERROR: QTVulkanVideoDevice: " << what << " failed (GL 0x" << hex << first << dec << "); demoting '" << name()
              << "' to CPU presentation." << endl;
 
@@ -603,9 +586,13 @@ namespace Rv
     bool QTVulkanVideoDevice::glDeviceMatchesVulkan() const
     {
         if (m_glVulkanDeviceMatch != -1)
+        {
             return m_glVulkanDeviceMatch == 1;
+        }
         if (!m_glContext || !m_window || !m_window->isInitialized())
+        {
             return false;
+        }
 
         using GetUnsignedByteIndexedProc = void(GLAPIENTRY*)(GLenum, GLuint, GLubyte*);
         const auto getUnsignedByteIndexed =
@@ -613,7 +600,9 @@ namespace Rv
 
         GLint deviceCount = 0;
         if (getUnsignedByteIndexed)
+        {
             glGetIntegerv(GL_NUM_DEVICE_UUIDS_EXT, &deviceCount);
+        }
 
         bool matched = false;
         for (GLint i = 0; i < deviceCount && !matched; ++i)
@@ -635,26 +624,19 @@ namespace Rv
     {
         TwkGLF::GLFBO* fbo = m_fbo;
 
-        // Pack in the swapchain's channel order. glReadPixels with
-        // GL_UNSIGNED_INT_2_10_10_10_REV packs A2B10G10R10 (R low) for GL_RGBA and
-        // A2R10G10B10 (R high) for GL_BGRA, so the read format selects the layout
-        // directly with no CPU conversion. Linux/RADV surfaces commonly offer only
-        // A2R10G10B10.
+        // With GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGBA packs A2B10G10R10 and
+        // GL_BGRA packs A2R10G10B10, so the read format matches the swapchain.
         const VkFormat scFmt = m_window ? m_window->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
         const GLenum readFormat = (scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? GL_BGRA : GL_RGBA;
 
         ensureCpuFallbackTarget(w, h);
 
-        // Y-flip blit (GL bottom-left -> Vulkan top-left) into the RGB10_A2 target,
-        // so glReadPixels below reads top-down and packs to the swapchain layout.
+        // Y-flip (GL bottom-left to Vulkan top-left) into the RGB10_A2 target.
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_cpuFlipFbo);
         glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);
 
-        // GL-packed readback: glReadPixels stalls until the flip blit finishes, but
-        // the driver packs directly to the swapchain bit layout, so there is no
-        // per-pixel CPU pack loop.
         m_cpuPackedScratch.resize(static_cast<size_t>(w) * h);
         glReadPixels(0, 0, w, h, readFormat, GL_UNSIGNED_INT_2_10_10_10_REV, m_cpuPackedScratch.data());
         m_window->presentPixelData(m_cpuPackedScratch.data(), w, h);
@@ -669,15 +651,17 @@ namespace Rv
     void QTVulkanVideoDevice::syncBuffers() const
     {
         if (!m_window)
+        {
             return;
+        }
 
         if (!m_glContext || !m_fbo)
+        {
             return;
+        }
 
-        // Pair this frame's GL ring objects with the Vulkan in-flight slot the
-        // frame renders into. getSharedImageInfo()/presentSharedImage() below use
-        // this same slot; presentSharedImage() advances it only at frame end, so
-        // the value is stable for the whole call.
+        // The Vulkan in-flight slot; presentSharedImage() advances it only at
+        // frame end, so it is stable for the whole call.
         const uint32_t slot = m_window->currentFrame();
 
         TwkGLF::GLFBO* fbo = m_fbo;
@@ -685,36 +669,29 @@ namespace Rv
         const int h = static_cast<int>(fbo->height());
 
         if (w <= 0 || h <= 0)
+        {
             return;
+        }
 
-        // A presentation device can be primed before its window receives the
-        // first expose event. There is no swapchain to present to yet; wait for
-        // exposeEvent(), which initializes Vulkan and calls syncBuffers() again.
+        // No swapchain before the first expose; exposeEvent() calls us again.
         if (!m_window->isInitialized())
+        {
             return;
+        }
 
-        //
-        //  Best-effort gate for a passive presentation output: skip the whole
-        //  frame while this device's own GPU work is still in flight, rather
-        //  than queueing another full-resolution blit behind it. Checked here,
-        //  ahead of the GL work below, so a skipped frame costs nothing -- the
-        //  blit into the shared image is the single most expensive thing in
-        //  this function at a 4K output. Always true for the control viewport.
-        //
+        // Skip the frame, before any GL work, while a passive output's previous
+        // GPU work is still in flight. Always true for the control viewport.
         if (m_window->isPassiveOutput() && !m_window->canPresentNow())
+        {
             return;
+        }
 
         if (!m_glContext->makeCurrent(m_offscreenSurface))
+        {
             return;
+        }
 
-        // Get shared image info from VulkanWindow. RV_VULKAN_FORCE_CPU_PRESENT skips
-        // interop entirely so getSharedImageInfo() never allocates a shared image
-        // and the CPU fallback below runs.
 #ifdef PLATFORM_WINDOWS
-        // Probe the EXT_memory_object/EXT_semaphore (+ _win32) entry points
-        // while the GL context is current. If the driver does not expose them,
-        // skip the Vulkan-side export work entirely and fall through to the
-        // CPU pack-and-upload path below.
         const bool glInteropAvailable =
             !forceCpuPresentation() && !m_interopDisabled && loadGLInteropExtensions() && glDeviceMatchesVulkan();
         const VulkanWindow::SharedImageInfo* sharedInfo = glInteropAvailable ? m_window->getSharedImageInfo(w, h) : nullptr;
@@ -724,16 +701,8 @@ namespace Rv
         const VulkanWindow::SharedImageInfo* sharedInfo = glInteropAvailable ? m_window->getSharedImageInfo(w, h) : nullptr;
 #endif
 
-        //
-        //  Unconditional, and re-reported on every transition. Which of the two
-        //  present paths a device ended up on is the first thing needed to place
-        //  a black or mis-rendered viewport, and the report has to survive a
-        //  session that was not launched with -debug gpu -- the only kind we get
-        //  back from QA. A first-frame-only latch was actively misleading: the
-        //  first syncBuffers() can run before the swapchain exists, so it
-        //  reported CPU-fallback / UNDEFINED for a device that then ran on
-        //  interop for the rest of the session.
-        //
+        //  Logged on every transition: the first call can precede swapchain
+        //  creation.
         const int presentPath = sharedInfo ? 1 : 0;
         if (m_loggedPresentPath != presentPath)
         {
@@ -750,15 +719,6 @@ namespace Rv
 
         if (!sharedInfo)
         {
-            // No zero-copy interop this frame: pack + present via the CPU fallback.
-            // The GL-packed RGB10_A2 readback handles the Y flip and the swapchain
-            // channel order (A2B10G10R10 / A2R10G10B10) without a per-pixel loop.
-            //
-            //  Report the specific reason so the startup record is conclusive
-            //  for someone reading only a log: a bare "CPU fallback" does not
-            //  say whether interop was forced off, demoted by an earlier GL
-            //  failure, unavailable in the GL driver, or refused by the
-            //  Vulkan-side capability probe.
             std::string reason;
             if (forceCpuPresentation())
             {
@@ -787,11 +747,8 @@ namespace Rv
             return;
         }
 
-        // Re-import only when the shared image was actually reallocated, i.e. its
-        // capacity (stride width + capacity height) changed. Within capacity the
-        // Vulkan side keeps the same export, so a resize does not re-import here;
-        // m_sharedWidth/m_sharedHeight cache the imported capacity, not the used
-        // (requested) size.
+        // Re-import only when the shared image's capacity changed; m_sharedWidth
+        // and m_sharedHeight cache the imported capacity, not the used size.
         if (m_sharedWidth[slot] != sharedInfo->strideWidth || m_sharedHeight[slot] != sharedInfo->capacityHeight || !m_glMemoryObject[slot])
         {
             cleanupSharedGLObjects(slot);
@@ -804,23 +761,15 @@ namespace Rv
 
             glCreateMemoryObjectsEXT(1, &m_glMemoryObject[slot]);
 
-            //  EXT_memory_object requires both sides to agree on whether the
-            //  allocation is dedicated, and the parameter has to be set before
-            //  the import. This follows whatever the Vulkan side allocated.
-            //  Set explicitly in both directions rather than only when
-            //  dedicated: a mismatch corrupts the image rather than raising an
-            //  error, so the value is stated instead of left at a default.
+            //  Both sides must agree on dedicated allocation before the import;
+            //  a mismatch corrupts the image silently, so always set it.
             {
                 const GLint dedicated = sharedInfo->dedicatedAllocation ? GL_TRUE : GL_FALSE;
                 glMemoryObjectParameterivEXT(m_glMemoryObject[slot], GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
             }
 #ifdef PLATFORM_WINDOWS
-            // Windows GL import does NOT take ownership of the HANDLE; the
-            // Vulkan side and this GL side each keep their own reference.
-            // VulkanWindow's cleanupSharedImage() calls CloseHandle on its
-            // copy; this device's cleanupSharedGLObjects() does not need to
-            // close anything because glImportMemoryWin32HandleEXT does not
-            // create a new handle.
+            // The Win32 import does not take ownership of the HANDLE;
+            // VulkanWindow::cleanupSharedImage() closes it.
             glImportMemoryWin32HandleEXT(m_glMemoryObject[slot], sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
                                          static_cast<HANDLE>(sharedInfo->memoryHandle));
 #else
@@ -838,16 +787,12 @@ namespace Rv
             glGenTextures(1, &m_glSharedTexture[slot]);
             glBindTexture(GL_TEXTURE_2D, m_glSharedTexture[slot]);
 
-            //  Import with the tiling the Vulkan side actually created the image
-            //  with. Importing OPTIMAL-tiled memory as LINEAR leaves the
-            //  image's large-scale structure recognizable but scrambles pixels
-            //  within each tile.
+            //  Must match the Vulkan image's tiling, or pixels scramble within
+            //  each tile.
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
                             sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
 
-            // Allocate the imported texture at the image's capacity dimensions
-            // (stride width x capacity height); the FBO blit below writes only the
-            // used w x h sub-region into its origin corner.
+            // Allocated at capacity; the blit below writes only the used w x h.
             glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight, m_glMemoryObject[slot],
                                  0);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -879,16 +824,11 @@ namespace Rv
             glImportSemaphoreFdEXT(m_vkReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
 #endif
 
-            //  Nothing above reports failure through a return value. Without
-            //  this check a rejected import leaves an incomplete texture, the
-            //  blit below is silently dropped, and Vulkan presents an image
-            //  that was never written -- a black viewport with no diagnostic.
+            //  The import calls above report failure only through glGetError().
             if (interopGLFailed("GL<->Vulkan shared image import"))
             {
-                //  Every slot, not just this one: interop is off for good now,
-                //  so the other ring slot's import would otherwise sit there
-                //  until the device is destroyed.
-                for (uint32_t s = 0; s < VulkanWindow::FRAMES_IN_FLIGHT; ++s)
+                //  Interop is now off for good, so release every slot.
+                for (uint32_t s = 0; s < VulkanWindow::kFramesInFlight; ++s)
                 {
                     cleanupSharedGLObjects(s);
                 }
@@ -897,39 +837,23 @@ namespace Rv
                 return;
             }
 
-            // Cache the imported capacity so we re-import only when it grows.
             m_sharedWidth[slot] = sharedInfo->strideWidth;
             m_sharedHeight[slot] = sharedInfo->capacityHeight;
 
-            //  Let the Vulkan side's startup record show what GL actually
-            //  imported, so the two sides can be compared in one place rather
-            //  than only what Vulkan intended being visible.
             m_window->reportGLImportState(sharedInfo->tiling, sharedInfo->dedicatedAllocation);
         }
 
-        //  Import succeeded (or was already valid from a previous frame): this
-        //  frame presents zero-copy. Reported here rather than before the
-        //  import so the record reflects the path actually taken.
         m_window->reportPresentPath(VulkanWindow::PresentPath::ZeroCopy, std::string());
 
-        //  Drain before the handshake, not after.
-        //
-        //  session->render() runs earlier in this same frame and does leave
-        //  errors pending -- that is what the "GL ERROR: *BEFORE* userRender"
-        //  report exists to surface. Checking glGetError() after the blit
-        //  without clearing first would attribute an unrelated error to the
-        //  interop path and permanently demote a working device to the CPU
-        //  fallback. Clear here so the check below sees only errors produced by
-        //  the wait/blit/signal sequence itself.
+        //  session->render() can leave errors pending; drain them so the check
+        //  below sees only the wait/blit/signal sequence's errors.
         while (glGetError() != GL_NO_ERROR)
         {
         }
 
-        // Wait for Vulkan to be ready
         GLuint waitSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
         glWaitSemaphoreEXT(m_vkReadySemaphore[slot], 0, nullptr, 1, &m_glSharedTexture[slot], waitSrcLayouts);
 
-        // Blit from FBO to shared texture
         GLuint readFbo = fbo->fboID();
         if (!m_drawFbo[slot])
         {
@@ -944,24 +868,19 @@ namespace Rv
 
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
 
-        // Note: GL origin is bottom-left, Vulkan origin is top-left. We need to flip Y.
+        // Flip Y: GL origin is bottom-left, Vulkan origin is top-left.
         glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
 
-        // Signal Vulkan that GL is done
         GLuint signalDstLayouts[] = {GL_LAYOUT_COLOR_ATTACHMENT_EXT};
         glSignalSemaphoreEXT(m_glReadySemaphore[slot], 0, nullptr, 1, &m_glSharedTexture[slot], signalDstLayouts);
 
         glFlush();
 
-        //  Same reasoning as the import check: the semaphore wait/signal and the
-        //  blit all fail silently. Catching it here means a driver that refuses
-        //  the handshake mid-session degrades to the CPU path with a named cause
-        //  instead of going black.
         if (interopGLFailed("GL<->Vulkan shared image blit"))
         {
-            for (uint32_t s = 0; s < VulkanWindow::FRAMES_IN_FLIGHT; ++s)
+            for (uint32_t s = 0; s < VulkanWindow::kFramesInFlight; ++s)
             {
                 cleanupSharedGLObjects(s);
             }
@@ -969,7 +888,6 @@ namespace Rv
             return;
         }
 
-        // Tell VulkanWindow to present
         m_window->presentSharedImage();
     }
 
@@ -979,9 +897,7 @@ namespace Rv
 
     void QTVulkanVideoDevice::redraw() const
     {
-        // QWindow::requestUpdate() posts a coalesced UpdateRequest: at most one
-        // render is queued at a time, so a burst of redraw requests collapses
-        // to a single render instead of one heavy present per request.
+        // requestUpdate() coalesces, so a burst of redraws renders once.
         if (m_window)
         {
             m_window->requestUpdate();

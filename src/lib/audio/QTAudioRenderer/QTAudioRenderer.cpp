@@ -239,10 +239,8 @@ namespace IPCore
 #endif
 
         //
-        //  Reached during shutdown, when the audio thread may already be on
-        //  its way out. Blocking on a thread with no event loop would never
-        //  return; skipping the stop costs nothing there, since a thread that
-        //  is not running its loop is not playing either.
+        //  A thread without a running event loop is not playing, and blocking
+        //  on it would never return.
         //
         if (!canBlockOnAudioThread())
         {
@@ -310,8 +308,7 @@ namespace IPCore
 #endif
 
         //
-        //  See emitStopAudio(): also reached during shutdown, and blocking on
-        //  a thread that cannot run the call never returns.
+        //  See emitStopAudio().
         //
         if (!canBlockOnAudioThread())
         {
@@ -352,12 +349,8 @@ namespace IPCore
         if (!createAudioOutput())
         {
             //
-            //  Release whatever was allocated before the failure, here, on the
-            //  thread that owns it. Returning without exec() means no event
-            //  loop ever runs on this thread, so detachAudioOutputDevice()
-            //  could not marshal the deletion onto it -- its
-            //  BlockingQueuedConnection would have no loop to run on. Clearing
-            //  the pointers leaves it nothing to do.
+            //  No event loop will run here, so detachAudioOutputDevice() cannot
+            //  marshal the deletion onto this thread. Delete on the owner now.
             //
             deleteAudioOutputObjects();
 
@@ -415,20 +408,10 @@ namespace IPCore
         }
 
         //
-        // m_audioOutput/m_ioDevice were created inside run(), so they belong to
-        // this audio thread, not to whatever thread is calling
-        // detachAudioOutputDevice() (typically the main/UI thread, via
-        // ~QTAudioThread()). On Windows, QAudioSink's backing QWindowsAudioSink
-        // parents an internal QIODevice, so deleting these objects directly
-        // from another thread trips QObject::~QObject()'s cross-thread
-        // sendEvent() assertion (fatal in Qt6 debug builds). Delete them on the
-        // thread that owns them, while its event loop is still running to
-        // process the call.
+        // Delete the output objects on the audio thread that owns them: on
+        // Windows, deleting them cross-thread trips QObject's cross-thread
+        // sendEvent() assertion (fatal in Qt6 debug builds).
         //
-        // Only while there is such a loop, though. See canBlockOnAudioThread():
-        // handing work to a thread that cannot run it and then waiting is a
-        // shutdown that never completes, which is strictly worse than the
-        // assertion this marshalling avoids.
         if ((m_audioOutput || m_ioDevice) && canBlockOnAudioThread())
         {
             QObject* owner = m_audioOutput ? static_cast<QObject*>(m_audioOutput) : static_cast<QObject*>(m_ioDevice);
@@ -440,10 +423,7 @@ namespace IPCore
         waitForAudioThreadToFinish();
 
         //
-        //  Anything the marshalled delete could not reach -- because there was
-        //  no loop to marshal onto, or because it timed out. The thread is
-        //  finished or beyond help by now, so doing it here is the last
-        //  resort, and a Qt warning on the way out beats never getting out.
+        //  Last resort for anything the marshalled delete could not reach.
         //
         deleteAudioOutputObjects();
     }
@@ -455,11 +435,6 @@ namespace IPCore
 
     void QTAudioThread::waitForAudioThreadToFinish()
     {
-        //
-        //  Long enough that a healthy thread always makes it, short enough
-        //  that a wedged one does not strand the user in a process they have
-        //  to kill.
-        //
         constexpr unsigned long audioThreadExitTimeoutMS = 5000;
 
         if (!wait(audioThreadExitTimeoutMS))
@@ -478,10 +453,10 @@ namespace IPCore
     void QTAudioThread::deleteAudioOutputObjects()
     {
         delete m_audioOutput;
-        m_audioOutput = 0;
+        m_audioOutput = nullptr;
 
         delete m_ioDevice;
-        m_ioDevice = 0;
+        m_ioDevice = nullptr;
     }
 
     //

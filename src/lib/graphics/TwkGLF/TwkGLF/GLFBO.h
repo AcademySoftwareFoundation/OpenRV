@@ -240,11 +240,8 @@ namespace TwkGLF
         void check() const;
 
         //
-        //  Non-throwing completeness test, for callers that assemble an FBO
-        //  from attachments they do not own and have to be able to reject the
-        //  result. An FBO built around a foreign texture name can come out
-        //  incomplete without any call failing outright, and blitting from it
-        //  then fails every frame far from the cause.
+        //  Non-throwing completeness test, for FBOs built around foreign
+        //  attachments that can come out incomplete without any call failing.
         //
         bool isComplete() const;
 

@@ -23,15 +23,9 @@ namespace TwkGLF
     {
 
         //
-        //  The fallback teardown context.
-        //
-        //  Created once and never destroyed. The paths that need it run while
-        //  the application object is itself being torn down, so anything that
-        //  freed this at static-destruction time would free it either too
-        //  early to be useful or after QGuiApplication has already gone. One
-        //  leaked context at process exit costs nothing; getting that ordering
-        //  wrong costs a crash on the way out, which is the class of bug this
-        //  exists to remove.
+        //  The fallback teardown context. Intentionally leaked: it is needed
+        //  while the application is being torn down, so there is no safe
+        //  point to free it.
         //
         QOpenGLContext* s_fallbackContext = nullptr;
         QOffscreenSurface* s_fallbackSurface = nullptr;
@@ -50,20 +44,15 @@ namespace TwkGLF
         }
 
         //
-        //  Build the fallback context, once. Returns false -- quietly after
-        //  the first time -- if it cannot be had.
+        //  Build the fallback context, once.
         //
         bool createFallbackContext()
         {
             s_fallbackAttempted = true;
 
             //
-            //  Insist on the global share group. GL names live in a share
-            //  group, so deleting an FBO under a context outside the group
-            //  that created it is not an error -- it simply does nothing,
-            //  which is the exact silent leak this class is meant to stop. A
-            //  non-sharing fallback would look like a fix and behave like the
-            //  bug.
+            //  Must share with the global group: deleting a name from outside
+            //  its share group silently does nothing.
             //
             QOpenGLContext* share = QOpenGLContext::globalShareContext();
 
@@ -105,10 +94,7 @@ namespace TwkGLF
         bool makeFallbackCurrent()
         {
             //
-            //  QOpenGLContext is thread-affine and QOffscreenSurface::create()
-            //  is GUI-thread only, so this fallback serves the GUI thread. That
-            //  is where teardown runs. Anywhere else, decline rather than
-            //  silently misbehave.
+            //  QOffscreenSurface::create() is GUI-thread only.
             //
             QCoreApplication* app = QCoreApplication::instance();
 
@@ -151,10 +137,7 @@ namespace TwkGLF
         , m_hasContext(false)
     {
         //
-        //  Already current -- including a context bound natively rather than
-        //  through Qt -- so leave it alone. Displacing a live context from
-        //  inside a destructor would be far worse than the problem this scope
-        //  solves.
+        //  Never displace a live context, including a natively bound one.
         //
         if (twkGlAnyContextIsCurrent())
         {
@@ -189,12 +172,8 @@ namespace TwkGLF
         }
 
         //
-        //  Nothing was current on entry -- that is the only state in which
-        //  this scope acquires -- so restoring means making nothing current.
-        //
-        //  A context bound natively by the device cannot be released this way;
-        //  Qt does not know about it. That is acceptable: it belongs to the
-        //  device, which will bind or release it on its own terms.
+        //  Nothing was current on entry. A context bound natively by the
+        //  device is invisible to Qt and is left to the device.
         //
         if (QOpenGLContext* current = QOpenGLContext::currentContext())
         {

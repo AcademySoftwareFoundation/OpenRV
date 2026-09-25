@@ -214,38 +214,17 @@ namespace TwkGLF
 } // namespace TwkGLF
 
 //
-//  Is any GL context current?
+//  Qt only knows about contexts it made current; FBOVideoDevice binds its own
+//  natively. glGetString() returns null only when no context at all is current.
 //
-//  QOpenGLContext::currentContext() only knows about contexts Qt made current,
-//  and TwkGLFFBO's FBOVideoDevice creates and binds its own natively
-//  (wglMakeCurrent / glXMakeCurrent / CGLSetCurrentContext). Trusting Qt alone
-//  would claim "no context" there while a perfectly good one is current, and
-//  would suppress the real GL errors the debug macro exists to print.
-//  glGetString() returns null only when nothing at all is current -- on every
-//  platform, for either kind of context -- so it settles the cases Qt cannot
-//  see. It is only reached when Qt says no, and it is a cached string lookup
-//  rather than a round trip.
-//
-bool twkGlAnyContextIsCurrent()
-{
-    return QOpenGLContext::currentContext() != nullptr || glGetString(GL_VERSION) != nullptr;
-}
+bool twkGlAnyContextIsCurrent() { return QOpenGLContext::currentContext() != nullptr || glGetString(GL_VERSION) != nullptr; }
 
 bool twkGlPrintError(std::string_view file, std::string_view function, const int line, const std::string_view msg)
 {
     //
-    //  Check that some context is current before asking glGetError() anything.
-    //  With no context current, glGetError() says nothing about this call: on
-    //  Windows it returns GL_INVALID_OPERATION for every call, for as long as
-    //  no context is current. Left unchecked, one missing context is reported
-    //  as a GL error at every TWK_GLDEBUG that follows it, which buries the
-    //  real fault under a dozen copies of itself and pins it on whichever
-    //  innocent line happens to check next -- the reason a missing context in
-    //  presentation teardown used to surface as an error in makeCurrent(), a
-    //  frame late and in the wrong place.
-    //
-    //  Report once per episode, at the first site to notice, and reset when a
-    //  context comes back so a later episode is not silently swallowed.
+    //  With no context current, glGetError() is meaningless (Windows returns
+    //  GL_INVALID_OPERATION for every call). Report once per episode instead,
+    //  and reset when a context comes back.
     //
     static std::atomic<bool> noContextReported{false};
 
