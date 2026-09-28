@@ -287,6 +287,9 @@ namespace Rv
         //
         static bool shouldUseVulkanPresentation();
 
+        //  True when the persisted display depth is RGB 10 + A 2.
+        static bool tenBitDisplayRequested();
+
     protected:
         void addDefaultDataFormats(size_t bits = 8);
         void sortVideoFormatsByWidth();

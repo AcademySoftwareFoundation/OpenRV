@@ -92,7 +92,6 @@ IF(RV_TARGET_LINUX
   LIST(
     APPEND
     _sources
-    VulkanBuildProbe.cpp
     VulkanView.cpp
     VulkanWindow.cpp
     QTVulkanVideoDevice.cpp

@@ -1092,14 +1092,17 @@ namespace Rv
     }
 #endif
 
+    bool DesktopVideoDevice::tenBitDisplayRequested()
+    {
+        const Options& opts = Options::sharedOptions();
+        return opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2;
+    }
+
     bool DesktopVideoDevice::shouldUseVulkanPresentation()
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //  Same rule as the main view in RvDocument.
-        const Options& opts = Options::sharedOptions();
-        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
-
-        return want10bit && VulkanView::supports10BitPresentation();
+        return tenBitDisplayRequested() && VulkanView::supports10BitPresentation();
 #else
         return false;
 #endif

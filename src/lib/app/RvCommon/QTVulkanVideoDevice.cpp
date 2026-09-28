@@ -213,7 +213,9 @@ namespace Rv
 
     QTVulkanVideoDevice::~QTVulkanVideoDevice()
     {
-        if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject[0] || m_cpuFlipFbo))
+        //  Every slot, unconditionally: the imports live in the global share
+        //  group and would outlive m_glContext, pinning the Vulkan memory.
+        if (m_glContext && m_offscreenSurface)
         {
             m_glContext->makeCurrent(m_offscreenSurface);
             delete m_fbo;
@@ -433,9 +435,10 @@ namespace Rv
         if (const DesktopVideoDevice* desktopDev = dynamic_cast<const DesktopVideoDevice*>(d))
         {
             const QList<QScreen*> screens = QGuiApplication::screens();
-            if (desktopDev->qtScreen() < screens.size())
+            const int screen = desktopDev->qtScreen();
+            if (screen >= 0 && screen < screens.size())
             {
-                m_devicePixelRatio = screens[desktopDev->qtScreen()]->devicePixelRatio();
+                m_devicePixelRatio = screens[screen]->devicePixelRatio();
             }
         }
     }

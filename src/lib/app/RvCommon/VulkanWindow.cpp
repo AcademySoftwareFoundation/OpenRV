@@ -65,8 +65,11 @@ namespace Rv
 {
     using namespace std;
 
-    //  -debug gpu frame-time accumulators. Only one VulkanWindow drives the
-    //  frame loop, so file statics suffice.
+    //  A best-effort output forces one blocking present once it is this stale.
+    static constexpr double kMaxStaleSeconds = 0.1;
+
+    //  -debug gpu frame-time accumulators, fed only by control viewports. They
+    //  are shared: with several documents open the totals are combined.
     static unsigned int s_diagFrames = 0;
     static double s_diagRenderMs = 0.0;
     static double s_diagMainPresentMs = 0.0;
@@ -397,24 +400,6 @@ namespace Rv
 
     bool VulkanWindow::initVulkan()
     {
-        VkApplicationInfo appInfo = {};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "RV VulkanWindow";
-        appInfo.apiVersion = VK_API_VERSION_1_1;
-
-        std::vector<const char*> instanceExtensions = {
-            VK_KHR_SURFACE_EXTENSION_NAME,
-#if defined(VK_USE_PLATFORM_WIN32_KHR)
-            VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_XLIB_KHR)
-            VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
-            VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
-#elif defined(VK_USE_PLATFORM_XCB_KHR)
-            VK_KHR_XCB_SURFACE_EXTENSION_NAME,
-#endif
-        };
-
         QVulkanInstance* qtVkInst = sharedVulkanInstance();
         if (!qtVkInst)
         {
@@ -516,7 +501,7 @@ namespace Rv
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         createInfo.pQueueCreateInfos = &queueCreateInfo;
         createInfo.queueCreateInfoCount = 1;
-        createInfo.enabledExtensionCount = deviceExtensions.size();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
         if (vkCreateDevice(m_vkPhysicalDevice, &createInfo, nullptr, &m_vkDevice) != VK_SUCCESS)
@@ -771,7 +756,6 @@ namespace Rv
             return VK_PRESENT_MODE_FIFO_KHR;
         }
 
-        (void)passiveOutput;
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
@@ -1067,7 +1051,8 @@ namespace Rv
 
             if (!m_vkCommandBuffers.empty())
             {
-                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, m_vkCommandBuffers.size(), m_vkCommandBuffers.data());
+                vkFreeCommandBuffers(m_vkDevice, m_vkCommandPool, static_cast<uint32_t>(m_vkCommandBuffers.size()),
+                                     m_vkCommandBuffers.data());
                 m_vkCommandBuffers.clear();
             }
 
@@ -1079,13 +1064,13 @@ namespace Rv
         }
     }
 
-    uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    static uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties)
     {
         VkPhysicalDeviceMemoryProperties memProperties;
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
         for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
         {
-            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            if ((typeFilter & (1u << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
             {
                 return i;
             }
@@ -1228,21 +1213,14 @@ namespace Rv
             return depth;
         }
 
-        // Vendor heuristic: OPTIMAL on NVIDIA, LINEAR elsewhere. NVIDIA 550+
+        // Vendor preference: OPTIMAL on NVIDIA, LINEAR elsewhere. NVIDIA 550+
         // returns blank pixels to GL for LINEAR shared images >= ~2 MiB
         // (forum thread #349436); its GL and Vulkan share one driver, so the
         // optimal layout matches on import. Under Mesa, GL and Vulkan are
-        // different drivers and OPTIMAL renders tile garbage (RADV PHOENIX2);
-        // making it usable there needs VK_EXT_image_drm_format_modifier.
-        bool useOptimalTilingForInterop(VkPhysicalDevice dev)
-        {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-            return !nvidiaInteropWorkaroundDisabled() && isNvidiaPhysicalDevice(dev);
-#else
-            (void)dev;
-            return false;
-#endif
-        }
+        // different drivers and OPTIMAL renders tile garbage (RADV PHOENIX2)
+        // even when reported exportable; making it usable there needs
+        // VK_EXT_image_drm_format_modifier.
+        bool useOptimalTilingForInterop(VkPhysicalDevice dev) { return !nvidiaInteropWorkaroundDisabled() && isNvidiaPhysicalDevice(dev); }
     } // namespace
 
     void VulkanWindow::negotiateInteropConfig()
@@ -1276,9 +1254,11 @@ namespace Rv
             return;
         }
 
-        //  OPTIMAL first (avoids NVIDIA's blank large-LINEAR-image bug);
-        //  LINEAR is the portable fallback.
-        const VkImageTiling candidates[] = {VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_TILING_LINEAR};
+        //  Exportability alone does not guarantee a usable import, so try the
+        //  vendor's preferred tiling first. See useOptimalTilingForInterop().
+        const bool preferOptimal = useOptimalTilingForInterop(m_vkPhysicalDevice);
+        const VkImageTiling candidates[] = {preferOptimal ? VK_IMAGE_TILING_OPTIMAL : VK_IMAGE_TILING_LINEAR,
+                                            preferOptimal ? VK_IMAGE_TILING_LINEAR : VK_IMAGE_TILING_OPTIMAL};
 
         auto probeTiling = [&](VkImageTiling tiling, VkExternalMemoryFeatureFlags& features) -> bool
         {
@@ -1494,10 +1474,6 @@ namespace Rv
             o << "INFO:   Probe candidate: " << entry << "\n";
         }
 
-        //  TODO: remove once the probe is confirmed on Linux/NVIDIA.
-        o << "INFO:   Legacy vendor heuristic would have chosen: "
-          << (m_vkPhysicalDevice != VK_NULL_HANDLE && useOptimalTilingForInterop(m_vkPhysicalDevice) ? "OPTIMAL" : "LINEAR") << "\n";
-
         if (envFlagSet("RV_VULKAN_FORCE_CPU_PRESENT"))
         {
             o << "INFO:   Override       : RV_VULKAN_FORCE_CPU_PRESENT is set\n";
@@ -1598,7 +1574,6 @@ namespace Rv
 
         //  Forward progress: under sustained load, force one blocking present
         //  rather than freezing the output.
-        static const double kMaxStaleSeconds = 0.1;
         if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds)
         {
             return true;
@@ -1942,6 +1917,8 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        //  Stored at once so cleanupSharedImage() closes it on a later failure.
+        info.memoryHandle = memHandle;
 #else
         auto pfnGetMemoryFdKHR = reinterpret_cast<PFN_vkGetMemoryFdKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetMemoryFdKHR"));
         if (!pfnGetMemoryFdKHR)
@@ -1963,6 +1940,8 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        //  Stored at once so cleanupSharedImage() closes it on a later failure.
+        info.memoryFd = memFd;
 #endif
 
         VkExportSemaphoreCreateInfo exportSemInfo = {};
@@ -2009,6 +1988,7 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        info.glReadySemaphoreHandle = glReadyHandle;
 
         getSemHandleInfo.semaphore = m_vkVkReadySemaphore[slot];
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle) != VK_SUCCESS || !vkReadyHandle)
@@ -2017,13 +1997,11 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        info.vkReadySemaphoreHandle = vkReadyHandle;
 
-        info.memoryHandle = memHandle;
         info.size = memReqs.size;
         info.width = w;
         info.height = h;
-        info.glReadySemaphoreHandle = glReadyHandle;
-        info.vkReadySemaphoreHandle = vkReadyHandle;
 #else
         auto pfnGetSemaphoreFdKHR = reinterpret_cast<PFN_vkGetSemaphoreFdKHR>(vkGetDeviceProcAddr(m_vkDevice, "vkGetSemaphoreFdKHR"));
         if (!pfnGetSemaphoreFdKHR)
@@ -2047,6 +2025,7 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        info.glReadySemaphoreFd = glReadyFd;
 
         getSemFdInfo.semaphore = m_vkVkReadySemaphore[slot];
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd) != VK_SUCCESS || vkReadyFd < 0)
@@ -2055,13 +2034,11 @@ namespace Rv
             cleanupSharedImage(slot);
             return nullptr;
         }
+        info.vkReadySemaphoreFd = vkReadyFd;
 
-        info.memoryFd = memFd;
         info.size = memReqs.size;
         info.width = w;
         info.height = h;
-        info.glReadySemaphoreFd = glReadyFd;
-        info.vkReadySemaphoreFd = vkReadyFd;
 #endif
 
         VkCommandBuffer cb = m_vkCommandBuffers[0];
@@ -2150,7 +2127,6 @@ namespace Rv
         //  passive output polls instead, so a second display's vblank never
         //  enters the loop; a skipped frame keeps the previous image.
         const bool bestEffort = isPassiveOutput();
-        static const double kMaxStaleSeconds = 0.1;
         const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
         const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
@@ -2408,7 +2384,6 @@ namespace Rv
 
         // Same best-effort throttle as presentSharedImage().
         const bool bestEffort = isPassiveOutput();
-        static const double kMaxStaleSeconds = 0.1;
         const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
         const uint64_t waitTimeout = (!bestEffort || forceProgress) ? UINT64_MAX : 0;
 
@@ -2991,7 +2966,7 @@ namespace Rv
         {
             keyevent = true;
             if (m_lastKey == kevent->key()
-                && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
+                && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
             {
                 m_lastKey = kevent->key();
                 m_lastKeyType = kevent->type();

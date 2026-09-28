@@ -5,6 +5,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
+#include <atomic>
 #include <string>
 #include <QTAudioRenderer/QTAudioRenderer.h>
 
@@ -450,11 +451,10 @@ namespace IPCore
             return true;
         }
 
-        static bool reported = false;
+        static std::atomic<bool> reported{false};
 
-        if (!reported)
+        if (!reported.exchange(true))
         {
-            reported = true;
             std::cerr << "WARNING: audio thread did not exit within " << audioThreadExitTimeoutMS << " ms; continuing shutdown without it"
                       << std::endl;
         }

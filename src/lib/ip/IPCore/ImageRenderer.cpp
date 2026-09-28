@@ -45,6 +45,7 @@
 #include <TwkUtil/ThreadName.h>
 #include <assert.h>
 #include <half.h>
+#include <atomic>
 #include <iostream>
 #include <stl_ext/string_algo.h>
 #include <boost/algorithm/string.hpp>
@@ -1342,10 +1343,9 @@ namespace IPCore
         }
         else
         {
-            static bool reported = false;
-            if (!reported)
+            static std::atomic<bool> reported{false};
+            if (!reported.exchange(true))
             {
-                reported = true;
                 cerr << "ERROR: ImageRenderer::setOutputDevice: neither the output nor the control device is a GLVideoDevice; "
                         "the GL objects released below have no current context"
                      << endl;

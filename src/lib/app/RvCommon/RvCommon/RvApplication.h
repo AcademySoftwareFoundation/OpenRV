@@ -141,7 +141,8 @@ namespace Rv
         //  view is Vulkan. mainViewIsVulkan comes from the caller because only
         //  it knows which view widget exists now.
         //
-        void rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
+        //  session is the document whose main view changed backend.
+        void rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 

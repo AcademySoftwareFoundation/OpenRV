@@ -3,7 +3,8 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#pragma once
+#ifndef __RvCommon__VulkanWindow__h__
+#define __RvCommon__VulkanWindow__h__
 
 #include <QtGui/QWindow>
 #include <QtCore/QEvent>
@@ -20,6 +21,7 @@
 
 QT_BEGIN_NAMESPACE
 class QPlatformWindow;
+class QWidget;
 QT_END_NAMESPACE
 
 namespace Rv
@@ -46,7 +48,7 @@ namespace Rv
         typedef TwkUtil::Timer Timer;
 
         explicit VulkanWindow(RvDocument* doc, bool noResize = true);
-        ~VulkanWindow();
+        ~VulkanWindow() override;
 
         QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
 
@@ -315,3 +317,5 @@ namespace Rv
     };
 
 } // namespace Rv
+
+#endif // __RvCommon__VulkanWindow__h__
