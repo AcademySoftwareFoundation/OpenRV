@@ -1,0 +1,34 @@
+# PBS (python-build-standalone) wheel-based requirements for RV.
+#
+# Used only when RV_DEPS_PYTHON_USE_PBS=ON (non-Debug configurations). Unlike requirements.txt.in (which builds native extensions from source against RV's
+# custom CPython), this manifest installs prebuilt wheels against a standard-ABI PBS CPython. This is ABI-safe: the Python C-API is a stable per-platform C ABI
+# and PBS is a stock CPython, so cp311 platform wheels load cleanly. PySide6/shiboken6 are installed as wheels and then repointed at RV's Qt by
+# adapt_pbs_python.py (--qt), so the wheel's bundled Qt is replaced by RV's Qt of the same version.
+#
+# NOTE: This is a CMake template file. The actual requirements_pbs.txt is generated during CMake configuration.
+#       PySide6/shiboken6 versions MUST match RV's Qt version (RV_DEPS_QT_VERSION) so the repoint is ABI-correct.
+
+pip==24.0               # License: MIT License (MIT)
+setuptools==69.5.1      # License: MIT License
+wheel==0.43.0           # License: MIT License (MIT)
+
+# Qt bindings installed as wheels; bundled Qt is stripped and repointed to RV's Qt by adapt_pbs_python.py.
+# @_pyside_version@ MUST equal RV's Qt version so shiboken's compiled-in Qt layout matches RV's Qt.
+PySide6==@_pyside_version@   # License: LGPL v3 / GPL / Commercial (Qt for Python)
+shiboken6==@_pyside_version@ # License: LGPL v3 / GPL / Commercial (Qt for Python)
+
+# Native extensions installed as wheels (standard cp311 platform ABI, no from-source build).
+numpy==@_numpy_version@ # License: BSD License (BSD-3-Clause) - Required by PySide6
+opentimelineio @ git+https://github.com/cedrik-fuoco-adsk/OpenTimelineIO.git@fix-windows-debug-crash # License: Other/Proprietary License (Modified Apache 2.0 License)
+PyOpenGL==3.1.7         # License: BSD License (BSD)
+PyOpenGL_accelerate==3.1.10 # License: BSD License (BSD) - v3.1.10 includes Python 3 fix for Cython compatibility
+psutil==7.2.2           # License: BSD License (BSD-3-Clause)
+
+# Additional packages required by RV and for testing the Python distribution
+
+certifi==2024.2.2       # License: Mozilla Public License 2.0 (MPL 2.0) (MPL-2.0)
+six==1.16.0             # License: MIT License (MIT)
+packaging==24.0         # License: Apache Software License, BSD License
+requests==2.31.0        # License: Apache Software License (Apache 2.0)
+cryptography==42.0.5    # License: Apache Software License, BSD License ((Apache-2.0 OR BSD-3-Clause) AND PSF-2.0)
+pydantic==2.7.1         # License: MIT License (MIT)
