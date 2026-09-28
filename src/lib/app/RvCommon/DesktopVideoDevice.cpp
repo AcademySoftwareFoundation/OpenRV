@@ -1070,7 +1070,7 @@ namespace Rv
 
                 DWORD maxLen = 2084;
                 std::vector<char> url(maxLen);
-                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, nullptr)))
+                if (SUCCEEDED(UrlCreateFromPath(path.data(), url.data(), &maxLen, 0)))
                 {
                     m_colorProfile.url = url.data();
                 }
