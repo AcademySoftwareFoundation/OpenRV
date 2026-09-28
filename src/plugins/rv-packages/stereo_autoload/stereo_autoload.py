@@ -3,13 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from __future__ import print_function
-
-from rv import commands, extra_commands, rvtypes
 
 import os
-import sys
 import re
+import sys
+
+from rv import commands, extra_commands, rvtypes
 
 
 def deb(s):

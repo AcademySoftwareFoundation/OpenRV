@@ -15,13 +15,13 @@ _Note: there are some slight differences that need to be noted when translating 
 to make the commands visible in the current namespace. In Python you need to include the package name:
 
 ```python
- from rv.commands import * 
+from rv.commands import *
 ```
 
 or
 
 ```python
- import rv.commands 
+import rv.commands
 ```
 
 ### Open RV Python quickstart
@@ -29,24 +29,25 @@ or
 In order to extend RV using Python you will be making a "mode" as part of an rvpkg package—this is identical to the way it’s done in Mu and this is the method that we use internally to add new functions to RV's interface. Creation of a modes and packages is documented later in this chapter. Here is a very simple mode written in Python which is part of the RV packages as `pyhello-1.1.rvpkg`.
 
 ```python
-import rv.rvtypes  
+import rv.rvtypes
 import rv.commands
 
-class PyHello(rv.rvtypes.MinorMode):  
+
+class PyHello(rv.rvtypes.MinorMode):
     "A simple example that shows how to make shift-Z start/stop playback"
 
-    def togglePlayback(self, event):  
-        if rv.commands.isPlaying():  
-            rv.commands.stop()  
-        else:  
+    def togglePlayback(self, event):
+        if rv.commands.isPlaying():
+            rv.commands.stop()
+        else:
             rv.commands.play()
 
-    def __init__(self):  
-        rv.rvtypes.MinorMode.__init__(self)  
-        self.init("pyhello",  [("key-down--Z", self.togglePlayback, "Z key")],  None)
+    def __init__(self):
+        rv.rvtypes.MinorMode.__init__(self)
+        self.init("pyhello", [("key-down--Z", self.togglePlayback, "Z key")], None)
 
-    def createMode():  
-        "Required to initialize the module. RV will call this function to create your mode."  
+    def createMode():
+        "Required to initialize the module. RV will call this function to create your mode."
         return PyHello()
 ```
 
@@ -62,18 +63,20 @@ It's possible to call Mu code from Python, but in practice you will probably not
 
 ```python
 from pymu import MuSymbol
+
 F = MuSymbol("commands.play")
-F() 
+F()
 ```
 
 If the Mu function has arguments you supply them when calling. Return values are automatically converted between languages. The conversions are indicated in Figure [4.3](#43-python-mu-type-conversions).
 
 ```python
 from pymu import MuSymbol
+
 F = MuSymbol("commands.isPlaying")
 G = MuSymbol("commands.setWindowTitle")
 if F() == True:
-    G("PLAYING") 
+    G("PLAYING")
 ```
 
 Once a MuSymbol object has been created, the overhead to call it is minimal. All of the Mu commands module is imported on start up or reimplemented as native CPython in the Python rv.commands module so you will not need to create MuSymbol objects yourself; just import rv.commands and use the pre-existing ones.
@@ -225,7 +228,7 @@ label.show()
 # Enter Qt application main loop.
 app.exec_()
 
-sys.exit() 
+sys.exit()
 ```
 
 To access RV's essential session window Qt QWidgets, i.e. the main window, the GL view, top tool bar and bottom tool bar, import the Python module 'rv.qtutils'.
@@ -245,7 +248,7 @@ rvSessionGLView = rv.qtutils.sessionGLView()
 rvSessionTopToolBar = rv.qtutils.sessionTopToolBar()
 
 # Gets the current RV session bottom tool bar as a PySide QToolBar.
-rvSessionBottomToolBar = rv.qtutils.sessionBottomToolBar() 
+rvSessionBottomToolBar = rv.qtutils.sessionBottomToolBar()
 ```
 
 ### 4.5 Open RV Python Implementation FAQ

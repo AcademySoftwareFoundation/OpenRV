@@ -34,13 +34,12 @@ Usage Examples:
     python generate_theme.py --output rv_custom.qss --set PRIMARY_BACKGROUND=rgb(40,40,40)
 """
 
-import sys
-import os
 import argparse
-import platform
 import logging
+import os
+import platform
 import re
-from typing import Dict, List, Optional, Set, Tuple
+import sys
 
 
 # Setup logging
@@ -99,7 +98,7 @@ def adjust_output_path(output_file: str) -> str:
     return output_file
 
 
-def adjust_config_path(config_file: Optional[str]) -> Optional[str]:
+def adjust_config_path(config_file: str | None) -> str | None:
     """Adjust config file path to RvCommon directory if running from OpenRV root"""
     if not config_file:
         return config_file
@@ -124,9 +123,9 @@ def adjust_config_path(config_file: Optional[str]) -> Optional[str]:
     return config_file
 
 
-def load_variables_from_config(config_file: Optional[str]) -> Dict[str, str]:
+def load_variables_from_config(config_file: str | None) -> dict[str, str]:
     """Load variables from a config file with validation"""
-    variables: Dict[str, str] = {}
+    variables: dict[str, str] = {}
     invalid_count: int = 0
 
     if not config_file or not os.path.exists(config_file):
@@ -196,7 +195,7 @@ def validate_css_value(var_name: str, value: str) -> bool:
         return True
 
     # Color-related variables should be valid CSS colors
-    color_vars: Set[str] = {
+    color_vars: set[str] = {
         "PRIMARY_BACKGROUND",
         "SECONDARY_BACKGROUND",
         "TERTIARY_BACKGROUND",
@@ -232,7 +231,7 @@ def validate_css_value(var_name: str, value: str) -> bool:
             return 0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255
 
         # Named colors (basic validation)
-        named_colors: Set[str] = {
+        named_colors: set[str] = {
             "black",
             "white",
             "red",
@@ -264,7 +263,7 @@ def validate_css_value(var_name: str, value: str) -> bool:
 
 def get_example_value(var_name: str) -> str:
     """Get example values for variables to help users"""
-    examples: Dict[str, str] = {
+    examples: dict[str, str] = {
         "PRIMARY_BACKGROUND": "rgb(34,34,34)",
         "ACCENT_PRIMARY": "rgb(7,75,120)",
         "TEXT_PRIMARY": "rgb(200,200,200)",
@@ -274,7 +273,7 @@ def get_example_value(var_name: str) -> str:
     return examples.get(var_name, "rgb(100,100,100)")
 
 
-def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
+def collect_missing_variables(missing_vars: set[str]) -> dict[str, str]:
     """Interactive collection of missing variables with validation"""
     print("\nMissing variables detected. Please provide values:")
     print("('quit' to abort, 'default' to use default value, 'help' for examples, Ctrl+C to cancel)")
@@ -283,7 +282,7 @@ def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
     config_file = adjust_config_path("rv_theme_variables.conf")
     variables = load_variables_from_config(config_file)
 
-    collected_vars: Dict[str, str] = {}
+    collected_vars: dict[str, str] = {}
     try:
         for var_name in sorted(missing_vars):
             while True:
@@ -336,7 +335,7 @@ def collect_missing_variables(missing_vars: Set[str]) -> Dict[str, str]:
     return collected_vars
 
 
-def process_template(template_file: str, variables: Dict[str, str]) -> str:
+def process_template(template_file: str, variables: dict[str, str]) -> str:
     """Process template file replacing {{variable}} placeholders"""
     if not os.path.exists(template_file):
         raise FileNotFoundError(f"Template file '{template_file}' not found")
@@ -386,7 +385,7 @@ def process_template(template_file: str, variables: Dict[str, str]) -> str:
     return content
 
 
-def parse_variable_override(var_string: str) -> Tuple[str, str]:
+def parse_variable_override(var_string: str) -> tuple[str, str]:
     """Parse a variable override in format KEY=VALUE"""
     if "=" not in var_string:
         raise ValueError(f"Invalid variable format: {var_string}. Use KEY=VALUE")
@@ -395,9 +394,9 @@ def parse_variable_override(var_string: str) -> Tuple[str, str]:
 
 
 def generate_theme(
-    config_file: Optional[str],
+    config_file: str | None,
     output_file: str,
-    variable_overrides: Optional[List[str]] = None,
+    variable_overrides: list[str] | None = None,
 ) -> str:
     """Generate a theme file"""
     logger.info(f"Generating theme: {output_file}")
