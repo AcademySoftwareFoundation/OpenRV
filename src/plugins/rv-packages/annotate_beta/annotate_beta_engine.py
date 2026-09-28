@@ -1081,6 +1081,12 @@ class AnnotateDrawEngine:
     def has_redo(self):
         return bool(self._redo_stack)
 
+    def clear_annotate_history(self):
+        self._reset_text()
+        self._undo_stack.clear()
+        self._redo_stack.clear()
+        self._notify_buttons()
+
     # ------------------------------------------------------------------
     # Order-list helpers
     # ------------------------------------------------------------------

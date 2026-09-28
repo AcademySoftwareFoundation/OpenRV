@@ -77,6 +77,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self.menu,
         )
 
+        commands.bind("default", "global", "session-clear-everything", self._on_session_clear, "Clear annotate history")
+
         # Register the named event table AFTER init() so mode name is set.
         self._engine.setup_event_table(self)
 
@@ -523,6 +525,10 @@ class AnnotateBetaMode(rvtypes.MinorMode):
                     self._preferred_paint_node = node_name
             except Exception:
                 pass
+        event.reject()
+
+    def _on_session_clear(self, event):
+        self._engine.clear_annotate_history()
         event.reject()
 
     # ------------------------------------------------------------------
