@@ -190,6 +190,9 @@ namespace Rv
         bool createSwapchain();
         void cleanupSwapchain();
 
+        // Recreates the swapchain if it no longer matches the surface extent.
+        bool ensureSwapchainMatchesSurface();
+
         // Resolves m_interopConfig once per device (not per slot or resize).
         void negotiateInteropConfig();
 
@@ -274,6 +277,10 @@ namespace Rv
         // GL has already signaled glReady and waited vkReady when an acquire
         // fails; this minimal submit keeps the semaphore pair balanced.
         void drainSharedSemaphores(uint32_t slot);
+
+        // After a failed fenced submit: re-signal the slot fence so the next
+        // wait on it cannot hang, consuming waitSemaphore if one is given.
+        void recoverFailedSubmit(uint32_t slot, VkSemaphore waitSemaphore);
 
         // Recreate the swapchain after OUT_OF_DATE. SUBOPTIMAL remains usable.
         void handleSwapchainOutOfDate();

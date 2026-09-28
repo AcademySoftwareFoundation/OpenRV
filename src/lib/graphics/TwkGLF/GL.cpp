@@ -215,9 +215,24 @@ namespace TwkGLF
 
 //
 //  Qt only knows about contexts it made current; FBOVideoDevice binds its own
-//  natively. glGetString() returns null only when no context at all is current.
+//  natively, so also ask the platform. A GL call with no context current is
+//  undefined (macOS crashes), so glGetString() is only used on Linux, where
+//  GLVND returns null.
 //
-bool twkGlAnyContextIsCurrent() { return QOpenGLContext::currentContext() != nullptr || glGetString(GL_VERSION) != nullptr; }
+bool twkGlAnyContextIsCurrent()
+{
+    if (QOpenGLContext::currentContext() != nullptr)
+    {
+        return true;
+    }
+#if defined(PLATFORM_DARWIN)
+    return CGLGetCurrentContext() != nullptr;
+#elif defined(PLATFORM_WINDOWS)
+    return wglGetCurrentContext() != nullptr;
+#else
+    return glGetString(GL_VERSION) != nullptr;
+#endif
+}
 
 bool twkGlPrintError(std::string_view file, std::string_view function, const int line, const std::string_view msg)
 {

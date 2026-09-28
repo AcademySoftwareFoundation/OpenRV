@@ -1651,6 +1651,47 @@ namespace Rv
         }
     }
 
+    void VulkanWindow::recoverFailedSubmit(uint32_t slot, VkSemaphore waitSemaphore)
+    {
+        VkSubmitInfo recover = {};
+        recover.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        if (waitSemaphore != VK_NULL_HANDLE)
+        {
+            recover.waitSemaphoreCount = 1;
+            recover.pWaitSemaphores = &waitSemaphore;
+            recover.pWaitDstStageMask = &waitStage;
+        }
+
+        if (vkQueueSubmit(m_vkQueue, 1, &recover, m_vkFence[slot]) != VK_SUCCESS)
+        {
+            cerr << "ERROR: VulkanWindow: could not recover from a failed submit" << endl;
+        }
+
+        //  An unexpected submit failure means Vulkan is unreliable here.
+        requestGLFallback();
+    }
+
+    // Compare against the surface extent, not the requested size:
+    // createSwapchain() can only match the surface, so a mismatched request
+    // would recreate the swapchain every frame.
+    bool VulkanWindow::ensureSwapchainMatchesSurface()
+    {
+        VkExtent2D surfaceExtent = m_vkSwapchainExtent;
+        VkSurfaceCapabilitiesKHR caps = {};
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &caps) == VK_SUCCESS
+            && caps.currentExtent.width != UINT32_MAX)
+        {
+            surfaceExtent = caps.currentExtent;
+        }
+
+        if (!m_vkSwapchain || m_vkSwapchainExtent.width != surfaceExtent.width || m_vkSwapchainExtent.height != surfaceExtent.height)
+        {
+            return createSwapchain();
+        }
+        return true;
+    }
+
     const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int w, int h)
     {
         if (!m_vkDevice || !m_externalInteropSupported)
@@ -1661,25 +1702,9 @@ namespace Rv
         const uint32_t slot = m_currentFrame;
         SharedImageInfo& info = m_sharedImageInfo[slot];
 
-        // Compare against the surface extent, not the requested size:
-        // createSwapchain() can only match the surface, so a mismatched request
-        // would recreate the swapchain every frame.
-        VkExtent2D surfaceExtent = m_vkSwapchainExtent;
+        if (!ensureSwapchainMatchesSurface())
         {
-            VkSurfaceCapabilitiesKHR caps = {};
-            if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_vkPhysicalDevice, m_vkSurface, &caps) == VK_SUCCESS
-                && caps.currentExtent.width != UINT32_MAX)
-            {
-                surfaceExtent = caps.currentExtent;
-            }
-        }
-
-        if (!m_vkSwapchain || m_vkSwapchainExtent.width != surfaceExtent.width || m_vkSwapchainExtent.height != surfaceExtent.height)
-        {
-            if (!createSwapchain())
-            {
-                return nullptr;
-            }
+            return nullptr;
         }
 
         // Within capacity: reuse the export, update the used sub-region.
@@ -2075,10 +2100,7 @@ namespace Rv
         VkResult layoutSubmitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (layoutSubmitResult != VK_SUCCESS)
         {
-            if (layoutSubmitResult == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
+            recoverFailedSubmit(slot, VK_NULL_HANDLE);
             cleanupSharedImage(slot);
             return nullptr;
         }
@@ -2312,10 +2334,8 @@ namespace Rv
         VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (submitResult != VK_SUCCESS)
         {
-            if (submitResult == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
+            drainSharedSemaphores(slot);
+            recoverFailedSubmit(slot, m_vkImageAvailableSemaphore[slot]);
             return;
         }
 
@@ -2381,13 +2401,9 @@ namespace Rv
         const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
         Timer diagTimer;
 
-        if (!m_vkSwapchain || m_vkSwapchainExtent.width != static_cast<uint32_t>(w)
-            || m_vkSwapchainExtent.height != static_cast<uint32_t>(h))
+        if (w <= 0 || h <= 0 || !ensureSwapchainMatchesSurface())
         {
-            if (!createSwapchain())
-            {
-                return;
-            }
+            return;
         }
 
         // Same best-effort throttle as presentSharedImage().
@@ -2417,25 +2433,33 @@ namespace Rv
             return;
         }
 
-        size_t size = w * h * 4;
+        const size_t size = static_cast<size_t>(w) * static_cast<size_t>(h) * 4;
 
         if (size > m_stagingBufferSize[slot])
         {
             if (m_vkStagingBuffer[slot])
             {
                 vkDestroyBuffer(m_vkDevice, m_vkStagingBuffer[slot], nullptr);
+                m_vkStagingBuffer[slot] = VK_NULL_HANDLE;
             }
             if (m_vkStagingBufferMemory[slot])
             {
                 vkFreeMemory(m_vkDevice, m_vkStagingBufferMemory[slot], nullptr);
+                m_vkStagingBufferMemory[slot] = VK_NULL_HANDLE;
             }
+            m_stagingBufferSize[slot] = 0;
 
             VkBufferCreateInfo bufferInfo = {};
             bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
             bufferInfo.size = size;
             bufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
             bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            vkCreateBuffer(m_vkDevice, &bufferInfo, nullptr, &m_vkStagingBuffer[slot]);
+            if (vkCreateBuffer(m_vkDevice, &bufferInfo, nullptr, &m_vkStagingBuffer[slot]) != VK_SUCCESS)
+            {
+                m_vkStagingBuffer[slot] = VK_NULL_HANDLE;
+                cerr << "ERROR: VulkanWindow: Failed to create staging buffer" << endl;
+                return;
+            }
 
             VkMemoryRequirements memRequirements;
             vkGetBufferMemoryRequirements(m_vkDevice, m_vkStagingBuffer[slot], &memRequirements);
@@ -2451,14 +2475,27 @@ namespace Rv
                 return;
             }
 
-            vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory[slot]);
-            vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer[slot], m_vkStagingBufferMemory[slot], 0);
+            if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_vkStagingBufferMemory[slot]) != VK_SUCCESS)
+            {
+                m_vkStagingBufferMemory[slot] = VK_NULL_HANDLE;
+                cerr << "ERROR: VulkanWindow: Failed to allocate staging buffer memory" << endl;
+                return;
+            }
+            if (vkBindBufferMemory(m_vkDevice, m_vkStagingBuffer[slot], m_vkStagingBufferMemory[slot], 0) != VK_SUCCESS)
+            {
+                cerr << "ERROR: VulkanWindow: Failed to bind staging buffer memory" << endl;
+                return;
+            }
 
             m_stagingBufferSize[slot] = size;
         }
 
-        void* data;
-        vkMapMemory(m_vkDevice, m_vkStagingBufferMemory[slot], 0, size, 0, &data);
+        void* data = nullptr;
+        if (vkMapMemory(m_vkDevice, m_vkStagingBufferMemory[slot], 0, size, 0, &data) != VK_SUCCESS)
+        {
+            cerr << "ERROR: VulkanWindow: Failed to map staging buffer memory" << endl;
+            return;
+        }
         memcpy(data, pixels, size);
         vkUnmapMemory(m_vkDevice, m_vkStagingBufferMemory[slot]);
 
@@ -2525,16 +2562,18 @@ namespace Rv
 
         vkCmdPipelineBarrier(cb, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
+        //  The buffer is w x h, but the destination is bounded by the swapchain.
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;
-        region.bufferRowLength = 0;
-        region.bufferImageHeight = 0;
+        region.bufferRowLength = static_cast<uint32_t>(w);
+        region.bufferImageHeight = static_cast<uint32_t>(h);
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         region.imageSubresource.mipLevel = 0;
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = {static_cast<uint32_t>(w), static_cast<uint32_t>(h), 1};
+        region.imageExtent = {std::min(static_cast<uint32_t>(w), m_vkSwapchainExtent.width),
+                              std::min(static_cast<uint32_t>(h), m_vkSwapchainExtent.height), 1};
 
         vkCmdCopyBufferToImage(cb, m_vkStagingBuffer[slot], m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
                                &region);
@@ -2565,10 +2604,7 @@ namespace Rv
         VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_vkFence[slot]);
         if (submitResult != VK_SUCCESS)
         {
-            if (submitResult == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
+            recoverFailedSubmit(slot, m_vkImageAvailableSemaphore[slot]);
             return;
         }
 
