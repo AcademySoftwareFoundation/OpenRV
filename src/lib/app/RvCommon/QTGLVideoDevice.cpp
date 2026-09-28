@@ -22,6 +22,7 @@
 #include <QOpenGLContext>
 #include <QScreen>
 
+#include <atomic>
 #include <iostream>
 
 namespace Rv
@@ -153,10 +154,9 @@ namespace Rv
         else
         {
             // Callers assume a current context afterwards, so report the failure once.
-            static bool reported = false;
-            if (!reported)
+            static std::atomic<bool> reported{false};
+            if (!reported.exchange(true))
             {
-                reported = true;
                 cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
                      << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface"))
                      << " widget=" << (m_view ? "alive" : "null")

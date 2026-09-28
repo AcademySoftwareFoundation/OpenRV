@@ -154,14 +154,14 @@ namespace Rv
         , m_closeEventReceived(false)
         , m_vsyncDisabled(false)
         , m_hdpiResizeWorkaroundDone(false)
+        , m_diagnosticsView(nullptr)
+        , m_diagnosticsDock(nullptr)
         , m_oldGLView(0)
         , m_glView(0)
-        , m_viewWidget(nullptr)
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         , m_vulkanView(nullptr)
 #endif
-        , m_diagnosticsView(nullptr)
-        , m_diagnosticsDock(nullptr)
+        , m_viewWidget(nullptr)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -208,7 +208,7 @@ namespace Rv
         //  pixel-format negotiation truncates to 8-bit; everything else stays
         //  on GLView.
         //
-        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+        const bool want10bit = DesktopVideoDevice::tenBitDisplayRequested();
 
         if (ImageRenderer::debugGpu())
         {
@@ -906,8 +906,7 @@ namespace Rv
         }
 
         Rv::Options& opts = Options::sharedOptions();
-        const bool requestedTenBit =
-            opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2;
+        const bool requestedTenBit = DesktopVideoDevice::tenBitDisplayRequested();
         if (requestedTenBit)
         {
             cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to 8-bit OpenGL." << endl;
@@ -979,7 +978,7 @@ namespace Rv
             m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
         }
 
-        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice(), false);
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
         // Deferred: this can be reached from inside the VulkanView's present path.
         oldVulkanView->deleteLater();
@@ -1049,7 +1048,7 @@ namespace Rv
         }
 
         // No GL share device on Vulkan; Qt::AA_ShareOpenGLContexts still shares.
-        RvApp()->rebuildDesktopVideoDevices(nullptr, true);
+        RvApp()->rebuildDesktopVideoDevices(m_session, nullptr, true);
 
         m_vulkanView->videoDevice()->translator().setCurrentModifiers(cur);
 
@@ -1153,7 +1152,7 @@ namespace Rv
         if (resetGLPrefs)
             resetGLStateAndPrefs();
 
-        RvApp()->rebuildDesktopVideoDevices(m_glView->videoDevice(), false);
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
         m_glView->videoDevice()->translator().setCurrentModifiers(cur);
         m_oldGLView = oldGLView;
@@ -1236,30 +1235,36 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        //
-        //  10-bit goes through Vulkan: an OpenGL context rebuild at 10-bit
-        //  fails on Mesa GLX and WGL. Persist the preference first so a later
-        //  Vulkan -> GL fallback and the next launch both honour it.
-        //
-        if (type == OpenGL1010102)
+        //  Persist the requested depth first, so an early return below, a later
+        //  Vulkan -> GL fallback and the next launch all honour it.
         {
+            const int bits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 10 : 0);
+            const int alphaBits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 2 : 0);
+
             Rv::Options& opts = Options::sharedOptions();
-            opts.dispRedBits = 10;
-            opts.dispGreenBits = 10;
-            opts.dispBlueBits = 10;
-            opts.dispAlphaBits = 2;
+            opts.dispRedBits = bits;
+            opts.dispGreenBits = bits;
+            opts.dispBlueBits = bits;
+            opts.dispAlphaBits = alphaBits;
 
             {
                 RV_QSETTINGS;
                 settings.beginGroup("Display");
-                settings.setValue("dispRedBits", 10);
-                settings.setValue("dispGreenBits", 10);
-                settings.setValue("dispBlueBits", 10);
-                settings.setValue("dispAlphaBits", 2);
+                settings.setValue("dispRedBits", bits);
+                settings.setValue("dispGreenBits", bits);
+                settings.setValue("dispBlueBits", bits);
+                settings.setValue("dispAlphaBits", alphaBits);
                 settings.endGroup();
             }
+        }
 
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        //
+        //  10-bit goes through Vulkan: an OpenGL context rebuild at 10-bit
+        //  fails on Mesa GLX and WGL.
+        //
+        if (type == OpenGL1010102)
+        {
             // Already on Vulkan.
             if (!m_glView)
             {
@@ -1289,54 +1294,13 @@ namespace Rv
             return;
         }
 
-        // Leaving 10-bit while Vulkan is live: persist and swap back to OpenGL.
+        // Leaving 10-bit while Vulkan is live: swap back to OpenGL.
         if (!m_glView)
         {
-            const int bits = (type == OpenGL8888) ? 8 : 0;
-            const int alpha = (type == OpenGL8888) ? 8 : 0;
-
-            Rv::Options& opts = Options::sharedOptions();
-            opts.dispRedBits = bits;
-            opts.dispGreenBits = bits;
-            opts.dispBlueBits = bits;
-            opts.dispAlphaBits = alpha;
-
-            {
-                RV_QSETTINGS;
-                settings.beginGroup("Display");
-                settings.setValue("dispRedBits", bits);
-                settings.setValue("dispGreenBits", bits);
-                settings.setValue("dispBlueBits", bits);
-                settings.setValue("dispAlphaBits", alpha);
-                settings.endGroup();
-            }
-
             fallbackVulkanToGLView();
             return;
         }
 #endif
-        // Persist the requested depth before anything below can early-return.
-        {
-            const int bits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 10 : 0);
-            const int alphaBits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 2 : 0);
-
-            Rv::Options& opts = Options::sharedOptions();
-            opts.dispRedBits = bits;
-            opts.dispGreenBits = bits;
-            opts.dispBlueBits = bits;
-            opts.dispAlphaBits = alphaBits;
-
-            {
-                RV_QSETTINGS;
-                settings.beginGroup("Display");
-                settings.setValue("dispRedBits", bits);
-                settings.setValue("dispGreenBits", bits);
-                settings.setValue("dispBlueBits", bits);
-                settings.setValue("dispAlphaBits", alphaBits);
-                settings.endGroup();
-            }
-        }
-
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
         bool dbl = false;

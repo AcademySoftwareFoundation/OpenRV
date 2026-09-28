@@ -3,7 +3,8 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#pragma once
+#ifndef __RvCommon__QTVulkanVideoDevice__h__
+#define __RvCommon__QTVulkanVideoDevice__h__
 
 #include <TwkGLF/GLVideoDevice.h>
 #include <RvCommon/QTTranslator.h>
@@ -39,6 +40,9 @@ namespace Rv
         //  for coordinate mapping and mouse grab.
         QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanWindow* window, QWidget* eventWidget);
         virtual ~QTVulkanVideoDevice();
+
+        QTVulkanVideoDevice(const QTVulkanVideoDevice&) = delete;
+        QTVulkanVideoDevice& operator=(const QTVulkanVideoDevice&) = delete;
 
         VulkanWindow* vulkanWindow() const { return m_window; }
 
@@ -156,3 +160,5 @@ namespace Rv
     };
 
 } // namespace Rv
+
+#endif // __RvCommon__QTVulkanVideoDevice__h__

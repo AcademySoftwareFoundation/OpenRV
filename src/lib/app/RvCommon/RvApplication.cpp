@@ -1956,7 +1956,7 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
-    void RvApplication::rebuildDesktopVideoDevices(QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
+    void RvApplication::rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsVulkan)
     {
         if (!m_desktopModule)
         {
@@ -1966,9 +1966,6 @@ namespace Rv
         // The selected screen is restored by name (Options::presentDevice)
         // since the rebuild may destroy the device it pointed to.
         const bool wasPresenting = m_presentationMode;
-
-        TwkApp::Document* doc = TwkApp::Document::activeDocument();
-        Rv::Session* session = doc ? static_cast<Rv::Session*>(doc) : nullptr;
 
         // Returns false when the backend is unchanged; the share device is
         // still rebound below.
@@ -2027,7 +2024,7 @@ namespace Rv
             }
             session->setOutputVideoDevice(d);
         }
-        catch (std::exception& exc)
+        catch (const std::exception& exc)
         {
             cerr << "ERROR: failed to re-open presentation device after rebuild: " << exc.what() << endl;
             session->setOutputVideoDevice(session->controlVideoDevice());

@@ -14,6 +14,7 @@
 #include <QOpenGLContext>
 #include <QThread>
 
+#include <atomic>
 #include <iostream>
 
 namespace TwkGLF
@@ -33,11 +34,11 @@ namespace TwkGLF
 
         void reportNoContext(const char* why)
         {
-            static bool reported = false;
+            //  Atomic: teardown can run off the GUI thread.
+            static std::atomic<bool> reported{false};
 
-            if (!reported)
+            if (!reported.exchange(true))
             {
-                reported = true;
                 std::cerr << "WARNING: no GL context available for teardown (" << why
                           << "); GL objects destroyed without one will leak in the driver" << std::endl;
             }

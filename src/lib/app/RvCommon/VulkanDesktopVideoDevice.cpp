@@ -32,6 +32,11 @@ namespace Rv
 
     void VulkanDesktopVideoDevice::open(const StringVector& args)
     {
+        if (isOpen())
+        {
+            close();
+        }
+
         //  A null doc makes the view passive (see VulkanWindow.h).
         m_vulkanView = new VulkanView(/*doc*/ nullptr, /*parent*/ nullptr, /*noResize*/ true);
 

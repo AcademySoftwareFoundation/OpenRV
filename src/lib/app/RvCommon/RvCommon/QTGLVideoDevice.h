@@ -44,6 +44,9 @@ namespace Rv
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
 
+        QTGLVideoDevice(const QTGLVideoDevice&) = delete;
+        QTGLVideoDevice& operator=(const QTGLVideoDevice&) = delete;
+
         void setWidget(QOpenGLWidget*);
 
         //

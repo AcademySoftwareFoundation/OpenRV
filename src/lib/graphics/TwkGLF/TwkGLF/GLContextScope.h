@@ -7,8 +7,6 @@
 #ifndef __TwkGLF__GLContextScope__h__
 #define __TwkGLF__GLContextScope__h__
 
-class QOpenGLContext;
-
 namespace TwkGLF
 {
     class GLVideoDevice;
@@ -29,6 +27,11 @@ namespace TwkGLF
     //  Destruction makes nothing current again if this scope acquired. If no
     //  context can be resolved, the scope reports once and does nothing; it
     //  never throws. Check hasContext() if needed.
+    //
+    //  Limitation: an already-current context is kept even when it is not the
+    //  supplied device's, since a natively bound context cannot be restored
+    //  afterwards. That is correct for shared objects (textures, buffers,
+    //  programs) but not for FBOs, which belong to the context that made them.
     //
     class GLContextScope
     {
