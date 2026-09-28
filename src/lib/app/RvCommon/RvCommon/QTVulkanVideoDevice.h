@@ -10,6 +10,7 @@
 #include <RvCommon/VulkanView.h>
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,11 +35,7 @@ namespace Rv
     {
     public:
         QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanView* view, QWidget* eventWidget);
-        virtual ~QTVulkanVideoDevice();
-
-        VulkanView* vulkanView() const { return m_view; }
-
-        QWidget* eventWidget() const { return m_eventWidget; }
+        ~QTVulkanVideoDevice() override;
 
         void setEventWidget(QWidget* widget);
 
@@ -69,7 +66,7 @@ namespace Rv
 
         float devicePixelRatio() const override;
 
-        void setPhysicalDevice(VideoDevice* d) override;
+        void setPhysicalDevice(VideoDevice* device) override;
 
         // GLVideoDevice API
         TwkGLF::GLFBO* defaultFBO() override;
@@ -82,8 +79,7 @@ namespace Rv
         void ensureGLContext() const;
 
         VulkanView* m_view;
-        QWidget* m_eventWidget;
-        QTTranslator* m_translator;
+        std::unique_ptr<QTTranslator> m_translator;
         float m_devicePixelRatio{1.0f};
         int m_x{0};
         int m_y{0};
@@ -91,9 +87,9 @@ namespace Rv
         bool m_isOpen{false};
 
         // Qt GL context + offscreen surface for GL rendering.
-        mutable QOpenGLContext* m_glContext{nullptr};
-        mutable QOffscreenSurface* m_offscreenSurface{nullptr};
-        mutable TwkGLF::GLFBO* m_fbo{nullptr};
+        mutable std::unique_ptr<QOpenGLContext> m_glContext;
+        mutable std::unique_ptr<QOffscreenSurface> m_offscreenSurface;
+        mutable std::unique_ptr<TwkGLF::GLFBO> m_fbo;
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
@@ -101,13 +97,18 @@ namespace Rv
         // GPU Interop GL objects, ringed per in-flight slot to match VulkanView's
         // per-slot Vulkan shared image/semaphores. Indexed by the Vulkan slot for
         // the frame being rendered (VulkanView::currentFrame()).
-        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glMemoryObject{};
-        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glSharedTexture{};
-        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_glReadySemaphore{};
-        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_vkReadySemaphore{};
-        mutable std::array<GLuint, VulkanView::FRAMES_IN_FLIGHT> m_drawFbo{};
-        mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedWidth{};
-        mutable std::array<int, VulkanView::FRAMES_IN_FLIGHT> m_sharedHeight{};
+        struct SharedGLObjects
+        {
+            GLuint memoryObject{0};
+            GLuint texture{0};
+            GLuint glReadySemaphore{0};
+            GLuint vkReadySemaphore{0};
+            GLuint drawFbo{0};
+            int width{0};  // imported capacity width
+            int height{0}; // imported capacity height
+        };
+
+        mutable std::array<SharedGLObjects, VulkanView::FRAMES_IN_FLIGHT> m_sharedGL{};
 
         // Latched once the GL side fails to import a Vulkan-exported shared
         // image. Without this the next frame re-attempts the same import with

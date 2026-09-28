@@ -215,8 +215,7 @@ namespace Rv
     QTVulkanVideoDevice::QTVulkanVideoDevice(VideoModule* module, const string& name, VulkanView* view, QWidget* eventWidget)
         : TwkGLF::GLVideoDevice(module, name, VideoDevice::ImageOutput | VideoDevice::ProvidesSync | VideoDevice::SubWindow)
         , m_view(view)
-        , m_eventWidget(eventWidget)
-        , m_translator(eventWidget ? new QTTranslator(this, eventWidget) : nullptr)
+        , m_translator(eventWidget ? std::make_unique<QTTranslator>(this, eventWidget) : nullptr)
     {
         assert(view);
     }
@@ -224,36 +223,36 @@ namespace Rv
     QTVulkanVideoDevice::~QTVulkanVideoDevice()
     {
         // Delete the FBO and its colour texture while the GL context is current.
-        if (m_glContext && (m_fbo || m_fboColorTex || m_glMemoryObject[0] || m_cpuFlipFbo))
+        if (m_glContext && (m_fbo || m_fboColorTex || m_sharedGL[0].memoryObject || m_cpuFlipFbo))
         {
-            m_glContext->makeCurrent(m_offscreenSurface);
-            delete m_fbo;
-            m_fbo = nullptr;
+            m_glContext->makeCurrent(m_offscreenSurface.get());
+            m_fbo.reset();
             if (m_fboColorTex)
             {
                 glDeleteTextures(1, &m_fboColorTex);
                 m_fboColorTex = 0;
             }
             for (uint32_t i = 0; i < VulkanView::FRAMES_IN_FLIGHT; ++i)
+            {
                 cleanupSharedGLObjects(i);
+            }
             cleanupCpuFallbackTarget();
             m_glContext->doneCurrent();
         }
 
-        delete m_offscreenSurface;
-        m_offscreenSurface = nullptr;
-
-        delete m_glContext;
-        m_glContext = nullptr;
-
-        delete m_translator;
+        // Explicit resets keep the release order: surface, context, translator.
+        m_offscreenSurface.reset();
+        m_glContext.reset();
+        m_translator.reset();
     }
 
     void QTVulkanVideoDevice::setEventWidget(QWidget* widget)
     {
-        m_eventWidget = widget;
-        delete m_translator;
-        m_translator = widget ? new QTTranslator(this, widget) : nullptr;
+        m_translator.reset();
+        if (widget)
+        {
+            m_translator = std::make_unique<QTTranslator>(this, widget);
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -267,7 +266,7 @@ namespace Rv
             fmt.setMajorVersion(2);
             fmt.setMinorVersion(1);
 
-            m_glContext = new QOpenGLContext();
+            m_glContext = std::make_unique<QOpenGLContext>();
             m_glContext->setFormat(fmt);
 
             // Join RV's global GL resource-sharing group (enabled via
@@ -280,26 +279,23 @@ namespace Rv
             if (!m_glContext->create())
             {
                 cerr << "ERROR: QTVulkanVideoDevice: QOpenGLContext::create() failed" << endl;
-                delete m_glContext;
-                m_glContext = nullptr;
+                m_glContext.reset();
                 return;
             }
 
-            m_offscreenSurface = new QOffscreenSurface();
+            m_offscreenSurface = std::make_unique<QOffscreenSurface>();
             m_offscreenSurface->setFormat(m_glContext->format());
             m_offscreenSurface->create();
 
             if (!m_offscreenSurface->isValid())
             {
                 cerr << "ERROR: QTVulkanVideoDevice: QOffscreenSurface::create() failed" << endl;
-                delete m_offscreenSurface;
-                m_offscreenSurface = nullptr;
-                delete m_glContext;
-                m_glContext = nullptr;
+                m_offscreenSurface.reset();
+                m_glContext.reset();
                 return;
             }
 
-            m_glContext->makeCurrent(m_offscreenSurface);
+            m_glContext->makeCurrent(m_offscreenSurface.get());
             glewExperimental = GL_TRUE;
 #ifdef PLATFORM_WINDOWS
             // The bundled Windows GLEW (src/pub/glew) has a Tweak-modified
@@ -315,15 +311,13 @@ namespace Rv
             {
                 cerr << "ERROR: QTVulkanVideoDevice: glewInit failed: " << glewGetErrorString(err) << endl;
                 m_glContext->doneCurrent();
-                delete m_offscreenSurface;
-                m_offscreenSurface = nullptr;
-                delete m_glContext;
-                m_glContext = nullptr;
+                m_offscreenSurface.reset();
+                m_glContext.reset();
                 return;
             }
         }
 
-        if (!m_glContext->makeCurrent(m_offscreenSurface))
+        if (!m_glContext->makeCurrent(m_offscreenSurface.get()))
         {
             cerr << "ERROR: QTVulkanVideoDevice: makeCurrent() failed" << endl;
             return;
@@ -339,8 +333,7 @@ namespace Rv
 
         if (!m_fbo || m_fboWidth != newW || m_fboHeight != newH)
         {
-            delete m_fbo;
-            m_fbo = nullptr;
+            m_fbo.reset();
             if (m_fboColorTex)
             {
                 glDeleteTextures(1, &m_fboColorTex);
@@ -352,7 +345,7 @@ namespace Rv
             glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA16F_ARB, newW, newH, 0, GL_RGBA, GL_FLOAT, nullptr);
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-            m_fbo = new TwkGLF::GLFBO(newW, newH, GL_RGBA16F_ARB);
+            m_fbo = std::make_unique<TwkGLF::GLFBO>(newW, newH, GL_RGBA16F_ARB);
             m_fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -383,12 +376,12 @@ namespace Rv
 
             if (const TwkApp::VideoModule* mod = TwkApp::App()->primaryVideoModule())
             {
-                if (TwkApp::VideoDevice* d = mod->deviceFromPosition(tx, ty))
+                if (TwkApp::VideoDevice* device = mod->deviceFromPosition(tx, ty))
                 {
-                    setPhysicalDevice(d);
-                    refresh = d->timing().hz;
+                    setPhysicalDevice(device);
+                    refresh = device->timing().hz;
 
-                    VideoDeviceContextChangeEvent event("video-device-changed", this, this, d);
+                    VideoDeviceContextChangeEvent event("video-device-changed", this, this, device);
                     sendEvent(event);
                 }
             }
@@ -408,9 +401,9 @@ namespace Rv
         m_y = y;
     }
 
-    void QTVulkanVideoDevice::setPhysicalDevice(VideoDevice* d)
+    void QTVulkanVideoDevice::setPhysicalDevice(VideoDevice* device)
     {
-        TwkApp::VideoDevice::setPhysicalDevice(d);
+        TwkApp::VideoDevice::setPhysicalDevice(device);
 
         m_devicePixelRatio = 1.0f;
 
@@ -418,7 +411,7 @@ namespace Rv
         if (noQtHighDPISupport)
             return;
 
-        if (const DesktopVideoDevice* desktopDev = dynamic_cast<const DesktopVideoDevice*>(d))
+        if (const DesktopVideoDevice* desktopDev = dynamic_cast<const DesktopVideoDevice*>(device))
         {
             const QList<QScreen*> screens = QGuiApplication::screens();
             if (desktopDev->qtScreen() < screens.size())
@@ -442,46 +435,48 @@ namespace Rv
     TwkGLF::GLFBO* QTVulkanVideoDevice::defaultFBO()
     {
         ensureGLContext();
-        return m_fbo;
+        return m_fbo.get();
     }
 
     const TwkGLF::GLFBO* QTVulkanVideoDevice::defaultFBO() const
     {
         ensureGLContext();
-        return m_fbo;
+        return m_fbo.get();
     }
 
     std::string QTVulkanVideoDevice::hardwareIdentification() const { return "vulkan-hybrid"; }
 
     void QTVulkanVideoDevice::cleanupSharedGLObjects(uint32_t slot) const
     {
-        if (m_drawFbo[slot])
+        SharedGLObjects& glShared = m_sharedGL[slot];
+
+        if (glShared.drawFbo)
         {
-            glDeleteFramebuffersEXT(1, &m_drawFbo[slot]);
-            m_drawFbo[slot] = 0;
+            glDeleteFramebuffersEXT(1, &glShared.drawFbo);
+            glShared.drawFbo = 0;
         }
-        if (m_glSharedTexture[slot])
+        if (glShared.texture)
         {
-            glDeleteTextures(1, &m_glSharedTexture[slot]);
-            m_glSharedTexture[slot] = 0;
+            glDeleteTextures(1, &glShared.texture);
+            glShared.texture = 0;
         }
-        if (m_glMemoryObject[slot])
+        if (glShared.memoryObject)
         {
-            glDeleteMemoryObjectsEXT(1, &m_glMemoryObject[slot]);
-            m_glMemoryObject[slot] = 0;
+            glDeleteMemoryObjectsEXT(1, &glShared.memoryObject);
+            glShared.memoryObject = 0;
         }
-        if (m_glReadySemaphore[slot])
+        if (glShared.glReadySemaphore)
         {
-            glDeleteSemaphoresEXT(1, &m_glReadySemaphore[slot]);
-            m_glReadySemaphore[slot] = 0;
+            glDeleteSemaphoresEXT(1, &glShared.glReadySemaphore);
+            glShared.glReadySemaphore = 0;
         }
-        if (m_vkReadySemaphore[slot])
+        if (glShared.vkReadySemaphore)
         {
-            glDeleteSemaphoresEXT(1, &m_vkReadySemaphore[slot]);
-            m_vkReadySemaphore[slot] = 0;
+            glDeleteSemaphoresEXT(1, &glShared.vkReadySemaphore);
+            glShared.vkReadySemaphore = 0;
         }
-        m_sharedWidth[slot] = 0;
-        m_sharedHeight[slot] = 0;
+        glShared.width = 0;
+        glShared.height = 0;
     }
 
     void QTVulkanVideoDevice::ensureCpuFallbackTarget(int w, int h) const
@@ -527,7 +522,7 @@ namespace Rv
 
     void QTVulkanVideoDevice::presentCpuFallback(int w, int h) const
     {
-        TwkGLF::GLFBO* fbo = m_fbo;
+        TwkGLF::GLFBO* fbo = m_fbo.get();
 
         // Pack in the swapchain's channel order. glReadPixels with
         // GL_UNSIGNED_INT_2_10_10_10_REV packs A2B10G10R10 (R low) for GL_RGBA and
@@ -573,15 +568,16 @@ namespace Rv
         // this same slot; presentSharedImage() advances it only at frame end, so
         // the value is stable for the whole call.
         const uint32_t slot = m_view->currentFrame();
+        SharedGLObjects& glShared = m_sharedGL[slot];
 
-        TwkGLF::GLFBO* fbo = m_fbo;
+        TwkGLF::GLFBO* fbo = m_fbo.get();
         const int w = static_cast<int>(fbo->width());
         const int h = static_cast<int>(fbo->height());
 
         if (w <= 0 || h <= 0)
             return;
 
-        if (!m_glContext->makeCurrent(m_offscreenSurface))
+        if (!m_glContext->makeCurrent(m_offscreenSurface.get()))
             return;
 
         // Get shared image info from VulkanView. RV_VULKAN_FORCE_CPU_PRESENT skips
@@ -621,8 +617,8 @@ namespace Rv
             }
             else
             {
-                const VulkanView::InteropConfig& c = m_view->interopConfig();
-                reason = c.rejectReason.empty() ? "the Vulkan side declined to allocate a shared image" : c.rejectReason;
+                const VulkanView::InteropConfig& config = m_view->interopConfig();
+                reason = config.rejectReason.empty() ? "the Vulkan side declined to allocate a shared image" : config.rejectReason;
             }
             m_view->reportPresentPath(VulkanView::PresentPath::CpuReadback, reason);
 
@@ -633,9 +629,9 @@ namespace Rv
         // Re-import only when the shared image was actually reallocated, i.e. its
         // capacity (stride width + capacity height) changed. Within capacity the
         // Vulkan side keeps the same export, so a resize does not re-import here;
-        // m_sharedWidth/m_sharedHeight cache the imported capacity, not the used
+        // glShared.width/height cache the imported capacity, not the used
         // (requested) size.
-        if (m_sharedWidth[slot] != sharedInfo->strideWidth || m_sharedHeight[slot] != sharedInfo->capacityHeight || !m_glMemoryObject[slot])
+        if (glShared.width != sharedInfo->strideWidth || glShared.height != sharedInfo->capacityHeight || !glShared.memoryObject)
         {
             cleanupSharedGLObjects(slot);
 
@@ -645,7 +641,7 @@ namespace Rv
             {
             }
 
-            glCreateMemoryObjectsEXT(1, &m_glMemoryObject[slot]);
+            glCreateMemoryObjectsEXT(1, &glShared.memoryObject);
 
             // Mirror the Vulkan side's dedicated-allocation decision. This must
             // be set on the memory object BEFORE glTexStorageMem2DEXT, and must
@@ -654,7 +650,7 @@ namespace Rv
             // rather than an error. NVIDIA's OPAQUE_WIN32 path requires it.
             {
                 const GLint dedicated = sharedInfo->dedicatedAllocation ? GL_TRUE : GL_FALSE;
-                glMemoryObjectParameterivEXT(m_glMemoryObject[slot], GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
+                glMemoryObjectParameterivEXT(glShared.memoryObject, GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
             }
 #ifdef PLATFORM_WINDOWS
             // Windows GL import does NOT take ownership of the HANDLE; the
@@ -663,7 +659,7 @@ namespace Rv
             // copy; this device's cleanupSharedGLObjects() does not need to
             // close anything because glImportMemoryWin32HandleEXT does not
             // create a new handle.
-            glImportMemoryWin32HandleEXT(m_glMemoryObject[slot], sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+            glImportMemoryWin32HandleEXT(glShared.memoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
                                          static_cast<HANDLE>(sharedInfo->memoryHandle));
 #else
             // Duplicate the FD because glImportMemoryFdEXT takes ownership
@@ -674,11 +670,11 @@ namespace Rv
                 cleanupSharedGLObjects(slot);
                 return;
             }
-            glImportMemoryFdEXT(m_glMemoryObject[slot], sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_FD_EXT, memFd);
+            glImportMemoryFdEXT(glShared.memoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_FD_EXT, memFd);
 #endif
 
-            glGenTextures(1, &m_glSharedTexture[slot]);
-            glBindTexture(GL_TEXTURE_2D, m_glSharedTexture[slot]);
+            glGenTextures(1, &glShared.texture);
+            glBindTexture(GL_TEXTURE_2D, glShared.texture);
 
             // Import with the tiling the Vulkan side actually created the image
             // with. Importing OPTIMAL-tiled memory as LINEAR leaves the image's
@@ -690,16 +686,16 @@ namespace Rv
             // Allocate the imported texture at the image's capacity dimensions
             // (stride width x capacity height); the FBO blit below writes only the
             // used w x h sub-region into its origin corner.
-            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight, m_glMemoryObject[slot],
+            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight, glShared.memoryObject,
                                  0);
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            glGenSemaphoresEXT(1, &m_glReadySemaphore[slot]);
-            glGenSemaphoresEXT(1, &m_vkReadySemaphore[slot]);
+            glGenSemaphoresEXT(1, &glShared.glReadySemaphore);
+            glGenSemaphoresEXT(1, &glShared.vkReadySemaphore);
 #ifdef PLATFORM_WINDOWS
-            glImportSemaphoreWin32HandleEXT(m_glReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+            glImportSemaphoreWin32HandleEXT(glShared.glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
                                             static_cast<HANDLE>(sharedInfo->glReadySemaphoreHandle));
-            glImportSemaphoreWin32HandleEXT(m_vkReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+            glImportSemaphoreWin32HandleEXT(glShared.vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
                                             static_cast<HANDLE>(sharedInfo->vkReadySemaphoreHandle));
 #else
             int glReadyFd = dup(sharedInfo->glReadySemaphoreFd);
@@ -709,7 +705,7 @@ namespace Rv
                 cleanupSharedGLObjects(slot);
                 return;
             }
-            glImportSemaphoreFdEXT(m_glReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_FD_EXT, glReadyFd);
+            glImportSemaphoreFdEXT(glShared.glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, glReadyFd);
 
             int vkReadyFd = dup(sharedInfo->vkReadySemaphoreFd);
             if (vkReadyFd == -1)
@@ -718,7 +714,7 @@ namespace Rv
                 cleanupSharedGLObjects(slot);
                 return;
             }
-            glImportSemaphoreFdEXT(m_vkReadySemaphore[slot], GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
+            glImportSemaphoreFdEXT(glShared.vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
 #endif
 
             // The import sequence fails by producing a GL error and an unusable
@@ -740,8 +736,8 @@ namespace Rv
             }
 
             // Cache the imported capacity so we re-import only when it grows.
-            m_sharedWidth[slot] = sharedInfo->strideWidth;
-            m_sharedHeight[slot] = sharedInfo->capacityHeight;
+            glShared.width = sharedInfo->strideWidth;
+            glShared.height = sharedInfo->capacityHeight;
 
             m_view->reportGLImportState(sharedInfo->tiling, sharedInfo->dedicatedAllocation);
         }
@@ -754,19 +750,19 @@ namespace Rv
 
         // Wait for Vulkan to be ready
         GLuint waitSrcLayouts[] = {GL_LAYOUT_TRANSFER_SRC_EXT};
-        glWaitSemaphoreEXT(m_vkReadySemaphore[slot], 0, nullptr, 1, &m_glSharedTexture[slot], waitSrcLayouts);
+        glWaitSemaphoreEXT(glShared.vkReadySemaphore, 0, nullptr, 1, &glShared.texture, waitSrcLayouts);
 
         // Blit from FBO to shared texture
         GLuint readFbo = fbo->fboID();
-        if (!m_drawFbo[slot])
+        if (!glShared.drawFbo)
         {
-            glGenFramebuffersEXT(1, &m_drawFbo[slot]);
-            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_drawFbo[slot]);
-            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_glSharedTexture[slot], 0);
+            glGenFramebuffersEXT(1, &glShared.drawFbo);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, glShared.drawFbo);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, glShared.texture, 0);
         }
         else
         {
-            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_drawFbo[slot]);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, glShared.drawFbo);
         }
 
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
@@ -778,7 +774,7 @@ namespace Rv
 
         // Signal Vulkan that GL is done
         GLuint signalDstLayouts[] = {GL_LAYOUT_COLOR_ATTACHMENT_EXT};
-        glSignalSemaphoreEXT(m_glReadySemaphore[slot], 0, nullptr, 1, &m_glSharedTexture[slot], signalDstLayouts);
+        glSignalSemaphoreEXT(glShared.glReadySemaphore, 0, nullptr, 1, &glShared.texture, signalDstLayouts);
 
         glFlush();
 

@@ -159,10 +159,6 @@ namespace Rv
         , m_hdpiResizeWorkaroundDone(false)
         , m_oldGLView(0)
         , m_glView(0)
-        , m_viewWidget(nullptr)
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        , m_vulkanView(nullptr)
-#endif
         , m_diagnosticsView(nullptr)
         , m_diagnosticsDock(nullptr)
         , m_sourceEditor(0)
@@ -276,7 +272,7 @@ namespace Rv
             else
             {
                 RvSession* s = static_cast<RvSession*>(docs.front());
-                RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+                RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
                 // The front document may be on the Vulkan/Metal path, where view()
                 // is null; share its GL context only if it has one (mirrors the
                 // first-window case above, which passes a null share context).
@@ -950,7 +946,7 @@ namespace Rv
         else
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+            RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
             QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
             newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                                    opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
@@ -991,13 +987,11 @@ namespace Rv
 
         if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
         {
-            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
-
-            for (size_t i = 0; i < devices.size(); i++)
+            for (TwkApp::VideoDevice* device : m->devices())
             {
-                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+                if (DesktopVideoDevice* desktopDevice = dynamic_cast<DesktopVideoDevice*>(device))
                 {
-                    d->setShareDevice(m_glView->videoDevice());
+                    desktopDevice->setShareDevice(m_glView->videoDevice());
                 }
             }
         }
@@ -1294,10 +1288,6 @@ namespace Rv
 #endif
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
-
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-    VulkanView* RvDocument::vulkanView() const { return m_vulkanView; }
-#endif
 
     void RvDocument::center()
     {

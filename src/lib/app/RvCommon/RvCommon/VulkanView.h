@@ -15,6 +15,7 @@
 
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,12 +37,12 @@ namespace Rv
         Q_OBJECT
 
     public:
-        typedef TwkUtil::Timer Timer;
+        using Timer = TwkUtil::Timer;
 
         explicit VulkanView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
-        ~VulkanView();
+        ~VulkanView() override;
 
-        QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
+        QTVulkanVideoDevice* videoDevice() const { return m_videoDevice.get(); }
 
         void setEventWidget(QWidget* widget);
 
@@ -132,7 +133,7 @@ namespace Rv
         void reportGLImportState(VkImageTiling tiling, bool dedicated);
 
         //
-        //  Vulkan presentation — called by QTVulkanVideoDevice::syncBuffers().
+        //  Vulkan presentation, called by QTVulkanVideoDevice::syncBuffers().
         //
 
         //  GPU Interop API
@@ -192,15 +193,13 @@ namespace Rv
         // CPU fallback API (not used when GPU interop is active)
         void presentPixelData(const void* pixels, int w, int h);
 
-        bool isInitialized() const { return m_initialized; }
-
         //
         //  Probe for whether this machine's Vulkan can present a 10-bit format
         //  (A2B10G10R10 or A2R10G10B10). Used at RvDocument construction time to
         //  decide whether a 10-bit display request should route to the Vulkan
         //  path or fall back to OpenGL. Creates a throwaway QVulkanInstance +
         //  dummy surface and queries the advertised surface formats; it never
-        //  throws — returns false if Vulkan is unavailable for any reason.
+        //  throws; returns false if Vulkan is unavailable for any reason.
         //
         static bool supports10BitPresentation();
 
@@ -244,21 +243,21 @@ namespace Rv
         void requestUpdate();
 
         RvDocument* m_doc;
-        QTVulkanVideoDevice* m_videoDevice;
+        std::unique_ptr<QTVulkanVideoDevice> m_videoDevice;
 
-        bool m_initialized;
-        bool m_firstPaintCompleted;
+        bool m_initialized{false};
+        bool m_firstPaintCompleted{false};
         bool m_postFirstNonEmptyRender;
-        bool m_stopProcessingEvents;
-        bool m_userActive;
+        bool m_stopProcessingEvents{false};
+        bool m_userActive{true};
         bool m_updatePending{false};
 
-        QSize m_csize;
-        QSize m_msize;
-        QWidget* m_eventWidget;
+        QSize m_csize{1024, 576};
+        QSize m_msize{128, 128};
+        QWidget* m_eventWidget{nullptr};
 
-        unsigned int m_lastKey;
-        QEvent::Type m_lastKeyType;
+        unsigned int m_lastKey{0};
+        QEvent::Type m_lastKeyType{QEvent::None};
         Timer m_activityTimer;
         Timer m_activationTimer;
         QTimer m_eventProcessingTimer;
@@ -278,9 +277,15 @@ namespace Rv
         std::vector<VkImage> m_vkSwapchainImages;
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
 
+        // Per-in-flight-slot acquire semaphore + frame fence.
+        struct FrameSync
+        {
+            VkSemaphore imageAvailable{VK_NULL_HANDLE};
+            VkFence fence{VK_NULL_HANDLE};
+        };
+
         // Per-in-flight-slot ring (indexed by m_currentFrame).
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkImageAvailableSemaphore{};
-        std::array<VkFence, FRAMES_IN_FLIGHT> m_vkFence{};
+        std::array<FrameSync, FRAMES_IN_FLIGHT> m_frameSync{};
         uint32_t m_currentFrame{0};
 
         // Per-swapchain-image (indexed by imageIndex, sized to the swapchain
@@ -298,27 +303,37 @@ namespace Rv
         // and overwrites it before acquiring, so with the per-frame block removed
         // it must not alias a buffer whose copy from a still-in-flight frame is
         // pending. The slot's frame fence (waited at frame start) gates reuse.
-        std::array<VkBuffer, FRAMES_IN_FLIGHT> m_vkStagingBuffer{};
-        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkStagingBufferMemory{};
-        std::array<size_t, FRAMES_IN_FLIGHT> m_stagingBufferSize{};
+        struct StagingBuffer
+        {
+            VkBuffer buffer{VK_NULL_HANDLE};
+            VkDeviceMemory memory{VK_NULL_HANDLE};
+            size_t size{0};
+        };
+
+        std::array<StagingBuffer, FRAMES_IN_FLIGHT> m_staging{};
 
         // Shared Image for GPU Interop, ringed per in-flight slot (indexed by
         // m_currentFrame). SharedImageInfo's default member initializers give the
         // correct unset state (FDs/handles = -1/nullptr), so value-initializing
         // the array is safe.
-        std::array<VkImage, FRAMES_IN_FLIGHT> m_vkSharedImage{};
-        std::array<VkDeviceMemory, FRAMES_IN_FLIGHT> m_vkSharedImageMemory{};
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkGlReadySemaphore{};
-        std::array<VkSemaphore, FRAMES_IN_FLIGHT> m_vkVkReadySemaphore{};
-        std::array<SharedImageInfo, FRAMES_IN_FLIGHT> m_sharedImageInfo{};
+        struct SharedImage
+        {
+            VkImage image{VK_NULL_HANDLE};
+            VkDeviceMemory memory{VK_NULL_HANDLE};
+            VkSemaphore glReady{VK_NULL_HANDLE};
+            VkSemaphore vkReady{VK_NULL_HANDLE};
+            SharedImageInfo info;
 
-        // Grow-only allocated capacity of each slot's shared image. A resize
-        // within capacity reuses the existing allocation/export (no rebuild, no
-        // FD re-export, no GL re-import); the image is only reallocated when the
-        // request exceeds capacity, at which point capacity grows to the
-        // componentwise max of the request and the screen size (monotonic).
-        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityW{};
-        std::array<int, FRAMES_IN_FLIGHT> m_sharedCapacityH{};
+            // Grow-only allocated capacity of the shared image. A resize within
+            // capacity reuses the existing allocation/export (no rebuild, no FD
+            // re-export, no GL re-import); the image is only reallocated when the
+            // request exceeds capacity, at which point capacity grows to the
+            // componentwise max of the request and the screen size (monotonic).
+            int capacityW{0};
+            int capacityH{0};
+        };
+
+        std::array<SharedImage, FRAMES_IN_FLIGHT> m_shared{};
 
         void cleanupSharedImage(uint32_t slot);
 
