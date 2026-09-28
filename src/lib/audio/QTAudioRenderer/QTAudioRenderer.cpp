@@ -392,7 +392,7 @@ namespace IPCore
         return true;
     }
 
-    void QTAudioThread::detachAudioOutputDevice()
+    bool QTAudioThread::detachAudioOutputDevice()
     {
         if (AudioRenderer::debug)
             TwkUtil::Log("AUDIO") << "detachAudioOutputDevice";
@@ -420,12 +420,20 @@ namespace IPCore
         }
 
         quit();
-        waitForAudioThreadToFinish();
+        if (!waitForAudioThreadToFinish())
+        {
+            //
+            //  The objects still belong to the running thread; leak them
+            //  rather than delete them cross-thread.
+            //
+            return false;
+        }
 
         //
         //  Last resort for anything the marshalled delete could not reach.
         //
         deleteAudioOutputObjects();
+        return true;
     }
 
     bool QTAudioThread::canBlockOnAudioThread() const
@@ -433,21 +441,25 @@ namespace IPCore
         return isRunning() && eventDispatcher() != nullptr && QThread::currentThread() != this;
     }
 
-    void QTAudioThread::waitForAudioThreadToFinish()
+    bool QTAudioThread::waitForAudioThreadToFinish()
     {
         constexpr unsigned long audioThreadExitTimeoutMS = 5000;
 
-        if (!wait(audioThreadExitTimeoutMS))
+        if (wait(audioThreadExitTimeoutMS))
         {
-            static bool reported = false;
-
-            if (!reported)
-            {
-                reported = true;
-                std::cerr << "WARNING: audio thread did not exit within " << audioThreadExitTimeoutMS
-                          << " ms; continuing shutdown without it" << std::endl;
-            }
+            return true;
         }
+
+        static bool reported = false;
+
+        if (!reported)
+        {
+            reported = true;
+            std::cerr << "WARNING: audio thread did not exit within " << audioThreadExitTimeoutMS << " ms; continuing shutdown without it"
+                      << std::endl;
+        }
+
+        return false;
     }
 
     void QTAudioThread::deleteAudioOutputObjects()
@@ -1086,7 +1098,18 @@ namespace IPCore
     {
         if (m_thread)
         {
-            delete m_thread;
+            //
+            //  Destroying a QThread that is still running is fatal in Qt6, so
+            //  a wedged audio thread is leaked, detached from its parent.
+            //
+            if (m_thread->detachAudioOutputDevice())
+            {
+                delete m_thread;
+            }
+            else
+            {
+                m_thread->setParent(nullptr);
+            }
         }
     }
 

@@ -111,6 +111,12 @@ namespace IPCore
 
         void startMe();
 
+        //
+        //  Stop the device and the thread. Returns false if the thread did
+        //  not exit in time; it must then be leaked, not destroyed.
+        //
+        bool detachAudioOutputDevice();
+
         size_t processedSamples() const;
         void setProcessedSamples(size_t n);
 
@@ -165,8 +171,6 @@ namespace IPCore
     private:
         bool createAudioOutput();
 
-        void detachAudioOutputDevice();
-
         //
         //  True if a BlockingQueuedConnection call to this thread can return:
         //  it is running an event loop and is not the calling thread.
@@ -174,9 +178,10 @@ namespace IPCore
         bool canBlockOnAudioThread() const;
 
         //
-        //  Bounded wait(); reports once if the bound is reached.
+        //  Bounded wait(); reports once and returns false if the bound is
+        //  reached.
         //
-        void waitForAudioThreadToFinish();
+        bool waitForAudioThreadToFinish();
 
         //
         //  Delete the output objects and null them. Idempotent.
