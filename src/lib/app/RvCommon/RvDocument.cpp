@@ -158,10 +158,6 @@ namespace Rv
         , m_diagnosticsDock(nullptr)
         , m_oldGLView(0)
         , m_glView(0)
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        , m_vulkanView(nullptr)
-#endif
-        , m_viewWidget(nullptr)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -1398,10 +1394,6 @@ namespace Rv
 #endif
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
-
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-    VulkanView* RvDocument::vulkanView() const { return m_vulkanView; }
-#endif
 
     void RvDocument::center()
     {

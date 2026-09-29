@@ -45,7 +45,7 @@ namespace Rv
         Q_OBJECT
 
     public:
-        typedef TwkUtil::Timer Timer;
+        using Timer = TwkUtil::Timer;
 
         explicit VulkanWindow(RvDocument* doc, bool noResize = true);
         ~VulkanWindow() override;
@@ -53,7 +53,7 @@ namespace Rv
         QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
 
         //  Owned by the hosting VulkanView, not by this window.
-        void setVideoDevice(QTVulkanVideoDevice* d) { m_videoDevice = d; }
+        void setVideoDevice(QTVulkanVideoDevice* device) { m_videoDevice = device; }
 
         //  The container QWidget; used for focus and the popup check in render().
         void setEventWidget(QWidget* widget) { m_eventWidget = widget; }
@@ -202,23 +202,23 @@ namespace Rv
         void emitPresentationRecord();
 
         RvDocument* m_doc;
-        QTVulkanVideoDevice* m_videoDevice;
+        QTVulkanVideoDevice* m_videoDevice{nullptr};
 
-        bool m_initialized;
+        bool m_initialized{false};
 
         // Platform window the VkSurfaceKHR was created against; see
         // handleSurfaceLost().
         const QPlatformWindow* m_initializedHandle{nullptr};
 
-        bool m_firstPaintCompleted;
+        bool m_firstPaintCompleted{false};
         bool m_postFirstNonEmptyRender;
-        bool m_stopProcessingEvents;
-        bool m_userActive;
+        bool m_stopProcessingEvents{false};
+        bool m_userActive{true};
 
-        QWidget* m_eventWidget;
+        QWidget* m_eventWidget{nullptr};
 
-        unsigned int m_lastKey;
-        QEvent::Type m_lastKeyType;
+        unsigned int m_lastKey{0};
+        QEvent::Type m_lastKeyType{QEvent::None};
         Timer m_activityTimer;
         Timer m_activationTimer;
         //  Forward-progress guard for canPresentNow().
@@ -246,8 +246,13 @@ namespace Rv
         std::vector<VkCommandBuffer> m_vkCommandBuffers;
 
         // Per-in-flight-slot ring (indexed by m_currentFrame).
-        std::array<VkSemaphore, kFramesInFlight> m_vkImageAvailableSemaphore{};
-        std::array<VkFence, kFramesInFlight> m_vkFence{};
+        struct FrameSync
+        {
+            VkSemaphore imageAvailable{VK_NULL_HANDLE};
+            VkFence fence{VK_NULL_HANDLE};
+        };
+
+        std::array<FrameSync, kFramesInFlight> m_frameSync{};
         uint32_t m_currentFrame{0};
 
         // Per swapchain image. The present-wait semaphore must be per image,
@@ -258,21 +263,31 @@ namespace Rv
 
         // CPU-fallback staging buffer, per slot so a frame never overwrites a
         // buffer an in-flight copy still reads; the slot fence gates reuse.
-        std::array<VkBuffer, kFramesInFlight> m_vkStagingBuffer{};
-        std::array<VkDeviceMemory, kFramesInFlight> m_vkStagingBufferMemory{};
-        std::array<size_t, kFramesInFlight> m_stagingBufferSize{};
+        struct StagingBuffer
+        {
+            VkBuffer buffer{VK_NULL_HANDLE};
+            VkDeviceMemory memory{VK_NULL_HANDLE};
+            size_t size{0};
+        };
+
+        std::array<StagingBuffer, kFramesInFlight> m_staging{};
 
         // Shared interop image, per slot.
-        std::array<VkImage, kFramesInFlight> m_vkSharedImage{};
-        std::array<VkDeviceMemory, kFramesInFlight> m_vkSharedImageMemory{};
-        std::array<VkSemaphore, kFramesInFlight> m_vkGlReadySemaphore{};
-        std::array<VkSemaphore, kFramesInFlight> m_vkVkReadySemaphore{};
-        std::array<SharedImageInfo, kFramesInFlight> m_sharedImageInfo{};
+        struct SharedImage
+        {
+            VkImage image{VK_NULL_HANDLE};
+            VkDeviceMemory memory{VK_NULL_HANDLE};
+            VkSemaphore glReadySemaphore{VK_NULL_HANDLE};
+            VkSemaphore vkReadySemaphore{VK_NULL_HANDLE};
+            SharedImageInfo info{};
 
-        // Grow-only capacity: a resize within it reuses the export and the GL
-        // import.
-        std::array<int, kFramesInFlight> m_sharedCapacityW{};
-        std::array<int, kFramesInFlight> m_sharedCapacityH{};
+            // Grow-only capacity: a resize within it reuses the export and the
+            // GL import.
+            int capacityW{0};
+            int capacityH{0};
+        };
+
+        std::array<SharedImage, kFramesInFlight> m_shared{};
 
         void cleanupSharedImage(uint32_t slot);
 

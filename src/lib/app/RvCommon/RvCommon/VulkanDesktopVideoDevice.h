@@ -39,7 +39,7 @@ namespace Rv
 
     private:
         //  Owns the QTVulkanVideoDevice used as the base m_viewDevice.
-        VulkanView* m_vulkanView;
+        VulkanView* m_vulkanView{nullptr};
     };
 
 } // namespace Rv

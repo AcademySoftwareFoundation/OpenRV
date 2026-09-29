@@ -17,7 +17,6 @@ namespace Rv
     VulkanDesktopVideoDevice::VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen,
                                                        const QTGLVideoDevice* shareDevice)
         : DesktopVideoDevice(module, name, screen, shareDevice)
-        , m_vulkanView(nullptr)
     {
         //
         //  Re-advertise at 10-bit (the base advertised RGB8); only built once
@@ -52,13 +51,13 @@ namespace Rv
         m_translator = new QTTranslator(this, m_vulkanView);
 
         //  Place before show(): the swapchain is built on first expose.
-        const QRect g = screenGeometry();
-        m_vulkanView->move(g.x(), g.y());
-        m_vulkanView->setGeometry(g);
+        const QRect screenRect = screenGeometry();
+        m_vulkanView->move(screenRect.x(), screenRect.y());
+        m_vulkanView->setGeometry(screenRect);
 
         m_vulkanView->setWindowState(useFullScreen() ? Qt::WindowFullScreen : Qt::WindowNoState);
 
-        m_vulkanView->setGeometry(g);
+        m_vulkanView->setGeometry(screenRect);
 
         m_vulkanView->show();
 
