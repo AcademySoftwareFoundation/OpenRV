@@ -1162,13 +1162,13 @@ namespace Rv
             }
         }
 
-        // False when RV_VULKAN_FORCE_TILING is unset or unrecognized.
-        bool forcedTilingRequested(VkImageTiling& out)
+        // nullopt when RV_VULKAN_FORCE_TILING is unset or unrecognized.
+        std::optional<VkImageTiling> forcedTilingRequested()
         {
             const char* value = getenv("RV_VULKAN_FORCE_TILING");
             if (!value)
             {
-                return false;
+                return std::nullopt;
             }
 
             std::string lowered(value);
@@ -1177,18 +1177,16 @@ namespace Rv
 
             if (lowered == "optimal")
             {
-                out = VK_IMAGE_TILING_OPTIMAL;
-                return true;
+                return VK_IMAGE_TILING_OPTIMAL;
             }
             if (lowered == "linear")
             {
-                out = VK_IMAGE_TILING_LINEAR;
-                return true;
+                return VK_IMAGE_TILING_LINEAR;
             }
 
             cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING='" << value << "' is not recognized (expected 'optimal' or 'linear'); "
                  << "ignoring it and using the negotiated tiling" << endl;
-            return false;
+            return std::nullopt;
         }
 
         // Resolved dynamically (with the KHR alias) so a 1.0-only loader
@@ -1381,20 +1379,20 @@ namespace Rv
         }
 
         //  Overrides last, so the record reports both values.
-        VkImageTiling forcedTiling = VK_IMAGE_TILING_LINEAR;
-        if (forcedTilingRequested(forcedTiling) && forcedTiling != cfg.tiling)
+        const std::optional<VkImageTiling> forcedTiling = forcedTilingRequested();
+        if (forcedTiling && *forcedTiling != cfg.tiling)
         {
             VkExternalMemoryFeatureFlags features = 0;
-            if (probeTiling(forcedTiling, features))
+            if (probeTiling(*forcedTiling, features))
             {
                 cfg.tilingOverridden = true;
-                cfg.tiling = forcedTiling;
+                cfg.tiling = *forcedTiling;
                 cfg.externalFeatures = features;
                 cfg.dedicatedAllocation = (features & VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT) != 0;
             }
             else
             {
-                cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING=" << tilingName(forcedTiling)
+                cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING=" << tilingName(*forcedTiling)
                      << " refused -- the driver does not report it as exportable; using the negotiated " << tilingName(cfg.tiling) << endl;
             }
         }
