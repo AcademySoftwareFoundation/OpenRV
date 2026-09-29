@@ -26,7 +26,7 @@ namespace TwkGLF
     //
     //  Destruction makes nothing current again if this scope acquired. If no
     //  context can be resolved, the scope reports once and does nothing; it
-    //  never throws. Check hasContext() if needed.
+    //  never throws.
     //
     //  Limitation: an already-current context is kept even when it is not the
     //  supplied device's, since a natively bound context cannot be restored
@@ -42,11 +42,8 @@ namespace TwkGLF
         GLContextScope(const GLContextScope&) = delete;
         GLContextScope& operator=(const GLContextScope&) = delete;
 
-        bool hasContext() const { return m_hasContext; }
-
     private:
-        bool m_acquired; // did this scope make something current?
-        bool m_hasContext;
+        bool m_acquired{false}; // did this scope make something current?
     };
 
 } // namespace TwkGLF

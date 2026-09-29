@@ -69,6 +69,7 @@
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/User.h>
 #include <TwkUtil/File.h>
+#include <array>
 #include <assert.h>
 #include <RvCommon/GLView.h> // WINDOWS NEEDS THIS LAST
 // #include <RvCommon/SequenceFileEngine.h>
@@ -406,8 +407,8 @@ namespace Rv
             if (ix >= 0 && iy >= 0 && static_cast<size_t>(ix) < device->width() && static_cast<size_t>(iy) < device->height())
             {
                 device->makeCurrent();
-                GLubyte rgba[4] = {};
-                glReadPixels(ix, iy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
+                std::array<GLubyte, 4> rgba{};
+                glReadPixels(ix, iy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
                 v[0] = static_cast<float>(rgba[0]) / 255.0f;
                 v[1] = static_cast<float>(rgba[1]) / 255.0f;
                 v[2] = static_cast<float>(rgba[2]) / 255.0f;

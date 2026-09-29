@@ -16,6 +16,7 @@
 
 #include <atomic>
 #include <iostream>
+#include <memory>
 
 namespace TwkGLF
 {
@@ -63,31 +64,28 @@ namespace TwkGLF
                 return false;
             }
 
-            QOpenGLContext* context = new QOpenGLContext;
+            auto context = std::make_unique<QOpenGLContext>();
             context->setShareContext(share);
             context->setFormat(share->format());
 
             if (!context->create() || !context->shareContext())
             {
-                delete context;
                 reportNoContext("shared context creation failed");
                 return false;
             }
 
-            QOffscreenSurface* surface = new QOffscreenSurface;
+            auto surface = std::make_unique<QOffscreenSurface>();
             surface->setFormat(context->format());
             surface->create();
 
             if (!surface->isValid())
             {
-                delete surface;
-                delete context;
                 reportNoContext("offscreen surface creation failed");
                 return false;
             }
 
-            s_fallbackContext = context;
-            s_fallbackSurface = surface;
+            s_fallbackContext = context.release();
+            s_fallbackSurface = surface.release();
 
             return true;
         }
@@ -134,15 +132,12 @@ namespace TwkGLF
     } // namespace
 
     GLContextScope::GLContextScope(const GLVideoDevice* device)
-        : m_acquired(false)
-        , m_hasContext(false)
     {
         //
         //  Never displace a live context, including a natively bound one.
         //
         if (twkGlAnyContextIsCurrent())
         {
-            m_hasContext = true;
             return;
         }
 
@@ -153,7 +148,6 @@ namespace TwkGLF
             if (twkGlAnyContextIsCurrent())
             {
                 m_acquired = true;
-                m_hasContext = true;
                 return;
             }
         }
@@ -161,7 +155,6 @@ namespace TwkGLF
         if (makeFallbackCurrent())
         {
             m_acquired = true;
-            m_hasContext = true;
         }
     }
 

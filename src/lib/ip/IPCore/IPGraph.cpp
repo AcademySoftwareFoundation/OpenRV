@@ -763,9 +763,9 @@ namespace IPCore
 
         std::vector<TwkApp::VideoDevice*> devices;
 
-        for (size_t i = 0; i < modules.size(); i++)
+        for (const auto& module : modules)
         {
-            const TwkApp::VideoModule::VideoDevices& mdevices = modules[i]->devices();
+            const TwkApp::VideoModule::VideoDevices& mdevices = module->devices();
             devices.insert(devices.end(), mdevices.begin(), mdevices.end());
         }
 
@@ -782,9 +782,8 @@ namespace IPCore
         DisplayGroups survivors;
         DisplayGroups doomed;
 
-        for (size_t gi = 0; gi < m_displayGroups.size(); gi++)
+        for (DisplayGroupIPNode* group : m_displayGroups)
         {
-            DisplayGroupIPNode* group = m_displayGroups[gi];
 
             if (group == m_defaultOutputGroup)
             {
@@ -844,16 +843,7 @@ namespace IPCore
             //
             if (group->outputDevice() && group->outputDevice() != m_controlDevice)
             {
-                bool stillPresent = false;
-
-                for (size_t di = 0; di < devices.size(); di++)
-                {
-                    if (devices[di] == group->outputDevice())
-                    {
-                        stillPresent = true;
-                        break;
-                    }
-                }
+                const bool stillPresent = std::find(devices.begin(), devices.end(), group->outputDevice()) != devices.end();
 
                 if (!stillPresent)
                 {
@@ -870,9 +860,9 @@ namespace IPCore
         //
         m_displayGroups = survivors;
 
-        for (size_t i = 0; i < doomed.size(); i++)
+        for (DisplayGroupIPNode* group : doomed)
         {
-            delete doomed[i];
+            delete group;
             m_topologyChanged = true;
         }
 

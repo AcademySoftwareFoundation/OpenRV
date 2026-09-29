@@ -45,8 +45,6 @@ namespace Rv
         QTVulkanVideoDevice(const QTVulkanVideoDevice&) = delete;
         QTVulkanVideoDevice& operator=(const QTVulkanVideoDevice&) = delete;
 
-        void setEventWidget(QWidget* widget);
-
         void resetInteropDeviceMatch() const { m_glVulkanDeviceMatch = -1; }
 
         const QTTranslator& translator() const { return *m_translator; }
@@ -100,13 +98,11 @@ namespace Rv
         //  The window container owns the window, so Qt can delete it
         //  independently of this device.
         QPointer<VulkanWindow> m_window;
-        QWidget* m_eventWidget;
         std::unique_ptr<QTTranslator> m_translator;
         float m_devicePixelRatio{1.0f};
         int m_x{0};
         int m_y{0};
         float m_refresh{-1.0f};
-        bool m_isOpen{false};
 
         mutable std::unique_ptr<QOpenGLContext> m_glContext;
         mutable std::unique_ptr<QOffscreenSurface> m_offscreenSurface;

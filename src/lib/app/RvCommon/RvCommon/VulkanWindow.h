@@ -320,6 +320,9 @@ namespace Rv
 
         InteropConfig m_interopConfig;
         bool m_interopNegotiated{false};
+        // Set when the shared image cannot be used with the current swapchain
+        // (no blit support, unaligned row pitch); cleared on swapchain rebuild.
+        bool m_sharedImageUnusable{false};
         bool m_recordEmitted{false};
 
         PresentPath m_presentPath{PresentPath::Undetermined};

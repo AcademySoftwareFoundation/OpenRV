@@ -43,10 +43,6 @@ namespace Rv
 
         bool firstPaintCompleted() const;
 
-        void absolutePosition(int& x, int& y) const;
-
-        float devicePixelRatio() const;
-
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }
 
         void setMinimumContentSize(int w, int h) { m_msize = QSize(w, h); }

@@ -74,11 +74,7 @@ namespace Rv
         assert(view);
     }
 
-    QTGLVideoDevice::~QTGLVideoDevice()
-    {
-        delete m_translator;
-        delete m_teardownSurface;
-    }
+    QTGLVideoDevice::~QTGLVideoDevice() { delete m_translator; }
 
     void QTGLVideoDevice::setWidget(QOpenGLWidget* widget)
     {
@@ -121,7 +117,7 @@ namespace Rv
             // Needs a live context to copy the format from.
             if (!m_teardownSurface && m_window->context())
             {
-                m_teardownSurface = new QOffscreenSurface();
+                m_teardownSurface = std::make_unique<QOffscreenSurface>();
                 m_teardownSurface->setFormat(m_window->context()->format());
                 m_teardownSurface->create();
             }
@@ -146,7 +142,7 @@ namespace Rv
             TWK_GLDEBUG;
         }
         else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
-                 && m_window->context()->makeCurrent(m_teardownSurface))
+                 && m_window->context()->makeCurrent(m_teardownSurface.get()))
         {
             // Surface gone, context alive: GL deletion only needs a current context.
             TWK_GLDEBUG;

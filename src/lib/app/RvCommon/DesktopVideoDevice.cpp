@@ -35,6 +35,7 @@
 #include <QScreen>
 #include <QVBoxLayout>
 
+#include <array>
 #include <vector>
 
 // #define DEBUG_NO_FULLSCREEN
@@ -1078,9 +1079,9 @@ namespace Rv
                 //  Null when the reported profile path is gone or unreadable.
                 if (cmsHPROFILE profile = cmsOpenProfileFromFile(path.data(), "r"))
                 {
-                    char desc[256] = {0};
-                    cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc, sizeof(desc));
-                    m_colorProfile.description = desc;
+                    std::array<char, 256> desc{};
+                    cmsGetProfileInfoASCII(profile, cmsInfoDescription, "en", "US", desc.data(), desc.size());
+                    m_colorProfile.description = desc.data();
                     cmsCloseProfile(profile);
                 }
             }

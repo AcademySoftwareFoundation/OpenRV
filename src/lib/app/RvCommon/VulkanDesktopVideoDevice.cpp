@@ -37,7 +37,7 @@ namespace Rv
         }
 
         //  A null doc makes the view passive (see VulkanWindow.h).
-        m_vulkanView = new VulkanView(/*doc*/ nullptr, /*parent*/ nullptr, /*noResize*/ true);
+        m_vulkanView = std::make_unique<VulkanView>(/*doc*/ nullptr, /*parent*/ nullptr, /*noResize*/ true);
 
         //  The view owns this device. There is no QOpenGLWidget, so this
         //  bypasses setViewWidget() and installs the translator by hand.
@@ -48,7 +48,7 @@ namespace Rv
         m_vulkanView->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
 
         //  Inert, created for parity with the base class's setViewWidget().
-        m_translator = new QTTranslator(this, m_vulkanView);
+        m_translator = new QTTranslator(this, m_vulkanView.get());
 
         //  Place before show(): the swapchain is built on first expose.
         const QRect screenRect = screenGeometry();
@@ -80,8 +80,7 @@ namespace Rv
 
         setViewDevice(nullptr);
 
-        delete m_vulkanView;
-        m_vulkanView = nullptr;
+        m_vulkanView.reset();
 
         delete m_translator;
         m_translator = nullptr;

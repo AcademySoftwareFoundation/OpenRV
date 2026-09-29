@@ -219,7 +219,7 @@ namespace Rv
         {
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: RvDocument: supports10BitPresentation()=" << (useVulkan ? "true" : "false") << endl;
+                cout << "INFO: RvDocument: shouldUseVulkanPresentation()=" << (useVulkan ? "true" : "false") << endl;
             }
             if (!useVulkan)
             {
@@ -258,7 +258,7 @@ namespace Rv
             else
             {
                 RvSession* s = static_cast<RvSession*>(docs.front());
-                RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+                RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
                 // view() is null if the front document is on Vulkan.
                 QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
                 m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
@@ -935,7 +935,7 @@ namespace Rv
         else
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
+            RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
             QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
             newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                                    opts.vsync != 0 && !m_vsyncDisabled, true, fallbackRedBits, fallbackGreenBits, fallbackBlueBits,

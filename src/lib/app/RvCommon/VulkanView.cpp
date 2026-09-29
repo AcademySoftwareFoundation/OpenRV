@@ -269,24 +269,6 @@ namespace Rv
 
     bool VulkanView::firstPaintCompleted() const { return m_vulkanWindow && m_vulkanWindow->firstPaintCompleted(); }
 
-    void VulkanView::absolutePosition(int& x, int& y) const
-    {
-        if (m_vulkanWindow)
-        {
-            m_vulkanWindow->absolutePosition(x, y);
-            return;
-        }
-
-        const QPoint gp = mapToGlobal(QPoint(0, 0));
-        x = gp.x();
-        y = gp.y();
-    }
-
-    float VulkanView::devicePixelRatio() const
-    {
-        return m_vulkanWindow ? m_vulkanWindow->devicePixelRatioF() : static_cast<float>(devicePixelRatioF());
-    }
-
     bool VulkanView::supports10BitPresentation() { return VulkanWindow::supports10BitPresentation(); }
 
 } // namespace Rv

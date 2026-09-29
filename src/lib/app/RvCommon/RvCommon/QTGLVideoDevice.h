@@ -8,6 +8,7 @@
 #ifndef __RvCommon__QTGLVideoDevice__h__
 #define __RvCommon__QTGLVideoDevice__h__
 #include <iostream>
+#include <memory>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
 #include <QOpenGLWindow>
@@ -145,7 +146,7 @@ namespace Rv
         //  native surface but not its context (shutdown). Created while the
         //  window is healthy: QOffscreenSurface needs the platform plugin.
         //
-        mutable QOffscreenSurface* m_teardownSurface{nullptr};
+        mutable std::unique_ptr<QOffscreenSurface> m_teardownSurface;
         QTTranslator* m_translator;
     };
 

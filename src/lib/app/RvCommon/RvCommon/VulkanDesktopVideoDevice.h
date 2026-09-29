@@ -8,6 +8,8 @@
 
 #include <RvCommon/DesktopVideoDevice.h>
 
+#include <memory>
+
 namespace Rv
 {
     class VulkanView;
@@ -39,7 +41,7 @@ namespace Rv
 
     private:
         //  Owns the QTVulkanVideoDevice used as the base m_viewDevice.
-        VulkanView* m_vulkanView{nullptr};
+        std::unique_ptr<VulkanView> m_vulkanView;
     };
 
 } // namespace Rv

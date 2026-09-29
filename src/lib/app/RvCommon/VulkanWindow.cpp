@@ -38,6 +38,7 @@
 #include <cstring>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -311,16 +312,15 @@ namespace Rv
         {
             static QVulkanInstance* instance = []() -> QVulkanInstance*
             {
-                auto* inst = new QVulkanInstance();
+                auto inst = std::make_unique<QVulkanInstance>();
                 // 1.1 for vkGetPhysicalDeviceProperties2 (device UUID matching).
                 inst->setApiVersion(QVersionNumber(1, 1));
                 if (!inst->create())
                 {
                     cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << endl;
-                    delete inst;
                     return nullptr;
                 }
-                return inst;
+                return inst.release();
             }();
             return instance;
         }
@@ -573,7 +573,9 @@ namespace Rv
         }
         m_glFallbackRequested = true;
 
-        //  Logged explicitly since OpenGL forgoes 10-bit.
+        //  Logged explicitly since OpenGL forgoes 10-bit, even if a record was
+        //  already emitted for an earlier path.
+        m_recordEmitted = false;
         reportPresentPath(PresentPath::OpenGL,
                           m_presentPathReason.empty() ? std::string("Vulkan presentation could not be established") : m_presentPathReason);
 
@@ -634,6 +636,10 @@ namespace Rv
         m_vkSwapchainExtent = {};
         m_vkSwapchainImages.clear();
         m_currentFrame = 0;
+
+        m_interopNegotiated = false;
+        m_interopConfig = {};
+        m_sharedImageUnusable = false;
 
         m_initialized = false;
         m_initializedHandle = nullptr;
@@ -892,6 +898,7 @@ namespace Rv
         }
 
         m_vkSwapchainFormat = surfaceFormat.format;
+        m_sharedImageUnusable = false;
 
         m_vkSwapchainExtent = capabilities.currentExtent;
         if (m_vkSwapchainExtent.width == std::numeric_limits<uint32_t>::max())
@@ -1718,8 +1725,18 @@ namespace Rv
 
     const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int w, int h)
     {
-        if (!m_vkDevice || !m_externalInteropSupported)
+        if (!m_vkDevice || !m_externalInteropSupported || m_sharedImageUnusable)
         {
+            return nullptr;
+        }
+
+        if (!m_interopConfig.supported)
+        {
+            if (ImageRenderer::debugGpu())
+            {
+                cout << "INFO: VulkanWindow: getSharedImageInfo: interop unavailable (" << m_interopConfig.rejectReason
+                     << "); using the CPU readback path" << endl;
+            }
             return nullptr;
         }
 
@@ -1752,19 +1769,32 @@ namespace Rv
         const int capW = std::max({w, screenW, m_shared[slot].capacityW});
         const int capH = std::max({h, screenH, m_shared[slot].capacityH});
 
-        cleanupSharedImage(slot);
+        const bool optimalTiling = m_interopConfig.tiling == VK_IMAGE_TILING_OPTIMAL;
 
-        if (!m_interopConfig.supported)
+        // A format mismatch needs a blit; without blit support, use the CPU
+        // fallback.
+        if (m_vkSwapchainFormat != VK_FORMAT_A2B10G10R10_UNORM_PACK32)
         {
-            if (ImageRenderer::debugGpu())
+            VkFormatProperties srcProps = {};
+            VkFormatProperties dstProps = {};
+            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, VK_FORMAT_A2B10G10R10_UNORM_PACK32, &srcProps);
+            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
+            const VkFormatFeatureFlags srcFeatures = optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
+            const bool blitOk =
+                (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
+            if (!blitOk)
             {
-                cout << "INFO: VulkanWindow: getSharedImageInfo: interop unavailable (" << m_interopConfig.rejectReason
-                     << "); using the CPU readback path" << endl;
+                if (ImageRenderer::debugGpu())
+                {
+                    cout << "INFO: VulkanWindow: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
+                         << " swapchain (blit unsupported); using CPU fallback." << endl;
+                }
+                m_sharedImageUnusable = true;
+                return nullptr;
             }
-            return nullptr;
         }
 
-        const bool optimalTiling = m_interopConfig.tiling == VK_IMAGE_TILING_OPTIMAL;
+        cleanupSharedImage(slot);
 
         //  Unconditional: fires about once per slot per session.
         cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
@@ -1800,29 +1830,6 @@ namespace Rv
             return nullptr;
         }
 
-        // A format mismatch needs a blit; without blit support, use the CPU
-        // fallback.
-        if (m_vkSwapchainFormat != VK_FORMAT_A2B10G10R10_UNORM_PACK32)
-        {
-            VkFormatProperties srcProps = {};
-            VkFormatProperties dstProps = {};
-            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, VK_FORMAT_A2B10G10R10_UNORM_PACK32, &srcProps);
-            vkGetPhysicalDeviceFormatProperties(m_vkPhysicalDevice, m_vkSwapchainFormat, &dstProps);
-            const VkFormatFeatureFlags srcFeatures = optimalTiling ? srcProps.optimalTilingFeatures : srcProps.linearTilingFeatures;
-            const bool blitOk =
-                (srcFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT) && (dstProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT);
-            if (!blitOk)
-            {
-                if (ImageRenderer::debugGpu())
-                {
-                    cout << "INFO: VulkanWindow: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
-                         << " swapchain (blit unsupported); using CPU fallback." << endl;
-                }
-                cleanupSharedImage(slot);
-                return nullptr;
-            }
-        }
-
         // vkGetImageSubresourceLayout is only valid for LINEAR tiling.
         if (optimalTiling)
         {
@@ -1842,6 +1849,7 @@ namespace Rv
             {
                 // Not an integer pixel width; use the CPU fallback.
                 cleanupSharedImage(slot);
+                m_sharedImageUnusable = true;
                 return nullptr;
             }
             info.strideWidth = static_cast<int>(layout.rowPitch / 4);
@@ -2906,7 +2914,6 @@ namespace Rv
             return QWindow::event(event);
         }
 
-        bool keyevent = false;
         Rv::Session* session = m_doc ? m_doc->session() : nullptr;
 
         if (m_stopProcessingEvents)
@@ -2949,7 +2956,6 @@ namespace Rv
 
         if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
         {
-            keyevent = true;
             if (m_lastKey == kevent->key()
                 && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
             {
