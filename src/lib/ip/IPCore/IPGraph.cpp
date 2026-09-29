@@ -684,9 +684,26 @@ namespace IPCore
         //  VideoModules can be initialized late.
         //
 
-        for (size_t i = 0; i < m_displayGroups.size(); i++)
+        //
+        //  Work from a copy: ~DisplayGroupIPNode calls
+        //  IPGraph::removeDisplayGroup(this), which erases the node from
+        //  m_displayGroups. Indexing m_displayGroups directly while deleting
+        //  from it therefore skips every other entry, leaving orphaned
+        //  DisplayGroupIPNodes still wired to m_rootNode and still holding
+        //  pointers to devices the caller is about to destroy. Walking the graph
+        //  afterwards then dereferences freed memory in
+        //  DisplayGroupIPNode::imageDevice(). This only shows up when
+        //  setPhysicalDevices() is called a second time with more than one real
+        //  display group (e.g. rebuilding the desktop devices for a live
+        //  8/10-bit backend switch); at startup the list holds only the default
+        //  group, which is never deleted.
+        //
+
+        const DisplayGroups groups = m_displayGroups;
+
+        for (size_t i = 0; i < groups.size(); i++)
         {
-            DisplayGroupIPNode* node = m_displayGroups[i];
+            DisplayGroupIPNode* node = groups[i];
 
             if (node == m_defaultOutputGroup)
             {
@@ -702,11 +719,11 @@ namespace IPCore
             }
         }
 
-        for (size_t i = 0; i < m_displayGroups.size(); i++)
+        for (size_t i = 0; i < groups.size(); i++)
         {
-            if (m_displayGroups[i] != m_defaultOutputGroup)
+            if (groups[i] != m_defaultOutputGroup)
             {
-                delete m_displayGroups[i];
+                delete groups[i];
             }
         }
 
@@ -744,6 +761,174 @@ namespace IPCore
         displayGroup->setInputs1(m_viewGroupNode);
 
         m_rootNode->appendInput(displayGroup);
+    }
+
+    void IPGraph::refreshPhysicalDevices(const VideoModules& modules)
+    {
+        beginGraphEdit();
+        refreshPhysicalDevicesInternal(modules);
+        endGraphEdit();
+    }
+
+    void IPGraph::refreshPhysicalDevicesInternal(const VideoModules& modules)
+    {
+        //
+        //  Unlike setPhysicalDevicesInternal(), keep the existing display groups
+        //  so their colour pipelines survive. Groups are matched to devices by
+        //  (module name, device name), which is stable while the monitors are.
+        //
+
+        std::vector<TwkApp::VideoDevice*> devices;
+
+        for (size_t i = 0; i < modules.size(); i++)
+        {
+            const TwkApp::VideoModule::VideoDevices& mdevices = modules[i]->devices();
+            devices.insert(devices.end(), mdevices.begin(), mdevices.end());
+        }
+
+        //
+        //  Nothing to preserve.
+        //
+        if (devices.empty() || m_displayGroups.empty())
+        {
+            setPhysicalDevicesInternal(modules);
+            return;
+        }
+
+        std::vector<bool> deviceMatched(devices.size(), false);
+        DisplayGroups survivors;
+        DisplayGroups doomed;
+
+        for (size_t gi = 0; gi < m_displayGroups.size(); gi++)
+        {
+            DisplayGroupIPNode* group = m_displayGroups[gi];
+
+            if (group == m_defaultOutputGroup)
+            {
+                survivors.push_back(group);
+                continue;
+            }
+
+            //
+            //  Match on the stored names, never on physicalDevice(): that
+            //  pointer refers to a device the caller has already destroyed.
+            //
+            const StringProperty* nameProp = group->property<StringProperty>("device.name");
+            const StringProperty* moduleProp = group->property<StringProperty>("device.moduleName");
+            const string groupName = (nameProp && !nameProp->empty()) ? nameProp->front() : "";
+            const string groupModule = (moduleProp && !moduleProp->empty()) ? moduleProp->front() : "";
+
+            size_t match = devices.size();
+
+            for (size_t di = 0; di < devices.size(); di++)
+            {
+                if (deviceMatched[di])
+                {
+                    continue;
+                }
+
+                const string deviceModule = devices[di]->module() ? devices[di]->module()->name() : "";
+
+                if (devices[di]->name() == groupName && deviceModule == groupModule)
+                {
+                    match = di;
+                    break;
+                }
+            }
+
+            if (match == devices.size())
+            {
+                //
+                //  The group's device is gone (e.g. a monitor was unplugged).
+                //
+                if (m_rootNode->isInput(group))
+                {
+                    m_rootNode->removeInput(group);
+                }
+                group->willDelete();
+                group->disconnectInputs();
+                doomed.push_back(group);
+                continue;
+            }
+
+            deviceMatched[match] = true;
+            group->setPhysicalVideoDevice(devices[match]);
+
+            //
+            //  Drop a dangling output pointer: findDisplayGroupByDevice()
+            //  compares pointers and it could alias a new device. The control
+            //  device is still alive, so keep it.
+            //
+            if (group->outputDevice() && group->outputDevice() != m_controlDevice)
+            {
+                bool stillPresent = false;
+
+                for (size_t di = 0; di < devices.size(); di++)
+                {
+                    if (devices[di] == group->outputDevice())
+                    {
+                        stillPresent = true;
+                        break;
+                    }
+                }
+
+                if (!stillPresent)
+                {
+                    group->setOutputVideoDevice(nullptr);
+                }
+            }
+
+            survivors.push_back(group);
+        }
+
+        //
+        //  Publish the surviving set before deleting anything: ~DisplayGroupIPNode
+        //  calls back into removeDisplayGroup().
+        //
+        m_displayGroups = survivors;
+
+        for (size_t i = 0; i < doomed.size(); i++)
+        {
+            delete doomed[i];
+            m_topologyChanged = true;
+        }
+
+        //
+        //  Unmatched devices are new.
+        //
+        for (size_t di = 0; di < devices.size(); di++)
+        {
+            if (deviceMatched[di])
+            {
+                continue;
+            }
+
+            size_t n = m_displayGroups.size();
+            string name;
+
+            do
+            {
+                ostringstream str;
+                str << "displayGroup" << n++;
+                name = str.str();
+            } while (findNode(name));
+
+            m_displayGroups.push_back(newDisplayGroup(name, devices[di]));
+        }
+
+        //
+        //  The primary may have been deleted above, so re-establish the view
+        //  connection and the root input for whichever group leads now.
+        //
+        if (DisplayGroupIPNode* displayGroup = primaryDisplayGroup())
+        {
+            displayGroup->setInputs1(m_viewGroupNode);
+
+            if (!m_rootNode->isInput(displayGroup))
+            {
+                m_rootNode->appendInput(displayGroup);
+            }
+        }
     }
 
     void IPGraph::setPrimaryDisplayGroup(DisplayGroupIPNode* node)
@@ -798,7 +983,20 @@ namespace IPCore
             if (newDevice)
             {
                 dnode->setOutputVideoDevice(newDevice);
-                dnode->setPhysicalVideoDevice(newDevice->physicalDevice());
+
+                //
+                //  A view that has not rendered yet reports itself as its own
+                //  physical device. Keep the group's monitor in that case, or
+                //  its device.name no longer matches on refreshPhysicalDevices().
+                //
+                if (const VideoDevice* physical = newDevice->physicalDevice())
+                {
+                    if (physical != newDevice)
+                    {
+                        dnode->setPhysicalVideoDevice(physical);
+                    }
+                }
+
                 m_deviceChangedSignal(oldDevice, newDevice);
             }
         }

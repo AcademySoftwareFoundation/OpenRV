@@ -11,6 +11,7 @@
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLWidget>
 #include <QOpenGLWindow>
+#include <QOffscreenSurface>
 #include <QOpenGLContext>
 #include <QPointer>
 #include <QSurfaceFormat>
@@ -42,6 +43,9 @@ namespace Rv
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name, QOpenGLWindow* window, QWidget* eventWidget);
         QTGLVideoDevice(TwkApp::VideoModule*, const std::string& name);
         virtual ~QTGLVideoDevice();
+
+        QTGLVideoDevice(const QTGLVideoDevice&) = delete;
+        QTGLVideoDevice& operator=(const QTGLVideoDevice&) = delete;
 
         void setWidget(QOpenGLWidget*);
 
@@ -136,6 +140,12 @@ namespace Rv
         //  it, redraw() would call update() on a freed QOpenGLWindow.
         //
         QPointer<QOpenGLWindow> m_window;
+        //
+        //  Fallback surface for makeCurrent() once Qt has destroyed m_window's
+        //  native surface but not its context (shutdown). Created while the
+        //  window is healthy: QOffscreenSurface needs the platform plugin.
+        //
+        mutable QOffscreenSurface* m_teardownSurface{nullptr};
         QTTranslator* m_translator;
     };
 

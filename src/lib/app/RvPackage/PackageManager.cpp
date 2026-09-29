@@ -2043,6 +2043,8 @@ namespace Rv
         {
             m_globalSettingsP->sync();
             delete m_globalSettingsP;
+            // globalSettings() reallocates only when this is null.
+            m_globalSettingsP = nullptr;
         }
     }
 
@@ -2193,6 +2195,19 @@ namespace Rv
         QSettings* qs = new QSettings(format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
                                       PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME);
         qs->setFallbacksEnabled(false);
+
+#ifdef PLATFORM_WINDOWS
+        // The atomic temp-file rename fails with AccessError when security
+        // software holds RV.ini open.
+        qs->setAtomicSyncRequired(false);
+#endif
+
+        // IniFormat does not create the parent directory, and sync() fails without it.
+        QDir settingsDir(QFileInfo(qs->fileName()).absolutePath());
+        if (!settingsDir.exists())
+        {
+            settingsDir.mkpath(".");
+        }
 
         if (qs->status() != QSettings::NoError)
         {

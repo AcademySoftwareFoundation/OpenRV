@@ -8,6 +8,7 @@
 
 #include <TwkGLF/GLPixelBufferObjectPool.h>
 
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLSyncObject.h>
 
 #include <TwkUtil/EnvVar.h>
@@ -500,6 +501,25 @@ namespace TwkGLF
             _cleanupNoLock(_usedPool);
         }
 
+        //
+        //  Release every buffer while a context is still obtainable: the pools
+        //  are statics whose destructors run after Qt is gone. Emptying the
+        //  containers keeps that destructor from walking them again.
+        //
+        void clear()
+        {
+            std::unique_lock<decltype(_mutex)> guard(_mutex);
+
+            _cleanupNoLock(_freePool);
+            _cleanupNoLock(_usedPool);
+
+            _freePool.clear();
+            _usedPool.clear();
+
+            _allocSize = 0;
+            _allocNbBuffers = 0;
+        }
+
         void setSoftMaxSize(size_t softMaxSize)
         {
             std::unique_lock<decltype(_mutex)> guard(_mutex);
@@ -825,6 +845,7 @@ namespace TwkGLF
                 if (gPoolToGPUInitialized)
                 {
                     gPoolToGPUInitialized = false;
+                    gPoolToGPU.clear();
                 }
             }
             else
@@ -832,6 +853,7 @@ namespace TwkGLF
                 if (gPoolFromGPUInitialized)
                 {
                     gPoolFromGPUInitialized = false;
+                    gPoolFromGPU.clear();
                 }
             }
         }
@@ -922,11 +944,20 @@ namespace TwkGLF
     //
     void UninitPBOPools()
     {
+        //
+        //  Called after the event loop returns, when no view context is left.
+        //
+        const GLContextScope contextScope;
+
         if (prefetchUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::TO_GPU);
+        }
 
         if (writeBehindUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::FROM_GPU);
+        }
     }
 
 } // namespace TwkGLF

@@ -6,6 +6,7 @@
 //******************************************************************************
 
 #include <IPCore/ImageFBO.h>
+#include <TwkGLF/GLContextScope.h>
 #include <algorithm>
 
 namespace
@@ -238,6 +239,11 @@ namespace IPCore
 
     void ImageFBOManager::destroyImageFBO(ImageFBO* imageFBO)
     {
+        //
+        //  Reached from destructors and event callbacks, not only renders.
+        //
+        const TwkGLF::GLContextScope contextScope;
+
         m_totalSizeInBytes -= imageFBO->fbo()->totalSizeInBytes();
         deleteFBOFence(imageFBO->fbo());
         delete imageFBO->fbo();
@@ -545,6 +551,11 @@ namespace IPCore
 
     void ImageFBOManager::flushImageFBOs()
     {
+        //
+        //  Acquire once for the whole flush rather than per FBO.
+        //
+        const TwkGLF::GLContextScope contextScope;
+
         for (size_t i = 0; i < m_outputImageFBOs.size(); i++)
             destroyImageFBO(m_outputImageFBOs[i]);
 

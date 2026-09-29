@@ -7,6 +7,7 @@
 //******************************************************************************
 
 #include <RvCommon/QTUtils.h>
+#include <RvCommon/RvApplication.h>
 #include <RvCommon/RvConsoleWindow.h>
 #include <RvPackage/PackageManager.h>
 #include <spdlog/common.h>
@@ -101,6 +102,9 @@ namespace Rv
         setWindowTitle(UI_APPLICATION_NAME " Console");
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
         setSizeGripEnabled(true);
+
+        // RV relies on quitOnLastWindowClosed; a log window must not keep it alive.
+        setAttribute(Qt::WA_QuitOnClose, false);
         bool doRedirect = (getenv("RV_NO_CONSOLE_REDIRECT") == 0);
         // setAttribute(Qt::WA_MacBrushedMetal);
 
@@ -133,12 +137,25 @@ namespace Rv
             m_consoleBuf->sync();
         processTextBuffer();
 
-#if defined(NDEBUG) || !defined(PLATFORM_WINDOWS)
+        //
+        //  Restore cout/cerr whenever the redirect was installed: Py_Finalize
+        //  can still write after this window is gone. The buffers are non-null
+        //  only if the install ran, so this is safe in every build and twice.
+        //
         if (m_stdoutBuf)
+        {
             cout.rdbuf(m_stdoutBuf);
+            m_stdoutBuf = nullptr;
+        }
+
         if (m_stderrBuf)
+        {
             cerr.rdbuf(m_stderrBuf);
-#endif
+            m_stderrBuf = nullptr;
+        }
+
+        delete m_consoleBuf;
+        m_consoleBuf = nullptr;
     }
 
     void RvConsoleWindow::processTimer()
@@ -246,7 +263,8 @@ namespace Rv
                 }
             }
 
-            if (shouldShow)
+            // Never re-show during shutdown: it would be the last visible window and block exit.
+            if (shouldShow && !(RvApp() && RvApp()->isShuttingDown()))
             {
                 show();
                 raise();
