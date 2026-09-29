@@ -11,6 +11,7 @@
 #include <RvCommon/VulkanWindow.h>
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -39,14 +40,10 @@ namespace Rv
         //  eventWidget is the window's container QWidget, used by QTTranslator
         //  for coordinate mapping and mouse grab.
         QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanWindow* window, QWidget* eventWidget);
-        virtual ~QTVulkanVideoDevice();
+        ~QTVulkanVideoDevice() override;
 
         QTVulkanVideoDevice(const QTVulkanVideoDevice&) = delete;
         QTVulkanVideoDevice& operator=(const QTVulkanVideoDevice&) = delete;
-
-        VulkanWindow* vulkanWindow() const { return m_window; }
-
-        QWidget* eventWidget() const { return m_eventWidget; }
 
         void setEventWidget(QWidget* widget);
 
@@ -83,7 +80,7 @@ namespace Rv
 
         float devicePixelRatio() const override;
 
-        void setPhysicalDevice(VideoDevice* d) override;
+        void setPhysicalDevice(VideoDevice* device) override;
 
         // GLVideoDevice API
         TwkGLF::GLFBO* defaultFBO() override;
@@ -104,28 +101,35 @@ namespace Rv
         //  independently of this device.
         QPointer<VulkanWindow> m_window;
         QWidget* m_eventWidget;
-        QTTranslator* m_translator;
+        std::unique_ptr<QTTranslator> m_translator;
         float m_devicePixelRatio{1.0f};
         int m_x{0};
         int m_y{0};
         float m_refresh{-1.0f};
         bool m_isOpen{false};
 
-        mutable QOpenGLContext* m_glContext{nullptr};
-        mutable QOffscreenSurface* m_offscreenSurface{nullptr};
-        mutable TwkGLF::GLFBO* m_fbo{nullptr};
+        mutable std::unique_ptr<QOpenGLContext> m_glContext;
+        mutable std::unique_ptr<QOffscreenSurface> m_offscreenSurface;
+        mutable std::unique_ptr<TwkGLF::GLFBO> m_fbo;
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
 
         // Interop GL objects, indexed by VulkanWindow::currentFrame().
-        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glMemoryObject{};
-        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glSharedTexture{};
-        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_glReadySemaphore{};
-        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_vkReadySemaphore{};
-        mutable std::array<GLuint, VulkanWindow::kFramesInFlight> m_drawFbo{};
-        mutable std::array<int, VulkanWindow::kFramesInFlight> m_sharedWidth{};
-        mutable std::array<int, VulkanWindow::kFramesInFlight> m_sharedHeight{};
+        struct SharedGLObjects
+        {
+            GLuint memoryObject{0};
+            GLuint texture{0};
+            GLuint glReadySemaphore{0};
+            GLuint vkReadySemaphore{0};
+            GLuint drawFbo{0};
+
+            // Imported capacity, not the used size.
+            int width{0};
+            int height{0};
+        };
+
+        mutable std::array<SharedGLObjects, VulkanWindow::kFramesInFlight> m_glShared{};
 
         // Last reported present path: -1 none yet, 0 CPU-fallback, 1 GPU-interop.
         mutable int m_loggedPresentPath{-1};

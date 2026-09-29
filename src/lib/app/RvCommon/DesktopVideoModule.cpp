@@ -50,9 +50,9 @@ namespace Rv
 
         bool currentVulkan = false;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        for (size_t i = 0; i < m_devices.size(); ++i)
+        for (TwkApp::VideoDevice* device : m_devices)
         {
-            if (dynamic_cast<VulkanDesktopVideoDevice*>(m_devices[i]))
+            if (dynamic_cast<VulkanDesktopVideoDevice*>(device))
             {
                 currentVulkan = true;
                 break;
@@ -66,13 +66,13 @@ namespace Rv
         }
 
         // close() releases the Vulkan swapchain or GL ScreenView before the delete.
-        for (size_t i = 0; i < m_devices.size(); ++i)
+        for (TwkApp::VideoDevice* device : m_devices)
         {
-            if (m_devices[i]->isOpen())
+            if (device->isOpen())
             {
-                m_devices[i]->close();
+                device->close();
             }
-            delete m_devices[i];
+            delete device;
         }
         m_devices.clear();
 

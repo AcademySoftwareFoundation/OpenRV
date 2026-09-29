@@ -9,6 +9,8 @@
 #include <QtWidgets/QWidget>
 #include <QtCore/QSize>
 
+#include <memory>
+
 QT_BEGIN_NAMESPACE
 class QWindow;
 QT_END_NAMESPACE
@@ -35,15 +37,11 @@ namespace Rv
         VulkanView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
         ~VulkanView() override;
 
-        VulkanWindow* vulkanWindow() const { return m_vulkanWindow; }
-
-        QTVulkanVideoDevice* videoDevice() const { return m_videoDevice; }
+        QTVulkanVideoDevice* videoDevice() const { return m_videoDevice.get(); }
 
         void stopProcessingEvents();
 
         bool firstPaintCompleted() const;
-
-        bool isInitialized() const;
 
         void absolutePosition(int& x, int& y) const;
 
@@ -77,16 +75,16 @@ namespace Rv
 
     private:
         RvDocument* m_doc;
-        VulkanWindow* m_vulkanWindow;
-        QWidget* m_container;
-        QTVulkanVideoDevice* m_videoDevice;
-        QSize m_csize;
-        QSize m_msize;
+        VulkanWindow* m_vulkanWindow{nullptr};
+        QWidget* m_container{nullptr};
+        std::unique_ptr<QTVulkanVideoDevice> m_videoDevice;
+        QSize m_csize{1024, 576};
+        QSize m_msize{128, 128};
 
         //  See watchParentWindow().
-        QWindow* m_watchedParentWindow;
+        QWindow* m_watchedParentWindow{nullptr};
         QMetaObject::Connection m_watchedParentConnection;
-        bool m_reattachPending;
+        bool m_reattachPending{false};
     };
 
 } // namespace Rv

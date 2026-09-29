@@ -26,13 +26,6 @@ namespace Rv
     VulkanView::VulkanView(RvDocument* doc, QWidget* parent, bool noResize)
         : QWidget(parent)
         , m_doc(doc)
-        , m_vulkanWindow(nullptr)
-        , m_container(nullptr)
-        , m_videoDevice(nullptr)
-        , m_csize(1024, 576)
-        , m_msize(128, 128)
-        , m_watchedParentWindow(nullptr)
-        , m_reattachPending(false)
     {
         m_vulkanWindow = new VulkanWindow(doc, noResize);
         m_container = QWidget::createWindowContainer(m_vulkanWindow, this);
@@ -66,8 +59,8 @@ namespace Rv
         }
         //  No event widget, so no QTTranslator: VulkanWindow::event() then
         //  ignores all input for a passive output.
-        m_videoDevice = new QTVulkanVideoDevice(nullptr, str.str(), m_vulkanWindow, passiveOutput ? nullptr : m_container);
-        m_vulkanWindow->setVideoDevice(m_videoDevice);
+        m_videoDevice = std::make_unique<QTVulkanVideoDevice>(nullptr, str.str(), m_vulkanWindow, passiveOutput ? nullptr : m_container);
+        m_vulkanWindow->setVideoDevice(m_videoDevice.get());
         m_vulkanWindow->setEventWidget(passiveOutput ? nullptr : m_container);
 
         setObjectName((m_doc && m_doc->session()) ? m_doc->session()->name().c_str() : "no session");
@@ -116,7 +109,7 @@ namespace Rv
             m_container = nullptr;
         }
 
-        delete m_videoDevice;
+        m_videoDevice.reset();
     }
 
     void VulkanView::showEvent(QShowEvent* event)
@@ -275,8 +268,6 @@ namespace Rv
     }
 
     bool VulkanView::firstPaintCompleted() const { return m_vulkanWindow && m_vulkanWindow->firstPaintCompleted(); }
-
-    bool VulkanView::isInitialized() const { return m_vulkanWindow && m_vulkanWindow->isInitialized(); }
 
     void VulkanView::absolutePosition(int& x, int& y) const
     {

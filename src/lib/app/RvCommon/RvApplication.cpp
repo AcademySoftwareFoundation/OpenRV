@@ -1972,9 +1972,9 @@ namespace Rv
         const bool rebuilt = m_desktopModule->rebuildDevices(shareDevice, mainViewIsVulkan);
 
         const VideoModule::VideoDevices& devices = m_desktopModule->devices();
-        for (size_t i = 0; i < devices.size(); i++)
+        for (VideoDevice* device : devices)
         {
-            if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(devices[i]))
+            if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(device))
             {
                 dd->setShareDevice(shareDevice);
             }
