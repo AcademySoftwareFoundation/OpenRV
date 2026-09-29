@@ -7,12 +7,13 @@
 
 #include <TwkGLF/GLVideoDevice.h>
 #include <RvCommon/QTTranslator.h>
-#include <RvCommon/VulkanView.h>
+#include <RvCommon/VulkanWindow.h>
 #include <array>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <vector>
+
+#include <QtCore/QPointer>
 
 QT_BEGIN_NAMESPACE
 class QOpenGLContext;
@@ -22,20 +23,30 @@ QT_END_NAMESPACE
 
 namespace Rv
 {
-    class VulkanView;
+    class VulkanWindow;
 
     //
     //  QTVulkanVideoDevice
     //
-    //  Wraps a VulkanView as a TwkGLF::GLVideoDevice so that ImageRenderer's
+    //  Wraps a VulkanWindow as a TwkGLF::GLVideoDevice so that ImageRenderer's
     //  existing GL rendering pipeline (renderMain, shader cache, etc.) can run
     //  unchanged on the Vulkan presentation path.
     //
     class QTVulkanVideoDevice : public TwkGLF::GLVideoDevice
     {
     public:
-        QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanView* view, QWidget* eventWidget);
-        ~QTVulkanVideoDevice() override;
+        //
+        //  The presentation surface is a QWindow (embedded in the widget tree
+        //  via createWindowContainer); eventWidget is the container QWidget the
+        //  QTTranslator uses for coordinate mapping (height/mapToGlobal) and
+        //  mouse grab.
+        //
+        QTVulkanVideoDevice(TwkApp::VideoModule* module, const std::string& name, VulkanWindow* window, QWidget* eventWidget);
+        virtual ~QTVulkanVideoDevice();
+
+        VulkanWindow* vulkanWindow() const { return m_window; }
+
+        QWidget* eventWidget() const { return m_eventWidget; }
 
         void setEventWidget(QWidget* widget);
 
@@ -44,6 +55,16 @@ namespace Rv
         bool hasTranslator() const { return m_translator != nullptr; }
 
         void setAbsolutePosition(int x, int y);
+
+        //
+        //  Drop every GL object imported from the window's Vulkan side (the
+        //  memory objects, their textures/FBOs and the shared semaphores), so
+        //  none of them outlives the Vulkan memory it aliases. Called by
+        //  VulkanWindow::releaseVulkanResources() before it frees that memory;
+        //  syncBuffers() re-imports on the next frame (it rebuilds whenever
+        //  m_glMemoryObject[slot] is 0).
+        //
+        void releaseSharedGLObjects();
 
         // VideoDevice API
         void makeCurrent() const override;
@@ -66,7 +87,7 @@ namespace Rv
 
         float devicePixelRatio() const override;
 
-        void setPhysicalDevice(VideoDevice* device) override;
+        void setPhysicalDevice(VideoDevice* d) override;
 
         // GLVideoDevice API
         TwkGLF::GLFBO* defaultFBO() override;
@@ -74,12 +95,20 @@ namespace Rv
         std::string hardwareIdentification() const override;
 
     private:
-        // Ensure the QOpenGLContext + FBO exist and match the current view size.
+        // Ensure the QOpenGLContext + FBO exist and match the current window size.
         // Makes the GL context current and binds the FBO on return.
         void ensureGLContext() const;
 
-        VulkanView* m_view;
-        std::unique_ptr<QTTranslator> m_translator;
+        //
+        //  Guarded: the window is embedded via QWidget::createWindowContainer(),
+        //  which owns it, so Qt can delete it independently of this device (and
+        //  of the VulkanView that created both). A QPointer makes the
+        //  `if (m_window)` checks below actual liveness checks instead of null
+        //  checks.
+        //
+        QPointer<VulkanWindow> m_window;
+        QWidget* m_eventWidget;
+        QTTranslator* m_translator;
         float m_devicePixelRatio{1.0f};
         int m_x{0};
         int m_y{0};
@@ -87,34 +116,44 @@ namespace Rv
         bool m_isOpen{false};
 
         // Qt GL context + offscreen surface for GL rendering.
-        mutable std::unique_ptr<QOpenGLContext> m_glContext;
-        mutable std::unique_ptr<QOffscreenSurface> m_offscreenSurface;
-        mutable std::unique_ptr<TwkGLF::GLFBO> m_fbo;
+        mutable QOpenGLContext* m_glContext{nullptr};
+        mutable QOffscreenSurface* m_offscreenSurface{nullptr};
+        mutable TwkGLF::GLFBO* m_fbo{nullptr};
         mutable GLuint m_fboColorTex{0}; // Texture attached to m_fbo; GLFBO does not own it
         mutable int m_fboWidth{0};
         mutable int m_fboHeight{0};
 
-        // GPU Interop GL objects, ringed per in-flight slot to match VulkanView's
+        // GPU Interop GL objects, ringed per in-flight slot to match VulkanWindow's
         // per-slot Vulkan shared image/semaphores. Indexed by the Vulkan slot for
-        // the frame being rendered (VulkanView::currentFrame()).
-        struct SharedGLObjects
-        {
-            GLuint memoryObject{0};
-            GLuint texture{0};
-            GLuint glReadySemaphore{0};
-            GLuint vkReadySemaphore{0};
-            GLuint drawFbo{0};
-            int width{0};  // imported capacity width
-            int height{0}; // imported capacity height
-        };
+        // the frame being rendered (VulkanWindow::currentFrame()).
+        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glMemoryObject{};
+        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glSharedTexture{};
+        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_glReadySemaphore{};
+        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_vkReadySemaphore{};
+        mutable std::array<GLuint, VulkanWindow::FRAMES_IN_FLIGHT> m_drawFbo{};
+        mutable std::array<int, VulkanWindow::FRAMES_IN_FLIGHT> m_sharedWidth{};
+        mutable std::array<int, VulkanWindow::FRAMES_IN_FLIGHT> m_sharedHeight{};
 
-        mutable std::array<SharedGLObjects, VulkanView::FRAMES_IN_FLIGHT> m_sharedGL{};
+        // Which present path this device last reported: -1 nothing yet,
+        // 0 CPU-fallback, 1 GPU-interop. Per-device, and reported on every
+        // transition rather than latched on the first frame, because the first
+        // syncBuffers() can run before that window's Vulkan is initialized --
+        // latching there reports CPU-fallback for a device that then spends its
+        // whole life on interop.
+        mutable int m_loggedPresentPath{-1};
 
-        // Latched once the GL side fails to import a Vulkan-exported shared
-        // image. Without this the next frame re-attempts the same import with
-        // the same configuration and fails identically, once per frame. The
-        // session stays on the CPU readback path instead.
-        mutable bool m_glInteropFailed{false};
+        // Latched once any GL call on the interop path reports an error. The
+        // GL<->Vulkan bridge has no way to notice that an import silently
+        // produced an unusable texture: the blit is dropped, Vulkan copies a
+        // never-written image, and the viewport is black with nothing logged.
+        // Demoting permanently to the CPU pack-and-upload path keeps the image
+        // correct (just slower) on a driver combination we have not seen.
+        mutable bool m_interopDisabled{false};
+
+        // Drain glGetError(); on error, report which step failed, latch
+        // m_interopDisabled and return true. Callers must then release the
+        // slot's GL objects and present through the CPU fallback.
+        bool interopGLFailed(const char* what) const;
 
         void cleanupSharedGLObjects(uint32_t slot) const;
 

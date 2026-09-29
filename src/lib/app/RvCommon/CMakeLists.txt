@@ -89,7 +89,17 @@ IF(RV_TARGET_LINUX
     MESSAGE(FATAL_ERROR "Vulkan::Vulkan target is missing; cmake/dependencies/vulkan.cmake should provide it on Linux and Windows")
   ENDIF()
   MESSAGE(STATUS "Vulkan: using managed Vulkan ${RV_DEPS_VULKAN_VERSION}")
-  LIST(APPEND _sources VulkanView.cpp QTVulkanVideoDevice.cpp RvCommon/VulkanView.h RvCommon/QTVulkanVideoDevice.h)
+  LIST(
+    APPEND
+    _sources
+    VulkanBuildProbe.cpp
+    VulkanView.cpp
+    VulkanWindow.cpp
+    QTVulkanVideoDevice.cpp
+    RvCommon/VulkanView.h
+    RvCommon/VulkanWindow.h
+    RvCommon/QTVulkanVideoDevice.h
+  )
 ENDIF()
 
 FILE(GLOB _ui_sources ui/*.ui)
@@ -164,7 +174,7 @@ IF(NOT
    (RV_TARGET_LINUX
     OR RV_TARGET_WINDOWS)
 )
-  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/QTVulkanVideoDevice.h")
+  LIST(REMOVE_ITEM _files_to_moc "RvCommon/VulkanView.h" "RvCommon/VulkanWindow.h" "RvCommon/QTVulkanVideoDevice.h")
 ENDIF()
 
 FOREACH(

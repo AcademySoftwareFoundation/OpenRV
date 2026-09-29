@@ -157,10 +157,20 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
-        QSurfaceFormat fmt = shareDevice()->glSurfaceFormat();
+        //
+        //  There is no GL share device when the main view presents through a
+        //  non-OpenGL backend (the Vulkan 10-bit path), where RvApplication
+        //  constructs the DesktopVideoModule with a null share device. Fall
+        //  back to the default surface format and no explicit share context --
+        //  Qt::AA_ShareOpenGLContexts (set in main.cpp) already puts every
+        //  QOpenGLContext in one resource-sharing group.
+        //
+        const QTGLVideoDevice* share = shareDevice();
+
+        QSurfaceFormat fmt = share ? share->glSurfaceFormat() : QSurfaceFormat::defaultFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, shareDevice()->glShareContext(), Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, 0, share ? share->glShareContext() : nullptr, Qt::Window);
         setViewWidget(vw);
 
         QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw);

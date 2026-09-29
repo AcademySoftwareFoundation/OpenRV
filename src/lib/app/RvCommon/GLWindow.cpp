@@ -18,49 +18,25 @@
 #include <RvCommon/InitGL.h>
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
-#include <IPCore/ImageRenderer.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 #include <TwkGLF/GLVideoDevice.h>
 #include <QOpenGLContext>
-#include <QtGui/QGuiApplication>
-#include <QtGui/QScreen>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <iostream>
 #include <sstream>
-#include <cstdlib>
 
 namespace Rv
 {
     using namespace std;
     using namespace TwkApp;
     using namespace IPCore;
-
-    namespace
-    {
-#ifdef PLATFORM_LINUX
-        string envOrUnset(const char* name)
-        {
-            const char* value = std::getenv(name);
-            return value ? value : "<unset>";
-        }
-#endif
-
-        string formatSummary(const QSurfaceFormat& f)
-        {
-            ostringstream out;
-            out << "rgba " << f.redBufferSize() << " " << f.greenBufferSize() << " " << f.blueBufferSize() << " "
-                << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize());
-            out << ", depth " << f.depthBufferSize() << ", stencil " << f.stencilBufferSize();
-            out << ", swapInterval " << f.swapInterval();
-            out << ", stereo " << (f.stereo() ? "true" : "false");
-            out << ", major.minor " << f.majorVersion() << "." << f.minorVersion();
-            return out.str();
-        }
-    } // namespace
 
     GLWindow::GLWindow(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red, int green,
                        int blue, int alpha, bool noResize)
@@ -79,13 +55,6 @@ namespace Rv
         , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
-
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        if (ImageRenderer::debugGpu())
-        {
-            cout << "INFO: GLWindow requested QSurfaceFormat: " << formatSummary(format()) << endl;
-        }
-#endif
 
         m_videoDevice = nullptr; // set later by the hosting GLView
 
@@ -135,32 +104,36 @@ namespace Rv
 
             QSurfaceFormat f = context()->format();
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+            //
+            //  One-shot -debug gpu baseline: everything needed to answer "why
+            //  did I only get 8 bits per component" without a second run --
+            //  what was asked for, what Qt negotiated, what the driver is, and
+            //  which display server we are on.
+            //
             static bool baselineLogged = false;
             if (ImageRenderer::debugGpu() && !baselineLogged)
             {
                 baselineLogged = true;
 
-                QScreen* screen = this->screen();
-                if (!screen)
-                    screen = QGuiApplication::primaryScreen();
+                QScreen* scr = screen();
+                if (!scr)
+                    scr = QGuiApplication::primaryScreen();
 
                 const GLubyte* glVendor = glGetString(GL_VENDOR);
                 const GLubyte* glRenderer = glGetString(GL_RENDERER);
                 const GLubyte* glVersion = glGetString(GL_VERSION);
                 const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-                const QSurfaceFormat requestedFormat = format();
 
                 cout << "INFO: GLWindow runtime baseline begin" << endl;
                 cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
                 cout << "INFO: Qt version: " << qVersion() << endl;
-                cout << "INFO: Constructor-requested color bits (GLWindow args): rgba " << m_red << " " << m_green << " " << m_blue << " "
-                     << m_alpha << endl;
-                cout << "INFO: GLWindow::format() (post-negotiation): " << formatSummary(requestedFormat) << endl;
-                cout << "INFO: Actual QOpenGLContext format: " << formatSummary(f) << endl;
-                if (screen)
+                cout << "INFO: Constructor-requested color bits: rgba " << m_red << " " << m_green << " " << m_blue << " " << m_alpha
+                     << endl;
+                cout << "INFO: QOpenGLWindow::format() (post-negotiation): " << glDebugFormatSummary(format()) << endl;
+                cout << "INFO: Actual QOpenGLContext format: " << glDebugFormatSummary(f) << endl;
+                if (scr)
                 {
-                    cout << "INFO: Screen name: " << screen->name().toStdString() << ", depth: " << screen->depth() << endl;
+                    cout << "INFO: Screen name: " << scr->name().toStdString() << ", depth: " << scr->depth() << endl;
                 }
                 else
                 {
@@ -172,14 +145,13 @@ namespace Rv
                 cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
                 cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
 #ifdef PLATFORM_LINUX
-                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << envOrUnset("XDG_SESSION_TYPE")
-                     << ", WAYLAND_DISPLAY=" << envOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << envOrUnset("DISPLAY")
-                     << ", XDG_CURRENT_DESKTOP=" << envOrUnset("XDG_CURRENT_DESKTOP")
-                     << ", DESKTOP_SESSION=" << envOrUnset("DESKTOP_SESSION") << endl;
+                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << glDebugEnvOrUnset("XDG_SESSION_TYPE")
+                     << ", WAYLAND_DISPLAY=" << glDebugEnvOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << glDebugEnvOrUnset("DISPLAY")
+                     << ", XDG_CURRENT_DESKTOP=" << glDebugEnvOrUnset("XDG_CURRENT_DESKTOP")
+                     << ", DESKTOP_SESSION=" << glDebugEnvOrUnset("DESKTOP_SESSION") << endl;
 #endif
                 cout << "INFO: GLWindow runtime baseline end" << endl;
             }
-#endif
 
 #ifndef PLATFORM_DARWIN
             if (f.redBufferSize() != m_red && m_red != 0)

@@ -92,6 +92,8 @@ namespace Rv
         TwkGLF::GLVideoDevice* viewVideoDevice() const;
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        VulkanView* vulkanView() const;
+
         // True once close has been accepted or the document is being destroyed.
         bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
 
@@ -206,9 +208,9 @@ namespace Rv
         GLView* m_glView;
         GLView* m_oldGLView;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        VulkanView* m_vulkanView{nullptr};
+        VulkanView* m_vulkanView;
 #endif
-        QWidget* m_viewWidget{nullptr};
+        QWidget* m_viewWidget;
         QWidget* m_viewContainerWidget;
         RvTopViewToolBar* m_topViewToolBar;
         RvBottomViewToolBar* m_bottomViewToolBar;
