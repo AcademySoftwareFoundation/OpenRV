@@ -38,7 +38,15 @@ namespace Rv
 
     GLWindow::GLWindow(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red, int green,
                        int blue, int alpha, bool noResize)
-        : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate)
+        //
+        //  The share context has to be handed to QOpenGLWindow here: Qt creates
+        //  the window's QOpenGLContext inside QOpenGLWindowPrivate::initialize()
+        //  and calls setShareContext() on it *before* create(). Setting it after
+        //  the fact, which is all a later context()->setShareContext() call
+        //  could do, is documented as having no effect, so the viewport would
+        //  silently end up in a share group of its own.
+        //
+        : QOpenGLWindow(sharedContext, QOpenGLWindow::NoPartialUpdate)
         , m_doc(doc)
         , m_red(red)
         , m_green(green)
@@ -50,7 +58,6 @@ namespace Rv
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
-        , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
 
@@ -83,11 +90,6 @@ namespace Rv
         {
             initializeGLExtensions();
             initializeOpenGLFunctions();
-
-            if (m_sharedContext)
-            {
-                context()->setShareContext(m_sharedContext);
-            }
 
             //
             //  NOTE: session initialization is deliberately NOT driven from

@@ -60,6 +60,15 @@ namespace Rv
         QSurfaceFormat format() const;
         void makeCurrent();
 
+        //
+        //  Build the viewport window's GL context now, if Qt has not already.
+        //  RV performs its GL setup (shader precompile, capability queries, FBO
+        //  creation) during startup, and every bit of that has to land in the
+        //  context the viewport actually renders with. See the implementation
+        //  for why Qt would otherwise not have created it yet.
+        //
+        void ensureViewportContext();
+
         //  Compatibility shim for the former QOpenGLWidget::isValid(): the
         //  native GL window is created up-front, so the viewport is considered
         //  valid once the window exists.
