@@ -36,6 +36,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
+#include <initializer_list>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -130,7 +131,7 @@ namespace Rv
             return format == VK_FORMAT_A2B10G10R10_UNORM_PACK32 || format == VK_FORMAT_A2R10G10B10_UNORM_PACK32;
         }
 
-        bool findGraphicsPresentQueue(VkPhysicalDevice device, VkSurfaceKHR surface, uint32_t& familyIndex)
+        std::optional<uint32_t> findGraphicsPresentQueue(VkPhysicalDevice device, VkSurfaceKHR surface)
         {
             uint32_t familyCount = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(device, &familyCount, nullptr);
@@ -143,11 +144,10 @@ namespace Rv
                 if (vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport) == VK_SUCCESS
                     && (families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) && presentSupport)
                 {
-                    familyIndex = i;
-                    return true;
+                    return i;
                 }
             }
-            return false;
+            return std::nullopt;
         }
 
         bool surfaceHasTenBitFormat(VkPhysicalDevice device, VkSurfaceKHR surface)
@@ -184,6 +184,14 @@ namespace Rv
 
             return std::any_of(extensions.begin(), extensions.end(),
                                [name](const VkExtensionProperties& extension) { return strcmp(extension.extensionName, name) == 0; });
+        }
+
+        // synchronization2 is a required 1.3 feature, so the version is enough.
+        bool deviceSupportsVulkan13(VkPhysicalDevice device)
+        {
+            VkPhysicalDeviceProperties props = {};
+            vkGetPhysicalDeviceProperties(device, &props);
+            return props.apiVersion >= VK_API_VERSION_1_3;
         }
 
         constexpr std::string_view formatName(VkFormat format)
@@ -313,8 +321,8 @@ namespace Rv
             static QVulkanInstance* instance = []() -> QVulkanInstance*
             {
                 auto inst = std::make_unique<QVulkanInstance>();
-                // 1.1 for vkGetPhysicalDeviceProperties2 (device UUID matching).
-                inst->setApiVersion(QVersionNumber(1, 1));
+                // 1.3 for synchronization2 (vkQueueSubmit2 / vkCmdPipelineBarrier2).
+                inst->setApiVersion(QVersionNumber(1, 3));
                 if (!inst->create())
                 {
                     cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << endl;
@@ -380,19 +388,19 @@ namespace Rv
             {
                 VkPhysicalDevice dev = devices[di];
 
-                uint32_t queueFamily = 0;
+                const bool vulkan13 = deviceSupportsVulkan13(dev);
                 const bool canPresent =
-                    deviceHasExtension(dev, VK_KHR_SWAPCHAIN_EXTENSION_NAME) && findGraphicsPresentQueue(dev, dummySurface, queueFamily);
+                    deviceHasExtension(dev, VK_KHR_SWAPCHAIN_EXTENSION_NAME) && findGraphicsPresentQueue(dev, dummySurface).has_value();
                 const bool has10bit = canPresent && surfaceHasTenBitFormat(dev, dummySurface);
-                any10bit = any10bit || has10bit;
+                any10bit = any10bit || (vulkan13 && has10bit);
 
                 VkPhysicalDeviceProperties props = {};
                 vkGetPhysicalDeviceProperties(dev, &props);
                 if (ImageRenderer::debugGpu())
                 {
                     cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
-                         << "': graphics+present=" << (canPresent ? "YES" : "NO") << "  10-bit surface format=" << (has10bit ? "YES" : "NO")
-                         << endl;
+                         << "': vulkan1.3=" << (vulkan13 ? "YES" : "NO") << "  graphics+present=" << (canPresent ? "YES" : "NO")
+                         << "  10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
                 }
             }
 
@@ -447,11 +455,15 @@ namespace Rv
 
         for (VkPhysicalDevice dev : devices)
         {
-            uint32_t queueFamily = 0;
-            if (findGraphicsPresentQueue(dev, m_vkSurface, queueFamily) && surfaceHasTenBitFormat(dev, m_vkSurface))
+            if (!deviceSupportsVulkan13(dev))
+            {
+                continue;
+            }
+            const std::optional<uint32_t> queueFamily = findGraphicsPresentQueue(dev, m_vkSurface);
+            if (queueFamily && surfaceHasTenBitFormat(dev, m_vkSurface))
             {
                 m_vkPhysicalDevice = dev;
-                m_queueFamilyIndex = queueFamily;
+                m_queueFamilyIndex = *queueFamily;
                 foundQueue = true;
                 break;
             }
@@ -459,7 +471,9 @@ namespace Rv
 
         if (!foundQueue)
         {
-            cerr << "ERROR: VulkanWindow: initVulkan: No physical device with graphics, present, and 10-bit surface support found." << endl;
+            cerr << "ERROR: VulkanWindow: initVulkan: No Vulkan 1.3 physical device with graphics, present, and 10-bit surface support "
+                    "found."
+                 << endl;
             return false;
         }
 
@@ -505,8 +519,13 @@ namespace Rv
             cout << "INFO: VulkanWindow: external memory/semaphore extensions unavailable; using CPU fallback." << endl;
         }
 
+        VkPhysicalDeviceVulkan13Features features13 = {};
+        features13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+        features13.synchronization2 = VK_TRUE;
+
         VkDeviceCreateInfo createInfo = {};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+        createInfo.pNext = &features13;
         createInfo.pQueueCreateInfos = &queueCreateInfo;
         createInfo.queueCreateInfoCount = 1;
         createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
@@ -719,34 +738,31 @@ namespace Rv
             }
         }
 
-        bool presentModeFromName(const char* name, VkPresentModeKHR& mode)
+        // name may be null (unset environment variable).
+        std::optional<VkPresentModeKHR> presentModeFromName(const char* name)
         {
             if (!name)
             {
-                return false;
+                return std::nullopt;
             }
-            const string modeName(name);
+            const std::string_view modeName(name);
             if (modeName == "fifo")
             {
-                mode = VK_PRESENT_MODE_FIFO_KHR;
+                return VK_PRESENT_MODE_FIFO_KHR;
             }
-            else if (modeName == "relaxed")
+            if (modeName == "relaxed")
             {
-                mode = VK_PRESENT_MODE_FIFO_RELAXED_KHR;
+                return VK_PRESENT_MODE_FIFO_RELAXED_KHR;
             }
-            else if (modeName == "mailbox")
+            if (modeName == "mailbox")
             {
-                mode = VK_PRESENT_MODE_MAILBOX_KHR;
+                return VK_PRESENT_MODE_MAILBOX_KHR;
             }
-            else if (modeName == "immediate")
+            if (modeName == "immediate")
             {
-                mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+                return VK_PRESENT_MODE_IMMEDIATE_KHR;
             }
-            else
-            {
-                return false;
-            }
-            return true;
+            return std::nullopt;
         }
 
         VkPresentModeKHR choosePresentMode(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, bool passiveOutput)
@@ -762,19 +778,16 @@ namespace Rv
             const auto supported = [&](VkPresentModeKHR mode)
             { return std::find(available.begin(), available.end(), mode) != available.end(); };
 
-            VkPresentModeKHR forced = VK_PRESENT_MODE_FIFO_KHR;
-            if (presentModeFromName(getenv(passiveOutput ? "RV_VULKAN_OUTPUT_PRESENT_MODE" : "RV_VULKAN_PRESENT_MODE"), forced))
+            const std::optional<VkPresentModeKHR> forced =
+                presentModeFromName(getenv(passiveOutput ? "RV_VULKAN_OUTPUT_PRESENT_MODE" : "RV_VULKAN_PRESENT_MODE"));
+            if (forced && !supported(*forced))
             {
-                if (supported(forced))
-                {
-                    return forced;
-                }
-                cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(forced) << " is unsupported; using FIFO"
+                cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(*forced) << " is unsupported; using FIFO"
                      << endl;
                 return VK_PRESENT_MODE_FIFO_KHR;
             }
 
-            return VK_PRESENT_MODE_FIFO_KHR;
+            return forced.value_or(VK_PRESENT_MODE_FIFO_KHR);
         }
     } // namespace
 
@@ -1108,11 +1121,13 @@ namespace Rv
 
         // Single-subresource colour image layout transition.
         void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout,
-                                   VkAccessFlags srcAccessMask, VkAccessFlags dstAccessMask, VkPipelineStageFlags srcStageMask,
-                                   VkPipelineStageFlags dstStageMask)
+                                   VkAccessFlags2 srcAccessMask, VkAccessFlags2 dstAccessMask, VkPipelineStageFlags2 srcStageMask,
+                                   VkPipelineStageFlags2 dstStageMask)
         {
-            VkImageMemoryBarrier barrier = {};
-            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            VkImageMemoryBarrier2 barrier = {};
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2;
+            barrier.srcStageMask = srcStageMask;
+            barrier.dstStageMask = dstStageMask;
             barrier.oldLayout = oldLayout;
             barrier.newLayout = newLayout;
             barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
@@ -1126,7 +1141,47 @@ namespace Rv
             barrier.srcAccessMask = srcAccessMask;
             barrier.dstAccessMask = dstAccessMask;
 
-            vkCmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+            VkDependencyInfo dependency = {};
+            dependency.sType = VK_STRUCTURE_TYPE_DEPENDENCY_INFO;
+            dependency.imageMemoryBarrierCount = 1;
+            dependency.pImageMemoryBarriers = &barrier;
+
+            vkCmdPipelineBarrier2(commandBuffer, &dependency);
+        }
+
+        VkSemaphoreSubmitInfo semaphoreSubmit(VkSemaphore semaphore, VkPipelineStageFlags2 stageMask)
+        {
+            VkSemaphoreSubmitInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
+            info.semaphore = semaphore;
+            info.stageMask = stageMask;
+            return info;
+        }
+
+        // Signal semaphores use ALL_COMMANDS, matching legacy vkQueueSubmit.
+        VkSemaphoreSubmitInfo signalSubmit(VkSemaphore semaphore)
+        {
+            return semaphoreSubmit(semaphore, VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT);
+        }
+
+        // One vkQueueSubmit2 batch; commandBuffer may be VK_NULL_HANDLE.
+        VkResult queueSubmit2(VkQueue queue, std::initializer_list<VkSemaphoreSubmitInfo> waits, VkCommandBuffer commandBuffer,
+                              std::initializer_list<VkSemaphoreSubmitInfo> signals, VkFence fence)
+        {
+            VkCommandBufferSubmitInfo commandBufferInfo = {};
+            commandBufferInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
+            commandBufferInfo.commandBuffer = commandBuffer;
+
+            VkSubmitInfo2 submit = {};
+            submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
+            submit.waitSemaphoreInfoCount = static_cast<uint32_t>(waits.size());
+            submit.pWaitSemaphoreInfos = waits.begin();
+            submit.commandBufferInfoCount = commandBuffer != VK_NULL_HANDLE ? 1 : 0;
+            submit.pCommandBufferInfos = &commandBufferInfo;
+            submit.signalSemaphoreInfoCount = static_cast<uint32_t>(signals.size());
+            submit.pSignalSemaphoreInfos = signals.begin();
+
+            return vkQueueSubmit2(queue, 1, &submit, fence);
         }
 
         bool envFlagSet(const char* name) { return getenv(name) != nullptr; }
@@ -1194,26 +1249,6 @@ namespace Rv
             cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING='" << value << "' is not recognized (expected 'optimal' or 'linear'); "
                  << "ignoring it and using the negotiated tiling" << endl;
             return std::nullopt;
-        }
-
-        // Resolved dynamically (with the KHR alias) so a 1.0-only loader
-        // degrades to "not exportable" instead of crashing.
-        PFN_vkGetPhysicalDeviceImageFormatProperties2 getImageFormatProperties2(VkInstance instance)
-        {
-            static PFN_vkGetPhysicalDeviceImageFormatProperties2 fn = nullptr;
-            static bool resolved = false;
-            if (!resolved)
-            {
-                resolved = true;
-                fn = reinterpret_cast<PFN_vkGetPhysicalDeviceImageFormatProperties2>(
-                    vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceImageFormatProperties2"));
-                if (!fn)
-                {
-                    fn = reinterpret_cast<PFN_vkGetPhysicalDeviceImageFormatProperties2>(
-                        vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceImageFormatProperties2KHR"));
-                }
-            }
-            return fn;
         }
 
         bool isNvidiaPhysicalDevice(VkPhysicalDevice dev)
@@ -1291,17 +1326,6 @@ namespace Rv
         const VkExternalMemoryHandleTypeFlagBits handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
 #endif
 
-        PFN_vkGetPhysicalDeviceImageFormatProperties2 probe = getImageFormatProperties2(m_vkInstance);
-        if (!probe)
-        {
-            cfg.supported = false;
-            cfg.rejectReason = "vkGetPhysicalDeviceImageFormatProperties2 is unavailable "
-                               "(Vulkan instance predates 1.1 and lacks VK_KHR_get_physical_device_properties2), "
-                               "so exportability cannot be established";
-            m_interopConfig = cfg;
-            return;
-        }
-
         //  Exportability alone does not guarantee a usable import, so try the
         //  vendor's preferred tiling first. See useOptimalTilingForInterop().
         const bool preferOptimal = useOptimalTilingForInterop(m_vkPhysicalDevice);
@@ -1330,7 +1354,7 @@ namespace Rv
             props.sType = VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2;
             props.pNext = &extProps;
 
-            const VkResult result = probe(m_vkPhysicalDevice, &fmtInfo, &props);
+            const VkResult result = vkGetPhysicalDeviceImageFormatProperties2(m_vkPhysicalDevice, &fmtInfo, &props);
             features = extProps.externalMemoryProperties.externalMemoryFeatures;
 
             if (result != VK_SUCCESS)
@@ -1663,19 +1687,9 @@ namespace Rv
             return;
         }
 
-        VkSubmitInfo drain = {};
-        drain.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        const std::array<VkSemaphore, 1> waitSemaphores = {m_shared[slot].glReadySemaphore};
-        const std::array<VkPipelineStageFlags, 1> waitStages = {VK_PIPELINE_STAGE_TRANSFER_BIT};
-        drain.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
-        drain.pWaitSemaphores = waitSemaphores.data();
-        drain.pWaitDstStageMask = waitStages.data();
-        drain.commandBufferCount = 0;
-        const std::array<VkSemaphore, 1> signalSemaphores = {m_shared[slot].vkReadySemaphore};
-        drain.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
-        drain.pSignalSemaphores = signalSemaphores.data();
-
-        VkResult result = vkQueueSubmit(m_vkQueue, 1, &drain, VK_NULL_HANDLE);
+        const VkResult result =
+            queueSubmit2(m_vkQueue, {semaphoreSubmit(m_shared[slot].glReadySemaphore, VK_PIPELINE_STAGE_2_TRANSFER_BIT)}, VK_NULL_HANDLE,
+                         {signalSubmit(m_shared[slot].vkReadySemaphore)}, VK_NULL_HANDLE);
         if (result == VK_ERROR_DEVICE_LOST)
         {
             requestGLFallback();
@@ -1684,17 +1698,12 @@ namespace Rv
 
     void VulkanWindow::recoverFailedSubmit(uint32_t slot, VkSemaphore waitSemaphore)
     {
-        VkSubmitInfo recover = {};
-        recover.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-        if (waitSemaphore != VK_NULL_HANDLE)
-        {
-            recover.waitSemaphoreCount = 1;
-            recover.pWaitSemaphores = &waitSemaphore;
-            recover.pWaitDstStageMask = &waitStage;
-        }
-
-        if (vkQueueSubmit(m_vkQueue, 1, &recover, m_frameSync[slot].fence) != VK_SUCCESS)
+        //  Consume the wait semaphore (if any) and signal the fence.
+        const VkResult result = waitSemaphore != VK_NULL_HANDLE
+                                    ? queueSubmit2(m_vkQueue, {semaphoreSubmit(waitSemaphore, VK_PIPELINE_STAGE_2_TRANSFER_BIT)},
+                                                   VK_NULL_HANDLE, {}, m_frameSync[slot].fence)
+                                    : queueSubmit2(m_vkQueue, {}, VK_NULL_HANDLE, {}, m_frameSync[slot].fence);
+        if (result != VK_SUCCESS)
         {
             cerr << "ERROR: VulkanWindow: could not recover from a failed submit" << endl;
         }
@@ -2106,18 +2115,13 @@ namespace Rv
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
 
-        transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 0,
-                              VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+        transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_2_NONE,
+                              VK_ACCESS_2_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_2_NONE, VK_PIPELINE_STAGE_2_TRANSFER_BIT);
 
         vkEndCommandBuffer(cb);
 
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &cb;
-
         vkResetFences(m_vkDevice, 1, &m_frameSync[slot].fence);
-        VkResult layoutSubmitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_frameSync[slot].fence);
+        const VkResult layoutSubmitResult = queueSubmit2(m_vkQueue, {}, cb, {}, m_frameSync[slot].fence);
         if (layoutSubmitResult != VK_SUCCESS)
         {
             recoverFailedSubmit(slot, VK_NULL_HANDLE);
@@ -2127,11 +2131,8 @@ namespace Rv
         vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
 
         // Signal vkReady so GL can write the first frame.
-        VkSubmitInfo signalInfo = {};
-        signalInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        signalInfo.signalSemaphoreCount = 1;
-        signalInfo.pSignalSemaphores = &m_shared[slot].vkReadySemaphore;
-        VkResult signalResult = vkQueueSubmit(m_vkQueue, 1, &signalInfo, VK_NULL_HANDLE);
+        const VkResult signalResult =
+            queueSubmit2(m_vkQueue, {}, VK_NULL_HANDLE, {signalSubmit(m_shared[slot].vkReadySemaphore)}, VK_NULL_HANDLE);
         if (signalResult != VK_SUCCESS)
         {
             if (signalResult == VK_ERROR_DEVICE_LOST)
@@ -2253,12 +2254,15 @@ namespace Rv
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
 
-        transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, 0,
-                              VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+        //  Source stage TRANSFER chains the transition after the glReady wait.
+        transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                              VK_ACCESS_2_NONE, VK_ACCESS_2_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+                              VK_PIPELINE_STAGE_2_TRANSFER_BIT);
 
         // Transition swapchain image to transfer dst
-        transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0,
-                              VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+        transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                              VK_ACCESS_2_NONE, VK_ACCESS_2_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+                              VK_PIPELINE_STAGE_2_TRANSFER_BIT);
 
         // Same format: raw copy. A2R10G10B10: a raw copy would swap R and B,
         // so blit (per-component conversion). The destination is bounded by
@@ -2294,29 +2298,17 @@ namespace Rv
         }
 
         transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                              VK_ACCESS_TRANSFER_WRITE_BIT, 0, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
+                              VK_ACCESS_2_TRANSFER_WRITE_BIT, VK_ACCESS_2_NONE, VK_PIPELINE_STAGE_2_TRANSFER_BIT, VK_PIPELINE_STAGE_2_NONE);
 
         vkEndCommandBuffer(cb);
 
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        const std::array<VkSemaphore, 2> waitSemaphores = {m_shared[slot].glReadySemaphore, m_frameSync[slot].imageAvailable};
-        // TRANSFER, not COLOR_ATTACHMENT_OUTPUT: the swapchain image is first
-        // touched by its TRANSFER_DST transition.
-        const std::array<VkPipelineStageFlags, 2> waitStages = {VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT};
-        submitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
-        submitInfo.pWaitSemaphores = waitSemaphores.data();
-        submitInfo.pWaitDstStageMask = waitStages.data();
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &cb;
-
-        const std::array<VkSemaphore, 2> signalSemaphores = {m_vkRenderFinished[imageIndex], m_shared[slot].vkReadySemaphore};
-        submitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
-        submitInfo.pSignalSemaphores = signalSemaphores.data();
-
-        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_frameSync[slot].fence);
+        // TRANSFER, not COLOR_ATTACHMENT_OUTPUT: both images are first touched
+        // by TRANSFER-stage transitions.
+        const VkResult submitResult = queueSubmit2(
+            m_vkQueue,
+            {semaphoreSubmit(m_shared[slot].glReadySemaphore, VK_PIPELINE_STAGE_2_TRANSFER_BIT),
+             semaphoreSubmit(m_frameSync[slot].imageAvailable, VK_PIPELINE_STAGE_2_TRANSFER_BIT)},
+            cb, {signalSubmit(m_vkRenderFinished[imageIndex]), signalSubmit(m_shared[slot].vkReadySemaphore)}, m_frameSync[slot].fence);
         if (submitResult != VK_SUCCESS)
         {
             drainSharedSemaphores(slot);
@@ -2531,8 +2523,9 @@ namespace Rv
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
         vkBeginCommandBuffer(cb, &beginInfo);
 
-        transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 0,
-                              VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT);
+        transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                              VK_ACCESS_2_NONE, VK_ACCESS_2_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_2_TRANSFER_BIT,
+                              VK_PIPELINE_STAGE_2_TRANSFER_BIT);
 
         //  The buffer is w x h, but the destination is bounded by the swapchain.
         VkBufferImageCopy region = {};
@@ -2551,24 +2544,13 @@ namespace Rv
                                &region);
 
         transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                              VK_ACCESS_TRANSFER_WRITE_BIT, 0, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
+                              VK_ACCESS_2_TRANSFER_WRITE_BIT, VK_ACCESS_2_NONE, VK_PIPELINE_STAGE_2_TRANSFER_BIT, VK_PIPELINE_STAGE_2_NONE);
 
         vkEndCommandBuffer(cb);
 
-        VkSubmitInfo submitInfo = {};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        const std::array<VkSemaphore, 1> waitSemaphores = {m_frameSync[slot].imageAvailable};
-        const std::array<VkPipelineStageFlags, 1> waitStages = {VK_PIPELINE_STAGE_TRANSFER_BIT};
-        submitInfo.waitSemaphoreCount = static_cast<uint32_t>(waitSemaphores.size());
-        submitInfo.pWaitSemaphores = waitSemaphores.data();
-        submitInfo.pWaitDstStageMask = waitStages.data();
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &cb;
-        const std::array<VkSemaphore, 1> signalSemaphores = {m_vkRenderFinished[imageIndex]};
-        submitInfo.signalSemaphoreCount = static_cast<uint32_t>(signalSemaphores.size());
-        submitInfo.pSignalSemaphores = signalSemaphores.data();
-
-        VkResult submitResult = vkQueueSubmit(m_vkQueue, 1, &submitInfo, m_frameSync[slot].fence);
+        const VkResult submitResult =
+            queueSubmit2(m_vkQueue, {semaphoreSubmit(m_frameSync[slot].imageAvailable, VK_PIPELINE_STAGE_2_TRANSFER_BIT)}, cb,
+                         {signalSubmit(m_vkRenderFinished[imageIndex])}, m_frameSync[slot].fence);
         if (submitResult != VK_SUCCESS)
         {
             recoverFailedSubmit(slot, m_frameSync[slot].imageAvailable);
