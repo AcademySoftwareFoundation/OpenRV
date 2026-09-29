@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import sys
 
 from dataclasses import dataclass
 
@@ -35,6 +36,8 @@ COLOR_MOD_NORMAL = "normal"
 COLOR_MOD_ADDITIVE = "additive"
 COLOR_MOD_DARKEN = "darken"
 
+_ICON_SIZE = 16
+
 
 @dataclass
 class Tool:
@@ -61,7 +64,7 @@ TOOLS = {
 # ---------------------------------------------------------------------------
 
 
-def _tool_button(tooltip, checkable=True, size=30):
+def _tool_button(tooltip="", checkable=True, size=30):
     btn = QtWidgets.QToolButton()
     btn.setToolTip(tooltip)
     btn.setCheckable(checkable)
@@ -299,7 +302,7 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
-def _apply_icon(btn, name, size=16):
+def _apply_icon(btn, name, size=_ICON_SIZE):
     """Set an SVG icon on a button"""
     icon = _load_icon(name)
     if not icon.isNull():
@@ -922,20 +925,33 @@ class AnnotateToolStrip(_StyledWidget):
         # All remaining space goes here, pushing actions to the bottom
         lay.addStretch()
 
-        self._undo_btn = _tool_button("Undo", checkable=False)
+        self._undo_action = QtGui.QAction(_load_icon("undo"), "Undo", self)
+        self._undo_action.setShortcut(QtGui.QKeySequence.StandardKey.Undo)
+        self._undo_action.setShortcutContext(QtCore.Qt.ApplicationShortcut)
+        self._undo_action.setEnabled(False)
+        self._undo_action.triggered.connect(self.undo_requested)
+
+        self._undo_btn = _tool_button(checkable=False)
+        self._undo_btn.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
+        self._undo_btn.setDefaultAction(self._undo_action)
         self._undo_btn.setObjectName("actionButton")
-        _apply_icon(self._undo_btn, "undo")
-        self._undo_btn.setEnabled(False)
-        self._undo_btn.clicked.connect(self.undo_requested)
         lay.addWidget(self._undo_btn)
 
         lay.addSpacing(1)
 
-        self._redo_btn = _tool_button("Redo", checkable=False)
+        self._redo_action = QtGui.QAction(_load_icon("redo"), "Redo", self)
+        if sys.platform == "win32":
+            self._redo_action.setShortcuts([QtGui.QKeySequence("Ctrl+Y"), QtGui.QKeySequence("Ctrl+Shift+Z")])
+        else:
+            self._redo_action.setShortcut(QtGui.QKeySequence.StandardKey.Redo)
+        self._redo_action.setShortcutContext(QtCore.Qt.ApplicationShortcut)
+        self._redo_action.setEnabled(False)
+        self._redo_action.triggered.connect(self.redo_requested)
+
+        self._redo_btn = _tool_button(checkable=False)
+        self._redo_btn.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
+        self._redo_btn.setDefaultAction(self._redo_action)
         self._redo_btn.setObjectName("actionButton")
-        _apply_icon(self._redo_btn, "redo")
-        self._redo_btn.setEnabled(False)
-        self._redo_btn.clicked.connect(self.redo_requested)
         lay.addWidget(self._redo_btn)
 
         lay.addSpacing(1)
@@ -986,10 +1002,10 @@ class AnnotateToolStrip(_StyledWidget):
                 self.tool_changed.emit(TOOL_PEN)
 
     def set_undo_enabled(self, enabled):
-        self._undo_btn.setEnabled(enabled)
+        self._undo_action.setEnabled(enabled)
 
     def set_redo_enabled(self, enabled):
-        self._redo_btn.setEnabled(enabled)
+        self._redo_action.setEnabled(enabled)
 
     def set_color(self, color):
         """Update the swatch color display."""

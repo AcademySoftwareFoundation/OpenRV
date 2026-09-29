@@ -421,33 +421,15 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_undo(self):
         self._engine.undo()
-        self._update_undo_redo_buttons()
 
     def _on_redo(self):
         self._engine.redo()
-        self._update_undo_redo_buttons()
-
-    def _on_undo_event(self, event):
-        if not self._dock or not self._dock.isVisible():
-            event.reject()
-            return
-        self._engine.undo()
-        self._update_undo_redo_buttons()
-
-    def _on_redo_event(self, event):
-        if not self._dock or not self._dock.isVisible():
-            event.reject()
-            return
-        self._engine.redo()
-        self._update_undo_redo_buttons()
 
     def _on_clear(self):
         self._engine.clear_frame()
-        self._update_undo_redo_buttons()
 
     def _on_clear_all(self):
         self._engine.clear_all_frames()
-        self._update_undo_redo_buttons()
 
     def _show_toolbar(self):
         self._dock.show()
@@ -626,10 +608,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         return [
             ("pointer-1--push", self._on_eyedropper_click, "Eyedropper sample"),
             ("stylus-pen--push", self._on_eyedropper_click, "Eyedropper sample (stylus)"),
-            ("key-down--control--z", self._on_undo_event, "Undo"),
-            ("key-down--control--y", self._on_redo_event, "Redo"),
-            ("key-down--meta--z", self._on_undo_event, "Undo (mac)"),
-            ("key-down--meta--shift--z", self._on_redo_event, "Redo (mac)"),
             ("graph-node-inputs-changed", self._on_node_inputs_changed, "Update UI"),
             ("before-graph-view-change", self._on_before_graph_view_change, "Update UI"),
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
