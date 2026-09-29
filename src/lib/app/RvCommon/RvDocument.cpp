@@ -159,6 +159,10 @@ namespace Rv
         , m_hdpiResizeWorkaroundDone(false)
         , m_oldGLView(0)
         , m_glView(0)
+        , m_viewWidget(nullptr)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        , m_vulkanView(nullptr)
+#endif
         , m_diagnosticsView(nullptr)
         , m_diagnosticsDock(nullptr)
         , m_sourceEditor(0)
@@ -253,12 +257,9 @@ namespace Rv
             m_vulkanView->setAcceptDrops(true);
             m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             m_vulkanView->resize(m_vulkanView->sizeHint());
-            m_vulkanView->setEventWidget(m_vulkanView);
             m_viewWidget = m_vulkanView;
 
             m_vulkanView->videoDevice()->makeCurrent();
-
-            initializeSession();
         }
         else
         {
@@ -272,7 +273,7 @@ namespace Rv
             else
             {
                 RvSession* s = static_cast<RvSession*>(docs.front());
-                RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
+                RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
                 // The front document may be on the Vulkan/Metal path, where view()
                 // is null; share its GL context only if it has one (mirrors the
                 // first-window case above, which passes a null share context).
@@ -380,11 +381,13 @@ namespace Rv
         //  input and dims the UI.
         //
         //  It is a frameless top-level window (owned by this document) rather
-        //  than a child widget. The viewport is a native QOpenGLWindow, which
-        //  renders above any sibling raster child widget regardless of
-        //  raise()/stacking order, so a child overlay could never dim or block
-        //  the viewport. A top-level window sits above the main window and its
-        //  native child, so it covers the viewport too.
+        //  than a child widget. The viewport is a native window on both
+        //  backends -- a QOpenGLWindow for GLView, a Vulkan surface for
+        //  VulkanView -- and a native window renders above any sibling raster
+        //  child widget regardless of raise()/stacking order, so a child
+        //  overlay could never dim or block the viewport. A top-level window
+        //  sits above the main window and its native child, so it covers the
+        //  viewport too.
         //
         m_blockingOverlay = new QWidget(this, Qt::FramelessWindowHint | Qt::Tool);
         m_blockingOverlay->setObjectName("UIBlockingOverlay");
@@ -420,29 +423,31 @@ namespace Rv
     void RvDocument::initializeSession()
     {
         //
-        //  On the OpenGL path this is called by
-        //  RvApplication::newSessionFromFiles() once the document has been
-        //  shown, so the viewport window exists and its GL context has been
-        //  created. Constructing an RvSession queries
+        //  Called by RvApplication::newSessionFromFiles() once the document has
+        //  been shown, so the viewport window exists and its GL context has
+        //  been created. Constructing an RvSession queries
         //  GL_SHADING_LANGUAGE_VERSION and aborts without a current context, so
         //  make the viewport context current first.
         //
-        //  On the Vulkan/Metal presentation path there is no GLView. Those
-        //  views make their own GL context current and call in here themselves
-        //  once initialized, so the guard is on having *a* view, not on having
-        //  a GLView, and makeCurrent() is skipped when GLView is absent.
+        //  Deliberately NOT driven from a view callback (GLWindow::initializeGL,
+        //  VulkanWindow::initialize): loading packages creates web panels, and
+        //  adding a QWebEngineView makes Qt tear down the main window's native
+        //  subtree -- destroying the viewport while that callback is still on
+        //  the stack.
         //
-        if (!m_viewWidget)
+        //  Backend-neutral: on the Vulkan path m_glView is null, and the
+        //  context to make current is the presentation device's offscreen one.
+        //
+        TwkGLF::GLVideoDevice* viewDevice = viewVideoDevice();
+
+        if (!viewDevice)
         {
             return;
         }
 
         if (!m_session)
         {
-            if (m_glView)
-            {
-                m_glView->makeCurrent();
-            }
+            viewDevice->makeCurrent();
 
             m_session = new RvSession;
             // m_session->setFrameBuffer(fb);
@@ -946,7 +951,7 @@ namespace Rv
         else
         {
             RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
+            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
             QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
             newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
                                    opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
@@ -987,16 +992,26 @@ namespace Rv
 
         if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
         {
-            for (TwkApp::VideoDevice* device : m->devices())
+            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
+
+            for (size_t i = 0; i < devices.size(); i++)
             {
-                if (DesktopVideoDevice* desktopDevice = dynamic_cast<DesktopVideoDevice*>(device))
+                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
                 {
-                    desktopDevice->setShareDevice(m_glView->videoDevice());
+                    d->setShareDevice(m_glView->videoDevice());
                 }
             }
         }
 
-        delete oldVulkanView;
+        //
+        //  Defer the delete. This is reached from a queued callback posted by
+        //  the VulkanView itself (VulkanView::requestGLFallback), which can be
+        //  raised from deep inside the present path, and destroying the view
+        //  tears down the Vulkan device and its in-flight frames. deleteLater()
+        //  guarantees the destructor runs with no VulkanView frame on the stack
+        //  and with its posted events already discarded.
+        //
+        oldVulkanView->deleteLater();
 
         newGLView->videoDevice()->makeCurrent();
         newGLView->update();
@@ -1288,6 +1303,10 @@ namespace Rv
 #endif
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    VulkanView* RvDocument::vulkanView() const { return m_vulkanView; }
+#endif
 
     void RvDocument::center()
     {
