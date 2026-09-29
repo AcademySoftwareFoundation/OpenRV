@@ -131,15 +131,15 @@ namespace Rv
             }
         }
 
-        // Decode RV_VULKAN_FORCE_TILING. Returns false when unset or when the
+        // Decode RV_VULKAN_FORCE_TILING. Returns nullopt when unset or when the
         // value is not recognized; an unrecognized value is reported rather
         // than silently behaving as if the variable were unset.
-        bool forcedTilingRequested(VkImageTiling& out)
+        std::optional<VkImageTiling> forcedTilingRequested()
         {
             const char* value = getenv("RV_VULKAN_FORCE_TILING");
             if (!value)
             {
-                return false;
+                return std::nullopt;
             }
 
             std::string lowered(value);
@@ -148,18 +148,16 @@ namespace Rv
 
             if (lowered == "optimal")
             {
-                out = VK_IMAGE_TILING_OPTIMAL;
-                return true;
+                return VK_IMAGE_TILING_OPTIMAL;
             }
             if (lowered == "linear")
             {
-                out = VK_IMAGE_TILING_LINEAR;
-                return true;
+                return VK_IMAGE_TILING_LINEAR;
             }
 
             cout << "WARNING: VulkanView: RV_VULKAN_FORCE_TILING='" << value << "' is not recognized (expected 'optimal' or 'linear'); "
                  << "ignoring it and using the negotiated tiling" << endl;
-            return false;
+            return std::nullopt;
         }
 
         // Both A2B10G10R10 and A2R10G10B10 are 10-bit-per-channel packed formats;
@@ -1172,8 +1170,8 @@ namespace Rv
         // Apply the diagnostic overrides last, so the record can report both
         // the negotiated value and the forced one. An override is honored only
         // when the driver reported that configuration as usable.
-        VkImageTiling forcedTiling = VK_IMAGE_TILING_LINEAR;
-        if (forcedTilingRequested(forcedTiling) && forcedTiling != cfg.tiling)
+        const std::optional<VkImageTiling> forcedTiling = forcedTilingRequested();
+        if (forcedTiling && *forcedTiling != cfg.tiling)
         {
             // Re-probe the forced tiling rather than trusting the request:
             // presenting through an unverified configuration is exactly what
@@ -1187,7 +1185,7 @@ namespace Rv
             fmtInfo.pNext = &extInfo;
             fmtInfo.format = cfg.format;
             fmtInfo.type = VK_IMAGE_TYPE_2D;
-            fmtInfo.tiling = forcedTiling;
+            fmtInfo.tiling = *forcedTiling;
             fmtInfo.usage = cfg.usage;
 
             VkExternalImageFormatProperties extProps = {};
@@ -1205,13 +1203,13 @@ namespace Rv
             if (ok)
             {
                 cfg.tilingOverridden = true;
-                cfg.tiling = forcedTiling;
+                cfg.tiling = *forcedTiling;
                 cfg.externalFeatures = features;
                 cfg.dedicatedAllocation = (features & VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT) != 0;
             }
             else
             {
-                cout << "WARNING: VulkanView: RV_VULKAN_FORCE_TILING=" << tilingName(forcedTiling)
+                cout << "WARNING: VulkanView: RV_VULKAN_FORCE_TILING=" << tilingName(*forcedTiling)
                      << " refused -- the driver does not report it as exportable; using the negotiated " << tilingName(cfg.tiling) << endl;
             }
         }

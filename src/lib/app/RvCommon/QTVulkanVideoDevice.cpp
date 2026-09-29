@@ -248,11 +248,7 @@ namespace Rv
 
     void QTVulkanVideoDevice::setEventWidget(QWidget* widget)
     {
-        m_translator.reset();
-        if (widget)
-        {
-            m_translator = std::make_unique<QTTranslator>(this, widget);
-        }
+        m_translator = widget ? std::make_unique<QTTranslator>(this, widget) : nullptr;
     }
 
     //--------------------------------------------------------------------------
