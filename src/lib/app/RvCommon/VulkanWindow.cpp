@@ -1166,7 +1166,7 @@ namespace Rv
 
         // One vkQueueSubmit2 batch; commandBuffer may be VK_NULL_HANDLE.
         VkResult queueSubmit2(VkQueue queue, std::initializer_list<VkSemaphoreSubmitInfo> waits, VkCommandBuffer commandBuffer,
-                              std::initializer_list<VkSemaphoreSubmitInfo> signals, VkFence fence)
+                              std::initializer_list<VkSemaphoreSubmitInfo> signalInfos, VkFence fence)
         {
             VkCommandBufferSubmitInfo commandBufferInfo = {};
             commandBufferInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
@@ -1178,8 +1178,8 @@ namespace Rv
             submit.pWaitSemaphoreInfos = waits.begin();
             submit.commandBufferInfoCount = commandBuffer != VK_NULL_HANDLE ? 1 : 0;
             submit.pCommandBufferInfos = &commandBufferInfo;
-            submit.signalSemaphoreInfoCount = static_cast<uint32_t>(signals.size());
-            submit.pSignalSemaphoreInfos = signals.begin();
+            submit.signalSemaphoreInfoCount = static_cast<uint32_t>(signalInfos.size());
+            submit.pSignalSemaphoreInfos = signalInfos.begin();
 
             return vkQueueSubmit2(queue, 1, &submit, fence);
         }
@@ -2569,7 +2569,7 @@ namespace Rv
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores.data();
+        presentInfo.pWaitSemaphores = &m_vkRenderFinished[imageIndex];
         const std::array<VkSwapchainKHR, 1> swapchains = {m_vkSwapchain};
         presentInfo.swapchainCount = static_cast<uint32_t>(swapchains.size());
         presentInfo.pSwapchains = swapchains.data();
