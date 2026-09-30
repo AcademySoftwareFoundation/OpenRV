@@ -471,9 +471,7 @@ namespace Rv
 
         if (!foundQueue)
         {
-            cerr << "ERROR: VulkanWindow: initVulkan: No Vulkan 1.3 physical device with graphics, present, and 10-bit surface support "
-                    "found."
-                 << endl;
+            cerr << "ERROR: VulkanWindow: initVulkan: no Vulkan 1.3 device with graphics, present and 10-bit surface support" << endl;
             return false;
         }
 
