@@ -9,6 +9,7 @@
 #include <RvCommon/VulkanWindow.h>
 #include <RvCommon/QTVulkanVideoDevice.h>
 #include <RvCommon/RvDocument.h>
+#include <RvCommon/DesktopVideoDevice.h>
 #include <RvApp/Options.h>
 #include <RvApp/RvSession.h>
 #include <IPCore/Session.h>
@@ -2708,6 +2709,8 @@ namespace Rv
         if (!m_doc && m_initialized && m_videoDevice)
         {
             m_videoDevice->syncBuffers();
+            //  That frame is empty on first expose; ask for a real one.
+            DesktopVideoDevice::requestOutputRecomposite();
             return;
         }
 
@@ -2726,6 +2729,10 @@ namespace Rv
         if (!m_stopProcessingEvents)
         {
             requestUpdate();
+            if (isPassiveOutput())
+            {
+                DesktopVideoDevice::requestOutputRecomposite();
+            }
         }
     }
 

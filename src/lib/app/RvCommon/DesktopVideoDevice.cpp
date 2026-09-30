@@ -25,6 +25,8 @@
 #include <TwkFB/IO.h>
 
 #include <RvApp/Options.h>
+#include <IPCore/Application.h>
+#include <IPCore/Session.h>
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #include <RvCommon/VulkanDesktopVideoDevice.h>
@@ -891,6 +893,23 @@ namespace Rv
 
     void DesktopVideoDevice::sortVideoFormatsByWidth() { sort(m_videoFormats.begin(), m_videoFormats.end(), widthSort); }
 
+    void DesktopVideoDevice::requestOutputRecomposite()
+    {
+        if (!IPCore::App())
+        {
+            return;
+        }
+
+        for (TwkApp::Document* doc : IPCore::App()->documents())
+        {
+            IPCore::Session* session = dynamic_cast<IPCore::Session*>(doc);
+            if (session && session->outputVideoDevice() && session->outputVideoDevice() != session->controlVideoDevice())
+            {
+                session->askForRedraw();
+            }
+        }
+    }
+
     DesktopVideoDevice::ScreenWindow::ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext)
         : QOpenGLWindow(glShareContext, QOpenGLWindow::PartialUpdateBlit)
         , m_glShareContext(glShareContext)
@@ -927,8 +946,16 @@ namespace Rv
 
     void DesktopVideoDevice::ScreenWindow::paintGL()
     {
-        // This method is explicitely empty because this window's FBO is
-        // written to by the transfer/transfer2() method
+        // Nothing is drawn here: this window's FBO is written to by the
+        // transfer/transfer2() method. transfer() cannot run before the first
+        // paint creates the FBO, and a resize reallocates it empty, so ask for
+        // a new frame then. Not on every paint: each transfer triggers one.
+        const QSize paintedSize = size() * devicePixelRatio();
+        if (paintedSize != m_paintedSize)
+        {
+            m_paintedSize = paintedSize;
+            requestOutputRecomposite();
+        }
     }
 
     DesktopVideoDevice::ScreenView::ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext,

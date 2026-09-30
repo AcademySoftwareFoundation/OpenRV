@@ -71,6 +71,10 @@ namespace Rv
 
         private:
             QOpenGLContext* m_glShareContext = nullptr;
+
+            //  Size of the backing FBO at the last paint; a change means it
+            //  was (re)allocated empty.
+            QSize m_paintedSize;
         };
 
         //  QWidget container for the ScreenWindow, as GLView is for GLWindow.
@@ -289,6 +293,13 @@ namespace Rv
 
         //  True when the persisted display depth is RGB 10 + A 2.
         static bool tenBitDisplayRequested();
+
+        //
+        //  An output surface only shows what the control session composites
+        //  into it, so a freshly shown or resized one holds nothing. Asks every
+        //  session driving a separate output device for a new frame.
+        //
+        static void requestOutputRecomposite();
 
     protected:
         void addDefaultDataFormats(size_t bits = 8);
