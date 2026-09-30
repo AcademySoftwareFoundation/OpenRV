@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <string_view>
 #ifdef PLATFORM_WINDOWS
@@ -120,6 +121,12 @@ namespace
     bool g_glInteropProbed = false;
     bool g_glInteropAvailable = false;
 
+    // Null when the driver does not expose the entry point.
+    template <typename Proc> void resolveGL(Proc& function, const char* name)
+    {
+        function = reinterpret_cast<Proc>(wglGetProcAddress(name));
+    }
+
     // Must be called with a current GL context.
     bool loadGLInteropExtensions()
     {
@@ -129,19 +136,16 @@ namespace
         }
         g_glInteropProbed = true;
 
-        g_glCreateMemoryObjectsEXT = reinterpret_cast<PFNGLCREATEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glCreateMemoryObjectsEXT"));
-        g_glDeleteMemoryObjectsEXT = reinterpret_cast<PFNGLDELETEMEMORYOBJECTSEXTPROC_RV>(wglGetProcAddress("glDeleteMemoryObjectsEXT"));
-        g_glMemoryObjectParameterivEXT =
-            reinterpret_cast<PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV>(wglGetProcAddress("glMemoryObjectParameterivEXT"));
-        g_glTexStorageMem2DEXT = reinterpret_cast<PFNGLTEXSTORAGEMEM2DEXTPROC_RV>(wglGetProcAddress("glTexStorageMem2DEXT"));
-        g_glImportMemoryWin32HandleEXT =
-            reinterpret_cast<PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportMemoryWin32HandleEXT"));
-        g_glGenSemaphoresEXT = reinterpret_cast<PFNGLGENSEMAPHORESEXTPROC_RV>(wglGetProcAddress("glGenSemaphoresEXT"));
-        g_glDeleteSemaphoresEXT = reinterpret_cast<PFNGLDELETESEMAPHORESEXTPROC_RV>(wglGetProcAddress("glDeleteSemaphoresEXT"));
-        g_glImportSemaphoreWin32HandleEXT =
-            reinterpret_cast<PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV>(wglGetProcAddress("glImportSemaphoreWin32HandleEXT"));
-        g_glWaitSemaphoreEXT = reinterpret_cast<PFNGLWAITSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glWaitSemaphoreEXT"));
-        g_glSignalSemaphoreEXT = reinterpret_cast<PFNGLSIGNALSEMAPHOREEXTPROC_RV>(wglGetProcAddress("glSignalSemaphoreEXT"));
+        resolveGL(g_glCreateMemoryObjectsEXT, "glCreateMemoryObjectsEXT");
+        resolveGL(g_glDeleteMemoryObjectsEXT, "glDeleteMemoryObjectsEXT");
+        resolveGL(g_glMemoryObjectParameterivEXT, "glMemoryObjectParameterivEXT");
+        resolveGL(g_glTexStorageMem2DEXT, "glTexStorageMem2DEXT");
+        resolveGL(g_glImportMemoryWin32HandleEXT, "glImportMemoryWin32HandleEXT");
+        resolveGL(g_glGenSemaphoresEXT, "glGenSemaphoresEXT");
+        resolveGL(g_glDeleteSemaphoresEXT, "glDeleteSemaphoresEXT");
+        resolveGL(g_glImportSemaphoreWin32HandleEXT, "glImportSemaphoreWin32HandleEXT");
+        resolveGL(g_glWaitSemaphoreEXT, "glWaitSemaphoreEXT");
+        resolveGL(g_glSignalSemaphoreEXT, "glSignalSemaphoreEXT");
 
         g_glInteropAvailable = g_glCreateMemoryObjectsEXT && g_glDeleteMemoryObjectsEXT && g_glMemoryObjectParameterivEXT
                                && g_glTexStorageMem2DEXT && g_glImportMemoryWin32HandleEXT && g_glGenSemaphoresEXT
@@ -201,6 +205,13 @@ namespace Rv
             static const bool forced = getenv("RV_VULKAN_FORCE_CPU_PRESENT") != nullptr;
             return forced;
         }
+
+        void drainGLErrors()
+        {
+            while (glGetError() != GL_NO_ERROR)
+            {
+            }
+        }
     } // namespace
 
     QTVulkanVideoDevice::QTVulkanVideoDevice(VideoModule* module, const string& name, VulkanWindow* window, QWidget* eventWidget)
@@ -223,10 +234,7 @@ namespace Rv
                 glDeleteTextures(1, &m_fboColorTex);
                 m_fboColorTex = 0;
             }
-            for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
-            {
-                cleanupSharedGLObjects(i);
-            }
+            cleanupAllSharedGLObjects();
             cleanupCpuFallbackTarget();
             m_glContext->doneCurrent();
         }
@@ -300,19 +308,18 @@ namespace Rv
             return;
         }
 
-        const float dpr = m_window ? m_window->devicePixelRatioF() : 1.0f;
-        int newW = m_window ? static_cast<int>(m_window->width() * dpr + 0.5f) : 128;
-        int newH = m_window ? static_cast<int>(m_window->height() * dpr + 0.5f) : 128;
-        if (newW < 1)
+        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : 128;
+        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : 128;
+        if (pixelWidth < 1)
         {
-            newW = 128;
+            pixelWidth = 128;
         }
-        if (newH < 1)
+        if (pixelHeight < 1)
         {
-            newH = 128;
+            pixelHeight = 128;
         }
 
-        if (!m_fbo || m_fboWidth != newW || m_fboHeight != newH)
+        if (!m_fbo || m_fboWidth != pixelWidth || m_fboHeight != pixelHeight)
         {
             m_fbo.reset();
             if (m_fboColorTex)
@@ -331,15 +338,16 @@ namespace Rv
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
             if (passiveOutput)
             {
-                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, newW, newH, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, pixelWidth, pixelHeight, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV,
+                             nullptr);
             }
             else
             {
-                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, newW, newH, 0, GL_RGBA, GL_FLOAT, nullptr);
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, pixelWidth, pixelHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
             }
             glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-            m_fbo = std::make_unique<TwkGLF::GLFBO>(newW, newH, fboFormat);
+            m_fbo = std::make_unique<TwkGLF::GLFBO>(pixelWidth, pixelHeight, fboFormat);
             m_fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
 
             GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -348,8 +356,8 @@ namespace Rv
                 cerr << "ERROR: QTVulkanVideoDevice: FBO incomplete: 0x" << hex << status << dec << endl;
             }
 
-            m_fboWidth = newW;
-            m_fboHeight = newH;
+            m_fboWidth = pixelWidth;
+            m_fboHeight = pixelHeight;
         }
 
         m_fbo->bind();
@@ -361,18 +369,18 @@ namespace Rv
 
     void QTVulkanVideoDevice::setAbsolutePosition(int x, int y)
     {
-        if (x != m_x || y != m_y || m_refresh == -1.0f)
+        if (x != m_x || y != m_y || !m_refresh)
         {
-            float refresh = -1.0f;
+            std::optional<float> refresh;
 
-            int w = m_window ? m_window->width() : 0;
-            int h = m_window ? m_window->height() : 0;
-            int tx = x + w / 2;
-            int ty = y + h / 2;
+            const int windowWidth = m_window ? m_window->width() : 0;
+            const int windowHeight = m_window ? m_window->height() : 0;
+            const int centerX = x + windowWidth / 2;
+            const int centerY = y + windowHeight / 2;
 
             if (const TwkApp::VideoModule* mod = TwkApp::App()->primaryVideoModule())
             {
-                if (TwkApp::VideoDevice* device = mod->deviceFromPosition(tx, ty))
+                if (TwkApp::VideoDevice* device = mod->deviceFromPosition(centerX, centerY))
                 {
                     setPhysicalDevice(device);
                     refresh = device->timing().hz;
@@ -384,18 +392,18 @@ namespace Rv
 
             if (refresh != m_refresh)
             {
-                if (refresh > 0)
+                if (refresh && *refresh > 0)
                 {
                     m_refresh = refresh;
                 }
                 else if (IPCore::debugPlayback)
                 {
-                    cout << "WARNING: ignoring intended desktop refresh rate = " << refresh << endl;
+                    cout << "WARNING: ignoring intended desktop refresh rate = " << refresh.value_or(-1.0f) << endl;
                 }
 
                 if (IPCore::debugPlayback)
                 {
-                    cout << "INFO: new desktop refresh rate " << m_refresh << endl;
+                    cout << "INFO: new desktop refresh rate " << m_refresh.value_or(-1.0f) << endl;
                 }
             }
         }
@@ -488,6 +496,14 @@ namespace Rv
         m_glShared[slot].height = 0;
     }
 
+    void QTVulkanVideoDevice::cleanupAllSharedGLObjects() const
+    {
+        for (uint32_t slot = 0; slot < VulkanWindow::kFramesInFlight; ++slot)
+        {
+            cleanupSharedGLObjects(slot);
+        }
+    }
+
     void QTVulkanVideoDevice::releaseSharedGLObjects()
     {
         //  No context means nothing was ever imported.
@@ -500,16 +516,13 @@ namespace Rv
         {
             return;
         }
-        for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
-        {
-            cleanupSharedGLObjects(i);
-        }
+        cleanupAllSharedGLObjects();
         m_glContext->doneCurrent();
     }
 
-    void QTVulkanVideoDevice::ensureCpuFallbackTarget(int w, int h) const
+    void QTVulkanVideoDevice::ensureCpuFallbackTarget(int targetWidth, int targetHeight) const
     {
-        if (m_cpuFlipFbo && m_cpuFlipWidth == w && m_cpuFlipHeight == h)
+        if (m_cpuFlipFbo && m_cpuFlipWidth == targetWidth && m_cpuFlipHeight == targetHeight)
         {
             return;
         }
@@ -520,7 +533,7 @@ namespace Rv
         // packed readback below is a direct copy (no conversion in glReadPixels).
         glGenTextures(1, &m_cpuFlipTex);
         glBindTexture(GL_TEXTURE_2D, m_cpuFlipTex);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, w, h, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, targetWidth, targetHeight, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -530,8 +543,8 @@ namespace Rv
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_cpuFlipTex, 0);
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-        m_cpuFlipWidth = w;
-        m_cpuFlipHeight = h;
+        m_cpuFlipWidth = targetWidth;
+        m_cpuFlipHeight = targetHeight;
     }
 
     void QTVulkanVideoDevice::cleanupCpuFallbackTarget() const
@@ -560,9 +573,7 @@ namespace Rv
         }
 
         //  Drain the rest so the next step starts from a clean queue.
-        while (glGetError() != GL_NO_ERROR)
-        {
-        }
+        drainGLErrors();
 
         cerr << "ERROR: QTVulkanVideoDevice: " << what << " failed (GL 0x" << hex << first << dec << "); demoting '" << name()
              << "' to CPU presentation." << endl;
@@ -574,9 +585,9 @@ namespace Rv
 
     bool QTVulkanVideoDevice::glDeviceMatchesVulkan() const
     {
-        if (m_glVulkanDeviceMatch != -1)
+        if (m_glVulkanDeviceMatch)
         {
-            return m_glVulkanDeviceMatch == 1;
+            return *m_glVulkanDeviceMatch;
         }
         if (!m_glContext || !m_window || !m_window->isInitialized())
         {
@@ -601,7 +612,7 @@ namespace Rv
             matched = m_window->physicalDeviceMatchesUUID(uuid.data(), uuid.size());
         }
 
-        m_glVulkanDeviceMatch = matched ? 1 : 0;
+        m_glVulkanDeviceMatch = matched;
         if (!matched && ImageRenderer::debugGpu())
         {
             cout << "INFO: QTVulkanVideoDevice: GL/Vulkan device UUIDs do not match or are unavailable; using CPU fallback." << endl;
@@ -609,26 +620,26 @@ namespace Rv
         return matched;
     }
 
-    void QTVulkanVideoDevice::presentCpuFallback(int w, int h) const
+    void QTVulkanVideoDevice::presentCpuFallback(int frameWidth, int frameHeight) const
     {
         TwkGLF::GLFBO* fbo = m_fbo.get();
 
         // With GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGBA packs A2B10G10R10 and
         // GL_BGRA packs A2R10G10B10, so the read format matches the swapchain.
-        const VkFormat scFmt = m_window ? m_window->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
-        const GLenum readFormat = (scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? GL_BGRA : GL_RGBA;
+        const VkFormat swapchainFormat = m_window ? m_window->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+        const GLenum readFormat = (swapchainFormat == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? GL_BGRA : GL_RGBA;
 
-        ensureCpuFallbackTarget(w, h);
+        ensureCpuFallbackTarget(frameWidth, frameHeight);
 
         // Y-flip (GL bottom-left to Vulkan top-left) into the RGB10_A2 target.
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
         glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_cpuFlipFbo);
-        glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebufferEXT(0, 0, frameWidth, frameHeight, 0, frameHeight, frameWidth, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);
 
-        m_cpuPackedScratch.resize(static_cast<size_t>(w) * h);
-        glReadPixels(0, 0, w, h, readFormat, GL_UNSIGNED_INT_2_10_10_10_REV, m_cpuPackedScratch.data());
-        m_window->presentPixelData(m_cpuPackedScratch.data(), w, h);
+        m_cpuPackedScratch.resize(static_cast<size_t>(frameWidth) * frameHeight);
+        glReadPixels(0, 0, frameWidth, frameHeight, readFormat, GL_UNSIGNED_INT_2_10_10_10_REV, m_cpuPackedScratch.data());
+        m_window->presentPixelData(m_cpuPackedScratch.data(), frameWidth, frameHeight);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID()); // restore
     }
@@ -654,10 +665,10 @@ namespace Rv
         const uint32_t slot = m_window->currentFrame();
 
         TwkGLF::GLFBO* fbo = m_fbo.get();
-        const int w = static_cast<int>(fbo->width());
-        const int h = static_cast<int>(fbo->height());
+        const int frameWidth = static_cast<int>(fbo->width());
+        const int frameHeight = static_cast<int>(fbo->height());
 
-        if (w <= 0 || h <= 0)
+        if (frameWidth <= 0 || frameHeight <= 0)
         {
             return;
         }
@@ -687,21 +698,22 @@ namespace Rv
             GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
 #endif
         const bool glInteropAvailable = !forceCpuPresentation() && !m_interopDisabled && glExtensionsAvailable && glDeviceMatchesVulkan();
-        const VulkanWindow::SharedImageInfo* sharedInfo = glInteropAvailable ? m_window->getSharedImageInfo(w, h) : nullptr;
+        const VulkanWindow::SharedImageInfo* sharedInfo =
+            glInteropAvailable ? m_window->getSharedImageInfo(frameWidth, frameHeight) : nullptr;
 
         //  Logged on every transition: the first call can precede swapchain
         //  creation.
-        const int presentPath = sharedInfo ? 1 : 0;
-        if (m_loggedPresentPath != presentPath)
+        const bool gpuInterop = sharedInfo != nullptr;
+        if (m_loggedPresentPath != gpuInterop)
         {
-            m_loggedPresentPath = presentPath;
-            const VkFormat scFmt = m_window ? m_window->swapchainFormat() : VK_FORMAT_UNDEFINED;
-            cout << "INFO: QTVulkanVideoDevice: syncBuffers: '" << name() << "' " << w << "x" << h
-                 << " present path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback") << "  swapchainFormat=" << scFmt
-                 << (scFmt == VK_FORMAT_A2B10G10R10_UNORM_PACK32   ? " (A2B10G10R10 / 10-bit)"
-                     : scFmt == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
-                     : scFmt == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
-                                                                   : " (NOT 10-bit)")
+            m_loggedPresentPath = gpuInterop;
+            const VkFormat swapchainFormat = m_window ? m_window->swapchainFormat() : VK_FORMAT_UNDEFINED;
+            cout << "INFO: QTVulkanVideoDevice: syncBuffers: '" << name() << "' " << frameWidth << "x" << frameHeight
+                 << " present path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback") << "  swapchainFormat=" << swapchainFormat
+                 << (swapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32   ? " (A2B10G10R10 / 10-bit)"
+                     : swapchainFormat == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
+                     : swapchainFormat == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
+                                                                             : " (NOT 10-bit)")
                  << endl;
         }
 
@@ -731,7 +743,7 @@ namespace Rv
             }
             m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, reason);
 
-            presentCpuFallback(w, h);
+            presentCpuFallback(frameWidth, frameHeight);
             return;
         }
 
@@ -744,9 +756,7 @@ namespace Rv
 
             //  Start from a clean error queue so interopGLFailed() below cannot
             //  attribute an unrelated earlier error to the import.
-            while (glGetError() != GL_NO_ERROR)
-            {
-            }
+            drainGLErrors();
 
             glCreateMemoryObjectsEXT(1, &m_glShared[slot].memoryObject);
 
@@ -767,7 +777,7 @@ namespace Rv
                 cerr << "ERROR: QTVulkanVideoDevice: dup(" << fdName << ") failed." << endl;
                 cleanupSharedGLObjects(slot);
                 m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "dup() of a shared image FD failed");
-                presentCpuFallback(w, h);
+                presentCpuFallback(frameWidth, frameHeight);
             };
 
             // Duplicate the FD because glImportMemoryFdEXT takes ownership
@@ -788,7 +798,7 @@ namespace Rv
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
                             sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
 
-            // Allocated at capacity; the blit below writes only the used w x h.
+            // Allocated at capacity; the blit below writes only the used region.
             glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight,
                                  m_glShared[slot].memoryObject, 0);
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -822,12 +832,9 @@ namespace Rv
             if (interopGLFailed("GL<->Vulkan shared image import"))
             {
                 //  Interop is now off for good, so release every slot.
-                for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
-                {
-                    cleanupSharedGLObjects(i);
-                }
+                cleanupAllSharedGLObjects();
                 m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "GL import of the shared image raised a GL error");
-                presentCpuFallback(w, h);
+                presentCpuFallback(frameWidth, frameHeight);
                 return;
             }
 
@@ -839,9 +846,7 @@ namespace Rv
 
         //  session->render() can leave errors pending; drain them so the check
         //  below sees only the wait/blit/signal sequence's errors.
-        while (glGetError() != GL_NO_ERROR)
-        {
-        }
+        drainGLErrors();
 
         constexpr GLenum waitSrcLayout = GL_LAYOUT_TRANSFER_SRC_EXT;
         glWaitSemaphoreEXT(m_glShared[slot].vkReadySemaphore, 0, nullptr, 1, &m_glShared[slot].texture, &waitSrcLayout);
@@ -861,7 +866,7 @@ namespace Rv
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
 
         // Flip Y: GL origin is bottom-left, Vulkan origin is top-left.
-        glBlitFramebufferEXT(0, 0, w, h, 0, h, w, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebufferEXT(0, 0, frameWidth, frameHeight, 0, frameHeight, frameWidth, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
 
@@ -872,12 +877,9 @@ namespace Rv
 
         if (interopGLFailed("GL<->Vulkan shared image blit"))
         {
-            for (uint32_t i = 0; i < VulkanWindow::kFramesInFlight; ++i)
-            {
-                cleanupSharedGLObjects(i);
-            }
+            cleanupAllSharedGLObjects();
             m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "GL blit into the shared image raised a GL error");
-            presentCpuFallback(w, h);
+            presentCpuFallback(frameWidth, frameHeight);
             return;
         }
 
@@ -902,19 +904,24 @@ namespace Rv
 
     void QTVulkanVideoDevice::clearCaches() const {}
 
+    int QTVulkanVideoDevice::toDevicePixels(int logical) const
+    {
+        const float dpr = m_window->devicePixelRatioF();
+        return static_cast<int>(logical * dpr + 0.5f);
+    }
+
     VideoDevice::Resolution QTVulkanVideoDevice::resolution() const
     {
         if (!m_window)
         {
             return Resolution(0, 0, 1.0f, 1.0f);
         }
-        const float dpr = m_window->devicePixelRatioF();
-        return Resolution(static_cast<int>(m_window->width() * dpr + 0.5f), static_cast<int>(m_window->height() * dpr + 0.5f), 1.0f, 1.0f);
+        return Resolution(toDevicePixels(m_window->width()), toDevicePixels(m_window->height()), 1.0f, 1.0f);
     }
 
     VideoDevice::Offset QTVulkanVideoDevice::offset() const { return Offset(m_x, m_y); }
 
-    VideoDevice::Timing QTVulkanVideoDevice::timing() const { return Timing((m_refresh != -1.0f) ? m_refresh : 0.0f); }
+    VideoDevice::Timing QTVulkanVideoDevice::timing() const { return Timing(m_refresh.value_or(0.0f)); }
 
     VideoDevice::VideoFormat QTVulkanVideoDevice::format() const
     {
@@ -922,9 +929,8 @@ namespace Rv
         {
             return VideoFormat(0, 0, 1.0, 1.0, 0.0, hardwareIdentification());
         }
-        const float dpr = m_window->devicePixelRatioF();
-        return VideoFormat(static_cast<int>(m_window->width() * dpr + 0.5f), static_cast<int>(m_window->height() * dpr + 0.5f), 1.0, 1.0,
-                           (m_refresh != -1.0f) ? m_refresh : 0.0f, hardwareIdentification());
+        return VideoFormat(toDevicePixels(m_window->width()), toDevicePixels(m_window->height()), 1.0, 1.0, m_refresh.value_or(0.0f),
+                           hardwareIdentification());
     }
 
     size_t QTVulkanVideoDevice::width() const
@@ -933,7 +939,7 @@ namespace Rv
         {
             return 0;
         }
-        return static_cast<size_t>(m_window->width() * m_window->devicePixelRatioF() + 0.5f);
+        return static_cast<size_t>(toDevicePixels(m_window->width()));
     }
 
     size_t QTVulkanVideoDevice::height() const
@@ -942,7 +948,7 @@ namespace Rv
         {
             return 0;
         }
-        return static_cast<size_t>(m_window->height() * m_window->devicePixelRatioF() + 0.5f);
+        return static_cast<size_t>(toDevicePixels(m_window->height()));
     }
 
     void QTVulkanVideoDevice::open(const StringVector& /*args*/)

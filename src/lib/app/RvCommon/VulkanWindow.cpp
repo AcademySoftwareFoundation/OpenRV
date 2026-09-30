@@ -70,37 +70,48 @@ namespace Rv
 {
     using namespace std;
 
-    //  A best-effort output forces one blocking present once it is this stale.
-    static constexpr double kMaxStaleSeconds = 0.1;
-
-    //  -debug gpu frame-time accumulators, fed only by control viewports. They
-    //  are shared: with several documents open the totals are combined.
-    static unsigned int s_diagFrames = 0;
-    static double s_diagRenderMs = 0.0;
-    static double s_diagMainPresentMs = 0.0;
-    static double s_diagOutPresentMs = 0.0;
-    static double s_diagFenceWaitMs = 0.0;
-    static double s_diagAcquireMs = 0.0;
-    static double s_diagLoopMs = 0.0;
-    static TwkUtil::Timer s_diagLoopTimer;
-    //  Post-present work: in the frame period but not in "total".
-    static double s_diagPostRenderMs = 0.0;
-    //  handler: time in the pointer handler. eventToRender: age of the newest
-    //  pointer event when its frame starts rendering.
-    static double s_diagPointerHandlerMs = 0.0;
-    static unsigned int s_diagPointerEvents = 0;
-    static double s_diagPointerAgeMs = 0.0;
-    static unsigned int s_diagPointerAgeSamples = 0;
-    static TwkUtil::Timer s_diagPointerTimer;
-    static bool s_diagPointerPending = false;
-
-    //  eventToRetire: end-to-end latency, from the pointer event to its
-    //  frame's GPU retirement. Needs an absolute clock since retirement lags
-    //  by several frames.
-    static TwkUtil::Timer s_diagClock;
-
     namespace
     {
+        //  A best-effort output forces one blocking present once it is this stale.
+        constexpr double kMaxStaleSeconds = 0.1;
+
+        //  -debug gpu frame-time accumulators, fed only by control viewports.
+        //  They are shared: with several documents open the totals are
+        //  combined. Reset after each 60-frame report.
+        struct DiagStats
+        {
+            unsigned int frames{0};
+            double renderMs{0.0};
+            double mainPresentMs{0.0};
+            double outPresentMs{0.0};
+            double fenceWaitMs{0.0};
+            double acquireMs{0.0};
+            double loopMs{0.0};
+            //  Post-present work: in the frame period but not in "total".
+            double postRenderMs{0.0};
+            //  handler: time in the pointer handler. eventToRender: age of the
+            //  newest pointer event when its frame starts rendering.
+            double pointerHandlerMs{0.0};
+            unsigned int pointerEvents{0};
+            double pointerAgeMs{0.0};
+            unsigned int pointerAgeSamples{0};
+            //  eventToRetire: end-to-end latency, from the pointer event to its
+            //  frame's GPU retirement.
+            double eventToRetireMs{0.0};
+            unsigned int eventToRetireSamples{0};
+        };
+
+        DiagStats s_diag;
+
+        //  Timing state that survives a report reset.
+        TwkUtil::Timer s_diagLoopTimer;
+        TwkUtil::Timer s_diagPointerTimer;
+        bool s_diagPointerPending = false;
+
+        //  Absolute clock for eventToRetire, since retirement lags by several
+        //  frames.
+        TwkUtil::Timer s_diagClock;
+
         double diagNow()
         {
             if (!s_diagClock.isRunning())
@@ -109,15 +120,52 @@ namespace Rv
             }
             return s_diagClock.elapsed();
         }
-    } // namespace
 
-    //  Event time for the frame being rendered (-1 if none), handed to its
-    //  slot at submit.
-    static double s_diagFrameEventTime = -1.0;
-    static std::array<double, VulkanWindow::kFramesInFlight> s_diagSlotEventTime{};
-    static std::array<bool, VulkanWindow::kFramesInFlight> s_diagSlotArmed{};
-    static double s_diagEventToRetireMs = 0.0;
-    static unsigned int s_diagEventToRetireSamples = 0;
+        //  Event time for the frame being rendered, handed to its slot at
+        //  submit. A slot holds a value until its fence retires.
+        std::optional<double> s_diagFrameEventTime;
+        std::array<std::optional<double>, VulkanWindow::kFramesInFlight> s_diagSlotEventTime{};
+
+        //  Adds the scope's duration in milliseconds to accumulatorMs when
+        //  enabled.
+        class ScopedDiagTimer
+        {
+        public:
+            ScopedDiagTimer(double& accumulatorMs, bool enabled)
+                : m_accumulatorMs(accumulatorMs)
+                , m_enabled(enabled)
+            {
+                if (m_enabled)
+                {
+                    m_timer.start();
+                }
+            }
+
+            ~ScopedDiagTimer()
+            {
+                if (m_enabled)
+                {
+                    m_accumulatorMs += m_timer.elapsed() * 1000.0;
+                }
+            }
+
+            ScopedDiagTimer(const ScopedDiagTimer&) = delete;
+            ScopedDiagTimer& operator=(const ScopedDiagTimer&) = delete;
+
+        private:
+            double& m_accumulatorMs;
+            bool m_enabled;
+            TwkUtil::Timer m_timer;
+        };
+
+#ifdef PLATFORM_WINDOWS
+        constexpr VkExternalMemoryHandleTypeFlagBits kMemoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+        constexpr VkExternalSemaphoreHandleTypeFlagBits kSemaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+#else
+        constexpr VkExternalMemoryHandleTypeFlagBits kMemoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+        constexpr VkExternalSemaphoreHandleTypeFlagBits kSemaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+#endif
+    } // namespace
 
     using namespace TwkApp;
     using namespace IPCore;
@@ -1117,6 +1165,17 @@ namespace Rv
             return reinterpret_cast<Fn>(vkGetDeviceProcAddr(device, name));
         }
 
+        // Resets commandBuffer and begins a one-time-submit recording.
+        void beginOneTimeCommands(VkCommandBuffer commandBuffer)
+        {
+            vkResetCommandBuffer(commandBuffer, 0);
+
+            VkCommandBufferBeginInfo beginInfo = {};
+            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+            vkBeginCommandBuffer(commandBuffer, &beginInfo);
+        }
+
         // Single-subresource colour image layout transition.
         void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout,
                                    VkAccessFlags2 srcAccessMask, VkAccessFlags2 dstAccessMask, VkPipelineStageFlags2 srcStageMask,
@@ -1318,12 +1377,6 @@ namespace Rv
         //  TRANSFER_SRC the driver may pick a compressed layout GL cannot read.
         cfg.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
-#ifdef PLATFORM_WINDOWS
-        const VkExternalMemoryHandleTypeFlagBits handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
-#else
-        const VkExternalMemoryHandleTypeFlagBits handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
-#endif
-
         //  Exportability alone does not guarantee a usable import, so try the
         //  vendor's preferred tiling first. See useOptimalTilingForInterop().
         const bool preferOptimal = useOptimalTilingForInterop(m_vkPhysicalDevice);
@@ -1334,7 +1387,7 @@ namespace Rv
         {
             VkPhysicalDeviceExternalImageFormatInfo extInfo = {};
             extInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO;
-            extInfo.handleType = handleType;
+            extInfo.handleType = kMemoryHandleType;
 
             VkPhysicalDeviceImageFormatInfo2 fmtInfo = {};
             fmtInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
@@ -1360,7 +1413,7 @@ namespace Rv
                 return false;
             }
 
-            return (extProps.externalMemoryProperties.compatibleHandleTypes & handleType) != 0
+            return (extProps.externalMemoryProperties.compatibleHandleTypes & kMemoryHandleType) != 0
                    && (features & VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT) != 0
                    && (features & VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT) != 0;
         };
@@ -1730,7 +1783,7 @@ namespace Rv
         return true;
     }
 
-    const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int w, int h)
+    const VulkanWindow::SharedImageInfo* VulkanWindow::getSharedImageInfo(int requestedWidth, int requestedHeight)
     {
         if (!m_vkDevice || !m_externalInteropSupported || m_sharedImageUnusable)
         {
@@ -1756,10 +1809,10 @@ namespace Rv
         }
 
         // Within capacity: reuse the export, update the used sub-region.
-        if (m_shared[slot].image && w <= m_shared[slot].capacityW && h <= m_shared[slot].capacityH)
+        if (m_shared[slot].image && requestedWidth <= m_shared[slot].capacityW && requestedHeight <= m_shared[slot].capacityH)
         {
-            info.width = w;
-            info.height = h;
+            info.width = requestedWidth;
+            info.height = requestedHeight;
             return &info;
         }
 
@@ -1773,8 +1826,8 @@ namespace Rv
             screenW = static_cast<int>(scr->geometry().width() * dpr);
             screenH = static_cast<int>(scr->geometry().height() * dpr);
         }
-        const int capW = std::max({w, screenW, m_shared[slot].capacityW});
-        const int capH = std::max({h, screenH, m_shared[slot].capacityH});
+        const int capW = std::max({requestedWidth, screenW, m_shared[slot].capacityW});
+        const int capH = std::max({requestedHeight, screenH, m_shared[slot].capacityH});
 
         const bool optimalTiling = m_interopConfig.tiling == VK_IMAGE_TILING_OPTIMAL;
 
@@ -1803,17 +1856,20 @@ namespace Rv
 
         cleanupSharedImage(slot);
 
+        const auto failSharedImage = [this, slot](std::string_view message) -> const SharedImageInfo*
+        {
+            cerr << "ERROR: VulkanWindow: " << message << endl;
+            cleanupSharedImage(slot);
+            return nullptr;
+        };
+
         //  Unconditional: fires about once per slot per session.
         cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
-             << " for request " << w << "x" << h << " tiling=" << tilingName(m_interopConfig.tiling) << endl;
+             << " for request " << requestedWidth << "x" << requestedHeight << " tiling=" << tilingName(m_interopConfig.tiling) << endl;
 
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
-#ifdef PLATFORM_WINDOWS
-        extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
-#else
-        extMemInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
-#endif
+        extMemInfo.handleTypes = kMemoryHandleType;
 
         VkImageCreateInfo imageInfo = {};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -1927,11 +1983,7 @@ namespace Rv
         VkExportMemoryAllocateInfo exportAllocInfo = {};
         exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
         exportAllocInfo.pNext = chain;
-#ifdef PLATFORM_WINDOWS
-        exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
-#else
-        exportAllocInfo.handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
-#endif
+        exportAllocInfo.handleTypes = kMemoryHandleType;
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -1941,46 +1993,36 @@ namespace Rv
             findMemoryType(m_vkPhysicalDevice, memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
         if (!memoryTypeIndex)
         {
-            cerr << "ERROR: VulkanWindow: No device-local memory type for shared image" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("No device-local memory type for shared image");
         }
         allocInfo.memoryTypeIndex = *memoryTypeIndex;
 
         if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_shared[slot].memory) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to allocate shared image memory" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to allocate shared image memory");
         }
 
         if (vkBindImageMemory(m_vkDevice, m_shared[slot].image, m_shared[slot].memory, 0) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to bind shared image memory" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to bind shared image memory");
         }
 
 #ifdef PLATFORM_WINDOWS
         auto pfnGetMemoryWin32HandleKHR = deviceProc<PFN_vkGetMemoryWin32HandleKHR>(m_vkDevice, "vkGetMemoryWin32HandleKHR");
         if (!pfnGetMemoryWin32HandleKHR)
         {
-            cerr << "ERROR: VulkanWindow: vkGetMemoryWin32HandleKHR not found" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("vkGetMemoryWin32HandleKHR not found");
         }
 
         VkMemoryGetWin32HandleInfoKHR getHandleInfo = {};
         getHandleInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR;
         getHandleInfo.memory = m_shared[slot].memory;
-        getHandleInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+        getHandleInfo.handleType = kMemoryHandleType;
 
         HANDLE memHandle = nullptr;
         if (pfnGetMemoryWin32HandleKHR(m_vkDevice, &getHandleInfo, &memHandle) != VK_SUCCESS || !memHandle)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get memory HANDLE" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get memory HANDLE");
         }
         //  Stored at once so cleanupSharedImage() closes it on a later failure.
         info.memoryHandle = memHandle;
@@ -1988,22 +2030,18 @@ namespace Rv
         auto pfnGetMemoryFdKHR = deviceProc<PFN_vkGetMemoryFdKHR>(m_vkDevice, "vkGetMemoryFdKHR");
         if (!pfnGetMemoryFdKHR)
         {
-            cerr << "ERROR: VulkanWindow: vkGetMemoryFdKHR not found" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("vkGetMemoryFdKHR not found");
         }
 
         VkMemoryGetFdInfoKHR getFdInfo = {};
         getFdInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
         getFdInfo.memory = m_shared[slot].memory;
-        getFdInfo.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+        getFdInfo.handleType = kMemoryHandleType;
 
         int memFd = -1;
         if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get memory FD" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get memory FD");
         }
         //  Stored at once so cleanupSharedImage() closes it on a later failure.
         info.memoryFd = memFd;
@@ -2011,11 +2049,7 @@ namespace Rv
 
         VkExportSemaphoreCreateInfo exportSemInfo = {};
         exportSemInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
-#ifdef PLATFORM_WINDOWS
-        exportSemInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
-#else
-        exportSemInfo.handleTypes = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
-#endif
+        exportSemInfo.handleTypes = kSemaphoreHandleType;
 
         VkSemaphoreCreateInfo semInfo = {};
         semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -2024,23 +2058,19 @@ namespace Rv
         if (vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_shared[slot].glReadySemaphore) != VK_SUCCESS
             || vkCreateSemaphore(m_vkDevice, &semInfo, nullptr, &m_shared[slot].vkReadySemaphore) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to create shared semaphores" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to create shared semaphores");
         }
 
 #ifdef PLATFORM_WINDOWS
         auto pfnGetSemaphoreWin32HandleKHR = deviceProc<PFN_vkGetSemaphoreWin32HandleKHR>(m_vkDevice, "vkGetSemaphoreWin32HandleKHR");
         if (!pfnGetSemaphoreWin32HandleKHR)
         {
-            cerr << "ERROR: VulkanWindow: vkGetSemaphoreWin32HandleKHR not found" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("vkGetSemaphoreWin32HandleKHR not found");
         }
 
         VkSemaphoreGetWin32HandleInfoKHR getSemHandleInfo = {};
         getSemHandleInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
-        getSemHandleInfo.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+        getSemHandleInfo.handleType = kSemaphoreHandleType;
 
         HANDLE glReadyHandle = nullptr;
         HANDLE vkReadyHandle = nullptr;
@@ -2048,36 +2078,30 @@ namespace Rv
         getSemHandleInfo.semaphore = m_shared[slot].glReadySemaphore;
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &glReadyHandle) != VK_SUCCESS || !glReadyHandle)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get glReady semaphore HANDLE" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get glReady semaphore HANDLE");
         }
         info.glReadySemaphoreHandle = glReadyHandle;
 
         getSemHandleInfo.semaphore = m_shared[slot].vkReadySemaphore;
         if (pfnGetSemaphoreWin32HandleKHR(m_vkDevice, &getSemHandleInfo, &vkReadyHandle) != VK_SUCCESS || !vkReadyHandle)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get vkReady semaphore HANDLE" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get vkReady semaphore HANDLE");
         }
         info.vkReadySemaphoreHandle = vkReadyHandle;
 
         info.size = memReqs.size;
-        info.width = w;
-        info.height = h;
+        info.width = requestedWidth;
+        info.height = requestedHeight;
 #else
         auto pfnGetSemaphoreFdKHR = deviceProc<PFN_vkGetSemaphoreFdKHR>(m_vkDevice, "vkGetSemaphoreFdKHR");
         if (!pfnGetSemaphoreFdKHR)
         {
-            cerr << "ERROR: VulkanWindow: vkGetSemaphoreFdKHR not found" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("vkGetSemaphoreFdKHR not found");
         }
 
         VkSemaphoreGetFdInfoKHR getSemFdInfo = {};
         getSemFdInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
-        getSemFdInfo.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+        getSemFdInfo.handleType = kSemaphoreHandleType;
 
         int glReadyFd = -1;
         int vkReadyFd = -1;
@@ -2085,33 +2109,24 @@ namespace Rv
         getSemFdInfo.semaphore = m_shared[slot].glReadySemaphore;
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &glReadyFd) != VK_SUCCESS || glReadyFd < 0)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get glReady semaphore FD" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get glReady semaphore FD");
         }
         info.glReadySemaphoreFd = glReadyFd;
 
         getSemFdInfo.semaphore = m_shared[slot].vkReadySemaphore;
         if (pfnGetSemaphoreFdKHR(m_vkDevice, &getSemFdInfo, &vkReadyFd) != VK_SUCCESS || vkReadyFd < 0)
         {
-            cerr << "ERROR: VulkanWindow: Failed to get vkReady semaphore FD" << endl;
-            cleanupSharedImage(slot);
-            return nullptr;
+            return failSharedImage("Failed to get vkReady semaphore FD");
         }
         info.vkReadySemaphoreFd = vkReadyFd;
 
         info.size = memReqs.size;
-        info.width = w;
-        info.height = h;
+        info.width = requestedWidth;
+        info.height = requestedHeight;
 #endif
 
         VkCommandBuffer cb = m_vkCommandBuffers[0];
-        vkResetCommandBuffer(cb, 0);
-
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        vkBeginCommandBuffer(cb, &beginInfo);
+        beginOneTimeCommands(cb);
 
         transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_ACCESS_2_NONE,
                               VK_ACCESS_2_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_2_NONE, VK_PIPELINE_STAGE_2_TRANSFER_BIT);
@@ -2148,8 +2163,131 @@ namespace Rv
     }
 
     //--------------------------------------------------------------------------
-    // presentSharedImage
+    // Frame helpers shared by presentSharedImage() and presentPixelData()
     //--------------------------------------------------------------------------
+
+    uint64_t VulkanWindow::presentWaitTimeout() const
+    {
+        //  The fence wait and acquire pace the control viewport to refresh. A
+        //  passive output polls instead, so a second display's vblank never
+        //  enters the loop; a skipped frame keeps the previous image.
+        const bool bestEffort = isPassiveOutput();
+        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
+        return (!bestEffort || forceProgress) ? std::numeric_limits<uint64_t>::max() : 0;
+    }
+
+    bool VulkanWindow::waitForFrameFence(uint32_t slot, uint64_t waitTimeout, bool drainShared)
+    {
+        //  Fence wait vs acquire timing tells GPU from vblank back-pressure.
+        VkResult fenceResult = VK_SUCCESS;
+        {
+            ScopedDiagTimer diagTimer(s_diag.fenceWaitMs, IPCore::ImageRenderer::debugGpu() && m_doc);
+            fenceResult = vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, waitTimeout);
+        }
+
+        if (fenceResult == VK_TIMEOUT)
+        {
+            //  The slot is not advanced: the next frame retries it.
+            if (drainShared)
+            {
+                drainSharedSemaphores(slot);
+            }
+            requestBestEffortRetry();
+            return false;
+        }
+        if (fenceResult != VK_SUCCESS)
+        {
+            requestGLFallback();
+            return false;
+        }
+        return true;
+    }
+
+    std::optional<uint32_t> VulkanWindow::acquireFrameImage(uint32_t slot, uint64_t waitTimeout, bool drainShared)
+    {
+        uint32_t imageIndex = 0;
+        VkResult result = VK_SUCCESS;
+        {
+            ScopedDiagTimer diagTimer(s_diag.acquireMs, IPCore::ImageRenderer::debugGpu() && m_doc);
+            result = vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_frameSync[slot].imageAvailable, VK_NULL_HANDLE,
+                                           &imageIndex);
+        }
+
+        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            //  A failed acquire leaves the semaphore unsignaled, so skip here.
+            if (drainShared)
+            {
+                drainSharedSemaphores(slot);
+            }
+            if (result == VK_NOT_READY || result == VK_TIMEOUT)
+            {
+                requestBestEffortRetry();
+            }
+            else if (result == VK_ERROR_OUT_OF_DATE_KHR)
+            {
+                handleSwapchainOutOfDate();
+            }
+            else if (result == VK_ERROR_DEVICE_LOST)
+            {
+                requestGLFallback();
+            }
+            return std::nullopt;
+        }
+
+        if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
+        }
+        m_imagesInFlight[imageIndex] = m_frameSync[slot].fence;
+
+        vkResetFences(m_vkDevice, 1, &m_frameSync[slot].fence);
+
+        return imageIndex;
+    }
+
+    void VulkanWindow::presentFrame(uint32_t slot, uint32_t imageIndex)
+    {
+        if (m_doc && s_diagFrameEventTime)
+        {
+            s_diagSlotEventTime[slot] = s_diagFrameEventTime;
+            s_diagFrameEventTime.reset();
+        }
+
+        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
+
+        VkPresentInfoKHR presentInfo = {};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &m_vkRenderFinished[imageIndex];
+        const std::array<VkSwapchainKHR, 1> swapchains = {m_vkSwapchain};
+        presentInfo.swapchainCount = static_cast<uint32_t>(swapchains.size());
+        presentInfo.pSwapchains = swapchains.data();
+        presentInfo.pImageIndices = &imageIndex;
+
+        const VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
+
+        m_lastPresentTimer.stop();
+        m_lastPresentTimer.start();
+
+        //  See maxFramesInFlight(). After the present so the driver gets the
+        //  frame early; never for the passive output.
+        if (maxFramesInFlight() == 1 && !isPassiveOutput())
+        {
+            vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
+        }
+
+        //  Recreate only on OUT_OF_DATE: some X11/RADV compositors report
+        //  SUBOPTIMAL persistently.
+        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            handleSwapchainOutOfDate();
+        }
+        else if (presentResult == VK_ERROR_DEVICE_LOST)
+        {
+            requestGLFallback();
+        }
+    }
 
     void VulkanWindow::presentSharedImage()
     {
@@ -2161,96 +2299,21 @@ namespace Rv
             return;
         }
 
-        //  Fence wait vs acquire timing tells GPU from vblank back-pressure.
-        const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
-        Timer diagTimer;
-
-        //  The fence wait and acquire pace the control viewport to refresh. A
-        //  passive output polls instead, so a second display's vblank never
-        //  enters the loop; a skipped frame keeps the previous image.
-        const bool bestEffort = isPassiveOutput();
-        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
-        const uint64_t waitTimeout = (!bestEffort || forceProgress) ? std::numeric_limits<uint64_t>::max() : 0;
-
-        if (diagPresent)
+        const uint64_t waitTimeout = presentWaitTimeout();
+        if (!waitForFrameFence(slot, waitTimeout, /*drainShared*/ true))
         {
-            diagTimer.start();
-        }
-
-        VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, waitTimeout);
-
-        if (diagPresent)
-        {
-            s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
-        }
-
-        if (fenceResult == VK_TIMEOUT)
-        {
-            //  The slot is not advanced: the next frame retries it.
-            drainSharedSemaphores(slot);
-            requestBestEffortRetry();
-            return;
-        }
-        if (fenceResult != VK_SUCCESS)
-        {
-            requestGLFallback();
             return;
         }
 
-        uint32_t imageIndex;
-        if (diagPresent)
+        const std::optional<uint32_t> acquiredIndex = acquireFrameImage(slot, waitTimeout, /*drainShared*/ true);
+        if (!acquiredIndex)
         {
-            diagTimer.start();
-        }
-
-        VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_frameSync[slot].imageAvailable, VK_NULL_HANDLE, &imageIndex);
-
-        if (diagPresent)
-        {
-            s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
-        }
-
-        if (result == VK_NOT_READY || result == VK_TIMEOUT)
-        {
-            //  Skip here, not after a successful acquire: a failed acquire
-            //  leaves the semaphore unsignaled.
-            drainSharedSemaphores(slot);
-            requestBestEffortRetry();
             return;
         }
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            drainSharedSemaphores(slot);
-            handleSwapchainOutOfDate();
-            return;
-        }
-        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-        {
-            drainSharedSemaphores(slot);
-            if (result == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
-            return;
-        }
-
-        if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
-        {
-            vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
-        }
-        m_imagesInFlight[imageIndex] = m_frameSync[slot].fence;
-
-        vkResetFences(m_vkDevice, 1, &m_frameSync[slot].fence);
+        const uint32_t imageIndex = *acquiredIndex;
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
-        vkResetCommandBuffer(cb, 0);
-
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        vkBeginCommandBuffer(cb, &beginInfo);
+        beginOneTimeCommands(cb);
 
         //  Source stage TRANSFER chains the transition after the glReady wait.
         transitionImageLayout(cb, m_shared[slot].image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -2314,57 +2377,14 @@ namespace Rv
             return;
         }
 
-        if (m_doc && s_diagFrameEventTime >= 0.0)
-        {
-            s_diagSlotEventTime[slot] = s_diagFrameEventTime;
-            s_diagSlotArmed[slot] = true;
-            s_diagFrameEventTime = -1.0;
-        }
-
-        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
-
-        VkPresentInfoKHR presentInfo = {};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_vkRenderFinished[imageIndex];
-        const std::array<VkSwapchainKHR, 1> swapchains = {m_vkSwapchain};
-        presentInfo.swapchainCount = static_cast<uint32_t>(swapchains.size());
-        presentInfo.pSwapchains = swapchains.data();
-        presentInfo.pImageIndices = &imageIndex;
-
-        VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
-
-        m_lastPresentTimer.stop();
-        m_lastPresentTimer.start();
-
-        //  See maxFramesInFlight(). After the present so the driver gets the
-        //  frame early; never for the passive output.
-        if (maxFramesInFlight() == 1 && !isPassiveOutput())
-        {
-            vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-        }
-        // Recreate only on OUT_OF_DATE: some X11/RADV compositors report
-        // SUBOPTIMAL persistently.
-        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            handleSwapchainOutOfDate();
-            return;
-        }
-        if (presentResult != VK_SUCCESS && presentResult != VK_SUBOPTIMAL_KHR)
-        {
-            if (presentResult == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
-            return;
-        }
+        presentFrame(slot, imageIndex);
     }
 
     //--------------------------------------------------------------------------
     // presentPixelData
     //--------------------------------------------------------------------------
 
-    void VulkanWindow::presentPixelData(const void* pixels, int w, int h)
+    void VulkanWindow::presentPixelData(const void* pixels, int pixelWidth, int pixelHeight)
     {
         const uint32_t slot = m_currentFrame;
 
@@ -2373,41 +2393,19 @@ namespace Rv
             return;
         }
 
-        const bool diagPresent = IPCore::ImageRenderer::debugGpu() && m_doc;
-        Timer diagTimer;
-
-        if (w <= 0 || h <= 0 || !ensureSwapchainMatchesSurface())
+        if (pixelWidth <= 0 || pixelHeight <= 0 || !ensureSwapchainMatchesSurface())
         {
             return;
         }
 
         // Same best-effort throttle as presentSharedImage().
-        const bool bestEffort = isPassiveOutput();
-        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
-        const uint64_t waitTimeout = (!bestEffort || forceProgress) ? std::numeric_limits<uint64_t>::max() : 0;
-
-        if (diagPresent)
+        const uint64_t waitTimeout = presentWaitTimeout();
+        if (!waitForFrameFence(slot, waitTimeout, /*drainShared*/ false))
         {
-            diagTimer.start();
-        }
-        const VkResult fenceResult = vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, waitTimeout);
-        if (diagPresent)
-        {
-            s_diagFenceWaitMs += diagTimer.elapsed() * 1000.0;
-        }
-
-        if (fenceResult == VK_TIMEOUT)
-        {
-            requestBestEffortRetry();
-            return;
-        }
-        if (fenceResult != VK_SUCCESS)
-        {
-            requestGLFallback();
             return;
         }
 
-        const size_t size = static_cast<size_t>(w) * static_cast<size_t>(h) * 4;
+        const size_t size = static_cast<size_t>(pixelWidth) * static_cast<size_t>(pixelHeight) * 4;
 
         if (size > m_staging[slot].size)
         {
@@ -2475,68 +2473,33 @@ namespace Rv
         memcpy(data, pixels, size);
         vkUnmapMemory(m_vkDevice, m_staging[slot].memory);
 
-        uint32_t imageIndex;
-        if (diagPresent)
+        const std::optional<uint32_t> acquiredIndex = acquireFrameImage(slot, waitTimeout, /*drainShared*/ false);
+        if (!acquiredIndex)
         {
-            diagTimer.start();
-        }
-        VkResult result =
-            vkAcquireNextImageKHR(m_vkDevice, m_vkSwapchain, waitTimeout, m_frameSync[slot].imageAvailable, VK_NULL_HANDLE, &imageIndex);
-        if (diagPresent)
-        {
-            s_diagAcquireMs += diagTimer.elapsed() * 1000.0;
-        }
-        if (result == VK_NOT_READY || result == VK_TIMEOUT)
-        {
-            requestBestEffortRetry();
             return;
         }
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            handleSwapchainOutOfDate();
-            return;
-        }
-        if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-        {
-            if (result == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
-            return;
-        }
-
-        if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
-        {
-            vkWaitForFences(m_vkDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
-        }
-        m_imagesInFlight[imageIndex] = m_frameSync[slot].fence;
-
-        vkResetFences(m_vkDevice, 1, &m_frameSync[slot].fence);
+        const uint32_t imageIndex = *acquiredIndex;
 
         VkCommandBuffer cb = m_vkCommandBuffers[imageIndex];
-        vkResetCommandBuffer(cb, 0);
-
-        VkCommandBufferBeginInfo beginInfo = {};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-        vkBeginCommandBuffer(cb, &beginInfo);
+        beginOneTimeCommands(cb);
 
         transitionImageLayout(cb, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                               VK_ACCESS_2_NONE, VK_ACCESS_2_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_2_TRANSFER_BIT,
                               VK_PIPELINE_STAGE_2_TRANSFER_BIT);
 
-        //  The buffer is w x h, but the destination is bounded by the swapchain.
+        //  The buffer is pixelWidth x pixelHeight, but the destination is
+        //  bounded by the swapchain.
         VkBufferImageCopy region = {};
         region.bufferOffset = 0;
-        region.bufferRowLength = static_cast<uint32_t>(w);
-        region.bufferImageHeight = static_cast<uint32_t>(h);
+        region.bufferRowLength = static_cast<uint32_t>(pixelWidth);
+        region.bufferImageHeight = static_cast<uint32_t>(pixelHeight);
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         region.imageSubresource.mipLevel = 0;
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
         region.imageOffset = {0, 0, 0};
-        region.imageExtent = {std::min(static_cast<uint32_t>(w), m_vkSwapchainExtent.width),
-                              std::min(static_cast<uint32_t>(h), m_vkSwapchainExtent.height), 1};
+        region.imageExtent = {std::min(static_cast<uint32_t>(pixelWidth), m_vkSwapchainExtent.width),
+                              std::min(static_cast<uint32_t>(pixelHeight), m_vkSwapchainExtent.height), 1};
 
         vkCmdCopyBufferToImage(cb, m_staging[slot].buffer, m_vkSwapchainImages[imageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
                                &region);
@@ -2555,49 +2518,7 @@ namespace Rv
             return;
         }
 
-        if (m_doc && s_diagFrameEventTime >= 0.0)
-        {
-            s_diagSlotEventTime[slot] = s_diagFrameEventTime;
-            s_diagSlotArmed[slot] = true;
-            s_diagFrameEventTime = -1.0;
-        }
-
-        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
-
-        VkPresentInfoKHR presentInfo = {};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &m_vkRenderFinished[imageIndex];
-        const std::array<VkSwapchainKHR, 1> swapchains = {m_vkSwapchain};
-        presentInfo.swapchainCount = static_cast<uint32_t>(swapchains.size());
-        presentInfo.pSwapchains = swapchains.data();
-        presentInfo.pImageIndices = &imageIndex;
-
-        VkResult presentResult = vkQueuePresentKHR(m_vkQueue, &presentInfo);
-
-        m_lastPresentTimer.stop();
-        m_lastPresentTimer.start();
-
-        //  See maxFramesInFlight(). After the present so the driver gets the
-        //  frame early; never for the passive output.
-        if (maxFramesInFlight() == 1 && !isPassiveOutput())
-        {
-            vkWaitForFences(m_vkDevice, 1, &m_frameSync[slot].fence, VK_TRUE, std::numeric_limits<uint64_t>::max());
-        }
-        // See presentSharedImage() on SUBOPTIMAL.
-        if (presentResult == VK_ERROR_OUT_OF_DATE_KHR)
-        {
-            handleSwapchainOutOfDate();
-            return;
-        }
-        if (presentResult != VK_SUCCESS && presentResult != VK_SUBOPTIMAL_KHR)
-        {
-            if (presentResult == VK_ERROR_DEVICE_LOST)
-            {
-                requestGLFallback();
-            }
-            return;
-        }
+        presentFrame(slot, imageIndex);
     }
 
     //--------------------------------------------------------------------------
@@ -2636,14 +2557,14 @@ namespace Rv
         {
             if (s_diagLoopTimer.isRunning())
             {
-                s_diagLoopMs += s_diagLoopTimer.elapsed() * 1000.0;
+                s_diag.loopMs += s_diagLoopTimer.elapsed() * 1000.0;
             }
             s_diagLoopTimer.start();
 
             if (s_diagPointerPending)
             {
-                s_diagPointerAgeMs += s_diagPointerTimer.elapsed() * 1000.0;
-                ++s_diagPointerAgeSamples;
+                s_diag.pointerAgeMs += s_diagPointerTimer.elapsed() * 1000.0;
+                ++s_diag.pointerAgeSamples;
                 s_diagPointerPending = false;
                 s_diagFrameEventTime = diagNow() - s_diagPointerTimer.elapsed();
             }
@@ -2651,12 +2572,12 @@ namespace Rv
             //  Close out retired slots (non-blocking; one frame of quantisation).
             for (uint32_t i = 0; i < kFramesInFlight; ++i)
             {
-                if (s_diagSlotArmed[i] && m_vkDevice && m_frameSync[i].fence
+                if (s_diagSlotEventTime[i] && m_vkDevice && m_frameSync[i].fence
                     && vkGetFenceStatus(m_vkDevice, m_frameSync[i].fence) == VK_SUCCESS)
                 {
-                    s_diagEventToRetireMs += (diagNow() - s_diagSlotEventTime[i]) * 1000.0;
-                    ++s_diagEventToRetireSamples;
-                    s_diagSlotArmed[i] = false;
+                    s_diag.eventToRetireMs += (diagNow() - *s_diagSlotEventTime[i]) * 1000.0;
+                    ++s_diag.eventToRetireSamples;
+                    s_diagSlotEventTime[i].reset();
                 }
             }
         }
@@ -2679,18 +2600,9 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
-            const bool diagTiming = IPCore::ImageRenderer::debugGpu();
-            Timer diagTimer;
-            if (diagTiming)
             {
-                diagTimer.start();
-            }
-
-            session->render();
-
-            if (diagTiming)
-            {
-                s_diagRenderMs += diagTimer.elapsed() * 1000.0;
+                ScopedDiagTimer diagTimer(s_diag.renderMs, IPCore::ImageRenderer::debugGpu());
+                session->render();
             }
 
             if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
@@ -2716,31 +2628,16 @@ namespace Rv
             //  Always present the control viewport, even with a separate output
             //  device: unlike GL, nothing else composites it.
             const bool diagPresent = IPCore::ImageRenderer::debugGpu();
-            Timer diagPresentTimer;
-            if (diagPresent)
             {
-                diagPresentTimer.start();
-            }
-
-            m_videoDevice->syncBuffers();
-
-            if (diagPresent)
-            {
-                s_diagMainPresentMs += diagPresentTimer.elapsed() * 1000.0;
+                ScopedDiagTimer diagTimer(s_diag.mainPresentMs, diagPresent);
+                m_videoDevice->syncBuffers();
             }
 
             if (session->outputVideoDevice() && session->outputVideoDevice() != videoDevice())
             {
-                if (diagPresent)
                 {
-                    diagPresentTimer.start();
-                }
-
-                session->outputVideoDevice()->syncBuffers();
-
-                if (diagPresent)
-                {
-                    s_diagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
+                    ScopedDiagTimer diagTimer(s_diag.outPresentMs, diagPresent);
+                    session->outputVideoDevice()->syncBuffers();
                 }
 
                 //  The output made its own GL context current; restore ours.
@@ -2750,57 +2647,33 @@ namespace Rv
 
         if (session)
         {
-            const bool diagPost = IPCore::ImageRenderer::debugGpu();
-            Timer diagPostTimer;
-            if (diagPost)
-            {
-                diagPostTimer.start();
-            }
-
+            ScopedDiagTimer diagTimer(s_diag.postRenderMs, IPCore::ImageRenderer::debugGpu());
             session->addSyncSample();
             session->postRender();
-
-            if (diagPost)
-            {
-                s_diagPostRenderMs += diagPostTimer.elapsed() * 1000.0;
-            }
         }
 
         //  Averaged -debug gpu breakdown every 60 frames.
         if (IPCore::ImageRenderer::debugGpu() && m_doc)
         {
-            if (++s_diagFrames >= 60)
+            if (++s_diag.frames >= 60)
             {
-                const double frames = static_cast<double>(s_diagFrames);
-                const double loopMs = s_diagLoopMs / frames;
-                cout << "INFO: VulkanWindow frame avg over " << s_diagFrames << " [depth=" << maxFramesInFlight()
+                const double frames = static_cast<double>(s_diag.frames);
+                const double loopMs = s_diag.loopMs / frames;
+                cout << "INFO: VulkanWindow frame avg over " << s_diag.frames << " [depth=" << maxFramesInFlight()
                      << " tiling=" << tilingName(m_shared[0].info.tiling) << "]"
-                     << ": session->render()=" << (s_diagRenderMs / frames) << "ms  mainPresent=" << (s_diagMainPresentMs / frames)
-                     << "ms  outputPresent=" << (s_diagOutPresentMs / frames)
-                     << "ms  total=" << ((s_diagRenderMs + s_diagMainPresentMs + s_diagOutPresentMs) / frames)
-                     << "ms   [mainPresent breakdown: fenceWait=" << (s_diagFenceWaitMs / frames)
-                     << "ms acquire=" << (s_diagAcquireMs / frames) << "ms]"
-                     << "  postRender=" << (s_diagPostRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
+                     << ": session->render()=" << (s_diag.renderMs / frames) << "ms  mainPresent=" << (s_diag.mainPresentMs / frames)
+                     << "ms  outputPresent=" << (s_diag.outPresentMs / frames)
+                     << "ms  total=" << ((s_diag.renderMs + s_diag.mainPresentMs + s_diag.outPresentMs) / frames)
+                     << "ms   [mainPresent breakdown: fenceWait=" << (s_diag.fenceWaitMs / frames)
+                     << "ms acquire=" << (s_diag.acquireMs / frames) << "ms]"
+                     << "  postRender=" << (s_diag.postRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
                      << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)"
-                     << "  pointer: events=" << s_diagPointerEvents
-                     << " handler=" << (s_diagPointerEvents ? s_diagPointerHandlerMs / s_diagPointerEvents : 0.0)
-                     << "ms eventToRender=" << (s_diagPointerAgeSamples ? s_diagPointerAgeMs / s_diagPointerAgeSamples : 0.0)
-                     << "ms eventToRetire=" << (s_diagEventToRetireSamples ? s_diagEventToRetireMs / s_diagEventToRetireSamples : 0.0)
+                     << "  pointer: events=" << s_diag.pointerEvents
+                     << " handler=" << (s_diag.pointerEvents ? s_diag.pointerHandlerMs / s_diag.pointerEvents : 0.0)
+                     << "ms eventToRender=" << (s_diag.pointerAgeSamples ? s_diag.pointerAgeMs / s_diag.pointerAgeSamples : 0.0)
+                     << "ms eventToRetire=" << (s_diag.eventToRetireSamples ? s_diag.eventToRetireMs / s_diag.eventToRetireSamples : 0.0)
                      << "ms" << endl;
-                s_diagFrames = 0;
-                s_diagRenderMs = 0.0;
-                s_diagMainPresentMs = 0.0;
-                s_diagOutPresentMs = 0.0;
-                s_diagFenceWaitMs = 0.0;
-                s_diagAcquireMs = 0.0;
-                s_diagLoopMs = 0.0;
-                s_diagPostRenderMs = 0.0;
-                s_diagPointerHandlerMs = 0.0;
-                s_diagPointerEvents = 0;
-                s_diagPointerAgeMs = 0.0;
-                s_diagPointerAgeSamples = 0;
-                s_diagEventToRetireMs = 0.0;
-                s_diagEventToRetireSamples = 0;
+                s_diag = DiagStats{};
             }
         }
 
@@ -3018,29 +2891,29 @@ namespace Rv
                 const TwkApp::VideoDevice* odv = session->outputVideoDevice();
                 if (odv && cdv != odv && cdv == videoDevice())
                 {
-                    const float w = static_cast<float>(width());
-                    const float h = static_cast<float>(height());
-                    const float ow = static_cast<float>(odv->width());
-                    const float oh = static_cast<float>(odv->height());
-                    const float aspect = w / h;
-                    const float oaspect = ow / oh;
+                    const float viewWidth = static_cast<float>(width());
+                    const float viewHeight = static_cast<float>(height());
+                    const float outputWidth = static_cast<float>(odv->width());
+                    const float outputHeight = static_cast<float>(odv->height());
+                    const float aspect = viewWidth / viewHeight;
+                    const float oaspect = outputWidth / outputHeight;
 
-                    m_videoDevice->translator().setRelativeDomain(ow, oh);
+                    m_videoDevice->translator().setRelativeDomain(outputWidth, outputHeight);
 
                     if (aspect >= oaspect)
                     {
-                        const float yscale = oh / h;
+                        const float yscale = outputHeight / viewHeight;
                         const float yoffset = 0.0f;
                         const float xscale = yscale;
-                        const float xoffset = -(w * yscale - ow) / 2.0f;
+                        const float xoffset = -(viewWidth * yscale - outputWidth) / 2.0f;
                         m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                     else
                     {
-                        const float xscale = ow / w;
+                        const float xscale = outputWidth / viewWidth;
                         const float xoffset = 0.0f;
                         const float yscale = xscale;
-                        const float yoffset = -(xscale * h - oh) / 2.0f;
+                        const float yoffset = -(xscale * viewHeight - outputHeight) / 2.0f;
                         m_videoDevice->translator().setScaleAndOffset(xoffset, yoffset, xscale, yscale);
                     }
                 }
@@ -3068,20 +2941,21 @@ namespace Rv
         const bool diagPointer =
             IPCore::ImageRenderer::debugGpu()
             && (event->type() == QEvent::MouseMove || event->type() == QEvent::MouseButtonPress || event->type() == QEvent::TabletMove);
-        Timer diagPointerTimer;
         if (diagPointer)
         {
-            diagPointerTimer.start();
             s_diagPointerTimer.start();
             s_diagPointerPending = true;
         }
 
-        const bool handled = m_videoDevice->translator().sendQTEvent(event, activationTime);
+        bool handled = false;
+        {
+            ScopedDiagTimer diagTimer(s_diag.pointerHandlerMs, diagPointer);
+            handled = m_videoDevice->translator().sendQTEvent(event, activationTime);
+        }
 
         if (diagPointer)
         {
-            s_diagPointerHandlerMs += diagPointerTimer.elapsed() * 1000.0;
-            ++s_diagPointerEvents;
+            ++s_diag.pointerEvents;
         }
 
         if (handled)

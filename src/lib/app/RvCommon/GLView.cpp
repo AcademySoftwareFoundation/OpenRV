@@ -36,15 +36,15 @@ namespace Rv
         return value ? value : "<unset>";
     }
 
-    std::string glDebugFormatSummary(const QSurfaceFormat& f)
+    std::string glDebugFormatSummary(const QSurfaceFormat& format)
     {
         ostringstream out;
-        out << "rgba " << f.redBufferSize() << " " << f.greenBufferSize() << " " << f.blueBufferSize() << " "
-            << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize());
-        out << ", depth " << f.depthBufferSize() << ", stencil " << f.stencilBufferSize();
-        out << ", swapInterval " << f.swapInterval();
-        out << ", stereo " << (f.stereo() ? "true" : "false");
-        out << ", major.minor " << f.majorVersion() << "." << f.minorVersion();
+        out << "rgba " << format.redBufferSize() << " " << format.greenBufferSize() << " " << format.blueBufferSize() << " "
+            << (format.alphaBufferSize() <= 0 ? 0 : format.alphaBufferSize());
+        out << ", depth " << format.depthBufferSize() << ", stencil " << format.stencilBufferSize();
+        out << ", swapInterval " << format.swapInterval();
+        out << ", stereo " << (format.stereo() ? "true" : "false");
+        out << ", major.minor " << format.majorVersion() << "." << format.minorVersion();
         return out.str();
     }
 

@@ -25,7 +25,7 @@ namespace Rv
 
     // -debug gpu helpers shared by GLView and GLWindow.
     std::string glDebugEnvOrUnset(const char* name);
-    std::string glDebugFormatSummary(const QSurfaceFormat&);
+    std::string glDebugFormatSummary(const QSurfaceFormat& format);
 
     //
     //  GLView

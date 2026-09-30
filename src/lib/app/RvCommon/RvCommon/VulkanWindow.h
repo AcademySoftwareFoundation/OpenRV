@@ -16,6 +16,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -164,11 +165,11 @@ namespace Rv
         //  armed). Always true for the control viewport.
         bool canPresentNow();
 
-        const SharedImageInfo* getSharedImageInfo(int w, int h);
+        const SharedImageInfo* getSharedImageInfo(int requestedWidth, int requestedHeight);
         void presentSharedImage();
 
         // CPU fallback API (not used when GPU interop is active)
-        void presentPixelData(const void* pixels, int w, int h);
+        void presentPixelData(const void* pixels, int pixelWidth, int pixelHeight);
 
         bool isInitialized() const { return m_initialized; }
 
@@ -298,6 +299,22 @@ namespace Rv
         // After a failed fenced submit: re-signal the slot fence so the next
         // wait on it cannot hang, consuming waitSemaphore if one is given.
         void recoverFailedSubmit(uint32_t slot, VkSemaphore waitSemaphore);
+
+        // Fence/acquire timeout: blocking for the control viewport, polling
+        // for a passive output unless its last present is stale.
+        uint64_t presentWaitTimeout() const;
+
+        // Waits for the slot fence. False means skip the frame. drainShared
+        // is set on the interop path, where GL has already signaled glReady.
+        bool waitForFrameFence(uint32_t slot, uint64_t waitTimeout, bool drainShared);
+
+        // Acquires a swapchain image and claims the slot fence for it. Empty
+        // means skip the frame; the failure is already handled.
+        std::optional<uint32_t> acquireFrameImage(uint32_t slot, uint64_t waitTimeout, bool drainShared);
+
+        // Hands the diag event time to the slot, advances the frame and
+        // presents imageIndex.
+        void presentFrame(uint32_t slot, uint32_t imageIndex);
 
         // Recreate the swapchain after OUT_OF_DATE. SUBOPTIMAL remains usable.
         void handleSwapchainOutOfDate();

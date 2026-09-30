@@ -191,6 +191,9 @@ namespace Rv
 
         void rebuildGLView(bool stereo, bool vsync, bool dbl, int, int, int, int);
 
+        // New GLView sharing the front document's GL context when it has one.
+        GLView* createGLView(int redBits, int greenBits, int blueBits, int alphaBits);
+
         void setActiveViewContentSize(int w, int h);
         void setActiveViewMinimumContentSize(int w, int h);
         bool activeViewFirstPaintCompleted() const;

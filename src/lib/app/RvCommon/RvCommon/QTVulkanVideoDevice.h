@@ -12,6 +12,7 @@
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -45,7 +46,7 @@ namespace Rv
         QTVulkanVideoDevice(const QTVulkanVideoDevice&) = delete;
         QTVulkanVideoDevice& operator=(const QTVulkanVideoDevice&) = delete;
 
-        void resetInteropDeviceMatch() const { m_glVulkanDeviceMatch = -1; }
+        void resetInteropDeviceMatch() const { m_glVulkanDeviceMatch.reset(); }
 
         const QTTranslator& translator() const { return *m_translator; }
 
@@ -95,6 +96,9 @@ namespace Rv
         // Makes the GL context current and binds the FBO on return.
         void ensureGLContext() const;
 
+        // Logical window pixels to device pixels, rounded. Requires m_window.
+        int toDevicePixels(int logical) const;
+
         //  The window container owns the window, so Qt can delete it
         //  independently of this device.
         QPointer<VulkanWindow> m_window;
@@ -102,7 +106,7 @@ namespace Rv
         float m_devicePixelRatio{1.0f};
         int m_x{0};
         int m_y{0};
-        float m_refresh{-1.0f};
+        std::optional<float> m_refresh;
 
         mutable std::unique_ptr<QOpenGLContext> m_glContext;
         mutable std::unique_ptr<QOffscreenSurface> m_offscreenSurface;
@@ -127,11 +131,10 @@ namespace Rv
 
         mutable std::array<SharedGLObjects, VulkanWindow::kFramesInFlight> m_glShared{};
 
-        // Last reported present path: -1 none yet, 0 CPU-fallback, 1 GPU-interop.
-        mutable int m_loggedPresentPath{-1};
-        // -1 until queried, 0 when GL and Vulkan use different/unidentifiable
-        // physical devices, 1 when their device UUIDs match.
-        mutable int m_glVulkanDeviceMatch{-1};
+        // Last logged present path (true for GPU-interop); empty until the first.
+        mutable std::optional<bool> m_loggedPresentPath;
+        // Empty until queried; true when the GL and Vulkan device UUIDs match.
+        mutable std::optional<bool> m_glVulkanDeviceMatch;
 
         // Latched once any GL call on the interop path fails; the device then
         // stays on the CPU path.
@@ -143,6 +146,7 @@ namespace Rv
         bool interopGLFailed(const char* what) const;
 
         void cleanupSharedGLObjects(uint32_t slot) const;
+        void cleanupAllSharedGLObjects() const;
         bool glDeviceMatchesVulkan() const;
 
         // CPU-fallback target: a Y-flipped RGB10_A2 copy that glReadPixels packs
@@ -153,10 +157,10 @@ namespace Rv
         mutable int m_cpuFlipHeight{0};
         mutable std::vector<uint32_t> m_cpuPackedScratch;
 
-        void ensureCpuFallbackTarget(int w, int h) const;
+        void ensureCpuFallbackTarget(int targetWidth, int targetHeight) const;
         void cleanupCpuFallbackTarget() const;
 
-        void presentCpuFallback(int w, int h) const;
+        void presentCpuFallback(int frameWidth, int frameHeight) const;
     };
 
 } // namespace Rv

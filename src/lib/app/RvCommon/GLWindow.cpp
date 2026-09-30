@@ -35,13 +35,21 @@
 namespace Rv
 {
 
-    //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
-    static unsigned int s_glDiagFrames = 0;
-    static double s_glDiagRenderMs = 0.0;
-    static double s_glDiagOutPresentMs = 0.0;
-    //  Time between paintGL() entries; includes the implicit swap after paintGL.
-    static double s_glDiagLoopMs = 0.0;
-    static TwkUtil::Timer s_glDiagLoopTimer;
+    namespace
+    {
+        //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
+        struct GLFrameDiag
+        {
+            unsigned int frames{0};
+            double renderMs{0.0};
+            double outPresentMs{0.0};
+            //  Time between paintGL() entries; includes the implicit swap after paintGL.
+            double loopMs{0.0};
+        };
+
+        GLFrameDiag s_glDiag;
+        TwkUtil::Timer s_glDiagLoopTimer;
+    } // namespace
 
     using namespace std;
     using namespace TwkApp;
@@ -229,7 +237,7 @@ namespace Rv
         {
             if (s_glDiagLoopTimer.isRunning())
             {
-                s_glDiagLoopMs += s_glDiagLoopTimer.elapsed() * 1000.0;
+                s_glDiag.loopMs += s_glDiagLoopTimer.elapsed() * 1000.0;
             }
             s_glDiagLoopTimer.start();
         }
@@ -269,7 +277,7 @@ namespace Rv
 
             if (diagTiming)
             {
-                s_glDiagRenderMs += diagTimer.elapsed() * 1000.0;
+                s_glDiag.renderMs += diagTimer.elapsed() * 1000.0;
             }
             TWK_GLDEBUG;
 
@@ -313,7 +321,7 @@ namespace Rv
 
             if (diagPresent)
             {
-                s_glDiagOutPresentMs += diagPresentTimer.elapsed() * 1000.0;
+                s_glDiag.outPresentMs += diagPresentTimer.elapsed() * 1000.0;
             }
         }
 
@@ -323,18 +331,15 @@ namespace Rv
         //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
         if (IPCore::ImageRenderer::debugGpu())
         {
-            if (++s_glDiagFrames >= 60)
+            if (++s_glDiag.frames >= 60)
             {
-                const double n = double(s_glDiagFrames);
-                const double loopMs = s_glDiagLoopMs / n;
-                cout << "INFO: GLWindow frame avg over " << s_glDiagFrames << ": session->render()=" << (s_glDiagRenderMs / n)
-                     << "ms  outputPresent=" << (s_glDiagOutPresentMs / n)
-                     << "ms  total=" << ((s_glDiagRenderMs + s_glDiagOutPresentMs) / n) << "ms  frameInterval=" << loopMs << "ms ("
-                     << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)" << endl;
-                s_glDiagFrames = 0;
-                s_glDiagRenderMs = 0.0;
-                s_glDiagOutPresentMs = 0.0;
-                s_glDiagLoopMs = 0.0;
+                const double frameCount = static_cast<double>(s_glDiag.frames);
+                const double loopMs = s_glDiag.loopMs / frameCount;
+                cout << "INFO: GLWindow frame avg over " << s_glDiag.frames << ": session->render()=" << (s_glDiag.renderMs / frameCount)
+                     << "ms  outputPresent=" << (s_glDiag.outPresentMs / frameCount)
+                     << "ms  total=" << ((s_glDiag.renderMs + s_glDiag.outPresentMs) / frameCount) << "ms  frameInterval=" << loopMs
+                     << "ms (" << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)" << endl;
+                s_glDiag = {};
             }
         }
 

@@ -1974,9 +1974,9 @@ namespace Rv
         const VideoModule::VideoDevices& devices = m_desktopModule->devices();
         for (VideoDevice* device : devices)
         {
-            if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(device))
+            if (DesktopVideoDevice* desktopDevice = dynamic_cast<DesktopVideoDevice*>(device))
             {
-                dd->setShareDevice(shareDevice);
+                desktopDevice->setShareDevice(shareDevice);
             }
         }
 
@@ -1999,8 +1999,8 @@ namespace Rv
         }
 
         Rv::Options& opts = Rv::Options::sharedOptions();
-        VideoDevice* d = findPresentationDevice(opts.presentDevice);
-        if (!d)
+        VideoDevice* presentDevice = findPresentationDevice(opts.presentDevice);
+        if (!presentDevice)
         {
             cerr << "ERROR: presentation device not found after rebuild." << endl;
             session->setOutputVideoDevice(session->controlVideoDevice());
@@ -2008,21 +2008,21 @@ namespace Rv
             return;
         }
 
-        if (DesktopVideoDevice* dd = dynamic_cast<DesktopVideoDevice*>(d))
+        if (DesktopVideoDevice* desktopDevice = dynamic_cast<DesktopVideoDevice*>(presentDevice))
         {
-            dd->setShareDevice(shareDevice);
+            desktopDevice->setShareDevice(shareDevice);
         }
 
         try
         {
-            if (!d->isOpen())
+            if (!presentDevice->isOpen())
             {
-                string optionArgs = setVideoDeviceStateFromSettings(d);
+                string optionArgs = setVideoDeviceStateFromSettings(presentDevice);
                 StringVector vargs;
                 algorithm::split(vargs, optionArgs, is_any_of(string(" \t\n\r")), token_compress_on);
-                d->open(vargs);
+                presentDevice->open(vargs);
             }
-            session->setOutputVideoDevice(d);
+            session->setOutputVideoDevice(presentDevice);
         }
         catch (const std::exception& exc)
         {

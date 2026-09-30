@@ -876,13 +876,13 @@ namespace IPCore
                 continue;
             }
 
-            size_t n = m_displayGroups.size();
+            size_t suffix = m_displayGroups.size();
             string name;
 
             do
             {
                 ostringstream str;
-                str << "displayGroup" << n++;
+                str << "displayGroup" << suffix++;
                 name = str.str();
             } while (findNode(name));
 

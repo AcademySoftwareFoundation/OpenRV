@@ -98,6 +98,20 @@ namespace Rv
 #define DBL(level, x)
 #endif
 
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    namespace
+    {
+        // Input and layout settings shared by every main view widget.
+        void configureViewWidget(QWidget* view)
+        {
+            view->setFocusPolicy(Qt::StrongFocus);
+            view->setMouseTracking(true);
+            view->setAcceptDrops(true);
+            view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        }
+    } // namespace
+#endif
+
     inline QString utf8(const std::string& us) { return QString::fromUtf8(us.c_str()); }
 
     static int sessionCount = 0;
@@ -168,8 +182,6 @@ namespace Rv
         setMenuBar(new QMenuBar(0));
 #endif
 
-        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
-
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
 
         Rv::Options& opts = Options::sharedOptions();
@@ -238,10 +250,7 @@ namespace Rv
         {
             m_vulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
 
-            m_vulkanView->setFocusPolicy(Qt::StrongFocus);
-            m_vulkanView->setMouseTracking(true);
-            m_vulkanView->setAcceptDrops(true);
-            m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            configureViewWidget(m_vulkanView);
             m_vulkanView->resize(m_vulkanView->sizeHint());
             m_viewWidget = m_vulkanView;
 
@@ -249,42 +258,11 @@ namespace Rv
         }
         else
         {
-            if (docs.empty())
-            {
-                m_glView =
-                    new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                               true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-            }
-            else
-            {
-                RvSession* s = static_cast<RvSession*>(docs.front());
-                RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
-                // view() is null if the front document is on Vulkan.
-                QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-                m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                      opts.vsync != 0 && !m_vsyncDisabled,
-                                      true, // double buffer
-                                      opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-            }
+            m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
             m_viewWidget = m_glView;
         }
 #else
-        if (docs.empty())
-        {
-            m_glView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-        }
-        else
-        {
-            RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-            m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                  opts.vsync != 0 && !m_vsyncDisabled,
-                                  true, // double buffer
-                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-        }
+        m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
         m_viewWidget = m_glView;
 #endif
 
@@ -892,6 +870,26 @@ namespace Rv
         m_oldGLView = 0;
     }
 
+    GLView* RvDocument::createGLView(int redBits, int greenBits, int blueBits, int alphaBits)
+    {
+        const Rv::Options& opts = Options::sharedOptions();
+        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
+
+        //  Share with the front document's context. It is null when that
+        //  document is on Vulkan, or is this document mid-fallback.
+        QOpenGLContext* shareContext = nullptr;
+        if (!docs.empty())
+        {
+            const RvDocument* frontDoc = static_cast<RvDocument*>(static_cast<RvSession*>(docs.front())->opaquePointer());
+            shareContext = frontDoc->view() ? frontDoc->view()->context() : nullptr;
+        }
+
+        return new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                          opts.vsync != 0 && !m_vsyncDisabled,
+                          true, // double buffer
+                          redBits, greenBits, blueBits, alphaBits, !m_startupResize);
+    }
+
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     // Hot-swap VulkanView -> GLView and rebind the live session to the GL device.
     void RvDocument::fallbackVulkanToGLView()
@@ -923,31 +921,12 @@ namespace Rv
         const int fallbackGreenBits = requestedTenBit ? 8 : opts.dispGreenBits;
         const int fallbackBlueBits = requestedTenBit ? 8 : opts.dispBlueBits;
         const int fallbackAlphaBits = requestedTenBit ? 8 : opts.dispAlphaBits;
-        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
 
-        GLView* newGLView = nullptr;
-        if (docs.size() <= 1)
-        {
-            newGLView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, fallbackRedBits, fallbackGreenBits, fallbackBlueBits, fallbackAlphaBits, !m_startupResize);
-        }
-        else
-        {
-            RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
-            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-            newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                   opts.vsync != 0 && !m_vsyncDisabled, true, fallbackRedBits, fallbackGreenBits, fallbackBlueBits,
-                                   fallbackAlphaBits, !m_startupResize);
-        }
+        GLView* newGLView = createGLView(fallbackRedBits, fallbackGreenBits, fallbackBlueBits, fallbackAlphaBits);
 
         newGLView->setContentSize(oldVulkanView->sizeHint().width(), oldVulkanView->sizeHint().height());
         newGLView->setMinimumSize(QSize(oldVulkanView->minimumSizeHint().width(), oldVulkanView->minimumSizeHint().height()));
-        newGLView->setFocusPolicy(Qt::StrongFocus);
-        newGLView->setMouseTracking(true);
-        newGLView->setAcceptDrops(true);
-        newGLView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        configureViewWidget(newGLView);
 
         m_stackedLayout->removeWidget(oldVulkanView);
         m_stackedLayout->addWidget(newGLView);
@@ -1005,10 +984,7 @@ namespace Rv
         newVulkanView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
         newVulkanView->setMinimumContentSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
         newVulkanView->setMinimumSize(QSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height()));
-        newVulkanView->setFocusPolicy(Qt::StrongFocus);
-        newVulkanView->setMouseTracking(true);
-        newVulkanView->setAcceptDrops(true);
-        newVulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        configureViewWidget(newVulkanView);
 
         m_stackedLayout->addWidget(newVulkanView);
         m_stackedLayout->removeWidget(oldGLView);
