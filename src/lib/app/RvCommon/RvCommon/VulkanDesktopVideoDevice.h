@@ -40,7 +40,7 @@ namespace Rv
         void syncBuffers() const override;
 
     private:
-        //  Owns the QTVulkanVideoDevice used as the base m_viewDevice.
+        //  Its QTVulkanVideoDevice is the base m_viewDevice.
         std::unique_ptr<VulkanView> m_vulkanView;
     };
 

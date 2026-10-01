@@ -9,6 +9,7 @@
 #ifndef __RvCommon__DesktopVideoDevice__h__
 #define __RvCommon__DesktopVideoDevice__h__
 #include <iostream>
+#include <memory>
 #include <TwkGLF/GLVideoDevice.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/GLPipeline.h>
@@ -334,7 +335,7 @@ namespace Rv
         DesktopDataFormats m_dataFormats;
 
         int m_screen;
-        QTTranslator* m_translator;
+        std::unique_ptr<QTTranslator> m_translator;
         mutable ColorProfile m_colorProfile;
 
         size_t m_videoFormatIndex;

@@ -59,7 +59,6 @@ namespace Rv
         , m_dataFormatIndex(0)
         , m_syncing(false)
         , m_screen(screen)
-        , m_translator(0)
         , m_view(0)
     {
         m_glGlobalState = new GLState();
@@ -224,10 +223,9 @@ namespace Rv
         // The device first: its font textures live in the view's context.
         delete m_viewDevice;
         delete m_view;
-        delete m_translator;
+        m_translator.reset();
         m_view = 0;
         m_viewDevice = 0;
-        m_translator = 0;
 
         // The current context was just destroyed; restore the main view's for later GL teardown.
         if (m_share)
@@ -239,7 +237,7 @@ namespace Rv
     void DesktopVideoDevice::setViewWidget(ScreenView* widget)
     {
         m_view = widget;
-        m_translator = new QTTranslator(this, m_view);
+        m_translator = std::make_unique<QTTranslator>(this, m_view);
     }
 
     void DesktopVideoDevice::makeCurrent() const
@@ -344,8 +342,7 @@ namespace Rv
 
         ScopedLock lock(m_mutex);
 
-        // Same readiness gate as transfer().
-        if (m_viewDevice->fboID() == 0)
+        if (!m_viewDevice || m_viewDevice->fboID() == 0)
         {
             return;
         }

@@ -48,7 +48,7 @@ namespace Rv
         m_vulkanView->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
 
         //  Inert, created for parity with the base class's setViewWidget().
-        m_translator = new QTTranslator(this, m_vulkanView.get());
+        m_translator = std::make_unique<QTTranslator>(this, m_vulkanView.get());
 
         //  Place before show(): the swapchain is built on first expose.
         const QRect screenRect = screenGeometry();
@@ -82,8 +82,7 @@ namespace Rv
 
         m_vulkanView.reset();
 
-        delete m_translator;
-        m_translator = nullptr;
+        m_translator.reset();
     }
 
     bool VulkanDesktopVideoDevice::isOpen() const { return m_vulkanView != nullptr; }
