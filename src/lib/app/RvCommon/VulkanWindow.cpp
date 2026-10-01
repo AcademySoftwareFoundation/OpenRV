@@ -889,7 +889,7 @@ namespace Rv
         // Prefer A2B10G10R10 (== GL_RGB10_A2) so the transfer is a plain copy.
         // RV emits sRGB, so require SRGB_NONLINEAR: in HDR mode NVIDIA lists a
         // 10-bit HDR10_ST2084 entry first, which renders the viewport black.
-        const auto findTenBit = [&formats](VkFormat wanted, bool requireSrgbNonlinear, VkSurfaceFormatKHR& out) -> bool
+        const auto findTenBit = [&formats](VkFormat wanted, bool requireSrgbNonlinear) -> std::optional<VkSurfaceFormatKHR>
         {
             for (const auto& fmt : formats)
             {
@@ -901,31 +901,27 @@ namespace Rv
                 {
                     continue;
                 }
-                out = fmt;
-                return true;
+                return fmt;
             }
-            return false;
+            return std::nullopt;
         };
 
-        for (const VkFormat wanted : {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32})
-        {
-            if (findTenBit(wanted, true, surfaceFormat))
-            {
-                found10bit = true;
-                break;
-            }
-        }
-
-        // No SRGB_NONLINEAR pairing: keep 10-bit anyway and warn below.
-        if (!found10bit)
+        // A second pass without SRGB_NONLINEAR keeps 10-bit anyway and warns below.
+        for (const bool requireSrgbNonlinear : {true, false})
         {
             for (const VkFormat wanted : {VK_FORMAT_A2B10G10R10_UNORM_PACK32, VK_FORMAT_A2R10G10B10_UNORM_PACK32})
             {
-                if (findTenBit(wanted, false, surfaceFormat))
+                if (const auto match = findTenBit(wanted, requireSrgbNonlinear))
                 {
+                    surfaceFormat = *match;
                     found10bit = true;
                     break;
                 }
+            }
+
+            if (found10bit)
+            {
+                break;
             }
         }
 

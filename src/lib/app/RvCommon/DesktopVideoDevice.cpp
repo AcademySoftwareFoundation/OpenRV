@@ -606,7 +606,7 @@ namespace Rv
         //  A dead source texture leaves the clone incomplete; never cache one,
         //  or every later frame would blit from it.
         //
-        GLFBO* clone = new GLFBO(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
+        auto clone = std::make_unique<GLFBO>(sourceFbo->width(), sourceFbo->height(), sourceFbo->primaryColorFormat());
 
         clone->attachColorTexture(sourceFbo->colorTarget(0), sourceFbo->colorID(0));
 
@@ -638,15 +638,15 @@ namespace Rv
                      << "  globalShare=" << static_cast<const void*>(QOpenGLContext::globalShareContext()) << endl;
             }
 
-            delete clone;
             return nullptr;
         }
 
         m_reportedBadSourceTex = 0;
 
-        m_fboMap[sourceFbo] = clone;
+        GLFBO* cached = clone.release();
+        m_fboMap[sourceFbo] = cached;
 
-        return clone;
+        return cached;
     }
 
     void DesktopVideoDevice::releaseFBOClones() const
@@ -965,7 +965,7 @@ namespace Rv
         m_glWindow = new ScreenWindow(fmt, glShareContext);
 
         // A plain QWidget container keeps this top-level off the OpenGL RHI backing store.
-        m_container = QWidget::createWindowContainer(m_glWindow, this);
+        QWidget* container = QWidget::createWindowContainer(m_glWindow, this);
 
         // A QOpenGLWindow has no GL context until its platform surface exists.
         m_glWindow->create();
@@ -973,7 +973,7 @@ namespace Rv
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setSpacing(0);
-        layout->addWidget(m_container);
+        layout->addWidget(container);
     }
 
     //----------------------------------------------------------------------

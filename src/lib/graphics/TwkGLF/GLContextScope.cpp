@@ -29,6 +29,9 @@ namespace TwkGLF
         //  while the application is being torn down, so there is no safe
         //  point to free it.
         //
+        //  GUI thread only: makeFallbackCurrent() returns before touching
+        //  these from any other thread.
+        //
         QOpenGLContext* s_fallbackContext = nullptr;
         QOffscreenSurface* s_fallbackSurface = nullptr;
         bool s_fallbackAttempted = false;

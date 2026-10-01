@@ -94,7 +94,6 @@ namespace Rv
 
         private:
             ScreenWindow* m_glWindow = nullptr;
-            QWidget* m_container = nullptr;
         };
 
     public:
