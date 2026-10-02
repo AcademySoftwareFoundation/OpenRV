@@ -29,6 +29,7 @@
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -41,6 +42,24 @@ namespace Rv
 
     namespace
     {
+        //  Sets a flag for the duration of a scope. Declare it as a named
+        //  local: an unnamed temporary guards nothing.
+        struct ScopedFlag
+        {
+            explicit ScopedFlag(bool& f)
+                : m_flag(f)
+            {
+                m_flag = true;
+            }
+
+            ~ScopedFlag() { m_flag = false; }
+
+            ScopedFlag(const ScopedFlag&) = delete;
+            ScopedFlag& operator=(const ScopedFlag&) = delete;
+
+            bool& m_flag;
+        };
+
 #ifdef PLATFORM_LINUX
         string envOrUnset(const char* name)
         {
@@ -76,6 +95,8 @@ namespace Rv
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
+        , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
+        , m_syncingDevicePixelRatio(false)
         , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
@@ -93,6 +114,10 @@ namespace Rv
 
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
+
+        //  Queued: screenChanged() is emitted before devicePixelRatio()
+        //  reports the new value.
+        connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
     }
 
     GLWindow::~GLWindow() {}
@@ -209,6 +234,42 @@ namespace Rv
             m_doc->viewSizeChanged(w, h);
     }
 
+    void GLWindow::syncDevicePixelRatio()
+    {
+        const auto currentRatio = static_cast<float>(devicePixelRatio());
+
+        //  Below any real difference between two displays, above the
+        //  last-bit jitter a fractionally scaled ratio can show.
+        constexpr float DevicePixelRatioTolerance = 1e-4f;
+
+        if (std::abs(currentRatio - m_devicePixelRatio) < DevicePixelRatioTolerance || m_syncingDevicePixelRatio)
+        {
+            return;
+        }
+
+        //  Everything below re-enters this function.
+        const ScopedFlag syncing(m_syncingDevicePixelRatio);
+
+        m_devicePixelRatio = currentRatio;
+
+        //  Qt only pushes a new surface size down on a change of *logical*
+        //  geometry, so a DPI change leaves the drawable at the old pixel size
+        //  and GL clips the frame to it. A one-pixel round trip forces the
+        //  push; RvDocument::showEvent() does the same on first show.
+        const QSize restore = size();
+        resize(restore.width() + 1, restore.height());
+        resize(restore);
+
+        //  Flushes the renderer's image FBOs and fires "view-size-changed".
+        //  Idempotent: resizeGL() does it too where the poke is synchronous.
+        if (m_doc)
+        {
+            m_doc->viewSizeChanged(width(), height());
+        }
+
+        requestUpdate();
+    }
+
     QImage GLWindow::readPixels(int x, int y, int w, int h)
     {
         const int pw = width() * devicePixelRatio();
@@ -315,6 +376,21 @@ namespace Rv
 
     bool GLWindow::event(QEvent* event)
     {
+        //  Before the base class paints, else one frame presents at the wrong
+        //  scale. UpdateRequest comes from requestUpdate(), Paint from a
+        //  backing-scale change.
+        switch (event->type())
+        {
+        case QEvent::UpdateRequest:
+        case QEvent::Paint:
+        case QEvent::Expose:
+        case QEvent::Move:
+            syncDevicePixelRatio();
+            break;
+        default:
+            break;
+        }
+
         // The device (and its translator) is wired by the hosting GLView just
         // after construction; ignore any events that arrive before then.
         if (!m_videoDevice)

@@ -27,6 +27,17 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
+    namespace
+    {
+        //  RV_NO_QT_HDPI_SUPPORT pins the ratio to 1 so RV renders at logical
+        //  size on HDPI displays.
+        bool qtHighDPISupportDisabled()
+        {
+            static const bool disabled = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+            return disabled;
+        }
+    } // namespace
+
     QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
         , m_view(view)
@@ -144,6 +155,25 @@ namespace Rv
         return 0;
     }
 
+    float QTGLVideoDevice::devicePixelRatio() const
+    {
+        if (qtHighDPISupportDisabled())
+        {
+            return 1.0f;
+        }
+
+        //  m_devicePixelRatio is a cache refreshed only from
+        //  setPhysicalDevice(), so it can disagree with the surface while the
+        //  window moves between displays. Widget-backed presentation and
+        //  worker devices keep the cache.
+        if (m_window)
+        {
+            return static_cast<float>(m_window->devicePixelRatio());
+        }
+
+        return m_devicePixelRatio;
+    }
+
     void QTGLVideoDevice::setPhysicalDevice(VideoDevice* d)
     {
         TwkGLF::GLVideoDevice::setPhysicalDevice(d);
@@ -153,8 +183,7 @@ namespace Rv
         // may differ from the logical pixel ratio on a per screen basis.
         m_devicePixelRatio = 1.0f;
 
-        static bool noQtHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
-        if (noQtHighDPISupport)
+        if (qtHighDPISupportDisabled())
         {
             return;
         }

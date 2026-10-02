@@ -79,6 +79,10 @@ namespace Rv
         void paintGL() override;
 
     private:
+        //  Re-establish the surface when the device pixel ratio changes
+        //  without a change of logical size. See the definition.
+        void syncDevicePixelRatio();
+
         RvDocument* m_doc;
         QTGLVideoDevice* m_videoDevice;
         unsigned int m_lastKey;
@@ -94,6 +98,8 @@ namespace Rv
         int m_alpha;
         bool m_postFirstNonEmptyRender;
         bool m_stopProcessingEvents;
+        float m_devicePixelRatio;
+        bool m_syncingDevicePixelRatio;
         QOpenGLContext* m_sharedContext;
     };
 
