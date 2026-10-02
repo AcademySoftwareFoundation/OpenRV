@@ -8,6 +8,9 @@
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
 #include <RvCommon/GLView.h>
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#include <RvCommon/VulkanDesktopVideoDevice.h>
+#endif
 #include <IPCore/ImageRenderer.h>
 #include <stl_ext/string_algo.h>
 #include <QtGui/QtGui>
@@ -38,6 +41,45 @@ namespace Rv
     }
 
     DesktopVideoModule::~DesktopVideoModule() {}
+
+    bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan)
+    {
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS)
+        targetVulkan = false;
+#endif
+
+        bool currentVulkan = false;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+        for (TwkApp::VideoDevice* device : m_devices)
+        {
+            if (dynamic_cast<VulkanDesktopVideoDevice*>(device))
+            {
+                currentVulkan = true;
+                break;
+            }
+        }
+#endif
+
+        if (!m_devices.empty() && currentVulkan == targetVulkan)
+        {
+            return false;
+        }
+
+        // close() releases the Vulkan swapchain or GL ScreenView before the delete.
+        for (TwkApp::VideoDevice* device : m_devices)
+        {
+            if (device->isOpen())
+            {
+                device->close();
+            }
+            delete device;
+        }
+        m_devices.clear();
+
+        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice, targetVulkan);
+
+        return true;
+    }
 
     string DesktopVideoModule::name() const { return "Desktop"; }
 

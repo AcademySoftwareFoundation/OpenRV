@@ -18,15 +18,35 @@
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <QtWidgets/QVBoxLayout>
 #include <QOpenGLContext>
 #include <QTimer>
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 namespace Rv
 {
     using namespace std;
+
+    std::string glDebugEnvOrUnset(const char* name)
+    {
+        const char* value = std::getenv(name);
+        return value ? value : "<unset>";
+    }
+
+    std::string glDebugFormatSummary(const QSurfaceFormat& format)
+    {
+        ostringstream out;
+        out << "rgba " << format.redBufferSize() << " " << format.greenBufferSize() << " " << format.blueBufferSize() << " "
+            << (format.alphaBufferSize() <= 0 ? 0 : format.alphaBufferSize());
+        out << ", depth " << format.depthBufferSize() << ", stencil " << format.stencilBufferSize();
+        out << ", swapInterval " << format.swapInterval();
+        out << ", stereo " << (format.stereo() ? "true" : "false");
+        out << ", major.minor " << format.majorVersion() << "." << format.minorVersion();
+        return out.str();
+    }
 
     GLView::GLView(QWidget* parent, QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red,
                    int green, int blue, int alpha, bool noResize)
@@ -388,6 +408,11 @@ namespace Rv
         }
 
         fmt.setSwapInterval(vsync ? 1 : 0);
+
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            cout << "INFO: GLView requested QSurfaceFormat: " << glDebugFormatSummary(fmt) << endl;
+        }
 
         return fmt;
     }

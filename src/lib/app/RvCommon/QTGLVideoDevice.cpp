@@ -19,7 +19,11 @@
 #include <TwkApp/Application.h>
 #include <TwkApp/VideoModule.h>
 
+#include <QOpenGLContext>
 #include <QScreen>
+
+#include <atomic>
+#include <iostream>
 
 namespace Rv
 {
@@ -104,20 +108,26 @@ namespace Rv
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        if (m_window)
+        // QOpenGLWindow creates its context lazily, and only if the platform surface exists.
+        if (m_window && m_window->handle())
         {
-            // QOpenGLWindow creates its GL context lazily on the first
-            // makeCurrent(), provided the platform window (surface) exists.
-            if (m_window->handle())
-            {
-                m_window->makeCurrent();
-                TWK_GLDEBUG;
+            m_window->makeCurrent();
+            TWK_GLDEBUG;
 
-                GLint surfaceFBO = m_window->defaultFramebufferObject();
-                if (surfaceFBO != 0)
-                    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
-                TWK_GLDEBUG;
+            // Needs a live context to copy the format from.
+            if (!m_teardownSurface && m_window->context())
+            {
+                m_teardownSurface = std::make_unique<QOffscreenSurface>();
+                m_teardownSurface->setFormat(m_window->context()->format());
+                m_teardownSurface->create();
             }
+
+            GLint surfaceFBO = m_window->defaultFramebufferObject();
+            if (surfaceFBO != 0)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
+            }
+            TWK_GLDEBUG;
         }
         else if (m_view && m_view->context() && m_view->context()->isValid())
         {
@@ -126,8 +136,30 @@ namespace Rv
 
             GLint widgetFBO = m_view->defaultFramebufferObject();
             if (widgetFBO != 0)
+            {
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
+            }
             TWK_GLDEBUG;
+        }
+        else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
+                 && m_window->context()->makeCurrent(m_teardownSurface.get()))
+        {
+            // Surface gone, context alive: GL deletion only needs a current context.
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            // Callers assume a current context afterwards, so report the failure once.
+            static std::atomic<bool> reported{false};
+            if (!reported.exchange(true))
+            {
+                cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
+                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface"))
+                     << " widget=" << (m_view ? "alive" : "null")
+                     << " currentContext=" << (QOpenGLContext::currentContext() ? "yes" : "none")
+                     << " ownContext=" << (m_window && m_window->context() ? "alive" : "null")
+                     << "); the caller's GL work has no current context" << endl;
+            }
         }
 
         if (!isWorkerDevice())
@@ -196,9 +228,29 @@ namespace Rv
 
         if (m_view)
         {
-            // redraw() is backend-agnostic; m_view may be null when a non-GL
-            // backend (Vulkan/Metal) is active, so m_view->update() is unsafe.
-            redraw();
+            if (m_view->isVisible())
+            {
+#ifdef PLATFORM_DARWIN
+                // Make sure that the QGLWidget gets redrawn by updateGL() even
+                // when completely overlapped by another window.
+                // Note that on macOS, Qt correctly detects when the QGLWidget
+                // is completely overlapped by another window and in which case
+                // resets the Qt::WA_Mapped attribute. This will prevent the
+                // GLView::paintGL() operation from being called by
+                // m_view->updateGL(), which will result in automatically
+                // interrupting any video playback that might be in progress
+                // while the RV window is completely overlapped. This is an
+                // undesirable behaviour during a review session, especially if
+                // an external video output device is used.
+                m_view->setAttribute(Qt::WA_Mapped);
+#endif
+
+                m_view->update();
+            }
+            else
+            {
+                redraw();
+            }
         }
     }
 
