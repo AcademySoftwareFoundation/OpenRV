@@ -13,7 +13,7 @@ RV_SHOW_STANDARD_DEPS_VARIABLES()
 
 STRING(REPLACE "." "_" _version_underscored ${_version})
 SET(_download_url
-    "https://github.com/libexpat/libexpat/archive/refs/tags/R_${_version_underscored}.tar.gz"
+    "https://github.com/libexpat/libexpat/releases/download/R_${_version_underscored}/expat-${_version}.tar.gz"
 )
 
 SET(_download_hash
