@@ -638,7 +638,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rectangle);
-        return makeqtype<QRectType>(c, arg0.operator&(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, arg0 & arg1, "qt.QRect");
     }
 
     Pointer qt_QRect_operatorPlus_EQ__QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
@@ -646,7 +646,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         const QMargins arg1 = getqtype<QMarginsType>(param_margins);
-        return makeqtype<QRectType>(c, arg0.operator+=(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, arg0 += arg1, "qt.QRect");
     }
 
     Pointer qt_QRect_operatorMinus_EQ__QRect_QRect_QMargins(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_margins)
@@ -654,7 +654,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         const QMargins arg1 = getqtype<QMarginsType>(param_margins);
-        return makeqtype<QRectType>(c, arg0.operator-=(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, arg0 -= arg1, "qt.QRect");
     }
 
     Pointer qt_QRect_operatorPipe__QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
@@ -662,7 +662,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rectangle);
-        return makeqtype<QRectType>(c, arg0.operator|(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, arg0 | arg1, "qt.QRect");
     }
 
     Pointer qt_QRect_operatorPipe_EQ__QRect_QRect_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rectangle)
@@ -670,7 +670,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRect arg0 = getqtype<QRectType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rectangle);
-        return makeqtype<QRectType>(c, arg0.operator|=(arg1), "qt.QRect");
+        return makeqtype<QRectType>(c, arg0 |= arg1, "qt.QRect");
     }
 
     Pointer qt_QRect_span_QRect_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_p1, Pointer param_p2)

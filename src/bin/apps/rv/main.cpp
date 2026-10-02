@@ -375,6 +375,12 @@ int utf8Main(int argc, char* argv[])
     // worker device -- share textures/FBOs with the main viewport context
     // without an explicit, ordering-sensitive setShareContext() call. Must be
     // set before the QApplication is constructed.
+    //
+    // The Vulkan presentation path depends on this as well: there is no GLView
+    // to chain from, so the offscreen presentation context joins this global
+    // group instead (see QTVulkanVideoDevice::ensureGLContext). Otherwise FTGL
+    // font-atlas glyph uploads land in a context where the atlas texture has no
+    // storage.
     QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
     // Render Qt Quick through OpenGL, matching the graphics API RV's windows

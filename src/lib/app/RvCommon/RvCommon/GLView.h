@@ -69,6 +69,8 @@ namespace Rv
 
         void stopProcessingEvents();
 
+        void setCursor(const QCursor& cursor);
+
         bool firstPaintCompleted() const;
 
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }

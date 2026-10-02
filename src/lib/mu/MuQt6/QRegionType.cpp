@@ -268,7 +268,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_other);
-        return arg0.operator!=(arg1);
+        return arg0 != arg1;
     }
 
     Pointer qt_QRegion_operatorAmp__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -276,7 +276,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator&(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 & arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorAmp__QRegion_QRegion_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -284,7 +284,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator&(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 & arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPlus__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -292,7 +292,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator+(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 + arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPlus__QRegion_QRegion_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -300,7 +300,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator+(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 + arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPlus_EQ__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -308,7 +308,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator+=(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 += arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPlus_EQ__QRegion_QRegion_QRect(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_rect)
@@ -316,7 +316,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRect arg1 = getqtype<QRectType>(param_rect);
-        return makeqtype<QRegionType>(c, arg0.operator+=(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 += arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorMinus__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -324,7 +324,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator-(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 - arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorMinus_EQ__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -332,7 +332,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator-=(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 -= arg1, "qt.QRegion");
     }
 
     bool qt_QRegion_operatorEQ_EQ__bool_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -340,7 +340,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return arg0.operator==(arg1);
+        return arg0 == arg1;
     }
 
     Pointer qt_QRegion_operatorCaret__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -348,7 +348,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator^(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 ^ arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorCaret_EQ__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -356,7 +356,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator^=(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 ^= arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPipe__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -364,7 +364,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator|(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 | arg1, "qt.QRegion");
     }
 
     Pointer qt_QRegion_operatorPipe_EQ__QRegion_QRegion_QRegion(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_r)
@@ -372,7 +372,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QRegion& arg0 = getqtype<QRegionType>(param_this);
         const QRegion arg1 = getqtype<QRegionType>(param_r);
-        return makeqtype<QRegionType>(c, arg0.operator|=(arg1), "qt.QRegion");
+        return makeqtype<QRegionType>(c, arg0 |= arg1, "qt.QRegion");
     }
 
     static NODE_IMPLEMENTATION(_n_QRegion0, Pointer)

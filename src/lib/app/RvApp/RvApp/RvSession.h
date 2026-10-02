@@ -60,6 +60,18 @@ namespace Rv
 
         void postInitialize();
 
+        //
+        //  Evaluates the -eval (Mu) and -pyeval (Python) command line
+        //  expressions. This is split out of postInitialize() so that callers
+        //  which build display groups after session initialization (i.e. the
+        //  interactive path in RvApplication::newSessionFromFiles()) can defer
+        //  it until the RVDisplayGroup nodes actually exist. Running it too
+        //  early leaves sources added by the expression without a display
+        //  group to configure, so their view settings never get applied.
+        //
+
+        void evalCommandLineScripts();
+
         const RvGraph& rvgraph() const { return *static_cast<RvGraph*>(m_graph); }
 
         RvGraph& rvgraph() { return *static_cast<RvGraph*>(m_graph); }

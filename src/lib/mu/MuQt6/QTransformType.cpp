@@ -408,7 +408,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         const QTransform arg1 = getqtype<QTransformType>(param_matrix);
-        return arg0.operator!=(arg1);
+        return arg0 != arg1;
     }
 
     Pointer qt_QTransform_operatorStar__QTransform_QTransform_QTransform(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix)
@@ -416,7 +416,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         const QTransform arg1 = getqtype<QTransformType>(param_matrix);
-        return makeqtype<QTransformType>(c, arg0.operator*(arg1), "qt.QTransform");
+        return makeqtype<QTransformType>(c, arg0 * arg1, "qt.QTransform");
     }
 
     Pointer qt_QTransform_operatorPlus_EQ__QTransform_QTransform_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_scalar)
@@ -424,7 +424,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         qreal arg1 = (double)(param_scalar);
-        return makeqtype<QTransformType>(c, arg0.operator+=(arg1), "qt.QTransform");
+        return makeqtype<QTransformType>(c, arg0 += arg1, "qt.QTransform");
     }
 
     Pointer qt_QTransform_operatorMinus_EQ__QTransform_QTransform_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_scalar)
@@ -432,7 +432,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         qreal arg1 = (double)(param_scalar);
-        return makeqtype<QTransformType>(c, arg0.operator-=(arg1), "qt.QTransform");
+        return makeqtype<QTransformType>(c, arg0 -= arg1, "qt.QTransform");
     }
 
     Pointer qt_QTransform_operatorSlash_EQ__QTransform_QTransform_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_scalar)
@@ -440,7 +440,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         qreal arg1 = (double)(param_scalar);
-        return makeqtype<QTransformType>(c, arg0.operator/=(arg1), "qt.QTransform");
+        return makeqtype<QTransformType>(c, arg0 /= arg1, "qt.QTransform");
     }
 
     bool qt_QTransform_operatorEQ_EQ__bool_QTransform_QTransform(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_matrix)
@@ -448,7 +448,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QTransform arg0 = getqtype<QTransformType>(param_this);
         const QTransform arg1 = getqtype<QTransformType>(param_matrix);
-        return arg0.operator==(arg1);
+        return arg0 == arg1;
     }
 
     Pointer qt_QTransform_fromScale_QTransform_double_double(Mu::Thread& NODE_THREAD, double param_sx, double param_sy)

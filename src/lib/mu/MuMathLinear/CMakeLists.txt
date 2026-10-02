@@ -27,7 +27,7 @@ TARGET_INCLUDE_DIRECTORIES(
 TARGET_LINK_LIBRARIES(
   ${_target}
   PUBLIC Mu
-  PRIVATE MuLang eigen
+  PRIVATE MuLang Imath::Imath
 )
 
 RV_STAGE(TYPE "LIBRARY" TARGET ${_target})

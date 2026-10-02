@@ -381,9 +381,7 @@ namespace Rv
         if (package.installing)
             return true;
 
-        QStringList deps = package.
-                               requires
-            .split(" ", Qt::SkipEmptyParts);
+        QStringList deps = package.requiresList.split(" ", Qt::SkipEmptyParts);
         QStringList missing;
         QStringList notinstalled;
         QFileInfo info(package.file);
@@ -758,10 +756,7 @@ namespace Rv
             entry.menu = mode.menu;
             entry.shortcut = mode.shortcut;
             entry.event = mode.event;
-            entry.
-                requires
-            = mode.
-                  requires;
+            entry.requiresList = mode.requiresList;
             entry.rvversion = package.rvversion;
             entry.openrvversion = package.openrvversion;
             entry.optional = package.optional;
@@ -1255,9 +1250,7 @@ namespace Rv
                                     else if (pname == "icon")
                                         m.icon = v;
                                     else if (pname == "requires")
-                                    m.
-                                        requires
-                                    = v.split(" ");
+                                        m.requiresList = v.split(" ");
                                 }
 
                                 valueState = false;
@@ -1309,16 +1302,21 @@ namespace Rv
                                 else if (pname == "excludes")
                                     package.excludes = v;
                                 else if (pname == "requires")
-                                package.
-                                    requires
-                                = v;
-                                else if (pname == "rv") package.rvversion = v;
-                                else if (pname == "openrv") package.openrvversion = v;
-                                else if (pname == "imageio") package.imageio = v.split(" ");
-                                else if (pname == "movieio") package.movieio = v.split(" ");
-                                else if (pname == "hidden") package.hidden = v == "true";
-                                else if (pname == "system") package.system = v == "true";
-                                else if (pname == "optional") package.optional = v == "true";
+                                    package.requiresList = v;
+                                else if (pname == "rv")
+                                    package.rvversion = v;
+                                else if (pname == "openrv")
+                                    package.openrvversion = v;
+                                else if (pname == "imageio")
+                                    package.imageio = v.split(" ");
+                                else if (pname == "movieio")
+                                    package.movieio = v.split(" ");
+                                else if (pname == "hidden")
+                                    package.hidden = v == "true";
+                                else if (pname == "system")
+                                    package.system = v == "true";
+                                else if (pname == "optional")
+                                    package.optional = v == "true";
                                 valueState = false;
                             }
                         }
@@ -1412,9 +1410,7 @@ namespace Rv
 
                     int requiresIndex = index;
                     for (int i = requiresIndex; i < parts.size(); i++)
-                    entry.
-                        requires
-                        .push_back(parts[i]);
+                        entry.requiresList.push_back(parts[i]);
 
                     list.push_back(entry);
                 }
@@ -1460,11 +1456,11 @@ namespace Rv
                     line += QString(",") + e.openrvversion;
                 }
 
-                if (!e.requires.empty())
+                if (!e.requiresList.empty())
                 {
-                    for (int q = 0; q < e.requires.size(); q++)
+                    for (int q = 0; q < e.requiresList.size(); q++)
                     {
-                        line += QString(",%1").arg(e.requires[q]);
+                        line += QString(",%1").arg(e.requiresList[q]);
                     }
                 }
 
@@ -1556,9 +1552,7 @@ namespace Rv
         for (int i = 0; i < m_packages.size(); i++)
         {
             Package& package = m_packages[i];
-            QStringList deps = package.
-                                   requires
-                .split(" ", Qt::SkipEmptyParts);
+            QStringList deps = package.requiresList.split(" ", Qt::SkipEmptyParts);
 
             for (size_t q = 0; q < deps.size(); q++)
             {
@@ -2199,6 +2193,19 @@ namespace Rv
         QSettings* qs = new QSettings(format, QSettings::UserScope, INTERNAL_ORGANIZATION_NAME,
                                       PackageManager::ignoringPrefs() ? "RVALT" : INTERNAL_APPLICATION_NAME);
         qs->setFallbacksEnabled(false);
+
+#ifdef PLATFORM_WINDOWS
+        // Qt's atomic write (temp-file + rename) can fail with AccessError when Windows
+        // security software holds RV.ini open at the moment of the rename. Writing
+        // directly to the file avoids that failure point. Available since Qt 5.13.
+        qs->setAtomicSyncRequired(false);
+#endif
+
+        // Qt IniFormat on Windows does not create the parent directory automatically.
+        // Create it here so sync() does not fail with AccessError (err: 1).
+        QDir settingsDir(QFileInfo(qs->fileName()).absolutePath());
+        if (!settingsDir.exists())
+            settingsDir.mkpath(".");
 
         if (qs->status() != QSettings::NoError)
         {

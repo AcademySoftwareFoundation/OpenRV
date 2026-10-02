@@ -867,11 +867,21 @@ namespace Rv
 
         if (videoModules().empty())
         {
-            doc->view()->makeCurrent();
+            // With a non-OpenGL presentation backend view() returns null — no
+            // GL context to make current; presentation handles it per-frame.
+            if (doc->view())
+            {
+                doc->view()->makeCurrent();
+            }
 
             try
             {
-                addVideoModule(m_desktopModule = new DesktopVideoModule(0, doc->view()->videoDevice()));
+                // With a non-OpenGL presentation backend view() is null — pass
+                // nullptr as the GL share device.  DesktopVideoDevice can still
+                // be created; it only needs the share device when open() is
+                // called later.
+                QTGLVideoDevice* shareDevice = doc->view() ? doc->view()->videoDevice() : nullptr;
+                addVideoModule(m_desktopModule = new DesktopVideoModule(0, shareDevice));
             }
             catch (...)
             {
@@ -897,7 +907,8 @@ namespace Rv
         //  we're on (video device) so make sure the primary display group is
         //  correct.
         //
-        doc->session()->graph().setPrimaryDisplayGroup(doc->view()->videoDevice());
+        // Use the session's control device — valid for any presentation backend.
+        doc->session()->graph().setPrimaryDisplayGroup(doc->session()->controlVideoDevice());
 
         if (RvApp()->documents().size() == 1 && opts.present)
         {
@@ -927,6 +938,17 @@ namespace Rv
             s->userGenericEvent("after-progressive-loading", "");
         }
 
+        //
+        //  Evaluate the -eval / -pyeval command line expressions last, once the
+        //  display groups exist and the session is fully initialized, so that
+        //  sources added by those expressions go through the same setup as
+        //  sources added interactively. Doing this any earlier means the source
+        //  setup packages have no RVDisplayGroup to configure and the view
+        //  settings of those sources are silently left unset.
+        //
+
+        s->evalCommandLineScripts();
+
         return doc;
     }
 
@@ -937,7 +959,12 @@ namespace Rv
         if (!m->isOpen())
         {
             RvDocument* doc = reinterpret_cast<RvDocument*>(documents().front()->opaquePointer());
-            doc->view()->makeCurrent();
+            // With a non-OpenGL presentation backend view() is null — no GL
+            // context to make current.
+            if (doc->view())
+            {
+                doc->view()->makeCurrent();
+            }
             m->open();
             //
             //  The open() may have added video devices, so make sure each
@@ -1682,7 +1709,11 @@ namespace Rv
 #endif
 
                 string optionArgs = setVideoDeviceStateFromSettings(d);
-                rvDoc->view()->videoDevice()->makeCurrent();
+                // With a non-OpenGL presentation backend view() is null — skip GL makeCurrent.
+                if (rvDoc->view())
+                {
+                    rvDoc->view()->videoDevice()->makeCurrent();
+                }
 
                 try
                 {

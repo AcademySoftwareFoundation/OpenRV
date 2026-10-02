@@ -335,6 +335,14 @@ namespace Rv
             m_glWindow->stopProcessingEvents();
     }
 
+    void GLView::setCursor(const QCursor& cursor)
+    {
+        if (m_glWindow != nullptr)
+        {
+            m_glWindow->setCursor(cursor);
+        }
+    }
+
     bool GLView::firstPaintCompleted() const { return m_glWindow && m_glWindow->firstPaintCompleted(); }
 
     QSize GLView::sizeHint() const { return m_csize; }

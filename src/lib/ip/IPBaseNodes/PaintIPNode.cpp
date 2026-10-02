@@ -392,40 +392,29 @@ namespace IPCore
 
             if (isStampBrush)
             {
-                // ── Stamp path: feed raw points through smoother → StampPlacer ─
-                if (!p.inputSmoother)
-                {
-                    p.inputSmoother = std::make_unique<TwkPaint::SmoothInterpolate2D>();
-                    p.rawPointsSmoothed = 0;
-                    p.stampPlacer = nullptr;
-                    p.stampInstances.clear();
-                }
-
+                // ── Stamp path: feed raw points directly into StampPath ────────
                 const size_t widthsCount = hasPerPointWidths ? widthP->size() : 0;
 
                 for (size_t i = p.rawPointsSmoothed; i < rawCount; ++i)
                 {
-                    p.inputSmoother->add_point(rawPts[i]);
+                    // The placer is created lazily on the first point so that p.width
+                    // and p.color have their final values from the property read above.
+                    if (!p.stampPlacer)
+                    {
+                        TwkPaint::BrushParams params;
+                        params.radius = p.width * 0.5f;
+                        params.opacity = p.color[3];
+                        p.stampPlacer = std::make_unique<TwkPaint::StampPath>(params);
+                        p.stampInstances.clear();
+                    }
 
                     const size_t wi = (hasPerPointWidths && widthsCount > 0) ? std::min(i, widthsCount - 1) : static_cast<size_t>(-1);
                     const float w = (wi != static_cast<size_t>(-1)) ? static_cast<const float*>(widthP->rawData())[wi] : p.width;
 
-                    TwkMath::Vec2f out;
-                    while (p.inputSmoother->interpolate(out))
-                    {
-                        // Create placer lazily so p.width has its final value.
-                        if (!p.stampPlacer)
-                        {
-                            TwkPaint::BrushParams params;
-                            params.radius = p.width * 0.5f;
-                            params.opacity = p.color[3];
-                            p.stampPlacer = std::make_unique<TwkPaint::StampPath>(params);
-                        }
-                        p.stampPlacer->add_point(out, w * 0.5f);
-                        TwkPaint::StampInstance s;
-                        while (p.stampPlacer->next(s))
-                            p.stampInstances.push_back(s);
-                    }
+                    p.stampPlacer->add_point(rawPts[i], w * 0.5f);
+                    TwkPaint::StampInstance s;
+                    while (p.stampPlacer->next(s))
+                        p.stampInstances.push_back(s);
                 }
 
                 p.rawPointsSmoothed = rawCount;

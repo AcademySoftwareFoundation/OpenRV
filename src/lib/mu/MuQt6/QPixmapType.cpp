@@ -333,7 +333,7 @@ namespace Mu
     {
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         const QPixmap& arg0 = getqtype<QPixmapType>(param_this);
-        return arg0.operator!();
+        return !arg0;
     }
 
     int qt_QPixmap_defaultDepth_int(Mu::Thread& NODE_THREAD)

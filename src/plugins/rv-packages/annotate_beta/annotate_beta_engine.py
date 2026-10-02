@@ -48,31 +48,6 @@ _SIZE_MIN = 0.001
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
 _FONT_SIZE_WCS_BASE = {"small": 24.0 / 1080.0, "medium": 48.0 / 1080.0, "large": 72.0 / 1080.0}
 
-# US keyboard shift-symbol mapping used for text input
-_SHIFT_MAP = {
-    "1": "!",
-    "2": "@",
-    "3": "#",
-    "4": "$",
-    "5": "%",
-    "6": "^",
-    "7": "&",
-    "8": "*",
-    "9": "(",
-    "0": ")",
-    "-": "_",
-    "=": "+",
-    "[": "{",
-    "]": "}",
-    "\\": "|",
-    ";": ":",
-    "'": '"',
-    ",": "<",
-    ".": ">",
-    "/": "?",
-    "`": "~",
-}
-
 
 class AnnotateDrawEngine:
     def __init__(self, mode):
@@ -92,10 +67,11 @@ class AnnotateDrawEngine:
         # Text editing state
         self._text_active = False
         self._text_buffer = ""
-        self._text_node = None  # full property path — None until first char typed
+        self._text_node = None
         self._text_anchor = None  # _Vec2 position recorded on pointer-push
         self._text_paint_node = None
         self._text_frame = None
+        self._text_registered = False
 
         # Pen/eraser stroke state
         self._pen_stroke = None  # current stroke node name (set on push, cleared on release)
@@ -150,6 +126,8 @@ class AnnotateDrawEngine:
             ("key-down--backspace", self.on_text_backspace, "Delete char"),
             ("key-down--delete", self.on_text_backspace, "Delete char"),
             ("key-down--space", self.on_text_space, "Insert space"),
+            ("key-down--shift--enter", self.on_text_new_line, "Insert a new line"),
+            ("key-down--shift--keypad-enter", self.on_text_new_line, "Insert a new line"),
             ("key-down--return", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
             ("key-down--enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
             ("key-down--keypad-enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
@@ -159,7 +137,7 @@ class AnnotateDrawEngine:
             ("before-session-write-copy", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("before-play-start", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("before-session-read", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-graph-view-changed", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("before-graph-view-change", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
             ("key-down--escape", self.on_text_cancel, "Cancel text"),
         ]
 
@@ -236,7 +214,7 @@ class AnnotateDrawEngine:
         return max(_SIZE_MIN, self._mode._size * _SIZE_SCALE * scale)
 
     def _colors(self):
-        c = self._mode._colour
+        c = self._mode._color
         alpha = self._mode._opacity / 100.0
         border = [c.redF(), c.greenF(), c.blueF(), alpha]
         tool = self._mode._tool
@@ -251,6 +229,23 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
     # Paint node resolution
     # ------------------------------------------------------------------
+
+    def set_tags(self):
+        view_node = commands.viewNode()
+        if view_node:
+            for node in commands.closestNodesOfType("RVPaint"):
+                annotate_tag = f"{node}.tag.annotate"
+                if not commands.propertyExists(annotate_tag):
+                    commands.newProperty(annotate_tag, commands.StringType, 1)
+                commands.setStringProperty(annotate_tag, [""], True)
+
+    def remove_tags(self):
+        view_node = commands.viewNode()
+        if view_node:
+            for node in commands.closestNodesOfType("RVPaint"):
+                annotate_tag = f"{node}.tag.annotate"
+                if commands.propertyExists(annotate_tag):
+                    commands.deleteProperty(annotate_tag)
 
     def _find_paint_node(self):
         try:
@@ -287,10 +282,7 @@ class AnnotateDrawEngine:
             for info in infos:
                 if info.get("nodeType") == "RVPaint":
                     return info["node"], info["frame"]
-            all_paint = commands.nodesOfType("RVPaint")
-            if all_paint:
-                return all_paint[0], frame
-            return None, None
+            return None, frame
         except Exception:
             return None, None
 
@@ -315,8 +307,8 @@ class AnnotateDrawEngine:
         pid = os.getpid()
         return f"{paint_node}.{prefix}:{node_id}:{frame}:{host}_{pid}"
 
-    def _frame_order_and_undo(self, paint_node, frame, node_name, shape_uuid):
-        """Insert the component into the frame draw order and undo stack."""
+    def _add_to_order(self, paint_node, frame, node_name):
+        """Insert the component into the frame draw order."""
 
         def _ensure(prop, ptype, w):
             if not commands.propertyExists(prop):
@@ -327,6 +319,11 @@ class AnnotateDrawEngine:
         _ensure(order_prop, commands.StringType, 1)
         if component not in commands.getStringProperty(order_prop):
             commands.insertStringProperty(order_prop, [component])
+
+    def _register_undo_entry(self, paint_node, frame, shape_uuid):
+        def _ensure(prop, ptype, w):
+            if not commands.propertyExists(prop):
+                commands.newProperty(prop, ptype, w)
 
         host = commands.myNetworkHost().replace(".", "_")
         pid = os.getpid()
@@ -339,6 +336,11 @@ class AnnotateDrawEngine:
                 commands.markFrame(commands.frame(), True)
             except Exception:
                 pass
+
+    def _frame_order_and_undo(self, paint_node, frame, node_name, shape_uuid):
+        """Insert the component into the frame draw order and undo stack."""
+        self._add_to_order(paint_node, frame, node_name)
+        self._register_undo_entry(paint_node, frame, shape_uuid)
 
     # ------------------------------------------------------------------
     # Pointer / coordinate helpers
@@ -361,7 +363,7 @@ class AnnotateDrawEngine:
             dpr = commands.devicePixelRatio()
             ip = (raw[0] * dpr, raw[1] * dpr)
 
-            pinfos = commands.imagesAtPixel(raw)
+            pinfos = commands.imagesAtPixel(raw, "annotate")
             if not pinfos:
                 return "", None
 
@@ -472,7 +474,7 @@ class AnnotateDrawEngine:
             n = self._unique_name(paint_node, "text", frame)
             shape_uuid = str(uuid.uuid4())
 
-            c = self._mode._colour
+            c = self._mode._color
             color = [c.redF(), c.greenF(), c.blueF(), 1.0]
 
             font_size = _FONT_SIZE_WCS_BASE.get(self._mode._font_size, 48.0 / 1080.0) * self._screen_scale()
@@ -537,7 +539,7 @@ class AnnotateDrawEngine:
             commands.setStringProperty(f"{n}.uuid", [shape_uuid], True)
             commands.setIntProperty(f"{n}.softDeleted", [0], True)
 
-            self._frame_order_and_undo(paint_node, frame, n, shape_uuid)
+            self._add_to_order(paint_node, frame, n)
             commands.redraw()
             self._end_sync()
             return n
@@ -550,7 +552,7 @@ class AnnotateDrawEngine:
             return None
 
     def _ensure_text_node(self):
-        """Create the text node on first keypress if not yet created."""
+        """Create the text node if not yet created."""
         if self._text_node is not None:
             return
         if not self._text_paint_node or self._text_anchor is None:
@@ -558,9 +560,17 @@ class AnnotateDrawEngine:
         node = self._new_text_node(self._text_paint_node, self._text_frame, self._text_anchor)
         if node:
             self._text_node = node
-            self._undo_stack.append((self._text_paint_node, self._text_frame, node))
-            self._redo_stack.clear()
-            self._notify_buttons()
+
+    def _register_text_undo(self):
+        if self._text_registered or self._text_node is None:
+            return
+
+        shape_uuid = self._uuid_for(self._text_node)
+        self._register_undo_entry(self._text_paint_node, self._text_frame, shape_uuid)
+        self._undo_stack.append((self._text_paint_node, self._text_frame, self._text_node))
+        self._redo_stack.clear()
+        self._text_registered = True
+        self._notify_buttons()
 
     def _update_text_display(self, cursor=True):
         if self._text_node is None:
@@ -572,33 +582,41 @@ class AnnotateDrawEngine:
         except Exception as e:
             print(f"[annotate_beta] _update_text_display error: {e}")
 
-    def _commit_text(self):
-        # Nothing typed — clean up the placeholder node rather than leaving an empty annotation
-        if not self._text_buffer:
-            self._cancel_text()
-            return
-        self._update_text_display(cursor=False)
-        self._text_active = False
-        self._text_node = None
-        self._text_buffer = ""
-        self._text_paint_node = None
-        self._text_frame = None
-        commands.sendInternalEvent("annotate-text-committed")
-
-    def _cancel_text(self):
-        if self._text_node:
-            try:
-                self._remove_from_order(self._text_paint_node, self._text_frame, self._text_node)
-                commands.setIntProperty(f"{self._text_node}.softDeleted", [1], True)
-                commands.redraw()
-            except Exception:
-                pass
+    def _reset_text(self):
         self._text_active = False
         self._text_node = None
         self._text_anchor = None
         self._text_buffer = ""
         self._text_paint_node = None
         self._text_frame = None
+        self._text_registered = False
+
+    def _commit_text(self):
+        # Nothing typed — clean up the placeholder node rather than leaving an empty annotation
+        if not self._text_buffer.strip():
+            self._cancel_text()
+            return
+        self._update_text_display(cursor=False)
+        self._reset_text()
+        commands.sendInternalEvent("annotate-text-committed")
+
+    def _cancel_text(self):
+        if self._text_node:
+            try:
+                self._update_text_display(cursor=False)
+                self._remove_from_order(self._text_paint_node, self._text_frame, self._text_node)
+                commands.setIntProperty(f"{self._text_node}.softDeleted", [1], True)
+                commands.redraw()
+            except Exception:
+                pass
+
+        if self._text_registered and self._undo_stack:
+            _, _, last_node = self._undo_stack[-1]
+            if last_node == self._text_node:
+                self._undo_stack.pop()
+                self._notify_buttons()
+
+        self._reset_text()
 
     # ------------------------------------------------------------------
     # Pen/eraser stroke node creation
@@ -619,7 +637,7 @@ class AnnotateDrawEngine:
             n = self._unique_name(paint_node, "pen", frame)
             stroke_uuid = str(uuid.uuid4())
 
-            c = self._mode._colour
+            c = self._mode._color
             alpha = self._mode._opacity / 100.0
             blend_mode = getattr(self._mode, "_color_modifier", "normal")
 
@@ -860,22 +878,23 @@ class AnnotateDrawEngine:
     def on_push(self, event):
         self._notify_draw_started()
         if self._mode._tool == TOOL_TEXT:
-            # Commit any in-progress text, then record the new anchor.
-            # The node is NOT created yet — it is deferred to the first keypress
-            # so that clicking without typing leaves nothing behind.
             if self._text_active:
                 self._commit_text()
             name, pei = self._pointer_location(event)
             if not name:
+                event.reject()
                 return
             self._current_source_name = name
             paint_node, frame = self._find_paint_node()
+            if paint_node is None:
+                event.reject()
+                return
             self._text_active = True
             self._text_buffer = ""
-            self._text_node = None
             self._text_anchor = pei
             self._text_paint_node = paint_node
             self._text_frame = frame
+            self._ensure_text_node()
             return
 
         if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
@@ -1013,17 +1032,13 @@ class AnnotateDrawEngine:
             event.reject()
             return
         parts = event.name().split("--")
-        ch = parts[-1]
-        if len(ch) != 1:
+        char = parts[-1]
+        if len(char) != 1:
             event.reject()
             return
-        has_shift = "shift" in parts[:-1]
-        if has_shift:
-            char = ch.upper() if ch.isalpha() else _SHIFT_MAP.get(ch, ch)
-        else:
-            char = ch
         self._text_buffer += char
         self._ensure_text_node()
+        self._register_text_undo()
         self._update_text_display(cursor=True)
 
     def on_text_space(self, event):
@@ -1032,6 +1047,7 @@ class AnnotateDrawEngine:
             return
         self._text_buffer += " "
         self._ensure_text_node()
+        self._register_text_undo()
         self._update_text_display(cursor=True)
 
     def on_text_backspace(self, event):
@@ -1040,6 +1056,16 @@ class AnnotateDrawEngine:
             return
         if self._text_buffer:
             self._text_buffer = self._text_buffer[:-1]
+        self._update_text_display(cursor=True)
+
+    def on_text_new_line(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+
+        self._text_buffer += "\n"
+        self._ensure_text_node()
+        self._register_text_undo()
         self._update_text_display(cursor=True)
 
     def on_text_commit(self, event, reject):
@@ -1072,6 +1098,12 @@ class AnnotateDrawEngine:
 
     def has_redo(self):
         return bool(self._redo_stack)
+
+    def clear_annotate_history(self):
+        self._reset_text()
+        self._undo_stack.clear()
+        self._redo_stack.clear()
+        self._notify_buttons()
 
     # ------------------------------------------------------------------
     # Order-list helpers
@@ -1115,6 +1147,7 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def undo(self):
+        self.commit_text_if_active()
         if not self._undo_stack:
             return
         paint_node, frame, node_name = self._undo_stack.pop()
@@ -1131,6 +1164,7 @@ class AnnotateDrawEngine:
         commands.sendInternalEvent("undo-paint", self._uuid_for(node_name))
 
     def redo(self):
+        self.commit_text_if_active()
         if not self._redo_stack:
             return
         paint_node, frame, node_name = self._redo_stack.pop()
@@ -1174,6 +1208,7 @@ class AnnotateDrawEngine:
         clients (which land on the live-review annotation source group's node)
         are cleared along with locally drawn ones.
         """
+        self.commit_text_if_active()
         _, frame = self._find_paint_node()
         if frame is None:
             return
@@ -1226,6 +1261,7 @@ class AnnotateDrawEngine:
         annotations and source-space frame numbers outside the timeline range
         are also cleared.
         """
+        self.commit_text_if_active()
         all_paint_nodes = commands.nodesOfType("RVPaint")
         if not all_paint_nodes:
             return
@@ -1287,9 +1323,9 @@ class AnnotateDrawEngine:
             pass
 
     def _notify_draw_started(self):
-        """Tell the mode to close any open popups (e.g. colour picker)."""
+        """Tell the mode to close any open popups (e.g. color picker)."""
         try:
-            self._mode._hide_colour_picker()
+            self._mode._hide_color_picker()
         except Exception:
             pass
 
