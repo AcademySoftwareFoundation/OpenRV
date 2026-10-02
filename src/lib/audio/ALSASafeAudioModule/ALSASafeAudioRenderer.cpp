@@ -15,6 +15,7 @@
 #include <TwkAudio/Audio.h>
 #include <TwkAudio/AudioFormats.h>
 #include <TwkMovie/Movie.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
 #include <iostream>
 #include <sstream>
 
@@ -1091,6 +1092,16 @@ namespace IPCore
                         cerr << endl;
                     }
 
+                    //  Record ALSA-level audio underruns independently of the
+                    //  -debug audio flag so they show up in the consolidated
+                    //  diagnostic log. -EPIPE is the classic hardware underrun.
+                    if (TwkUtil::PlaybackDiagnostics::enabled())
+                    {
+                        std::ostringstream extra;
+                        extra << "err=" << snd_strerror((int)frames);
+                        TwkUtil::PlaybackDiagnostics::instance().record("underrun", -1, -1, 0.0, extra.str());
+                    }
+
                     if (!m_pcm)
                         return;
 #ifdef USE_SAFE_ALSA
@@ -1115,6 +1126,11 @@ namespace IPCore
 
             if (pcmState == SND_PCM_STATE_XRUN)
             {
+                if (TwkUtil::PlaybackDiagnostics::enabled())
+                {
+                    TwkUtil::PlaybackDiagnostics::instance().record("underrun", -1, -1, 0.0, "state=xrun");
+                }
+
                 if (!m_pcm)
                     return;
                 if (snd_pcm_prepare(m_pcm) < 0)
