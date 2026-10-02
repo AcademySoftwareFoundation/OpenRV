@@ -9,6 +9,10 @@
 #define __stl_ext__thread_group__h__
 #include <pthread.h>
 #include <vector>
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 #include <stl_ext/stl_ext_config.h>
 
 namespace stl_ext
@@ -92,18 +96,19 @@ namespace stl_ext
         bool control_wait(bool allThreads = true,
                           double timeout_seconds = 0.0); // control thread API
 
-        //
-        //  Call dispatch for each work thread you want to dispatch. Its an
-        //  error to call this if there are not available threads.
+        //  Queue a job to be executed by a worker thread asynchronously. The
+        //  job will be placed in the work queue and executed by the next
+        //  available worker. If all workers are busy, the job will wait
+        //  in the queue until a worker becomes available.
         //
 
-        void dispatch(thread_function, void*);
+        void dispatch(thread_function func, void* data) { internal_dispatch(func, data, false); }
 
         //
         //  Dispatch, but if all threads are busy returns false otherwise true
         //
 
-        bool maybe_dispatch(thread_function, void*, bool async = false);
+        bool maybe_dispatch(thread_function func, void* data) { return internal_dispatch(func, data, true); }
 
         //
         //  Use the function to add additional threads. Once a thread is added
@@ -119,39 +124,17 @@ namespace stl_ext
         //  Number of worker threads in the thread group.
         //
 
-        size_t num_threads() const { return _num_threads; }
+        size_t num_threads() const { return m_num_threads; }
 
         //
         //  set debugging messages on/off
         //
 
-        void debug(bool b) { _debugging = b; }
+        void debug(bool b) { m_debugging = b; }
 
-        static void debug_all(bool b) { _debug_all = b; }
-
-        //
-        //  Cancel a thread if its running. USE WITH CAUTION
-        //
-
-        void cancel(pthread_t);
-
-        //
-        //  Pthreads wrappers
-        //
-
-        static void lock(pthread_mutex_t&);
-        static void unlock(pthread_mutex_t&);
-        static void wait_cond(pthread_cond_t&, pthread_mutex_t&);
-        static bool wait_cond_time(pthread_cond_t&, pthread_mutex_t&, size_t usec);
-        static void signal(pthread_cond_t&);
-        static void broadcast(pthread_cond_t&);
+        static void debug_all(bool b) { DEBUG_ALL = b; }
 
         void debug(const char*, ...);
-
-        //----------------------------------------------------------------------
-        //
-        //  Worker thread API
-        //
 
         //
         //  Restart any waiting workers, using the func/data pair that
@@ -163,66 +146,52 @@ namespace stl_ext
         void awaken_all_workers();
 
     private:
-        static void* thread_main(void*);
-        static void thread_cleanup(void*);
-
-        void worker_wait(); // worker thread API
-        void worker_jump();
-        void worker_cleanup();
-        void release_control();
-        void release_worker();
-
-        typedef std::vector<pthread_t> thread_vector;
-
-        struct thread_package
+        struct WorkerState
         {
-            // thread_package () {}
-            // thread_package (thread_group* g, thread_function f, void* d) :
-            // group(g), func(f), data(d) {}
-
-            thread_group* group;
-            thread_function func;
-            void* data;
+            size_t worker_id = 0;
+            thread_group* group = nullptr;
+            thread_function original_func = nullptr; // Function to recall
+            void* original_data = nullptr;           // Data to recall
         };
 
-        typedef std::vector<thread_package> package_vector;
+        struct Job
+        {
+            thread_function func; // Function to execute
+            void* data;           // Data to pass to the function
+            bool recall;          // If true, use the thread's original func/data
+        };
 
-        bool running() { return _running; }
+        //
+        // Main loop for each worker thread.
+        //
+
+        void thread_main(WorkerState* state);
+
+        bool internal_dispatch(thread_function func, void* data, bool maybe);
 
     private:
-        thread_api _api;
-        pthread_mutex_t _wait_mutex;
-        pthread_cond_t _wait_cond;
+        thread_api m_api;
+        pthread_attr_t m_thread_attr;
+        std::vector<pthread_t> m_threads;
+        size_t m_default_stack_size = 0;
 
-        pthread_mutex_t _worker_mutex;
-        pthread_cond_t _worker_cond;
+        // Debug logging
+        static bool DEBUG_ALL;
+        static std::mutex DEBUG_MUTEX;
+        int m_group_id;
+        bool m_debugging = false;
 
-        pthread_mutex_t _control_mutex;
-        pthread_cond_t _control_cond;
+        // Work queue and synchronization
+        int m_num_threads = 0;
+        std::atomic<int> m_num_jobs{0};
+        std::atomic<bool> m_running{true};
+        std::queue<Job> m_job_queue;
+        std::mutex m_queue_mutex;
+        std::condition_variable m_queue_cond;
 
-        pthread_mutex_t _debug_mutex;
-
-        pthread_attr_t _thread_attr;
-
-        bool _wait_flag;
-        thread_vector _threads;
-        package_vector _packages;
-
-        int _num_finished;
-        int _num_threads;
-        thread_function _func;
-        void* _data;
-        bool _recall;
-        bool _debugging;
-        bool _running;
-        pthread_t _join_thread;
-
-        bool _dispatching;
-        size_t _default_stack_size;
-        static bool _debug_all;
-
-        pthread_key_t _funcKey;
-        pthread_key_t _dataKey;
+        // For control_wait synchronization
+        std::mutex m_finished_mutex;
+        std::condition_variable m_finished_cond;
     };
 
 } // namespace stl_ext
