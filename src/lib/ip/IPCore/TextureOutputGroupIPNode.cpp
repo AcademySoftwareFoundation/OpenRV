@@ -186,7 +186,10 @@ namespace IPCore
                                dataType, stype);
 
             image->fitToAspect(aspect);
+            // S is a scale-to-aspect (no rotation), so mirror into the
+            // overlay chain as well.
             image->transformMatrix = S * image->transformMatrix;
+            image->overlayTransformMatrix = S * image->overlayTransformMatrix;
 
             root->tagMap[IPImage::textureIDTagName()] = m_tag->front();
             root->appendChild(image);

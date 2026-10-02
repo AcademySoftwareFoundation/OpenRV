@@ -398,6 +398,7 @@ namespace IPCore
         //
 
         transformMatrix.makeIdentity();
+        overlayTransformMatrix.makeIdentity();
         stencilBox.makeEmpty();
 
         fb = 0;
@@ -548,7 +549,12 @@ namespace IPCore
         //  result of the original transformMatrix.  This doesn't often matter,
         //  but will mess up stereo offset in the stereo case.
         //
-        transformMatrix = fitToAspectMatrix(aspect) * transformMatrix;
+        const Matrix fit = fitToAspectMatrix(aspect);
+        transformMatrix = fit * transformMatrix;
+        // Mirror the fit into the overlay chain -- the fit is purely a
+        // uniform scale-to-aspect and never introduces rotation, so the
+        // overlay chain stays in lockstep with the main chain here.
+        overlayTransformMatrix = fit * overlayTransformMatrix;
     }
 
     static void hashMatrix(ostream& o, const IPImage::Matrix& M)
@@ -601,6 +607,7 @@ namespace IPCore
         c.controlDevice = controlDevice;
         c.outputDevice = outputDevice;
         c.parentMatrix = Matrix();
+        c.parentOverlayMatrix = Matrix();
 
         //
         //  Compute projection and viewport
@@ -669,6 +676,15 @@ namespace IPCore
 
         Mat44f currentMatrix = baseContext.parentMatrix * transformMatrix;
         Mat44f currentMatrixGlobal = baseContext.parentMatrixGlobal * transformMatrix;
+        //
+        //  Parallel accumulation for the overlay chain. Nodes that introduce
+        //  an arbitrary rotation (Transform2DIPNode) may set
+        //  overlayTransformMatrix to a rotation-stripped variant, in which
+        //  case overlayImageMatrix diverges from imageMatrix here. All other
+        //  nodes keep overlayTransformMatrix in lockstep with transformMatrix,
+        //  so this stays a no-op for them.
+        //
+        Mat44f currentOverlayMatrix = baseContext.parentOverlayMatrix * overlayTransformMatrix;
 
         // if (fb)
         // {
@@ -696,6 +712,7 @@ namespace IPCore
             placementMatrix = T;
             orientationMatrix = computeOrientationMatrix(fb);
             imageMatrix = currentMatrix;
+            overlayImageMatrix = currentOverlayMatrix;
             modelViewMatrix = imageMatrix * placementMatrix;
 
             projectionMatrixGlobal = baseContext.projectionMatrixGlobal;
@@ -725,6 +742,7 @@ namespace IPCore
                 context.outputWidth = width;
                 context.outputHeight = height;
                 context.parentMatrix = Matrix();
+                context.parentOverlayMatrix = Matrix();
 
                 //
                 //  Compute projection and viewport
@@ -791,6 +809,7 @@ namespace IPCore
                     context.viewport = viewport;
 
                     currentMatrix = Matrix();
+                    currentOverlayMatrix = Matrix();
 
                     //
                     //  "Global" matrices react to the root case just like "non
@@ -803,6 +822,7 @@ namespace IPCore
 
                 context.parentMatrix = currentMatrix;
                 context.parentMatrixGlobal = currentMatrixGlobal;
+                context.parentOverlayMatrix = currentOverlayMatrix;
             }
 
             //
