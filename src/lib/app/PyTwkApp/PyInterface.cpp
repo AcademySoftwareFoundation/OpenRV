@@ -13,6 +13,7 @@
 #include <PyTwkApp/PyMu.h>
 #include <PyTwkApp/PyMuSymbolType.h>
 
+#include <ImGuiPythonBridge.h>
 #include <MuPy/PyModule.h>
 #include <MuTwkApp/EventType.h>
 #include <MuTwkApp/MuInterface.h>
@@ -371,6 +372,9 @@ namespace TwkApp
 
     void finalizePython()
     {
+
+        Rv::ImGuiPythonBridge::shutdown();
+
         // Deliberately not using PyLockObject to avoid calling
         // PyGILState_Release in its destructor.
         PyGILState_Ensure();
