@@ -227,6 +227,42 @@ def build() -> None:
     subprocess.run(build_args, cwd=SOURCE_DIR, env=build_env).check_returncode()
 
 
+def install_pkgconfig_exporters() -> None:
+    """Copy OpenSSL's pkg-config exporters into the install prefix.
+
+    OpenSSL's Windows nmake Makefile never installs them and has NO target that
+    does. `install_sw` pulls in `install_dev`, and `install_dev` copies the
+    headers, the libraries and INSTALL_EXPORTERS_CMAKE -- but nothing copies the
+    generated `exporters/*.pc`, and there is no `install_exporters` rule at all.
+    So the install prefix ends up holding libcrypto.lib and libssl.lib and no
+    lib/pkgconfig directory whatsoever.
+
+    THAT SILENTLY BREAKS FFMPEG. cmake/dependencies/ffmpeg.cmake pins
+    PKG_CONFIG_LIBDIR to the dependency prefixes and clears PKG_CONFIG_PATH on
+    purpose, to keep MSYS2 MinGW .pc files out of an MSVC build. With no .pc in
+    the prefix, openssl is invisible and configure dies with
+    "openssl >= 1.0.1k not found using pkg-config" -- taking RV_DEPS_OIIO,
+    movie_formats, image_formats and rv itself down behind it, none of which
+    mention openssl in their own errors.
+
+    The exporters/ copies are the RIGHT ones. They are generated with
+    -Minstalldata, so their prefix= is the INSTALL directory, unlike the
+    top-level libcrypto.pc/libssl.pc/openssl.pc which are generated with
+    -Mbuilddata for the build tree and carry a header comment saying they
+    "should never be installed".
+    """
+    src = os.path.join(SOURCE_DIR, "exporters")
+    dst = os.path.join(OUTPUT_DIR, "lib", "pkgconfig")
+    found = sorted(glob.glob(os.path.join(src, "*.pc")))
+    if not found:
+        print(f"WARNING: no pkg-config exporters in {src}; FFmpeg will not find openssl")
+        return
+    os.makedirs(dst, exist_ok=True)
+    for pc in found:
+        shutil.copy2(pc, dst)
+        print(f"Installed {os.path.basename(pc)} -> {dst}")
+
+
 def install() -> None:
     """
     Run the install step of the build. It puts all the files inside of the output directory and make them ready to be
@@ -239,6 +275,8 @@ def install() -> None:
 
     print(f"Executing {install_args} from {SOURCE_DIR}")
     subprocess.run(install_args, cwd=SOURCE_DIR).check_returncode()
+
+    install_pkgconfig_exporters()
 
     patch_openssl_distribution()
     test_openssl_distribution()
