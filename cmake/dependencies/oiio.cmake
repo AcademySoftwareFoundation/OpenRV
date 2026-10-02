@@ -258,6 +258,9 @@ LIST(APPEND _configure_options "-DZLIB_ROOT=${RV_DEPS_ZLIB_ROOT_DIR}")
 
 LIST(APPEND _configure_options "-Dopenjph_ROOT=${RV_DEPS_OPENJPH_ROOT_DIR}")
 
+# libjxl (JPEG XL). OIIO discovers it through its FindJXL module using JXL_ROOT.
+LIST(APPEND _configure_options "-DJXL_ROOT=${RV_DEPS_JXL_ROOT_DIR}")
+
 # OIIO tools are not needed.
 LIST(APPEND _configure_options "-DOIIO_BUILD_TOOLS=OFF" "-DOIIO_BUILD_TESTS=OFF")
 
@@ -296,6 +299,8 @@ IF(NOT RV_TARGET_WINDOWS)
             OpenEXR::OpenEXR
             OpenJpeg::OpenJpeg
             OpenJph::OpenJph
+            jxl::jxl
+            jxl::jxl_threads
             libjpeg-turbo::turbojpeg
             PNG::PNG
             Boost::headers
@@ -352,6 +357,8 @@ ELSE()
             OpenEXR::OpenEXR
             OpenJpeg::OpenJpeg
             OpenJph::OpenJph
+            jxl::jxl
+            jxl::jxl_threads
             libjpeg-turbo::turbojpeg
             PNG::PNG
             Boost::headers
