@@ -2073,6 +2073,29 @@ namespace TwkMovie
                 track->fb.setRange(ColorSpace::VideoRange());
                 track->fb.setPrimaryColorSpace(ColorSpace::Rec709());
             }
+            else if (name == "rawvideo" && m_avFormatContext->iformat && m_avFormatContext->iformat->name
+                     && string(m_avFormatContext->iformat->name) == "yuv4mpegpipe")
+            {
+                //
+                //  YUV4MPEG2 has no matrix, primaries or transfer field, only an
+                //  optional XCOLORRANGE. With no conversion set, RV falls back
+                //  to BT.601 (see getYUVtoRGBMatrix), which is wrong for HD. Use
+                //  the usual convention: BT.709 above SD resolution, BT.601 at
+                //  SD and below. Range comes from XCOLORRANGE when present,
+                //  otherwise video range, which is the norm for YUV.
+                //
+
+                const bool isHD = videoCodecContext->height > 576;
+                track->fb.setConversion(isHD ? ColorSpace::Rec709() : ColorSpace::Rec601());
+                if (isHD)
+                {
+                    track->fb.setPrimaryColorSpace(ColorSpace::Rec709());
+                }
+                track->fb.setRange((videoCodecContext->color_range == AVCOL_RANGE_JPEG) ? ColorSpace::FullRange()
+                                                                                        : ColorSpace::VideoRange());
+                track->fb.attribute<string>("ColorSpace/Note") = isHD ? "YUV4MPEG2 has no matrix; assumed Rec709 from resolution"
+                                                                      : "YUV4MPEG2 has no matrix; assumed Rec601 from resolution";
+            }
 
             //
             //  The current existing behavior in RV if no transfer
@@ -6080,6 +6103,15 @@ namespace TwkMovie
         formats["mp4"] = make_pair("MPEG-4 Movie Container", vidcap);
         formats["mpg"] = make_pair("MPEG Format", vidcap);
         formats["mxf"] = make_pair("Material eXchange Format", vidcap);
+
+        // Read only: YUV4MPEG2 raw video, the usual lossless YUV interchange
+        // format for encoder testing. It has no audio and RV has no y4m writer.
+        unsigned int y4mcap = MovieIO::MovieRead | MovieIO::AttributeRead;
+        if (this->bruteForce())
+        {
+            y4mcap |= MovieIO::MovieBruteForceIO;
+        }
+        formats["y4m"] = make_pair("YUV4MPEG2 Raw Video", y4mcap);
         //    formats["ogv"]  = make_pair("OGG Video", vidcap);
         //    formats["webm"] = make_pair("WEBM Video", vidcap);
 
