@@ -4,11 +4,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from __future__ import print_function
 
 import socket
 import sys
 import time
+
 import six
 
 
@@ -57,13 +57,13 @@ class RvCommunicator:
 
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't create socket: %s\n" % msg[1], file=sys.stderr)
             return
 
         try:
             self.sock.connect((host, self.port))
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't connect: %s\n" % msg[1], file=sys.stderr)
             return
 
@@ -73,7 +73,7 @@ class RvCommunicator:
             self.sock.sendall(six.ensure_binary(msg))
             if self.noPingPong:
                 self.sock.sendall(six.ensure_binary("PINGPONGCONTROL 1 0"))
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't send greeting: %s\n" % msg[1], file=sys.stderr)
             return
 
@@ -159,7 +159,7 @@ class RvCommunicator:
                 self.sock.close()
                 self.connected = False
 
-        except socket.error as msg:
+        except OSError as msg:
             sanitized_msg = msg
             if hasattr(msg, "errno"):
                 sanitized_msg = (msg.errno, msg.strerror)
@@ -194,7 +194,7 @@ class RvCommunicator:
             messContents = self.sock.recv(messSize)
             self.sock.setblocking(0)
 
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't process message: %s\n" % msg[1], file=sys.stderr)
             self.sock.setblocking(0)
 

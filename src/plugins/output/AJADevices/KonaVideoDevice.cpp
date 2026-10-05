@@ -211,31 +211,29 @@ namespace AJADevices
         KonaVideo4KTransport video4KTransports[] = {{"Quadrants 4-wire", VIDEO_4K_TRANSPORT_QUADRANTS},
                                                     {"SMPTE 2SI", VIDEO_4K_TRANSPORT_TSI}};
 
-        KonaDataFormat dataFormatsCP[] = {
-            //
-            //  In this case we're going to get everything from the AJA
-            //  control panel.
-            //
+        KonaDataFormat dataFormatsCP[] = {//
+                                          //  In this case we're going to get everything from the AJA
+                                          //  control panel.
+                                          //
 
-            {"AJA Control Panel", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags},
-            // End of list
-            {"", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags}};
+                                          {"AJA Control Panel", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags},
+                                          // End of list
+                                          {"", (NTV2FrameBufferFormat)999, VideoDevice::RGB8, DataFormatFlags::NoFlags}};
 
-        KonaDataFormat dataFormatsYUV[] = {
-            //
-            //  These are for t-tap: it can only receive YUV formats so the
-            //  renderer will use the GPU to convert to YUV and then in
-            //  software we do the 4:2:2 down convert (until we have a packing
-            //  shader).
-            //
-            //  Using GL_PACK_ROW_LENGTH slows down glReadPixels sufficiently
-            //  to make it not worthwhile.
-            //
+        KonaDataFormat dataFormatsYUV[] = {//
+                                           //  These are for t-tap: it can only receive YUV formats so the
+                                           //  renderer will use the GPU to convert to YUV and then in
+                                           //  software we do the 4:2:2 down convert (until we have a packing
+                                           //  shader).
+                                           //
+                                           //  Using GL_PACK_ROW_LENGTH slows down glReadPixels sufficiently
+                                           //  to make it not worthwhile.
+                                           //
 
-            {"8 Bit YCrCb 4:2:2 (YUV-8)", NTV2_FBF_8BIT_YCBCR, VideoDevice::Y0CbY1Cr_8_422, P2P},
-            {"10 Bit YCrCb 4:2:2 (YUV-10)", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P},
-            // End of list
-            {"", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P}};
+                                           {"8 Bit YCrCb 4:2:2 (YUV-8)", NTV2_FBF_8BIT_YCBCR, VideoDevice::Y0CbY1Cr_8_422, P2P},
+                                           {"10 Bit YCrCb 4:2:2 (YUV-10)", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P},
+                                           // End of list
+                                           {"", NTV2_FBF_10BIT_YCBCR, VideoDevice::YCrCb_AJA_10_422, P2P}};
 
         KonaDataFormat dataFormats[] = {
             //

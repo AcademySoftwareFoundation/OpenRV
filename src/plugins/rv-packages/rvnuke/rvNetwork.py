@@ -4,12 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 #! /usr/bin/python
-from __future__ import print_function
 
+import os
 import socket
 import sys
 import time
-import os
 
 doDebug = False
 if os.getenv("RV_NUKE_DEBUG") is not None:
@@ -62,13 +61,13 @@ class RvCommunicator:
 
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't create socket: %s\n" % msg[1], file=sys.stderr)
             return
 
         try:
             self.sock.connect((host, self.port))
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't connect: %s\n" % msg[1], file=sys.stderr)
             return
 
@@ -77,7 +76,7 @@ class RvCommunicator:
             self.sock.sendall(b"NEWGREETING %d %s" % (len(greeting), greeting.encode("utf-8")))
             if self.noPingPong:
                 self.sock.sendall(b"PINGPONGCONTROL 1 0")
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't send greeting: %s\n" % msg[1], file=sys.stderr)
             return
 
@@ -146,7 +145,7 @@ class RvCommunicator:
                 self.sock.close()
                 self.connected = False
 
-        except socket.error as msg:
+        except OSError as msg:
             if (
                 msg.strerror != "Resource temporarily unavailable"
                 and msg.strerror != "A non-blocking socket operation could not be completed immediately"
@@ -182,7 +181,7 @@ class RvCommunicator:
             messContents = self.sock.recv(messSize)
             self.sock.setblocking(0)
 
-        except socket.error as msg:
+        except OSError as msg:
             print("ERROR: can't process message: %s\n" % msg[1], file=sys.stderr)
             self.sock.setblocking(0)
 

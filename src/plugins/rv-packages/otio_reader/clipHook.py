@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from effectHook import *  # noqa: F403
+from effectHook import *
 
 
 # this is an example for clip that can be removed or augmented as required

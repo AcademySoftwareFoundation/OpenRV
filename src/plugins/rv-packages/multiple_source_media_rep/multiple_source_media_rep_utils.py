@@ -8,10 +8,10 @@
 # agreement to the ShotGrid Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by ShotGrid Software Inc.
 
+from collections import namedtuple
+
 from rv import commands as rvc
 from rv import extra_commands as rve
-
-from collections import namedtuple
 
 
 def is_url(url):
