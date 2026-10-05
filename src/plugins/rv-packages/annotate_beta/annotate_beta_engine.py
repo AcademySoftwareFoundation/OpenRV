@@ -2,32 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
-import os
-import uuid
+from contextlib import contextmanager
+from dataclasses import dataclass
+from functools import partial
+from typing import NamedTuple
 
 from rv import commands
 
-from annotate_beta_widget import (
-    TOOL_PEN,
-    TOOL_AIRBRUSH,
-    TOOL_ERASER,
-    TOOL_RECT,
-    TOOL_CIRCLE,
-    TOOL_ARROW,
-    TOOL_LINE,
-    TOOL_TEXT,
-)
-
-_SHAPE_TOOLS = {TOOL_RECT, TOOL_CIRCLE, TOOL_ARROW, TOOL_LINE}
-_DRAWING_TOOLS = _SHAPE_TOOLS | {TOOL_TEXT, TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER}
-
-TABLE_NAME = "annotate_beta_shape"
+import annotate_beta_constants as constants
+import annotate_beta_paint as paint
 
 _PREFIX = {
-    TOOL_RECT: "rect",
-    TOOL_CIRCLE: "ellipse",
-    TOOL_ARROW: "arrow",
-    TOOL_LINE: "line",
+    constants.Tool.RECT: "rect",
+    constants.Tool.CIRCLE: "ellipse",
+    constants.Tool.ARROW: "arrow",
+    constants.Tool.LINE: "line",
 }
 
 _SIZE_SCALE = 1.0 / 10000.0
@@ -36,29 +25,71 @@ _SIZE_SCALE = 1.0 / 10000.0
 # Slider 1→100 maps linearly to 0.001→0.024 in normalized image-space units.
 _PEN_WIDTH_MIN = 0.001
 _PEN_WIDTH_MAX = 0.024
-_PEN_SLIDER_MIN = 1
-_PEN_SLIDER_MAX = 100
 
-_SIZE_MIN = 0.001
+_BORDER_WIDTH_MIN = 0.001
 
 # Base WCS fractions for each font size tier (desired px at zoom=1 / 1080).
-# Multiplied by _screen_scale() at draw time — identical to how stroke
-# border_width uses _SIZE_SCALE * _screen_scale(). This gives:
-#   - constant initial screen size regardless of zoom (draw-time compensation)
+# Multiplied by _screen_scale() when the text is created, so:
+#   - new text has the same initial screen size regardless of zoom
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
-_FONT_SIZE_WCS_BASE = {"small": 24.0 / 1080.0, "medium": 48.0 / 1080.0, "large": 72.0 / 1080.0}
+_FONT_SIZE_WCS_BASE = {
+    constants.FontSize.SMALL: 24.0 / 1080.0,
+    constants.FontSize.MEDIUM: 48.0 / 1080.0,
+    constants.FontSize.LARGE: 72.0 / 1080.0,
+}
+
+
+class _Vec2(NamedTuple):
+    x: float
+    y: float
+
+
+@dataclass
+class ToolState:
+    """Style remembered separately for each tool."""
+
+    color: object  # QtGui.QColor
+    size: int = constants.DEFAULT_SIZE
+    opacity: int = constants.DEFAULT_OPACITY
+    color_modifier: constants.ColorModifier = constants.ColorModifier.NORMAL
+    filled: bool = False
+
+
+@dataclass
+class DrawSettings:
+    """Drawing state owned by the mode and read by the engine at draw time."""
+
+    tool_states: dict
+    tool: constants.Tool = constants.Tool.PEN
+    eraser_brush: constants.Brush = constants.Brush.CIRCLE
+    font_family: str = constants.DEFAULT_FONT_FAMILY
+    font_size: constants.FontSize = constants.FontSize.MEDIUM
+    font_bold: bool = False
+    font_italic: bool = False
+    font_underline: bool = False
+    store_on_source: bool = False
+    auto_mark: bool = False
+    sync_whole_strokes: bool = False  # True = batch stroke; False = send each point live
+    scale_brush: bool = True
+
+    @property
+    def tool_state(self):
+        return self.tool_states[self.tool]
 
 
 class AnnotateDrawEngine:
-    def __init__(self, mode):
-        self._mode = mode
+    def __init__(self, settings, on_history_changed, on_draw_started):
+        self._settings = settings
+        self._on_history_changed = on_history_changed
+        self._on_draw_started = on_draw_started
+
+        # Paint node set via set-current-annotate-mode-node; see _find_paint_node.
+        self.preferred_paint_node = ""
 
         # Shape drag state
         self._anchor = None
-        self._last_pei = None
+        self._last_image_point = None
         self._current_shape = None
-        self._current_node = None
-        self._current_frame = None
         self._shape_type = None
         self._shape_active = False
         self._shift_transition = False
@@ -68,7 +99,6 @@ class AnnotateDrawEngine:
         self._text_active = False
         self._text_buffer = ""
         self._text_node = None
-        self._text_anchor = None  # _Vec2 position recorded on pointer-push
         self._text_paint_node = None
         self._text_frame = None
         self._text_registered = False
@@ -77,7 +107,7 @@ class AnnotateDrawEngine:
         self._pen_stroke = None  # current stroke node name (set on push, cleared on release)
         self._pen_paint_node = None
         self._pen_frame = None
-        self._pen_stroke_width = 0.0  # constant width for the active stroke, used per-drag insert
+        self._pen_stroke_width = 0.0  # base width for the active stroke, scaled by pressure per point
         # True while the physical eraser end of a Wacom stylus is in use; forces erase
         # mode regardless of the selected tool.
         self._stylus_erasing = False
@@ -89,7 +119,7 @@ class AnnotateDrawEngine:
 
         # Undo/redo stacks — each entry: (paint_node, frame, node_name)
         # node_name is the full prop path prefix, e.g. "RVPaint_1.rect:3:42:host_123"
-        self._undo_stack = []  # list of (paint_node, frame, node_name)
+        self._undo_stack = []
         self._redo_stack = []
 
     # ------------------------------------------------------------------
@@ -97,25 +127,31 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def setup_event_table(self, mode):
-        mode.defineEventTable(TABLE_NAME, self.bindings)
-        mode.defineEventTableRegex(TABLE_NAME, self.regex_bindings)
+        mode.defineEventTable(constants.EVENT_TABLE_NAME, self.bindings)
+        mode.defineEventTableRegex(constants.EVENT_TABLE_NAME, self.regex_bindings)
 
     @property
     def bindings(self):
+        push_constrained = partial(self.on_push, constrained=True)
+        drag_constrained = partial(self.on_drag, constrained=True)
+        release_constrained = partial(self.on_release, constrained=True)
+        commit = partial(self.on_text_commit, reject=False)
+        commit_and_propagate = partial(self.on_text_commit, reject=True)
+        insert_new_line = partial(self._append_text, text="\n")
         return [
-            # Shape pointer events
+            # Pointer events (shapes, strokes and text placement)
             ("pointer-1--push", self.on_push, "Start shape/text"),
             ("pointer-1--drag", self.on_drag, "Update shape"),
             ("pointer-1--release", self.on_release, "Commit shape"),
-            ("pointer-1--shift--push", self.on_push_shift, "Start shape (constrained)"),
-            ("pointer-1--shift--drag", self.on_drag_shift, "Update shape (constrained)"),
-            ("pointer-1--shift--release", self.on_release_shift, "Commit shape (constrained)"),
+            ("pointer-1--shift--push", push_constrained, "Start shape (constrained)"),
+            ("pointer-1--shift--drag", drag_constrained, "Update shape (constrained)"),
+            ("pointer-1--shift--release", release_constrained, "Commit shape (constrained)"),
             ("stylus-pen--push", self.on_push, "Start shape/text (stylus)"),
             ("stylus-pen--drag", self.on_drag, "Update shape (stylus)"),
             ("stylus-pen--release", self.on_release, "Commit shape (stylus)"),
-            ("stylus-pen--shift--push", self.on_push_shift, "Start shape (stylus, constrained)"),
-            ("stylus-pen--shift--drag", self.on_drag_shift, "Update shape (stylus, constrained)"),
-            ("stylus-pen--shift--release", self.on_release_shift, "Commit shape (stylus, constrained)"),
+            ("stylus-pen--shift--push", push_constrained, "Start shape (stylus, constrained)"),
+            ("stylus-pen--shift--drag", drag_constrained, "Update shape (stylus, constrained)"),
+            ("stylus-pen--shift--release", release_constrained, "Commit shape (stylus, constrained)"),
             ("stylus-eraser--push", self.on_stylus_eraser_push, "Start (stylus eraser end)"),
             ("stylus-eraser--drag", self.on_stylus_eraser_drag, "Draw (stylus eraser end)"),
             ("stylus-eraser--release", self.on_stylus_eraser_release, "Commit (stylus eraser end)"),
@@ -125,20 +161,20 @@ class AnnotateDrawEngine:
             # Text editing — explicit keys
             ("key-down--backspace", self.on_text_backspace, "Delete char"),
             ("key-down--delete", self.on_text_backspace, "Delete char"),
-            ("key-down--space", self.on_text_space, "Insert space"),
-            ("key-down--shift--enter", self.on_text_new_line, "Insert a new line"),
-            ("key-down--shift--keypad-enter", self.on_text_new_line, "Insert a new line"),
-            ("key-down--return", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
-            ("key-down--enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
-            ("key-down--keypad-enter", lambda event: self.on_text_commit(event, reject=False), "Commit text"),
-            # Session events
-            ("frame-changed", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-session-write", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-session-write-copy", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-play-start", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-session-read", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
-            ("before-graph-view-change", lambda event: self.on_text_commit(event, reject=True), "Commit text"),
+            ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
+            ("key-down--shift--enter", insert_new_line, "Insert a new line"),
+            ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
+            ("key-down--return", commit, "Commit text"),
+            ("key-down--enter", commit, "Commit text"),
+            ("key-down--keypad-enter", commit, "Commit text"),
             ("key-down--escape", self.on_text_cancel, "Cancel text"),
+            # Session events
+            ("frame-changed", commit_and_propagate, "Commit text"),
+            ("before-session-write", commit_and_propagate, "Commit text"),
+            ("before-session-write-copy", commit_and_propagate, "Commit text"),
+            ("before-play-start", commit_and_propagate, "Commit text"),
+            ("before-session-read", commit_and_propagate, "Commit text"),
+            ("before-graph-view-change", commit_and_propagate, "Commit text"),
         ]
 
     @property
@@ -154,28 +190,6 @@ class AnnotateDrawEngine:
     # Public helpers called by the mode
     # ------------------------------------------------------------------
 
-    def update_text_style(self):
-        """Update all font properties on the active text node.
-
-        Called whenever the user changes family, size, bold, italic, or underline
-        while a text node is being edited so changes apply immediately.
-        """
-        if not self._text_active or self._text_node is None:
-            return
-        try:
-            font_size = _FONT_SIZE_WCS_BASE.get(self._mode._font_size, 48.0 / 1080.0) * self._screen_scale()
-            font_weight = "bold" if self._mode._font_bold else "normal"
-            font_style = "italic" if self._mode._font_italic else "normal"
-            text_deco = "underline" if self._mode._font_underline else "none"
-            commands.setStringProperty(f"{self._text_node}.fontFamily", [self._mode._font_family], True)
-            commands.setFloatProperty(f"{self._text_node}.fontSize", [font_size], True)
-            commands.setStringProperty(f"{self._text_node}.fontWeight", [font_weight], True)
-            commands.setStringProperty(f"{self._text_node}.fontStyle", [font_style], True)
-            commands.setStringProperty(f"{self._text_node}.textDecoration", [text_deco], True)
-            commands.redraw()
-        except Exception as e:
-            print(f"[annotate_beta] update_text_style error: {e}")
-
     def commit_text_if_active(self):
         if self._text_active:
             self._commit_text()
@@ -184,163 +198,71 @@ class AnnotateDrawEngine:
     # State helpers
     # ------------------------------------------------------------------
 
-    def _is_shape_tool(self):
-        return self._mode._tool in _SHAPE_TOOLS
-
     def _screen_scale(self):
         """Scale factor that makes image-space widths screen-constant.
 
-        At zoom=1 (fit-to-window) for a 16:9 image returns 1.0.
-        At zoom=2 returns 0.5 — stored width halved so the rendered screen
-        width stays the same as at zoom=1.
-        Also accounts for image aspect ratio: a letterboxed 2.39:1 image has
-        a smaller proj_scale than 16:9, so this factor compensates to give the
-        same screen-pixel width for any image format.
+        Returns the view height divided by the image height in event pixels, so
+        doubling the zoom halves the result and the rendered width stays the same.
+        Because it is based on the displayed image height, it also gives the same
+        screen-pixel width for any image aspect ratio.
         """
-        name = self._current_source_name
-        if not name:
+        source_name = self._current_source_name
+        if not source_name:
             return 1.0
-        try:
-            view_h = commands.viewSize()[1]
-            p0 = commands.imageToEventSpace(name, (0.0, 0.0), True)
-            p1 = commands.imageToEventSpace(name, (0.0, 0.01), True)
-            px_per_unit = abs(p1[1] - p0[1]) / 0.01
-            return view_h / max(px_per_unit, 0.1)
-        except Exception:
-            return 1.0
+        view_height = commands.viewSize()[1]
+        event_origin = commands.imageToEventSpace(source_name, (0.0, 0.0), True)
+        event_offset = commands.imageToEventSpace(source_name, (0.0, 0.01), True)
+        pixels_per_unit = abs(event_offset[1] - event_origin[1]) / 0.01
+        return view_height / max(pixels_per_unit, 0.1)
+
+    def _font_size(self):
+        base = _FONT_SIZE_WCS_BASE.get(self._settings.font_size, _FONT_SIZE_WCS_BASE[constants.FontSize.MEDIUM])
+        return base * self._screen_scale()
 
     def _border_width(self):
-        scale = self._screen_scale() if getattr(self._mode, "_scale_brush", True) else 1.0
-        return max(_SIZE_MIN, self._mode._size * _SIZE_SCALE * scale)
-
-    def _colors(self):
-        c = self._mode._color
-        alpha = self._mode._opacity / 100.0
-        border = [c.redF(), c.greenF(), c.blueF(), alpha]
-        tool = self._mode._tool
-        if tool == TOOL_ARROW:
-            inner = list(border)
-        elif self._mode._filled and tool in (TOOL_RECT, TOOL_CIRCLE):
-            inner = list(border)
-        else:
-            inner = [c.redF(), c.greenF(), c.blueF(), 0.0]
-        return border, inner
+        scale = self._screen_scale() if self._settings.scale_brush else 1.0
+        return max(_BORDER_WIDTH_MIN, self._settings.tool_state.size * _SIZE_SCALE * scale)
 
     # ------------------------------------------------------------------
     # Paint node resolution
     # ------------------------------------------------------------------
 
-    def set_tags(self):
-        view_node = commands.viewNode()
-        if view_node:
-            for node in commands.closestNodesOfType("RVPaint"):
-                annotate_tag = f"{node}.tag.annotate"
-                if not commands.propertyExists(annotate_tag):
-                    commands.newProperty(annotate_tag, commands.StringType, 1)
-                commands.setStringProperty(annotate_tag, [""], True)
-
-    def remove_tags(self):
-        view_node = commands.viewNode()
-        if view_node:
-            for node in commands.closestNodesOfType("RVPaint"):
-                annotate_tag = f"{node}.tag.annotate"
-                if commands.propertyExists(annotate_tag):
-                    commands.deleteProperty(annotate_tag)
-
     def _find_paint_node(self):
+        frame = commands.frame()
         try:
-            frame = commands.frame()
             infos = commands.metaEvaluate(frame, commands.viewNode())
-
-            # If live_review has nominated a specific paint node (via
-            # set-current-annotate-mode-node), prefer it so that RV-drawn
-            # annotations land on the annotation source group's node — the same
-            # one live_review tracks — rather than the local pipeline node.
-            preferred = getattr(self._mode, "_preferred_paint_node", "")
-            if preferred:
-                for info in infos:
-                    if info.get("node") == preferred:
-                        return preferred, info["frame"]
-                # Preferred node isn't part of the current view (e.g. it was set
-                # while viewing a different view/layout) — fall through to normal
-                # resolution below rather than trusting a stale override. Matches
-                # legacy annotate_mode.mu's updateCurrentNode(), which never uses
-                # _userSelectedNode unless it's found in the current metaEvaluate.
-
-            store_on_src = getattr(self._mode, "_store_on_src", False)
-            if store_on_src:
-                for info in infos:
-                    if info.get("nodeType") == "RVPaint":
-                        node = info["node"]
-                        try:
-                            grp = commands.nodeGroup(node)
-                            if grp and commands.nodeType(grp) == "RVSourceGroup":
-                                return node, info["frame"]
-                        except Exception:
-                            pass
-
-            for info in infos:
-                if info.get("nodeType") == "RVPaint":
-                    return info["node"], info["frame"]
-            return None, frame
-        except Exception:
+        except Exception:  # raised when the view node name is invalid
             return None, None
 
-    def _next_id(self, paint_node):
-        prop = f"{paint_node}.paint.nextId"
-        if not commands.propertyExists(prop):
-            commands.newProperty(prop, commands.IntType, 1)
-            commands.setIntProperty(prop, [0])
-        i = commands.getIntProperty(prop)[0] + 1
-        commands.setIntProperty(prop, [i])
-        return i
+        # If an external package has nominated a specific paint node (via
+        # set-current-annotate-mode-node), prefer it so that RV-drawn
+        # annotations land on the annotation source group's node rather than the local pipeline node.
+        if self.preferred_paint_node:
+            for info in infos:
+                if info.get("node") == self.preferred_paint_node:
+                    return self.preferred_paint_node, info["frame"]
+            # Preferred node isn't part of the current view (e.g. it was set
+            # while viewing a different view/layout) — fall through to normal
+            # resolution below rather than trusting a stale override. Matches
+            # legacy annotate_mode.mu's updateCurrentNode(), which never uses
+            # _userSelectedNode unless it's found in the current metaEvaluate.
 
-    def _ensure_visible(self, paint_node):
-        prop = f"{paint_node}.paint.show"
-        if not commands.propertyExists(prop):
-            commands.newProperty(prop, commands.IntType, 1)
-        commands.setIntProperty(prop, [1], True)
+        if self._settings.store_on_source:
+            for info in infos:
+                if info.get("nodeType") == "RVPaint":
+                    node = info["node"]
+                    group = commands.nodeGroup(node)
+                    if group and commands.nodeType(group) == "RVSourceGroup":
+                        return node, info["frame"]
 
-    def _unique_name(self, paint_node, prefix, frame):
-        node_id = self._next_id(paint_node)
-        host = commands.myNetworkHost().replace(".", "_")
-        pid = os.getpid()
-        return f"{paint_node}.{prefix}:{node_id}:{frame}:{host}_{pid}"
+        for info in infos:
+            if info.get("nodeType") == "RVPaint":
+                return info["node"], info["frame"]
+        return None, frame
 
-    def _add_to_order(self, paint_node, frame, node_name):
-        """Insert the component into the frame draw order."""
-
-        def _ensure(prop, ptype, w):
-            if not commands.propertyExists(prop):
-                commands.newProperty(prop, ptype, w)
-
-        component = node_name.split(".")[-1]
-        order_prop = f"{paint_node}.frame:{frame}.order"
-        _ensure(order_prop, commands.StringType, 1)
-        if component not in commands.getStringProperty(order_prop):
-            commands.insertStringProperty(order_prop, [component])
-
-    def _register_undo_entry(self, paint_node, frame, shape_uuid):
-        def _ensure(prop, ptype, w):
-            if not commands.propertyExists(prop):
-                commands.newProperty(prop, ptype, w)
-
-        host = commands.myNetworkHost().replace(".", "_")
-        pid = os.getpid()
-        undo_prop = f"{paint_node}.frame:{frame}.userUndoStack:{host}_{pid}"
-        _ensure(undo_prop, commands.StringType, 1)
-        commands.insertStringProperty(undo_prop, [shape_uuid, "create"])
-
-        if getattr(self._mode, "_auto_mark", False):
-            try:
-                commands.markFrame(commands.frame(), True)
-            except Exception:
-                pass
-
-    def _frame_order_and_undo(self, paint_node, frame, node_name, shape_uuid):
-        """Insert the component into the frame draw order and undo stack."""
-        self._add_to_order(paint_node, frame, node_name)
-        self._register_undo_entry(paint_node, frame, shape_uuid)
+    def _auto_mark_frame(self):
+        if self._settings.auto_mark:
+            commands.markFrame(commands.frame(), True)
 
     # ------------------------------------------------------------------
     # Pointer / coordinate helpers
@@ -358,234 +280,46 @@ class AnnotateDrawEngine:
         default sequence) the innermost entry may be a virtual composite image whose
         source name is not valid for eventToImageSpace.
         """
-        try:
-            raw = event.pointer()
-            dpr = commands.devicePixelRatio()
-            ip = (raw[0] * dpr, raw[1] * dpr)
+        pointer = event.pointer()
+        device_pixel_ratio = commands.devicePixelRatio()
+        device_pointer = (pointer[0] * device_pixel_ratio, pointer[1] * device_pixel_ratio)
 
-            pinfos = commands.imagesAtPixel(raw, "annotate")
-            if not pinfos:
-                return "", None
-
-            for info in reversed(pinfos):
-                name = info.get("name", "")
-                if not name:
-                    continue
-                try:
-                    pei_raw = commands.eventToImageSpace(name, ip, True)
-                    return name, _Vec2(pei_raw[0], pei_raw[1])
-                except Exception:
-                    continue
-
-            return "", None
-        except Exception as e:
-            import traceback
-
-            print(f"[annotate_beta] _pointer_location error: {e}")
-            traceback.print_exc()
+        image_infos = commands.imagesAtPixel(pointer, "annotate")
+        if not image_infos:
             return "", None
 
-    # ------------------------------------------------------------------
-    # Shape node creation / update
-    # ------------------------------------------------------------------
+        for info in reversed(image_infos):
+            source_name = info.get("name", "")
+            if not source_name:
+                continue
+            try:
+                image_point = commands.eventToImageSpace(source_name, device_pointer, True)
+                return source_name, _Vec2(image_point[0], image_point[1])
+            except Exception:
+                continue
 
-    def _new_shape(self, paint_node, frame, prefix, anchor, cur):
-        try:
-            self._ensure_visible(paint_node)
-            n = self._unique_name(paint_node, prefix, frame)
-            bw = self._border_width()
-            border, inner = self._colors()
-            shape_uuid = str(uuid.uuid4())
-
-            def _ensure(prop, ptype, w):
-                if not commands.propertyExists(prop):
-                    commands.newProperty(prop, ptype, w)
-
-            _ensure(f"{n}.startFrame", commands.IntType, 1)
-            _ensure(f"{n}.duration", commands.IntType, 1)
-            _ensure(f"{n}.eye", commands.IntType, 1)
-            commands.setIntProperty(f"{n}.startFrame", [frame], True)
-            commands.setIntProperty(f"{n}.duration", [1], True)
-            commands.setIntProperty(f"{n}.eye", [2], True)
-
-            if prefix in ("rect", "ellipse"):
-                for prop, w in ((".min", 2), (".max", 2), (".innerColor", 4), (".borderColor", 4), (".borderWidth", 1)):
-                    _ensure(f"{n}{prop}", commands.FloatType, w)
-                min_x = min(anchor.x, cur.x)
-                min_y = min(anchor.y, cur.y)
-                max_x = max(anchor.x, cur.x)
-                max_y = max(anchor.y, cur.y)
-                commands.setFloatProperty(f"{n}.min", [min_x, min_y], True)
-                commands.setFloatProperty(f"{n}.max", [max_x, max_y], True)
-                commands.setFloatProperty(f"{n}.innerColor", inner, True)
-                commands.setFloatProperty(f"{n}.borderColor", border, True)
-                commands.setFloatProperty(f"{n}.borderWidth", [bw], True)
-            else:
-                for prop, w in ((".startPos", 2), (".endPos", 2), (".borderColor", 4), (".borderWidth", 1)):
-                    _ensure(f"{n}{prop}", commands.FloatType, w)
-                commands.setFloatProperty(f"{n}.startPos", [anchor.x, anchor.y], True)
-                commands.setFloatProperty(f"{n}.endPos", [cur.x, cur.y], True)
-                commands.setFloatProperty(f"{n}.borderColor", border, True)
-                commands.setFloatProperty(f"{n}.borderWidth", [bw], True)
-                if prefix == "arrow":
-                    _ensure(f"{n}.innerColor", commands.FloatType, 4)
-                    _ensure(f"{n}.thickness", commands.FloatType, 1)
-                    commands.setFloatProperty(f"{n}.innerColor", inner, True)
-                    commands.setFloatProperty(f"{n}.thickness", [bw], True)
-
-            _ensure(f"{n}.uuid", commands.StringType, 1)
-            _ensure(f"{n}.softDeleted", commands.IntType, 1)
-            commands.setStringProperty(f"{n}.uuid", [shape_uuid], True)
-            commands.setIntProperty(f"{n}.softDeleted", [0], True)
-
-            self._frame_order_and_undo(paint_node, frame, n, shape_uuid)
-
-            commands.redraw()
-            return n
-        except Exception as e:
-            import traceback
-
-            print(f"[annotate_beta] _new_shape error: {e}")
-            traceback.print_exc()
-            return None
-
-    def _update_shape(self, shape_node, prefix, anchor, cur):
-        if shape_node is None:
-            return
-        try:
-            if prefix in ("rect", "ellipse"):
-                commands.setFloatProperty(f"{shape_node}.min", [min(anchor.x, cur.x), min(anchor.y, cur.y)], True)
-                commands.setFloatProperty(f"{shape_node}.max", [max(anchor.x, cur.x), max(anchor.y, cur.y)], True)
-            else:
-                commands.setFloatProperty(f"{shape_node}.endPos", [cur.x, cur.y], True)
-            commands.redraw()
-        except Exception as e:
-            print(f"[annotate_beta] _update_shape error: {e}")
+        return "", None
 
     # ------------------------------------------------------------------
-    # Text node creation / update
+    # Text editing state
     # ------------------------------------------------------------------
-
-    def _new_text_node(self, paint_node, frame, pos):
-        """Create an empty text node at pos and return its property path."""
-        self._begin_sync()
-        try:
-            self._ensure_visible(paint_node)
-            n = self._unique_name(paint_node, "text", frame)
-            shape_uuid = str(uuid.uuid4())
-
-            c = self._mode._color
-            color = [c.redF(), c.greenF(), c.blueF(), 1.0]
-
-            font_size = _FONT_SIZE_WCS_BASE.get(self._mode._font_size, 48.0 / 1080.0) * self._screen_scale()
-            font_weight = "bold" if self._mode._font_bold else "normal"
-            font_style = "italic" if self._mode._font_italic else "normal"
-            text_deco = "underline" if self._mode._font_underline else "none"
-
-            def _ensure(prop, ptype, w):
-                if not commands.propertyExists(prop):
-                    commands.newProperty(prop, ptype, w)
-
-            for prop, ptype, w in (
-                (".position", commands.FloatType, 2),
-                (".color", commands.FloatType, 4),
-                (".size", commands.FloatType, 1),
-                (".scale", commands.FloatType, 1),
-                (".rotation", commands.FloatType, 1),
-                (".spacing", commands.FloatType, 1),
-                (".font", commands.StringType, 1),
-                (".text", commands.StringType, 1),
-                (".origin", commands.StringType, 1),
-                (".debug", commands.IntType, 1),
-                (".startFrame", commands.IntType, 1),
-                (".duration", commands.IntType, 1),
-                (".mode", commands.IntType, 1),
-            ):
-                _ensure(f"{n}{prop}", ptype, w)
-
-            commands.setFloatProperty(f"{n}.position", [pos.x, pos.y], True)
-            commands.setFloatProperty(f"{n}.color", color, True)
-            commands.setFloatProperty(f"{n}.size", [0.01], True)
-            commands.setFloatProperty(f"{n}.scale", [1.0], True)
-            commands.setFloatProperty(f"{n}.rotation", [0.0], True)
-            commands.setFloatProperty(f"{n}.spacing", [0.8], True)
-            commands.setStringProperty(f"{n}.font", [""], True)
-            commands.setStringProperty(f"{n}.text", ["|"], True)
-            commands.setStringProperty(f"{n}.origin", [""], True)
-            commands.setIntProperty(f"{n}.debug", [0], True)
-            commands.setIntProperty(f"{n}.startFrame", [frame], True)
-            commands.setIntProperty(f"{n}.duration", [1], True)
-            commands.setIntProperty(f"{n}.mode", [0], True)
-
-            for prop, ptype, w in (
-                (".fontFamily", commands.StringType, 1),
-                (".fontSize", commands.FloatType, 1),
-                (".fontWeight", commands.StringType, 1),
-                (".fontStyle", commands.StringType, 1),
-                (".textDecoration", commands.StringType, 1),
-                (".textAlign", commands.StringType, 1),
-            ):
-                _ensure(f"{n}{prop}", ptype, w)
-
-            commands.setStringProperty(f"{n}.fontFamily", [self._mode._font_family], True)
-            commands.setFloatProperty(f"{n}.fontSize", [font_size], True)
-            commands.setStringProperty(f"{n}.fontWeight", [font_weight], True)
-            commands.setStringProperty(f"{n}.fontStyle", [font_style], True)
-            commands.setStringProperty(f"{n}.textDecoration", [text_deco], True)
-            commands.setStringProperty(f"{n}.textAlign", ["left"], True)
-
-            _ensure(f"{n}.uuid", commands.StringType, 1)
-            _ensure(f"{n}.softDeleted", commands.IntType, 1)
-            commands.setStringProperty(f"{n}.uuid", [shape_uuid], True)
-            commands.setIntProperty(f"{n}.softDeleted", [0], True)
-
-            self._add_to_order(paint_node, frame, n)
-            commands.redraw()
-            self._end_sync()
-            return n
-        except Exception as e:
-            import traceback
-
-            print(f"[annotate_beta] _new_text_node error: {e}")
-            traceback.print_exc()
-            self._end_sync()
-            return None
-
-    def _ensure_text_node(self):
-        """Create the text node if not yet created."""
-        if self._text_node is not None:
-            return
-        if not self._text_paint_node or self._text_anchor is None:
-            return
-        node = self._new_text_node(self._text_paint_node, self._text_frame, self._text_anchor)
-        if node:
-            self._text_node = node
 
     def _register_text_undo(self):
-        if self._text_registered or self._text_node is None:
+        if self._text_registered:
             return
 
-        shape_uuid = self._uuid_for(self._text_node)
-        self._register_undo_entry(self._text_paint_node, self._text_frame, shape_uuid)
+        self._auto_mark_frame()
         self._undo_stack.append((self._text_paint_node, self._text_frame, self._text_node))
         self._redo_stack.clear()
         self._text_registered = True
-        self._notify_buttons()
+        self._on_history_changed()
 
     def _update_text_display(self, cursor=True):
-        if self._text_node is None:
-            return
-        display = self._text_buffer + "|" if cursor else self._text_buffer
-        try:
-            commands.setStringProperty(f"{self._text_node}.text", [display], True)
-            commands.redraw()
-        except Exception as e:
-            print(f"[annotate_beta] _update_text_display error: {e}")
+        paint.set_text(self._text_node, self._text_buffer + "|" if cursor else self._text_buffer)
 
     def _reset_text(self):
         self._text_active = False
         self._text_node = None
-        self._text_anchor = None
         self._text_buffer = ""
         self._text_paint_node = None
         self._text_frame = None
@@ -601,128 +335,26 @@ class AnnotateDrawEngine:
         commands.sendInternalEvent("annotate-text-committed")
 
     def _cancel_text(self):
-        if self._text_node:
-            try:
-                self._update_text_display(cursor=False)
-                self._remove_from_order(self._text_paint_node, self._text_frame, self._text_node)
-                commands.setIntProperty(f"{self._text_node}.softDeleted", [1], True)
-                commands.redraw()
-            except Exception:
-                pass
+        self._update_text_display(cursor=False)
+        paint.soft_delete(self._text_paint_node, self._text_frame, self._text_node)
+        commands.redraw()
 
         if self._text_registered and self._undo_stack:
             _, _, last_node = self._undo_stack[-1]
             if last_node == self._text_node:
                 self._undo_stack.pop()
-                self._notify_buttons()
+                self._on_history_changed()
 
         self._reset_text()
 
     # ------------------------------------------------------------------
-    # Pen/eraser stroke node creation
+    # Pen/eraser strokes
     # ------------------------------------------------------------------
 
     def _pressure_width(self, event):
-        """Return pen width scaled by stylus pressure; falls back to 1.0 for mouse."""
-        try:
-            p = max(0.01, min(1.0, event.pressure()))
-        except Exception:
-            p = 1.0
-        return self._pen_stroke_width * p
-
-    def _new_stroke(self, paint_node, frame, first_point, brush, erase_mode, first_point_width=None):
-        """Create a new pen/eraser stroke component and return its property path."""
-        try:
-            self._ensure_visible(paint_node)
-            n = self._unique_name(paint_node, "pen", frame)
-            stroke_uuid = str(uuid.uuid4())
-
-            c = self._mode._color
-            alpha = self._mode._opacity / 100.0
-            blend_mode = getattr(self._mode, "_color_modifier", "normal")
-
-            if blend_mode == "additive":
-                s = 1.0 + alpha
-                color = [c.redF() * s, c.greenF() * s, c.blueF() * s, alpha * alpha]
-            elif blend_mode == "darken":
-                s = (1.0 - alpha) * 0.75 + 0.25
-                color = [c.redF() * s, c.greenF() * s, c.blueF() * s, alpha * alpha]
-            else:
-                color = [c.redF(), c.greenF(), c.blueF(), alpha]
-
-            t = (self._mode._size - _PEN_SLIDER_MIN) / (_PEN_SLIDER_MAX - _PEN_SLIDER_MIN)
-            scale = self._screen_scale() if getattr(self._mode, "_scale_brush", True) else 1.0
-            width = (_PEN_WIDTH_MIN + t * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
-            self._pen_stroke_width = width
-            push_width = first_point_width if first_point_width is not None else width
-
-            def _ensure(prop, ptype, w):
-                if not commands.propertyExists(prop):
-                    commands.newProperty(prop, ptype, w)
-
-            for prop, ptype, w in (
-                (".color", commands.FloatType, 4),
-                (".width", commands.FloatType, 1),
-                (".brush", commands.StringType, 1),
-                (".uuid", commands.StringType, 1),
-                (".points", commands.FloatType, 2),
-                (".join", commands.IntType, 1),
-                (".cap", commands.IntType, 1),
-                (".splat", commands.IntType, 1),
-                (".mode", commands.IntType, 1),
-                (".debug", commands.IntType, 1),
-                (".smoothingWidth", commands.FloatType, 1),
-                (".startFrame", commands.IntType, 1),
-                (".duration", commands.IntType, 1),
-                # Stamp-brush properties (only take effect for brush names other than
-                # "circle"/"gauss" — see PaintIPNode::compilePenComponent). Not yet
-                # exposed in this UI; written here so future sliders/pickers have a
-                # ready-made property to set.
-                (".hardness", commands.FloatType, 1),
-                (".tipTexture", commands.StringType, 1),
-                (".blendMode", commands.IntType, 1),
-            ):
-                _ensure(f"{n}{prop}", ptype, w)
-
-            # mode: 0=OverMode, 1=EraseMode, 2=ScaleMode (burn/dodge use ScaleMode)
-            if erase_mode:
-                stroke_mode = 1
-            elif blend_mode in ("additive", "darken"):
-                stroke_mode = 2  # ScaleMode
-            else:
-                stroke_mode = 0  # OverMode
-
-            # All properties read by _get_paint_start must be written before .points,
-            # because setting .points fires graph-state-change which immediately tries
-            # to build the PAINT_START payload for the LiveReview package.
-            _ensure(f"{n}.softDeleted", commands.IntType, 1)
-            commands.setFloatProperty(f"{n}.color", color, True)
-            commands.setFloatProperty(f"{n}.width", [push_width], True)
-            commands.setStringProperty(f"{n}.brush", [brush], True)
-            commands.setIntProperty(f"{n}.mode", [stroke_mode], True)
-            commands.setIntProperty(f"{n}.startFrame", [frame], True)
-            commands.setIntProperty(f"{n}.duration", [1], True)
-            commands.setStringProperty(f"{n}.uuid", [stroke_uuid], True)
-            commands.setIntProperty(f"{n}.softDeleted", [0], True)
-            commands.setFloatProperty(f"{n}.points", [first_point.x, first_point.y], True)
-            commands.setIntProperty(f"{n}.join", [1], True)  # RoundJoin
-            commands.setIntProperty(f"{n}.cap", [2], True)  # RoundCap
-            commands.setIntProperty(f"{n}.splat", [1 if brush == "gauss" else 0], True)
-            commands.setIntProperty(f"{n}.debug", [0], True)
-            commands.setFloatProperty(f"{n}.smoothingWidth", [1.0], True)
-            commands.setFloatProperty(f"{n}.hardness", [100.0], True)
-            commands.setStringProperty(f"{n}.tipTexture", [""], True)
-            commands.setIntProperty(f"{n}.blendMode", [2 if blend_mode == "additive" else 0], True)
-
-            self._frame_order_and_undo(paint_node, frame, n, stroke_uuid)
-            commands.redraw()
-            return n
-        except Exception as e:
-            import traceback as _tb
-
-            print(f"[annotate_beta] _new_stroke error: {e}")
-            _tb.print_exc()
-            return None
+        """Return pen width scaled by the event pressure."""
+        pressure = max(0.01, min(1.0, event.pressure()))
+        return self._pen_stroke_width * pressure
 
     def _pen_push(self, event):
         if commands.isPlaying():
@@ -733,69 +365,61 @@ class AnnotateDrawEngine:
             self._end_sync()
             event.reject()
             return
-        name, pei = self._pointer_location(event)
-        if not name:
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
             self._end_sync()
             event.reject()
             return
-        self._current_source_name = name
+        self._current_source_name = source_name
         # Refresh cached stroke width so _pressure_width() uses the current
         # zoom's _screen_scale(), not the stale value from the previous stroke.
-        t = (self._mode._size - _PEN_SLIDER_MIN) / (_PEN_SLIDER_MAX - _PEN_SLIDER_MIN)
-        scale = self._screen_scale() if getattr(self._mode, "_scale_brush", True) else 1.0
-        self._pen_stroke_width = (_PEN_WIDTH_MIN + t * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
-        tool = self._mode._tool
+        size_fraction = (self._settings.tool_state.size - constants.SIZE_MIN) / (
+            constants.SIZE_MAX - constants.SIZE_MIN
+        )
+        scale = self._screen_scale() if self._settings.scale_brush else 1.0
+        self._pen_stroke_width = (_PEN_WIDTH_MIN + size_fraction * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
+        tool = self._settings.tool
         if self._stylus_erasing:
             erase = True
-            brush = getattr(self._mode, "_eraser_brush", "circle")
+            brush = self._settings.eraser_brush
         else:
-            erase = tool == TOOL_ERASER
-            if tool == TOOL_AIRBRUSH:
-                brush = "gauss"
-            elif tool == TOOL_ERASER:
-                brush = getattr(self._mode, "_eraser_brush", "circle")
+            erase = tool == constants.Tool.ERASER
+            if tool == constants.Tool.AIRBRUSH:
+                brush = constants.Brush.GAUSS
+            elif tool == constants.Tool.ERASER:
+                brush = self._settings.eraser_brush
             else:
-                brush = "circle"
-        stroke = self._new_stroke(paint_node, frame, pei, brush, erase, self._pressure_width(event))
-        if stroke:
-            self._pen_stroke = stroke
-            self._pen_paint_node = paint_node
-            self._pen_frame = frame
-            commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
-            # sync accumulation is still open — will be flushed at _pen_release
-        else:
-            self._end_sync()
+                brush = constants.Brush.CIRCLE
+        self._pen_stroke = paint.new_stroke(
+            paint_node, frame, image_point, self._pressure_width(event), brush, erase, self._settings.tool_state
+        )
+        self._auto_mark_frame()
+        self._pen_paint_node = paint_node
+        self._pen_frame = frame
+        commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
+        # sync accumulation is still open — will be flushed at _pen_release
 
     def _pen_drag(self, event):
         if not self._pen_stroke:
             return
-        name, pei = self._pointer_location(event)
-        if not name:
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
             return
-        try:
-            commands.insertFloatProperty(f"{self._pen_stroke}.points", [pei.x, pei.y])
-            commands.insertFloatProperty(f"{self._pen_stroke}.width", [self._pressure_width(event)])
-            commands.redraw()
-            if not getattr(self._mode, "_sync_whole_strokes", True):
-                self._end_sync(force=True)
-                self._begin_sync()
-        except Exception as e:
-            print(f"[annotate_beta] _pen_drag error: {e}")
+        paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
+        commands.redraw()
+        if not self._settings.sync_whole_strokes:
+            self._end_sync(force=True)
+            self._begin_sync()
 
     def _pen_release(self, event):
         if not self._pen_stroke:
             return
-        name, pei = self._pointer_location(event)
-        if name and pei:
-            try:
-                commands.insertFloatProperty(f"{self._pen_stroke}.points", [pei.x, pei.y])
-                commands.insertFloatProperty(f"{self._pen_stroke}.width", [self._pressure_width(event)])
-            except Exception:
-                pass
-        # Commit to undo stack now that stroke is complete
+        source_name, image_point = self._pointer_location(event)
+        if source_name and image_point:
+            paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
         self._undo_stack.append((self._pen_paint_node, self._pen_frame, self._pen_stroke))
         self._redo_stack.clear()
-        self._notify_buttons()
+        self._on_history_changed()
         commands.sendInternalEvent("annotate-stroke-released")
         self._pen_stroke = None
         self._pen_paint_node = None
@@ -808,15 +432,15 @@ class AnnotateDrawEngine:
     # Shift constraint (shapes only)
     # ------------------------------------------------------------------
 
-    def _constrain(self, prefix, anchor, cur):
-        dx = cur.x - anchor.x
-        dy = cur.y - anchor.y
-        if prefix in ("rect", "ellipse"):
+    def _constrain(self, prefix, anchor, current):
+        dx = current.x - anchor.x
+        dy = current.y - anchor.y
+        if prefix in paint.BOX_PREFIXES:
             if self._constraint_angle is not None:
-                cx = math.cos(self._constraint_angle)
-                cy = math.sin(self._constraint_angle)
-                proj = max(dx * cx + dy * cy, 0.0)
-                return _Vec2(anchor.x + proj * cx, anchor.y + proj * cy)
+                direction_x = math.cos(self._constraint_angle)
+                direction_y = math.sin(self._constraint_angle)
+                projection = max(dx * direction_x + dy * direction_y, 0.0)
+                return _Vec2(anchor.x + projection * direction_x, anchor.y + projection * direction_y)
             side = min(abs(dx), abs(dy))
             return _Vec2(
                 anchor.x + (side if dx >= 0 else -side),
@@ -825,7 +449,7 @@ class AnnotateDrawEngine:
         else:
             length = math.sqrt(dx * dx + dy * dy)
             if length < 1e-5:
-                return cur
+                return current
             angle = math.atan2(dy, dx)
             snapped = round(angle / (math.pi / 4)) * (math.pi / 4)
             return _Vec2(
@@ -837,34 +461,32 @@ class AnnotateDrawEngine:
     # Common shape push / release
     # ------------------------------------------------------------------
 
-    def _do_push(self, pei, paint_node, frame):
+    def _do_push(self, image_point, paint_node, frame):
         if commands.isPlaying():
             commands.stop()
             commands.setFrame(frame)
-        prefix = _PREFIX[self._mode._tool]
-        self._anchor = pei
-        self._last_pei = pei
+        prefix = _PREFIX[self._settings.tool]
+        self._anchor = image_point
+        self._last_image_point = image_point
         self._shape_type = prefix
-        self._current_node = paint_node
-        self._current_frame = frame
         self._shape_active = True
         self._shift_transition = False
         commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
         # Open a sync accumulation block that stays open until _do_release so the
-        # entire shape (push → drag → release) is sent as one batch to Live Review
-        # participants instead of immediately broadcasting the initial zero-size shape.
+        # entire shape (push → drag → release) is sent as one batch to remote
+        # clients instead of immediately broadcasting the initial zero-size shape.
         self._begin_sync()
-        self._current_shape = self._new_shape(paint_node, frame, prefix, pei, pei)
-        if self._current_shape:
-            self._undo_stack.append((self._current_node, self._current_frame, self._current_shape))
-            self._redo_stack.clear()
-            self._notify_buttons()
-        else:
-            self._end_sync(force=True)
+        self._current_shape = paint.new_shape(
+            paint_node, frame, prefix, image_point, image_point, self._settings.tool_state, self._border_width()
+        )
+        self._auto_mark_frame()
+        self._undo_stack.append((paint_node, frame, self._current_shape))
+        self._redo_stack.clear()
+        self._on_history_changed()
 
-    def _do_release(self, pei):
-        if pei is not None:
-            self._update_shape(self._current_shape, self._shape_type, self._anchor, pei)
+    def _do_release(self, image_point):
+        if image_point is not None:
+            paint.update_shape(self._current_shape, self._shape_type, self._anchor, image_point)
         self._shape_active = False
         self._current_shape = None
         commands.sendInternalEvent("annotate-shape-released")
@@ -875,33 +497,17 @@ class AnnotateDrawEngine:
     # Pointer event handlers
     # ------------------------------------------------------------------
 
-    def on_push(self, event):
-        self._notify_draw_started()
-        if self._mode._tool == TOOL_TEXT:
-            if self._text_active:
-                self._commit_text()
-            name, pei = self._pointer_location(event)
-            if not name:
-                event.reject()
-                return
-            self._current_source_name = name
-            paint_node, frame = self._find_paint_node()
-            if paint_node is None:
-                event.reject()
-                return
-            self._text_active = True
-            self._text_buffer = ""
-            self._text_anchor = pei
-            self._text_paint_node = paint_node
-            self._text_frame = frame
-            self._ensure_text_node()
+    def on_push(self, event, constrained=False):
+        self._on_draw_started()
+        tool = self._settings.tool
+        if tool == constants.Tool.TEXT:
+            if not constrained:
+                self._start_text(event)
             return
-
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
+        if tool in constants.BRUSH_TOOLS:
             self._pen_push(event)
             return
-
-        if not self._is_shape_tool():
+        if tool not in constants.SHAPE_TOOLS:
             event.reject()
             return
         if self._shift_transition:
@@ -911,108 +517,76 @@ class AnnotateDrawEngine:
         if paint_node is None:
             event.reject()
             return
-        name, pei = self._pointer_location(event)
-        if not name:
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
             event.reject()
             return
-        self._current_source_name = name
+        self._current_source_name = source_name
         self._constraint_angle = None
-        self._do_push(pei, paint_node, frame)
+        self._do_push(image_point, paint_node, frame)
 
-    def on_drag(self, event):
-        if self._mode._tool == TOOL_TEXT:
+    def on_drag(self, event, constrained=False):
+        tool = self._settings.tool
+        if tool == constants.Tool.TEXT:
             return  # consume without action during text placement
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
+        if tool in constants.BRUSH_TOOLS:
             self._pen_drag(event)
             return
-        if not self._is_shape_tool() or not self._shape_active:
+        if tool not in constants.SHAPE_TOOLS or not self._shape_active:
             event.reject()
             return
-        name, pei = self._pointer_location(event)
-        if not name:
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
             return
-        self._last_pei = pei
-        self._update_shape(self._current_shape, self._shape_type, self._anchor, pei)
+        self._last_image_point = image_point
+        if constrained:
+            image_point = self._constrain(self._shape_type, self._anchor, image_point)
+        paint.update_shape(self._current_shape, self._shape_type, self._anchor, image_point)
 
-    def on_release(self, event):
-        if self._mode._tool == TOOL_TEXT:
+    def on_release(self, event, constrained=False):
+        tool = self._settings.tool
+        if tool == constants.Tool.TEXT:
             return
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
+        if tool in constants.BRUSH_TOOLS:
             self._pen_release(event)
             return
-        if not self._is_shape_tool() or not self._shape_active:
+        if tool not in constants.SHAPE_TOOLS or not self._shape_active:
             event.reject()
             return
         if self._shift_transition:
             return
-        name, pei = self._pointer_location(event)
-        self._do_release(pei if name else None)
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
+            image_point = None
+        elif constrained:
+            image_point = self._constrain(self._shape_type, self._anchor, image_point)
+        self._do_release(image_point)
 
-    def on_push_shift(self, event):
-        self._notify_draw_started()
-        if self._mode._tool == TOOL_TEXT:
-            return
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
-            self._pen_push(event)
-            return
-        if not self._is_shape_tool():
+    def _start_text(self, event):
+        if self._text_active:
+            self._commit_text()
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
             event.reject()
             return
-        if self._shift_transition:
-            self._shift_transition = False
-            return
+        self._current_source_name = source_name
         paint_node, frame = self._find_paint_node()
         if paint_node is None:
             event.reject()
             return
-        name, pei = self._pointer_location(event)
-        if not name:
-            event.reject()
-            return
-        self._current_source_name = name
-        self._constraint_angle = None
-        self._do_push(pei, paint_node, frame)
-
-    def on_drag_shift(self, event):
-        if self._mode._tool == TOOL_TEXT:
-            return
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
-            self._pen_drag(event)
-            return
-        if not self._is_shape_tool() or not self._shape_active:
-            event.reject()
-            return
-        name, pei = self._pointer_location(event)
-        if not name:
-            return
-        self._last_pei = pei
-        self._update_shape(
-            self._current_shape, self._shape_type, self._anchor, self._constrain(self._shape_type, self._anchor, pei)
-        )
-
-    def on_release_shift(self, event):
-        if self._mode._tool == TOOL_TEXT:
-            return
-        if self._mode._tool in (TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER):
-            self._pen_release(event)
-            return
-        if not self._is_shape_tool() or not self._shape_active:
-            event.reject()
-            return
-        if self._shift_transition:
-            return
-        name, pei = self._pointer_location(event)
-        if name:
-            self._do_release(self._constrain(self._shape_type, self._anchor, pei))
-        else:
-            self._do_release(None)
+        self._text_active = True
+        self._text_buffer = ""
+        self._text_paint_node = paint_node
+        self._text_frame = frame
+        with self._sync_batch(force=False):
+            self._text_node = paint.new_text_node(paint_node, frame, image_point, self._settings, self._font_size())
 
     def on_shift_down(self, event):
         if self._text_active:
             return  # don't interfere with text shift+letter input
-        if self._shape_active and self._anchor and self._last_pei:
-            dx = self._last_pei.x - self._anchor.x
-            dy = self._last_pei.y - self._anchor.y
+        if self._shape_active and self._anchor and self._last_image_point:
+            dx = self._last_image_point.x - self._anchor.x
+            dy = self._last_image_point.y - self._anchor.y
             self._constraint_angle = math.atan2(dy, dx)
         self._shift_transition = True
 
@@ -1028,25 +602,13 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def on_text_key(self, event):
-        if not self._text_active:
-            event.reject()
-            return
-        parts = event.name().split("--")
-        char = parts[-1]
-        if len(char) != 1:
-            event.reject()
-            return
-        self._text_buffer += char
-        self._ensure_text_node()
-        self._register_text_undo()
-        self._update_text_display(cursor=True)
+        self._append_text(event, event.name().split("--")[-1])
 
-    def on_text_space(self, event):
+    def _append_text(self, event, text):
         if not self._text_active:
             event.reject()
             return
-        self._text_buffer += " "
-        self._ensure_text_node()
+        self._text_buffer += text
         self._register_text_undo()
         self._update_text_display(cursor=True)
 
@@ -1056,16 +618,6 @@ class AnnotateDrawEngine:
             return
         if self._text_buffer:
             self._text_buffer = self._text_buffer[:-1]
-        self._update_text_display(cursor=True)
-
-    def on_text_new_line(self, event):
-        if not self._text_active:
-            event.reject()
-            return
-
-        self._text_buffer += "\n"
-        self._ensure_text_node()
-        self._register_text_undo()
         self._update_text_display(cursor=True)
 
     def on_text_commit(self, event, reject):
@@ -1103,109 +655,43 @@ class AnnotateDrawEngine:
         self._reset_text()
         self._undo_stack.clear()
         self._redo_stack.clear()
-        self._notify_buttons()
-
-    # ------------------------------------------------------------------
-    # Order-list helpers
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def _component_name(node_name):
-        """Extract the component key from a full property path.
-
-        e.g. "RVPaint_1.rect:3:42:host_1234"  →  "rect:3:42:host_1234"
-        """
-        return node_name.split(".", 1)[1] if "." in node_name else node_name
-
-    def _remove_from_order(self, paint_node, frame, node_name):
-        """Remove a component from the frame draw-order list."""
-        if not paint_node:
-            return
-        order_prop = f"{paint_node}.frame:{frame}.order"
-        if not commands.propertyExists(order_prop):
-            return
-        comp = self._component_name(node_name)
-        current = list(commands.getStringProperty(order_prop))
-        if comp in current:
-            current.remove(comp)
-            commands.setStringProperty(order_prop, current, True)
-
-    def _restore_to_order(self, paint_node, frame, node_name):
-        """Re-append a component to the frame draw-order list."""
-        if not paint_node:
-            return
-        order_prop = f"{paint_node}.frame:{frame}.order"
-        if not commands.propertyExists(order_prop):
-            return
-        comp = self._component_name(node_name)
-        current = list(commands.getStringProperty(order_prop))
-        if comp not in current:
-            commands.insertStringProperty(order_prop, [comp])
-
-    # ------------------------------------------------------------------
-    # Undo / redo / clear
-    # ------------------------------------------------------------------
+        self._on_history_changed()
 
     def undo(self):
         self.commit_text_if_active()
         if not self._undo_stack:
             return
         paint_node, frame, node_name = self._undo_stack.pop()
-        self._begin_sync()
-        try:
-            self._remove_from_order(paint_node, frame, node_name)
-            commands.setIntProperty(f"{node_name}.softDeleted", [1], True)
-            commands.redraw()
-        except Exception as e:
-            print(f"[annotate_beta] undo error: {e}")
-        self._end_sync(force=True)
+        with self._sync_batch():
+            try:
+                paint.soft_delete(paint_node, frame, node_name)
+                commands.redraw()
+            except Exception as error:
+                print(f"[annotate_beta] undo error: {error}")
         self._redo_stack.append((paint_node, frame, node_name))
-        self._notify_buttons()
-        commands.sendInternalEvent("undo-paint", self._uuid_for(node_name))
+        self._on_history_changed()
+        commands.sendInternalEvent("undo-paint", paint.uuid_for(node_name))
 
     def redo(self):
         self.commit_text_if_active()
         if not self._redo_stack:
             return
         paint_node, frame, node_name = self._redo_stack.pop()
-        self._begin_sync()
-        try:
-            self._restore_to_order(paint_node, frame, node_name)
-            commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
-            commands.redraw()
-        except Exception as e:
-            print(f"[annotate_beta] redo error: {e}")
-        self._end_sync(force=True)
+        with self._sync_batch():
+            try:
+                paint.restore(paint_node, frame, node_name)
+                commands.redraw()
+            except Exception as error:
+                print(f"[annotate_beta] redo error: {error}")
         self._undo_stack.append((paint_node, frame, node_name))
-        self._notify_buttons()
-        commands.sendInternalEvent("redo-paint", self._uuid_for(node_name))
-
-    @staticmethod
-    def _annotated_frames(paint_node):
-        """Return the set of frame numbers that have an order property on paint_node.
-
-        Scans actual properties rather than iterating a frame range so that
-        annotations stored at source-space frame numbers outside the current
-        timeline range are still found.
-        """
-        try:
-            frames = set()
-            for prop in commands.properties(paint_node):
-                # prop is e.g. "RVPaint_1.frame:42.order"
-                parts = prop.split(".")
-                if len(parts) >= 3 and parts[2] == "order":
-                    comp_parts = parts[1].split(":")
-                    if len(comp_parts) == 2 and comp_parts[0] == "frame":
-                        frames.add(int(comp_parts[1]))
-            return frames
-        except Exception:
-            return set()
+        self._on_history_changed()
+        commands.sendInternalEvent("redo-paint", paint.uuid_for(node_name))
 
     def clear_frame(self):
         """Remove all visible nodes on the current frame from the draw order.
 
         Iterates every RVPaint node so that annotations received from remote
-        clients (which land on the live-review annotation source group's node)
+        clients (which land on the annotation source group's node)
         are cleared along with locally drawn ones.
         """
         self.commit_text_if_active()
@@ -1215,42 +701,19 @@ class AnnotateDrawEngine:
         all_paint_nodes = commands.nodesOfType("RVPaint")
         if not all_paint_nodes:
             return
-        self._begin_sync()
-        cleared = []
-        cleared_uuids = []
-        for paint_node in all_paint_nodes:
-            order_prop = f"{paint_node}.frame:{frame}.order"
-            if not commands.propertyExists(order_prop):
-                continue
-            components = list(commands.getStringProperty(order_prop))
-            surviving = []
-            node_cleared = False
-            for comp in components:
-                node_name = f"{paint_node}.{comp}"
-                deleted_prop = f"{node_name}.softDeleted"
-                try:
-                    already_deleted = commands.propertyExists(deleted_prop) and commands.getIntProperty(deleted_prop)[0]
-                    if not already_deleted:
-                        commands.setIntProperty(deleted_prop, [1], True)
-                        cleared.append((paint_node, frame, node_name))
-                        uuid = self._uuid_for(node_name)
-                        if uuid:
-                            cleared_uuids.append(uuid)
-                        node_cleared = True
-                    else:
-                        surviving.append(comp)
-                except Exception:
-                    surviving.append(comp)
-            if node_cleared:
-                commands.setStringProperty(order_prop, surviving, True)
-        self._end_sync(force=True)
+        with self._sync_batch():
+            cleared = [
+                (paint_node, frame, node_name)
+                for paint_node in all_paint_nodes
+                for node_name in paint.soft_delete_frame(paint_node, frame)
+            ]
         if cleared:
             self._undo_stack.extend(cleared)
             self._redo_stack.clear()
             commands.redraw()
-        self._notify_buttons()
-        primary = all_paint_nodes[0]
-        payload = "|".join(cleared_uuids) if cleared_uuids else f"{primary}:{frame}"
+        self._on_history_changed()
+        cleared_uuids = [shape_uuid for _, _, node_name in cleared if (shape_uuid := paint.uuid_for(node_name))]
+        payload = "|".join(cleared_uuids) if cleared_uuids else f"{all_paint_nodes[0]}:{frame}"
         commands.sendInternalEvent("clear-paint", payload)
 
     def clear_all_frames(self):
@@ -1265,69 +728,21 @@ class AnnotateDrawEngine:
         all_paint_nodes = commands.nodesOfType("RVPaint")
         if not all_paint_nodes:
             return
-        self._begin_sync()
-        any_cleared = False
-        cleared_uuids = []
-        for paint_node in all_paint_nodes:
-            for frame in self._annotated_frames(paint_node):
-                order_prop = f"{paint_node}.frame:{frame}.order"
-                if not commands.propertyExists(order_prop):
-                    continue
-                components = list(commands.getStringProperty(order_prop))
-                surviving = []
-                frame_cleared = False
-                for comp in components:
-                    node_name = f"{paint_node}.{comp}"
-                    deleted_prop = f"{node_name}.softDeleted"
-                    try:
-                        already_deleted = (
-                            commands.propertyExists(deleted_prop) and commands.getIntProperty(deleted_prop)[0]
-                        )
-                        if not already_deleted:
-                            commands.setIntProperty(deleted_prop, [1], True)
-                            uuid = self._uuid_for(node_name)
-                            if uuid:
-                                cleared_uuids.append(uuid)
-                            frame_cleared = True
-                        else:
-                            surviving.append(comp)
-                    except Exception:
-                        surviving.append(comp)
-                if frame_cleared:
-                    commands.setStringProperty(order_prop, surviving, True)
-                    any_cleared = True
-        self._end_sync(force=True)
+        with self._sync_batch():
+            cleared = [
+                node_name
+                for paint_node in all_paint_nodes
+                for frame in paint.annotated_frames(paint_node)
+                for node_name in paint.soft_delete_frame(paint_node, frame)
+            ]
         self._undo_stack.clear()
         self._redo_stack.clear()
-        self._notify_buttons()
-        if any_cleared:
+        self._on_history_changed()
+        if cleared:
             commands.redraw()
+        cleared_uuids = [shape_uuid for node_name in cleared if (shape_uuid := paint.uuid_for(node_name))]
         payload = "|".join(cleared_uuids) if cleared_uuids else all_paint_nodes[0]
         commands.sendInternalEvent("clear-all-paint", payload)
-
-    def _uuid_for(self, node_name):
-        """Return the UUID stored on a paint node, or empty string if unavailable."""
-        try:
-            uuid_prop = f"{node_name}.uuid"
-            if commands.propertyExists(uuid_prop):
-                return commands.getStringProperty(uuid_prop)[0]
-        except Exception:
-            pass
-        return ""
-
-    def _notify_buttons(self):
-        """Tell the mode to update undo/redo button enabled state."""
-        try:
-            self._mode._update_undo_redo_buttons()
-        except Exception:
-            pass
-
-    def _notify_draw_started(self):
-        """Tell the mode to close any open popups (e.g. color picker)."""
-        try:
-            self._mode._hide_color_picker()
-        except Exception:
-            pass
 
     # ------------------------------------------------------------------
     # Stylus eraser-end handlers
@@ -1335,7 +750,7 @@ class AnnotateDrawEngine:
 
     def on_stylus_eraser_push(self, event):
         """Physical eraser end of stylus: always draws with erase mode regardless of tool."""
-        self._notify_draw_started()
+        self._on_draw_started()
         self._stylus_erasing = True
         self._pen_push(event)
 
@@ -1350,6 +765,15 @@ class AnnotateDrawEngine:
     # Sync helpers
     # ------------------------------------------------------------------
 
+    @contextmanager
+    def _sync_batch(self, force=True):
+        """Batch every graph change made inside the block into one sync update."""
+        self._begin_sync()
+        try:
+            yield
+        finally:
+            self._end_sync(force=force)
+
     @staticmethod
     def _begin_sync():
         """Signal sync.mu to start batching graph-state-change events (RV-to-RV sync)."""
@@ -1361,11 +785,3 @@ class AnnotateDrawEngine:
         commands.sendInternalEvent("internal-sync-end-accumulate")
         if force:
             commands.sendInternalEvent("internal-sync-flush")
-
-
-class _Vec2:
-    __slots__ = ("x", "y")
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
