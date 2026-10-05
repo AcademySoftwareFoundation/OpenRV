@@ -23,6 +23,7 @@
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPaintEvent>
+#include <QtGui/QPlatformSurfaceEvent>
 #include <QtGui/QWindow>
 #include <QtGui/QVulkanInstance>
 #include <QtGui/QGuiApplication>
@@ -483,6 +484,11 @@ namespace Rv
             return false;
         }
 
+        // Qt owns the surface and destroys it with the native window, which on
+        // close happens before this widget is deleted. Watch for that so the
+        // swapchain is released first (see eventFilter()).
+        window->installEventFilter(this);
+
         // Pick Physical Device
         uint32_t deviceCount = 0;
         vkEnumeratePhysicalDevices(m_vkInstance, &deviceCount, nullptr);
@@ -731,6 +737,17 @@ namespace Rv
 
     bool VulkanView::createSwapchain()
     {
+        // The surface is dropped when Qt destroys the native window; pick up
+        // the new one if the window has been recreated since.
+        if (m_vkDevice && !m_vkSurface)
+        {
+            QWindow* window = windowHandle();
+            if (window && window->handle() && window->vulkanInstance())
+            {
+                m_vkSurface = QVulkanInstance::surfaceForWindow(window);
+            }
+        }
+
         if (!m_vkDevice || !m_vkSurface)
         {
             return false;
@@ -2643,6 +2660,23 @@ namespace Rv
 
     bool VulkanView::eventFilter(QObject* object, QEvent* event)
     {
+        // Our own native window: only track its Vulkan surface lifetime and
+        // let every other event through untouched.
+        if (object == windowHandle())
+        {
+            if (event->type() == QEvent::PlatformSurface
+                && static_cast<QPlatformSurfaceEvent*>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
+            {
+                // Destroying a swapchain after its surface is gone crashes in
+                // the driver (seen on NVIDIA when closing RV), so release it
+                // now. createSwapchain() re-acquires the surface if the native
+                // window is recreated.
+                cleanupSwapchain();
+                m_vkSurface = VK_NULL_HANDLE;
+            }
+            return false;
+        }
+
         if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
             || event->type() == QEvent::ShortcutOverride)
         {
