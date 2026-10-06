@@ -36,13 +36,19 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._link_tool_colors = False
         self._auto_save_settings = True
 
-        self._engine = AnnotateDrawEngine(self._settings, self._update_undo_redo_buttons, self._hide_color_picker)
+        self._engine = AnnotateDrawEngine(
+            self._settings, self._update_undo_redo_buttons, self._hide_color_picker, self._sample_eyedropper
+        )
 
+        # sortKey "z" (same as the legacy annotate_mode) orders this mode's global table
+        # below widgets such as the timeline, so their bounding boxes take pointer
+        # events first and every tool can scrub.
         self.init(
             constants.MODE_NAME,
-            self.global_bindings,
+            self.global_bindings + self._engine.pointer_bindings,
             [],
             self.menu,
+            "z",
         )
 
         commands.bind("default", "global", "session-clear-everything", self._on_session_clear, "Clear annotate history")
@@ -429,8 +435,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     @property
     def global_bindings(self):
         return [
-            ("pointer-1--push", self._on_eyedropper_click, "Eyedropper sample"),
-            ("stylus-pen--push", self._on_eyedropper_click, "Eyedropper sample (stylus)"),
             ("graph-node-inputs-changed", self._on_node_inputs_changed, "Update UI"),
             ("before-graph-view-change", self._on_before_graph_view_change, "Update UI"),
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
@@ -448,10 +452,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             ("key-down--alt-shift--left", self._previous_annotated_frame, "Previous Annotated Frame"),
         ]
 
-    def _on_eyedropper_click(self, event):
-        if self._settings.tool != constants.Tool.EYEDROPPER:
-            event.reject()
-            return
+    def _sample_eyedropper(self, event):
         pointer = event.pointer()
         device_pixel_ratio = commands.devicePixelRatio()
         x = pointer[0] * device_pixel_ratio
