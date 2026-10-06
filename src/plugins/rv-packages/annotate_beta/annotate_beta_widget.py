@@ -640,8 +640,13 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.setToolTip("Font")
         self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
         for name in QtGui.QFontDatabase.families():
-            if not name.startswith(".") and QtGui.QFontDatabase.isSmoothlyScalable(name):
-                self._font_combo.addItem(name)
+            if name.startswith(".") or not QtGui.QFontDatabase.isSmoothlyScalable(name):
+                continue
+            # Skip fonts without an 'hhea' table (e.g. macOS "GB18030 Bitmap"): Qt warns
+            # it can't compute their bearings when laying out text.
+            if not QtGui.QRawFont.fromFont(QtGui.QFont(name)).fontTable("hhea"):
+                continue
+            self._font_combo.addItem(name)
         self._font_combo.setMaxVisibleItems(10)
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         self._font_combo.view().setMinimumWidth(160)
