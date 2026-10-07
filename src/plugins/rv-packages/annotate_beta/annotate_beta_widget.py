@@ -5,58 +5,45 @@ import os
 import sys
 
 from dataclasses import dataclass
+from enum import Enum, auto
+from functools import partial
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
-from annotate_beta_color_picker import ColorPickerSection
+from annotate_beta_color_picker import ColorPickerPopup
+import annotate_beta_constants as constants
 
 
-# Tool identifiers
-TOOL_CURSOR = "cursor"
-TOOL_PEN = "pen"
-TOOL_AIRBRUSH = "airbrush"
-TOOL_ERASER = "eraser"
-TOOL_RECT = "rect"
-TOOL_CIRCLE = "circle"
-TOOL_ARROW = "arrow"
-TOOL_LINE = "line"
-TOOL_TEXT = "text"
-TOOL_EYEDROPPER = "eyedropper"
+class _Page(Enum):
+    """Secondary panel option page shown for a tool."""
 
-# Secondary panel page indices
-_PAGE_EMPTY = -1  # cursor, eyedropper
-_PAGE_SIZE_OPACITY = 0  # arrow, line
-_PAGE_SHAPE = 1  # rect, circle
-_PAGE_TEXT = 2  # text
-_PAGE_BLEND = 3  # pen and airbrush (size/opacity/blend mode)
-_PAGE_ERASER = 4  # eraser (brush type combo + size/opacity)
+    SIZE_OPACITY = auto()
+    SHAPE = auto()
+    TEXT = auto()
+    BLEND = auto()
+    ERASER = auto()
 
-# Blend mode values passed to the mode/engine
-COLOR_MOD_NORMAL = "normal"
-COLOR_MOD_ADDITIVE = "additive"
-COLOR_MOD_DARKEN = "darken"
 
 _ICON_SIZE = 16
 
 
-@dataclass
-class Tool:
-    page: int
+@dataclass(frozen=True)
+class _ToolInfo:
+    page: _Page | None  # None: no option page (cursor, eyedropper)
     tooltip: str
-    cursor: QtCore.Qt.CursorShape
 
 
-TOOLS = {
-    TOOL_CURSOR: Tool(page=_PAGE_EMPTY, tooltip="Cursor", cursor=QtCore.Qt.ArrowCursor),
-    TOOL_EYEDROPPER: Tool(page=_PAGE_EMPTY, tooltip="Eyedropper", cursor=QtCore.Qt.CrossCursor),
-    TOOL_PEN: Tool(page=_PAGE_BLEND, tooltip="Pen", cursor=QtCore.Qt.CrossCursor),
-    TOOL_AIRBRUSH: Tool(page=_PAGE_BLEND, tooltip="Airbrush", cursor=QtCore.Qt.CrossCursor),
-    TOOL_ERASER: Tool(page=_PAGE_ERASER, tooltip="Eraser", cursor=QtCore.Qt.CrossCursor),
-    TOOL_RECT: Tool(page=_PAGE_SHAPE, tooltip="Rectangle", cursor=QtCore.Qt.CrossCursor),
-    TOOL_CIRCLE: Tool(page=_PAGE_SHAPE, tooltip="Circle", cursor=QtCore.Qt.CrossCursor),
-    TOOL_ARROW: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Arrow", cursor=QtCore.Qt.CrossCursor),
-    TOOL_LINE: Tool(page=_PAGE_SIZE_OPACITY, tooltip="Line", cursor=QtCore.Qt.CrossCursor),
-    TOOL_TEXT: Tool(page=_PAGE_TEXT, tooltip="Text", cursor=QtCore.Qt.IBeamCursor),
+_TOOLS = {
+    constants.Tool.CURSOR: _ToolInfo(page=None, tooltip="Cursor"),
+    constants.Tool.EYEDROPPER: _ToolInfo(page=None, tooltip="Eyedropper"),
+    constants.Tool.PEN: _ToolInfo(page=_Page.BLEND, tooltip="Pen"),
+    constants.Tool.AIRBRUSH: _ToolInfo(page=_Page.BLEND, tooltip="Airbrush"),
+    constants.Tool.ERASER: _ToolInfo(page=_Page.ERASER, tooltip="Eraser"),
+    constants.Tool.RECT: _ToolInfo(page=_Page.SHAPE, tooltip="Rectangle"),
+    constants.Tool.CIRCLE: _ToolInfo(page=_Page.SHAPE, tooltip="Circle"),
+    constants.Tool.ARROW: _ToolInfo(page=_Page.SIZE_OPACITY, tooltip="Arrow"),
+    constants.Tool.LINE: _ToolInfo(page=_Page.SIZE_OPACITY, tooltip="Line"),
+    constants.Tool.TEXT: _ToolInfo(page=_Page.TEXT, tooltip="Text"),
 }
 
 # ---------------------------------------------------------------------------
@@ -64,22 +51,32 @@ TOOLS = {
 # ---------------------------------------------------------------------------
 
 
-def _tool_button(tooltip="", checkable=True, size=30):
-    btn = QtWidgets.QToolButton()
-    btn.setToolTip(tooltip)
-    btn.setCheckable(checkable)
-    btn.setFixedSize(size, size)
-    btn.setProperty("tbstyle", "palette")
-    return btn
+def _tool_button(tooltip="", checkable=True):
+    button = QtWidgets.QToolButton()
+    button.setToolTip(tooltip)
+    button.setCheckable(checkable)
+    button.setFixedSize(30, 30)
+    button.setProperty("tbstyle", "palette")
+    return button
 
 
-def _separator(width=None):
-    sep = QtWidgets.QWidget()
-    sep.setObjectName("separator")
-    sep.setFixedHeight(1)
-    if width is not None:
-        sep.setFixedWidth(width)
-    return sep
+def _separator(width):
+    separator = QtWidgets.QWidget()
+    separator.setObjectName("separator")
+    separator.setFixedHeight(1)
+    separator.setFixedWidth(width)
+    return separator
+
+
+def _add_divider(layout, spacing=16):
+    layout.addSpacing(spacing)
+    layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
+    layout.addSpacing(spacing)
+
+
+def _group_positions(count):
+    """QSS "grouppos" values for a run of visually connected buttons."""
+    return ["first", *["mid"] * (count - 2), "last"]
 
 
 class _StyledWidget(QtWidgets.QWidget):
@@ -98,16 +95,13 @@ class _StyledWidget(QtWidgets.QWidget):
 class ColorSwatch(QtWidgets.QAbstractButton):
     """Square button showing the current annotation color.
 
-    Clicking it emits swatch_clicked — the parent is responsible for
-    showing/hiding the inline color picker.
+    AnnotateToolbarWidget shows/hides the color picker popup when it is clicked.
     """
-
-    swatch_clicked = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("colorSwatch")
-        self._color = QtGui.QColor(255, 204, 0)
+        self._color = QtGui.QColor(constants.DEFAULT_COLOR)
         self.setFixedSize(30, 30)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setToolTip("Color")
@@ -117,15 +111,11 @@ class ColorSwatch(QtWidgets.QAbstractButton):
         self.update()
 
     def paintEvent(self, event):
-        p = QtGui.QPainter(self)
-        p.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        p.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
-        p.setBrush(self._color)
-        p.drawRect(self.rect().adjusted(1, 1, -1, -1))
-
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.swatch_clicked.emit()
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
+        painter.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
+        painter.setBrush(self._color)
+        painter.drawRect(self.rect().adjusted(1, 1, -1, -1))
 
 
 # ---------------------------------------------------------------------------
@@ -138,25 +128,23 @@ class _AnnotationSlider(QtWidgets.QSlider):
 
     _WIDTH = 32
     _MIN_HEIGHT = 110
+    _HANDLE_LENGTH = 18
 
-    def __init__(self, min_val=0, max_val=100, default=50, parent=None):
+    def __init__(self, minimum=0, maximum=100, default=50, parent=None):
         super().__init__(QtCore.Qt.Vertical, parent)
         self.setObjectName("annotationSlider")
-        self.setRange(min_val, max_val)
-        self.setValue(max(min_val, min(max_val, default)))
-        self.setPageStep(max(1, (max_val - min_val) // 10))
+        self.setRange(minimum, maximum)
+        self.setValue(max(minimum, min(maximum, default)))
+        self.setPageStep(max(1, (maximum - minimum) // 10))
         self.setFixedWidth(self._WIDTH)
         self.setMinimumHeight(self._MIN_HEIGHT)
         self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-    _HANDLE_LENGTH = 18
-    _GROOVE_MARGIN = 0
-
     def _value_at(self, y):
-        span = max(1, self.height() - 2 * self._GROOVE_MARGIN - self._HANDLE_LENGTH)
-        bottom = self._GROOVE_MARGIN + self._HANDLE_LENGTH // 2 + span
+        span = max(1, self.height() - self._HANDLE_LENGTH)
+        bottom = self._HANDLE_LENGTH // 2 + span
 
         return QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), bottom - int(y), span)
 
@@ -201,17 +189,17 @@ class _SliderSection(QtWidgets.QWidget):
 
     value_changed = QtCore.Signal(int)
 
-    def __init__(self, label, min_val, max_val, default, suffix="", parent=None):
+    def __init__(self, label, minimum, maximum, default, suffix="", parent=None):
         super().__init__(parent)
         self._suffix = suffix
-        self._min = min_val
-        self._max = max_val
+        self._minimum = minimum
+        self._maximum = maximum
 
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(4)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
 
-        self._slider = _AnnotationSlider(min_val, max_val, default)
+        self._slider = _AnnotationSlider(minimum, maximum, default)
         self._slider.setToolTip(label)
         self._slider.valueChanged.connect(self._on_slider_changed)
         slider_row = QtWidgets.QHBoxLayout()
@@ -219,7 +207,7 @@ class _SliderSection(QtWidgets.QWidget):
         slider_row.addStretch()
         slider_row.addWidget(self._slider)
         slider_row.addStretch()
-        lay.addLayout(slider_row, 1)
+        layout.addLayout(slider_row, 1)
 
         self._input = _ValueLineEdit(f"{default}{suffix}")
         self._input.setObjectName("sliderValue")
@@ -227,65 +215,73 @@ class _SliderSection(QtWidgets.QWidget):
         self._input.setAlignment(QtCore.Qt.AlignCenter)
         self._input.setFixedWidth(48)
         self._input.editingFinished.connect(self._on_input_committed)
-        lay.addWidget(self._input, alignment=QtCore.Qt.AlignHCenter)
+        layout.addWidget(self._input, alignment=QtCore.Qt.AlignHCenter)
 
-        # Fixed after layout is set up — prevents sections in less-constrained panels
-        # (no blend buttons) from claiming leftover space. Preferred has GrowFlag set
+        # Prevents sections in less-constrained panels (no blend buttons) from
+        # claiming leftover space. Preferred has GrowFlag set
         # and quietly absorbs extra space; Fixed (no flags) takes exactly sizeHint.
         self.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 
-    def _on_slider_changed(self, v):
+    def _on_slider_changed(self, value):
         if not self._input.hasFocus():
-            self._input.setText(f"{v}{self._suffix}")
-        self.value_changed.emit(v)
+            self._input.setText(f"{value}{self._suffix}")
+        self.value_changed.emit(value)
 
     def _on_input_committed(self):
         text = self._input.text().strip()
         if self._suffix and text.endswith(self._suffix):
             text = text[: -len(self._suffix)].strip()
         try:
-            v = max(self._min, min(self._max, int(round(float(text)))))
-            self._slider.setValue(v)
-            self._input.setText(f"{v}{self._suffix}")
-            self.value_changed.emit(v)
-        except (ValueError, TypeError):
+            value = max(self._minimum, min(self._maximum, int(round(float(text)))))
+        except (ValueError, OverflowError):
             self._input.setText(f"{self._slider.value()}{self._suffix}")
+            return
+        self._slider.setValue(value)
+        self._input.setText(f"{value}{self._suffix}")
 
-    def set_value(self, v):
-        self._slider.setValue(v)
+    def set_value(self, value):
+        with QtCore.QSignalBlocker(self._slider):
+            self._slider.setValue(value)
         if not self._input.hasFocus():
-            self._input.setText(f"{v}{self._suffix}")
+            self._input.setText(f"{value}{self._suffix}")
 
 
-class _SizeOpacityPanel(QtWidgets.QWidget):
+class _SliderPanel(QtWidgets.QWidget):
+    """Option page with size and opacity sliders; subclasses add their own controls around them."""
+
     size_changed = QtCore.Signal(int)
     opacity_changed = QtCore.Signal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
+        self._layout = QtWidgets.QVBoxLayout(self)
+        self._layout.setContentsMargins(8, 8, 8, 8)
+        self._layout.setSpacing(0)
 
-        self._size = _SliderSection("Size", 1, 100, 32)
+        self._size = _SliderSection("Size", constants.SIZE_MIN, constants.SIZE_MAX, constants.DEFAULT_SIZE)
         self._size.value_changed.connect(self.size_changed)
-        lay.addWidget(self._size)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
-
-        self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
+        self._opacity = _SliderSection(
+            "Opacity", constants.OPACITY_MIN, constants.OPACITY_MAX, constants.DEFAULT_OPACITY, suffix="%"
+        )
         self._opacity.value_changed.connect(self.opacity_changed)
-        lay.addWidget(self._opacity)
 
-        lay.addStretch()
+    def _add_sliders(self):
+        self._layout.addWidget(self._size)
+        _add_divider(self._layout)
+        self._layout.addWidget(self._opacity)
 
-    def set_size(self, v):
-        self._size.set_value(v)
+    def set_size(self, value):
+        self._size.set_value(value)
 
-    def set_opacity(self, v):
-        self._opacity.set_value(v)
+    def set_opacity(self, value):
+        self._opacity.set_value(value)
+
+
+class _SizeOpacityPanel(_SliderPanel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._add_sliders()
+        self._layout.addStretch()
 
 
 def _load_icon(name):
@@ -302,13 +298,12 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
-def _apply_icon(btn, name, size=_ICON_SIZE):
-    """Set an SVG icon on a button"""
+def _apply_icon(button, name):
     icon = _load_icon(name)
     if not icon.isNull():
-        btn.setIcon(icon)
-        btn.setIconSize(QtCore.QSize(size, size))
-        btn.setText("")
+        button.setIcon(icon)
+        button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
+        button.setText("")
 
 
 class _MenuToolButton(QtWidgets.QToolButton):
@@ -348,7 +343,7 @@ class _MenuToolButton(QtWidgets.QToolButton):
         self.selection_changed.emit(item_id)
 
     def _action_for(self, item_id):
-        return next((a for a in self._menu.actions() if a.data() == item_id), None)
+        return next((action for action in self._menu.actions() if action.data() == item_id), None)
 
     def has_item(self, item_id):
         return self._action_for(item_id) is not None
@@ -362,8 +357,7 @@ class _MenuToolButton(QtWidgets.QToolButton):
             return
 
         self._selection = item_id
-        for other in self._menu.actions():
-            other.setChecked(other is action)
+        action.setChecked(True)
         if action.icon().isNull():
             self.setText(action.text())
         else:
@@ -375,189 +369,100 @@ class _MenuToolButton(QtWidgets.QToolButton):
             action.setEnabled(enabled)
 
 
-class _EraserPanel(QtWidgets.QWidget):
+class _EraserPanel(_SliderPanel):
     """Brush-type dropdown + size/opacity sliders for the eraser tool."""
 
-    eraser_brush_changed = QtCore.Signal(str)  # "circle" or "gauss"
-    size_changed = QtCore.Signal(int)
-    opacity_changed = QtCore.Signal(int)
+    eraser_brush_changed = QtCore.Signal(str)  # Brush value
 
     _BRUSHES = (
-        ("circle", "Circle (Hard)", "erase_circle"),
-        ("gauss", "Gauss (Soft)", "erase_gauss"),
+        (constants.Brush.CIRCLE, "Circle (Hard)", "erase_circle"),
+        (constants.Brush.GAUSS, "Gauss (Soft)", "erase_gauss"),
     )
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
-
-        self._brush_btn = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
-        self._brush_btn.set_selection("circle")
-        self._brush_btn.selection_changed.connect(self.eraser_brush_changed)
-        lay.addWidget(self._brush_btn)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
-
-        self._size = _SliderSection("Size", 1, 100, 32)
-        self._size.value_changed.connect(self.size_changed)
-        lay.addWidget(self._size)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
-
-        self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
-        self._opacity.value_changed.connect(self.opacity_changed)
-        lay.addWidget(self._opacity)
-
-        lay.addStretch()
+        self._brush_button = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
+        self._brush_button.set_selection(constants.Brush.CIRCLE)
+        self._brush_button.selection_changed.connect(self.eraser_brush_changed)
+        self._layout.addWidget(self._brush_button)
+        _add_divider(self._layout)
+        self._add_sliders()
+        self._layout.addStretch()
 
     def set_eraser_brush(self, brush):
-        if self._brush_btn.has_item(brush):
-            self._brush_btn.set_selection(brush)
+        self._brush_button.set_selection(brush)
 
     def set_soft_erase_enabled(self, enabled):
         """Enable or disable the Gauss (soft) eraser brush option."""
-        self._brush_btn.set_item_enabled("gauss", enabled)
-        if not enabled and self._brush_btn.selection() == "gauss":
-            self._brush_btn.set_selection("circle")
-            self.eraser_brush_changed.emit("circle")
-
-    def set_size(self, v):
-        self._size.set_value(v)
-
-    def set_opacity(self, v):
-        self._opacity.set_value(v)
+        self._brush_button.set_item_enabled(constants.Brush.GAUSS, enabled)
+        if not enabled and self._brush_button.selection() == constants.Brush.GAUSS:
+            self._brush_button.set_selection(constants.Brush.CIRCLE)
+            self.eraser_brush_changed.emit(constants.Brush.CIRCLE)
 
 
-class _PenPanel(QtWidgets.QWidget):
+class _PenPanel(_SliderPanel):
     """Size + opacity sliders plus Normal / Darken / Additive blend mode buttons."""
 
-    size_changed = QtCore.Signal(int)
-    opacity_changed = QtCore.Signal(int)
-    color_modifier_changed = QtCore.Signal(str)  # COLOR_MOD_NORMAL / COLOR_MOD_ADDITIVE / COLOR_MOD_DARKEN
+    color_modifier_changed = QtCore.Signal(str)  # ColorModifier value
+
+    _BLEND_MODES = (
+        (constants.ColorModifier.NORMAL, "normal", "Normal"),
+        (constants.ColorModifier.DARKEN, "burn", "Burn"),
+        (constants.ColorModifier.ADDITIVE, "dodge", "Dodge"),
+    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
-
-        self._size = _SliderSection("Size", 1, 100, 32)
-        self._size.value_changed.connect(self.size_changed)
-        lay.addWidget(self._size)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
-
-        self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
-        self._opacity.value_changed.connect(self.opacity_changed)
-        lay.addWidget(self._opacity)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
+        self._add_sliders()
+        _add_divider(self._layout)
 
         # Blend mode buttons — grouped with 1px gaps, connected border-radius
-        self._blend_grp = QtWidgets.QButtonGroup(self)
-        self._blend_btns = {}
-        _blend_positions = ["first", "mid", "last"]
-        for i, (key, icon_name, tip) in enumerate(
-            [
-                (COLOR_MOD_NORMAL, "normal", "Normal"),
-                (COLOR_MOD_DARKEN, "burn", "Burn"),
-                (COLOR_MOD_ADDITIVE, "dodge", "Dodge"),
-            ]
-        ):
-            btn = QtWidgets.QToolButton()
-            btn.setToolTip(tip)
-            btn.setProperty("tbstyle", "palette")
-            btn.setProperty("grouppos", _blend_positions[i])
-            _apply_icon(btn, icon_name)
-            btn.setCheckable(True)
-            btn.setFixedSize(30, 30)
-            self._blend_grp.addButton(btn)
-            self._blend_btns[key] = btn
-            lay.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
-            if i < 2:
-                lay.addSpacing(1)
-        self._blend_btns[COLOR_MOD_NORMAL].setChecked(True)
-        self._blend_grp.buttonClicked.connect(self._on_blend_clicked)
-        lay.addStretch()
-
-    def _on_blend_clicked(self, btn):
-        for key, b in self._blend_btns.items():
-            if b is btn:
-                self.color_modifier_changed.emit(key)
-                return
+        self._blend_group = QtWidgets.QButtonGroup(self)
+        self._blend_buttons = {}
+        positions = _group_positions(len(self._BLEND_MODES))
+        for index, (key, icon_name, tooltip) in enumerate(self._BLEND_MODES):
+            if index:
+                self._layout.addSpacing(1)
+            button = _tool_button(tooltip)
+            button.setProperty("grouppos", positions[index])
+            _apply_icon(button, icon_name)
+            button.clicked.connect(partial(self.color_modifier_changed.emit, key))
+            self._blend_group.addButton(button)
+            self._blend_buttons[key] = button
+            self._layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
+        self._blend_buttons[constants.ColorModifier.NORMAL].setChecked(True)
+        self._layout.addStretch()
 
     def set_color_modifier(self, mode):
-        btn = self._blend_btns.get(mode)
-        if btn:
-            btn.setChecked(True)
+        button = self._blend_buttons.get(mode)
+        if button:
+            button.setChecked(True)
 
     def set_blend_mode_enabled(self, mode, enabled):
         """Enable or disable a blend mode button (e.g. burn/dodge) by its key."""
-        btn = self._blend_btns.get(mode)
-        if btn:
-            btn.setEnabled(enabled)
-            if not enabled and btn.isChecked():
-                self._blend_btns[COLOR_MOD_NORMAL].setChecked(True)
-                self.color_modifier_changed.emit(COLOR_MOD_NORMAL)
-
-    def set_size(self, v):
-        self._size.set_value(v)
-
-    def set_opacity(self, v):
-        self._opacity.set_value(v)
+        button = self._blend_buttons.get(mode)
+        if button:
+            button.setEnabled(enabled)
+            if not enabled and button.isChecked():
+                self._blend_buttons[constants.ColorModifier.NORMAL].setChecked(True)
+                self.color_modifier_changed.emit(constants.ColorModifier.NORMAL)
 
 
-class _ShapeOptionsPanel(QtWidgets.QWidget):
+class _ShapeOptionsPanel(_SliderPanel):
     filled_changed = QtCore.Signal(bool)
-    size_changed = QtCore.Signal(int)
-    opacity_changed = QtCore.Signal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
-
         self._filled = QtWidgets.QCheckBox("Filled")
-        self._filled.setChecked(False)
         self._filled.toggled.connect(self.filled_changed)
-        lay.addWidget(self._filled)
-        lay.addSpacing(8)
+        self._layout.addWidget(self._filled)
+        self._layout.addSpacing(8)
+        self._add_sliders()
+        self._layout.addStretch()
 
-        self._size = _SliderSection("Size", 1, 100, 32)
-        self._size.value_changed.connect(self.size_changed)
-        lay.addWidget(self._size)
-
-        lay.addSpacing(16)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(16)
-
-        self._opacity = _SliderSection("Opacity", 0, 100, 50, suffix="%")
-        self._opacity.value_changed.connect(self.opacity_changed)
-        lay.addWidget(self._opacity)
-
-        lay.addStretch()
-
-    def set_filled(self, v):
-        self._filled.blockSignals(True)
-        self._filled.setChecked(v)
-        self._filled.blockSignals(False)
-
-    def set_size(self, v):
-        self._size.set_value(v)
-
-    def set_opacity(self, v):
-        self._opacity.set_value(v)
+    def set_filled(self, value):
+        with QtCore.QSignalBlocker(self._filled):
+            self._filled.setChecked(value)
 
 
 class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
@@ -570,15 +475,15 @@ class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
 
         font_name = index.data()
         if font_name:
-            f = QtGui.QFont(font_name)
-            pt = option.font.pointSize()
-            if pt > 0:
-                f.setPointSize(pt)
+            font = QtGui.QFont(font_name)
+            point_size = option.font.pointSize()
+            if point_size > 0:
+                font.setPointSize(point_size)
             else:
-                px = option.font.pixelSize()
-                if px > 0:
-                    f.setPixelSize(px)
-            option.font = f
+                pixel_size = option.font.pixelSize()
+                if pixel_size > 0:
+                    font.setPixelSize(pixel_size)
+            option.font = font
 
     def paint(self, painter, option, index):
         super().paint(painter, option, index)
@@ -604,17 +509,17 @@ class _FontComboBox(QtWidgets.QComboBox):
         self.currentTextChanged.connect(self.sync_display_font)
 
     def sync_display_font(self, family):
-        f = self.font()
-        f.setFamily(family)
-        self.setFont(f)
+        font = self.font()
+        font.setFamily(family)
+        self.setFont(font)
 
     def paintEvent(self, event):
         painter = QtWidgets.QStylePainter(self)
-        opt = QtWidgets.QStyleOptionComboBox()
-        self.initStyleOption(opt)
-        opt.currentText = "Aa"
-        painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, opt)
-        painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, opt)
+        style_option = QtWidgets.QStyleOptionComboBox()
+        self.initStyleOption(style_option)
+        style_option.currentText = "Aa"
+        painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, style_option)
+        painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
 
 class _TextOptionsPanel(QtWidgets.QWidget):
@@ -625,16 +530,16 @@ class _TextOptionsPanel(QtWidgets.QWidget):
     font_underline_changed = QtCore.Signal(bool)
 
     _SIZES = (
-        ("small", "S", None),
-        ("medium", "M", None),
-        ("large", "L", None),
+        (constants.FontSize.SMALL, "S", None),
+        (constants.FontSize.MEDIUM, "M", None),
+        (constants.FontSize.LARGE, "L", None),
     )
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(8)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(8)
 
         self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
@@ -645,89 +550,51 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.setMaxVisibleItems(10)
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         self._font_combo.view().setMinimumWidth(160)
-        lay.addWidget(self._font_combo)
+        layout.addWidget(self._font_combo)
 
-        self._size_btn = _MenuToolButton("Size", self._SIZES)
-        self._size_btn.set_selection("medium")
-        self._size_btn.selection_changed.connect(self.font_size_changed)
-        lay.addWidget(self._size_btn)
+        self._size_button = _MenuToolButton("Size", self._SIZES)
+        self._size_button.set_selection(constants.FontSize.MEDIUM)
+        self._size_button.selection_changed.connect(self.font_size_changed)
+        layout.addWidget(self._size_button)
 
-        lay.addSpacing(5)
-        lay.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(5)
+        _add_divider(layout, spacing=5)
 
-        # B / I / U style toggles
-        self._style_btns = {}
+        self._style_buttons = {}
         for key, label, signal in (
             ("bold", "Bold", self.font_bold_changed),
             ("italic", "Italic", self.font_italic_changed),
             ("underline", "Underline", self.font_underline_changed),
         ):
-            btn = _tool_button(label)
-            _apply_icon(btn, key)
-            btn.toggled.connect(signal)
-            lay.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
-            self._style_btns[key] = btn
+            button = _tool_button(label)
+            _apply_icon(button, key)
+            button.toggled.connect(signal)
+            layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
+            self._style_buttons[key] = button
 
-        lay.addStretch()
+        layout.addStretch()
 
     def set_font_family(self, name):
-        idx = self._font_combo.findText(name)
-        if idx >= 0:
-            self._font_combo.blockSignals(True)
-            self._font_combo.setCurrentIndex(idx)
+        index = self._font_combo.findText(name)
+        if index >= 0:
+            with QtCore.QSignalBlocker(self._font_combo):
+                self._font_combo.setCurrentIndex(index)
             self._font_combo.sync_display_font(name)
-            self._font_combo.blockSignals(False)
 
     def set_font_size(self, size):
-        self._size_btn.set_selection(size if self._size_btn.has_item(size) else "medium")
+        self._size_button.set_selection(size if self._size_button.has_item(size) else constants.FontSize.MEDIUM)
 
-    def _set_style(self, key, v):
-        btn = self._style_btns[key]
-        btn.blockSignals(True)
-        btn.setChecked(v)
-        btn.blockSignals(False)
+    def _set_style(self, key, value):
+        with QtCore.QSignalBlocker(self._style_buttons[key]):
+            self._style_buttons[key].setChecked(value)
 
-    def set_bold(self, v):
-        self._set_style("bold", v)
+    def set_bold(self, value):
+        self._set_style("bold", value)
 
-    def set_italic(self, v):
-        self._set_style("italic", v)
+    def set_italic(self, value):
+        self._set_style("italic", value)
 
-    def set_underline(self, v):
-        self._set_style("underline", v)
-
-
-# ---------------------------------------------------------------------------
-# Floating color picker popup
-# ---------------------------------------------------------------------------
-
-
-class ColorPickerPopup(QtWidgets.QFrame):
-    """Floating color picker that appears to the right of the toolbar."""
-
-    color_changed = QtCore.Signal(QtGui.QColor)
-
-    def __init__(self, parent=None):
-        super().__init__(parent, QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
-        self.setObjectName("annotationBetaColorPopup")
-        self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        self._picker = ColorPickerSection()
-        self._picker.color_changed.connect(self.color_changed)
-        lay.addWidget(self._picker)
-        self.adjustSize()
-
-    def show_near(self, anchor_widget):
-        """Position and show the popup to the right of anchor_widget."""
-        pos = anchor_widget.mapToGlobal(QtCore.QPoint(anchor_widget.width() + 6, 0))
-        self.move(pos)
-        self.show()
-        self.raise_()
-
-    def set_color(self, c):
-        self._picker.set_color(c)
+    def set_underline(self, value):
+        self._set_style("underline", value)
 
 
 # ---------------------------------------------------------------------------
@@ -752,69 +619,57 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self.setObjectName("secondaryPanel")
         self.setFixedWidth(80)
 
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(4, 8, 4, 8)
-        lay.setSpacing(0)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(4, 8, 4, 8)
+        layout.setSpacing(0)
 
         self._stack = QtWidgets.QStackedWidget()
-        lay.addWidget(self._stack)
+        layout.addWidget(self._stack)
 
-        # Page 0 — brush tools (arrow, line)
-        self._brush_panel = _SizeOpacityPanel()
-        self._brush_panel.size_changed.connect(self.size_changed)
-        self._brush_panel.opacity_changed.connect(self.opacity_changed)
-        self._stack.addWidget(self._brush_panel)
-
-        # Page 1 — shape tools (rect, circle)
-        self._shape_panel = _ShapeOptionsPanel()
-        self._shape_panel.filled_changed.connect(self.filled_changed)
-        self._shape_panel.size_changed.connect(self.size_changed)
-        self._shape_panel.opacity_changed.connect(self.opacity_changed)
-        self._stack.addWidget(self._shape_panel)
-
-        # Page 2 — text tool
+        self._brush_panel = _SizeOpacityPanel()  # arrow, line
+        self._shape_panel = _ShapeOptionsPanel()  # rect, circle
         self._text_panel = _TextOptionsPanel()
+        self._pen_panel = _PenPanel()  # pen, airbrush
+        self._eraser_panel = _EraserPanel()
+        self._pages = {
+            _Page.SIZE_OPACITY: self._brush_panel,
+            _Page.SHAPE: self._shape_panel,
+            _Page.TEXT: self._text_panel,
+            _Page.BLEND: self._pen_panel,
+            _Page.ERASER: self._eraser_panel,
+        }
+        for page in self._pages.values():
+            self._stack.addWidget(page)
+
+        self._slider_panels = (self._brush_panel, self._shape_panel, self._pen_panel, self._eraser_panel)
+        for panel in self._slider_panels:
+            panel.size_changed.connect(self.size_changed)
+            panel.opacity_changed.connect(self.opacity_changed)
+        self._shape_panel.filled_changed.connect(self.filled_changed)
+        self._pen_panel.color_modifier_changed.connect(self.color_modifier_changed)
+        self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
         self._text_panel.font_family_changed.connect(self.font_family_changed)
         self._text_panel.font_size_changed.connect(self.font_size_changed)
         self._text_panel.font_bold_changed.connect(self.font_bold_changed)
         self._text_panel.font_italic_changed.connect(self.font_italic_changed)
         self._text_panel.font_underline_changed.connect(self.font_underline_changed)
-        self._stack.addWidget(self._text_panel)
-
-        # Page 3 — pen and airbrush (size + opacity + blend mode buttons)
-        self._pen_panel = _PenPanel()
-        self._pen_panel.size_changed.connect(self.size_changed)
-        self._pen_panel.opacity_changed.connect(self.opacity_changed)
-        self._pen_panel.color_modifier_changed.connect(self.color_modifier_changed)
-        self._stack.addWidget(self._pen_panel)
-
-        # Page 4 — eraser (brush type combo + size + opacity)
-        self._eraser_panel = _EraserPanel()
-        self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
-        self._eraser_panel.size_changed.connect(self.size_changed)
-        self._eraser_panel.opacity_changed.connect(self.opacity_changed)
-        self._stack.addWidget(self._eraser_panel)
 
     def set_page_for_tool(self, tool):
-        page = TOOLS[tool].page
-        self._stack.setVisible(page != _PAGE_EMPTY)
-        if page != _PAGE_EMPTY:
-            self._stack.setCurrentIndex(page)
+        page = _TOOLS[tool].page
+        self._stack.setVisible(page is not None)
+        if page is not None:
+            self._stack.setCurrentWidget(self._pages[page])
 
-    def set_size(self, v):
-        self._brush_panel.set_size(v)
-        self._shape_panel.set_size(v)
-        self._pen_panel.set_size(v)
-        self._eraser_panel.set_size(v)
+    def set_size(self, value):
+        for panel in self._slider_panels:
+            panel.set_size(value)
 
-    def set_opacity(self, v):
-        self._brush_panel.set_opacity(v)
-        self._shape_panel.set_opacity(v)
-        self._pen_panel.set_opacity(v)
-        self._eraser_panel.set_opacity(v)
+    def set_opacity(self, value):
+        for panel in self._slider_panels:
+            panel.set_opacity(value)
 
-    def set_filled(self, v):
-        self._shape_panel.set_filled(v)
+    def set_filled(self, value):
+        self._shape_panel.set_filled(value)
 
     def set_color_modifier(self, mode):
         self._pen_panel.set_color_modifier(mode)
@@ -834,14 +689,14 @@ class AnnotateSecondaryPanel(_StyledWidget):
     def set_font_size(self, size):
         self._text_panel.set_font_size(size)
 
-    def set_bold(self, v):
-        self._text_panel.set_bold(v)
+    def set_bold(self, value):
+        self._text_panel.set_bold(value)
 
-    def set_italic(self, v):
-        self._text_panel.set_italic(v)
+    def set_italic(self, value):
+        self._text_panel.set_italic(value)
 
-    def set_underline(self, v):
-        self._text_panel.set_underline(v)
+    def set_underline(self, value):
+        self._text_panel.set_underline(value)
 
 
 # ---------------------------------------------------------------------------
@@ -857,73 +712,60 @@ class AnnotateToolStrip(_StyledWidget):
     redo_requested = QtCore.Signal()
     clear_requested = QtCore.Signal()
     clear_all_requested = QtCore.Signal()
-    swatch_toggle_requested = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("toolStrip")
         self.setFixedWidth(50)
 
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(8, 8, 8, 8)
-        lay.setSpacing(0)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(0)
 
         self._group = QtWidgets.QButtonGroup(self)
         self._buttons = {}
 
-        def _add_tool(tool, grouppos="solo"):
-            btn = _tool_button(TOOLS[tool].tooltip)
-            _apply_icon(btn, tool)
-            if grouppos != "solo":
-                btn.setProperty("grouppos", grouppos)
-            self._buttons[tool] = btn
-            self._group.addButton(btn)
-            lay.addWidget(btn)
+        def _add_tool(tool, grouppos=None):
+            button = _tool_button(_TOOLS[tool].tooltip)
+            _apply_icon(button, tool)
+            if grouppos:
+                button.setProperty("grouppos", grouppos)
+            button.clicked.connect(partial(self.tool_changed.emit, tool))
+            self._buttons[tool] = button
+            self._group.addButton(button)
+            layout.addWidget(button)
 
         def _group_of(tools):
             """Add a visually-connected group of tool buttons (1px gap between them)."""
-            for i, tool in enumerate(tools):
-                if i == 0:
-                    pos = "first"
-                elif i == len(tools) - 1:
-                    pos = "last"
-                else:
-                    pos = "mid"
-                _add_tool(tool, grouppos=pos)
-                if i < len(tools) - 1:
-                    lay.addSpacing(1)
+            for index, (tool, group_position) in enumerate(zip(tools, _group_positions(len(tools)))):
+                if index:
+                    layout.addSpacing(1)
+                _add_tool(tool, grouppos=group_position)
 
-        # Cursor — standalone
-        _add_tool(TOOL_CURSOR)
+        _add_tool(constants.Tool.CURSOR)
 
-        lay.addSpacing(2)
+        layout.addSpacing(2)
 
-        # Drawing group: pen + airbrush + eraser
-        _group_of([TOOL_PEN, TOOL_AIRBRUSH, TOOL_ERASER])
+        _group_of([constants.Tool.PEN, constants.Tool.AIRBRUSH, constants.Tool.ERASER])
 
-        lay.addSpacing(2)
+        layout.addSpacing(2)
 
-        # Shapes group: rect + circle + arrow + line
-        _group_of([TOOL_RECT, TOOL_CIRCLE, TOOL_ARROW, TOOL_LINE])
+        _group_of([constants.Tool.RECT, constants.Tool.CIRCLE, constants.Tool.ARROW, constants.Tool.LINE])
 
-        lay.addSpacing(2)
+        layout.addSpacing(2)
 
-        # Text and eyedropper — standalone
-        _add_tool(TOOL_TEXT)
-        lay.addSpacing(2)
-        _add_tool(TOOL_EYEDROPPER)
+        _add_tool(constants.Tool.TEXT)
+        layout.addSpacing(2)
+        _add_tool(constants.Tool.EYEDROPPER)
 
-        # Fixed gap + divider + swatch (NOT floating — swatch follows tools)
-        lay.addSpacing(10)
-        lay.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
-        lay.addSpacing(10)
+        layout.addSpacing(10)
+        layout.addWidget(_separator(15), alignment=QtCore.Qt.AlignHCenter)
+        layout.addSpacing(10)
 
-        self._swatch = ColorSwatch()
-        lay.addWidget(self._swatch, alignment=QtCore.Qt.AlignHCenter)
-        self._swatch.swatch_clicked.connect(self.swatch_toggle_requested)
+        self.swatch = ColorSwatch()
+        layout.addWidget(self.swatch, alignment=QtCore.Qt.AlignHCenter)
 
-        # All remaining space goes here, pushing actions to the bottom
-        lay.addStretch()
+        layout.addStretch()
 
         self._undo_action = QtGui.QAction(_load_icon("undo"), "Undo", self)
         self._undo_action.setShortcut(QtGui.QKeySequence.StandardKey.Undo)
@@ -931,13 +773,13 @@ class AnnotateToolStrip(_StyledWidget):
         self._undo_action.setEnabled(False)
         self._undo_action.triggered.connect(self.undo_requested)
 
-        self._undo_btn = _tool_button(checkable=False)
-        self._undo_btn.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
-        self._undo_btn.setDefaultAction(self._undo_action)
-        self._undo_btn.setObjectName("actionButton")
-        lay.addWidget(self._undo_btn)
+        self._undo_button = _tool_button(checkable=False)
+        self._undo_button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
+        self._undo_button.setDefaultAction(self._undo_action)
+        self._undo_button.setObjectName("actionButton")
+        layout.addWidget(self._undo_button)
 
-        lay.addSpacing(1)
+        layout.addSpacing(1)
 
         self._redo_action = QtGui.QAction(_load_icon("redo"), "Redo", self)
         if sys.platform == "win32":
@@ -948,58 +790,51 @@ class AnnotateToolStrip(_StyledWidget):
         self._redo_action.setEnabled(False)
         self._redo_action.triggered.connect(self.redo_requested)
 
-        self._redo_btn = _tool_button(checkable=False)
-        self._redo_btn.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
-        self._redo_btn.setDefaultAction(self._redo_action)
-        self._redo_btn.setObjectName("actionButton")
-        lay.addWidget(self._redo_btn)
+        self._redo_button = _tool_button(checkable=False)
+        self._redo_button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
+        self._redo_button.setDefaultAction(self._redo_action)
+        self._redo_button.setObjectName("actionButton")
+        layout.addWidget(self._redo_button)
 
-        lay.addSpacing(1)
+        layout.addSpacing(1)
 
-        self._clear_btn = _tool_button("Clear Frame", checkable=False)
-        self._clear_btn.setObjectName("actionButton")
-        _apply_icon(self._clear_btn, "clear")
-        self._clear_btn.clicked.connect(self._on_clear_clicked)
-        lay.addWidget(self._clear_btn)
+        self._clear_button = _tool_button("Clear Frame", checkable=False)
+        self._clear_button.setObjectName("actionButton")
+        _apply_icon(self._clear_button, "clear")
+        self._clear_button.clicked.connect(self._on_clear_clicked)
+        layout.addWidget(self._clear_button)
 
-        self._group.buttonClicked.connect(self._on_tool_clicked)
-        self._buttons[TOOL_PEN].setChecked(True)
+        self._buttons[constants.Tool.PEN].setChecked(True)
 
     def _on_clear_clicked(self):
         menu = QtWidgets.QMenu(self)
         menu.addAction("Clear Frame", self.clear_requested.emit)
         menu.addAction("Clear All Frames on Timeline", self._on_clear_all_confirmed)
-        pos = self._clear_btn.mapToGlobal(QtCore.QPoint(self._clear_btn.width() + 2, 0))
-        menu.exec(pos)
+        position = self._clear_button.mapToGlobal(QtCore.QPoint(self._clear_button.width() + 2, 0))
+        menu.exec(position)
 
     def _on_clear_all_confirmed(self):
-        dlg = QtWidgets.QMessageBox(self)
-        dlg.setWindowTitle("Clear Annotations")
-        dlg.setText("Clear all annotations from the current timeline?")
-        dlg.setStandardButtons(QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
-        dlg.setDefaultButton(QtWidgets.QMessageBox.Cancel)
-        if dlg.exec() == QtWidgets.QMessageBox.Ok:
+        dialog = QtWidgets.QMessageBox(self)
+        dialog.setWindowTitle("Clear Annotations")
+        dialog.setText("Clear all annotations from the current timeline?")
+        dialog.setStandardButtons(QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
+        dialog.setDefaultButton(QtWidgets.QMessageBox.Cancel)
+        if dialog.exec() == QtWidgets.QMessageBox.Ok:
             self.clear_all_requested.emit()
 
-    def _on_tool_clicked(self, btn):
-        for tool, b in self._buttons.items():
-            if b is btn:
-                self.tool_changed.emit(tool)
-                return
-
     def set_active_tool(self, tool):
-        btn = self._buttons.get(tool)
-        if btn:
-            btn.setChecked(True)
+        button = self._buttons.get(tool)
+        if button:
+            button.setChecked(True)
 
     def set_tool_enabled(self, tool, enabled):
         """Enable or disable a tool button. If the tool is active when disabled, switches to pen."""
-        btn = self._buttons.get(tool)
-        if btn:
-            btn.setEnabled(enabled)
-            if not enabled and btn.isChecked():
-                self._buttons[TOOL_PEN].setChecked(True)
-                self.tool_changed.emit(TOOL_PEN)
+        button = self._buttons.get(tool)
+        if button:
+            button.setEnabled(enabled)
+            if not enabled and button.isChecked():
+                self._buttons[constants.Tool.PEN].setChecked(True)
+                self.tool_changed.emit(constants.Tool.PEN)
 
     def set_undo_enabled(self, enabled):
         self._undo_action.setEnabled(enabled)
@@ -1009,7 +844,7 @@ class AnnotateToolStrip(_StyledWidget):
 
     def set_color(self, color):
         """Update the swatch color display."""
-        self._swatch.set_color(color)
+        self.swatch.set_color(color)
 
 
 # ---------------------------------------------------------------------------
@@ -1036,35 +871,33 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     redo_requested = QtCore.Signal()
     clear_requested = QtCore.Signal()
     clear_all_requested = QtCore.Signal()
-    swatch_toggle_requested = QtCore.Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("annotationBeta")
 
-        lay = QtWidgets.QHBoxLayout(self)
-        lay.setContentsMargins(0, 0, 0, 0)
-        lay.setSpacing(0)
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         self._strip = AnnotateToolStrip()
-        lay.addWidget(self._strip)
+        layout.addWidget(self._strip)
 
         self._panel = AnnotateSecondaryPanel()
-        lay.addWidget(self._panel)
+        layout.addWidget(self._panel)
 
         # Floating color picker popup (no parent — truly floating)
         self._picker_popup = ColorPickerPopup()
         self._picker_popup.color_changed.connect(self._on_color_changed)
 
-        # Wire strip signals
         self._strip.tool_changed.connect(self._on_tool_changed)
         self._strip.undo_requested.connect(self.undo_requested)
         self._strip.redo_requested.connect(self.redo_requested)
         self._strip.clear_requested.connect(self.clear_requested)
         self._strip.clear_all_requested.connect(self.clear_all_requested)
-        self._strip.swatch_toggle_requested.connect(self._on_swatch_toggle)
+        self._strip.swatch.clicked.connect(self._on_swatch_toggle)
 
-        # Wire panel signals (no color_changed — that comes from the popup now)
+        # color_changed comes from the popup, not the panel
         self._panel.size_changed.connect(self.size_changed)
         self._panel.opacity_changed.connect(self.opacity_changed)
         self._panel.filled_changed.connect(self.filled_changed)
@@ -1076,8 +909,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._panel.font_italic_changed.connect(self.font_italic_changed)
         self._panel.font_underline_changed.connect(self.font_underline_changed)
 
-        # Set initial page
-        self._panel.set_page_for_tool(TOOL_PEN)
+        self._panel.set_page_for_tool(constants.Tool.PEN)
 
     def _on_tool_changed(self, tool):
         self._panel.set_page_for_tool(tool)
@@ -1087,8 +919,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         if self._picker_popup.isVisible():
             self._picker_popup.hide()
         else:
-            self._picker_popup.show_near(self._strip._swatch)
-        self.swatch_toggle_requested.emit()
+            self._picker_popup.show_near(self._strip.swatch)
 
     def hide_popups(self):
         self._picker_popup.hide()
@@ -1102,16 +933,15 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._strip.set_color(color)
         self._picker_popup.set_color(color)
 
-    def set_size(self, v):
-        self._panel.set_size(v)
+    def set_size(self, value):
+        self._panel.set_size(value)
 
-    def set_opacity(self, v):
-        self._panel.set_opacity(v)
+    def set_opacity(self, value):
+        self._panel.set_opacity(value)
 
-    def set_filled(self, v):
-        self._panel.set_filled(v)
+    def set_filled(self, value):
+        self._panel.set_filled(value)
 
-    # Passthrough accessors so the mode can read current UI state
     @property
     def panel(self):
         return self._panel
@@ -1120,11 +950,11 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     def strip(self):
         return self._strip
 
-    def set_undo_enabled(self, v):
-        self._strip.set_undo_enabled(v)
+    def set_undo_enabled(self, enabled):
+        self._strip.set_undo_enabled(enabled)
 
-    def set_redo_enabled(self, v):
-        self._strip.set_redo_enabled(v)
+    def set_redo_enabled(self, enabled):
+        self._strip.set_redo_enabled(enabled)
 
     def set_tool_enabled(self, tool, enabled):
         self._strip.set_tool_enabled(tool, enabled)
