@@ -422,7 +422,7 @@ namespace Rv
         TWK_GLDEBUG;
     }
 
-    bool GLWindow::eventFilter(QObject* object, QEvent* event)
+    bool GLWindow::eventFilter(QObject* /*object*/, QEvent* event)
     {
         if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
             || event->type() == QEvent::ShortcutOverride)
@@ -433,7 +433,7 @@ namespace Rv
             //  otherwise any number of ShortcutOverride/Press pairs get
             //  filtered out and auto-repeat doesn't work.
             //
-            if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+            if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
             {
                 if (m_lastKey == kevent->key()
                     && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
@@ -449,8 +449,8 @@ namespace Rv
                 m_lastKey = kevent->key();
             }
 
-            Session* session = m_doc ? m_doc->session() : nullptr;
-            if (session && m_videoDevice)
+            Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+            if (session != nullptr && m_videoDevice != nullptr)
             {
                 session->setEventVideoDevice(m_videoDevice);
                 m_videoDevice->translator().sendQTEvent(event);
