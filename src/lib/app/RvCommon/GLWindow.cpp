@@ -97,6 +97,7 @@ namespace Rv
         , m_stopProcessingEvents(false)
         , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
         , m_syncingDevicePixelRatio(false)
+        , m_profilingSwapPending(false)
         , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
@@ -118,11 +119,34 @@ namespace Rv
         //  Queued: screenChanged() is emitted before devicePixelRatio()
         //  reports the new value.
         connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
+
+        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::endProfilingSwap);
     }
 
     GLWindow::~GLWindow() {}
 
     void GLWindow::stopProcessingEvents() { m_stopProcessingEvents = true; }
+
+    void GLWindow::endProfilingSwap()
+    {
+        //
+        //  The former QOpenGLWidget-based paintGL() swapped explicitly and
+        //  timed it. QOpenGLWindow swaps after paintGL() returns and emits
+        //  frameSwapped() right after, so the swap end is recorded here.
+        //
+        if (!m_profilingSwapPending)
+            return;
+
+        m_profilingSwapPending = false;
+
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (session)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
+        }
+    }
 
     void GLWindow::eventProcessingTimeout() { m_doc->session()->userGenericEvent("per-render-event-processing", ""); }
 
@@ -295,6 +319,7 @@ namespace Rv
         TWK_GLDEBUG;
 
         IPCore::Session* session = m_doc->session();
+        const bool debug = IPCore::debugProfile && session;
 
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
@@ -306,6 +331,12 @@ namespace Rv
                 m_doc->center();
                 TWK_GLDEBUG;
             }
+        }
+
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->beginProfilingSample();
+            trecord.renderStart = session->profilingElapsedTime();
         }
 
         if (m_doc && session && m_videoDevice)
@@ -358,12 +389,30 @@ namespace Rv
         if (m_stopProcessingEvents)
             return;
 
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.renderEnd = session->profilingElapsedTime();
+            trecord.swapStart = trecord.renderEnd;
+        }
+
         // If a separate output device is presenting, sync it. The control
         // (window) surface presents itself: QOpenGLWindow swaps automatically
         // after paintGL returns.
         if (session->outputVideoDevice() != m_videoDevice)
         {
             session->outputVideoDevice()->syncBuffers();
+
+            if (debug)
+            {
+                Session::ProfilingRecord& trecord = session->currentProfilingSample();
+                trecord.swapEnd = session->profilingElapsedTime();
+                session->endProfilingSample();
+            }
+        }
+        else if (debug)
+        {
+            m_profilingSwapPending = true;
         }
 
         session->addSyncSample();
