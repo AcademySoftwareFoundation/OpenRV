@@ -28,6 +28,9 @@ _PEN_WIDTH_MAX = 0.024
 
 _BORDER_WIDTH_MIN = 0.001
 
+# Shift bit of event.modifiers() (TwkApp ModifierEvent::Shift).
+_SHIFT_MODIFIER = 1 << 0
+
 # Base WCS fractions for each font size tier (desired px at zoom=1 / 1080).
 # Multiplied by _screen_scale() when the text is created, so:
 #   - new text has the same initial screen size regardless of zoom
@@ -92,7 +95,6 @@ class AnnotateDrawEngine:
         self._current_shape = None
         self._shape_type = None
         self._shape_active = False
-        self._shift_transition = False
         self._constraint_angle = None
 
         # Text editing state
@@ -470,7 +472,6 @@ class AnnotateDrawEngine:
         self._last_image_point = image_point
         self._shape_type = prefix
         self._shape_active = True
-        self._shift_transition = False
         commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
         # Open a sync accumulation block that stays open until _do_release so the
         # entire shape (push → drag → release) is sent as one batch to remote
@@ -510,9 +511,8 @@ class AnnotateDrawEngine:
         if tool not in constants.SHAPE_TOOLS:
             event.reject()
             return
-        if self._shift_transition:
-            self._shift_transition = False
-            return
+        if self._shape_active:
+            return  # synthetic push after a Shift change mid-drag; keep the current shape
         paint_node, frame = self._find_paint_node()
         if paint_node is None:
             event.reject()
@@ -553,7 +553,10 @@ class AnnotateDrawEngine:
         if tool not in constants.SHAPE_TOOLS or not self._shape_active:
             event.reject()
             return
-        if self._shift_transition:
+        # On a modifier change mid-drag, QTTranslator::sendMouseEvent sends a synthetic
+        # release named with the old modifiers but carrying the live ones. A real release
+        # always matches, so a Shift mismatch means the drag continues.
+        if constrained != bool(event.modifiers() & _SHIFT_MODIFIER):
             return
         source_name, image_point = self._pointer_location(event)
         if not source_name:
@@ -588,14 +591,11 @@ class AnnotateDrawEngine:
             dx = self._last_image_point.x - self._anchor.x
             dy = self._last_image_point.y - self._anchor.y
             self._constraint_angle = math.atan2(dy, dx)
-        self._shift_transition = True
 
     def on_shift_up(self, event):
         if self._text_active:
             return
         self._constraint_angle = None
-        if self._shape_active:
-            self._shift_transition = True
 
     # ------------------------------------------------------------------
     # Text key handlers
