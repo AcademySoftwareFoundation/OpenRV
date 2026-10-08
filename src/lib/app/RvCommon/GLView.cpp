@@ -20,6 +20,8 @@
 #include <IPCore/Session.h>
 #include <QtWidgets/QVBoxLayout>
 #include <QtGui/QResizeEvent>
+#include <QtGui/QCursor>
+#include <QtCore/QEvent>
 #include <QOpenGLContext>
 #include <QTimer>
 #include <iostream>
@@ -359,12 +361,28 @@ namespace Rv
 
     bool GLView::eventFilter(QObject* object, QEvent* event) { return m_glWindow != nullptr && m_glWindow->eventFilter(object, event); }
 
-    void GLView::setCursor(const QCursor& cursor)
+    bool GLView::event(QEvent* event)
     {
-        if (m_glWindow != nullptr)
+        //
+        //  The viewport renders in a native QWindow embedded through
+        //  createWindowContainer(), and Qt does not propagate a widget's cursor
+        //  to an embedded window. Forward it so QWidget::setCursor() /
+        //  unsetCursor() on the view -- whichever pointer type the caller holds
+        //  (e.g. RvDocument::viewWidget()) -- reaches the surface under the mouse.
+        //
+        if (event->type() == QEvent::CursorChange && m_glWindow != nullptr)
         {
-            m_glWindow->setCursor(cursor);
+            if (testAttribute(Qt::WA_SetCursor))
+            {
+                m_glWindow->setCursor(cursor());
+            }
+            else
+            {
+                m_glWindow->unsetCursor();
+            }
         }
+
+        return QWidget::event(event);
     }
 
     bool GLView::firstPaintCompleted() const { return m_glWindow && m_glWindow->firstPaintCompleted(); }
