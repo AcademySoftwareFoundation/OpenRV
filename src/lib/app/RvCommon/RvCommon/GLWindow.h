@@ -61,6 +61,8 @@ namespace Rv
 
         bool event(QEvent*) override;
 
+        bool eventFilter(QObject* object, QEvent* event) override;
+
         bool firstPaintCompleted() const { return m_firstPaintCompleted; }
 
         // Absolute (global) top-left position of the surface in pixels.

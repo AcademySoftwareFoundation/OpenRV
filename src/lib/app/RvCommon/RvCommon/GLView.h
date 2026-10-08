@@ -69,6 +69,10 @@ namespace Rv
 
         void stopProcessingEvents();
 
+        //  Forwards key and shortcut events of a watched object to RV's event
+        //  system (e.g. the Session Manager dock, via mainViewWidget()).
+        bool eventFilter(QObject* object, QEvent* event) override;
+
         void setCursor(const QCursor& cursor);
 
         bool firstPaintCompleted() const;

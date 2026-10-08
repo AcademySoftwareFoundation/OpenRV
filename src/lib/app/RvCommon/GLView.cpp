@@ -357,6 +357,8 @@ namespace Rv
             m_glWindow->stopProcessingEvents();
     }
 
+    bool GLView::eventFilter(QObject* object, QEvent* event) { return m_glWindow != nullptr && m_glWindow->eventFilter(object, event); }
+
     void GLView::setCursor(const QCursor& cursor)
     {
         if (m_glWindow != nullptr)

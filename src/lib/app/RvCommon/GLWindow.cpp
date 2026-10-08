@@ -422,6 +422,47 @@ namespace Rv
         TWK_GLDEBUG;
     }
 
+    bool GLWindow::eventFilter(QObject* /*object*/, QEvent* event)
+    {
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
+            || event->type() == QEvent::ShortcutOverride)
+        {
+            //
+            //  Qt can deliver both ShortcutOverride and KeyPress for the same
+            //  key; filter the duplicate here. Remember the new key/type,
+            //  otherwise any number of ShortcutOverride/Press pairs get
+            //  filtered out and auto-repeat doesn't work.
+            //
+            if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
+            {
+                if (m_lastKey == kevent->key()
+                    && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
+                        || (m_lastKeyType == kevent->type())))
+                {
+                    m_lastKey = kevent->key();
+                    m_lastKeyType = kevent->type();
+                    event->accept();
+                    return true;
+                }
+
+                m_lastKeyType = kevent->type();
+                m_lastKey = kevent->key();
+            }
+
+            Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+            if (session != nullptr && m_videoDevice != nullptr)
+            {
+                session->setEventVideoDevice(m_videoDevice);
+                m_videoDevice->translator().sendQTEvent(event);
+            }
+
+            event->accept();
+            return true;
+        }
+
+        return false;
+    }
+
     bool GLWindow::event(QEvent* event)
     {
         //  Before the base class paints, else one frame presents at the wrong
