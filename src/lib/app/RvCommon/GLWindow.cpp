@@ -136,8 +136,8 @@ namespace Rv
 
         m_profilingSwapPending = false;
 
-        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
-        if (session)
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
         {
             Session::ProfilingRecord& trecord = session->currentProfilingSample();
             trecord.swapEnd = session->profilingElapsedTime();
@@ -316,7 +316,7 @@ namespace Rv
         TWK_GLDEBUG;
 
         IPCore::Session* session = m_doc->session();
-        const bool debug = IPCore::debugProfile && session;
+        const bool debug = IPCore::debugProfile && session != nullptr;
 
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
@@ -383,8 +383,10 @@ namespace Rv
             TWK_GLDEBUG;
         }
 
-        if (m_stopProcessingEvents)
+        if (m_stopProcessingEvents || session == nullptr)
+        {
             return;
+        }
 
         if (debug)
         {
