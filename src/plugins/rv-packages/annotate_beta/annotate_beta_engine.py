@@ -26,6 +26,11 @@ _SIZE_SCALE = 1.0 / 10000.0
 _PEN_WIDTH_MIN = 0.001
 _PEN_WIDTH_MAX = 0.024
 
+# Minimum spacing between recorded stroke points, as a fraction of stroke width.
+# Matches the splat smoothing interval in PaintIPNode::compilePenComponent, so
+# closer points only pile up as overlapping airbrush splats.
+_PEN_MIN_POINT_SPACING = 0.25
+
 _BORDER_WIDTH_MIN = 0.001
 
 # Base WCS fractions for each font size tier (desired px at zoom=1 / 1080).
@@ -362,7 +367,7 @@ class AnnotateDrawEngine:
         if self._pen_last_point is None:
             return False
         distance = math.hypot(image_point.x - self._pen_last_point.x, image_point.y - self._pen_last_point.y)
-        return distance < constants.PEN_MIN_POINT_SPACING * self._pen_stroke_width
+        return distance < _PEN_MIN_POINT_SPACING * self._pen_stroke_width
 
     def _pen_push(self, event):
         if commands.isPlaying():
