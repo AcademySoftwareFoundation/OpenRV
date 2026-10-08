@@ -154,8 +154,8 @@ namespace Rv
             return;
         }
 
-        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
-        if (session)
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
         {
             ostringstream contents;
             contents << event->oldSize().width() << " " << event->oldSize().height() << "|" << event->size().width() << " "

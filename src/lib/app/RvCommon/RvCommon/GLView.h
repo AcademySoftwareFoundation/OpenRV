@@ -111,7 +111,7 @@ namespace Rv
 
     protected:
         void showEvent(QShowEvent*) override;
-        void resizeEvent(QResizeEvent*) override;
+        void resizeEvent(QResizeEvent* event) override;
 
     private:
         RvDocument* m_doc;
