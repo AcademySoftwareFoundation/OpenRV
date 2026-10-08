@@ -197,11 +197,6 @@ class: AnnotateMinorMode : MinorMode
     Point             _shapeLastPei;         // most recent drag position (for shift capture)
     float             _shapeConstraintAngle; // diagonal angle locked when shift is pressed;
                                              // -999.0 = use standard 1:1 / 45° snap
-    // When shift is pressed/released mid-drag, RV synthesizes a release + push pair
-    // whose modifier states differ. The shift key event fires first; we set this flag
-    // to tell the synthetic release/push pair to no-op so the in-progress shape stays
-    // alive across the modifier transition.
-    bool              _shapeShiftTransition;
 
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
@@ -1169,8 +1164,7 @@ class: AnnotateMinorMode : MinorMode
     // key-down--shift--shift: shift was pressed. (The double "shift" in the event name
     // is by design — see QTTranslator::sendKeyEvent: m_modifiers gets shift added before
     // modifierString builds the name, so both the modifier prefix and the key name are
-    // "shift".) If a shape is active, mark a transition so the synthetic release/push
-    // RV is about to fire is suppressed, and capture the current diagonal angle.
+    // "shift".) If a shape is active, capture the current diagonal angle.
     method: shapeShiftDown (void; Event event)
     {
         if (_shapeActive)
@@ -1178,30 +1172,19 @@ class: AnnotateMinorMode : MinorMode
             let dx = _shapeLastPei.x - _shapeAnchor.x,
                 dy = _shapeLastPei.y - _shapeAnchor.y;
             _shapeConstraintAngle = atan2(dy, dx);
-            _shapeShiftTransition = true;
         }
     }
 
-    // key-up--shift: shift was released. Clear the constraint and (symmetric to
-    // shapeShiftDown) mark a transition for the upcoming synthetic release/push.
+    // key-up--shift: shift was released. Clear the constraint.
     method: shapeShiftUp (void; Event event)
     {
         _shapeConstraintAngle = -999.0;
-        if (_shapeActive)
-        {
-            _shapeShiftTransition = true;
-        }
     }
 
     // pointer-1--shift--push: starts a new shape with shift held, OR is the synthetic
-    // push half of a modifier-transition pair (clears the flag set by shapeShiftDown).
+    // push half of a modifier-transition pair (shape already active, keep it).
     method: shapePushShift (void; Event event)
     {
-        if (_shapeShiftTransition)
-        {
-            _shapeShiftTransition = false;
-            return;
-        }
         if (!_shapeActive)
         {
             shapePush(event);
@@ -1271,15 +1254,11 @@ class: AnnotateMinorMode : MinorMode
     }
 
     // Mouse-down handler shared by all shape tools.
-    // If this is the synthetic push half of a modifier transition (flag set by
-    // shapeShiftUp), no-op so the in-progress shape continues without interruption.
+    // If a shape is already active, this is the synthetic push half of a modifier
+    // transition: no-op so the in-progress shape continues without interruption.
     method: shapePush (void; Event event)
     {
-        if (_shapeShiftTransition)
-        {
-            _shapeShiftTransition = false;
-            return;
-        }
+        if (_shapeActive && _currentDrawObject neq nil) return;
 
         updateCurrentNode();
         if (_currentNode eq nil) return;
@@ -1296,7 +1275,6 @@ class: AnnotateMinorMode : MinorMode
         _shapeAnchor = pei;
         _shapeLastPei = pei;
         _shapeActive = true;
-        _shapeShiftTransition = false;
 
         let d = _currentDrawMode;
         let shapeInnerColor = if (d.brushName == "arrow")
@@ -1351,16 +1329,14 @@ class: AnnotateMinorMode : MinorMode
     }
 
     // Mouse-up handler: finalise the shape geometry and commit.
-    // If this is the synthetic release half of a modifier transition (flag set by
-    // shapeShiftDown / shapeShiftUp), suppress the commit and keep the shape alive.
+    // On a modifier change mid-drag, QTTranslator::sendMouseEvent sends a synthetic
+    // release named with the old modifiers but carrying the live ones. A real release
+    // always matches, so shift held here means the drag continues.
     method: shapeRelease (void; Event event)
     {
         if (!_shapeActive || _currentDrawObject eq nil) return;
 
-        if (_shapeShiftTransition)
-        {
-            return;  // matching push will clear the flag
-        }
+        if ((event.modifiers() & Event.Shift) != 0) return;
 
         let (name, ip) = pointerLocation(event);
         if (name != "")
@@ -1401,16 +1377,13 @@ class: AnnotateMinorMode : MinorMode
     }
 
     // Shift-constrained release: finalise with constraint applied. As with
-    // shapeRelease, suppress the commit if this is the synthetic release half of a
-    // modifier transition.
+    // shapeRelease, shift no longer held here means this is the synthetic release
+    // half of a modifier transition and the drag continues.
     method: shapeReleaseShift (void; Event event)
     {
         if (!_shapeActive || _currentDrawObject eq nil) return;
 
-        if (_shapeShiftTransition)
-        {
-            return;
-        }
+        if ((event.modifiers() & Event.Shift) == 0) return;
 
         let (name, ip) = pointerLocation(event);
         if (name != "")
