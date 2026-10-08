@@ -83,8 +83,7 @@ namespace Rv
         //  without a change of logical size. See the definition.
         void syncDevicePixelRatio();
 
-        //  Closes the -debug profile sample opened by paintGL() once the
-        //  window has presented. See the definition.
+        //  Closes the -debug profile sample opened by paintGL() once the window has presented.
         void endProfilingSwap();
 
         RvDocument* m_doc;

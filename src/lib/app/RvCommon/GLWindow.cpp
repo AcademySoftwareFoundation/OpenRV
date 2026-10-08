@@ -129,13 +129,10 @@ namespace Rv
 
     void GLWindow::endProfilingSwap()
     {
-        //
-        //  The former QOpenGLWidget-based paintGL() swapped explicitly and
-        //  timed it. QOpenGLWindow swaps after paintGL() returns and emits
-        //  frameSwapped() right after, so the swap end is recorded here.
-        //
         if (!m_profilingSwapPending)
+        {
             return;
+        }
 
         m_profilingSwapPending = false;
 
