@@ -19,6 +19,7 @@
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
 #include <QtWidgets/QVBoxLayout>
+#include <QtGui/QResizeEvent>
 #include <QOpenGLContext>
 #include <QTimer>
 #include <iostream>
@@ -140,6 +141,27 @@ namespace Rv
         }
 
         delete m_videoDevice;
+    }
+
+    void GLView::resizeEvent(QResizeEvent* event)
+    {
+        QWidget::resizeEvent(event);
+
+        //  Notify RV of the view's logical size change
+
+        if (!isVisible() || event->oldSize().width() == -1 || event->oldSize().height() == -1)
+        {
+            return;
+        }
+
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
+        {
+            ostringstream contents;
+            contents << event->oldSize().width() << " " << event->oldSize().height() << "|" << event->size().width() << " "
+                     << event->size().height();
+            session->userGenericEvent("view-resized", contents.str());
+        }
     }
 
     void GLView::showEvent(QShowEvent* event)
