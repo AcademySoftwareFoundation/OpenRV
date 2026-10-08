@@ -55,3 +55,8 @@ DEFAULT_SIZE = 32
 OPACITY_MIN = 0
 OPACITY_MAX = 100
 DEFAULT_OPACITY = 50
+
+# Minimum spacing between recorded stroke points, as a fraction of stroke width.
+# Matches the splat smoothing interval in PaintIPNode::compilePenComponent, so
+# closer points only pile up as overlapping airbrush splats.
+PEN_MIN_POINT_SPACING = 0.25

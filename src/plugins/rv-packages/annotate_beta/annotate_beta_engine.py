@@ -108,6 +108,7 @@ class AnnotateDrawEngine:
         self._pen_paint_node = None
         self._pen_frame = None
         self._pen_stroke_width = 0.0  # base width for the active stroke, scaled by pressure per point
+        self._pen_last_point = None  # last point recorded into the active stroke
         # True while the physical eraser end of a Wacom stylus is in use; forces erase
         # mode regardless of the selected tool.
         self._stylus_erasing = False
@@ -356,6 +357,13 @@ class AnnotateDrawEngine:
         pressure = max(0.01, min(1.0, event.pressure()))
         return self._pen_stroke_width * pressure
 
+    def _pen_point_too_close(self, image_point):
+        """Return True if image_point is closer to the last recorded stroke point than the minimum spacing."""
+        if self._pen_last_point is None:
+            return False
+        distance = math.hypot(image_point.x - self._pen_last_point.x, image_point.y - self._pen_last_point.y)
+        return distance < constants.PEN_MIN_POINT_SPACING * self._pen_stroke_width
+
     def _pen_push(self, event):
         if commands.isPlaying():
             commands.stop()
@@ -396,6 +404,7 @@ class AnnotateDrawEngine:
         self._auto_mark_frame()
         self._pen_paint_node = paint_node
         self._pen_frame = frame
+        self._pen_last_point = image_point
         commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
         # sync accumulation is still open — will be flushed at _pen_release
 
@@ -403,9 +412,10 @@ class AnnotateDrawEngine:
         if not self._pen_stroke:
             return
         source_name, image_point = self._pointer_location(event)
-        if not source_name:
+        if not source_name or self._pen_point_too_close(image_point):
             return
         paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
+        self._pen_last_point = image_point
         commands.redraw()
         if not self._settings.sync_whole_strokes:
             self._end_sync(force=True)
@@ -415,7 +425,7 @@ class AnnotateDrawEngine:
         if not self._pen_stroke:
             return
         source_name, image_point = self._pointer_location(event)
-        if source_name and image_point:
+        if source_name and image_point and not self._pen_point_too_close(image_point):
             paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
         self._undo_stack.append((self._pen_paint_node, self._pen_frame, self._pen_stroke))
         self._redo_stack.clear()
@@ -424,6 +434,7 @@ class AnnotateDrawEngine:
         self._pen_stroke = None
         self._pen_paint_node = None
         self._pen_frame = None
+        self._pen_last_point = None
         commands.redraw()
         # End the whole-stroke accumulation started in _pen_push and flush to network.
         self._end_sync(force=True)
