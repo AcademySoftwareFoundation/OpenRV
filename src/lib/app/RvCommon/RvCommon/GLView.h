@@ -73,8 +73,6 @@ namespace Rv
         //  system (e.g. the Session Manager dock, via mainViewWidget()).
         bool eventFilter(QObject* object, QEvent* event) override;
 
-        void setCursor(const QCursor& cursor);
-
         bool firstPaintCompleted() const;
 
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }
@@ -114,6 +112,7 @@ namespace Rv
         void reattachGLWindow();
 
     protected:
+        bool event(QEvent* event) override;
         void showEvent(QShowEvent*) override;
         void resizeEvent(QResizeEvent* event) override;
 
