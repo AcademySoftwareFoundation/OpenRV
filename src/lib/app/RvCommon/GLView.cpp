@@ -147,13 +147,12 @@ namespace Rv
     {
         QWidget::resizeEvent(event);
 
-        //
-        //  Notify RV of the view's logical size change, as the former
-        //  QOpenGLWidget-based GLView did (used by "Lock Pixel Scale During
-        //  Resize" in rvui.mu).
-        //
+        //  Notify RV of the view's logical size change
+
         if (!isVisible() || event->oldSize().width() == -1 || event->oldSize().height() == -1)
+        {
             return;
+        }
 
         IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
         if (session)
