@@ -1430,6 +1430,32 @@ class: AnnotateMinorMode : MinorMode
         sendInternalEvent("annotate-shape-released");
     }
 
+    method: rejectEvent (void; Event event) { event.reject(); }
+
+    method: isShapeDrawMode (bool;)
+    {
+        let table = _currentDrawMode.eventTable;
+        return table == "shape_rect" || table == "shape_ellipse" || table == "shape_arrow" || table == "shape_line";
+    }
+
+    // Pointer and stylus events are bound in this mode's global table (sortKey "z")
+    // instead of the pushed draw mode tables, so widgets with a bounding box such as
+    // the timeline get them first. Routes an event to the current draw mode's handler.
+    method: drawModeEvent (void;
+                           EventFunc dropperFunc,
+                           EventFunc textFunc,
+                           EventFunc shapeFunc,
+                           EventFunc strokeFunc,
+                           Event event)
+    {
+        let table = _currentDrawMode.eventTable;
+
+        if (table == "dropper") dropperFunc(event);
+        else if (table == "textplacement") textFunc(event);
+        else if (isShapeDrawMode()) shapeFunc(event);
+        else strokeFunc(event);
+    }
+
     method: backwardDeleteChar (void; Event event)
     {
         if (_textPlacementMode && _textBuffer.size() > 1)
@@ -3659,11 +3685,14 @@ class: AnnotateMinorMode : MinorMode
 
         init(name,
              nil,
-             [("pointer-1--drag", makeCategoryEventFunc("annotate_category", drag), "Add to current stroke"),
-              ("pointer-1--push", makeCategoryEventFunc("annotate_category", push), "Start New Stroke"),
-              ("pointer-1--release", release, "End Current Stroke"),
+             [("pointer-1--drag", drawModeEvent(dropperSample, noop, shapeDrag, makeCategoryEventFunc("annotate_category", drag),), "Add to current stroke"),
+              ("pointer-1--push", drawModeEvent(dropperStartSample, startTextPlacement, shapePush, makeCategoryEventFunc("annotate_category", push),), "Start New Stroke"),
+              ("pointer-1--release", drawModeEvent(dropperSample, noop, shapeRelease, release,), "End Current Stroke"),
+              ("pointer-1--shift--push", drawModeEvent(rejectEvent, rejectEvent, shapePushShift, rejectEvent,), "Lock Aspect Ratio or Start Shape"),
+              ("pointer-1--shift--drag", drawModeEvent(rejectEvent, rejectEvent, shapeDragShift, rejectEvent,), "Resize Shape (Constrained)"),
+              ("pointer-1--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeReleaseShift, rejectEvent,), "Commit Shape (Constrained)"),
               ("pointer--move", move, ""),
-              ("pointer--shift--move", editRadius, ""),
+              ("pointer--shift--move", drawModeEvent(noop, noop, noop, editRadius,), ""),
               ("pointer--enter", enter, ""),
               ("pointer--leave", leave, ""),
               ("before-session-deletion", shutdown, ""),
@@ -3672,16 +3701,19 @@ class: AnnotateMinorMode : MinorMode
               ("after-graph-view-change", afterGraphViewChange, "Update UI"),
               ("frame-changed", updateFrameDependentStateEvent, ""),
               ("play-stop", updateFrameDependentStateEvent, ""),
-              ("stylus-pen--push", makeCategoryEventFunc("annotate_category", penPush), "Pen Down"),
-              ("stylus-pen--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
-              ("stylus-pen--shift--move", editRadius, ""),
-              ("stylus-pen--move", move, "Pen Move"),
-              ("stylus-pen--release", release, "Pen Release"),
-              ("stylus-eraser--push", makeCategoryEventFunc("annotate_category", eraserPush), "Pen Down"),
-              ("stylus-eraser--drag", makeCategoryEventFunc("annotate_category", drag), "Pen Drag"),
-              ("stylus-eraser--move", move, "Pen Move"),
-              ("stylus-eraser--shift--move", editRadius, ""),
-              ("stylus-eraser--release", release, "Pen Release"),
+              ("stylus-pen--push", drawModeEvent(dropperStartSample, startTextPlacement, shapePush, makeCategoryEventFunc("annotate_category", penPush),), "Pen Down"),
+              ("stylus-pen--drag", drawModeEvent(dropperSample, noop, shapeDrag, makeCategoryEventFunc("annotate_category", drag),), "Pen Drag"),
+              ("stylus-pen--shift--push", drawModeEvent(rejectEvent, rejectEvent, shapePushShift, rejectEvent,), "Lock Aspect Ratio or Start Shape"),
+              ("stylus-pen--shift--drag", drawModeEvent(rejectEvent, rejectEvent, shapeDragShift, rejectEvent,), "Resize Shape (Constrained)"),
+              ("stylus-pen--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeReleaseShift, rejectEvent,), "Commit Shape (Constrained)"),
+              ("stylus-pen--shift--move", drawModeEvent(dropperSample, noop, noop, editRadius,), ""),
+              ("stylus-pen--move", drawModeEvent(noop, noop, noop, move,), "Pen Move"),
+              ("stylus-pen--release", drawModeEvent(noop, noop, shapeRelease, release,), "Pen Release"),
+              ("stylus-eraser--push", drawModeEvent(noop, noop, noop, makeCategoryEventFunc("annotate_category", eraserPush),), "Pen Down"),
+              ("stylus-eraser--drag", drawModeEvent(noop, noop, noop, makeCategoryEventFunc("annotate_category", drag),), "Pen Drag"),
+              ("stylus-eraser--move", drawModeEvent(noop, noop, noop, move,), "Pen Move"),
+              ("stylus-eraser--shift--move", drawModeEvent(noop, noop, noop, editRadius,), ""),
+              ("stylus-eraser--release", drawModeEvent(noop, noop, noop, release,), "Pen Release"),
               ("key-down--d", toggleDebug, "Toggle debug display"),
               ("pointer--leave", pointerGone, "Pointer Gone"),
               ("pointer--enter", pointerNotGone, "Pointer Back"),
@@ -3741,39 +3773,15 @@ class: AnnotateMinorMode : MinorMode
              "z"
              );
 
-        defineEventTable("dropper",
-                         [("pointer-1--push", dropperStartSample, "Sample Color"),
-                          ("pointer-1--drag", dropperSample, "Sample Color"),
-                          ("pointer-1--release", dropperSample, "Sample Color"),
-                          ("pointer--shift--move", noop, ""),
-                          ("stylus-pen--push", dropperStartSample, "Sample Color"),
-                          ("stylus-pen--drag", dropperSample, "Sample Color"),
-                          ("stylus-pen--shift--move", dropperSample, "Sample Color"),
-                          ("stylus-pen--move", noop, ""),
-                          ("stylus-pen--release", noop, ""),
-                          ("stylus-eraser--push", noop, ""),
-                          ("stylus-eraser--drag", noop, ""),
-                          ("stylus-eraser--move", noop, ""),
-                          ("stylus-eraser--shift--move", noop, ""),
-                          ("stylus-eraser--release", noop, "")
-                          ]);
+        //
+        //  The draw mode tables below only hold key and session events. Pointer
+        //  and stylus events for every draw mode are routed by drawModeEvent()
+        //  from the global table so widgets such as the timeline get them first.
+        //  The "dropper" draw mode needs no table.
+        //
 
         defineEventTable("textplacement",
-                         [("pointer-1--push", startTextPlacement, "Start Placing Text"),
-                          ("pointer-1--drag", noop, ""),
-                          ("pointer-1--release", noop, ""),
-                          ("pointer--shift--move", noop, ""),
-                          ("stylus-pen--push", startTextPlacement, "Start Placing Text"),
-                          ("stylus-pen--drag", noop, ""),
-                          ("stylus-pen--shift--move", noop, ""),
-                          ("stylus-pen--move", noop, ""),
-                          ("stylus-pen--release", noop, ""),
-                          ("stylus-eraser--push", noop, ""),
-                          ("stylus-eraser--drag", noop, ""),
-                          ("stylus-eraser--move", noop, ""),
-                          ("stylus-eraser--shift--move", noop, ""),
-                          ("stylus-eraser--release", noop, ""),
-                          ("frame-changed", commitText(true,), ""),
+                         [("frame-changed", commitText(true,), ""),
                           ("before-session-write", commitText(true,), ""),
                           ("before-session-write-copy", commitText(true,), ""),
                           ("before-play-start", commitText(true,), ""),
@@ -3809,32 +3817,13 @@ class: AnnotateMinorMode : MinorMode
                               );
 
         // ── Shape event tables ───────────────────────────────────────────
-        // Each shape tool shares the same push/drag/release handlers.
-        // The _currentDrawMode.brushName field carries the shape type string
-        // so the handlers know which component prefix to create.
+        // Each shape tool shares the same shift-constraint key handlers.
+        // Pointer events go through drawModeEvent(); the _currentDrawMode.brushName
+        // field carries the shape type string so the handlers know which
+        // component prefix to create.
 
-        let shapeEvents = [("pointer-1--push",         shapePush,         "Start Shape"),
-                           ("pointer-1--drag",         shapeDrag,         "Resize Shape"),
-                           ("pointer-1--release",      shapeRelease,      "Commit Shape"),
-                           ("pointer-1--shift--push",  shapePushShift,    "Lock Aspect Ratio or Start Shape"),
-                           ("pointer-1--shift--drag",  shapeDragShift,    "Resize Shape (Constrained)"),
-                           ("pointer-1--shift--release", shapeReleaseShift, "Commit Shape (Constrained)"),
-                           ("key-down--shift--shift",  shapeShiftDown,    "Lock Aspect Ratio"),
-                           ("key-up--shift",           shapeShiftUp,      ""),
-                           ("pointer--shift--move", noop, ""),
-                           ("stylus-pen--push",         shapePush,         "Start Shape"),
-                           ("stylus-pen--drag",         shapeDrag,         "Resize Shape"),
-                           ("stylus-pen--shift--push",  shapePushShift,    "Lock Aspect Ratio or Start Shape"),
-                           ("stylus-pen--shift--drag",  shapeDragShift,    "Resize Shape (Constrained)"),
-                           ("stylus-pen--shift--release", shapeReleaseShift, "Commit Shape (Constrained)"),
-                           ("stylus-pen--shift--move", noop, ""),
-                           ("stylus-pen--move",         noop, ""),
-                           ("stylus-pen--release",      shapeRelease,      "Commit Shape"),
-                           ("stylus-eraser--push",    noop, ""),
-                           ("stylus-eraser--drag",    noop, ""),
-                           ("stylus-eraser--move",    noop, ""),
-                           ("stylus-eraser--shift--move", noop, ""),
-                           ("stylus-eraser--release", noop, "")
+        let shapeEvents = [("key-down--shift--shift",  shapeShiftDown,    "Lock Aspect Ratio"),
+                           ("key-up--shift",           shapeShiftUp,      "")
                            ];
 
         defineEventTable("shape_rect",    shapeEvents);

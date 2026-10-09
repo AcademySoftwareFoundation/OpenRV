@@ -78,10 +78,11 @@ class DrawSettings:
 
 
 class AnnotateDrawEngine:
-    def __init__(self, settings, on_history_changed, on_draw_started):
+    def __init__(self, settings, on_history_changed, on_draw_started, on_eyedropper):
         self._settings = settings
         self._on_history_changed = on_history_changed
         self._on_draw_started = on_draw_started
+        self._on_eyedropper = on_eyedropper
 
         # Paint node set via set-current-annotate-mode-node; see _find_paint_node.
         self.preferred_paint_node = ""
@@ -131,15 +132,17 @@ class AnnotateDrawEngine:
         mode.defineEventTableRegex(constants.EVENT_TABLE_NAME, self.regex_bindings)
 
     @property
-    def bindings(self):
+    def pointer_bindings(self):
+        """Pointer and stylus bindings for the mode's global table.
+
+        They live in the global table rather than the pushed EVENT_TABLE_NAME so that
+        widgets with a bounding box (timeline, timeline magnifier) get pointer
+        events inside their area first.
+        """
         push_constrained = partial(self.on_push, constrained=True)
         drag_constrained = partial(self.on_drag, constrained=True)
         release_constrained = partial(self.on_release, constrained=True)
-        commit = partial(self.on_text_commit, reject=False)
-        commit_and_propagate = partial(self.on_text_commit, reject=True)
-        insert_new_line = partial(self._append_text, text="\n")
         return [
-            # Pointer events (shapes, strokes and text placement)
             ("pointer-1--push", self.on_push, "Start shape/text"),
             ("pointer-1--drag", self.on_drag, "Update shape"),
             ("pointer-1--release", self.on_release, "Commit shape"),
@@ -155,6 +158,14 @@ class AnnotateDrawEngine:
             ("stylus-eraser--push", self.on_stylus_eraser_push, "Start (stylus eraser end)"),
             ("stylus-eraser--drag", self.on_stylus_eraser_drag, "Draw (stylus eraser end)"),
             ("stylus-eraser--release", self.on_stylus_eraser_release, "Commit (stylus eraser end)"),
+        ]
+
+    @property
+    def bindings(self):
+        commit = partial(self.on_text_commit, reject=False)
+        commit_and_propagate = partial(self.on_text_commit, reject=True)
+        insert_new_line = partial(self._append_text, text="\n")
+        return [
             # Shape shift-constraint tracking
             ("key-down--shift--shift", self.on_shift_down, "Constrain shape"),
             ("key-up--shift", self.on_shift_up, "Release constraint"),
@@ -498,17 +509,20 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def on_push(self, event, constrained=False):
-        self._on_draw_started()
         tool = self._settings.tool
+        if tool == constants.Tool.EYEDROPPER and not constrained:
+            self._on_eyedropper(event)
+            return
+        if tool not in constants.DRAWING_TOOLS:
+            event.reject()
+            return
+        self._on_draw_started()
         if tool == constants.Tool.TEXT:
             if not constrained:
                 self._start_text(event)
             return
         if tool in constants.BRUSH_TOOLS:
             self._pen_push(event)
-            return
-        if tool not in constants.SHAPE_TOOLS:
-            event.reject()
             return
         if self._shift_transition:
             self._shift_transition = False
@@ -749,15 +763,26 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def on_stylus_eraser_push(self, event):
-        """Physical eraser end of stylus: always draws with erase mode regardless of tool."""
+        """Physical eraser end of stylus: erases with any drawing tool selected."""
+        if self._settings.tool not in constants.DRAWING_TOOLS:
+            event.reject()
+            return
         self._on_draw_started()
         self._stylus_erasing = True
         self._pen_push(event)
+        if not self._pen_stroke:
+            self._stylus_erasing = False
 
     def on_stylus_eraser_drag(self, event):
+        if not self._stylus_erasing:
+            event.reject()
+            return
         self._pen_drag(event)
 
     def on_stylus_eraser_release(self, event):
+        if not self._stylus_erasing:
+            event.reject()
+            return
         self._pen_release(event)
         self._stylus_erasing = False
 
