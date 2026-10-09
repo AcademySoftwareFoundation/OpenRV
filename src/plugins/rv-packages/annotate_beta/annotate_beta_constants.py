@@ -48,7 +48,6 @@ class FontSize(StrEnum):
 DEFAULT_COLOR = "#ffdc00"
 DEFAULT_FONT_FAMILY = "Helvetica"
 
-# Time spent filling the font list per event loop pass.
 FONT_BATCH_SECONDS = 0.001
 
 SIZE_MIN = 1
