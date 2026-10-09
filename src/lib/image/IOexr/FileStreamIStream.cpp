@@ -79,17 +79,21 @@ namespace TwkFB
     int64_t FileStreamIStream::read(void* buf, uint64_t sz, uint64_t offset)
     {
         const char* data = static_cast<const char*>(m_stream.data());
-        const int64_t fileSize = int64_t(m_stream.size());
+        const auto fileSize = int64_t(m_stream.size());
 
         if (data == nullptr || fileSize < 0)
+        {
             return -1;
+        }
 
         //
         //  Per the OpenEXR contract a read at or past EOF is not an error:
         //  return 0, and clamp a read that would run past the end.
         //
         if (offset >= uint64_t(fileSize))
+        {
             return 0;
+        }
 
         const uint64_t available = uint64_t(fileSize) - offset;
         const uint64_t toCopy = (sz < available) ? sz : available;

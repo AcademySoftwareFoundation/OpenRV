@@ -1108,7 +1108,7 @@ namespace IPCore::Shader
 
             if (diag)
             {
-                const double ms = (TwkUtil::SystemClock().now() - diagStart) * 1000.0;
+                const double ms = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
                 std::ostringstream extra;
                 extra << "ok=" << (compiled ? 1 : 0) << ";cached=" << m_programCache.size();
                 TwkUtil::PlaybackDiagnostics::instance().record("shadercompile", -1, -1, ms, extra.str());

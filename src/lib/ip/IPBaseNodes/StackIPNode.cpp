@@ -801,14 +801,16 @@ namespace IPCore
 
         if (StringProperty* sp = m_compMode)
         {
-            if (sp->size())
+            if (!sp->empty())
+            {
                 comp = sp->front().c_str();
+            }
         }
 
-        const bool topmostOnly = !strcmp(comp, "topmost");
-        const bool dissolveOnly = !strcmp(comp, "dissolve");
-        const bool strictFrameRanges = m_strictFrameRanges->front();
-        const bool useCutInfo = m_useCutInfo->front();
+        const bool topmostOnly = strcmp(comp, "topmost") == 0;
+        const bool dissolveOnly = strcmp(comp, "dissolve") == 0;
+        const bool strictFrameRanges = m_strictFrameRanges->front() != 0;
+        const bool useCutInfo = m_useCutInfo->front() != 0;
 
         int numTested = 0;
 
@@ -822,20 +824,28 @@ namespace IPCore
                 if (useCutInfo)
                 {
                     if (inF < info.cutIn || inF > info.cutOut)
+                    {
                         continue;
+                    }
                 }
                 else
                 {
                     if (inF < info.start || inF > info.end)
+                    {
                         continue;
+                    }
                 }
             }
 
             if (topmostOnly && numTested >= 1)
+            {
                 break;
+            }
 
             if (dissolveOnly && numTested >= 2)
+            {
                 break;
+            }
 
             Context c = context;
             c.fps = m_outputFPS->front();

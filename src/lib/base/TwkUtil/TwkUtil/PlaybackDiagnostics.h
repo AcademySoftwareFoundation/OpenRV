@@ -5,8 +5,7 @@
 //
 //******************************************************************************
 
-#ifndef _TwkUtilPlaybackDiagnostics_h_
-#define _TwkUtilPlaybackDiagnostics_h_
+#pragma once
 
 #include <string>
 #include <fstream>
@@ -16,6 +15,9 @@
 
 namespace TwkUtil
 {
+
+    //  Conversion factor used to report diagnostic durations in milliseconds.
+    constexpr double kMillisecondsPerSecond = 1000.0;
 
     //
     //  Lightweight, thread-safe diagnostic logger used to attribute playback
@@ -55,12 +57,14 @@ namespace TwkUtil
 
         void record(const char* event, int threadId, int frame, double durMs, const std::string& extra = std::string());
 
+        PlaybackDiagnostics(const PlaybackDiagnostics&) = delete;
+        PlaybackDiagnostics& operator=(const PlaybackDiagnostics&) = delete;
+        PlaybackDiagnostics(PlaybackDiagnostics&&) = delete;
+        PlaybackDiagnostics& operator=(PlaybackDiagnostics&&) = delete;
+
     private:
         PlaybackDiagnostics();
         ~PlaybackDiagnostics();
-
-        PlaybackDiagnostics(const PlaybackDiagnostics&) = delete;
-        PlaybackDiagnostics& operator=(const PlaybackDiagnostics&) = delete;
 
         std::mutex m_mutex;
         std::ofstream m_file;
@@ -69,5 +73,3 @@ namespace TwkUtil
     };
 
 } // namespace TwkUtil
-
-#endif

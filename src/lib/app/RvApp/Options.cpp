@@ -39,6 +39,7 @@
 #include <TwkUtil/Timer.h>
 #include <TwkAudio/Audio.h>
 #include <algorithm>
+#include <climits>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -170,14 +171,20 @@ namespace Rv
         //  Explicit override wins (for tuning without a rebuild).
         if (const char* v = getenv("RV_EXR_AUTO_MAX_THREADS"))
         {
-            const int n = atoi(v);
-            if (n > 0)
-                return n;
+            constexpr int kDecimalBase = 10;
+            char* end = nullptr;
+            const long n = strtol(v, &end, kDecimalBase);
+            if (end != v && *end == '\0' && n > 0 && n <= INT_MAX)
+            {
+                return static_cast<int>(n);
+            }
         }
 
         const int cores = static_cast<int>(TwkUtil::SystemInfo::numCPUs());
         if (cores <= 1)
+        {
             return 1;
+        }
 
         //  Up to 16 logical cores keep the previous behavior (all but one).
         //  Above that, add one thread per four extra cores. The decode work
@@ -188,10 +195,14 @@ namespace Rv
         //  more cores never lowers the count (e.g. 16 -> 15, 24 -> 17,
         //  64 -> 27, 128 -> 43). On a 64-logical-core system, 12-32 threads
         //  played back best and 40+ degraded.
-        if (cores <= 16)
+        constexpr int kAllButOneMaxCores = 16;
+        constexpr int kExtraCoresPerThread = 4;
+        if (cores <= kAllButOneMaxCores)
+        {
             return cores - 1;
+        }
 
-        return 15 + (cores - 16) / 4;
+        return (kAllButOneMaxCores - 1) + (cores - kAllButOneMaxCores) / kExtraCoresPerThread;
     }
 
     int collectParams(Options::Params& p, const Options::Files& inputFiles, int index)

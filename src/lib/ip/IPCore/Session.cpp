@@ -1876,7 +1876,7 @@ namespace IPCore
         //  above so the diagnostic log shows how long each pause lasted.
         if (eventData == "buffering" && isBuffering() && TwkUtil::PlaybackDiagnostics::enabled())
         {
-            TwkUtil::PlaybackDiagnostics::instance().record("resume", -1, m_frame, m_cacheStats.lookAheadSeconds * 1000.0);
+            TwkUtil::PlaybackDiagnostics::instance().record("resume", -1, m_frame, m_cacheStats.lookAheadSeconds * kMillisecondsPerSecond);
         }
 
         if (m_avPlaybackVersion == 2)
@@ -2089,7 +2089,8 @@ namespace IPCore
         //  keep up. Captured under RV_PLAYBACK_DIAG regardless of -debug flags.
         if (eventData == "buffering" && TwkUtil::PlaybackDiagnostics::enabled())
         {
-            TwkUtil::PlaybackDiagnostics::instance().record("buffering", -1, m_frame, m_cacheStats.lookAheadSeconds * 1000.0);
+            TwkUtil::PlaybackDiagnostics::instance().record("buffering", -1, m_frame,
+                                                            m_cacheStats.lookAheadSeconds * kMillisecondsPerSecond);
         }
 
         m_timer.stop();
@@ -3276,7 +3277,9 @@ namespace IPCore
                     //  itself lands whenever Qt's event loop gets to it, which on
                     //  some platforms is gated on the display refresh signal.
                     if (isPlaying())
+                    {
                         ++m_diagRedrawRequests;
+                    }
                     d->redrawImmediately();
                     m_lastDrawingTime = now;
                 }
@@ -3411,7 +3414,9 @@ namespace IPCore
                     //  Realtime playback dropped one or more frames to stay in
                     //  sync: another symptom of image decode not keeping up.
                     if (m_skipped != 0 && TwkUtil::PlaybackDiagnostics::enabled())
+                    {
                         TwkUtil::PlaybackDiagnostics::instance().record("skip", -1, m_frame, double(m_skipped));
+                    }
                 }
                 else if (outDeviceClock)
                 {
@@ -3981,9 +3986,13 @@ namespace IPCore
         {
             const double nowSecs = TwkUtil::SystemClock().now();
             if (s_diagPrevRenderTime > 0.0)
-                diagPaceInterval = (nowSecs - s_diagPrevRenderTime) * 1000.0;
+            {
+                diagPaceInterval = (nowSecs - s_diagPrevRenderTime) * kMillisecondsPerSecond;
+            }
             if (s_diagRenderV2EndTime > 0.0)
-                diagOutsideGap = (nowSecs - s_diagRenderV2EndTime) * 1000.0;
+            {
+                diagOutsideGap = (nowSecs - s_diagRenderV2EndTime) * kMillisecondsPerSecond;
+            }
             s_diagPrevRenderTime = nowSecs;
         }
 
@@ -4050,7 +4059,9 @@ namespace IPCore
                     //  Realtime playback dropped one or more frames to stay in
                     //  sync: another symptom of image decode not keeping up.
                     if (m_skipped != 0 && TwkUtil::PlaybackDiagnostics::enabled())
+                    {
                         TwkUtil::PlaybackDiagnostics::instance().record("skip", -1, m_frame, double(m_skipped));
+                    }
                 }
                 else if (outDeviceClock)
                 {
@@ -4254,7 +4265,9 @@ namespace IPCore
             const bool diagDisplay = TwkUtil::PlaybackDiagnostics::enabled();
             TwkUtil::Timer diagEvalTimer;
             if (diagDisplay)
+            {
                 diagEvalTimer.start();
+            }
 
             try
             {
@@ -4309,7 +4322,7 @@ namespace IPCore
                 graph().endProfilingSample();
             }
 
-            const double diagEvalMs = diagDisplay ? diagEvalTimer.elapsed() * 1000.0 : 0.0;
+            const double diagEvalMs = diagDisplay ? diagEvalTimer.elapsed() * kMillisecondsPerSecond : 0.0;
 
             const float clockMult = fps() / currentTargetFPS();
 
@@ -4385,7 +4398,9 @@ namespace IPCore
                 //  synchronous texture uploads), not on decode/cache.
                 TwkUtil::Timer diagRenderTimer;
                 if (diagDisplay)
+                {
                     diagRenderTimer.start();
+                }
 
                 waitForUploadToFinish();
                 m_waitForUploadThreadPrefetch = m_preEval && useThreadedUpload();
@@ -4409,7 +4424,7 @@ namespace IPCore
 
                 if (diagDisplay)
                 {
-                    const double diagRenderMs = diagRenderTimer.elapsed() * 1000.0;
+                    const double diagRenderMs = diagRenderTimer.elapsed() * kMillisecondsPerSecond;
 
                     //  Frame delta since the previous displayed frame: +1 is a
                     //  clean advance, 0 means the same frame was displayed again
@@ -4578,7 +4593,9 @@ namespace IPCore
         //  Mark when render_v2 returns so the next entry can measure the time
         //  spent outside render_v2 (present/composite/swap + event loop).
         if (playing && TwkUtil::PlaybackDiagnostics::enabled())
+        {
             s_diagRenderV2EndTime = TwkUtil::SystemClock().now();
+        }
     }
 
     void Session::waitForUploadToFinish()

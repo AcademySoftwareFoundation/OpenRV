@@ -111,6 +111,18 @@ namespace IPCore
     using namespace TwkMovie;
     using namespace TwkFB;
     using namespace TwkUtil;
+
+    namespace
+    {
+        //  Opaque alpha written when expanding RGB to RGBA: 1.0 as an IEEE
+        //  half-float, and as the bit pattern of an IEEE single-precision float.
+        constexpr uint16_t kHalfFloatOne = 0x3C00;
+        constexpr uint32_t kFloatOneBits = 0x3F800000;
+
+        constexpr double kBytesPerMiB = 1024.0 * 1024.0;
+        constexpr double kMiBPerGiB = 1024.0;
+    } // namespace
+
     using namespace TwkGLF;
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
@@ -3194,7 +3206,7 @@ namespace IPCore
         s.numChannels =
             s.planar
                 ? image->planes.size()
-                : (image->planes.size() ? (image->planes.front().tile->expandRGBToRGBA ? 3 : image->planes.front().tile->channels) : 4);
+                : (!image->planes.empty() ? (image->planes.front().tile->expandRGBToRGBA ? 3 : image->planes.front().tile->channels) : 4);
         s.pixelAspect = image->pixelAspect;
         s.initPixelAspect = image->initPixelAspect;
         s.device = (VideoDevice*)context.device;
@@ -4242,11 +4254,13 @@ namespace IPCore
                 d->expandRGBToRGBA = true;
                 d->format = GL_RGBA;
                 d->channels = 4;
-                d->pixelSize = (d->channelType == GL_HALF_FLOAT_ARB) ? 8 : 16;
+                constexpr int kRGBAHalfPixelBytes = 8;
+                constexpr int kRGBAFloatPixelBytes = 16;
+                d->pixelSize = (d->channelType == GL_HALF_FLOAT_ARB) ? kRGBAHalfPixelBytes : kRGBAFloatPixelBytes;
                 d->internalFormat = (d->channelType == GL_HALF_FLOAT_ARB) ? GL_RGBA16F_ARB : GL_RGBA32F_ARB;
                 //  Destination rows are tightly packed RGBA (8 or 16 bytes/px),
                 //  both multiples of 8, so an 8-byte unpack alignment is valid.
-                d->alignment = 8;
+                d->alignment = kRGBAHalfPixelBytes;
             }
 
             break;
@@ -4512,9 +4526,9 @@ namespace IPCore
 
         if (diag)
         {
-            const double ms = (TwkUtil::SystemClock().now() - diagStart) * 1000.0;
+            const double ms = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
             std::ostringstream extra;
-            extra << "w=" << iw << ";h=" << ih << ";d=" << id << ";type=" << tex->channelType << ";mb=" << totalBytes / (1024.0 * 1024.0);
+            extra << "w=" << iw << ";h=" << ih << ";d=" << id << ";type=" << tex->channelType << ";mb=" << totalBytes / kBytesPerMiB;
             TwkUtil::PlaybackDiagnostics::instance().record("lut3d", -1, -1, ms, extra.str());
         }
     }
@@ -4734,7 +4748,9 @@ namespace IPCore
             //  or the request exceeds the max PBO size; fall back to the
             //  client-memory path in that case.
             if (pbo->getSize() >= totalBytes)
+            {
                 d->pPBOToGPU = pbo;
+            }
         }
 
         const bool usePBO = pboEligible && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes;
@@ -4766,11 +4782,13 @@ namespace IPCore
                 //  Expand RGB->RGBA directly into the mapped PBO (no extra
                 //  staging copy) so the GPU gets a native RGBA transfer.
                 if (d->channelType == GL_HALF_FLOAT_ARB)
-                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(b),
-                                                static_cast<uint16_t>(0x3C00));
+                {
+                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(b), kHalfFloatOne);
+                }
                 else
-                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(b),
-                                                static_cast<uint32_t>(0x3F800000));
+                {
+                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(b), kFloatOneBits);
+                }
             }
             else
             {
@@ -4859,11 +4877,15 @@ namespace IPCore
                 static thread_local std::vector<unsigned char> expandScratch;
                 expandScratch.resize(totalBytes);
                 if (d->channelType == GL_HALF_FLOAT_ARB)
+                {
                     expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(expandScratch.data()),
-                                                static_cast<uint16_t>(0x3C00));
+                                                kHalfFloatOne);
+                }
                 else
+                {
                     expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(expandScratch.data()),
-                                                static_cast<uint32_t>(0x3F800000));
+                                                kFloatOneBits);
+                }
                 p = expandScratch.data();
             }
 
@@ -4936,12 +4958,12 @@ namespace IPCore
 
         if (diagUpload)
         {
-            const double cpuMs = (TwkUtil::SystemClock().now() - diagUploadStart) * 1000.0;
-            const double mbytes = totalBytes / (1024.0 * 1024.0);
+            const double cpuMs = (TwkUtil::SystemClock().now() - diagUploadStart) * kMillisecondsPerSecond;
+            const double mbytes = totalBytes / kBytesPerMiB;
             //  cpuThroughput is the effective GB/s of just the CPU submission
             //  (map+memcpy for PBO, or glTexImage2D client-copy for non-PBO).
             //  A slow value with usePBO=0 means we fell into the fallback path.
-            const double gbPerSec = (cpuMs > 0.0) ? (mbytes / 1024.0) / (cpuMs / 1000.0) : 0.0;
+            const double gbPerSec = (cpuMs > 0.0) ? (mbytes / kMiBPerGiB) / (cpuMs / kMillisecondsPerSecond) : 0.0;
             std::ostringstream extra;
             extra << "w=" << iw << ";h=" << ih << ";ch=" << d->channels << ";type=" << d->channelType << ";pxsz=" << d->pixelSize
                   << ";mb=" << mbytes << ";pbo=" << (usePBO ? 1 : 0) << ";update=" << (updateOnly ? 1 : 0) << ";cpuGBps=" << gbPerSec;

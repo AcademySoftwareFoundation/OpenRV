@@ -157,14 +157,14 @@ namespace Rv
         //  stalls it is the event-loop half of the "outside render_v2" time; if
         //  it is small, the stall is in the present path (swapBuffers/vsync or
         //  update-request delivery) rather than in a handler.
-        if (session && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled())
+        if ((session != nullptr) && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled())
         {
             const double t0 = TwkUtil::SystemClock().now();
             session->userGenericEvent("per-render-event-processing", "");
-            const double perRenderMs = (TwkUtil::SystemClock().now() - t0) * 1000.0;
+            const double perRenderMs = (TwkUtil::SystemClock().now() - t0) * TwkUtil::kMillisecondsPerSecond;
             TwkUtil::PlaybackDiagnostics::instance().record("perrender", -1, session->currentFrame(), perRenderMs);
         }
-        else if (session)
+        else if (session != nullptr)
         {
             session->userGenericEvent("per-render-event-processing", "");
         }
@@ -359,12 +359,15 @@ namespace Rv
         static double s_diagPaintEntry = 0.0;
         static double s_diagPrevPaintExit = 0.0;
         double diagPaintGap = 0.0;
-        const bool diagOn = session && m_videoDevice && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
+        const bool diagOn =
+            (session != nullptr) && (m_videoDevice != nullptr) && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
         if (diagOn)
         {
             s_diagPaintEntry = TwkUtil::SystemClock().now();
             if (s_diagPrevPaintExit > 0.0)
-                diagPaintGap = (s_diagPaintEntry - s_diagPrevPaintExit) * 1000.0;
+            {
+                diagPaintGap = (s_diagPaintEntry - s_diagPrevPaintExit) * TwkUtil::kMillisecondsPerSecond;
+            }
         }
 
         //  Optional GPU-completion probe (RV_DIAG_GLFINISH). session->render()
@@ -376,7 +379,9 @@ namespace Rv
         //  (swapBuffers/vsync or update-request delivery), not the GPU.
         static int s_diagGlFinish = -1;
         if (s_diagGlFinish < 0)
+        {
             s_diagGlFinish = (getenv("RV_DIAG_GLFINISH") != nullptr) ? 1 : 0;
+        }
         double diagGpuMs = -1.0;
 
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
@@ -424,11 +429,11 @@ namespace Rv
             session->render();
             TWK_GLDEBUG;
 
-            if (diagOn && s_diagGlFinish)
+            if (diagOn && (s_diagGlFinish != 0))
             {
                 const double t0 = TwkUtil::SystemClock().now();
                 glFinish();
-                diagGpuMs = (TwkUtil::SystemClock().now() - t0) * 1000.0;
+                diagGpuMs = (TwkUtil::SystemClock().now() - t0) * TwkUtil::kMillisecondsPerSecond;
             }
 
             m_firstPaintCompleted = true;
@@ -492,7 +497,7 @@ namespace Rv
         if (diagOn)
         {
             const double nowSecs = TwkUtil::SystemClock().now();
-            const double paintMs = (nowSecs - s_diagPaintEntry) * 1000.0;
+            const double paintMs = (nowSecs - s_diagPaintEntry) * TwkUtil::kMillisecondsPerSecond;
             s_diagPrevPaintExit = nowSecs;
             std::ostringstream extra;
             //  paint = whole paintGL (render_v2 + glClear tail + postRender)

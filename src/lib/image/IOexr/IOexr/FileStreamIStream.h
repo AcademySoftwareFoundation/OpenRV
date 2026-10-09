@@ -66,9 +66,9 @@ namespace TwkFB
         //  directly from that buffer without touching any shared state. This
         //  restores the fast/parallel reader path in OpenEXR >= 3.3.
         //
-        virtual int64_t size();
-        virtual bool isStatelessRead() const;
-        virtual int64_t read(void* buf, uint64_t sz, uint64_t offset);
+        int64_t size() override;
+        bool isStatelessRead() const override;
+        int64_t read(void* buf, uint64_t sz, uint64_t offset) override;
 #endif
 
     private:

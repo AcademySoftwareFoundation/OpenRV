@@ -1640,7 +1640,9 @@ namespace IPCore
             auto emitCacheStall = [&]()
             {
                 if (!TwkUtil::PlaybackDiagnostics::enabled())
+                {
                     return;
+                }
                 std::ostringstream extra;
                 extra << "cacheFrame=" << cacheTarget.frame << ";cacheUtil=" << cacheTarget.utility << ";freeFrame=" << freeTarget.frame
                       << ";freeUtil=" << freeTarget.utility << ";displayFrame=" << m_displayFrame;
@@ -2004,7 +2006,9 @@ namespace IPCore
     int FBCache::cachedRunwayAhead(int frame, int inc, int maxCount) const
     {
         if (inc == 0)
+        {
             inc = 1;
+        }
 
         int n = 0;
         int f = frame + inc;

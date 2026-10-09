@@ -27,9 +27,13 @@ namespace TwkUtil
         {
             const char* v = getenv("RV_PLAYBACK_DIAG");
             if (v == nullptr || v[0] == '\0')
+            {
                 return false;
+            }
             if (v[0] == '0' && v[1] == '\0')
+            {
                 return false;
+            }
             return true;
         }();
         return e;
@@ -63,13 +67,17 @@ namespace TwkUtil
     PlaybackDiagnostics::~PlaybackDiagnostics()
     {
         if (m_file.is_open())
+        {
             m_file.close();
+        }
     }
 
     void PlaybackDiagnostics::record(const char* event, int threadId, int frame, double durMs, const std::string& extra)
     {
         if (!enabled())
+        {
             return;
+        }
 
         //
         //  Sanitize the free-form "extra" field so it can never corrupt the CSV
@@ -79,24 +87,33 @@ namespace TwkUtil
         //
         string safeExtra;
         safeExtra.reserve(extra.size());
-        for (char c : extra)
+        for (const char c : extra)
         {
             if (c == ',')
+            {
                 safeExtra.push_back(';');
+            }
             else if (c == '\n' || c == '\r')
+            {
                 safeExtra.push_back(' ');
+            }
             else
+            {
                 safeExtra.push_back(c);
+            }
         }
 
-        const double tMs = m_timer.elapsed() * 1000.0;
+        const double tMs = m_timer.elapsed() * kMillisecondsPerSecond;
 
-        lock_guard<mutex> lock(m_mutex);
+        const std::scoped_lock lock(m_mutex);
 
         if (!m_ok)
+        {
             return;
+        }
 
-        m_file << tMs << ',' << (event ? event : "") << ',' << threadId << ',' << frame << ',' << durMs << ',' << safeExtra << '\n';
+        m_file << tMs << ',' << ((event != nullptr) ? event : "") << ',' << threadId << ',' << frame << ',' << durMs << ',' << safeExtra
+               << '\n';
         m_file.flush();
     }
 

@@ -635,7 +635,7 @@ namespace IPCore
         bool slow = false;
 
         ImageComponent selection;
-        MediaPointer selectedMedia = getMediaFromContext(selection, context);
+        const MediaPointer selectedMedia = getMediaFromContext(selection, context);
         if (selectedMedia && selectedMedia->hasVideo())
         {
             if (const Movie* mov = selectedMedia->primaryMovie())
@@ -1011,10 +1011,12 @@ namespace IPCore
         //  concrete media file so we can tell whether the serialized (thread 1)
         //  decodes are the slow MOV itself or fast EXR frames dragged onto one
         //  thread. Only cache-eval threads and only when diagnostics are on.
-        const bool diagDecode = TwkUtil::PlaybackDiagnostics::enabled() && (context.thread & CacheEvalThread);
+        const bool diagDecode = TwkUtil::PlaybackDiagnostics::enabled() && ((context.thread & CacheEvalThread) != 0);
         TwkUtil::Timer diagTimer;
         if (diagDecode)
+        {
             diagTimer.start();
+        }
 
         try
         {
@@ -1030,8 +1032,10 @@ namespace IPCore
             {
                 const bool selSlow = mov->info().slowRandomAccess && mov->info().video;
                 std::string nm;
-                if (const MovieReader* r = dynamic_cast<const MovieReader*>(mov))
+                if (const auto* r = dynamic_cast<const MovieReader*>(mov))
+                {
                     nm = TwkUtil::basename(r->filename());
+                }
                 std::ostringstream extra;
                 extra << "file=" << nm << ";slow=" << (selSlow ? 1 : 0);
 
@@ -1041,10 +1045,10 @@ namespace IPCore
                 //  than ZIP), and how many channels/planes we actually decoded
                 //  vs how many are displayed (decoding unused AOV channels is
                 //  wasted decode+upload time).
-                if (!fbs.empty() && fbs[0])
+                if (!fbs.empty() && (fbs[0] != nullptr))
                 {
                     const TwkFB::FrameBuffer* fb = fbs[0];
-                    const char* dt = "?";
+                    const char* dt = nullptr;
                     switch (fb->dataType())
                     {
                     case TwkFB::FrameBuffer::BIT:
@@ -1077,14 +1081,17 @@ namespace IPCore
                     //  planes (planar EXR keeps each channel in its own plane).
                     int decodedChannels = 0;
                     int planeCount = 0;
+                    constexpr int kMaxLoggedChannelNames = 12;
                     std::ostringstream chNames;
-                    for (const TwkFB::FrameBuffer* p = fb; p; p = p->nextPlane())
+                    for (const TwkFB::FrameBuffer* p = fb; p != nullptr; p = p->nextPlane())
                     {
                         planeCount++;
                         for (int c = 0; c < p->numChannels(); c++)
                         {
-                            if (decodedChannels < 12)
-                                chNames << (decodedChannels ? "|" : "") << p->channelName(c);
+                            if (decodedChannels < kMaxLoggedChannelNames)
+                            {
+                                chNames << ((decodedChannels != 0) ? "|" : "") << p->channelName(c);
+                            }
                             decodedChannels++;
                         }
                     }
@@ -1096,7 +1103,9 @@ namespace IPCore
 
                     std::string comp = "?";
                     if (fb->hasAttribute("EXR/compression"))
+                    {
                         comp = fb->attribute<std::string>("EXR/compression");
+                    }
 
                     extra << ";type=" << dt << ";comp=" << comp << ";w=" << fb->width() << ";h=" << fb->height() << ";planes=" << planeCount
                           << ";chDecoded=" << decodedChannels << ";chDisplayed=" << displayedChannels
@@ -1104,7 +1113,7 @@ namespace IPCore
                 }
 
                 TwkUtil::PlaybackDiagnostics::instance().record("decsrc", int(context.threadNum), context.frame,
-                                                                diagTimer.elapsed() * 1000.0, extra.str());
+                                                                diagTimer.elapsed() * TwkUtil::kMillisecondsPerSecond, extra.str());
             }
 
             if (fbs.empty())
@@ -2845,7 +2854,7 @@ namespace IPCore
         //  and is NOT updated by the reader, so it always reports the default
         //  (slowRandomAccess=false). The authoritative value lives in the opened
         //  reader's own info(), which is populated during initializeVideo().
-        if (reader && TwkUtil::PlaybackDiagnostics::enabled())
+        if ((reader != nullptr) && TwkUtil::PlaybackDiagnostics::enabled())
         {
             const MovieInfo& rinfo = reader->info();
             std::ostringstream extra;

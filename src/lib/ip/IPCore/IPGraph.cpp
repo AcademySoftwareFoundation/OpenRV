@@ -1645,7 +1645,8 @@ IPGraph::findNodesByAbstractPath(int frame,
             diagCap = m_fbcache.capacity();
             diagOverflow = m_fbcache.overflowing();
             diagDisplayInc = m_fbcache.displayInc();
-            diagRunway = m_fbcache.cachedRunwayAhead(frame, diagDisplayInc, 300);
+            constexpr int kDiagMaxRunwayFrames = 300;
+            diagRunway = m_fbcache.cachedRunwayAhead(frame, diagDisplayInc, kDiagMaxRunwayFrames);
         }
         double diagOtfDecodeMs = 0.0;
 
@@ -1662,7 +1663,9 @@ IPGraph::findNodesByAbstractPath(int frame,
         auto emitDiagCache = [&]()
         {
             if (!diagCache)
+            {
                 return;
+            }
             const double pct = diagCap ? (100.0 * double(diagUsed) / double(diagCap)) : 0.0;
             ostringstream extra;
             extra << "hit=" << (diagHit ? 1 : 0) << ";full=" << pct << ";overflow=" << (diagOverflow ? 1 : 0) << ";runway=" << diagRunway
@@ -1797,12 +1800,16 @@ IPGraph::findNodesByAbstractPath(int frame,
                 //  on-screen stall directly to the missing frame.
                 TwkUtil::Timer diagOtfTimer;
                 if (diagCache)
+                {
                     diagOtfTimer.start();
+                }
 
                 img = evaluate(frame, IPNode::DisplayCacheEvalThread);
 
                 if (diagCache)
-                    diagOtfDecodeMs = diagOtfTimer.elapsed() * 1000.0;
+                {
+                    diagOtfDecodeMs = diagOtfTimer.elapsed() * kMillisecondsPerSecond;
+                }
 
                 if (willPause)
                     status = EvalBufferNeedsRefill;
@@ -2602,7 +2609,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
                         void release()
                         {
-                            if (counter)
+                            if (counter != nullptr)
                             {
                                 --(*counter);
                                 counter = nullptr;
@@ -2629,8 +2636,8 @@ IPGraph::findNodesByAbstractPath(int frame,
                         activeDecodeGuard.release();
                         ostringstream extra;
                         extra << "concurrency=" << diagConcurrency;
-                        TwkUtil::PlaybackDiagnostics::instance().record("decode", int(id), frame, decodeTimer.elapsed() * 1000.0,
-                                                                        extra.str());
+                        TwkUtil::PlaybackDiagnostics::instance().record("decode", int(id), frame,
+                                                                        decodeTimer.elapsed() * kMillisecondsPerSecond, extra.str());
                     }
 
                     TWK_CACHE_LOCK(m_fbcache, "");
