@@ -177,6 +177,7 @@ namespace IPCore
             TextureDescription()
                 : uploaded(false)
                 , age(-1)
+                , expandRGBToRGBA(false)
             {
             }
 
@@ -201,6 +202,13 @@ namespace IPCore
             GLuint alignment;
             size_t pixelSize; // in byte
             bool swapBytes;
+
+            //  When true the source FrameBuffer is 3-channel RGB but the GPU
+            //  texture is allocated as 4-channel RGBA (native fast-DMA format);
+            //  uploadPlane() expands RGB->RGBA (opaque alpha) during upload.
+            //  channels/format/internalFormat/pixelSize below describe the
+            //  RGBA destination; the source stride comes from the FrameBuffer.
+            bool expandRGBToRGBA;
 
             int uncropWidth; // display window size for uncropped
             int uncropHeight;

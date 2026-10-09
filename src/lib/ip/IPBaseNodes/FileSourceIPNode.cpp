@@ -33,6 +33,7 @@
 #include <TwkUtil/File.h>
 #include <TwkUtil/FrameUtils.h>
 #include <TwkUtil/PathConform.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
 #include <TwkUtil/sgcHop.h>
 #include <TwkUtil/sgcHopTools.h>
 #include <TwkMediaLibrary/Library.h>
@@ -618,13 +619,28 @@ namespace IPCore
 
     void FileSourceIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
+        //
+        //  Random-access performance only matters for the media that actually
+        //  supplies the image at this frame. A single source can carry several
+        //  media -- example: an EXR image sequence with a MOV attached purely
+        //  for its audio track. That MOV has a video track
+        //  (info.video == true) and may be a slow-random-access codec, but its
+        //  images are never decoded during caching (evaluate() only decodes the
+        //  media returned by getMediaFromContext(), i.e. the EXR here).
+        //  Test only the image-supplying media so fast image sequences keep
+        //  decoding in parallel.
+        //
         bool slow = false;
 
-        for (size_t i = 0, s = numMedia(); i < s; i++)
+        ImageComponent selection;
+        const MediaPointer selectedMedia = getMediaFromContext(selection, context);
+        if (selectedMedia && selectedMedia->hasVideo())
         {
-            const MovieInfo& info = mediaMovieInfo(i);
-            if (info.slowRandomAccess && info.video)
-                slow = true;
+            if (const Movie* mov = selectedMedia->primaryMovie())
+            {
+                const MovieInfo& info = mov->info();
+                slow = info.slowRandomAccess && info.video;
+            }
         }
 
         result.poorRandomAccessPerformance = slow || result.poorRandomAccessPerformance;
@@ -989,6 +1005,13 @@ namespace IPCore
 
         debuggingDelay();
 
+        const bool diagDecode = TwkUtil::PlaybackDiagnostics::enabled() && ((context.thread & CacheEvalThread) != 0);
+        TwkUtil::Timer diagTimer;
+        if (diagDecode)
+        {
+            diagTimer.start();
+        }
+
         try
         {
 #if defined(HOP_ENABLED)
@@ -998,6 +1021,88 @@ namespace IPCore
 #endif
 
             mov->imagesAtFrame(request, fbs);
+
+            if (diagDecode)
+            {
+                const bool selSlow = mov->info().slowRandomAccess && mov->info().video;
+                std::string nm;
+                if (const auto* r = dynamic_cast<const MovieReader*>(mov))
+                {
+                    nm = TwkUtil::basename(r->filename());
+                }
+                std::ostringstream extra;
+                extra << "file=" << nm << ";slow=" << (selSlow ? 1 : 0);
+
+                //  Report the decoded pixel format and how many channels/planes
+                //  we actually decoded vs how many are displayed (decoding unused
+                //  channels is wasted decode+upload time).
+                if (!fbs.empty() && (fbs[0] != nullptr))
+                {
+                    const TwkFB::FrameBuffer* fb = fbs[0];
+                    const char* dt = nullptr;
+                    switch (fb->dataType())
+                    {
+                    case TwkFB::FrameBuffer::BIT:
+                        dt = "bit";
+                        break;
+                    case TwkFB::FrameBuffer::UCHAR:
+                        dt = "uint8";
+                        break;
+                    case TwkFB::FrameBuffer::USHORT:
+                        dt = "uint16";
+                        break;
+                    case TwkFB::FrameBuffer::UINT:
+                        dt = "uint32";
+                        break;
+                    case TwkFB::FrameBuffer::HALF:
+                        dt = "half";
+                        break;
+                    case TwkFB::FrameBuffer::FLOAT:
+                        dt = "float32";
+                        break;
+                    case TwkFB::FrameBuffer::DOUBLE:
+                        dt = "float64";
+                        break;
+                    default:
+                        dt = "packed";
+                        break;
+                    }
+
+                    //  Total channels actually decoded
+                    int decodedChannels = 0;
+                    int planeCount = 0;
+                    constexpr int kMaxLoggedChannelNames = 12;
+                    std::ostringstream chNames;
+                    for (const TwkFB::FrameBuffer* p = fb; p != nullptr; p = p->nextPlane())
+                    {
+                        planeCount++;
+                        for (int c = 0; c < p->numChannels(); c++)
+                        {
+                            if (decodedChannels < kMaxLoggedChannelNames)
+                            {
+                                chNames << ((decodedChannels != 0) ? "|" : "") << p->channelName(c);
+                            }
+                            decodedChannels++;
+                        }
+                    }
+
+                    //  How many channels the display pipeline will actually use
+                    const int displayedChannels = std::min(decodedChannels, 4);
+
+                    std::string comp = "?";
+                    if (fb->hasAttribute("EXR/compression"))
+                    {
+                        comp = fb->attribute<std::string>("EXR/compression");
+                    }
+
+                    extra << ";type=" << dt << ";comp=" << comp << ";w=" << fb->width() << ";h=" << fb->height() << ";planes=" << planeCount
+                          << ";chDecoded=" << decodedChannels << ";chDisplayed=" << displayedChannels
+                          << ";extraCh=" << (decodedChannels > displayedChannels ? 1 : 0) << ";chNames=" << chNames.str();
+                }
+
+                TwkUtil::PlaybackDiagnostics::instance().record("decsrc", int(context.threadNum), context.frame,
+                                                                diagTimer.elapsed() * TwkUtil::kMillisecondsPerSecond, extra.str());
+            }
 
             if (fbs.empty())
             {
@@ -2727,6 +2832,24 @@ namespace IPCore
         Movie::ReadRequest request;
         std::copy(m_inparams.begin(), m_inparams.end(), back_inserter(request.parameters));
         MovieReader* reader = TwkMovie::GenericIO::openMovieReader(filename, info, request);
+
+        //  Record whether this media reports "slow random access". Only such
+        //  sources (e.g. long-GOP h264/dnxhd movies) force RV into single-thread
+        //  block caching; EXR image sequences normally do not. This pins down
+        //  which source in a session is responsible for serializing decode.
+        //
+        //  NOTE: the `info` local passed to openMovieReader is const/input-only
+        //  and is NOT updated by the reader, so it always reports the default
+        //  (slowRandomAccess=false). The authoritative value lives in the opened
+        //  reader's own info(), which is populated during initializeVideo().
+        if ((reader != nullptr) && TwkUtil::PlaybackDiagnostics::enabled())
+        {
+            const MovieInfo& rinfo = reader->info();
+            std::ostringstream extra;
+            extra << "file=" << TwkUtil::basename(filename) << ";slowRandomAccess=" << (rinfo.slowRandomAccess ? 1 : 0)
+                  << ";video=" << (rinfo.video ? 1 : 0);
+            TwkUtil::PlaybackDiagnostics::instance().record("sourceinfo", -1, -1, rinfo.slowRandomAccess ? 1.0 : 0.0, extra.str());
+        }
 
         if (reader && reader->needsScan())
         {

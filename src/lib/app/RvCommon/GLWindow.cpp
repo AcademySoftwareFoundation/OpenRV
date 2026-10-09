@@ -23,6 +23,8 @@
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 #include <TwkGLF/GLVideoDevice.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
+#include <TwkUtil/Clock.h>
 #include <QOpenGLContext>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
@@ -30,6 +32,7 @@
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
@@ -145,7 +148,27 @@ namespace Rv
         }
     }
 
-    void GLWindow::eventProcessingTimeout() { m_doc->session()->userGenericEvent("per-render-event-processing", ""); }
+    void GLWindow::eventProcessingTimeout()
+    {
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session == nullptr)
+        {
+            return;
+        }
+
+        //  Time the synchronous per-render event processing (Mu/Python handlers)
+        //  that runs on the GUI thread after each paint.
+        const bool diagOn = session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
+        const double startTime = diagOn ? TwkUtil::SystemClock().now() : 0.0;
+
+        session->userGenericEvent("per-render-event-processing", "");
+
+        if (diagOn)
+        {
+            const double perRenderMs = (TwkUtil::SystemClock().now() - startTime) * TwkUtil::kMillisecondsPerSecond;
+            TwkUtil::PlaybackDiagnostics::instance().record("perrender", -1, session->currentFrame(), perRenderMs);
+        }
+    }
 
     float GLWindow::devicePixelRatioF() const { return static_cast<float>(devicePixelRatio()); }
 
@@ -318,6 +341,41 @@ namespace Rv
         IPCore::Session* session = m_doc->session();
         const bool debug = IPCore::debugProfile && session != nullptr;
 
+        //  Playback present-path diagnostics. The Session-side "outsideGap"
+        //  measures render_v2-end -> next render_v2-start, which lumps together
+        //  the present and the event-loop work (notably the
+        //  per-render-event-processing handler). Here we time the whole paintGL
+        //  and the gap between successive paints so the analyzer can split that
+        //  bucket into present vs event-loop handlers.
+        //
+        //  m_videoDevice is null until the hosting GLView assigns it after
+        //  construction, and the window is created during that construction, so
+        //  a paint can land before the device is wired up. Require it here so we
+        //  never record a paint that did no rendering.
+        static double s_diagPaintEntry = 0.0;
+        static double s_diagPrevPaintExit = 0.0;
+        double diagPaintGap = 0.0;
+        const bool diagOn =
+            (session != nullptr) && (m_videoDevice != nullptr) && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
+        if (diagOn)
+        {
+            s_diagPaintEntry = TwkUtil::SystemClock().now();
+            if (s_diagPrevPaintExit > 0.0)
+            {
+                diagPaintGap = (s_diagPaintEntry - s_diagPrevPaintExit) * TwkUtil::kMillisecondsPerSecond;
+            }
+        }
+
+        //  Optional GPU-completion probe (RV_DIAG_GLFINISH). session->render()
+        //  only submits GL commands (texture upload + shaders); the GPU runs
+        //  them asynchronously and the present later blocks until they finish.
+        static int s_diagGlFinish = -1;
+        if (s_diagGlFinish < 0)
+        {
+            s_diagGlFinish = (getenv("RV_DIAG_GLFINISH") != nullptr) ? 1 : 0;
+        }
+        double diagGpuMs = -1.0;
+
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
             m_postFirstNonEmptyRender = true;
@@ -363,6 +421,13 @@ namespace Rv
             session->render();
             TWK_GLDEBUG;
 
+            if (diagOn && (s_diagGlFinish != 0))
+            {
+                const double t0 = TwkUtil::SystemClock().now();
+                glFinish();
+                diagGpuMs = (TwkUtil::SystemClock().now() - t0) * TwkUtil::kMillisecondsPerSecond;
+            }
+
             m_firstPaintCompleted = true;
 
             // Force the resulting alpha channel to 1 so the surface is fully
@@ -385,6 +450,10 @@ namespace Rv
 
         if (m_stopProcessingEvents || session == nullptr)
         {
+            //  This path skips the "paint" record below, so drop the exit
+            //  timestamp too. Leaving it stale would make the next computed
+            //  gap span everything that happened in between.
+            s_diagPrevPaintExit = 0.0;
             return;
         }
 
@@ -416,6 +485,24 @@ namespace Rv
 
         session->addSyncSample();
         session->postRender();
+
+        if (diagOn)
+        {
+            const double nowSecs = TwkUtil::SystemClock().now();
+            const double paintMs = (nowSecs - s_diagPaintEntry) * TwkUtil::kMillisecondsPerSecond;
+            s_diagPrevPaintExit = nowSecs;
+            std::ostringstream extra;
+            //  paint = whole paintGL (render_v2 + glClear tail + postRender)
+            //  gap   = previous paint-exit -> this paint-entry. The viewport is a
+            //          QOpenGLWindow, which swaps after paintGL returns, so this
+            //          covers swapBuffers/vsync + platform update-request
+            //          delivery + the event loop between paints. It does NOT
+            //          include a full-window widget composite: the viewport has
+            //          its own native surface and no longer serializes with the
+            //          rest of the window.
+            extra << "paint=" << paintMs << ";gap=" << diagPaintGap << ";gpuFinish=" << diagGpuMs;
+            TwkUtil::PlaybackDiagnostics::instance().record("paint", -1, session->currentFrame(), paintMs, extra.str());
+        }
 
         m_eventProcessingTimer.start();
 

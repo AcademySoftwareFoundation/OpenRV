@@ -39,6 +39,8 @@
 #include <TwkUtil/Timer.h>
 #include <TwkAudio/Audio.h>
 #include <algorithm>
+#include <climits>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <stl_ext/string_algo.h>
@@ -162,6 +164,45 @@ namespace Rv
                "imagefbolog, "
                "nodes, "
                "plugins";
+    }
+
+    int automaticExrThreadCount()
+    {
+        //  Explicit override wins (for tuning without a rebuild).
+        if (const char* v = getenv("RV_EXR_AUTO_MAX_THREADS"))
+        {
+            constexpr int kDecimalBase = 10;
+            char* end = nullptr;
+            const long n = strtol(v, &end, kDecimalBase);
+            if (end != v && *end == '\0' && n > 0 && n <= INT_MAX)
+            {
+                return static_cast<int>(n);
+            }
+        }
+
+        const int cores = static_cast<int>(TwkUtil::SystemInfo::numCPUs());
+        if (cores <= 1)
+        {
+            return 1;
+        }
+
+        //  Up to 16 logical cores keep the previous behavior (all but one).
+        //  Above that, add one thread per four extra cores. The decode work
+        //  needed for playback is bounded by the media, not the core count, so
+        //  a large pool (which all readers share) only adds contention with the
+        //  main/UI, audio, caching and compositor threads and drops frames.
+        //  The curve is continuous and monotonic so moving to a machine with
+        //  more cores never lowers the count (e.g. 16 -> 15, 24 -> 17,
+        //  64 -> 27, 128 -> 43). On a 64-logical-core system, 12-32 threads
+        //  played back best and 40+ degraded.
+        constexpr int kAllButOneMaxCores = 16;
+        constexpr int kExtraCoresPerThread = 4;
+        if (cores <= kAllButOneMaxCores)
+        {
+            return cores - 1;
+        }
+
+        return (kAllButOneMaxCores - 1) + (cores - kAllButOneMaxCores) / kExtraCoresPerThread;
     }
 
     int collectParams(Options::Params& p, const Options::Files& inputFiles, int index)
