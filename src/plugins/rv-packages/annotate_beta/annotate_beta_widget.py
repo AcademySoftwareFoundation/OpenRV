@@ -1,8 +1,10 @@
 # Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import collections
 import os
 import sys
+import time
 
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -541,13 +543,17 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         layout.setContentsMargins(8, 8, 8, 8)
         layout.setSpacing(8)
 
+        self._pending_family = None
+        self._font_queue = None
+        self._font_timer = None
+
         self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
         self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
-        for name in QtGui.QFontDatabase.families():
-            if not name.startswith(".") and QtGui.QFontDatabase.isSmoothlyScalable(name):
-                self._font_combo.addItem(name)
         self._font_combo.setMaxVisibleItems(10)
+        # A placeholder keeps the first loaded font from being auto-selected.
+        self._font_combo.setPlaceholderText("Aa")
+        self._font_combo.currentTextChanged.connect(self._on_font_selected)
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         self._font_combo.view().setMinimumWidth(160)
         layout.addWidget(self._font_combo)
@@ -573,12 +579,44 @@ class _TextOptionsPanel(QtWidgets.QWidget):
 
         layout.addStretch()
 
+    def start_loading_fonts(self):
+        """Fill the font combo in time-boxed batches so the GUI stays responsive."""
+        if self._font_queue is not None:
+            return
+        self._font_queue = collections.deque(
+            name for name in QtGui.QFontDatabase.families() if not name.startswith(".")
+        )
+        self._font_timer = QtCore.QTimer(self)
+        self._font_timer.timeout.connect(self._load_font_batch)
+        self._font_timer.start(0)
+
+    def _load_font_batch(self):
+        # isSmoothlyScalable() is the slow call: it resolves every style of the family.
+        deadline = time.perf_counter() + constants.FONT_BATCH_TIME_BUDGET_SECONDS
+        combo = self._font_combo
+        with QtCore.QSignalBlocker(combo):
+            while self._font_queue and time.perf_counter() < deadline:
+                name = self._font_queue.popleft()
+                if QtGui.QFontDatabase.isSmoothlyScalable(name):
+                    combo.addItem(name)
+                    if name == self._pending_family:
+                        combo.setCurrentIndex(combo.count() - 1)
+        if not self._font_queue:
+            self._font_timer.stop()
+            self._font_timer.deleteLater()
+            self._font_timer = None
+
+    def _on_font_selected(self, name):
+        # Only user selections reach here: programmatic changes block signals.
+        self._pending_family = name
+
     def set_font_family(self, name):
+        self._pending_family = name
         index = self._font_combo.findText(name)
         if index >= 0:
             with QtCore.QSignalBlocker(self._font_combo):
                 self._font_combo.setCurrentIndex(index)
-            self._font_combo.sync_display_font(name)
+        self._font_combo.sync_display_font(name)
 
     def set_font_size(self, size):
         self._size_button.set_selection(size if self._size_button.has_item(size) else constants.FontSize.MEDIUM)
@@ -659,6 +697,11 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._stack.setVisible(page is not None)
         if page is not None:
             self._stack.setCurrentWidget(self._pages[page])
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # Deferred so the dock paints before the font list starts loading.
+        QtCore.QTimer.singleShot(0, self._text_panel.start_loading_fonts)
 
     def set_size(self, value):
         for panel in self._slider_panels:
