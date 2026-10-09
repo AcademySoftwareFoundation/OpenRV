@@ -29,6 +29,7 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
@@ -37,6 +38,24 @@ namespace Rv
 
     namespace
     {
+        //  Sets a flag for the duration of a scope. Declare it as a named
+        //  local: an unnamed temporary guards nothing.
+        struct ScopedFlag
+        {
+            explicit ScopedFlag(bool& f)
+                : m_flag(f)
+            {
+                m_flag = true;
+            }
+
+            ~ScopedFlag() { m_flag = false; }
+
+            ScopedFlag(const ScopedFlag&) = delete;
+            ScopedFlag& operator=(const ScopedFlag&) = delete;
+
+            bool& m_flag;
+        };
+
         //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
         struct GLFrameDiag
         {
@@ -69,6 +88,9 @@ namespace Rv
         , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
         , m_stopProcessingEvents(false)
+        , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
+        , m_syncingDevicePixelRatio(false)
+        , m_profilingSwapPending(false)
         , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
@@ -79,11 +101,35 @@ namespace Rv
 
         m_eventProcessingTimer.setSingleShot(true);
         connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
+
+        //  Queued: screenChanged() is emitted before devicePixelRatio()
+        //  reports the new value.
+        connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
+
+        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::endProfilingSwap);
     }
 
     GLWindow::~GLWindow() {}
 
     void GLWindow::stopProcessingEvents() { m_stopProcessingEvents = true; }
+
+    void GLWindow::endProfilingSwap()
+    {
+        if (!m_profilingSwapPending)
+        {
+            return;
+        }
+
+        m_profilingSwapPending = false;
+
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
+        }
+    }
 
     void GLWindow::eventProcessingTimeout() { m_doc->session()->userGenericEvent("per-render-event-processing", ""); }
 
@@ -195,6 +241,42 @@ namespace Rv
             m_doc->viewSizeChanged(w, h);
     }
 
+    void GLWindow::syncDevicePixelRatio()
+    {
+        const auto currentRatio = static_cast<float>(devicePixelRatio());
+
+        //  Below any real difference between two displays, above the
+        //  last-bit jitter a fractionally scaled ratio can show.
+        constexpr float DevicePixelRatioTolerance = 1e-4f;
+
+        if (std::abs(currentRatio - m_devicePixelRatio) < DevicePixelRatioTolerance || m_syncingDevicePixelRatio)
+        {
+            return;
+        }
+
+        //  Everything below re-enters this function.
+        const ScopedFlag syncing(m_syncingDevicePixelRatio);
+
+        m_devicePixelRatio = currentRatio;
+
+        //  Qt only pushes a new surface size down on a change of *logical*
+        //  geometry, so a DPI change leaves the drawable at the old pixel size
+        //  and GL clips the frame to it. A one-pixel round trip forces the
+        //  push; RvDocument::showEvent() does the same on first show.
+        const QSize restore = size();
+        resize(restore.width() + 1, restore.height());
+        resize(restore);
+
+        //  Flushes the renderer's image FBOs and fires "view-size-changed".
+        //  Idempotent: resizeGL() does it too where the poke is synchronous.
+        if (m_doc)
+        {
+            m_doc->viewSizeChanged(width(), height());
+        }
+
+        requestUpdate();
+    }
+
     QImage GLWindow::readPixels(int x, int y, int w, int h)
     {
         const int pw = width() * devicePixelRatio();
@@ -220,6 +302,7 @@ namespace Rv
         TWK_GLDEBUG;
 
         IPCore::Session* session = m_doc->session();
+        const bool debug = IPCore::debugProfile && session != nullptr;
 
         if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
         {
@@ -231,6 +314,12 @@ namespace Rv
                 m_doc->center();
                 TWK_GLDEBUG;
             }
+        }
+
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->beginProfilingSample();
+            trecord.renderStart = session->profilingElapsedTime();
         }
 
         if (IPCore::ImageRenderer::debugGpu())
@@ -301,8 +390,17 @@ namespace Rv
             TWK_GLDEBUG;
         }
 
-        if (m_stopProcessingEvents)
+        if (m_stopProcessingEvents || session == nullptr)
+        {
             return;
+        }
+
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.renderEnd = session->profilingElapsedTime();
+            trecord.swapStart = trecord.renderEnd;
+        }
 
         // If a separate output device is presenting, sync it. The control
         // (window) surface presents itself: QOpenGLWindow swaps automatically
@@ -323,6 +421,17 @@ namespace Rv
             {
                 s_glDiag.outPresentMs += diagPresentTimer.elapsed() * 1000.0;
             }
+
+            if (debug)
+            {
+                Session::ProfilingRecord& trecord = session->currentProfilingSample();
+                trecord.swapEnd = session->profilingElapsedTime();
+                session->endProfilingSample();
+            }
+        }
+        else if (debug)
+        {
+            m_profilingSwapPending = true;
         }
 
         session->addSyncSample();
@@ -348,8 +457,64 @@ namespace Rv
         TWK_GLDEBUG;
     }
 
+    bool GLWindow::eventFilter(QObject* /*object*/, QEvent* event)
+    {
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
+            || event->type() == QEvent::ShortcutOverride)
+        {
+            //
+            //  Qt can deliver both ShortcutOverride and KeyPress for the same
+            //  key; filter the duplicate here. Remember the new key/type,
+            //  otherwise any number of ShortcutOverride/Press pairs get
+            //  filtered out and auto-repeat doesn't work.
+            //
+            if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
+            {
+                if (m_lastKey == kevent->key()
+                    && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
+                        || (m_lastKeyType == kevent->type())))
+                {
+                    m_lastKey = kevent->key();
+                    m_lastKeyType = kevent->type();
+                    event->accept();
+                    return true;
+                }
+
+                m_lastKeyType = kevent->type();
+                m_lastKey = kevent->key();
+            }
+
+            Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+            if (session != nullptr && m_videoDevice != nullptr)
+            {
+                session->setEventVideoDevice(m_videoDevice);
+                m_videoDevice->translator().sendQTEvent(event);
+            }
+
+            event->accept();
+            return true;
+        }
+
+        return false;
+    }
+
     bool GLWindow::event(QEvent* event)
     {
+        //  Before the base class paints, else one frame presents at the wrong
+        //  scale. UpdateRequest comes from requestUpdate(), Paint from a
+        //  backing-scale change.
+        switch (event->type())
+        {
+        case QEvent::UpdateRequest:
+        case QEvent::Paint:
+        case QEvent::Expose:
+        case QEvent::Move:
+            syncDevicePixelRatio();
+            break;
+        default:
+            break;
+        }
+
         // The device (and its translator) is wired by the hosting GLView just
         // after construction; ignore any events that arrive before then.
         if (!m_videoDevice)

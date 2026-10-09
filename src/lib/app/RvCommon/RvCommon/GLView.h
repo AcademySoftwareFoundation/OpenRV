@@ -74,7 +74,9 @@ namespace Rv
 
         void stopProcessingEvents();
 
-        void setCursor(const QCursor& cursor);
+        //  Forwards key and shortcut events of a watched object to RV's event
+        //  system (e.g. the Session Manager dock, via mainViewWidget()).
+        bool eventFilter(QObject* object, QEvent* event) override;
 
         bool firstPaintCompleted() const;
 
@@ -115,7 +117,9 @@ namespace Rv
         void reattachGLWindow();
 
     protected:
+        bool event(QEvent* event) override;
         void showEvent(QShowEvent*) override;
+        void resizeEvent(QResizeEvent* event) override;
 
     private:
         RvDocument* m_doc;
