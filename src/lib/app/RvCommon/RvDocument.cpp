@@ -870,8 +870,11 @@ namespace Rv
         if (box.clickedButton() == b2)
         {
             RvApp()->prefs();
-            RvApp()->prefDialog()->tabWidget()->setCurrentIndex(2);
-            RvApp()->prefDialog()->raise();
+            if (RvPreferences* p = RvApp()->prefDialog())
+            {
+                p->tabWidget()->setCurrentIndex(2);
+                p->raise();
+            }
         }
         else
         {
@@ -891,9 +894,12 @@ namespace Rv
                 settings.endGroup();
             }
 
-            RvApp()->prefDialog()->update();
-            RvApp()->prefDialog()->write();
-            RvApp()->prefDialog()->raise();
+            if (RvPreferences* p = RvApp()->prefDialog())
+            {
+                p->update();
+                p->write();
+                p->raise();
+            }
         }
     }
 
