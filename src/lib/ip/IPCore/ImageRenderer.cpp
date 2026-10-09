@@ -4867,8 +4867,6 @@ namespace IPCore
         if (root->commands.empty())
             return;
 
-        const string prenderID = imageToFBOIdentifier(root);
-
         assert(fbo);
 
         //////////////////////////////caching////////////////////////////////
@@ -4936,9 +4934,11 @@ namespace IPCore
             }
         }
 
-        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused
-        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
-        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused.
+        // No identifier, so findExistingImageFBO() never returns a scratch buffer in place of the
+        // image's cached render.
+        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, "")->fbo();
+        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, "")->fbo();
 
         // Copy initial render to temp buffer
         if (root->commands.size() > 1)
