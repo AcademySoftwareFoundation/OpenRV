@@ -118,6 +118,13 @@ namespace IPCore
                                 for (int colIndex = 0; colIndex < 4; colIndex++)
                                 {
                                     img->transformMatrix(rowIndex, colIndex) = transformMatrixAtt->value()[rowIndex * 4 + colIndex];
+                                    // The cache lives upstream of any arbitrary
+                                    // 2D rotation (Transform2DIPNode is applied
+                                    // later in the source pipeline), so it is
+                                    // safe to mirror the cached transform into
+                                    // the overlay chain -- it never contains an
+                                    // arbitrary rotation of its own.
+                                    img->overlayTransformMatrix(rowIndex, colIndex) = transformMatrixAtt->value()[rowIndex * 4 + colIndex];
                                 }
                             }
                         }
