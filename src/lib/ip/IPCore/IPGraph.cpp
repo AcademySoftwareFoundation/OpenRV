@@ -1626,7 +1626,7 @@ IPGraph::findNodesByAbstractPath(int frame,
         PROFILE_SAMPLE(frameCachedTestEnd);
 
         //
-        //  Cache hit/miss verification for playback stutter. Once per newly
+        //  Cache hit/miss verification for playback diagnostics. Once per newly
         //  presented frame, capture whether the frame the display asked for was
         //  actually resident in the look-ahead cache and, if not, how "full"
         //  the cache was and how many contiguous frames ahead were cached (the
@@ -2441,7 +2441,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                         //  Log slow-media transitions. When this turns on, RV
                         //  restricts caching to this single thread (thread 1)
                         //  and switches to block caching, which serializes image
-                        //  decode and is a common cause of playback stutter.
+                        //  decode.
                         if (poorPerf != m_evalSlowMedia && TwkUtil::PlaybackDiagnostics::enabled())
                         {
                             TwkUtil::PlaybackDiagnostics::instance().record("slowmedia", int(id), frame, poorPerf ? 1.0 : 0.0,
@@ -2584,20 +2584,9 @@ IPGraph::findNodesByAbstractPath(int frame,
                 {
                     DB("thread " << id << " evaluate frame " << frame << ", overflowing " << m_fbcache.overflowing());
 
-                    //  Time the per-frame background decode so playback stutter
-                    //  can be attributed to slow image (e.g. EXR) decoding. This
-                    //  is where the actual disk read + decode happens during
+                    //  Time the per-frame background decode. This is where the
+                    //  actual disk read + decode happens during
                     //  look-ahead/region caching.
-                    //
-                    //  We also record how many caching threads are decoding
-                    //  concurrently at the moment this decode starts. If the
-                    //  per-decode time grows with concurrency, the reader
-                    //  threads are oversubscribing a shared resource (most
-                    //  likely the OpenEXR global thread pool: N reader threads
-                    //  x M EXR threads each thrash the CPU), so adding reader
-                    //  threads does not scale throughput. If the time is flat
-                    //  across concurrency levels, the decode is genuinely
-                    //  CPU-bound per frame and needs real parallelism instead.
                     static std::atomic<int> s_activeDecodes(0);
 
                     //  Releases the s_activeDecodes slot on every exit path,
@@ -3113,9 +3102,6 @@ IPGraph::findNodesByAbstractPath(int frame,
                     cerr << "DEBUG: audio cache miss, zeroing buffer!" << endl;
                 }
 
-                //  Record audio starvation independently of -debug audio so a
-                //  stutter run can be captured with a single env var. A steady
-                //  stream of these means the audio decode/cache can't keep up.
                 if (TwkUtil::PlaybackDiagnostics::enabled())
                 {
                     ostringstream extra;

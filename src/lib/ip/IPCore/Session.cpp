@@ -2083,10 +2083,6 @@ namespace IPCore
         if (!isPlaying() && !isBuffering())
             return;
 
-        //  A stop triggered with the "buffering" reason means the look-ahead
-        //  cache under-ran and playback is pausing to let it refill. Frequent
-        //  buffering events indicate image (e.g. EXR) decode throughput can't
-        //  keep up. Captured under RV_PLAYBACK_DIAG regardless of -debug flags.
         if (eventData == "buffering" && TwkUtil::PlaybackDiagnostics::enabled())
         {
             TwkUtil::PlaybackDiagnostics::instance().record("buffering", -1, m_frame,
@@ -3270,12 +3266,6 @@ namespace IPCore
                 double now = TwkUtil::SystemClock().now();
                 if (now >= (m_lastDrawingTime + minElapsedTime))
                 {
-                    //  Count each posted redraw request so render_v2 can report
-                    //  how many requests were coalesced into a single actual
-                    //  paint (see m_diagRedrawRequests). update() posts an async
-                    //  QPaintDeviceWindow::update()/requestUpdate(); the paint
-                    //  itself lands whenever Qt's event loop gets to it, which on
-                    //  some platforms is gated on the display refresh signal.
                     if (isPlaying())
                     {
                         ++m_diagRedrawRequests;

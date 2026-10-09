@@ -1631,11 +1631,7 @@ namespace IPCore
             //
             //  Diagnostics: the cache is full and we are about to give up on
             //  caching the best ahead target because the best freeable frame is
-            //  considered at least as valuable. This is precisely the "cache
-            //  full but the frame the player needs next is not cached"
-            //  condition. Record which ahead frame we refused to cache and
-            //  which cached frame we chose to protect instead, so playback
-            //  stutter can be attributed to the cache retention policy.
+            //  considered at least as valuable.
             //
             auto emitCacheStall = [&]()
             {

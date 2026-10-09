@@ -63,8 +63,7 @@ namespace TwkFB
         //
         //  The complete file is already in a single contiguous buffer, so we
         //  can report its size and service concurrent, offset-based reads
-        //  directly from that buffer without touching any shared state. This
-        //  restores the fast/parallel reader path in OpenEXR >= 3.3.
+        //  directly from that buffer without touching any shared state.
         //
         int64_t size() override;
         bool isStatelessRead() const override;

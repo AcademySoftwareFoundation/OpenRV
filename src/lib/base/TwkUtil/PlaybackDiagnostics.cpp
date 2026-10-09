@@ -19,9 +19,7 @@ namespace TwkUtil
     {
         //
         //  Cached once: RV_PLAYBACK_DIAG is interpreted purely as an on/off
-        //  boolean (non-empty and not "0"). It is never used to build a file
-        //  path or otherwise passed to the filesystem, so there is no
-        //  path-injection risk from this environment variable.
+        //  boolean (non-empty and not "0").
         //
         static const bool e = []() -> bool
         {
@@ -50,8 +48,7 @@ namespace TwkUtil
     {
         //
         //  The output path is a hard-coded constant filename in the current
-        //  working directory. No environment variable or other external input
-        //  is used to construct it, so there is no file-path injection risk.
+        //  working directory.
         //
         m_file.open("rv-playback-diag.log", ios::out | ios::trunc);
         if (m_file.is_open())

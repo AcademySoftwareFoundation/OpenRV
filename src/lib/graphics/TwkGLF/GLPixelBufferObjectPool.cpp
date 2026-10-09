@@ -129,15 +129,7 @@ namespace TwkGLF
     //  expand per-pixel during the transfer (see the expandRGBToRGBA path in
     //  ImageRenderer). Leaving the term at 6 would silently lower the maximum
     //  workable resolution by ~25%, and a frame over the max makes pop() return
-    //  NULL, which falls back to the slow non-PBO upload -- the very stall the
-    //  transient-PBO work removed. Keep this in step with the widest format the
-    //  upload path can produce.
-    //
-    //  MAX_SIZE = 4032x4536 at RGBA16 -> 18.3 Mpx ceiling, 140 MiB per buffer.
-    //  Note the fixed-size pool pre-allocates ceil(MAX_NB_BUFFERS * 1.05)
-    //  buffers of this size, so raising it raises the pre-allocated footprint
-    //  proportionally; the pool purges against its soft caps and refuses only
-    //  when free physical memory runs low.
+    //  NULL, which falls back to the slow non-PBO upload.
     //
     RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MAX_SIZE, size_t, 4032 * 4536 * 8, prefetchFixedSizePBOsMaxSize);
     RV_MAKE_STATIC(RV_PREFETCH_FIXED_SIZE_PBOS_MIN_SIZE, size_t, 1920 * 1080 * 8, prefetchFixedSizePBOsMinSize);

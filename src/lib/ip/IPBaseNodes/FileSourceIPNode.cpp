@@ -622,15 +622,13 @@ namespace IPCore
         //
         //  Random-access performance only matters for the media that actually
         //  supplies the image at this frame. A single source can carry several
-        //  media -- most commonly an EXR image sequence with a MOV attached
-        //  purely for its audio track. That MOV has a video track
+        //  media -- example: an EXR image sequence with a MOV attached purely
+        //  for its audio track. That MOV has a video track
         //  (info.video == true) and may be a slow-random-access codec, but its
         //  images are never decoded during caching (evaluate() only decodes the
-        //  media returned by getMediaFromContext(), i.e. the EXR here). The old
-        //  behaviour flagged the whole source "slow" if *any* media had a video
-        //  track, which needlessly forced fast EXR decode onto a single caching
-        //  thread whenever an audio MOV was present. Test only the image-
-        //  supplying media so fast image sequences keep decoding in parallel.
+        //  media returned by getMediaFromContext(), i.e. the EXR here).
+        //  Test only the image-supplying media so fast image sequences keep
+        //  decoding in parallel.
         //
         bool slow = false;
 
@@ -1007,10 +1005,6 @@ namespace IPCore
 
         debuggingDelay();
 
-        //  TEMP DECODE-SOURCE DIAGNOSTIC: attribute each background decode to a
-        //  concrete media file so we can tell whether the serialized (thread 1)
-        //  decodes are the slow MOV itself or fast EXR frames dragged onto one
-        //  thread. Only cache-eval threads and only when diagnostics are on.
         const bool diagDecode = TwkUtil::PlaybackDiagnostics::enabled() && ((context.thread & CacheEvalThread) != 0);
         TwkUtil::Timer diagTimer;
         if (diagDecode)
@@ -1039,12 +1033,9 @@ namespace IPCore
                 std::ostringstream extra;
                 extra << "file=" << nm << ";slow=" << (selSlow ? 1 : 0);
 
-                //  Report the decoded pixel format so we can see what bit depth
-                //  the EXRs land in (half vs full float dominates upload cost),
-                //  the EXR compression codec (PIZ/DWA decompress much slower
-                //  than ZIP), and how many channels/planes we actually decoded
-                //  vs how many are displayed (decoding unused AOV channels is
-                //  wasted decode+upload time).
+                //  Report the decoded pixel format and how many channels/planes
+                //  we actually decoded vs how many are displayed (decoding unused
+                //  channels is wasted decode+upload time).
                 if (!fbs.empty() && (fbs[0] != nullptr))
                 {
                     const TwkFB::FrameBuffer* fb = fbs[0];
@@ -1077,8 +1068,7 @@ namespace IPCore
                         break;
                     }
 
-                    //  Total channels actually decoded, summed across all
-                    //  planes (planar EXR keeps each channel in its own plane).
+                    //  Total channels actually decoded
                     int decodedChannels = 0;
                     int planeCount = 0;
                     constexpr int kMaxLoggedChannelNames = 12;
@@ -1097,8 +1087,6 @@ namespace IPCore
                     }
 
                     //  How many channels the display pipeline will actually use
-                    //  (RV shows at most RGBA). Anything decoded beyond this is
-                    //  wasted work for straight playback.
                     const int displayedChannels = std::min(decodedChannels, 4);
 
                     std::string comp = "?";

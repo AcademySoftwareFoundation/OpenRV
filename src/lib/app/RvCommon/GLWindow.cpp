@@ -157,10 +157,7 @@ namespace Rv
         }
 
         //  Time the synchronous per-render event processing (Mu/Python handlers)
-        //  that runs on the GUI thread after each paint. If this is large during
-        //  stalls it is the event-loop half of the "outside render_v2" time; if
-        //  it is small, the stall is in the present path (swapBuffers/vsync or
-        //  update-request delivery) rather than in a handler.
+        //  that runs on the GUI thread after each paint.
         const bool diagOn = session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
         const double startTime = diagOn ? TwkUtil::SystemClock().now() : 0.0;
 
@@ -351,10 +348,6 @@ namespace Rv
         //  and the gap between successive paints so the analyzer can split that
         //  bucket into present vs event-loop handlers.
         //
-        //  Note the viewport is a QOpenGLWindow presenting on its own native
-        //  surface, so unlike the old QOpenGLWidget path the full-window widget
-        //  composite is NOT part of the gap -- see the "gap" note below.
-        //
         //  m_videoDevice is null until the hosting GLView assigns it after
         //  construction, and the window is created during that construction, so
         //  a paint can land before the device is wired up. Require it here so we
@@ -376,10 +369,6 @@ namespace Rv
         //  Optional GPU-completion probe (RV_DIAG_GLFINISH). session->render()
         //  only submits GL commands (texture upload + shaders); the GPU runs
         //  them asynchronously and the present later blocks until they finish.
-        //  glFinish() here attributes that GPU time: if it is large on new
-        //  frames the stall is the synchronous GPU upload/render; if it stays
-        //  small while the present still stalls, the block is the present path
-        //  (swapBuffers/vsync or update-request delivery), not the GPU.
         static int s_diagGlFinish = -1;
         if (s_diagGlFinish < 0)
         {
@@ -510,8 +499,7 @@ namespace Rv
             //          delivery + the event loop between paints. It does NOT
             //          include a full-window widget composite: the viewport has
             //          its own native surface and no longer serializes with the
-            //          rest of the window. Do not compare these numbers against
-            //          gaps captured on the pre-QOpenGLWindow present path.
+            //          rest of the window.
             extra << "paint=" << paintMs << ";gap=" << diagPaintGap << ";gpuFinish=" << diagGpuMs;
             TwkUtil::PlaybackDiagnostics::instance().record("paint", -1, session->currentFrame(), paintMs, extra.str());
         }
