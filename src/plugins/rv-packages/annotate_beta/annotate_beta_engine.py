@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple
 
-from rv import commands
+from rv import commands, extra_commands
 
 import annotate_beta_constants as constants
 import annotate_beta_paint as paint
@@ -280,6 +280,12 @@ class AnnotateDrawEngine:
         default sequence) the innermost entry may be a virtual composite image whose
         source name is not valid for eventToImageSpace.
         """
+        # Update RV's shared pointer state
+        try:
+            extra_commands.recordPixelInfo(event)
+        except Exception:
+            pass  # A failure here must not interrupt the stroke
+
         pointer = event.pointer()
         device_pixel_ratio = commands.devicePixelRatio()
         device_pointer = (pointer[0] * device_pixel_ratio, pointer[1] * device_pixel_ratio)
