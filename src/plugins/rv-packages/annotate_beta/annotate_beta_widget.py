@@ -592,7 +592,7 @@ class _TextOptionsPanel(QtWidgets.QWidget):
 
     def _load_font_batch(self):
         # isSmoothlyScalable() is the slow call: it resolves every style of the family.
-        deadline = time.perf_counter() + constants.FONT_BATCH_SECONDS
+        deadline = time.perf_counter() + constants.FONT_BATCH_TIME_BUDGET_SECONDS
         combo = self._font_combo
         with QtCore.QSignalBlocker(combo):
             while self._font_queue and time.perf_counter() < deadline:
