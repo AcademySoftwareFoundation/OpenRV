@@ -1152,7 +1152,17 @@ namespace Rv
             return p;
         }
 
-        TwkFB::linearRGBA709pixelValue(fb, int(x), int(y), &p[0]);
+        int ignoreChroma = 0;
+        std::vector<TwkContainer::IntProperty*> chromaProps;
+        s->findPropertyOfType<TwkContainer::IntProperty>(chromaProps, "#RVLinearize.color.ignoreChromaticities");
+        if (!chromaProps.empty() && !chromaProps.front()->empty())
+            ignoreChroma = chromaProps.front()->front();
+
+        if (ignoreChroma)
+            TwkFB::linearRGBARawPixelValue(fb, int(x), int(y), &p[0]);
+        else
+            TwkFB::linearRGBA709pixelValue(fb, int(x), int(y), &p[0]);
+
         NODE_RETURN(p);
     }
 
