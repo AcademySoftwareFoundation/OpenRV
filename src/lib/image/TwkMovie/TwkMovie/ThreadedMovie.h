@@ -12,6 +12,7 @@
 #include <TwkMovie/dll_defs.h>
 #include <stl_ext/thread_group.h>
 #include <map>
+#include <mutex>
 
 namespace TwkMovie
 {
@@ -75,31 +76,12 @@ namespace TwkMovie
 
         void dispatchAll();
 
-    protected:
-        void lock();
-        void unlock();
-
-        struct Lock
-        {
-            Lock(ThreadedMovie* m)
-                : movie(m)
-            {
-                movie->lock();
-            }
-
-            ~Lock() { movie->unlock(); }
-
-            ThreadedMovie* movie;
-        };
-
-        friend class ThreadedMovie::Lock;
-
     private:
         Movies m_movies;
         ThreadGroup m_threadGroup;
         FBMap m_map;
-        pthread_mutex_t m_mapLock;
-        pthread_mutex_t m_runLock;
+        std::mutex m_mapLock;
+        std::mutex m_runLock;
         Frames m_frames;
         ThreadDataVector m_threadData;
         int m_currentIndex;
