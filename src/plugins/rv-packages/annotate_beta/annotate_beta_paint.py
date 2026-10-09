@@ -369,8 +369,8 @@ def new_stroke(paint_node, frame, first_point, first_point_width, brush, erase_m
     commands.setStringProperty(f"{node_name}.uuid", [stroke_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
     commands.setFloatProperty(f"{node_name}.points", [first_point.x, first_point.y], True)
-    commands.setIntProperty(f"{node_name}.join", [1], True)  # BevelJoin
-    commands.setIntProperty(f"{node_name}.cap", [2], True)  # RoundCap
+    commands.setIntProperty(f"{node_name}.join", [3], True)  # RoundJoin
+    commands.setIntProperty(f"{node_name}.cap", [1], True)  # SquareCap, rendered round by the radial shader
     commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.Brush.GAUSS else 0], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setFloatProperty(f"{node_name}.smoothingWidth", [1.0], True)
