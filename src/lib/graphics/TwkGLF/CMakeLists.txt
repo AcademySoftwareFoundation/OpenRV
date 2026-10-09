@@ -14,6 +14,7 @@ SET(_target
 SET(_sources
     GLVideoDevice.cpp
     GL.cpp
+    GLContextScope.cpp
     GLFBO.cpp
     GLVBO.cpp
     GLFence.cpp

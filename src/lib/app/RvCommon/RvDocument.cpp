@@ -27,10 +27,7 @@
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
 #include <RvCommon/VulkanView.h>
 #include <RvCommon/QTVulkanVideoDevice.h>
-// The X11/QtX11Extras includes (Linux-only, above) drag in GL headers that
-// conflict with GLEW; only assert the include-order invariant on Linux.
-// On Windows, GLEW is intentionally included first (see the
-// PLATFORM_WINDOWS block higher up) and the conflict does not apply.
+// Windows includes GLEW first on purpose; only Linux has the X11 conflict.
 #if defined(PLATFORM_LINUX)
 #ifdef __glew_h_
 #error "GLEW IS DEFINED BEFORE QTGUI!"
@@ -101,6 +98,20 @@ namespace Rv
 #define DBL(level, x)
 #endif
 
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+    namespace
+    {
+        // Input and layout settings shared by every main view widget.
+        void configureViewWidget(QWidget* view)
+        {
+            view->setFocusPolicy(Qt::StrongFocus);
+            view->setMouseTracking(true);
+            view->setAcceptDrops(true);
+            view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        }
+    } // namespace
+#endif
+
     inline QString utf8(const std::string& us) { return QString::fromUtf8(us.c_str()); }
 
     static int sessionCount = 0;
@@ -157,10 +168,10 @@ namespace Rv
         , m_closeEventReceived(false)
         , m_vsyncDisabled(false)
         , m_hdpiResizeWorkaroundDone(false)
-        , m_oldGLView(0)
-        , m_glView(0)
         , m_diagnosticsView(nullptr)
         , m_diagnosticsDock(nullptr)
+        , m_oldGLView(0)
+        , m_glView(0)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -170,8 +181,6 @@ namespace Rv
 #if !defined(PLATFORM_DARWIN)
         setMenuBar(new QMenuBar(0));
 #endif
-
-        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
 
         setWindowIcon(QIcon(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)));
 
@@ -202,19 +211,12 @@ namespace Rv
         //
 
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        // --- Backend selection: Vulkan for 10-bit, OpenGL otherwise ---
         //
-        //  The display-depth preference is the user intent. A 10-bit request
-        //  (RGB 10 + A 2) routes to the Vulkan presentation path, which avoids
-        //  the 8-bit truncation that the OpenGL+Qt path is subject to on both
-        //  Linux (GLX visual) and Windows (WGL pixel-format negotiation);
-        //  everything else (8-bit, default) stays on the legacy OpenGL GLView.
-        //  If 10-bit is requested but this machine's Vulkan cannot present
-        //  10-bit, we fall back to GLView and log why. The choice is made
-        //  once per window at construction; changing the preference takes
-        //  effect on the next launch / new window.
+        //  10-bit (RGB 10 + A 2) presents through Vulkan, since GLX/WGL
+        //  pixel-format negotiation truncates to 8-bit; everything else stays
+        //  on GLView.
         //
-        const bool want10bit = (opts.dispRedBits == 10 && opts.dispGreenBits == 10 && opts.dispBlueBits == 10 && opts.dispAlphaBits == 2);
+        const bool want10bit = DesktopVideoDevice::tenBitDisplayRequested();
 
         if (ImageRenderer::debugGpu())
         {
@@ -222,13 +224,14 @@ namespace Rv
                  << " A" << opts.dispAlphaBits << "  -> want10bit=" << (want10bit ? "true" : "false") << endl;
         }
 
-        bool useVulkan = false;
+        // Shared with the presentation output so both stay on the same backend.
+        const bool useVulkan = DesktopVideoDevice::shouldUseVulkanPresentation();
+
         if (want10bit)
         {
-            useVulkan = VulkanView::supports10BitPresentation();
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: RvDocument: supports10BitPresentation()=" << (useVulkan ? "true" : "false") << endl;
+                cout << "INFO: RvDocument: shouldUseVulkanPresentation()=" << (useVulkan ? "true" : "false") << endl;
             }
             if (!useVulkan)
             {
@@ -245,87 +248,36 @@ namespace Rv
 
         if (useVulkan)
         {
-            // --- Vulkan path ---
             m_vulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
 
-            m_vulkanView->setFocusPolicy(Qt::StrongFocus);
-            m_vulkanView->setMouseTracking(true);
-            m_vulkanView->setAcceptDrops(true);
-            m_vulkanView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            configureViewWidget(m_vulkanView);
             m_vulkanView->resize(m_vulkanView->sizeHint());
-            m_vulkanView->setEventWidget(m_vulkanView);
             m_viewWidget = m_vulkanView;
 
             m_vulkanView->videoDevice()->makeCurrent();
-
-            initializeSession();
         }
         else
         {
-            // --- OpenGL path ---
-            if (docs.empty())
-            {
-                m_glView =
-                    new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                               true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-            }
-            else
-            {
-                RvSession* s = static_cast<RvSession*>(docs.front());
-                RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
-                // The front document may be on the Vulkan/Metal path, where view()
-                // is null; share its GL context only if it has one (mirrors the
-                // first-window case above, which passes a null share context).
-                QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-                m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                      opts.vsync != 0 && !m_vsyncDisabled,
-                                      true, // double buffer
-                                      opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-            }
+            m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
             m_viewWidget = m_glView;
         }
 #else
-        // --- OpenGL path ---
-        if (docs.empty())
-        {
-            m_glView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-        }
-        else
-        {
-            RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-            // The front document may be on an alternative presentation path, where
-            // view() is null; share its GL context only if it has one.
-            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-            m_glView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                  opts.vsync != 0 && !m_vsyncDisabled,
-                                  true, // double buffer
-                                  opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-        }
+        m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
         m_viewWidget = m_glView;
-#endif // PLATFORM_LINUX
+#endif
 
-        // DiagnosticsView is an independent QOpenGLWidget with its own GL context;
-        // it only needs a valid surface format, not the main view's context. On the
-        // Vulkan/Metal presentation path m_glView is null, so fall back to the global
-        // default format (OpenGL 2.1, set in RV/main.cpp) which ImGui's GL2 backend
-        // expects.
+        // DiagnosticsView has its own context and only needs a surface format.
         const QSurfaceFormat diagnosticsFormat = m_glView ? m_glView->format() : QSurfaceFormat::defaultFormat();
         m_diagnosticsView = new DiagnosticsView(nullptr, diagnosticsFormat);
 
         // Dockable to QMainWindow, not centralwidget.
-        if (m_diagnosticsView)
-        {
-            m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
-            m_diagnosticsDock->setObjectName("Diagnostics");
-            m_diagnosticsDock->setWidget(m_diagnosticsView);
-            m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
-            addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
-            m_diagnosticsDock->hide();                    // Hide by default
-            m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
-        }
+        m_diagnosticsDock = new QDockWidget(tr("Diagnostics"), this);
+        m_diagnosticsDock->setObjectName("Diagnostics");
+        m_diagnosticsDock->setWidget(m_diagnosticsView);
+        m_diagnosticsDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        addDockWidget(Qt::BottomDockWidgetArea, m_diagnosticsDock);
+        m_diagnosticsDock->hide();                    // Hide by default
+        m_diagnosticsView->setWindowFlag(Qt::Widget); // Not a top-level window
 
         m_stackedLayout = new QStackedLayout(m_centralWidget);
         m_stackedLayout->setStackingMode(QStackedLayout::StackAll);
@@ -380,11 +332,12 @@ namespace Rv
         //  input and dims the UI.
         //
         //  It is a frameless top-level window (owned by this document) rather
-        //  than a child widget. The viewport is a native QOpenGLWindow, which
-        //  renders above any sibling raster child widget regardless of
-        //  raise()/stacking order, so a child overlay could never dim or block
-        //  the viewport. A top-level window sits above the main window and its
-        //  native child, so it covers the viewport too.
+        //  than a child widget. The viewport is a native window on both
+        //  backends (QOpenGLWindow or a Vulkan surface), which renders above
+        //  any sibling raster child widget regardless of raise()/stacking
+        //  order, so a child overlay could never dim or block the viewport. A
+        //  top-level window sits above the main window and its native child,
+        //  so it covers the viewport too.
         //
         m_blockingOverlay = new QWidget(this, Qt::FramelessWindowHint | Qt::Tool);
         m_blockingOverlay->setObjectName("UIBlockingOverlay");
@@ -420,29 +373,26 @@ namespace Rv
     void RvDocument::initializeSession()
     {
         //
-        //  On the OpenGL path this is called by
-        //  RvApplication::newSessionFromFiles() once the document has been
-        //  shown, so the viewport window exists and its GL context has been
-        //  created. Constructing an RvSession queries
+        //  Called by RvApplication::newSessionFromFiles() once the document has
+        //  been shown, so the viewport window exists and its GL context has
+        //  been created. Constructing an RvSession queries
         //  GL_SHADING_LANGUAGE_VERSION and aborts without a current context, so
         //  make the viewport context current first.
         //
-        //  On the Vulkan/Metal presentation path there is no GLView. Those
-        //  views make their own GL context current and call in here themselves
-        //  once initialized, so the guard is on having *a* view, not on having
-        //  a GLView, and makeCurrent() is skipped when GLView is absent.
+        //  Not driven from a view init callback: loading packages can add a
+        //  QWebEngineView, which destroys the viewport's native window while
+        //  that callback is still on the stack.
         //
-        if (!m_viewWidget)
+        TwkGLF::GLVideoDevice* viewDevice = viewVideoDevice();
+
+        if (!viewDevice)
         {
             return;
         }
 
         if (!m_session)
         {
-            if (m_glView)
-            {
-                m_glView->makeCurrent();
-            }
+            viewDevice->makeCurrent();
 
             m_session = new RvSession;
             // m_session->setFrameBuffer(fb);
@@ -619,6 +569,10 @@ namespace Rv
             //  Then this is the last document, so shutdown network
             //
 
+            // Before closing anything, so the console's queued auto-show cannot
+            // reopen it and keep the application alive.
+            RvApp()->setShuttingDown();
+
             if (RvNetworkDialog* d = RvApp()->networkWindow())
             {
                 if (d->serverRunning())
@@ -718,8 +672,7 @@ namespace Rv
         }
         else if (m == IPCore::Session::eventDeviceChangedMessage())
         {
-            // translator() is not on the shared GLVideoDevice base, so it is
-            // accessed via the concrete backend view here (still null-safe).
+            // translator() is not on the GLVideoDevice base.
             if (m_session->eventVideoDevice())
             {
                 const int w = m_session->eventVideoDevice()->width();
@@ -917,6 +870,26 @@ namespace Rv
         m_oldGLView = 0;
     }
 
+    GLView* RvDocument::createGLView(int redBits, int greenBits, int blueBits, int alphaBits)
+    {
+        const Rv::Options& opts = Options::sharedOptions();
+        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
+
+        //  Share with the front document's context. It is null when that
+        //  document is on Vulkan, or is this document mid-fallback.
+        QOpenGLContext* shareContext = nullptr;
+        if (!docs.empty())
+        {
+            const RvDocument* frontDoc = static_cast<RvDocument*>(static_cast<RvSession*>(docs.front())->opaquePointer());
+            shareContext = frontDoc->view() ? frontDoc->view()->context() : nullptr;
+        }
+
+        return new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
+                          opts.vsync != 0 && !m_vsyncDisabled,
+                          true, // double buffer
+                          redBits, greenBits, blueBits, alphaBits, !m_startupResize);
+    }
+
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
     // Hot-swap VulkanView -> GLView and rebind the live session to the GL device.
     void RvDocument::fallbackVulkanToGLView()
@@ -926,39 +899,34 @@ namespace Rv
             return;
         }
 
-        cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to OpenGL." << endl;
+        Rv::Options& opts = Options::sharedOptions();
+        const bool requestedTenBit = DesktopVideoDevice::tenBitDisplayRequested();
+        if (requestedTenBit)
+        {
+            cout << "INFO: Vulkan 10-bit presentation failed at runtime; falling back to 8-bit OpenGL." << endl;
+        }
+        else
+        {
+            cout << "INFO: Switching the main view from Vulkan to OpenGL for the requested display depth." << endl;
+        }
 
         VulkanView* oldVulkanView = m_vulkanView;
         m_vulkanView = nullptr;
 
         oldVulkanView->stopProcessingEvents();
 
-        Rv::Options& opts = Options::sharedOptions();
-        const TwkApp::Application::Documents& docs = TwkApp::App()->documents();
+        // OpenGL cannot provide the 10/10/10/2 surface that required Vulkan, so
+        // the recovery view is 8-bit; the persisted 10-bit preference is kept.
+        const int fallbackRedBits = requestedTenBit ? 8 : opts.dispRedBits;
+        const int fallbackGreenBits = requestedTenBit ? 8 : opts.dispGreenBits;
+        const int fallbackBlueBits = requestedTenBit ? 8 : opts.dispBlueBits;
+        const int fallbackAlphaBits = requestedTenBit ? 8 : opts.dispAlphaBits;
 
-        GLView* newGLView = nullptr;
-        if (docs.size() <= 1)
-        {
-            newGLView =
-                new GLView(this, 0, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"), opts.vsync != 0 && !m_vsyncDisabled,
-                           true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits, !m_startupResize);
-        }
-        else
-        {
-            RvSession* s = static_cast<RvSession*>(docs.front());
-            RvDocument* rvDoc = static_cast<RvDocument*>(s->opaquePointer());
-            QOpenGLContext* shareContext = rvDoc->view() ? rvDoc->view()->context() : nullptr;
-            newGLView = new GLView(this, shareContext, this, opts.stereoMode && !strcmp(opts.stereoMode, "hardware"),
-                                   opts.vsync != 0 && !m_vsyncDisabled, true, opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits,
-                                   opts.dispAlphaBits, !m_startupResize);
-        }
+        GLView* newGLView = createGLView(fallbackRedBits, fallbackGreenBits, fallbackBlueBits, fallbackAlphaBits);
 
         newGLView->setContentSize(oldVulkanView->sizeHint().width(), oldVulkanView->sizeHint().height());
         newGLView->setMinimumSize(QSize(oldVulkanView->minimumSizeHint().width(), oldVulkanView->minimumSizeHint().height()));
-        newGLView->setFocusPolicy(Qt::StrongFocus);
-        newGLView->setMouseTracking(true);
-        newGLView->setAcceptDrops(true);
-        newGLView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        configureViewWidget(newGLView);
 
         m_stackedLayout->removeWidget(oldVulkanView);
         m_stackedLayout->addWidget(newGLView);
@@ -985,21 +953,84 @@ namespace Rv
             m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
         }
 
-        if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
-        {
-            for (TwkApp::VideoDevice* device : m->devices())
-            {
-                if (DesktopVideoDevice* desktopDevice = dynamic_cast<DesktopVideoDevice*>(device))
-                {
-                    desktopDevice->setShareDevice(m_glView->videoDevice());
-                }
-            }
-        }
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
-        delete oldVulkanView;
+        // Deferred: this can be reached from inside the VulkanView's present path.
+        oldVulkanView->deleteLater();
 
         newGLView->videoDevice()->makeCurrent();
         newGLView->update();
+    }
+
+    // Hot-swap GLView -> VulkanView and rebind the live session to the Vulkan device.
+    void RvDocument::swapGLViewToVulkan()
+    {
+        if (!m_glView || isClosing())
+        {
+            return;
+        }
+
+        cout << "INFO: RvDocument: switching main view from OpenGL to Vulkan." << endl;
+
+        // Flush any GLView pending from an earlier swap before reusing m_oldGLView.
+        lazyDeleteGLView();
+
+        GLView* oldGLView = m_glView;
+        const Qt::KeyboardModifiers cur = oldGLView->videoDevice()->translator().currentModifiers();
+        oldGLView->stopProcessingEvents();
+
+        VulkanView* newVulkanView = new VulkanView(this, m_centralWidget, !m_startupResize);
+
+        newVulkanView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
+        newVulkanView->setMinimumContentSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        newVulkanView->setMinimumSize(QSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height()));
+        configureViewWidget(newVulkanView);
+
+        m_stackedLayout->addWidget(newVulkanView);
+        m_stackedLayout->removeWidget(oldGLView);
+
+        //
+        //  Vulkan initializes asynchronously from exposeEvent(), so commit now;
+        //  a failure falls back through requestGLFallback(), which is guarded
+        //  on m_vulkanView, so assign it before showing.
+        //
+        m_vulkanView = newVulkanView;
+        m_viewWidget = newVulkanView;
+
+        // Backend-neutral code keys the active backend on m_glView being null.
+        m_glView = nullptr;
+
+        m_vulkanView->show();
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+
+        m_topViewToolBar->setDevice(m_vulkanView->videoDevice());
+
+        if (m_session)
+        {
+            const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+            m_session->setEventVideoDevice(0);
+            m_session->setOutputVideoDevice(0);
+            m_session->setControlVideoDevice(m_vulkanView->videoDevice());
+            if (same)
+            {
+                m_session->setOutputVideoDevice(m_vulkanView->videoDevice());
+            }
+
+            m_vulkanView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("vulkan-context-changed", m_vulkanView->videoDevice()));
+        }
+
+        // No GL share device on Vulkan; Qt::AA_ShareOpenGLContexts still shares.
+        RvApp()->rebuildDesktopVideoDevices(m_session, nullptr, true);
+
+        m_vulkanView->videoDevice()->translator().setCurrentModifiers(cur);
+
+        // Lazy-delete, as in rebuildGLView: deleting inline can crash.
+        m_oldGLView = oldGLView;
+        m_oldGLView->hide();
+        QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
+
+        m_vulkanView->videoDevice()->makeCurrent();
+        m_vulkanView->update();
     }
 #endif
 
@@ -1028,12 +1059,6 @@ namespace Rv
 
     void RvDocument::rebuildGLView(bool stereo, bool vsync, bool doubleBuffer, int red, int green, int blue, int alpha)
     {
-        //
-        //  Rebuilding the GLView only makes sense on the OpenGL path. On the
-        //  Vulkan/Metal presentation path m_glView is null and every deref below
-        //  would crash. Current callers already bail when !m_glView, so this is a
-        //  defensive guard against future callers.
-        //
         if (!m_glView)
         {
             return;
@@ -1099,18 +1124,7 @@ namespace Rv
         if (resetGLPrefs)
             resetGLStateAndPrefs();
 
-        if (DesktopVideoModule* m = RvApp()->desktopVideoModule())
-        {
-            const TwkApp::VideoModule::VideoDevices& devices = m->devices();
-
-            for (size_t i = 0; i < devices.size(); i++)
-            {
-                if (DesktopVideoDevice* d = dynamic_cast<DesktopVideoDevice*>(devices[i]))
-                {
-                    d->setShareDevice(m_glView->videoDevice());
-                }
-            }
-        }
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
         m_glView->videoDevice()->translator().setCurrentModifiers(cur);
         m_oldGLView = oldGLView;
@@ -1121,16 +1135,18 @@ namespace Rv
     void RvDocument::showDiagnostics()
     {
         if (m_diagnosticsDock)
+        {
             m_diagnosticsDock->show();
+        }
     }
 
     void RvDocument::setStereo(bool b)
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        // GL-format queries below are only valid on the OpenGL path; on the
-        // Vulkan presentation path m_glView is null.
         if (!m_glView)
+        {
             return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1151,7 +1167,9 @@ namespace Rv
             return;
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
+        {
             return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1170,7 +1188,9 @@ namespace Rv
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
+        {
             return;
+        }
 #endif
         bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1187,9 +1207,71 @@ namespace Rv
 
     void RvDocument::setDisplayOutput(DisplayOutputType type)
     {
+        //  Persist the requested depth first, so an early return below, a later
+        //  Vulkan -> GL fallback and the next launch all honour it.
+        {
+            const int bits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 10 : 0);
+            const int alphaBits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 2 : 0);
+
+            Rv::Options& opts = Options::sharedOptions();
+            opts.dispRedBits = bits;
+            opts.dispGreenBits = bits;
+            opts.dispBlueBits = bits;
+            opts.dispAlphaBits = alphaBits;
+
+            {
+                RV_QSETTINGS;
+                settings.beginGroup("Display");
+                settings.setValue("dispRedBits", bits);
+                settings.setValue("dispGreenBits", bits);
+                settings.setValue("dispBlueBits", bits);
+                settings.setValue("dispAlphaBits", alphaBits);
+                settings.endGroup();
+            }
+        }
+
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
-        if (!m_glView)
+        //
+        //  10-bit goes through Vulkan: an OpenGL context rebuild at 10-bit
+        //  fails on Mesa GLX and WGL.
+        //
+        if (type == OpenGL1010102)
+        {
+            // Already on Vulkan.
+            if (!m_glView)
+            {
+                return;
+            }
+
+            if (VulkanView::supports10BitPresentation())
+            {
+                swapGLViewToVulkan();
+                return;
+            }
+
+            QMessageBox box(this);
+            box.setWindowModality(Qt::WindowModal);
+#ifdef PLATFORM_LINUX
+            box.setIconPixmap(QPixmap(qApp->applicationDirPath() + QString(RV_ICON_PATH_SUFFIX)).scaledToHeight(64));
+#else
+            box.setIcon(QMessageBox::Critical);
+#endif
+            box.setWindowTitle(tr(UI_APPLICATION_NAME ": 10-bit Display Output Unavailable"));
+            box.setText(tr("This display cannot present 10-bit output"));
+            box.setInformativeText(
+                tr("This graphics hardware or driver does not provide a 10-bit presentation surface. " UI_APPLICATION_NAME
+                   " cannot output 10-bit on this display and will continue in 8-bit."));
+
+            box.exec();
             return;
+        }
+
+        // Leaving 10-bit while Vulkan is live: swap back to OpenGL.
+        if (!m_glView)
+        {
+            fallbackVulkanToGLView();
+            return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -2457,7 +2539,9 @@ namespace Rv
     {
         TwkApp::VideoDevice* vdev = viewVideoDevice();
         if (!vdev)
+        {
             return;
+        }
         TwkApp::GenericStringEvent event("file-changed", vdev, path.toUtf8().data());
         vdev->sendEvent(event);
     }

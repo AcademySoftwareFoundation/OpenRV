@@ -5,6 +5,7 @@
 //  SPDX-License-Identifier: Apache-2.0
 //
 //
+#include <atomic>
 #include <string>
 #include <QTAudioRenderer/QTAudioRenderer.h>
 
@@ -238,6 +239,15 @@ namespace IPCore
         }
 #endif
 
+        //
+        //  A thread without a running event loop is not playing, and blocking
+        //  on it would never return.
+        //
+        if (!canBlockOnAudioThread())
+        {
+            return;
+        }
+
         QMetaObject::invokeMethod(m_audioOutput, "stopAudio", Qt::BlockingQueuedConnection);
     }
 
@@ -298,6 +308,14 @@ namespace IPCore
         }
 #endif
 
+        //
+        //  See emitStopAudio().
+        //
+        if (!canBlockOnAudioThread())
+        {
+            return;
+        }
+
         QMetaObject::invokeMethod(m_ioDevice, "stopDevice", Qt::BlockingQueuedConnection);
     }
 
@@ -330,7 +348,15 @@ namespace IPCore
         // so that the QTAudioOuput and QTAudioIODevice
         // is created within run()'s execution thread.
         if (!createAudioOutput())
+        {
+            //
+            //  No event loop will run here, so detachAudioOutputDevice() cannot
+            //  marshal the deletion onto this thread. Delete on the owner now.
+            //
+            deleteAudioOutputObjects();
+
             return;
+        }
 
         exec();
     }
@@ -367,7 +393,7 @@ namespace IPCore
         return true;
     }
 
-    void QTAudioThread::detachAudioOutputDevice()
+    bool QTAudioThread::detachAudioOutputDevice()
     {
         if (AudioRenderer::debug)
             TwkUtil::Log("AUDIO") << "detachAudioOutputDevice";
@@ -382,20 +408,67 @@ namespace IPCore
             emitStopAudio();
         }
 
+        //
+        // Delete the output objects on the audio thread that owns them: on
+        // Windows, deleting them cross-thread trips QObject's cross-thread
+        // sendEvent() assertion (fatal in Qt6 debug builds).
+        //
+        if ((m_audioOutput || m_ioDevice) && canBlockOnAudioThread())
+        {
+            QObject* owner = m_audioOutput ? static_cast<QObject*>(m_audioOutput) : static_cast<QObject*>(m_ioDevice);
+
+            QMetaObject::invokeMethod(owner, [this]() { deleteAudioOutputObjects(); }, Qt::BlockingQueuedConnection);
+        }
+
         quit();
-        wait();
-
-        if (m_audioOutput)
+        if (!waitForAudioThreadToFinish())
         {
-            delete m_audioOutput;
-            m_audioOutput = 0;
+            //
+            //  The objects still belong to the running thread; leak them
+            //  rather than delete them cross-thread.
+            //
+            return false;
         }
 
-        if (m_ioDevice)
+        //
+        //  Last resort for anything the marshalled delete could not reach.
+        //
+        deleteAudioOutputObjects();
+        return true;
+    }
+
+    bool QTAudioThread::canBlockOnAudioThread() const
+    {
+        return isRunning() && eventDispatcher() != nullptr && QThread::currentThread() != this;
+    }
+
+    bool QTAudioThread::waitForAudioThreadToFinish()
+    {
+        constexpr unsigned long audioThreadExitTimeoutMS = 5000;
+
+        if (wait(audioThreadExitTimeoutMS))
         {
-            delete m_ioDevice;
-            m_ioDevice = 0;
+            return true;
         }
+
+        static std::atomic<bool> reported{false};
+
+        if (!reported.exchange(true))
+        {
+            std::cerr << "WARNING: audio thread did not exit within " << audioThreadExitTimeoutMS << " ms; continuing shutdown without it"
+                      << std::endl;
+        }
+
+        return false;
+    }
+
+    void QTAudioThread::deleteAudioOutputObjects()
+    {
+        delete m_audioOutput;
+        m_audioOutput = nullptr;
+
+        delete m_ioDevice;
+        m_ioDevice = nullptr;
     }
 
     //
@@ -1025,7 +1098,18 @@ namespace IPCore
     {
         if (m_thread)
         {
-            delete m_thread;
+            //
+            //  Destroying a QThread that is still running is fatal in Qt6, so
+            //  a wedged audio thread is leaked, detached from its parent.
+            //
+            if (m_thread->detachAudioOutputDevice())
+            {
+                delete m_thread;
+            }
+            else
+            {
+                m_thread->setParent(nullptr);
+            }
         }
     }
 

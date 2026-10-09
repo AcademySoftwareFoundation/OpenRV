@@ -2043,6 +2043,8 @@ namespace Rv
         {
             m_globalSettingsP->sync();
             delete m_globalSettingsP;
+            // globalSettings() reallocates only when this is null.
+            m_globalSettingsP = nullptr;
         }
     }
 
@@ -2195,17 +2197,17 @@ namespace Rv
         qs->setFallbacksEnabled(false);
 
 #ifdef PLATFORM_WINDOWS
-        // Qt's atomic write (temp-file + rename) can fail with AccessError when Windows
-        // security software holds RV.ini open at the moment of the rename. Writing
-        // directly to the file avoids that failure point. Available since Qt 5.13.
+        // The atomic temp-file rename fails with AccessError when security
+        // software holds RV.ini open.
         qs->setAtomicSyncRequired(false);
 #endif
 
-        // Qt IniFormat on Windows does not create the parent directory automatically.
-        // Create it here so sync() does not fail with AccessError (err: 1).
+        // IniFormat does not create the parent directory, and sync() fails without it.
         QDir settingsDir(QFileInfo(qs->fileName()).absolutePath());
         if (!settingsDir.exists())
+        {
             settingsDir.mkpath(".");
+        }
 
         if (qs->status() != QSettings::NoError)
         {
