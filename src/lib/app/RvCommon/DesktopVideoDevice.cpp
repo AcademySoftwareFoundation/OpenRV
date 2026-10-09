@@ -13,6 +13,15 @@
 #include <lcms2.h>
 #endif
 
+#ifdef PLATFORM_DARWIN
+#include <ApplicationServices/ApplicationServices.h>
+#include <ColorSync/ColorSync.h>
+#include <array>
+#include <cmath>
+#include <string>
+#include <vector>
+#endif
+
 #include <RvCommon/DesktopVideoDevice.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -911,6 +920,154 @@ namespace Rv
         {
             m_colorProfile = ColorProfile();
         }
+
+        return m_colorProfile;
+    }
+#endif
+
+#ifdef PLATFORM_DARWIN
+    namespace
+    {
+
+        //
+        //  RAII wrapper for CoreFoundation objects returned by Create/Copy
+        //  functions, which the caller owns and must release.
+        //
+        template <typename T> class CFRef
+        {
+        public:
+            explicit CFRef(T ref = nullptr)
+                : m_ref(ref)
+            {
+            }
+
+            ~CFRef()
+            {
+                if (m_ref)
+                    CFRelease(m_ref);
+            }
+
+            CFRef(const CFRef&) = delete;
+            CFRef& operator=(const CFRef&) = delete;
+
+            T get() const { return m_ref; }
+
+            explicit operator bool() const { return m_ref != nullptr; }
+
+        private:
+            T m_ref;
+        };
+
+        //
+        //  Copies a CFString into a std::string. Returns an empty string if
+        //  the input is null or cannot be converted, so callers do not have to
+        //  null check every ColorSync getter individually.
+        //
+        std::string stringFromCFString(CFStringRef string)
+        {
+            if (!string)
+                return std::string();
+
+            //  CFStringGetLength() counts UTF-16 code units and a UTF-8
+            //  encoding needs at most 4 bytes per code unit, plus the
+            //  terminator.
+            constexpr CFIndex kMaxUTF8BytesPerCodeUnit = 4;
+            std::vector<char> buffer(CFStringGetLength(string) * kMaxUTF8BytesPerCodeUnit + 1, '\0');
+
+            if (!CFStringGetCString(string, buffer.data(), buffer.size(), kCFStringEncodingUTF8))
+                return std::string();
+
+            return std::string(buffer.data());
+        }
+
+        //
+        //  Resolves the CGDirectDisplayID backing a Qt screen.
+        //
+        //  Qt screen indices and the CoreGraphics online display list are not
+        //  guaranteed to be in the same order, so the screen is matched by its
+        //  position in the global desktop coordinate space, which both APIs
+        //  express in top-left-origin points.
+        //
+        bool cgDisplayIDForQtScreen(const QScreen* screen, CGDirectDisplayID& displayID)
+        {
+            if (!screen)
+                return false;
+
+            constexpr uint32_t kMaxDisplays = 64;
+            std::array<CGDirectDisplayID, kMaxDisplays> displayIDs{};
+            uint32_t displayCount = 0;
+
+            if (CGGetOnlineDisplayList(kMaxDisplays, displayIDs.data(), &displayCount) != kCGErrorSuccess)
+                return false;
+
+            const QRect geometry = screen->geometry();
+
+            for (uint32_t index = 0; index < displayCount; index++)
+            {
+                const CGRect bounds = CGDisplayBounds(displayIDs[index]);
+
+                if (static_cast<int>(std::lround(bounds.origin.x)) == geometry.x()
+                    && static_cast<int>(std::lround(bounds.origin.y)) == geometry.y())
+                {
+                    displayID = displayIDs[index];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+    } // namespace
+
+    TwkApp::VideoDevice::ColorProfile DesktopVideoDevice::colorProfileForDisplay(CGDirectDisplayID displayID)
+    {
+        //
+        //  Get the display's color sync profile
+        //
+
+        const CFRef<ColorSyncProfileRef> iccRef(ColorSyncProfileCreateWithDisplayID(displayID));
+
+        if (!iccRef)
+            return ColorProfile();
+
+        ColorProfile profile;
+        profile.type = ICCProfile;
+
+        const CFRef<CFStringRef> description(ColorSyncProfileCopyDescriptionString(iccRef.get()));
+        profile.description = stringFromCFString(description.get());
+
+        //
+        //  ColorSyncProfileGetURL() follows the Get rule: the URL belongs to
+        //  the profile and must not be released. It is null for a profile
+        //  which has no backing file.
+        //
+        if (CFURLRef url = ColorSyncProfileGetURL(iccRef.get(), nullptr))
+        {
+            profile.url = stringFromCFString(CFURLGetString(url));
+        }
+
+        return profile;
+    }
+
+    TwkApp::VideoDevice::ColorProfile DesktopVideoDevice::colorProfile() const
+    {
+        const QList<QScreen*> screens = QGuiApplication::screens();
+
+        if (m_screen < 0 || m_screen >= screens.size())
+        {
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        CGDirectDisplayID displayID = 0;
+
+        if (!cgDisplayIDForQtScreen(screens[m_screen], displayID))
+        {
+            m_colorProfile = ColorProfile();
+            return m_colorProfile;
+        }
+
+        m_colorProfile = colorProfileForDisplay(displayID);
 
         return m_colorProfile;
     }
