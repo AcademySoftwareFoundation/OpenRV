@@ -150,23 +150,26 @@ namespace Rv
 
     void GLWindow::eventProcessingTimeout()
     {
-        IPCore::Session* session = m_doc->session();
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session == nullptr)
+        {
+            return;
+        }
 
         //  Time the synchronous per-render event processing (Mu/Python handlers)
         //  that runs on the GUI thread after each paint. If this is large during
         //  stalls it is the event-loop half of the "outside render_v2" time; if
         //  it is small, the stall is in the present path (swapBuffers/vsync or
         //  update-request delivery) rather than in a handler.
-        if ((session != nullptr) && session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled())
+        const bool diagOn = session->isPlaying() && TwkUtil::PlaybackDiagnostics::enabled();
+        const double startTime = diagOn ? TwkUtil::SystemClock().now() : 0.0;
+
+        session->userGenericEvent("per-render-event-processing", "");
+
+        if (diagOn)
         {
-            const double t0 = TwkUtil::SystemClock().now();
-            session->userGenericEvent("per-render-event-processing", "");
-            const double perRenderMs = (TwkUtil::SystemClock().now() - t0) * TwkUtil::kMillisecondsPerSecond;
+            const double perRenderMs = (TwkUtil::SystemClock().now() - startTime) * TwkUtil::kMillisecondsPerSecond;
             TwkUtil::PlaybackDiagnostics::instance().record("perrender", -1, session->currentFrame(), perRenderMs);
-        }
-        else if (session != nullptr)
-        {
-            session->userGenericEvent("per-render-event-processing", "");
         }
     }
 
