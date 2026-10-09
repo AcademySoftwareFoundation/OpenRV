@@ -79,6 +79,21 @@ namespace TwkMovie
 #define RV_OUTPUT_VIDEO_CODEC "mjpeg"
 #define RV_OUTPUT_AUDIO_CODEC "pcm_s16be"
 
+    static bool isHEVCElementaryStream(const AVFormatContext* formatContext, const AVStream* stream, const string& filename)
+    {
+        if (!stream || !stream->codecpar || stream->codecpar->codec_id != AV_CODEC_ID_H265)
+            return false;
+
+        if (formatContext && formatContext->iformat && formatContext->iformat->name && !std::strcmp(formatContext->iformat->name, "hevc"))
+        {
+            return true;
+        }
+
+        string ext = boost::filesystem::path(filename).extension().string();
+        boost::algorithm::to_lower(ext);
+        return ext == ".265" || ext == ".h265" || ext == ".hevc";
+    }
+
 #if 0
 #define DB_LOG_LEVEL AV_LOG_ERROR
 #define DB_GENERAL 0x001
@@ -281,6 +296,7 @@ namespace TwkMovie
             , videoFrame(0)
             , lastDecodedVideo(-1)
             , lastEncodedVideo(0)
+            , nextSyntheticTS(0)
             , imgConvertContext(0)
             , isOpen(false)
             , useOpenJPH(false)
@@ -329,6 +345,7 @@ namespace TwkMovie
             useAppleProRes = t->useAppleProRes;
             number = t->number;
             rotate = t->rotate;
+            nextSyntheticTS = t->nextSyntheticTS;
 #if defined(RV_USE_APPLE_PRORES_SDK)
             appleProResCtx = t->appleProResCtx;
 #endif
@@ -344,6 +361,7 @@ namespace TwkMovie
         bool useOpenJPH;
         bool useAppleProRes;
         set<int64_t> tsSet;
+        int64_t nextSyntheticTS;
         FrameBuffer fb;
         struct SwsContext* imgConvertContext;
         AVPacket* videoPacket;
@@ -1343,6 +1361,34 @@ namespace TwkMovie
             TWK_THROW_EXC_STREAM("Failed to open " << m_filename << " for reading: " << avErr2Str(ret));
 
         return true;
+    }
+
+    int64_t MovieFFMpegReader::countHeroVideoPacketsAndReopen(const vector<bool>& heroVideoTracks)
+    {
+        int64_t frames = 0;
+        AVPacket* pkt = av_packet_alloc();
+        if (!pkt)
+            TWK_THROW_EXC_STREAM("Unable to allocate packet while counting frames: " << m_filename);
+
+        while (av_read_frame(m_avFormatContext, pkt) >= 0)
+        {
+            const int streamIndex = pkt->stream_index;
+            if (streamIndex >= 0)
+            {
+                const size_t heroIndex = static_cast<size_t>(streamIndex);
+                if (heroIndex < heroVideoTracks.size() && heroVideoTracks[heroIndex])
+                    ++frames;
+            }
+            av_packet_unref(pkt);
+        }
+
+        av_packet_free(&pkt);
+
+        avformat_close_input(&m_avFormatContext);
+        openAVFormat();
+        findStreamInfo();
+
+        return frames;
     }
 
     void MovieFFMpegReader::trackFromStreamIndex(int index, VideoTrack*& vTrack, AudioTrack*& aTrack)
@@ -2845,6 +2891,7 @@ namespace TwkMovie
         //
 
         AVRational rate = av_d2q(0.0, INT_MAX);
+        AVRational fallbackVideoRate = av_d2q(0.0, INT_MAX);
         int64_t frames = 0;
         Time audioLength = 0;
         double timeDuration = 0;
@@ -2889,6 +2936,12 @@ namespace TwkMovie
                 DBL(DB_TIMESTAMPS, "stm: " << i << " fps: " << codecFPS << " frames: " << frames << " frameDur: " << frameDur
                                            << " timeDuration: " << timeDuration << " start_time: " << tsStream->start_time);
             }
+            else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && heroVideoTracks[i] && codecFPS > 0
+                     && isHEVCElementaryStream(m_avFormatContext, tsStream, m_filename))
+            {
+                AVRational tsRate = (realFPS > 0) ? tsStream->r_frame_rate : tsStream->avg_frame_rate;
+                fallbackVideoRate = (av_q2d(tsRate) > av_q2d(fallbackVideoRate)) ? tsRate : fallbackVideoRate;
+            }
             // check if we are reading an image instead of a video
             else if (tsStream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && heroVideoTracks[i]
                      && isImageFormat(m_avFormatContext->iformat->name))
@@ -2929,7 +2982,20 @@ namespace TwkMovie
         }
         if (timeDuration <= 0)
         {
-            TWK_THROW_EXC_STREAM("Could not determine playback timing: " << m_filename);
+            const double fallbackFPS = av_q2d(fallbackVideoRate);
+            if (fallbackFPS > 0)
+            {
+                frames = countHeroVideoPacketsAndReopen(heroVideoTracks);
+                if (frames > 0)
+                {
+                    rate = fallbackVideoRate;
+                    timeDuration = double(frames) / fallbackFPS;
+                }
+            }
+            if (timeDuration <= 0)
+            {
+                TWK_THROW_EXC_STREAM("Could not determine playback timing: " << m_filename);
+            }
         }
         if (frames == 0)
         {
@@ -3543,10 +3609,28 @@ namespace TwkMovie
         }
 
         avcodec_flush_buffers(track->avCodecContext);
-        if (av_seek_frame(m_avFormatContext, track->number, seekTarget, AVSEEK_FLAG_BACKWARD) < 0)
+
+        const bool useSyntheticTimestamps = isHEVCElementaryStream(m_avFormatContext, videoStream, m_filename) && videoStream->duration <= 0
+                                            && videoStream->nb_frames <= 0 && m_info.fps > 0;
+        bool seekFailed = false;
+        if (useSyntheticTimestamps && m_avFormatContext->pb)
+        {
+            seekFailed = avio_seek(m_avFormatContext->pb, 0, SEEK_SET) < 0;
+            if (!seekFailed)
+            {
+                avformat_flush(m_avFormatContext);
+            }
+        }
+        else
+        {
+            seekFailed = av_seek_frame(m_avFormatContext, track->number, seekTarget, AVSEEK_FLAG_BACKWARD) < 0;
+        }
+
+        if (seekFailed)
         {
             // Try from the start if targeted seek fails
-            if (av_seek_frame(m_avFormatContext, -1, m_avFormatContext->start_time, 0) < 0)
+            const int64_t startTime = (m_avFormatContext->start_time == AV_NOPTS_VALUE) ? 0 : m_avFormatContext->start_time;
+            if (av_seek_frame(m_avFormatContext, -1, startTime, 0) < 0)
             {
                 TWK_THROW_EXC_STREAM("av_seek_frame failed in video stream.");
             }
@@ -3558,6 +3642,7 @@ namespace TwkMovie
         //
         track->lastDecodedVideo = -1;
         track->tsSet.clear();
+        track->nextSyntheticTS = useSyntheticTimestamps ? 0 : seekTarget;
 
 #if DB_TIMING & DB_LEVEL
         double seekDuration = m_timingDetails->pauseTimer("seek");
@@ -3596,6 +3681,25 @@ namespace TwkMovie
             }
 #endif
         } while ((track->videoPacket->stream_index != track->number) && !finalPacket);
+
+        AVStream* stream = m_avFormatContext->streams[track->number];
+        if (!finalPacket && track->videoPacket->pts == AV_NOPTS_VALUE && track->videoPacket->dts == AV_NOPTS_VALUE && m_info.fps > 0
+            && isHEVCElementaryStream(m_avFormatContext, stream, m_filename))
+        {
+            int64_t packetDuration = track->videoPacket->duration;
+            if (packetDuration <= 0)
+            {
+                const double timeBase = av_q2d(stream->time_base);
+                if (timeBase > 0)
+                {
+                    packetDuration = int64_t(1.0 / (timeBase * m_info.fps) + 0.5);
+                }
+            }
+            packetDuration = std::max<int64_t>(1, packetDuration);
+            track->videoPacket->pts = track->nextSyntheticTS;
+            track->videoPacket->dts = track->nextSyntheticTS;
+            track->nextSyntheticTS += packetDuration;
+        }
 
         // If we get a valid timestamp here then we should add it to
         // the track's list of nearby timestamps.
@@ -6060,10 +6164,12 @@ namespace TwkMovie
         unsigned int audcap = MovieIO::MovieReadAudio | MovieIO::MovieWriteAudio | MovieIO::AttributeRead | MovieIO::AttributeWrite;
 
         unsigned int vidcap = MovieIO::MovieRead | MovieIO::MovieWrite | audcap;
+        unsigned int vidReadCap = MovieIO::MovieRead | MovieIO::AttributeRead;
 
         if (this->bruteForce())
         {
             vidcap |= MovieIO::MovieBruteForceIO;
+            vidReadCap |= MovieIO::MovieBruteForceIO;
             audcap |= MovieIO::MovieBruteForceIO;
         }
 
@@ -6073,6 +6179,9 @@ namespace TwkMovie
         formats["avi"] = make_pair("Audio Video Interleave", vidcap);
         formats["flv"] = make_pair("Flash Video", vidcap);
         formats["gif"] = make_pair("Graphics Interchange Format", vidcap);
+        formats["265"] = make_pair("HEVC/H.265 Elementary Stream", vidReadCap);
+        formats["h265"] = make_pair("HEVC/H.265 Elementary Stream", vidReadCap);
+        formats["hevc"] = make_pair("HEVC/H.265 Elementary Stream", vidReadCap);
         formats["m3u8"] = make_pair("M3U8 Stream Metadata", vidcap);
         formats["m4v"] = make_pair("iTunes Video Format (from MPEG-4)", vidcap);
         formats["mkv"] = make_pair("Matroska Video", vidcap);
