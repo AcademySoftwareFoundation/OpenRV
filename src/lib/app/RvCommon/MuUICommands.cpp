@@ -8,11 +8,11 @@
 #ifdef PLATFORM_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLVBO.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLState.h>
-#endif
 #endif
 
 #include <RvCommon/MediaFileTypes.h>
@@ -473,7 +473,7 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->view()->mapToGlobal(location);
+        QPoint p = rvDoc->viewWidget()->mapToGlobal(location);
 
         if (array)
         {
@@ -500,11 +500,11 @@ namespace Rv
 
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(e->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), rvDoc->viewWidget()->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->view()->height() - 1);
+            lp = QPoint(0, rvDoc->viewWidget()->height() - 1);
         }
 
         popupMenuInternal(array, lp);
@@ -518,7 +518,7 @@ namespace Rv
         int y = NODE_ARG(1, int);
         DynamicArray* array = NODE_ARG_OBJECT(2, DynamicArray);
 
-        QPoint lp(x, rvDoc->view()->height() - y - 1);
+        QPoint lp(x, rvDoc->viewWidget()->height() - y - 1);
 
         popupMenuInternal(array, lp);
     }
@@ -653,7 +653,7 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -776,7 +776,7 @@ namespace Rv
 
         rvDoc->setDocumentDisabled(false, true);
         bool result = dialog.exec();
-        rvDoc->view()->setFocus(Qt::OtherFocusReason);
+        rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
         rvDoc->setDocumentDisabled(false, false);
 
         if (result)
@@ -885,7 +885,7 @@ namespace Rv
         {
             rvDoc->setDocumentDisabled(false, true);
             bool result = dialog.exec();
-            rvDoc->view()->setFocus(Qt::OtherFocusReason);
+            rvDoc->viewWidget()->setFocus(Qt::OtherFocusReason);
             rvDoc->setDocumentDisabled(false, false);
 
             if (result)
@@ -955,7 +955,7 @@ namespace Rv
     {
         Session* s = Session::currentSession();
         RvDocument* rvDoc = (RvDocument*)s->opaquePointer();
-        rvDoc->view()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
+        rvDoc->viewWidget()->setCursor(QCursor(Qt::CursorShape(NODE_ARG(0, int))));
     }
 
     NODE_IMPLEMENTATION(alertPanel, int)
@@ -1026,7 +1026,7 @@ namespace Rv
         else if (box.clickedButton() == q3 && b3)
             result = 2;
 
-        doc->view()->setFocus(Qt::OtherFocusReason);
+        doc->viewWidget()->setFocus(Qt::OtherFocusReason);
         NODE_RETURN(result);
     }
 
@@ -1731,7 +1731,11 @@ namespace Rv
         MuLangContext* c = static_cast<MuLangContext*>(p->context());
         Session* s = Session::currentSession();
         RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
-        QWidget* w = doc->view();
+        // Use the neutral view-widget accessor: doc->view() is the GL-only
+        // m_glView, which is null on the Vulkan/Metal presentation path. Wrapping
+        // a null QWidget* here makes the Mu side (e.g. the Session Manager event
+        // filter) dereference null and crash.
+        QWidget* w = doc->viewWidget();
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 
@@ -2154,9 +2158,9 @@ namespace Rv
         const Session* s = Session::currentSession();
         const RvDocument* doc = reinterpret_cast<RvDocument*>(s->opaquePointer());
 
-        if (doc != nullptr && doc->view() != nullptr)
+        if (doc != nullptr && doc->viewWidget() != nullptr)
         {
-            devicePixelRatio = doc->view()->devicePixelRatio();
+            devicePixelRatio = doc->viewWidget()->devicePixelRatio();
         }
 
         NODE_RETURN(devicePixelRatio);

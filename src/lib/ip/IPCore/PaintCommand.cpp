@@ -851,12 +851,12 @@ namespace IPCore
             Color textColor = isGhostOn ? localCommand->ghostColor : color;
 
             // All text renders via QPainter → QImage → GL texture.
-            // Pre-Qt sessions without fontFamily set use the system default font
-            // at fontSize 24px (the readProp default in compileTextComponent).
-            // Visual tuning for legacy sessions can be done by adjusting those defaults.
+            // Pre-Qt sessions without fontFamily set use the system default font.
+            // Plain Paint::Text (e.g. RVOverlay text) has no fontSize, so derive the
+            // WCS fraction from the legacy ptsize * scale (see PaintIPNode::compileTextComponent).
             const auto* localText = dynamic_cast<const PaintIPNode::LocalText*>(this);
             const std::string& effectiveFontFamily = localText ? localText->fontFamily : "";
-            const float effectiveFontSize = localText ? localText->fontSize : 24.0f;
+            const float effectiveFontSize = localText ? localText->fontSize : ptsize * scale;
             const std::string& effectiveFontWeight = localText ? localText->fontWeight : PaintIPNode::FontWeight::Normal;
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;

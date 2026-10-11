@@ -27,6 +27,17 @@ namespace Rv
     using namespace TwkGLF;
     using namespace TwkApp;
 
+    namespace
+    {
+        //  RV_NO_QT_HDPI_SUPPORT pins the ratio to 1 so RV renders at logical
+        //  size on HDPI displays.
+        bool qtHighDPISupportDisabled()
+        {
+            static const bool disabled = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+            return disabled;
+        }
+    } // namespace
+
     QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
         , m_view(view)
@@ -144,6 +155,25 @@ namespace Rv
         return 0;
     }
 
+    float QTGLVideoDevice::devicePixelRatio() const
+    {
+        if (qtHighDPISupportDisabled())
+        {
+            return 1.0f;
+        }
+
+        //  m_devicePixelRatio is a cache refreshed only from
+        //  setPhysicalDevice(), so it can disagree with the surface while the
+        //  window moves between displays. Widget-backed presentation and
+        //  worker devices keep the cache.
+        if (m_window)
+        {
+            return static_cast<float>(m_window->devicePixelRatio());
+        }
+
+        return m_devicePixelRatio;
+    }
+
     void QTGLVideoDevice::setPhysicalDevice(VideoDevice* d)
     {
         TwkGLF::GLVideoDevice::setPhysicalDevice(d);
@@ -153,8 +183,7 @@ namespace Rv
         // may differ from the logical pixel ratio on a per screen basis.
         m_devicePixelRatio = 1.0f;
 
-        static bool noQtHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
-        if (noQtHighDPISupport)
+        if (qtHighDPISupportDisabled())
         {
             return;
         }
@@ -196,29 +225,9 @@ namespace Rv
 
         if (m_view)
         {
-            if (m_view->isVisible())
-            {
-#ifdef PLATFORM_DARWIN
-                // Make sure that the QGLWidget gets redrawn by updateGL() even
-                // when completely overlapped by another window.
-                // Note that on macOS, Qt correctly detects when the QGLWidget
-                // is completely overlapped by another window and in which case
-                // resets the Qt::WA_Mapped attribute. This will prevent the
-                // GLView::paintGL() operation from being called by
-                // m_view->updateGL(), which will result in automatically
-                // interrupting any video playback that might be in progress
-                // while the RV window is completely overlapped. This is an
-                // undesirable behaviour during a review session, especially if
-                // an external video output device is used.
-                m_view->setAttribute(Qt::WA_Mapped);
-#endif
-
-                m_view->update();
-            }
-            else
-            {
-                redraw();
-            }
+            // redraw() is backend-agnostic; m_view may be null when a non-GL
+            // backend (Vulkan/Metal) is active, so m_view->update() is unsafe.
+            redraw();
         }
     }
 

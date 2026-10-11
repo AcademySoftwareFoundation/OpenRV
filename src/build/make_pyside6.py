@@ -211,12 +211,15 @@ def prepare() -> None:
     # with Clang, mirroring upstream's existing GNU-only -Wno-cast-function-type.
     shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake")
     old_shiboken_helpers_path = os.path.join(SOURCE_DIR, "sources", "shiboken6", "cmake", "ShibokenHelpers.cmake.old")
-    if os.path.exists(old_shiboken_helpers_path):
-        os.remove(old_shiboken_helpers_path)
 
-    os.rename(shiboken_helpers_path, old_shiboken_helpers_path)
-    with open(old_shiboken_helpers_path) as old_shiboken_helpers:
-        old_content = old_shiboken_helpers.read()
+    with open(shiboken_helpers_path) as shiboken_helpers:
+        old_content = shiboken_helpers.read()
+
+    # The source tree can already be patched, e.g. when CI restores _build/_deps
+    # from its dependency cache.
+    if "-Wno-cast-function-type-mismatch" in old_content:
+        print(f"{shiboken_helpers_path} is already patched; skipping.")
+        return
 
     new_content = old_content.replace(
         'if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL  "GNU")\n'
@@ -235,6 +238,10 @@ def prepare() -> None:
             f"Failed to patch {shiboken_helpers_path}: the expected compiler-id block was not found. "
             "Upstream ShibokenHelpers.cmake likely changed; update the search string."
         )
+
+    if os.path.exists(old_shiboken_helpers_path):
+        os.remove(old_shiboken_helpers_path)
+    os.rename(shiboken_helpers_path, old_shiboken_helpers_path)
 
     with open(shiboken_helpers_path, "w") as shiboken_helpers:
         shiboken_helpers.write(new_content)

@@ -19,6 +19,9 @@
 #include <RvApp/Options.h>
 #include <IPCore/Session.h>
 #include <QtWidgets/QVBoxLayout>
+#include <QtGui/QResizeEvent>
+#include <QtGui/QCursor>
+#include <QtCore/QEvent>
 #include <QOpenGLContext>
 #include <QTimer>
 #include <iostream>
@@ -140,6 +143,27 @@ namespace Rv
         }
 
         delete m_videoDevice;
+    }
+
+    void GLView::resizeEvent(QResizeEvent* event)
+    {
+        QWidget::resizeEvent(event);
+
+        //  Notify RV of the view's logical size change
+
+        if (!isVisible() || event->oldSize().width() == -1 || event->oldSize().height() == -1)
+        {
+            return;
+        }
+
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
+        {
+            ostringstream contents;
+            contents << event->oldSize().width() << " " << event->oldSize().height() << "|" << event->size().width() << " "
+                     << event->size().height();
+            session->userGenericEvent("view-resized", contents.str());
+        }
     }
 
     void GLView::showEvent(QShowEvent* event)
@@ -333,6 +357,32 @@ namespace Rv
     {
         if (m_glWindow)
             m_glWindow->stopProcessingEvents();
+    }
+
+    bool GLView::eventFilter(QObject* object, QEvent* event) { return m_glWindow != nullptr && m_glWindow->eventFilter(object, event); }
+
+    bool GLView::event(QEvent* event)
+    {
+        //
+        //  The viewport renders in a native QWindow embedded through
+        //  createWindowContainer(), and Qt does not propagate a widget's cursor
+        //  to an embedded window. Forward it so QWidget::setCursor() /
+        //  unsetCursor() on the view -- whichever pointer type the caller holds
+        //  (e.g. RvDocument::viewWidget()) -- reaches the surface under the mouse.
+        //
+        if (event->type() == QEvent::CursorChange && m_glWindow != nullptr)
+        {
+            if (testAttribute(Qt::WA_SetCursor))
+            {
+                m_glWindow->setCursor(cursor());
+            }
+            else
+            {
+                m_glWindow->unsetCursor();
+            }
+        }
+
+        return QWidget::event(event);
     }
 
     bool GLView::firstPaintCompleted() const { return m_glWindow && m_glWindow->firstPaintCompleted(); }
