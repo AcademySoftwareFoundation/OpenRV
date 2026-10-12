@@ -3,15 +3,13 @@
 
 import os
 import sys
-
 from dataclasses import dataclass
 from enum import Enum, auto
 from functools import partial
 
-from PySide6 import QtCore, QtWidgets, QtGui
-
-from annotate_beta_color_picker import ColorPickerPopup
 import annotate_beta_constants as constants
+from annotate_beta_color_picker import ColorPickerPopup
+from PySide6 import QtCore, QtGui, QtWidgets
 
 
 class _Page(Enum):

@@ -4,16 +4,14 @@
 #  SPDX-License-Identifier: Apache-2.0
 #
 
+import fnmatch
 import functools
 import os
 import sys
-import fnmatch
 
 from ..config import config
 from ..options import OPTION
-from ..utils import copydir, copyfile, makefile
-from ..utils import regenerate_qt_resources, filter_match
-from ..utils import download_and_extract_7z
+from ..utils import copydir, copyfile, download_and_extract_7z, filter_match, makefile, regenerate_qt_resources
 
 
 def prepare_packages_win32(self, vars):
@@ -392,7 +390,7 @@ def copy_qt_artifacts(self, copy_pdbs, vars):
         # e.g. "/home/work/qt/qtbase/bin"
         file_path_dir_name = os.path.dirname(file_full_path)
         # e.g. "Qt5Coredd"
-        maybe_debug_name = "{}d".format(file_base_name)
+        maybe_debug_name = f"{file_base_name}d"
         if self.debug or OPTION["DEBUG"]:
             filter = debug
 

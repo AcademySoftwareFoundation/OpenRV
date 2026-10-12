@@ -5,8 +5,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import rvNetwork
 import sys
+
+import rvNetwork
 
 if len(sys.argv) != 3:
     print("usage: %s <port> <file>" % sys.argv[0])

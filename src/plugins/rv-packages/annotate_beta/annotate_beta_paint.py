@@ -6,9 +6,8 @@
 import os
 import uuid
 
-from rv import commands
-
 import annotate_beta_constants as constants
+from rv import commands
 
 BOX_PREFIXES = frozenset({"rect", "ellipse"})
 

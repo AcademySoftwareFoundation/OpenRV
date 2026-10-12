@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import commands, extra_commands
-import opentimelineio as otio
-
-import six
 import math
 import sys
+
+import opentimelineio as otio
+import six
+from rv import commands, extra_commands
 
 
 def hook_function(in_timeline, argument_map):
@@ -21,12 +21,12 @@ def hook_function(in_timeline, argument_map):
     if not rv_node_name:
         return
 
-    scalar = 1 / commands.getFloatProperty("{}.audio.scale".format(rv_node_name))[0]
+    scalar = 1 / commands.getFloatProperty(f"{rv_node_name}.audio.scale")[0]
 
     if is_close(scalar, 1.0):
-        scalar = 1 / commands.getFloatProperty("{}.visual.scale".format(rv_node_name))[0]
+        scalar = 1 / commands.getFloatProperty(f"{rv_node_name}.visual.scale")[0]
 
-    key_frames = commands.getIntProperty("{}.warp.keyFrames".format(rv_node_name))
+    key_frames = commands.getIntProperty(f"{rv_node_name}.warp.keyFrames")
 
     # only linear warps are supported
     if len(key_frames) > 1:
