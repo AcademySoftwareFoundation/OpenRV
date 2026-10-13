@@ -67,7 +67,7 @@ namespace TwkFB
         //
         int64_t size() override;
         bool isStatelessRead() const override;
-        int64_t read(void* buf, uint64_t sz, uint64_t offset) override;
+        int64_t read(void* buffer, uint64_t requestedBytes, uint64_t offset) override;
 #endif
 
     private:

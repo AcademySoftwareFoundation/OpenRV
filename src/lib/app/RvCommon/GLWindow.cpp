@@ -423,9 +423,9 @@ namespace Rv
 
             if (diagOn && (s_diagGlFinish != 0))
             {
-                const double t0 = TwkUtil::SystemClock().now();
+                const double glFinishStart = TwkUtil::SystemClock().now();
                 glFinish();
-                diagGpuMs = (TwkUtil::SystemClock().now() - t0) * TwkUtil::kMillisecondsPerSecond;
+                diagGpuMs = (TwkUtil::SystemClock().now() - glFinishStart) * TwkUtil::kMillisecondsPerSecond;
             }
 
             m_firstPaintCompleted = true;

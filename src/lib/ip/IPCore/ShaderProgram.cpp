@@ -1108,10 +1108,10 @@ namespace IPCore::Shader
 
             if (diag)
             {
-                const double ms = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
+                const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
                 std::ostringstream extra;
                 extra << "ok=" << (compiled ? 1 : 0) << ";cached=" << m_programCache.size();
-                TwkUtil::PlaybackDiagnostics::instance().record("shadercompile", -1, -1, ms, extra.str());
+                TwkUtil::PlaybackDiagnostics::instance().record("shadercompile", -1, -1, elapsedMs, extra.str());
             }
 
             if (compiled)

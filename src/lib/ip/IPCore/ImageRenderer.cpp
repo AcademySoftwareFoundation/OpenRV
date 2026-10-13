@@ -4455,10 +4455,10 @@ namespace IPCore
 
         if (diag)
         {
-            const double ms = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
+            const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
             std::ostringstream extra;
             extra << "w=" << iw << ";h=" << ih << ";d=" << id << ";type=" << tex->channelType << ";mb=" << totalBytes / kBytesPerMiB;
-            TwkUtil::PlaybackDiagnostics::instance().record("lut3d", -1, -1, ms, extra.str());
+            TwkUtil::PlaybackDiagnostics::instance().record("lut3d", -1, -1, elapsedMs, extra.str());
         }
     }
 

@@ -799,11 +799,11 @@ namespace IPCore
 
         const char* comp = "";
 
-        if (StringProperty* sp = m_compMode)
+        if (StringProperty* compModeProperty = m_compMode)
         {
-            if (!sp->empty())
+            if (!compModeProperty->empty())
             {
-                comp = sp->front().c_str();
+                comp = compModeProperty->front().c_str();
             }
         }
 

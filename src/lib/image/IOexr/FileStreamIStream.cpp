@@ -76,7 +76,7 @@ namespace TwkFB
     //
     bool FileStreamIStream::isStatelessRead() const { return true; }
 
-    int64_t FileStreamIStream::read(void* buf, uint64_t sz, uint64_t offset)
+    int64_t FileStreamIStream::read(void* buffer, uint64_t requestedBytes, uint64_t offset)
     {
         const char* data = static_cast<const char*>(m_stream.data());
         const auto fileSize = int64_t(m_stream.size());
@@ -96,9 +96,9 @@ namespace TwkFB
         }
 
         const uint64_t available = uint64_t(fileSize) - offset;
-        const uint64_t toCopy = (sz < available) ? sz : available;
+        const uint64_t toCopy = (requestedBytes < available) ? requestedBytes : available;
 
-        memcpy(buf, data + offset, size_t(toCopy));
+        memcpy(buffer, data + offset, size_t(toCopy));
 
         return int64_t(toCopy);
     }
