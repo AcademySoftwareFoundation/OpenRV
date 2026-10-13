@@ -102,7 +102,7 @@ namespace Rv
         //  Types
         //
 
-        typedef std::map<const TwkGLF::GLFBO*, TwkGLF::GLFBO*> FBOMap;
+        using FBOMap = std::map<const TwkGLF::GLFBO*, std::unique_ptr<TwkGLF::GLFBO>>;
         typedef boost::mutex Mutex;
         typedef boost::mutex::scoped_lock ScopedLock;
 

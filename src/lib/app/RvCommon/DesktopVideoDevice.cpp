@@ -583,7 +583,7 @@ namespace Rv
 
         if (i != m_fboMap.end())
         {
-            GLFBO* cached = i->second;
+            GLFBO* cached = i->second.get();
 
             // The renderer reallocates FBOs, so the same address can be a different FBO.
             const bool stillMatches = cached && cached->colorID(0) == sourceFbo->colorID(0)
@@ -595,7 +595,6 @@ namespace Rv
                 return cached;
             }
 
-            delete cached;
             m_fboMap.erase(i);
         }
 
@@ -640,8 +639,8 @@ namespace Rv
 
         m_reportedBadSourceTex = 0;
 
-        GLFBO* cached = clone.release();
-        m_fboMap[sourceFbo] = cached;
+        GLFBO* cached = clone.get();
+        m_fboMap[sourceFbo] = std::move(clone);
 
         return cached;
     }
@@ -662,11 +661,6 @@ namespace Rv
         {
             cerr << "WARNING: DesktopVideoDevice: '" << name() << "' released " << m_fboMap.size()
                  << " FBO clone(s) WITHOUT a current context -- the GL handles leaked." << endl;
-        }
-
-        for (FBOMap::iterator i = m_fboMap.begin(); i != m_fboMap.end(); ++i)
-        {
-            delete i->second;
         }
 
         m_fboMap.clear();
