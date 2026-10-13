@@ -39,10 +39,14 @@
 #include <TwkUtil/Timer.h>
 #include <TwkAudio/Audio.h>
 #include <algorithm>
-#include <climits>
+#include <charconv>
+#include <cstddef>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
+#include <string_view>
+#include <system_error>
 #include <stl_ext/string_algo.h>
 
 extern void TwkMovie_GenericIO_setDebug(bool);
@@ -171,12 +175,14 @@ namespace Rv
         //  Explicit override wins (for tuning without a rebuild).
         if (const char* overrideValue = getenv("RV_EXR_AUTO_MAX_THREADS"))
         {
-            constexpr int kDecimalBase = 10;
-            char* end = nullptr;
-            const long threadCount = strtol(overrideValue, &end, kDecimalBase);
-            if (end != overrideValue && *end == '\0' && threadCount > 0 && threadCount <= INT_MAX)
+            const std::string_view value(overrideValue);
+            const char* valueBegin = value.data();
+            const char* valueEnd = std::next(valueBegin, static_cast<std::ptrdiff_t>(value.size()));
+            int threadCount = 0;
+            const auto [parseEnd, errorCode] = std::from_chars(valueBegin, valueEnd, threadCount);
+            if (errorCode == std::errc() && parseEnd == valueEnd && threadCount > 0)
             {
-                return static_cast<int>(threadCount);
+                return threadCount;
             }
         }
 
