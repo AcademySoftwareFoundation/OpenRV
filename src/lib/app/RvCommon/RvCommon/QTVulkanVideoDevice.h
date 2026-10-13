@@ -128,7 +128,7 @@ namespace Rv
             int height{0};
         };
 
-        mutable std::array<SharedGLObjects, VulkanWindow::kFramesInFlight> m_glShared{};
+        mutable std::array<SharedGLObjects, VulkanWindow::framesInFlight> m_glShared{};
 
         // Last logged present path (true for GPU-interop); empty until the first.
         mutable std::optional<bool> m_loggedPresentPath;

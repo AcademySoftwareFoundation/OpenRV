@@ -72,9 +72,9 @@ namespace Rv
     namespace
     {
         //  A best-effort output forces one blocking present once it is this stale.
-        constexpr double kMaxStaleSeconds = 0.1;
+        constexpr double maxStaleSeconds = 0.1;
 
-        constexpr double kMsPerSecond = 1000.0;
+        constexpr double msPerSecond = 1000.0;
 
         //  -debug gpu frame-time accumulators, fed only by control viewports.
         //  They are shared: with several documents open the totals are
@@ -125,7 +125,7 @@ namespace Rv
         //  Event time for the frame being rendered, handed to its slot at
         //  submit. A slot holds a value until its fence retires.
         std::optional<double> s_diagFrameEventTime;
-        std::array<std::optional<double>, VulkanWindow::kFramesInFlight> s_diagSlotEventTime{};
+        std::array<std::optional<double>, VulkanWindow::framesInFlight> s_diagSlotEventTime{};
 
         //  Adds the scope's duration in milliseconds to accumulatorMs when
         //  enabled.
@@ -146,7 +146,7 @@ namespace Rv
             {
                 if (m_enabled)
                 {
-                    m_accumulatorMs += m_timer.elapsed() * kMsPerSecond;
+                    m_accumulatorMs += m_timer.elapsed() * msPerSecond;
                 }
             }
 
@@ -160,11 +160,11 @@ namespace Rv
         };
 
 #ifdef PLATFORM_WINDOWS
-        constexpr VkExternalMemoryHandleTypeFlagBits kMemoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
-        constexpr VkExternalSemaphoreHandleTypeFlagBits kSemaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+        constexpr VkExternalMemoryHandleTypeFlagBits memoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT;
+        constexpr VkExternalSemaphoreHandleTypeFlagBits semaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT;
 #else
-        constexpr VkExternalMemoryHandleTypeFlagBits kMemoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
-        constexpr VkExternalSemaphoreHandleTypeFlagBits kSemaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
+        constexpr VkExternalMemoryHandleTypeFlagBits memoryHandleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT;
+        constexpr VkExternalSemaphoreHandleTypeFlagBits semaphoreHandleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT;
 #endif
     } // namespace
 
@@ -689,7 +689,7 @@ namespace Rv
             m_videoDevice->resetInteropDeviceMatch();
         }
 
-        for (uint32_t i = 0; i < kFramesInFlight; ++i)
+        for (uint32_t i = 0; i < framesInFlight; ++i)
         {
             cleanupSharedImage(i);
         }
@@ -1334,18 +1334,18 @@ namespace Rv
         {
             static const unsigned int depth = []
             {
-                constexpr unsigned int kDefault = 1;
+                constexpr unsigned int defaultDepth = 1;
                 const char* value = getenv("RV_VULKAN_MAX_FRAMES_IN_FLIGHT");
                 if (!value)
                 {
-                    return kDefault;
+                    return defaultDepth;
                 }
                 const int requested = atoi(value);
-                if (requested < 1 || requested > static_cast<int>(VulkanWindow::kFramesInFlight))
+                if (requested < 1 || requested > static_cast<int>(VulkanWindow::framesInFlight))
                 {
-                    std::cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::kFramesInFlight
-                              << "; using " << kDefault << std::endl;
-                    return kDefault;
+                    std::cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::framesInFlight
+                              << "; using " << defaultDepth << std::endl;
+                    return defaultDepth;
                 }
                 return static_cast<unsigned int>(requested);
             }();
@@ -1386,7 +1386,7 @@ namespace Rv
         {
             VkPhysicalDeviceExternalImageFormatInfo extInfo = {};
             extInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO;
-            extInfo.handleType = kMemoryHandleType;
+            extInfo.handleType = memoryHandleType;
 
             VkPhysicalDeviceImageFormatInfo2 fmtInfo = {};
             fmtInfo.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2;
@@ -1412,7 +1412,7 @@ namespace Rv
                 return false;
             }
 
-            return (extProps.externalMemoryProperties.compatibleHandleTypes & kMemoryHandleType) != 0
+            return (extProps.externalMemoryProperties.compatibleHandleTypes & memoryHandleType) != 0
                    && (features & VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT) != 0
                    && (features & VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT) != 0;
         };
@@ -1699,19 +1699,19 @@ namespace Rv
 
         //  Forward progress: under sustained load, force one blocking present
         //  rather than freezing the output.
-        if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds)
+        if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > maxStaleSeconds)
         {
             return true;
         }
 
         //  Every in-flight frame must have retired, not only this slot's.
-        std::array<VkFence, kFramesInFlight> fences{};
-        for (uint32_t i = 0; i < kFramesInFlight; ++i)
+        std::array<VkFence, framesInFlight> fences{};
+        for (uint32_t i = 0; i < framesInFlight; ++i)
         {
             fences[i] = m_frameSync[i].fence;
         }
 
-        const VkResult result = vkWaitForFences(m_vkDevice, kFramesInFlight, fences.data(), VK_TRUE, 0);
+        const VkResult result = vkWaitForFences(m_vkDevice, framesInFlight, fences.data(), VK_TRUE, 0);
         if (result == VK_SUCCESS)
         {
             return true;
@@ -1870,7 +1870,7 @@ namespace Rv
 
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
-        extMemInfo.handleTypes = kMemoryHandleType;
+        extMemInfo.handleTypes = memoryHandleType;
 
         VkImageCreateInfo imageInfo = {};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -1984,7 +1984,7 @@ namespace Rv
         VkExportMemoryAllocateInfo exportAllocInfo = {};
         exportAllocInfo.sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO;
         exportAllocInfo.pNext = chain;
-        exportAllocInfo.handleTypes = kMemoryHandleType;
+        exportAllocInfo.handleTypes = memoryHandleType;
 
         VkMemoryAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -2018,7 +2018,7 @@ namespace Rv
         VkMemoryGetWin32HandleInfoKHR getHandleInfo = {};
         getHandleInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR;
         getHandleInfo.memory = m_shared[slot].memory;
-        getHandleInfo.handleType = kMemoryHandleType;
+        getHandleInfo.handleType = memoryHandleType;
 
         HANDLE memHandle = nullptr;
         if (pfnGetMemoryWin32HandleKHR(m_vkDevice, &getHandleInfo, &memHandle) != VK_SUCCESS || !memHandle)
@@ -2037,7 +2037,7 @@ namespace Rv
         VkMemoryGetFdInfoKHR getFdInfo = {};
         getFdInfo.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
         getFdInfo.memory = m_shared[slot].memory;
-        getFdInfo.handleType = kMemoryHandleType;
+        getFdInfo.handleType = memoryHandleType;
 
         int memFd = -1;
         if (pfnGetMemoryFdKHR(m_vkDevice, &getFdInfo, &memFd) != VK_SUCCESS)
@@ -2050,7 +2050,7 @@ namespace Rv
 
         VkExportSemaphoreCreateInfo exportSemInfo = {};
         exportSemInfo.sType = VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO;
-        exportSemInfo.handleTypes = kSemaphoreHandleType;
+        exportSemInfo.handleTypes = semaphoreHandleType;
 
         VkSemaphoreCreateInfo semInfo = {};
         semInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -2071,7 +2071,7 @@ namespace Rv
 
         VkSemaphoreGetWin32HandleInfoKHR getSemHandleInfo = {};
         getSemHandleInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR;
-        getSemHandleInfo.handleType = kSemaphoreHandleType;
+        getSemHandleInfo.handleType = semaphoreHandleType;
 
         HANDLE glReadyHandle = nullptr;
         HANDLE vkReadyHandle = nullptr;
@@ -2102,7 +2102,7 @@ namespace Rv
 
         VkSemaphoreGetFdInfoKHR getSemFdInfo = {};
         getSemFdInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
-        getSemFdInfo.handleType = kSemaphoreHandleType;
+        getSemFdInfo.handleType = semaphoreHandleType;
 
         int glReadyFd = -1;
         int vkReadyFd = -1;
@@ -2173,7 +2173,7 @@ namespace Rv
         //  passive output polls instead, so a second display's vblank never
         //  enters the loop; a skipped frame keeps the previous image.
         const bool bestEffort = isPassiveOutput();
-        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > kMaxStaleSeconds);
+        const bool forceProgress = bestEffort && (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > maxStaleSeconds);
         return (!bestEffort || forceProgress) ? std::numeric_limits<uint64_t>::max() : 0;
     }
 
@@ -2255,7 +2255,7 @@ namespace Rv
             s_diagFrameEventTime.reset();
         }
 
-        m_currentFrame = (m_currentFrame + 1) % kFramesInFlight;
+        m_currentFrame = (m_currentFrame + 1) % framesInFlight;
 
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -2558,25 +2558,25 @@ namespace Rv
         {
             if (s_diagLoopTimer.isRunning())
             {
-                s_diag.loopMs += s_diagLoopTimer.elapsed() * kMsPerSecond;
+                s_diag.loopMs += s_diagLoopTimer.elapsed() * msPerSecond;
             }
             s_diagLoopTimer.start();
 
             if (s_diagPointerPending)
             {
-                s_diag.pointerAgeMs += s_diagPointerTimer.elapsed() * kMsPerSecond;
+                s_diag.pointerAgeMs += s_diagPointerTimer.elapsed() * msPerSecond;
                 ++s_diag.pointerAgeSamples;
                 s_diagPointerPending = false;
                 s_diagFrameEventTime = diagNow() - s_diagPointerTimer.elapsed();
             }
 
             //  Close out retired slots (non-blocking; one frame of quantisation).
-            for (uint32_t i = 0; i < kFramesInFlight; ++i)
+            for (uint32_t i = 0; i < framesInFlight; ++i)
             {
                 if (s_diagSlotEventTime[i] && m_vkDevice && m_frameSync[i].fence
                     && vkGetFenceStatus(m_vkDevice, m_frameSync[i].fence) == VK_SUCCESS)
                 {
-                    s_diag.eventToRetireMs += (diagNow() - *s_diagSlotEventTime[i]) * kMsPerSecond;
+                    s_diag.eventToRetireMs += (diagNow() - *s_diagSlotEventTime[i]) * msPerSecond;
                     ++s_diag.eventToRetireSamples;
                     s_diagSlotEventTime[i].reset();
                 }
@@ -2668,7 +2668,7 @@ namespace Rv
                           << "ms   [mainPresent breakdown: fenceWait=" << (s_diag.fenceWaitMs / frames)
                           << "ms acquire=" << (s_diag.acquireMs / frames) << "ms]"
                           << "  postRender=" << (s_diag.postRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
-                          << (loopMs > 0.0 ? kMsPerSecond / loopMs : 0.0) << " fps)"
+                          << (loopMs > 0.0 ? msPerSecond / loopMs : 0.0) << " fps)"
                           << "  pointer: events=" << s_diag.pointerEvents
                           << " handler=" << (s_diag.pointerEvents ? s_diag.pointerHandlerMs / s_diag.pointerEvents : 0.0)
                           << "ms eventToRender=" << (s_diag.pointerAgeSamples ? s_diag.pointerAgeMs / s_diag.pointerAgeSamples : 0.0)

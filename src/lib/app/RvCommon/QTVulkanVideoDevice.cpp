@@ -309,17 +309,17 @@ namespace Rv
         }
 
         //  Size used before the window exists or while it reports zero.
-        constexpr int kFallbackPixelSize = 128;
+        constexpr int fallbackPixelSize = 128;
 
-        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : kFallbackPixelSize;
-        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : kFallbackPixelSize;
+        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : fallbackPixelSize;
+        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : fallbackPixelSize;
         if (pixelWidth < 1)
         {
-            pixelWidth = kFallbackPixelSize;
+            pixelWidth = fallbackPixelSize;
         }
         if (pixelHeight < 1)
         {
-            pixelHeight = kFallbackPixelSize;
+            pixelHeight = fallbackPixelSize;
         }
 
         if (!m_fbo || m_fboWidth != pixelWidth || m_fboHeight != pixelHeight)
@@ -501,7 +501,7 @@ namespace Rv
 
     void QTVulkanVideoDevice::cleanupAllSharedGLObjects() const
     {
-        for (uint32_t slot = 0; slot < VulkanWindow::kFramesInFlight; ++slot)
+        for (uint32_t slot = 0; slot < VulkanWindow::framesInFlight; ++slot)
         {
             cleanupSharedGLObjects(slot);
         }

@@ -151,7 +151,7 @@ namespace Rv
 
         // Ring capacity. Runtime depth defaults to 1 for latency;
         // RV_VULKAN_MAX_FRAMES_IN_FLIGHT=2 uses both slots.
-        static constexpr uint32_t kFramesInFlight = 2;
+        static constexpr uint32_t framesInFlight = 2;
 
         // Ring slot for the current frame; the GL side pairs its objects to it.
         uint32_t currentFrame() const { return m_currentFrame; }
@@ -252,7 +252,7 @@ namespace Rv
             VkFence fence{VK_NULL_HANDLE};
         };
 
-        std::array<FrameSync, kFramesInFlight> m_frameSync{};
+        std::array<FrameSync, framesInFlight> m_frameSync{};
         uint32_t m_currentFrame{0};
 
         // Per swapchain image. The present-wait semaphore must be per image,
@@ -270,7 +270,7 @@ namespace Rv
             size_t size{0};
         };
 
-        std::array<StagingBuffer, kFramesInFlight> m_staging{};
+        std::array<StagingBuffer, framesInFlight> m_staging{};
 
         // Shared interop image, per slot.
         struct SharedImage
@@ -287,7 +287,7 @@ namespace Rv
             int capacityH{0};
         };
 
-        std::array<SharedImage, kFramesInFlight> m_shared{};
+        std::array<SharedImage, framesInFlight> m_shared{};
 
         void cleanupSharedImage(uint32_t slot);
 
