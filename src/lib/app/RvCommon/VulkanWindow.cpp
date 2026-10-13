@@ -1332,7 +1332,7 @@ namespace Rv
         {
             static const unsigned int depth = []
             {
-                const unsigned int kDefault = 1;
+                constexpr unsigned int kDefault = 1;
                 const char* value = getenv("RV_VULKAN_MAX_FRAMES_IN_FLIGHT");
                 if (!value)
                 {
@@ -1547,8 +1547,8 @@ namespace Rv
         report << "INFO:   Role           : " << (isPassiveOutput() ? "presentation output" : "control viewport") << "\n";
         report << "INFO:   GPU            : " << (m_vkPhysicalDevice != VK_NULL_HANDLE ? props.deviceName : "(none)") << "  vendorID=0x"
                << std::hex << props.vendorID << std::dec << "  driverVersion=" << props.driverVersion
-               << "  apiVersion=" << VK_VERSION_MAJOR(props.apiVersion) << "." << VK_VERSION_MINOR(props.apiVersion) << "."
-               << VK_VERSION_PATCH(props.apiVersion) << "\n";
+               << "  apiVersion=" << VK_API_VERSION_MAJOR(props.apiVersion) << "." << VK_API_VERSION_MINOR(props.apiVersion) << "."
+               << VK_API_VERSION_PATCH(props.apiVersion) << "\n";
         report << "INFO:   Present path   : " << pathName << "\n";
         if (!m_presentPathReason.empty())
         {

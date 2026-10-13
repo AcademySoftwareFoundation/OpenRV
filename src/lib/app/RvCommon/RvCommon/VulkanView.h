@@ -34,7 +34,7 @@ namespace Rv
         Q_OBJECT
 
     public:
-        VulkanView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
+        explicit VulkanView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true);
         ~VulkanView() override;
 
         QTVulkanVideoDevice* videoDevice() const { return m_videoDevice.get(); }
@@ -67,7 +67,7 @@ namespace Rv
         void reattachVulkanWindow();
 
     protected:
-        void showEvent(QShowEvent*) override;
+        void showEvent(QShowEvent* event) override;
 
     private:
         RvDocument* m_doc;

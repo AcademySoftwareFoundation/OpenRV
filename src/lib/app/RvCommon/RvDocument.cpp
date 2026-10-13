@@ -170,8 +170,8 @@ namespace Rv
         , m_hdpiResizeWorkaroundDone(false)
         , m_diagnosticsView(nullptr)
         , m_diagnosticsDock(nullptr)
-        , m_oldGLView(0)
-        , m_glView(0)
+        , m_oldGLView(nullptr)
+        , m_glView(nullptr)
         , m_sourceEditor(0)
         , m_displayLink(0)
         , m_blockingOverlay(0)
@@ -1210,8 +1210,22 @@ namespace Rv
         //  Persist the requested depth first, so an early return below, a later
         //  Vulkan -> GL fallback and the next launch all honour it.
         {
-            const int bits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 10 : 0);
-            const int alphaBits = (type == OpenGL8888) ? 8 : (type == OpenGL1010102 ? 2 : 0);
+            int bits = 0;
+            int alphaBits = 0;
+
+            switch (type)
+            {
+            case OpenGL8888:
+                bits = 8;
+                alphaBits = 8;
+                break;
+            case OpenGL1010102:
+                bits = 10;
+                alphaBits = 2;
+                break;
+            case OpenGLDefaultFormat:
+                break;
+            }
 
             Rv::Options& opts = Options::sharedOptions();
             opts.dispRedBits = bits;

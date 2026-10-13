@@ -1,8 +1,7 @@
 //
-//  Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
+//  Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 //
 //  SPDX-License-Identifier: Apache-2.0
-//
 //
 #ifndef __TwkGLF__GLContextScope__h__
 #define __TwkGLF__GLContextScope__h__

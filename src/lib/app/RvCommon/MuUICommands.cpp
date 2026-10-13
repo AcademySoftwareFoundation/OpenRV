@@ -407,12 +407,13 @@ namespace Rv
             if (ix >= 0 && iy >= 0 && static_cast<size_t>(ix) < device->width() && static_cast<size_t>(iy) < device->height())
             {
                 device->makeCurrent();
+                constexpr float kMaxByteValue = 255.0f;
                 std::array<GLubyte, 4> rgba{};
                 glReadPixels(ix, iy, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, rgba.data());
-                v[0] = static_cast<float>(rgba[0]) / 255.0f;
-                v[1] = static_cast<float>(rgba[1]) / 255.0f;
-                v[2] = static_cast<float>(rgba[2]) / 255.0f;
-                v[3] = static_cast<float>(rgba[3]) / 255.0f;
+                v[0] = static_cast<float>(rgba[0]) / kMaxByteValue;
+                v[1] = static_cast<float>(rgba[1]) / kMaxByteValue;
+                v[2] = static_cast<float>(rgba[2]) / kMaxByteValue;
+                v[3] = static_cast<float>(rgba[3]) / kMaxByteValue;
             }
         }
 

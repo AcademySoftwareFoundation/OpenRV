@@ -187,11 +187,11 @@ namespace Rv
         QSurfaceFormat fmt = share ? share->glSurfaceFormat() : QSurfaceFormat::defaultFormat();
         fmt.setSwapInterval(m_vsync ? 1 : 0);
 
-        ScreenView* vw = new ScreenView(fmt, 0, share ? share->glShareContext() : nullptr, Qt::Window);
+        ScreenView* vw = new ScreenView(fmt, nullptr, share ? share->glShareContext() : nullptr, Qt::Window);
         setViewWidget(vw);
 
         // GL surface is the embedded window; the container handles events, as in GLView.
-        QTGLVideoDevice* vd = new QTGLVideoDevice(0, "local view", vw->glWindow(), vw);
+        QTGLVideoDevice* vd = new QTGLVideoDevice(nullptr, "local view", vw->glWindow(), vw);
         setViewDevice(vd);
 
         QRect g = screenGeometry();
@@ -224,8 +224,8 @@ namespace Rv
         delete m_viewDevice;
         delete m_view;
         m_translator.reset();
-        m_view = 0;
-        m_viewDevice = 0;
+        m_view = nullptr;
+        m_viewDevice = nullptr;
 
         // The current context was just destroyed; restore the main view's for later GL teardown.
         if (m_share)

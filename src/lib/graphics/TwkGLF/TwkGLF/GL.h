@@ -110,7 +110,7 @@ bool twkGlAnyContextIsCurrent();
 //  Declared in every build: GLFBO's destructor uses it to report a missing
 //  context in release builds too. TWK_GLDEBUG still compiles out under NDEBUG.
 //
-bool twkGlPrintError(std::string_view file, std::string_view function, const int line, std::string_view msg);
+bool twkGlPrintError(std::string_view file, std::string_view function, int line, std::string_view msg);
 
 #ifdef NDEBUG
 #define TWK_GLDEBUG ;

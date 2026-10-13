@@ -301,6 +301,8 @@ namespace Rv
     {
         TWK_GLDEBUG;
 
+        constexpr double kMsPerSecond = 1000.0;
+
         IPCore::Session* session = m_doc->session();
         const bool debug = IPCore::debugProfile && session != nullptr;
 
@@ -326,7 +328,7 @@ namespace Rv
         {
             if (s_glDiagLoopTimer.isRunning())
             {
-                s_glDiag.loopMs += s_glDiagLoopTimer.elapsed() * 1000.0;
+                s_glDiag.loopMs += s_glDiagLoopTimer.elapsed() * kMsPerSecond;
             }
             s_glDiagLoopTimer.start();
         }
@@ -366,7 +368,7 @@ namespace Rv
 
             if (diagTiming)
             {
-                s_glDiag.renderMs += diagTimer.elapsed() * 1000.0;
+                s_glDiag.renderMs += diagTimer.elapsed() * kMsPerSecond;
             }
             TWK_GLDEBUG;
 
@@ -419,7 +421,7 @@ namespace Rv
 
             if (diagPresent)
             {
-                s_glDiag.outPresentMs += diagPresentTimer.elapsed() * 1000.0;
+                s_glDiag.outPresentMs += diagPresentTimer.elapsed() * kMsPerSecond;
             }
 
             if (debug)
@@ -447,7 +449,7 @@ namespace Rv
                 cout << "INFO: GLWindow frame avg over " << s_glDiag.frames << ": session->render()=" << (s_glDiag.renderMs / frameCount)
                      << "ms  outputPresent=" << (s_glDiag.outPresentMs / frameCount)
                      << "ms  total=" << ((s_glDiag.renderMs + s_glDiag.outPresentMs) / frameCount) << "ms  frameInterval=" << loopMs
-                     << "ms (" << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)" << endl;
+                     << "ms (" << (loopMs > 0.0 ? kMsPerSecond / loopMs : 0.0) << " fps)" << endl;
                 s_glDiag = {};
             }
         }
