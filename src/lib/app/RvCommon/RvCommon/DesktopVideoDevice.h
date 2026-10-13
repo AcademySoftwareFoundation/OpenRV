@@ -103,8 +103,8 @@ namespace Rv
         //
 
         using FBOMap = std::map<const TwkGLF::GLFBO*, std::unique_ptr<TwkGLF::GLFBO>>;
-        typedef boost::mutex Mutex;
-        typedef boost::mutex::scoped_lock ScopedLock;
+        using Mutex = boost::mutex;
+        using ScopedLock = boost::mutex::scoped_lock;
 
         enum DesktopStereoMode
         {
