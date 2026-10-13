@@ -29,6 +29,15 @@ namespace Rv
         DesktopVideoModule(NativeDisplayPtr np, QTGLVideoDevice* shareDevice);
         virtual ~DesktopVideoModule();
 
+        //
+        //  Rebuild the per-screen presentation devices onto targetVulkan, the
+        //  backend the main view is actually running (not the persisted
+        //  preference). Returns false and leaves the devices untouched when the
+        //  backend has not changed. The caller re-binds the share device and
+        //  re-opens the session's presentation output.
+        //
+        bool rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetVulkan);
+
         virtual std::string name() const;
         virtual void open();
         virtual void close();
