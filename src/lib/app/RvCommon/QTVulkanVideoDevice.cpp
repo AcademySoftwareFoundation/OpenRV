@@ -308,15 +308,18 @@ namespace Rv
             return;
         }
 
-        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : 128;
-        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : 128;
+        //  Size used before the window exists or while it reports zero.
+        constexpr int kFallbackPixelSize = 128;
+
+        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : kFallbackPixelSize;
+        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : kFallbackPixelSize;
         if (pixelWidth < 1)
         {
-            pixelWidth = 128;
+            pixelWidth = kFallbackPixelSize;
         }
         if (pixelHeight < 1)
         {
-            pixelHeight = 128;
+            pixelHeight = kFallbackPixelSize;
         }
 
         if (!m_fbo || m_fboWidth != pixelWidth || m_fboHeight != pixelHeight)

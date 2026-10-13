@@ -74,6 +74,8 @@ namespace Rv
         //  A best-effort output forces one blocking present once it is this stale.
         constexpr double kMaxStaleSeconds = 0.1;
 
+        constexpr double kMsPerSecond = 1000.0;
+
         //  -debug gpu frame-time accumulators, fed only by control viewports.
         //  They are shared: with several documents open the totals are
         //  combined. Reset after each 60-frame report.
@@ -144,7 +146,7 @@ namespace Rv
             {
                 if (m_enabled)
                 {
-                    m_accumulatorMs += m_timer.elapsed() * 1000.0;
+                    m_accumulatorMs += m_timer.elapsed() * kMsPerSecond;
                 }
             }
 
@@ -2556,13 +2558,13 @@ namespace Rv
         {
             if (s_diagLoopTimer.isRunning())
             {
-                s_diag.loopMs += s_diagLoopTimer.elapsed() * 1000.0;
+                s_diag.loopMs += s_diagLoopTimer.elapsed() * kMsPerSecond;
             }
             s_diagLoopTimer.start();
 
             if (s_diagPointerPending)
             {
-                s_diag.pointerAgeMs += s_diagPointerTimer.elapsed() * 1000.0;
+                s_diag.pointerAgeMs += s_diagPointerTimer.elapsed() * kMsPerSecond;
                 ++s_diag.pointerAgeSamples;
                 s_diagPointerPending = false;
                 s_diagFrameEventTime = diagNow() - s_diagPointerTimer.elapsed();
@@ -2574,7 +2576,7 @@ namespace Rv
                 if (s_diagSlotEventTime[i] && m_vkDevice && m_frameSync[i].fence
                     && vkGetFenceStatus(m_vkDevice, m_frameSync[i].fence) == VK_SUCCESS)
                 {
-                    s_diag.eventToRetireMs += (diagNow() - *s_diagSlotEventTime[i]) * 1000.0;
+                    s_diag.eventToRetireMs += (diagNow() - *s_diagSlotEventTime[i]) * kMsPerSecond;
                     ++s_diag.eventToRetireSamples;
                     s_diagSlotEventTime[i].reset();
                 }
@@ -2666,7 +2668,7 @@ namespace Rv
                           << "ms   [mainPresent breakdown: fenceWait=" << (s_diag.fenceWaitMs / frames)
                           << "ms acquire=" << (s_diag.acquireMs / frames) << "ms]"
                           << "  postRender=" << (s_diag.postRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
-                          << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)"
+                          << (loopMs > 0.0 ? kMsPerSecond / loopMs : 0.0) << " fps)"
                           << "  pointer: events=" << s_diag.pointerEvents
                           << " handler=" << (s_diag.pointerEvents ? s_diag.pointerHandlerMs / s_diag.pointerEvents : 0.0)
                           << "ms eventToRender=" << (s_diag.pointerAgeSamples ? s_diag.pointerAgeMs / s_diag.pointerAgeSamples : 0.0)
