@@ -1876,7 +1876,8 @@ namespace IPCore
         //  above so the diagnostic log shows how long each pause lasted.
         if (eventData == "buffering" && isBuffering() && TwkUtil::PlaybackDiagnostics::enabled())
         {
-            TwkUtil::PlaybackDiagnostics::instance().record("resume", -1, m_frame, m_cacheStats.lookAheadSeconds * kMillisecondsPerSecond);
+            TwkUtil::PlaybackDiagnostics::instance().record("resume", -1, m_frame,
+                                                            m_cacheStats.lookAheadSeconds * kDiagSecondsToMilliseconds);
         }
 
         if (m_avPlaybackVersion == 2)
@@ -2086,7 +2087,7 @@ namespace IPCore
         if (eventData == "buffering" && TwkUtil::PlaybackDiagnostics::enabled())
         {
             TwkUtil::PlaybackDiagnostics::instance().record("buffering", -1, m_frame,
-                                                            m_cacheStats.lookAheadSeconds * kMillisecondsPerSecond);
+                                                            m_cacheStats.lookAheadSeconds * kDiagSecondsToMilliseconds);
         }
 
         m_timer.stop();
@@ -3977,11 +3978,11 @@ namespace IPCore
             const double nowSecs = TwkUtil::SystemClock().now();
             if (s_diagPrevRenderTime > 0.0)
             {
-                diagPaceInterval = (nowSecs - s_diagPrevRenderTime) * kMillisecondsPerSecond;
+                diagPaceInterval = (nowSecs - s_diagPrevRenderTime) * kDiagSecondsToMilliseconds;
             }
             if (s_diagRenderV2EndTime > 0.0)
             {
-                diagOutsideGap = (nowSecs - s_diagRenderV2EndTime) * kMillisecondsPerSecond;
+                diagOutsideGap = (nowSecs - s_diagRenderV2EndTime) * kDiagSecondsToMilliseconds;
             }
             s_diagPrevRenderTime = nowSecs;
         }
@@ -4312,7 +4313,7 @@ namespace IPCore
                 graph().endProfilingSample();
             }
 
-            const double diagEvalMs = diagDisplay ? diagEvalTimer.elapsed() * kMillisecondsPerSecond : 0.0;
+            const double diagEvalMs = diagDisplay ? diagEvalTimer.elapsed() * kDiagSecondsToMilliseconds : 0.0;
 
             const float clockMult = fps() / currentTargetFPS();
 
@@ -4414,7 +4415,7 @@ namespace IPCore
 
                 if (diagDisplay)
                 {
-                    const double diagRenderMs = diagRenderTimer.elapsed() * kMillisecondsPerSecond;
+                    const double diagRenderMs = diagRenderTimer.elapsed() * kDiagSecondsToMilliseconds;
 
                     //  Frame delta since the previous displayed frame: +1 is a
                     //  clean advance, 0 means the same frame was displayed again

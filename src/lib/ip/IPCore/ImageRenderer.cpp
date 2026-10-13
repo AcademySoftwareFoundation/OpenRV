@@ -4455,7 +4455,7 @@ namespace IPCore
 
         if (diag)
         {
-            const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
+            const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kDiagSecondsToMilliseconds;
             std::ostringstream extra;
             extra << "w=" << iw << ";h=" << ih << ";d=" << id << ";type=" << tex->channelType << ";mb=" << totalBytes / kBytesPerMiB;
             TwkUtil::PlaybackDiagnostics::instance().record("lut3d", -1, -1, elapsedMs, extra.str());
@@ -4849,12 +4849,12 @@ namespace IPCore
 
         if (diagUpload)
         {
-            const double cpuMs = (TwkUtil::SystemClock().now() - diagUploadStart) * kMillisecondsPerSecond;
+            const double cpuMs = (TwkUtil::SystemClock().now() - diagUploadStart) * kDiagSecondsToMilliseconds;
             const double mbytes = totalBytes / kBytesPerMiB;
             //  cpuThroughput is the effective GB/s of just the CPU submission
             //  (map+memcpy for PBO, or glTexImage2D client-copy for non-PBO).
             //  A slow value with usePBO=0 means we fell into the fallback path.
-            const double gbPerSec = (cpuMs > 0.0) ? (mbytes / kMiBPerGiB) / (cpuMs / kMillisecondsPerSecond) : 0.0;
+            const double gbPerSec = (cpuMs > 0.0) ? (mbytes / kMiBPerGiB) / (cpuMs / kDiagSecondsToMilliseconds) : 0.0;
             std::ostringstream extra;
             extra << "w=" << iw << ";h=" << ih << ";ch=" << d->channels << ";type=" << d->channelType << ";pxsz=" << d->pixelSize
                   << ";mb=" << mbytes << ";pbo=" << (usePBO ? 1 : 0) << ";update=" << (updateOnly ? 1 : 0) << ";cpuGBps=" << gbPerSec;

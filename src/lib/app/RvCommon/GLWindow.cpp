@@ -165,7 +165,7 @@ namespace Rv
 
         if (diagOn)
         {
-            const double perRenderMs = (TwkUtil::SystemClock().now() - startTime) * TwkUtil::kMillisecondsPerSecond;
+            const double perRenderMs = (TwkUtil::SystemClock().now() - startTime) * TwkUtil::kDiagSecondsToMilliseconds;
             TwkUtil::PlaybackDiagnostics::instance().record("perrender", -1, session->currentFrame(), perRenderMs);
         }
     }
@@ -362,7 +362,7 @@ namespace Rv
             s_diagPaintEntry = TwkUtil::SystemClock().now();
             if (s_diagPrevPaintExit > 0.0)
             {
-                diagPaintGap = (s_diagPaintEntry - s_diagPrevPaintExit) * TwkUtil::kMillisecondsPerSecond;
+                diagPaintGap = (s_diagPaintEntry - s_diagPrevPaintExit) * TwkUtil::kDiagSecondsToMilliseconds;
             }
         }
 
@@ -425,7 +425,7 @@ namespace Rv
             {
                 const double glFinishStart = TwkUtil::SystemClock().now();
                 glFinish();
-                diagGpuMs = (TwkUtil::SystemClock().now() - glFinishStart) * TwkUtil::kMillisecondsPerSecond;
+                diagGpuMs = (TwkUtil::SystemClock().now() - glFinishStart) * TwkUtil::kDiagSecondsToMilliseconds;
             }
 
             m_firstPaintCompleted = true;
@@ -489,7 +489,7 @@ namespace Rv
         if (diagOn)
         {
             const double nowSecs = TwkUtil::SystemClock().now();
-            const double paintMs = (nowSecs - s_diagPaintEntry) * TwkUtil::kMillisecondsPerSecond;
+            const double paintMs = (nowSecs - s_diagPaintEntry) * TwkUtil::kDiagSecondsToMilliseconds;
             s_diagPrevPaintExit = nowSecs;
             std::ostringstream extra;
             //  paint = whole paintGL (render_v2 + glClear tail + postRender)

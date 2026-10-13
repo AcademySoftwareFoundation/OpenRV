@@ -1810,7 +1810,7 @@ IPGraph::findNodesByAbstractPath(int frame,
 
                 if (diagCache)
                 {
-                    diagOtfDecodeMs = diagOtfTimer.elapsed() * kMillisecondsPerSecond;
+                    diagOtfDecodeMs = diagOtfTimer.elapsed() * kDiagSecondsToMilliseconds;
                 }
 
                 if (willPause)
@@ -2628,7 +2628,7 @@ IPGraph::findNodesByAbstractPath(int frame,
                         ostringstream extra;
                         extra << "concurrency=" << diagConcurrency;
                         TwkUtil::PlaybackDiagnostics::instance().record("decode", int(id), frame,
-                                                                        decodeTimer.elapsed() * kMillisecondsPerSecond, extra.str());
+                                                                        decodeTimer.elapsed() * kDiagSecondsToMilliseconds, extra.str());
                     }
 
                     TWK_CACHE_LOCK(m_fbcache, "");

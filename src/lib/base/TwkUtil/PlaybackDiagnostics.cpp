@@ -100,7 +100,7 @@ namespace TwkUtil
             }
         }
 
-        const double tMs = m_timer.elapsed() * kMillisecondsPerSecond;
+        const double tMs = m_timer.elapsed() * kDiagSecondsToMilliseconds;
 
         const std::scoped_lock lock(m_mutex);
 

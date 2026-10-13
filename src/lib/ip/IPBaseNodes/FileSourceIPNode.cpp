@@ -1101,7 +1101,7 @@ namespace IPCore
                 }
 
                 TwkUtil::PlaybackDiagnostics::instance().record("decsrc", int(context.threadNum), context.frame,
-                                                                diagTimer.elapsed() * TwkUtil::kMillisecondsPerSecond, extra.str());
+                                                                diagTimer.elapsed() * TwkUtil::kDiagSecondsToMilliseconds, extra.str());
             }
 
             if (fbs.empty())

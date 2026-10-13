@@ -1108,7 +1108,7 @@ namespace IPCore::Shader
 
             if (diag)
             {
-                const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kMillisecondsPerSecond;
+                const double elapsedMs = (TwkUtil::SystemClock().now() - diagStart) * kDiagSecondsToMilliseconds;
                 std::ostringstream extra;
                 extra << "ok=" << (compiled ? 1 : 0) << ";cached=" << m_programCache.size();
                 TwkUtil::PlaybackDiagnostics::instance().record("shadercompile", -1, -1, elapsedMs, extra.str());

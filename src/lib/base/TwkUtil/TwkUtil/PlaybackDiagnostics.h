@@ -16,8 +16,7 @@
 namespace TwkUtil
 {
 
-    //  Conversion factor used to report diagnostic durations in milliseconds.
-    constexpr double kMillisecondsPerSecond = 1000.0;
+    inline constexpr double kDiagSecondsToMilliseconds = 1000.0;
 
     //
     //  Lightweight, thread-safe diagnostic logger used to attribute playback
