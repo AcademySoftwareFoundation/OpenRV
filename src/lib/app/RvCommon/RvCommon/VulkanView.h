@@ -3,8 +3,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __RvCommon__VulkanView__h__
-#define __RvCommon__VulkanView__h__
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtCore/QSize>
@@ -84,5 +83,3 @@ namespace Rv
     };
 
 } // namespace Rv
-
-#endif // __RvCommon__VulkanView__h__

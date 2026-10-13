@@ -3,8 +3,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __RvCommon__QTVulkanVideoDevice__h__
-#define __RvCommon__QTVulkanVideoDevice__h__
+#pragma once
 
 #include <TwkGLF/GLVideoDevice.h>
 #include <RvCommon/QTTranslator.h>
@@ -164,5 +163,3 @@ namespace Rv
     };
 
 } // namespace Rv
-
-#endif // __RvCommon__QTVulkanVideoDevice__h__
