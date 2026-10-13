@@ -69,8 +69,6 @@
 
 namespace Rv
 {
-    using namespace std;
-
     namespace
     {
         //  A best-effort output forces one blocking present once it is this stale.
@@ -344,7 +342,7 @@ namespace Rv
 
         if (!initVulkan())
         {
-            cerr << "ERROR: VulkanWindow: initVulkan failed; falling back to OpenGL" << endl;
+            std::cerr << "ERROR: VulkanWindow: initVulkan failed; falling back to OpenGL" << std::endl;
             requestGLFallback();
             return;
         }
@@ -374,7 +372,7 @@ namespace Rv
                 inst->setApiVersion(QVersionNumber(1, 3));
                 if (!inst->create())
                 {
-                    cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << endl;
+                    std::cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << std::endl;
                     return nullptr;
                 }
                 return inst.release();
@@ -413,7 +411,7 @@ namespace Rv
             VkSurfaceKHR dummySurface = qtVkInst->surfaceForWindow(dummyWindow);
             if (!dummySurface)
             {
-                cerr << "ERROR: VulkanWindow: supports10BitPresentation: failed to create dummy surface" << endl;
+                std::cerr << "ERROR: VulkanWindow: supports10BitPresentation: failed to create dummy surface" << std::endl;
                 return false;
             }
 
@@ -421,7 +419,7 @@ namespace Rv
             vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
             if (deviceCount == 0)
             {
-                cerr << "ERROR: VulkanWindow: supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices" << endl;
+                std::cerr << "ERROR: VulkanWindow: supports10BitPresentation: vkEnumeratePhysicalDevices returned 0 devices" << std::endl;
                 return false;
             }
             std::vector<VkPhysicalDevice> devices(deviceCount);
@@ -429,7 +427,7 @@ namespace Rv
 
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: VulkanWindow: supports10BitPresentation: probing " << deviceCount << " physical device(s)" << endl;
+                std::cout << "INFO: VulkanWindow: supports10BitPresentation: probing " << deviceCount << " physical device(s)" << std::endl;
             }
 
             bool any10bit = false;
@@ -447,15 +445,15 @@ namespace Rv
                 vkGetPhysicalDeviceProperties(dev, &props);
                 if (ImageRenderer::debugGpu())
                 {
-                    cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
-                         << "': vulkan1.3=" << (vulkan13 ? "YES" : "NO") << "  graphics+present=" << (canPresent ? "YES" : "NO")
-                         << "  10-bit surface format=" << (has10bit ? "YES" : "NO") << endl;
+                    std::cout << "INFO: VulkanWindow:   device[" << di << "] '" << props.deviceName
+                              << "': vulkan1.3=" << (vulkan13 ? "YES" : "NO") << "  graphics+present=" << (canPresent ? "YES" : "NO")
+                              << "  10-bit surface format=" << (has10bit ? "YES" : "NO") << std::endl;
                 }
             }
 
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: VulkanWindow: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << endl;
+                std::cout << "INFO: VulkanWindow: supports10BitPresentation: returning " << (any10bit ? "true" : "false") << std::endl;
             }
             return any10bit;
         }();
@@ -468,7 +466,7 @@ namespace Rv
         QVulkanInstance* qtVkInst = sharedVulkanInstance();
         if (!qtVkInst)
         {
-            cerr << "ERROR: VulkanWindow: shared QVulkanInstance unavailable" << endl;
+            std::cerr << "ERROR: VulkanWindow: shared QVulkanInstance unavailable" << std::endl;
             return false;
         }
 
@@ -485,7 +483,7 @@ namespace Rv
         m_vkSurface = qtVkInst->surfaceForWindow(this);
         if (!m_vkSurface)
         {
-            cerr << "ERROR: VulkanWindow: Failed to create Vulkan surface" << endl;
+            std::cerr << "ERROR: VulkanWindow: Failed to create Vulkan surface" << std::endl;
             return false;
         }
 
@@ -520,7 +518,8 @@ namespace Rv
 
         if (!foundQueue)
         {
-            cerr << "ERROR: VulkanWindow: initVulkan: no Vulkan 1.3 device with graphics, present and 10-bit surface support" << endl;
+            std::cerr << "ERROR: VulkanWindow: initVulkan: no Vulkan 1.3 device with graphics, present and 10-bit surface support"
+                      << std::endl;
             return false;
         }
 
@@ -529,8 +528,8 @@ namespace Rv
             //  machines.
             VkPhysicalDeviceProperties props = {};
             vkGetPhysicalDeviceProperties(m_vkPhysicalDevice, &props);
-            cout << "INFO: VulkanWindow: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
-                 << " available)" << endl;
+            std::cout << "INFO: VulkanWindow: initVulkan: picked physical device '" << props.deviceName << "' (of " << deviceCount
+                      << " available)" << std::endl;
         }
 
         float queuePriority = 1.0f;
@@ -543,7 +542,7 @@ namespace Rv
         std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         if (!deviceHasExtension(m_vkPhysicalDevice, VK_KHR_SWAPCHAIN_EXTENSION_NAME))
         {
-            cerr << "ERROR: VulkanWindow: selected device does not support VK_KHR_swapchain." << endl;
+            std::cerr << "ERROR: VulkanWindow: selected device does not support VK_KHR_swapchain." << std::endl;
             return false;
         }
 
@@ -563,7 +562,7 @@ namespace Rv
         }
         else if (ImageRenderer::debugGpu())
         {
-            cout << "INFO: VulkanWindow: external memory/semaphore extensions unavailable; using CPU fallback." << endl;
+            std::cout << "INFO: VulkanWindow: external memory/semaphore extensions unavailable; using CPU fallback." << std::endl;
         }
 
         VkPhysicalDeviceVulkan13Features features13 = {};
@@ -588,8 +587,8 @@ namespace Rv
         negotiateInteropConfig();
         if (ImageRenderer::debugGpu())
         {
-            cout << "INFO: VulkanWindow: initVulkan: interop negotiation ran (once per device); result="
-                 << (m_interopConfig.supported ? "supported" : "unsupported") << endl;
+            std::cout << "INFO: VulkanWindow: initVulkan: interop negotiation ran (once per device); result="
+                      << (m_interopConfig.supported ? "supported" : "unsupported") << std::endl;
         }
 
         auto failInit = [this]()
@@ -672,7 +671,7 @@ namespace Rv
         //  Qt replaces the platform window when the top-level QWidgetWindow is
         //  recreated (e.g. inserting a QWebEngineView). The VkSurfaceKHR itself
         //  is stale, so a swapchain recreate is not enough.
-        cout << "INFO: VulkanWindow: platform window recreated; rebuilding Vulkan surface" << endl;
+        std::cout << "INFO: VulkanWindow: platform window recreated; rebuilding Vulkan surface" << std::endl;
 
         releaseVulkanResources();
     }
@@ -829,8 +828,8 @@ namespace Rv
                 presentModeFromName(getenv(passiveOutput ? "RV_VULKAN_OUTPUT_PRESENT_MODE" : "RV_VULKAN_PRESENT_MODE"));
             if (forced && !supported(*forced))
             {
-                cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(*forced) << " is unsupported; using FIFO"
-                     << endl;
+                std::cout << "WARNING: VulkanWindow: requested present mode " << presentModeName(*forced) << " is unsupported; using FIFO"
+                          << std::endl;
                 return VK_PRESENT_MODE_FIFO_KHR;
             }
 
@@ -876,11 +875,11 @@ namespace Rv
         {
             m_loggedSurfaceFormatList = true;
 
-            cout << "INFO: VulkanWindow: createSwapchain: surface offers " << formatCount << " format(s):" << endl;
+            std::cout << "INFO: VulkanWindow: createSwapchain: surface offers " << formatCount << " format(s):" << std::endl;
             for (uint32_t i = 0; i < formats.size(); ++i)
             {
-                cout << "INFO: VulkanWindow:   [" << i << "] format=" << formats[i].format << " (" << formatName(formats[i].format)
-                     << ")  colorSpace=" << formats[i].colorSpace << endl;
+                std::cout << "INFO: VulkanWindow:   [" << i << "] format=" << formats[i].format << " (" << formatName(formats[i].format)
+                          << ")  colorSpace=" << formats[i].colorSpace << std::endl;
             }
         }
 
@@ -932,23 +931,23 @@ namespace Rv
             {
                 m_loggedSurfaceFormat = surfaceFormat;
 
-                cout << "INFO: VulkanWindow: createSwapchain: chose " << formatName(surfaceFormat.format)
-                     << " colorSpace=" << surfaceFormat.colorSpace
-                     << (surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR ? " (SRGB_NONLINEAR)" : " (NOT SRGB_NONLINEAR)")
-                     << " (10-bit OK)" << endl;
+                std::cout << "INFO: VulkanWindow: createSwapchain: chose " << formatName(surfaceFormat.format)
+                          << " colorSpace=" << surfaceFormat.colorSpace
+                          << (surfaceFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR ? " (SRGB_NONLINEAR)" : " (NOT SRGB_NONLINEAR)")
+                          << " (10-bit OK)" << std::endl;
 
                 if (surfaceFormat.colorSpace != VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
                 {
-                    cout << "WARNING: VulkanWindow: no 10-bit surface format is paired with SRGB_NONLINEAR on this surface. RV emits "
-                            "sRGB, so the image may look wrong (dark or washed out)."
-                         << endl;
+                    std::cout << "WARNING: VulkanWindow: no 10-bit surface format is paired with SRGB_NONLINEAR on this surface. RV emits "
+                                 "sRGB, so the image may look wrong (dark or washed out)."
+                              << std::endl;
                 }
             }
         }
         else
         {
-            cout << "WARNING: VulkanWindow: Real surface lacks a 10-bit format (A2B10G10R10/A2R10G10B10); requesting OpenGL fallback"
-                 << endl;
+            std::cout << "WARNING: VulkanWindow: Real surface lacks a 10-bit format (A2B10G10R10/A2R10G10B10); requesting OpenGL fallback"
+                      << std::endl;
             requestGLFallback();
             return false;
         }
@@ -987,9 +986,9 @@ namespace Rv
 
         if (ImageRenderer::debugGpu())
         {
-            cout << "INFO: VulkanWindow: createSwapchain: " << (m_doc ? "control viewport" : "presentation output")
-                 << ": presentMode=" << presentModeName(presentMode) << "  images=" << imageCount
-                 << " (surface min=" << capabilities.minImageCount << " max=" << capabilities.maxImageCount << ")" << endl;
+            std::cout << "INFO: VulkanWindow: createSwapchain: " << (m_doc ? "control viewport" : "presentation output")
+                      << ": presentMode=" << presentModeName(presentMode) << "  images=" << imageCount
+                      << " (surface min=" << capabilities.minImageCount << " max=" << capabilities.maxImageCount << ")" << std::endl;
         }
 
         VkSwapchainCreateInfoKHR createInfo = {};
@@ -1002,8 +1001,8 @@ namespace Rv
         createInfo.imageArrayLayers = 1;
         if (!(capabilities.supportedUsageFlags & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
         {
-            cout << "WARNING: VulkanWindow: surface does not support transfer-destination swapchain images; requesting OpenGL fallback"
-                 << endl;
+            std::cout << "WARNING: VulkanWindow: surface does not support transfer-destination swapchain images; requesting OpenGL fallback"
+                      << std::endl;
             requestGLFallback();
             return false;
         }
@@ -1300,8 +1299,9 @@ namespace Rv
                 return VK_IMAGE_TILING_LINEAR;
             }
 
-            cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING='" << value << "' is not recognized (expected 'optimal' or 'linear'); "
-                 << "ignoring it and using the negotiated tiling" << endl;
+            std::cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING='" << value
+                      << "' is not recognized (expected 'optimal' or 'linear'); "
+                      << "ignoring it and using the negotiated tiling" << std::endl;
             return std::nullopt;
         }
 
@@ -1341,8 +1341,8 @@ namespace Rv
                 const int requested = atoi(value);
                 if (requested < 1 || requested > static_cast<int>(VulkanWindow::kFramesInFlight))
                 {
-                    cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::kFramesInFlight
-                         << "; using " << kDefault << endl;
+                    std::cout << "WARNING: VulkanWindow: RV_VULKAN_MAX_FRAMES_IN_FLIGHT must be 1.." << VulkanWindow::kFramesInFlight
+                              << "; using " << kDefault << std::endl;
                     return kDefault;
                 }
                 return static_cast<unsigned int>(requested);
@@ -1421,7 +1421,7 @@ namespace Rv
             VkExternalMemoryFeatureFlags features = 0;
             const bool exportable = probeTiling(tiling, features);
 
-            ostringstream entry;
+            std::ostringstream entry;
             entry << tilingName(tiling) << ": ";
 
             if (!exportable)
@@ -1471,8 +1471,9 @@ namespace Rv
             }
             else
             {
-                cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING=" << tilingName(*forcedTiling)
-                     << " refused -- the driver does not report it as exportable; using the negotiated " << tilingName(cfg.tiling) << endl;
+                std::cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_TILING=" << tilingName(*forcedTiling)
+                          << " refused -- the driver does not report it as exportable; using the negotiated " << tilingName(cfg.tiling)
+                          << std::endl;
             }
         }
 
@@ -1480,8 +1481,8 @@ namespace Rv
         {
             if ((cfg.externalFeatures & VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT) != 0)
             {
-                cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_NO_DEDICATED refused -- the driver reports "
-                     << "DEDICATED_ONLY for this configuration, which is a requirement rather than a preference" << endl;
+                std::cout << "WARNING: VulkanWindow: RV_VULKAN_FORCE_NO_DEDICATED refused -- the driver reports "
+                          << "DEDICATED_ONLY for this configuration, which is a requirement rather than a preference" << std::endl;
             }
             else
             {
@@ -1542,7 +1543,7 @@ namespace Rv
             break;
         }
 
-        ostringstream report;
+        std::ostringstream report;
         report << "INFO: RV Vulkan presentation report\n";
         report << "INFO:   Role           : " << (isPassiveOutput() ? "presentation output" : "control viewport") << "\n";
         report << "INFO:   GPU            : " << (m_vkPhysicalDevice != VK_NULL_HANDLE ? props.deviceName : "(none)") << "  vendorID=0x"
@@ -1601,7 +1602,7 @@ namespace Rv
             report << "INFO:   Override       : RV_VULKAN_FORCE_CPU_PRESENT is set\n";
         }
 
-        cout << report.str() << flush;
+        std::cout << report.str() << std::flush;
     }
 
     void VulkanWindow::cleanupSharedImage(uint32_t slot)
@@ -1753,7 +1754,7 @@ namespace Rv
                                     : queueSubmit2(m_vkQueue, {}, VK_NULL_HANDLE, {}, m_frameSync[slot].fence);
         if (result != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: could not recover from a failed submit" << endl;
+            std::cerr << "ERROR: VulkanWindow: could not recover from a failed submit" << std::endl;
         }
 
         //  An unexpected submit failure means Vulkan is unreliable here.
@@ -1791,8 +1792,8 @@ namespace Rv
         {
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: VulkanWindow: getSharedImageInfo: interop unavailable (" << m_interopConfig.rejectReason
-                     << "); using the CPU readback path" << endl;
+                std::cout << "INFO: VulkanWindow: getSharedImageInfo: interop unavailable (" << m_interopConfig.rejectReason
+                          << "); using the CPU readback path" << std::endl;
             }
             return nullptr;
         }
@@ -1843,8 +1844,8 @@ namespace Rv
             {
                 if (ImageRenderer::debugGpu())
                 {
-                    cout << "INFO: VulkanWindow: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
-                         << " swapchain (blit unsupported); using CPU fallback." << endl;
+                    std::cout << "INFO: VulkanWindow: GPU interop unavailable for " << formatName(m_vkSwapchainFormat)
+                              << " swapchain (blit unsupported); using CPU fallback." << std::endl;
                 }
                 m_sharedImageUnusable = true;
                 return nullptr;
@@ -1855,14 +1856,15 @@ namespace Rv
 
         const auto failSharedImage = [this, slot](std::string_view message) -> const SharedImageInfo*
         {
-            cerr << "ERROR: VulkanWindow: " << message << endl;
+            std::cerr << "ERROR: VulkanWindow: " << message << std::endl;
             cleanupSharedImage(slot);
             return nullptr;
         };
 
         //  Unconditional: fires about once per slot per session.
-        cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x" << capH
-             << " for request " << requestedWidth << "x" << requestedHeight << " tiling=" << tilingName(m_interopConfig.tiling) << endl;
+        std::cout << "INFO: VulkanWindow: getSharedImageInfo: (re)allocating shared image slot " << slot << " capacity " << capW << "x"
+                  << capH << " for request " << requestedWidth << "x" << requestedHeight << " tiling=" << tilingName(m_interopConfig.tiling)
+                  << std::endl;
 
         VkExternalMemoryImageCreateInfo extMemInfo = {};
         extMemInfo.sType = VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO;
@@ -1886,7 +1888,7 @@ namespace Rv
 
         if (vkCreateImage(m_vkDevice, &imageInfo, nullptr, &m_shared[slot].image) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to create shared image" << endl;
+            std::cerr << "ERROR: VulkanWindow: Failed to create shared image" << std::endl;
             return nullptr;
         }
 
@@ -1947,10 +1949,10 @@ namespace Rv
 
         info.dedicatedAllocation = useDedicated;
 
-        cout << "INFO: VulkanWindow: getSharedImageInfo: shared image slot " << slot
-             << " memory = " << (useDedicated ? "dedicated" : "non-dedicated")
-             << " (driver requires=" << (dedicatedReqs.requiresDedicatedAllocation ? "yes" : "no")
-             << " prefers=" << (dedicatedReqs.prefersDedicatedAllocation ? "yes" : "no") << ")" << endl;
+        std::cout << "INFO: VulkanWindow: getSharedImageInfo: shared image slot " << slot
+                  << " memory = " << (useDedicated ? "dedicated" : "non-dedicated")
+                  << " (driver requires=" << (dedicatedReqs.requiresDedicatedAllocation ? "yes" : "no")
+                  << " prefers=" << (dedicatedReqs.prefersDedicatedAllocation ? "yes" : "no") << ")" << std::endl;
 
         //  pNext chain, built back to front:
         //    allocInfo -> exportAllocInfo [-> dedicatedAllocInfo] [-> exportWin32Info]
@@ -2426,7 +2428,7 @@ namespace Rv
             if (vkCreateBuffer(m_vkDevice, &bufferInfo, nullptr, &m_staging[slot].buffer) != VK_SUCCESS)
             {
                 m_staging[slot].buffer = VK_NULL_HANDLE;
-                cerr << "ERROR: VulkanWindow: Failed to create staging buffer" << endl;
+                std::cerr << "ERROR: VulkanWindow: Failed to create staging buffer" << std::endl;
                 return;
             }
 
@@ -2441,7 +2443,7 @@ namespace Rv
                                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
             if (!memoryTypeIndex)
             {
-                cerr << "ERROR: VulkanWindow: No host-visible memory type for staging buffer" << endl;
+                std::cerr << "ERROR: VulkanWindow: No host-visible memory type for staging buffer" << std::endl;
                 return;
             }
             allocInfo.memoryTypeIndex = *memoryTypeIndex;
@@ -2449,12 +2451,12 @@ namespace Rv
             if (vkAllocateMemory(m_vkDevice, &allocInfo, nullptr, &m_staging[slot].memory) != VK_SUCCESS)
             {
                 m_staging[slot].memory = VK_NULL_HANDLE;
-                cerr << "ERROR: VulkanWindow: Failed to allocate staging buffer memory" << endl;
+                std::cerr << "ERROR: VulkanWindow: Failed to allocate staging buffer memory" << std::endl;
                 return;
             }
             if (vkBindBufferMemory(m_vkDevice, m_staging[slot].buffer, m_staging[slot].memory, 0) != VK_SUCCESS)
             {
-                cerr << "ERROR: VulkanWindow: Failed to bind staging buffer memory" << endl;
+                std::cerr << "ERROR: VulkanWindow: Failed to bind staging buffer memory" << std::endl;
                 return;
             }
 
@@ -2464,7 +2466,7 @@ namespace Rv
         void* data = nullptr;
         if (vkMapMemory(m_vkDevice, m_staging[slot].memory, 0, size, 0, &data) != VK_SUCCESS)
         {
-            cerr << "ERROR: VulkanWindow: Failed to map staging buffer memory" << endl;
+            std::cerr << "ERROR: VulkanWindow: Failed to map staging buffer memory" << std::endl;
             return;
         }
         memcpy(data, pixels, size);
@@ -2656,20 +2658,21 @@ namespace Rv
             {
                 const double frames = static_cast<double>(s_diag.frames);
                 const double loopMs = s_diag.loopMs / frames;
-                cout << "INFO: VulkanWindow frame avg over " << s_diag.frames << " [depth=" << maxFramesInFlight()
-                     << " tiling=" << tilingName(m_shared[0].info.tiling) << "]"
-                     << ": session->render()=" << (s_diag.renderMs / frames) << "ms  mainPresent=" << (s_diag.mainPresentMs / frames)
-                     << "ms  outputPresent=" << (s_diag.outPresentMs / frames)
-                     << "ms  total=" << ((s_diag.renderMs + s_diag.mainPresentMs + s_diag.outPresentMs) / frames)
-                     << "ms   [mainPresent breakdown: fenceWait=" << (s_diag.fenceWaitMs / frames)
-                     << "ms acquire=" << (s_diag.acquireMs / frames) << "ms]"
-                     << "  postRender=" << (s_diag.postRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
-                     << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)"
-                     << "  pointer: events=" << s_diag.pointerEvents
-                     << " handler=" << (s_diag.pointerEvents ? s_diag.pointerHandlerMs / s_diag.pointerEvents : 0.0)
-                     << "ms eventToRender=" << (s_diag.pointerAgeSamples ? s_diag.pointerAgeMs / s_diag.pointerAgeSamples : 0.0)
-                     << "ms eventToRetire=" << (s_diag.eventToRetireSamples ? s_diag.eventToRetireMs / s_diag.eventToRetireSamples : 0.0)
-                     << "ms" << endl;
+                std::cout << "INFO: VulkanWindow frame avg over " << s_diag.frames << " [depth=" << maxFramesInFlight()
+                          << " tiling=" << tilingName(m_shared[0].info.tiling) << "]"
+                          << ": session->render()=" << (s_diag.renderMs / frames) << "ms  mainPresent=" << (s_diag.mainPresentMs / frames)
+                          << "ms  outputPresent=" << (s_diag.outPresentMs / frames)
+                          << "ms  total=" << ((s_diag.renderMs + s_diag.mainPresentMs + s_diag.outPresentMs) / frames)
+                          << "ms   [mainPresent breakdown: fenceWait=" << (s_diag.fenceWaitMs / frames)
+                          << "ms acquire=" << (s_diag.acquireMs / frames) << "ms]"
+                          << "  postRender=" << (s_diag.postRenderMs / frames) << "ms  frameInterval=" << loopMs << "ms ("
+                          << (loopMs > 0.0 ? 1000.0 / loopMs : 0.0) << " fps)"
+                          << "  pointer: events=" << s_diag.pointerEvents
+                          << " handler=" << (s_diag.pointerEvents ? s_diag.pointerHandlerMs / s_diag.pointerEvents : 0.0)
+                          << "ms eventToRender=" << (s_diag.pointerAgeSamples ? s_diag.pointerAgeMs / s_diag.pointerAgeSamples : 0.0)
+                          << "ms eventToRetire="
+                          << (s_diag.eventToRetireSamples ? s_diag.eventToRetireMs / s_diag.eventToRetireSamples : 0.0) << "ms"
+                          << std::endl;
                 s_diag = DiagStats{};
             }
         }
@@ -2858,7 +2861,7 @@ namespace Rv
             }
             if (resize->oldSize().width() != -1 && resize->oldSize().height() != -1)
             {
-                ostringstream contents;
+                std::ostringstream contents;
                 contents << resize->oldSize().width() << " " << resize->oldSize().height() << "|" << resize->size().width() << " "
                          << resize->size().height();
                 if (m_doc && session)

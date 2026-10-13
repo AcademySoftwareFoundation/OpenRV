@@ -12,8 +12,6 @@
 
 namespace Rv
 {
-    using namespace std;
-
     VulkanDesktopVideoDevice::VulkanDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen,
                                                        const QTGLVideoDevice* shareDevice)
         : DesktopVideoDevice(module, name, screen, shareDevice)
