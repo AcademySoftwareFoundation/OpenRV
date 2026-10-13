@@ -1434,8 +1434,8 @@ class: AnnotateMinorMode : MinorMode
 
     method: isShapeDrawMode (bool;)
     {
-        let table = _currentDrawMode.eventTable;
-        return table == "shape_rect" || table == "shape_ellipse" || table == "shape_arrow" || table == "shape_line";
+        let mode = _currentDrawMode;
+        return mode eq _rectDrawMode || mode eq _ellipseDrawMode || mode eq _arrowDrawMode || mode eq _lineDrawMode;
     }
 
     // Pointer and stylus events are bound in this mode's global table (sortKey "z")
@@ -1448,10 +1448,8 @@ class: AnnotateMinorMode : MinorMode
                            EventFunc strokeFunc,
                            Event event)
     {
-        let table = _currentDrawMode.eventTable;
-
-        if (table == "dropper") dropperFunc(event);
-        else if (table == "textplacement") textFunc(event);
+        if (_currentDrawMode eq _dropperDrawMode) dropperFunc(event);
+        else if (_currentDrawMode eq _textDrawMode) textFunc(event);
         else if (isShapeDrawMode()) shapeFunc(event);
         else strokeFunc(event);
     }
