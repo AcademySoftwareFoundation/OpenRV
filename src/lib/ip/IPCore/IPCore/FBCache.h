@@ -118,6 +118,16 @@ namespace IPCore
 
         bool isFrameCached(int frame) const { return m_frames.find(frame) != m_frames.end(); }
 
+        //
+        //  Number of contiguous cached frames immediately ahead of `frame` in
+        //  the playback direction (`inc`), capped at `maxCount`. A value of 0
+        //  means the very next frame to be shown is NOT cached (the display
+        //  thread will have to decode it on the fly). Used by playback
+        //  diagnostics to prove "cache full but the needed frame is absent".
+        //  The caller must already hold the cache lock.
+        //
+        int cachedRunwayAhead(int frame, int inc, int maxCount) const;
+
         bool hasPartialFrameCache(int frame) const;
 
         TreeResults testInCache(const IDTree&);

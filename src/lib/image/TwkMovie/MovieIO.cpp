@@ -158,12 +158,26 @@ namespace TwkMovie
         // from the getReader method and that have been marked for removal.
 
         auto range = std::remove_if(m_readers.begin(), m_readers.end(),
-                                    [&update](const std::shared_ptr<Reader>& reader)
+                                    [this, &update](const std::shared_ptr<Reader>& reader)
                                     {
-                                        bool remove = reader->isRemove();
-                                        if (remove)
-                                            update = true;
-                                        return remove;
+                                        if (!reader->isRemove())
+                                        {
+                                            return false;
+                                        }
+
+                                        // The status may have changed to REMOVE after the loop above checked it,
+                                        // so the thread may still be joinable. Destroying a joinable std::thread
+                                        // calls std::terminate.
+                                        if (reader->m_thread.joinable())
+                                        {
+                                            reader->m_thread.join();
+                                            reader->m_thread = std::thread();
+                                            m_threadCount--;
+                                            m_completedCount++;
+                                        }
+
+                                        update = true;
+                                        return true;
                                     });
 
         m_readers.erase(range, m_readers.end());

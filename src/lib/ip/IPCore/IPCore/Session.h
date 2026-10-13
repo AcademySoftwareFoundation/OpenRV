@@ -1270,6 +1270,7 @@ namespace IPCore
         int m_avPlaybackVersion;
         bool m_enableFastTurnAround;
         double m_lastDrawingTime;
+        long long m_diagRedrawRequests;
         std::vector<std::string> m_disabledEventCategories; // List of blocked event categories
 
         class FpsCalculator;

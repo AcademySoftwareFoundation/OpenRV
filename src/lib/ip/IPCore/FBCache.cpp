@@ -13,6 +13,8 @@
 #include <TwkUtil/EnvVar.h>
 #include <TwkUtil/ThreadName.h>
 #include <TwkUtil/Timer.h>
+#include <TwkUtil/PlaybackDiagnostics.h>
+#include <sstream>
 
 static ENVVAR_BOOL(evActiveTailCaching, "RV_ACTIVE_TAIL_CACHING", false);
 
@@ -1626,15 +1628,38 @@ namespace IPCore
 
         if (overflowing())
         {
+            //
+            //  Diagnostics: the cache is full and we are about to give up on
+            //  caching the best ahead target because the best freeable frame is
+            //  considered at least as valuable.
+            //
+            auto emitCacheStall = [&]()
+            {
+                if (!TwkUtil::PlaybackDiagnostics::enabled())
+                {
+                    return;
+                }
+                std::ostringstream extra;
+                extra << "cacheFrame=" << cacheTarget.frame << ";cacheUtil=" << cacheTarget.utility << ";freeFrame=" << freeTarget.frame
+                      << ";freeUtil=" << freeTarget.utility << ";displayFrame=" << m_displayFrame;
+                TwkUtil::PlaybackDiagnostics::instance().record("cachestall", -1, cacheTarget.frame, 0.0, extra.str());
+            };
+
             if (isActiveTailCachingEnabled())
             {
                 if (freeTarget.utility >= cacheTarget.utility)
+                {
+                    emitCacheStall();
                     return;
+                }
             }
             else
             {
                 if (freeTarget.utility >= (utility(cacheTarget.frame, FOR_FREEING) - 0.001))
+                {
+                    emitCacheStall();
                     return;
+                }
             }
         }
 
@@ -1974,6 +1999,23 @@ namespace IPCore
 
     //------------------------------------------------------------------------------
     //
+    int FBCache::cachedRunwayAhead(int frame, int inc, int maxCount) const
+    {
+        if (inc == 0)
+        {
+            inc = 1;
+        }
+
+        int cachedCount = 0;
+        int nextFrame = frame + inc;
+        while (cachedCount < maxCount && nextFrame >= m_minFrame && nextFrame < m_maxFrame && isFrameCached(nextFrame))
+        {
+            ++cachedCount;
+            nextFrame += inc;
+        }
+        return cachedCount;
+    }
+
     void FBCache::computeCachedRangesStat(FrameRangeVector& array) const
     {
         array.clear();
