@@ -801,11 +801,17 @@ jobs:
       - name: Build and install OpenRV dependencies
         run: |
           source ~/.bash_profile
+          # Dependency builds clone with the git CMake finds, which in this shell is msys2's own: started from native cmake and MSBuild it intermittently
+          # hangs on its first clone with no output until the job times out. find_program searches CMAKE_PROGRAM_PATH before PATH, in every CMake below this
+          # one, so this points them all at Git for Windows. PATH itself is left alone: putting Git for Windows first on it broke FFmpeg's build.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
           conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Build OpenRV main executable
         run: |
+          # Git for Windows for every CMake below this one; see the step above.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
           conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
