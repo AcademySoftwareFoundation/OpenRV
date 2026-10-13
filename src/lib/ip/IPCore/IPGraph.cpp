@@ -1636,9 +1636,11 @@ IPGraph::findNodesByAbstractPath(int frame,
         //
         const bool diagCache = forDisplay && m_newFrame && TwkUtil::PlaybackDiagnostics::enabled();
         bool diagHit = isCached;
-        size_t diagUsed = 0, diagCap = 0;
+        size_t diagUsed = 0;
+        size_t diagCap = 0;
         bool diagOverflow = false;
-        int diagRunway = 0, diagDisplayInc = 0;
+        int diagRunway = 0;
+        int diagDisplayInc = 0;
         if (diagCache)
         {
             diagUsed = m_fbcache.used();
