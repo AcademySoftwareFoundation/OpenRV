@@ -61,8 +61,6 @@
 #include <limits>
 #include <stdexcept>
 #include <algorithm>
-#include <cstdint>
-#include <vector>
 
 #ifdef PLATFORM_DARWIN
 #include <OpenCL/cl.h>
@@ -114,11 +112,6 @@ namespace IPCore
 
     namespace
     {
-        //  Opaque alpha written when expanding RGB to RGBA: 1.0 as an IEEE
-        //  half-float, and as the bit pattern of an IEEE single-precision float.
-        constexpr uint16_t kHalfFloatOne = 0x3C00;
-        constexpr uint32_t kFloatOneBits = 0x3F800000;
-
         constexpr double kBytesPerMiB = 1024.0 * 1024.0;
         constexpr double kMiBPerGiB = 1024.0;
     } // namespace
@@ -126,10 +119,6 @@ namespace IPCore
     using namespace TwkGLF;
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
-    //  Upload 3-channel half/float images as native RGBA16F/RGBA32F (fast GPU
-    //  DMA) instead of GL_RGB16F/GL_RGB32F (per-pixel driver expansion on
-    //  upload). Set RV_EXPAND_RGB_TO_RGBA=0 to restore the legacy RGB path.
-    static ENVVAR_BOOL(evExpandRGBToRGBA, "RV_EXPAND_RGB_TO_RGBA", true);
 
 #define NOT_A_FRAME (std::numeric_limits<int>::min())
 #define NOT_A_COORDINATE (GLuint(-1))
@@ -3199,14 +3188,7 @@ namespace IPCore
         s.uncropX = image->uncropX;
         s.uncropY = image->uncropY;
         s.planar = image->planes.size() > 1;
-        //  Report the logical source channel count. For RGB half/float images
-        //  uploaded via the RGBA-expansion fast path the texture has 4 channels
-        //  but the image is still logically 3-channel (opaque alpha), so undo
-        //  the expansion here to keep externally-visible semantics unchanged.
-        s.numChannels =
-            s.planar
-                ? image->planes.size()
-                : (!image->planes.empty() ? (image->planes.front().tile->expandRGBToRGBA ? 3 : image->planes.front().tile->channels) : 4);
+        s.numChannels = s.planar ? image->planes.size() : (image->planes.size() ? image->planes.front().tile->channels : 4);
         s.pixelAspect = image->pixelAspect;
         s.initPixelAspect = image->initPixelAspect;
         s.device = (VideoDevice*)context.device;
@@ -3887,36 +3869,11 @@ namespace IPCore
     bool ImageRenderer::compatible(const FrameBuffer* fb, const TextureDescription* tex) const
     {
         //
-        //  Build the description this fb would produce and compare against the
-        //  existing texture. We must compare against the *derived* description
-        //  (not the raw fb) because the destination geometry can differ from
-        //  the source -- e.g. 3-channel RGB half/float is expanded to a
-        //  4-channel RGBA texture (see initializeTextureFormat), so the
-        //  texture's channels/pixelSize/format intentionally differ from the fb.
-        //
-        TextureDescription b;
-        initializeTextureFormat(fb, &b);
-
-        //
         //  Check for basic geometry
         //
-        if (b.height != tex->height || b.width != tex->width || b.depth != tex->depth || b.channels != tex->channels
-            || b.pixelSize != tex->pixelSize || b.uncropWidth != tex->uncropWidth || b.uncropHeight != tex->uncropHeight
-            || b.uncropX != tex->uncropX || b.uncropY != tex->uncropY)
-        {
-            return false;
-        }
-
-        //
-        //  An expanded (3ch RGB -> 4ch RGBA) texture and a genuine 4-channel
-        //  RGBA texture produce identical destination geometry/format, but the
-        //  *upload path* differs (one expands the source, one does not). The
-        //  Compatible-reuse path in getTexture() does not re-run
-        //  initializeTextureFormat, so it would leave tex->expandRGBToRGBA
-        //  stale and make uploadPlane read the source with the wrong channel
-        //  stride -> corruption. Never cross-reuse between the two.
-        //
-        if (b.expandRGBToRGBA != tex->expandRGBToRGBA)
+        if (fb->height() != tex->height || fb->width() != tex->width || fb->depth() != tex->depth || fb->numChannels() != tex->channels
+            || fb->pixelSize() != tex->pixelSize || fb->uncropWidth() != tex->uncropWidth || fb->uncropHeight() != tex->uncropHeight
+            || fb->uncropX() != tex->uncropX || fb->uncropY() != tex->uncropY)
         {
             return false;
         }
@@ -3924,6 +3881,9 @@ namespace IPCore
         //
         //  Check further
         //
+        TextureDescription b;
+        initializeTextureFormat(fb, &b);
+
         if (tex->channelType != b.channelType || tex->internalFormat != b.internalFormat || tex->format != b.format
             || tex->alignment != b.alignment)
         {
@@ -4061,7 +4021,6 @@ namespace IPCore
         d->channels = fb->numChannels();
         d->pixelSize = fb->pixelSize();
         d->swapBytes = false;
-        d->expandRGBToRGBA = false;
         d->uncropWidth = fb->uncropWidth();
         d->uncropHeight = fb->uncropHeight();
         d->uncropX = fb->uncropX();
@@ -4231,36 +4190,6 @@ namespace IPCore
             default:
                 d->internalFormat = 3;
                 break;
-            }
-
-            //
-            //  3-component float texture uploads (GL_RGB16F/GL_RGB32F) have no
-            //  native DMA path on real GPUs: the driver expands RGB->RGBA per
-            //  pixel on upload, which is far slower than a native RGBA transfer
-            //  (and worse when it also forces the slow non-PBO path). Allocate
-            //  the texture as RGBA and expand RGB->RGBA on the CPU in
-            //  uploadPlane() so we ride the native GL_RGBA16F/RGBA32F fast path.
-            //  The extra opaque alpha is harmless (shaders sample .rgb). Only
-            //  applies to hardware float paths; software renderer already uses
-            //  an RGBA internal format above.
-            //  Only the GL_TEXTURE_RECTANGLE path in uploadPlane() implements
-            //  the RGB->RGBA expansion. Normalized-coordinate textures
-            //  (GL_TEXTURE_1D/2D/3D, e.g. 3D color LUTs) go through
-            //  upload{1,2,3}DTexture() which upload the source as-is, so they
-            //  must keep the real RGB format or they would be corrupted.
-            if (evExpandRGBToRGBA.getValue() && !m_softwareGLRenderer && d->target == GL_TEXTURE_RECTANGLE
-                && (d->channelType == GL_HALF_FLOAT_ARB || d->channelType == GL_FLOAT))
-            {
-                d->expandRGBToRGBA = true;
-                d->format = GL_RGBA;
-                d->channels = 4;
-                constexpr int kRGBAHalfPixelBytes = 8;
-                constexpr int kRGBAFloatPixelBytes = 16;
-                d->pixelSize = (d->channelType == GL_HALF_FLOAT_ARB) ? kRGBAHalfPixelBytes : kRGBAFloatPixelBytes;
-                d->internalFormat = (d->channelType == GL_HALF_FLOAT_ARB) ? GL_RGBA16F_ARB : GL_RGBA32F_ARB;
-                //  Destination rows are tightly packed RGBA (8 or 16 bytes/px),
-                //  both multiples of 8, so an 8-byte unpack alignment is valid.
-                d->alignment = kRGBAHalfPixelBytes;
             }
 
             break;
@@ -4777,23 +4706,7 @@ namespace IPCore
                 TWK_THROW_STREAM(RenderFailedExc, "glMapBuffer FAILED" << estring);
             }
 
-            if (d->expandRGBToRGBA)
-            {
-                //  Expand RGB->RGBA directly into the mapped PBO (no extra
-                //  staging copy) so the GPU gets a native RGBA transfer.
-                if (d->channelType == GL_HALF_FLOAT_ARB)
-                {
-                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(b), kHalfFloatOne);
-                }
-                else
-                {
-                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(b), kFloatOneBits);
-                }
-            }
-            else
-            {
-                FastMemcpy_MP(b, p, totalBytes);
-            }
+            FastMemcpy_MP(b, p, totalBytes);
 
             d->pPBOToGPU->unmap();
             d->pPBOToGPU->bind();
@@ -4803,9 +4716,7 @@ namespace IPCore
 
                 glBindTexture(d->target, d->id);
                 TWK_GLDEBUG;
-                //  Expanded data in the PBO is tightly packed RGBA (no source
-                //  scanline padding), so the row length is just the width.
-                glPixelStorei(GL_UNPACK_ROW_LENGTH, d->expandRGBToRGBA ? d->width : (d->width + fb->scanlinePixelPadding()));
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, d->width + fb->scanlinePixelPadding());
                 TWK_GLDEBUG;
                 glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
                 TWK_GLDEBUG;
@@ -4869,29 +4780,9 @@ namespace IPCore
         {
             HOP_PROF("ImageRenderer::uploadPlane() - !usePBO");
 
-            if (d->expandRGBToRGBA)
-            {
-                //  No PBO available: expand RGB->RGBA into a reusable per-thread
-                //  scratch buffer and upload that (still a native RGBA
-                //  transfer, just synchronous from client memory).
-                static thread_local std::vector<unsigned char> expandScratch;
-                expandScratch.resize(totalBytes);
-                if (d->channelType == GL_HALF_FLOAT_ARB)
-                {
-                    expand_rgb_to_rgba_16bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint16_t*>(expandScratch.data()),
-                                                kHalfFloatOne);
-                }
-                else
-                {
-                    expand_rgb_to_rgba_32bit_MP(iw, ih, p, fb->scanlineSize(), reinterpret_cast<uint32_t*>(expandScratch.data()),
-                                                kFloatOneBits);
-                }
-                p = expandScratch.data();
-            }
-
             glBindTexture(d->target, d->id);
             TWK_GLDEBUG;
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, d->expandRGBToRGBA ? d->width : (fb->scanlineSize() / fb->pixelSize()));
+            glPixelStorei(GL_UNPACK_ROW_LENGTH, fb->scanlineSize() / fb->pixelSize());
             TWK_GLDEBUG;
             glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, d->height);
             TWK_GLDEBUG;
