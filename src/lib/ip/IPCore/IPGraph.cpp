@@ -47,6 +47,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <cmath>
+#include <optional>
 
 #define MIN_WORK_ITEM_THREADS 1
 #define MAX_WORK_ITEM_THREADS 4
@@ -746,11 +747,108 @@ namespace IPCore
         m_rootNode->appendInput(displayGroup);
     }
 
+    namespace
+    {
+        using VideoDeviceList = std::vector<TwkApp::VideoDevice*>;
+
+        VideoDeviceList collectDevices(const IPGraph::VideoModules& modules)
+        {
+            VideoDeviceList devices;
+
+            for (const auto& module : modules)
+            {
+                const TwkApp::VideoModule::VideoDevices& moduleDevices = module->devices();
+                devices.insert(devices.end(), moduleDevices.begin(), moduleDevices.end());
+            }
+
+            return devices;
+        }
+
+        std::string firstStringValue(const DisplayGroupIPNode* group, const std::string& propertyName)
+        {
+            const StringProperty* prop = group->property<StringProperty>(propertyName);
+            return (prop && !prop->empty()) ? prop->front() : "";
+        }
+
+        //
+        //  Match on the stored names, never on physicalDevice(): that pointer
+        //  refers to a device the caller has already destroyed.
+        //
+        std::optional<size_t> findMatchingDevice(const DisplayGroupIPNode* group, const VideoDeviceList& devices,
+                                                 const std::vector<bool>& deviceMatched)
+        {
+            const std::string groupName = firstStringValue(group, "device.name");
+            const std::string groupModule = firstStringValue(group, "device.moduleName");
+
+            for (size_t index = 0; index < devices.size(); ++index)
+            {
+                if (deviceMatched[index])
+                {
+                    continue;
+                }
+
+                const TwkApp::VideoDevice* device = devices[index];
+                const std::string deviceModule = device->module() ? device->module()->name() : "";
+
+                if (device->name() == groupName && deviceModule == groupModule)
+                {
+                    return index;
+                }
+            }
+
+            return std::nullopt;
+        }
+
+        //
+        //  Drop a dangling output pointer: findDisplayGroupByDevice() compares
+        //  pointers and it could alias a new device. The control device is
+        //  still alive, so keep it.
+        //
+        void dropStaleOutputDevice(DisplayGroupIPNode* group, const VideoDeviceList& devices, const TwkApp::VideoDevice* controlDevice)
+        {
+            const TwkApp::VideoDevice* output = group->outputDevice();
+
+            if (!output || output == controlDevice)
+            {
+                return;
+            }
+
+            if (std::find(devices.begin(), devices.end(), output) == devices.end())
+            {
+                group->setOutputVideoDevice(nullptr);
+            }
+        }
+    } // namespace
+
     void IPGraph::refreshPhysicalDevices(const VideoModules& modules)
     {
         beginGraphEdit();
         refreshPhysicalDevicesInternal(modules);
         endGraphEdit();
+    }
+
+    void IPGraph::detachDisplayGroup(DisplayGroupIPNode* group)
+    {
+        if (m_rootNode->isInput(group))
+        {
+            m_rootNode->removeInput(group);
+        }
+
+        group->willDelete();
+        group->disconnectInputs();
+    }
+
+    std::string IPGraph::uniqueDisplayGroupName() const
+    {
+        size_t suffix = m_displayGroups.size();
+        std::string name;
+
+        do
+        {
+            name = "displayGroup" + std::to_string(suffix++);
+        } while (findNode(name));
+
+        return name;
     }
 
     void IPGraph::refreshPhysicalDevicesInternal(const VideoModules& modules)
@@ -761,13 +859,7 @@ namespace IPCore
         //  (module name, device name), which is stable while the monitors are.
         //
 
-        std::vector<TwkApp::VideoDevice*> devices;
-
-        for (const auto& module : modules)
-        {
-            const TwkApp::VideoModule::VideoDevices& mdevices = module->devices();
-            devices.insert(devices.end(), mdevices.begin(), mdevices.end());
-        }
+        const VideoDeviceList devices = collectDevices(modules);
 
         //
         //  Nothing to preserve.
@@ -784,73 +876,25 @@ namespace IPCore
 
         for (DisplayGroupIPNode* group : m_displayGroups)
         {
-
             if (group == m_defaultOutputGroup)
             {
                 survivors.push_back(group);
                 continue;
             }
 
-            //
-            //  Match on the stored names, never on physicalDevice(): that
-            //  pointer refers to a device the caller has already destroyed.
-            //
-            const StringProperty* nameProp = group->property<StringProperty>("device.name");
-            const StringProperty* moduleProp = group->property<StringProperty>("device.moduleName");
-            const string groupName = (nameProp && !nameProp->empty()) ? nameProp->front() : "";
-            const string groupModule = (moduleProp && !moduleProp->empty()) ? moduleProp->front() : "";
+            const std::optional<size_t> match = findMatchingDevice(group, devices, deviceMatched);
 
-            size_t match = devices.size();
-
-            for (size_t di = 0; di < devices.size(); di++)
+            if (!match)
             {
-                if (deviceMatched[di])
-                {
-                    continue;
-                }
-
-                const string deviceModule = devices[di]->module() ? devices[di]->module()->name() : "";
-
-                if (devices[di]->name() == groupName && deviceModule == groupModule)
-                {
-                    match = di;
-                    break;
-                }
-            }
-
-            if (match == devices.size())
-            {
-                //
                 //  The group's device is gone (e.g. a monitor was unplugged).
-                //
-                if (m_rootNode->isInput(group))
-                {
-                    m_rootNode->removeInput(group);
-                }
-                group->willDelete();
-                group->disconnectInputs();
+                detachDisplayGroup(group);
                 doomed.push_back(group);
                 continue;
             }
 
-            deviceMatched[match] = true;
-            group->setPhysicalVideoDevice(devices[match]);
-
-            //
-            //  Drop a dangling output pointer: findDisplayGroupByDevice()
-            //  compares pointers and it could alias a new device. The control
-            //  device is still alive, so keep it.
-            //
-            if (group->outputDevice() && group->outputDevice() != m_controlDevice)
-            {
-                const bool stillPresent = std::find(devices.begin(), devices.end(), group->outputDevice()) != devices.end();
-
-                if (!stillPresent)
-                {
-                    group->setOutputVideoDevice(nullptr);
-                }
-            }
-
+            deviceMatched[*match] = true;
+            group->setPhysicalVideoDevice(devices[*match]);
+            dropStaleOutputDevice(group, devices, m_controlDevice);
             survivors.push_back(group);
         }
 
@@ -869,24 +913,12 @@ namespace IPCore
         //
         //  Unmatched devices are new.
         //
-        for (size_t di = 0; di < devices.size(); di++)
+        for (size_t index = 0; index < devices.size(); ++index)
         {
-            if (deviceMatched[di])
+            if (!deviceMatched[index])
             {
-                continue;
+                m_displayGroups.push_back(newDisplayGroup(uniqueDisplayGroupName(), devices[index]));
             }
-
-            size_t suffix = m_displayGroups.size();
-            string name;
-
-            do
-            {
-                ostringstream str;
-                str << "displayGroup" << suffix++;
-                name = str.str();
-            } while (findNode(name));
-
-            m_displayGroups.push_back(newDisplayGroup(name, devices[di]));
         }
 
         //

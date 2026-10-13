@@ -772,6 +772,10 @@ namespace IPCore
         void setPhysicalDevicesInternal(const VideoModules&);
         void refreshPhysicalDevicesInternal(const VideoModules&);
 
+        //  Helpers for refreshPhysicalDevicesInternal().
+        void detachDisplayGroup(DisplayGroupIPNode*);
+        std::string uniqueDisplayGroupName() const;
+
         void dispatchCachingThreadsSafely();
 
         void updateHasAudio() const;
