@@ -162,7 +162,7 @@ namespace Rv
 
         DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const QTGLVideoDevice* glViewShared);
 
-        virtual ~DesktopVideoDevice();
+        ~DesktopVideoDevice() override;
 
         virtual void redraw() const;
         virtual void redrawImmediately() const;
@@ -178,30 +178,30 @@ namespace Rv
         //  frame packed.
         //
 
-        virtual Resolution internalResolution() const;
-        virtual VideoFormat internalFormat() const;
-        virtual size_t internalHeight() const;
+        Resolution internalResolution() const override;
+        VideoFormat internalFormat() const override;
+        size_t internalHeight() const override;
 
         //
         //  This will try and lock the sync mutex
         //
 
-        virtual void blockUntilSyncComplete() const;
+        void blockUntilSyncComplete() const override;
 
         //
         //  GLBindableVideoDevice API
         //
 
-        virtual bool isStereo() const;
-        virtual bool isDualStereo() const;
+        bool isStereo() const override;
+        bool isDualStereo() const override;
 
         // virtual bool willBlockOnTransfer() const;
-        virtual void transfer(const TwkGLF::GLFBO*) const;
-        virtual void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const;
+        void transfer(const TwkGLF::GLFBO*) const override;
+        void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const override;
 
-        virtual void unbind() const;
+        void unbind() const override;
 
-        virtual void clearCaches() const { releaseFBOClones(); }
+        void clearCaches() const override { releaseFBOClones(); }
 
         //
         //  Delete the FBO clones in m_fboMap. Must run while this device's view
@@ -221,26 +221,26 @@ namespace Rv
         //  Configurations
         //
 
-        virtual size_t numVideoFormats() const;
-        virtual VideoFormat videoFormatAtIndex(size_t) const;
+        size_t numVideoFormats() const override;
+        VideoFormat videoFormatAtIndex(size_t) const override;
         virtual VideoFormat videoFormatFromData(void*) const;
-        virtual void setVideoFormat(size_t);
-        virtual size_t currentVideoFormat() const;
+        void setVideoFormat(size_t) override;
+        size_t currentVideoFormat() const override;
 
-        virtual size_t numDataFormats() const;
-        virtual DataFormat dataFormatAtIndex(size_t) const;
-        virtual void setDataFormat(size_t);
-        virtual size_t currentDataFormat() const;
+        size_t numDataFormats() const override;
+        DataFormat dataFormatAtIndex(size_t) const override;
+        void setDataFormat(size_t) override;
+        size_t currentDataFormat() const override;
 
-        virtual size_t numSyncModes() const;
-        virtual SyncMode syncModeAtIndex(size_t) const;
-        virtual void setSyncMode(size_t);
-        virtual size_t currentSyncMode() const;
+        size_t numSyncModes() const override;
+        SyncMode syncModeAtIndex(size_t) const override;
+        void setSyncMode(size_t) override;
+        size_t currentSyncMode() const override;
 
-        virtual size_t numSyncSources() const;
-        virtual SyncSource syncSourceAtIndex(size_t) const;
-        virtual void setSyncSource(size_t);
-        virtual size_t currentSyncSource() const;
+        size_t numSyncSources() const override;
+        SyncSource syncSourceAtIndex(size_t) const override;
+        void setSyncSource(size_t) override;
+        size_t currentSyncSource() const override;
 
         // imported
 
@@ -258,19 +258,19 @@ namespace Rv
         //  VideoDevice API
         //
 
-        virtual Resolution resolution() const;
-        virtual Offset offset() const;
-        virtual Timing timing() const;
-        virtual VideoFormat format() const;
+        Resolution resolution() const override;
+        Offset offset() const override;
+        Timing timing() const override;
+        VideoFormat format() const override;
 
-        virtual size_t width() const;
-        virtual size_t height() const;
+        size_t width() const override;
+        size_t height() const override;
 
-        virtual void open(const StringVector&);
-        virtual void close();
-        virtual bool isOpen() const;
+        void open(const StringVector&) override;
+        void close() override;
+        bool isOpen() const override;
 
-        virtual void syncBuffers() const;
+        void syncBuffers() const override;
 
         virtual int qtScreen() const { return m_screen; }
 
@@ -315,7 +315,7 @@ namespace Rv
         void addDataFormatAtDepth(size_t depth, DesktopStereoMode m);
 
 #ifdef PLATFORM_WINDOWS
-        virtual ColorProfile colorProfile() const;
+        ColorProfile colorProfile() const override;
 #endif
 
     protected:
