@@ -3,8 +3,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __RvCommon__VulkanWindow__h__
-#define __RvCommon__VulkanWindow__h__
+#pragma once
 
 #include <QtGui/QWindow>
 #include <QtCore/QEvent>
@@ -352,5 +351,3 @@ namespace Rv
     };
 
 } // namespace Rv
-
-#endif // __RvCommon__VulkanWindow__h__

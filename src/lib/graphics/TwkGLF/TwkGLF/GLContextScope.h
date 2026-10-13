@@ -3,8 +3,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __TwkGLF__GLContextScope__h__
-#define __TwkGLF__GLContextScope__h__
+#pragma once
 
 namespace TwkGLF
 {
@@ -46,5 +45,3 @@ namespace TwkGLF
     };
 
 } // namespace TwkGLF
-
-#endif // __TwkGLF__GLContextScope__h__

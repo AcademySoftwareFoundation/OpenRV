@@ -3,8 +3,7 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __RvCommon__VulkanDesktopVideoDevice__h__
-#define __RvCommon__VulkanDesktopVideoDevice__h__
+#pragma once
 
 #include <RvCommon/DesktopVideoDevice.h>
 
@@ -45,5 +44,3 @@ namespace Rv
     };
 
 } // namespace Rv
-
-#endif // __RvCommon__VulkanDesktopVideoDevice__h__
