@@ -1025,13 +1025,13 @@ namespace IPCore
             if (diagDecode)
             {
                 const bool selSlow = mov->info().slowRandomAccess && mov->info().video;
-                std::string nm;
-                if (const auto* r = dynamic_cast<const MovieReader*>(mov))
+                std::string fileName;
+                if (const auto* movieReader = dynamic_cast<const MovieReader*>(mov))
                 {
-                    nm = TwkUtil::basename(r->filename());
+                    fileName = TwkUtil::basename(movieReader->filename());
                 }
                 std::ostringstream extra;
-                extra << "file=" << nm << ";slow=" << (selSlow ? 1 : 0);
+                extra << "file=" << fileName << ";slow=" << (selSlow ? 1 : 0);
 
                 //  Report the decoded pixel format and how many channels/planes
                 //  we actually decoded vs how many are displayed (decoding unused
@@ -1039,32 +1039,32 @@ namespace IPCore
                 if (!fbs.empty() && (fbs[0] != nullptr))
                 {
                     const TwkFB::FrameBuffer* fb = fbs[0];
-                    const char* dt = nullptr;
+                    const char* dataTypeName = nullptr;
                     switch (fb->dataType())
                     {
                     case TwkFB::FrameBuffer::BIT:
-                        dt = "bit";
+                        dataTypeName = "bit";
                         break;
                     case TwkFB::FrameBuffer::UCHAR:
-                        dt = "uint8";
+                        dataTypeName = "uint8";
                         break;
                     case TwkFB::FrameBuffer::USHORT:
-                        dt = "uint16";
+                        dataTypeName = "uint16";
                         break;
                     case TwkFB::FrameBuffer::UINT:
-                        dt = "uint32";
+                        dataTypeName = "uint32";
                         break;
                     case TwkFB::FrameBuffer::HALF:
-                        dt = "half";
+                        dataTypeName = "half";
                         break;
                     case TwkFB::FrameBuffer::FLOAT:
-                        dt = "float32";
+                        dataTypeName = "float32";
                         break;
                     case TwkFB::FrameBuffer::DOUBLE:
-                        dt = "float64";
+                        dataTypeName = "float64";
                         break;
                     default:
-                        dt = "packed";
+                        dataTypeName = "packed";
                         break;
                     }
 
@@ -1073,14 +1073,14 @@ namespace IPCore
                     int planeCount = 0;
                     constexpr int kMaxLoggedChannelNames = 12;
                     std::ostringstream chNames;
-                    for (const TwkFB::FrameBuffer* p = fb; p != nullptr; p = p->nextPlane())
+                    for (const TwkFB::FrameBuffer* plane = fb; plane != nullptr; plane = plane->nextPlane())
                     {
                         planeCount++;
-                        for (int c = 0; c < p->numChannels(); c++)
+                        for (int channel = 0; channel < plane->numChannels(); channel++)
                         {
                             if (decodedChannels < kMaxLoggedChannelNames)
                             {
-                                chNames << ((decodedChannels != 0) ? "|" : "") << p->channelName(c);
+                                chNames << ((decodedChannels != 0) ? "|" : "") << plane->channelName(channel);
                             }
                             decodedChannels++;
                         }
@@ -1089,14 +1089,14 @@ namespace IPCore
                     //  How many channels the display pipeline will actually use
                     const int displayedChannels = std::min(decodedChannels, 4);
 
-                    std::string comp = "?";
+                    std::string compression = "?";
                     if (fb->hasAttribute("EXR/compression"))
                     {
-                        comp = fb->attribute<std::string>("EXR/compression");
+                        compression = fb->attribute<std::string>("EXR/compression");
                     }
 
-                    extra << ";type=" << dt << ";comp=" << comp << ";w=" << fb->width() << ";h=" << fb->height() << ";planes=" << planeCount
-                          << ";chDecoded=" << decodedChannels << ";chDisplayed=" << displayedChannels
+                    extra << ";type=" << dataTypeName << ";comp=" << compression << ";w=" << fb->width() << ";h=" << fb->height()
+                          << ";planes=" << planeCount << ";chDecoded=" << decodedChannels << ";chDisplayed=" << displayedChannels
                           << ";extraCh=" << (decodedChannels > displayedChannels ? 1 : 0) << ";chNames=" << chNames.str();
                 }
 

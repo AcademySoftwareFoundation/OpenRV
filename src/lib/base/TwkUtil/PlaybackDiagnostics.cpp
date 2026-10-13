@@ -21,26 +21,26 @@ namespace TwkUtil
         //  Cached once: RV_PLAYBACK_DIAG is interpreted purely as an on/off
         //  boolean (non-empty and not "0").
         //
-        static const bool e = []() -> bool
+        static const bool isEnabled = []() -> bool
         {
-            const char* v = getenv("RV_PLAYBACK_DIAG");
-            if (v == nullptr || v[0] == '\0')
+            const char* value = getenv("RV_PLAYBACK_DIAG");
+            if (value == nullptr || value[0] == '\0')
             {
                 return false;
             }
-            if (v[0] == '0' && v[1] == '\0')
+            if (value[0] == '0' && value[1] == '\0')
             {
                 return false;
             }
             return true;
         }();
-        return e;
+        return isEnabled;
     }
 
     PlaybackDiagnostics& PlaybackDiagnostics::instance()
     {
-        static PlaybackDiagnostics s;
-        return s;
+        static PlaybackDiagnostics diagnostics;
+        return diagnostics;
     }
 
     PlaybackDiagnostics::PlaybackDiagnostics()
@@ -84,19 +84,19 @@ namespace TwkUtil
         //
         string safeExtra;
         safeExtra.reserve(extra.size());
-        for (const char c : extra)
+        for (const char character : extra)
         {
-            if (c == ',')
+            if (character == ',')
             {
                 safeExtra.push_back(';');
             }
-            else if (c == '\n' || c == '\r')
+            else if (character == '\n' || character == '\r')
             {
                 safeExtra.push_back(' ');
             }
             else
             {
-                safeExtra.push_back(c);
+                safeExtra.push_back(character);
             }
         }
 

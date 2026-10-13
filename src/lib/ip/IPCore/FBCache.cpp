@@ -2006,14 +2006,14 @@ namespace IPCore
             inc = 1;
         }
 
-        int n = 0;
-        int f = frame + inc;
-        while (n < maxCount && f >= m_minFrame && f < m_maxFrame && isFrameCached(f))
+        int cachedCount = 0;
+        int nextFrame = frame + inc;
+        while (cachedCount < maxCount && nextFrame >= m_minFrame && nextFrame < m_maxFrame && isFrameCached(nextFrame))
         {
-            ++n;
-            f += inc;
+            ++cachedCount;
+            nextFrame += inc;
         }
-        return n;
+        return cachedCount;
     }
 
     void FBCache::computeCachedRangesStat(FrameRangeVector& array) const

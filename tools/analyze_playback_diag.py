@@ -99,16 +99,16 @@ def merged_interval_length(intervals):
 def read_diag_log(path):
     """Return (rows, header_ok). Each row is a dict with typed fields."""
     rows = []
-    with open(path, newline="") as fh:
-        reader = csv.reader(fh)
+    with open(path, newline="") as log_file:
+        reader = csv.reader(log_file)
         try:
             header = next(reader)
         except StopIteration:
             return rows
         # Tolerate a missing header (older logs) by detecting a numeric first col.
         if header and header[0].strip() != "t_ms":
-            fh.seek(0)
-            reader = csv.reader(fh)
+            log_file.seek(0)
+            reader = csv.reader(log_file)
         for raw in reader:
             if len(raw) < 5:
                 continue
@@ -130,8 +130,8 @@ def read_diag_log(path):
 def analyze_decode(decode_rows, fps, span_s):
     """Per-thread and aggregate image-decode statistics."""
     per_thread = defaultdict(list)
-    for r in decode_rows:
-        per_thread[r["thread"]].append(r["dur_ms"])
+    for row in decode_rows:
+        per_thread[row["thread"]].append(row["dur_ms"])
 
     frame_budget_ms = 1000.0 / fps if fps > 0 else 0.0
 
@@ -152,10 +152,10 @@ def analyze_decode(decode_rows, fps, span_s):
             "over_budget_frac": 0.0,
         }
 
-    all_durs = sorted(r["dur_ms"] for r in decode_rows)
+    all_durs = sorted(row["dur_ms"] for row in decode_rows)
     n_threads = len(per_thread)
     mean_ms = mean(all_durs)
-    over_budget = [d for d in all_durs if frame_budget_ms and d > frame_budget_ms]
+    over_budget = [duration for duration in all_durs if frame_budget_ms and duration > frame_budget_ms]
     over_budget_frac = len(over_budget) / len(all_durs)
 
     print("  target fps            : %.3f  (frame budget %.2f ms)" % (fps, frame_budget_ms))
@@ -183,9 +183,9 @@ def analyze_decode(decode_rows, fps, span_s):
     #   busy_union  = wall time during which >=1 decode was in progress
     #   concurrency = sum(decode time) / busy_union  (avg threads working at once)
     #   active_fps  = decodes / busy_union           (real sustained decode rate)
-    intervals = [((r["t_ms"] - r["dur_ms"]), r["t_ms"]) for r in decode_rows]
+    intervals = [((row["t_ms"] - row["dur_ms"]), row["t_ms"]) for row in decode_rows]
     busy_union_ms = merged_interval_length(intervals)
-    busy_sum_ms = sum(r["dur_ms"] for r in decode_rows)
+    busy_sum_ms = sum(row["dur_ms"] for row in decode_rows)
     concurrency = (busy_sum_ms / busy_union_ms) if busy_union_ms > 0 else 0.0
     active_fps = (len(decode_rows) / (busy_union_ms / 1000.0)) if busy_union_ms > 0 else 0.0
     measured_fps = len(decode_rows) / span_s if span_s > 0 else 0.0
@@ -210,38 +210,43 @@ def analyze_decode(decode_rows, fps, span_s):
     # concurrency, adding reader threads is counter-productive (they fight over
     # the shared OpenEXR global thread pool / CPU) and throughput will not scale.
     by_conc = defaultdict(list)
-    for r in decode_rows:
-        e = parse_extra(r.get("extra", ""))
-        if "concurrency" in e:
+    for row in decode_rows:
+        extra_fields = parse_extra(row.get("extra", ""))
+        if "concurrency" in extra_fields:
             try:
-                by_conc[int(e["concurrency"])].append(r["dur_ms"])
+                by_conc[int(extra_fields["concurrency"])].append(row["dur_ms"])
             except ValueError:
                 pass
     oversubscribed = False
     if by_conc:
         print("  decode time vs concurrency (does adding threads scale?):")
         base_med = None
-        for c in sorted(by_conc):
-            durs = sorted(by_conc[c])
+        for conc_level in sorted(by_conc):
+            durs = sorted(by_conc[conc_level])
             med = median(durs)
-            if c == 1:
+            if conc_level == 1:
                 base_med = med
-            ratio = (" (%.1fx slower than solo)" % (med / base_med)) if base_med and base_med > 0 and c > 1 else ""
-            # Effective aggregate throughput at this level: c frames in flight,
-            # each taking 'med' ms, so ~ c / med * 1000 frames/s of capacity.
-            eff = (c / med * 1000.0) if med > 0 else 0.0
-            print("      concurrency %-2d : n=%-5d median %7.2f ms  eff %5.1f fps%s" % (c, len(durs), med, eff, ratio))
+            ratio = (
+                (" (%.1fx slower than solo)" % (med / base_med)) if base_med and base_med > 0 and conc_level > 1 else ""
+            )
+            # Effective aggregate throughput at this level: conc_level frames in flight,
+            # each taking 'med' ms, so ~ conc_level / med * 1000 frames/s of capacity.
+            eff = (conc_level / med * 1000.0) if med > 0 else 0.0
+            print(
+                "      concurrency %-2d : n=%-5d median %7.2f ms  eff %5.1f fps%s"
+                % (conc_level, len(durs), med, eff, ratio)
+            )
         # Flag oversubscription if decodes at high concurrency are much slower
         # than solo decodes (the aggregate barely improves or regresses).
         if base_med and base_med > 0:
-            hi = [c for c in by_conc if c >= 3]
-            if hi:
-                hi_med = median(sorted([d for c in hi for d in by_conc[c]]))
+            high_levels = [conc_level for conc_level in by_conc if conc_level >= 3]
+            if high_levels:
+                hi_med = median(sorted([duration for conc_level in high_levels for duration in by_conc[conc_level]]))
                 if hi_med > base_med * 2.0:
                     oversubscribed = True
                     print(
                         "  NOTE: decodes are ~%.1fx slower when %d+ run at once than when solo."
-                        % (hi_med / base_med, min(hi))
+                        % (hi_med / base_med, min(high_levels))
                     )
                     print("        This is EXR-pool / CPU oversubscription: the reader threads are")
                     print("        stealing cores from each other, so more threads != more throughput.")
@@ -264,8 +269,8 @@ def parse_extra(extra):
     out = {}
     for tok in extra.split(";"):
         if "=" in tok:
-            k, _, v = tok.partition("=")
-            out[k.strip()] = v.strip()
+            key, _, value = tok.partition("=")
+            out[key.strip()] = value.strip()
     return out
 
 
@@ -276,7 +281,7 @@ def analyze_display(rows, fps, span_s):
     displayed frame. If render dominates while frames are already cached, the
     stall is on the GPU/upload path rather than on decode.
     """
-    disp = [r for r in rows if r["event"] == "display"]
+    disp = [row for row in rows if row["event"] == "display"]
 
     print("=" * 72)
     print("DISPLAY PACING  --  on-screen frame time (evaluate vs GPU render)")
@@ -304,43 +309,43 @@ def analyze_display(rows, fps, span_s):
     refresh_counts = []
     threaded_upload = None
     bit_types = set()
-    for r in disp:
-        e = parse_extra(r["extra"])
+    for row in disp:
+        extra_fields = parse_extra(row["extra"])
         try:
-            ev = float(e.get("eval", "nan"))
-            rd = float(e.get("render", "nan"))
+            eval_ms = float(extra_fields.get("eval", "nan"))
+            render_ms = float(extra_fields.get("render", "nan"))
         except ValueError:
             continue
-        if ev == ev:  # not NaN
-            evals.append(ev)
-        if rd == rd:
-            renders.append(rd)
-        totals.append(r["dur_ms"])
-        if "threadedUpload" in e:
-            threaded_upload = e["threadedUpload"] == "1"
+        if eval_ms == eval_ms:  # not NaN
+            evals.append(eval_ms)
+        if render_ms == render_ms:
+            renders.append(render_ms)
+        totals.append(row["dur_ms"])
+        if "threadedUpload" in extra_fields:
+            threaded_upload = extra_fields["threadedUpload"] == "1"
         # dframe tells us whether the displayed frame number actually advanced.
-        df = None
-        if "dframe" in e:
+        dframe = None
+        if "dframe" in extra_fields:
             try:
-                df = int(e["dframe"])
-                if df == 0:
+                dframe = int(extra_fields["dframe"])
+                if dframe == 0:
                     repeats += 1
-                elif abs(df) == 1:
+                elif abs(dframe) == 1:
                     advances += 1
                 else:
                     multi_skips += 1
             except ValueError:
-                df = None
-        disp_samples.append((r["t_ms"], df))
-        if e.get("refreshes"):
+                dframe = None
+        disp_samples.append((row["t_ms"], dframe))
+        if extra_fields.get("refreshes"):
             try:
-                rc = int(e["refreshes"])
-                if rc > 0:
-                    refresh_counts.append(rc)
+                refresh_count = int(extra_fields["refreshes"])
+                if refresh_count > 0:
+                    refresh_counts.append(refresh_count)
             except ValueError:
                 pass
         try:
-            skipped_frames += abs(int(e.get("skipped", "0")))
+            skipped_frames += abs(int(extra_fields.get("skipped", "0")))
         except ValueError:
             pass
 
@@ -349,40 +354,42 @@ def analyze_display(rows, fps, span_s):
     extra_channel_frames = 0
     decsrc_count = 0
     ch_examples = {}
-    for r in rows:
-        if r["event"] == "decsrc":
-            e = parse_extra(r["extra"])
-            t = e.get("type")
-            if t:
-                bit_types.add(t)
-            c = e.get("comp")
-            if c:
-                comps[c] += 1
-                comp_times[c].append(r["dur_ms"])
-            if e.get("extraCh") == "1":
+    for row in rows:
+        if row["event"] == "decsrc":
+            extra_fields = parse_extra(row["extra"])
+            pixel_type = extra_fields.get("type")
+            if pixel_type:
+                bit_types.add(pixel_type)
+            compression = extra_fields.get("comp")
+            if compression:
+                comps[compression] += 1
+                comp_times[compression].append(row["dur_ms"])
+            if extra_fields.get("extraCh") == "1":
                 extra_channel_frames += 1
-            if e.get("chNames") and e.get("chDecoded") not in (None, "3", "4"):
-                ch_examples.setdefault(e.get("chDecoded"), e.get("chNames"))
+            if extra_fields.get("chNames") and extra_fields.get("chDecoded") not in (None, "3", "4"):
+                ch_examples.setdefault(extra_fields.get("chDecoded"), extra_fields.get("chNames"))
             decsrc_count += 1
 
     evals.sort()
     renders.sort()
     totals.sort()
-    n = len(totals)
-    over = [t for t in totals if frame_budget_ms and t > frame_budget_ms]
+    frame_count = len(totals)
+    over = [frame_time for frame_time in totals if frame_budget_ms and frame_time > frame_budget_ms]
     achieved_fps = (1000.0 / mean(totals)) if totals and mean(totals) > 0 else 0.0
 
     print("  target fps            : %.3f  (frame budget %.2f ms)" % (fps, frame_budget_ms))
-    print("  displayed frames      : %d" % n)
+    print("  displayed frames      : %d" % frame_count)
     if threaded_upload is not None:
         print("  threaded upload       : %s" % ("ON" if threaded_upload else "OFF"))
     if bit_types:
         print("  decoded pixel types   : %s" % ", ".join(sorted(bit_types)))
     if comps:
-        summary = ", ".join("%s x%d" % (k, v) for k, v in sorted(comps.items(), key=lambda kv: -kv[1]))
+        summary = ", ".join(
+            "%s x%d" % (codec, count) for codec, count in sorted(comps.items(), key=lambda item: -item[1])
+        )
         print("  EXR compression       : %s" % summary)
         slow_codecs = {"PIZ_COMPRESSION", "DWAA_COMPRESSION", "DWAB_COMPRESSION", "B44_COMPRESSION", "B44A_COMPRESSION"}
-        seen_slow = [k for k in comps if k in slow_codecs]
+        seen_slow = [codec for codec in comps if codec in slow_codecs]
         if seen_slow:
             print("    NOTE: %s decode significantly slower than ZIP/ZIPS on CPU." % ", ".join(seen_slow))
 
@@ -394,12 +401,19 @@ def analyze_display(rows, fps, span_s):
         def _label(codec):
             return {"?": "(movie/non-EXR)"}.get(codec, codec)
 
-        rows_by_slow = sorted(comp_times.items(), key=lambda kv: -median(sorted(kv[1])))
+        rows_by_slow = sorted(comp_times.items(), key=lambda item: -median(sorted(item[1])))
         for codec, times in rows_by_slow:
-            st = sorted(times)
+            sorted_times = sorted(times)
             print(
                 "      %-22s n=%-5d mean %7.2f  median %7.2f  p95 %7.2f  max %8.2f"
-                % (_label(codec), len(st), mean(st), median(st), percentile(st, 95.0), st[-1])
+                % (
+                    _label(codec),
+                    len(sorted_times),
+                    mean(sorted_times),
+                    median(sorted_times),
+                    percentile(sorted_times, 95.0),
+                    sorted_times[-1],
+                )
             )
     if decsrc_count:
         print(
@@ -422,7 +436,10 @@ def analyze_display(rows, fps, span_s):
         "  total frame time (ms) : mean %.2f  median %.2f  p95 %.2f  max %.2f"
         % (mean(totals), median(totals), percentile(totals, 95.0), totals[-1])
     )
-    print("  frames over budget    : %d / %d (%.1f%%)" % (len(over), n, 100.0 * len(over) / n if n else 0.0))
+    print(
+        "  frames over budget    : %d / %d (%.1f%%)"
+        % (len(over), frame_count, 100.0 * len(over) / frame_count if frame_count else 0.0)
+    )
     print("  implied display rate  : %.2f fps (1 / mean frame time)" % achieved_fps)
 
     #
@@ -440,20 +457,20 @@ def analyze_display(rows, fps, span_s):
     #
     redraw_gaps = []
     for i in range(1, len(disp_samples)):
-        g = disp_samples[i][0] - disp_samples[i - 1][0]
-        if g > 0:
-            redraw_gaps.append(g)
+        gap = disp_samples[i][0] - disp_samples[i - 1][0]
+        if gap > 0:
+            redraw_gaps.append(gap)
 
-    advance_ts = [t for (t, df) in disp_samples if df is not None and df != 0]
+    advance_ts = [timestamp for (timestamp, dframe) in disp_samples if dframe is not None and dframe != 0]
     advance_gaps = []
     for i in range(1, len(advance_ts)):
-        g = advance_ts[i] - advance_ts[i - 1]
-        if g > 0:
-            advance_gaps.append(g)
+        gap = advance_ts[i] - advance_ts[i - 1]
+        if gap > 0:
+            advance_gaps.append(gap)
 
     # A "stall" is an advance gap noticeably longer than the frame budget: the
     # frame froze on screen longer than it should have (the visible stutter).
-    stall_gaps = [g for g in advance_gaps if frame_budget_ms and g > frame_budget_ms * 1.5]
+    stall_gaps = [gap for gap in advance_gaps if frame_budget_ms and gap > frame_budget_ms * 1.5]
 
     redraw_hz = 0.0
     playback_fps = 0.0
@@ -497,14 +514,14 @@ def analyze_display(rows, fps, span_s):
     # perceived rate that is NOT decode- or render-bound.
     if refresh_counts:
         hist = defaultdict(int)
-        for rc in refresh_counts:
-            hist[rc] += 1
+        for refresh_count in refresh_counts:
+            hist[refresh_count] += 1
         avg_rc = sum(refresh_counts) / len(refresh_counts)
         redraw_ms = 1000.0 / redraw_hz if redraw_hz > 0 else 0.0
         print("    refreshes/new frame : mean %.2f  (redraws each new frame is held)" % avg_rc)
-        for k in sorted(hist):
-            share = 100.0 * hist[k] / len(refresh_counts)
-            print("        held %d redraw(s) : %5d  (%4.1f%%)" % (k, hist[k], share))
+        for hold_count in sorted(hist):
+            share = 100.0 * hist[hold_count] / len(refresh_counts)
+            print("        held %d redraw(s) : %5d  (%4.1f%%)" % (hold_count, hist[hold_count], share))
         if redraw_ms > 0 and fps > 0:
             ideal_rc = (1000.0 / fps) / redraw_ms
             print("        ideal hold        : %.2f redraws/frame -> vsync bias %+.2f" % (ideal_rc, avg_rc - ideal_rc))
@@ -545,7 +562,7 @@ def analyze_display(rows, fps, span_s):
             print("     %d visible stall(s) where the on-screen frame froze > 1.5x the budget." % len(stall_gaps))
 
     return {
-        "count": n,
+        "count": frame_count,
         "render_bound": render_bound,
         "cadence_ok": cadence_ok,
         "cadence_stutter": cadence_stutter,
@@ -564,9 +581,9 @@ def analyze_display(rows, fps, span_s):
 
 def analyze_audio(rows, span_s):
     """Audio starvation statistics."""
-    misses = [r for r in rows if r["event"] == "cachemiss"]
-    locked = [r for r in rows if r["event"] == "audiolocked"]
-    underruns = [r for r in rows if r["event"] == "underrun"]
+    misses = [row for row in rows if row["event"] == "cachemiss"]
+    locked = [row for row in rows if row["event"] == "audiolocked"]
+    underruns = [row for row in rows if row["event"] == "underrun"]
 
     print("=" * 72)
     print("AUDIO  --  cache misses, lock-outs and hardware underruns")
@@ -579,7 +596,7 @@ def analyze_audio(rows, span_s):
         print("  starvation rate       : %.3f events/s over %.1f s" % (total / span_s, span_s))
 
     # First event is often a harmless startup miss; count steady-state ones.
-    steady = [r for r in (misses + locked + underruns) if r["t_ms"] > 2000.0]
+    steady = [row for row in (misses + locked + underruns) if row["t_ms"] > 2000.0]
     print("  steady-state events   : %d (excluding first 2 s of playback)" % len(steady))
     return {
         "misses": len(misses),
@@ -592,9 +609,9 @@ def analyze_audio(rows, span_s):
 
 def analyze_buffering(rows, span_s):
     """Buffering pauses (frame cache under-runs) and realtime skips."""
-    events = [r for r in rows if r["event"] in ("buffering", "resume")]
-    buffering = [r for r in rows if r["event"] == "buffering"]
-    skips = [r for r in rows if r["event"] == "skip"]
+    events = [row for row in rows if row["event"] in ("buffering", "resume")]
+    buffering = [row for row in rows if row["event"] == "buffering"]
+    skips = [row for row in rows if row["event"] == "skip"]
 
     print("=" * 72)
     print("PLAYBACK CONTROL  --  buffering pauses and realtime frame skips")
@@ -602,38 +619,38 @@ def analyze_buffering(rows, span_s):
     print("  buffering pauses      : %d" % len(buffering))
     print(
         "  realtime frame skips  : %d event(s), %d frame(s) dropped"
-        % (len(skips), sum(abs(int(r["dur_ms"])) for r in skips))
+        % (len(skips), sum(abs(int(row["dur_ms"])) for row in skips))
     )
 
     # Pair buffering -> resume in time order to estimate pause durations.
     pause_durations = []
     open_pause_t = None
-    for r in sorted(events, key=lambda x: x["t_ms"]):
-        if r["event"] == "buffering" and open_pause_t is None:
-            open_pause_t = r["t_ms"]
-        elif r["event"] == "resume" and open_pause_t is not None:
-            pause_durations.append(r["t_ms"] - open_pause_t)
+    for row in sorted(events, key=lambda entry: entry["t_ms"]):
+        if row["event"] == "buffering" and open_pause_t is None:
+            open_pause_t = row["t_ms"]
+        elif row["event"] == "resume" and open_pause_t is not None:
+            pause_durations.append(row["t_ms"] - open_pause_t)
             open_pause_t = None
     if pause_durations:
-        sp = sorted(pause_durations)
+        sorted_pauses = sorted(pause_durations)
         print(
             "  pause duration (ms)   : n=%d  mean %.1f  median %.1f  max %.1f  total %.1f"
-            % (len(sp), mean(sp), median(sp), sp[-1], sum(sp))
+            % (len(sorted_pauses), mean(sorted_pauses), median(sorted_pauses), sorted_pauses[-1], sum(sorted_pauses))
         )
         if span_s > 0:
-            print("  time spent buffering  : %.1f%% of the run" % (100.0 * sum(sp) / (span_s * 1000.0)))
+            print("  time spent buffering  : %.1f%% of the run" % (100.0 * sum(sorted_pauses) / (span_s * 1000.0)))
     return {
         "buffering": len(buffering),
         "skips": len(skips),
-        "skipped_frames": sum(abs(int(r["dur_ms"])) for r in skips),
+        "skipped_frames": sum(abs(int(row["dur_ms"])) for row in skips),
         "pause_total_ms": sum(pause_durations),
     }
 
 
 def analyze_slow_media(rows, span_s):
     """Report per-source slowRandomAccess flags and slow-media mode transitions."""
-    sources = [r for r in rows if r["event"] == "sourceinfo"]
-    transitions = sorted((r for r in rows if r["event"] == "slowmedia"), key=lambda x: x["t_ms"])
+    sources = [row for row in rows if row["event"] == "sourceinfo"]
+    transitions = sorted((row for row in rows if row["event"] == "slowmedia"), key=lambda entry: entry["t_ms"])
 
     if not sources and not transitions:
         return {"slow_sources": 0, "slow_fraction": 0.0, "any": False}
@@ -645,11 +662,11 @@ def analyze_slow_media(rows, span_s):
     slow_sources = 0
     if sources:
         print("  sources opened:")
-        for r in sources:
-            flag = "SLOW random access" if r["dur_ms"] >= 0.5 else "fast"
-            if r["dur_ms"] >= 0.5:
+        for row in sources:
+            flag = "SLOW random access" if row["dur_ms"] >= 0.5 else "fast"
+            if row["dur_ms"] >= 0.5:
                 slow_sources += 1
-            print("      [%s] %s" % (flag, r["extra"]))
+            print("      [%s] %s" % (flag, row["extra"]))
     else:
         print("  (no per-source info recorded)")
 
@@ -658,25 +675,25 @@ def analyze_slow_media(rows, span_s):
     slow_ms = 0.0
     state_on = False
     last_t = transitions[0]["t_ms"] if transitions else 0.0
-    end_t = max((r["t_ms"] for r in rows), default=0.0)
-    for tr in transitions:
+    end_t = max((row["t_ms"] for row in rows), default=0.0)
+    for transition in transitions:
         if state_on:
-            slow_ms += tr["t_ms"] - last_t
-        state_on = tr["dur_ms"] >= 0.5  # 1.0=on, 0.0=off
-        last_t = tr["t_ms"]
+            slow_ms += transition["t_ms"] - last_t
+        state_on = transition["dur_ms"] >= 0.5  # 1.0=on, 0.0=off
+        last_t = transition["t_ms"]
     if state_on:
         slow_ms += end_t - last_t
     slow_fraction = (slow_ms / (span_s * 1000.0)) if span_s > 0 else 0.0
 
     print("  slow-media transitions: %d" % len(transitions))
     if transitions:
-        onc = sum(1 for t in transitions if t["dur_ms"] >= 0.5)
+        onc = sum(1 for transition in transitions if transition["dur_ms"] >= 0.5)
         print("      turned ON %d time(s), OFF %d time(s)" % (onc, len(transitions) - onc))
         print(
             "      first ON at frame %d (t=%.1f s)"
             % (
-                next((t["frame"] for t in transitions if t["dur_ms"] >= 0.5), -1),
-                next((t["t_ms"] / 1000.0 for t in transitions if t["dur_ms"] >= 0.5), 0.0),
+                next((transition["frame"] for transition in transitions if transition["dur_ms"] >= 0.5), -1),
+                next((transition["t_ms"] / 1000.0 for transition in transitions if transition["dur_ms"] >= 0.5), 0.0),
             )
         )
     print("  time in slow-media    : ~%.0f%% of the run" % (100.0 * slow_fraction))
@@ -688,17 +705,17 @@ def parse_rvprof(path):
     """Light parse of an .rvprof file; report display-thread frame budget overruns."""
     records = []
     try:
-        with open(path) as fh:
-            for line in fh:
+        with open(path) as rvprof_file:
+            for line in rvprof_file:
                 line = line.strip()
                 if not line or line.startswith("#"):
                     continue
                 fields = {}
                 for tok in line.split(","):
                     if "=" in tok:
-                        k, _, v = tok.partition("=")
+                        key, _, value = tok.partition("=")
                         try:
-                            fields[k] = float(v)
+                            fields[key] = float(value)
                         except ValueError:
                             pass
                 if "R0" in fields and "R1" in fields:
@@ -714,9 +731,11 @@ def parse_rvprof(path):
         print("  No usable per-frame records found.")
         return
 
-    render_ms = sorted(1000.0 * (r["R1"] - r["R0"]) for r in records if r["R1"] >= r["R0"])
+    render_ms = sorted(1000.0 * (record["R1"] - record["R0"]) for record in records if record["R1"] >= record["R0"])
     io_ms = sorted(
-        1000.0 * (r["IO1"] - r["IO0"]) for r in records if "IO1" in r and "IO0" in r and r["IO1"] >= r["IO0"]
+        1000.0 * (record["IO1"] - record["IO0"])
+        for record in records
+        if "IO1" in record and "IO0" in record and record["IO1"] >= record["IO0"]
     )
     print("  frames profiled       : %d" % len(records))
     if render_ms:
@@ -725,7 +744,7 @@ def parse_rvprof(path):
             % (mean(render_ms), median(render_ms), percentile(render_ms, 95.0), render_ms[-1])
         )
     if io_ms:
-        nonzero = [v for v in io_ms if v > 0.01]
+        nonzero = [io_time for io_time in io_ms if io_time > 0.01]
         print(
             "  display-thread IO (ms): %d/%d frames did synchronous IO; mean(nonzero) %.2f  max %.2f"
             % (len(nonzero), len(io_ms), mean(nonzero) if nonzero else 0.0, io_ms[-1])
@@ -741,18 +760,18 @@ def analyze_cache(rows, fps, span_s):
     Emitted by IPGraph::evaluateAtFrame (displaycache) and
     FBCache::initiateCachingOfBestFrameGroup (cachestall).
     """
-    dc = [r for r in rows if r["event"] == "displaycache"]
-    stalls = [r for r in rows if r["event"] == "cachestall"]
+    display_cache_rows = [row for row in rows if row["event"] == "displaycache"]
+    stalls = [row for row in rows if row["event"] == "cachestall"]
 
     print("=" * 72)
     print("CACHE CONTENT  --  was the needed frame actually in cache?")
     print("=" * 72)
-    if not dc:
+    if not display_cache_rows:
         print("  No displaycache events recorded.")
         print("  (Rebuild with the cache-content diagnostic, or the run predates it.)")
         return {"count": 0, "miss_rate": 0.0, "misses": 0, "cachestalls": len(stalls)}
 
-    n = len(dc)
+    frame_count = len(display_cache_rows)
     hits, misses = 0, 0
     miss_full = []  # cache percent-full at each miss
     miss_runway = []  # contiguous cached frames ahead at each miss
@@ -761,18 +780,18 @@ def analyze_cache(rows, fps, span_s):
     runway_all = []  # runway on every presented frame (hit or miss)
     zero_runway = 0  # presented frames whose NEXT frame was not cached
     full_all = []
-    for r in dc:
-        e = parse_extra(r["extra"])
-        is_hit = e.get("hit") == "1"
+    for row in display_cache_rows:
+        extra_fields = parse_extra(row["extra"])
+        is_hit = extra_fields.get("hit") == "1"
         try:
-            rw = int(e.get("runway", "0"))
-            runway_all.append(rw)
-            if rw == 0:
+            runway = int(extra_fields.get("runway", "0"))
+            runway_all.append(runway)
+            if runway == 0:
                 zero_runway += 1
         except ValueError:
-            rw = None
+            runway = None
         try:
-            full_all.append(float(e.get("full", "0")))
+            full_all.append(float(extra_fields.get("full", "0")))
         except ValueError:
             pass
         if is_hit:
@@ -780,22 +799,22 @@ def analyze_cache(rows, fps, span_s):
         else:
             misses += 1
             try:
-                miss_full.append(float(e.get("full", "0")))
+                miss_full.append(float(extra_fields.get("full", "0")))
             except ValueError:
                 pass
-            if rw is not None:
-                miss_runway.append(rw)
-            if e.get("overflow") == "1":
+            if runway is not None:
+                miss_runway.append(runway)
+            if extra_fields.get("overflow") == "1":
                 miss_overflow += 1
             try:
-                otf = float(e.get("otfDecodeMs", "0"))
+                otf = float(extra_fields.get("otfDecodeMs", "0"))
                 if otf > 0:
                     otf_ms.append(otf)
             except ValueError:
                 pass
 
-    miss_rate = misses / n if n else 0.0
-    print("  presented frames      : %d" % n)
+    miss_rate = misses / frame_count if frame_count else 0.0
+    print("  presented frames      : %d" % frame_count)
     print("  cache HITS / MISSES   : %d / %d  (%.1f%% miss)" % (hits, misses, 100.0 * miss_rate))
     if full_all:
         sfa = sorted(full_all)
@@ -806,7 +825,10 @@ def analyze_cache(rows, fps, span_s):
             "  ahead runway (all)    : median %d  p05 %d frame(s) cached ahead of playhead"
             % (median(sra), percentile(sra, 5.0))
         )
-        print("  next frame NOT cached : %d / %d presented frames (%.1f%%)" % (zero_runway, n, 100.0 * zero_runway / n))
+        print(
+            "  next frame NOT cached : %d / %d presented frames (%.1f%%)"
+            % (zero_runway, frame_count, 100.0 * zero_runway / frame_count)
+        )
 
     med_full_miss = 0.0
     med_runway_miss = 0.0
@@ -841,27 +863,27 @@ def analyze_cache(rows, fps, span_s):
     if stalls:
         # Show how far the refused cache target sat from the protected frame.
         sample = stalls[: min(3, len(stalls))]
-        for r in sample:
-            e = parse_extra(r["extra"])
+        for row in sample:
+            extra_fields = parse_extra(row["extra"])
             print(
                 "      want frame %s (util %s) but protected cached frame %s (util %s); displayFrame %s"
                 % (
-                    e.get("cacheFrame", "?"),
-                    e.get("cacheUtil", "?"),
-                    e.get("freeFrame", "?"),
-                    e.get("freeUtil", "?"),
-                    e.get("displayFrame", "?"),
+                    extra_fields.get("cacheFrame", "?"),
+                    extra_fields.get("cacheUtil", "?"),
+                    extra_fields.get("freeFrame", "?"),
+                    extra_fields.get("freeUtil", "?"),
+                    extra_fields.get("displayFrame", "?"),
                 )
             )
 
     return {
-        "count": n,
+        "count": frame_count,
         "misses": misses,
         "miss_rate": miss_rate,
         "miss_overflow": miss_overflow,
         "med_full_at_miss": med_full_miss,
         "med_runway_at_miss": med_runway_miss,
-        "zero_runway_frac": (zero_runway / n) if n else 0.0,
+        "zero_runway_frac": (zero_runway / frame_count) if frame_count else 0.0,
         "cachestalls": len(stalls),
         "otf_count": len(otf_ms),
     }
@@ -884,29 +906,29 @@ def analyze_stall_causes(rows, fps):
     budget = 1000.0 / fps if fps > 0 else 0.0
 
     disp = []
-    for r in rows:
-        if r["event"] != "display":
+    for row in rows:
+        if row["event"] != "display":
             continue
-        e = parse_extra(r["extra"])
+        extra_fields = parse_extra(row["extra"])
         try:
-            interval = float(e.get("interval", "0"))
-            ev = float(e.get("eval", "0"))
-            rd = float(e.get("render", "0"))
+            interval = float(extra_fields.get("interval", "0"))
+            eval_ms = float(extra_fields.get("eval", "0"))
+            render_ms = float(extra_fields.get("render", "0"))
         except ValueError:
             continue
         try:
-            reqs = int(e.get("reqs", "-1"))
+            reqs = int(extra_fields.get("reqs", "-1"))
         except ValueError:
             reqs = -1
         try:
-            outside_gap = float(e.get("outsideGap", "-1"))
+            outside_gap = float(extra_fields.get("outsideGap", "-1"))
         except ValueError:
             outside_gap = -1.0
         try:
-            df = int(e.get("dframe", "0"))
+            dframe = int(extra_fields.get("dframe", "0"))
         except ValueError:
-            df = 0
-        disp.append((r["t_ms"], interval, ev, rd, reqs, outside_gap, df))
+            dframe = 0
+        disp.append((row["t_ms"], interval, eval_ms, render_ms, reqs, outside_gap, dframe))
 
     print("=" * 72)
     print("STALL ANATOMY  --  where does a slow redraw spend its time?")
@@ -917,23 +939,23 @@ def analyze_stall_causes(rows, fps):
 
     # Decode windows [start,end] with the concurrency reported at decode start.
     decodes = []
-    for r in rows:
-        if r["event"] != "decode":
+    for row in rows:
+        if row["event"] != "decode":
             continue
-        e = parse_extra(r.get("extra", ""))
+        extra_fields = parse_extra(row.get("extra", ""))
         try:
-            conc = int(e.get("concurrency", "1"))
+            conc = int(extra_fields.get("concurrency", "1"))
         except ValueError:
             conc = 1
-        decodes.append((r["t_ms"] - r["dur_ms"], r["t_ms"], conc))
+        decodes.append((row["t_ms"] - row["dur_ms"], row["t_ms"], conc))
     decodes.sort()
-    dec_starts = [d[0] for d in decodes]
+    dec_starts = [decode[0] for decode in decodes]
 
     # Per-render event-processing handler samples (GUI-thread Mu/Python work
     # that runs between paints). Used to split the "outside render_v2" bucket
     # into event-loop-handler time vs present (swapBuffers/vsync) time.
-    perrender = sorted((r["t_ms"], r["dur_ms"]) for r in rows if r["event"] == "perrender")
-    pr_ts = [p[0] for p in perrender]
+    perrender = sorted((row["t_ms"], row["dur_ms"]) for row in rows if row["event"] == "perrender")
+    pr_ts = [sample[0] for sample in perrender]
 
     # Optional GPU-completion probe (RV_DIAG_GLFINISH): paint events carry
     # gpuFinish = glFinish() time right after render(), i.e. how long the GPU
@@ -945,50 +967,54 @@ def analyze_stall_causes(rows, fps):
     # its own QOpenGLWindow surface and does not serialize with the window.)
     gpu_all = []
     gpu_gap = []  # (gap, gpuFinish) pairs for paints where glFinish was active
-    for r in rows:
-        if r["event"] != "paint":
+    for row in rows:
+        if row["event"] != "paint":
             continue
-        e = parse_extra(r["extra"])
+        extra_fields = parse_extra(row["extra"])
         try:
-            g = float(e.get("gpuFinish", "-1"))
-            gp = float(e.get("gap", "-1"))
+            gpu_finish_ms = float(extra_fields.get("gpuFinish", "-1"))
+            paint_gap_ms = float(extra_fields.get("gap", "-1"))
         except ValueError:
             continue
-        if g >= 0:
-            gpu_all.append(g)
-            if gp >= 0:
-                gpu_gap.append((gp, g))
+        if gpu_finish_ms >= 0:
+            gpu_all.append(gpu_finish_ms)
+            if paint_gap_ms >= 0:
+                gpu_gap.append((paint_gap_ms, gpu_finish_ms))
 
-    def perrender_in(a, b):
-        """Sum of per-render handler time whose events fall within [a,b]."""
+    def perrender_in(start_ms, end_ms):
+        """Sum of per-render handler time whose events fall within [start_ms, end_ms]."""
         import bisect
 
-        lo = bisect.bisect_left(pr_ts, a)
-        hi = bisect.bisect_right(pr_ts, b)
-        return sum(perrender[i][1] for i in range(lo, hi))
+        low = bisect.bisect_left(pr_ts, start_ms)
+        high = bisect.bisect_right(pr_ts, end_ms)
+        return sum(perrender[i][1] for i in range(low, high))
 
-    def max_conc_in(a, b):
-        """Max decode concurrency for any decode window overlapping [a,b]."""
+    def max_conc_in(start_ms, end_ms):
+        """Max decode concurrency for any decode window overlapping [start_ms, end_ms]."""
         import bisect
 
-        # any decode with start <= b and end >= a
-        hi = bisect.bisect_right(dec_starts, b)
+        # any decode with start <= end_ms and end >= start_ms
+        high = bisect.bisect_right(dec_starts, end_ms)
         best = 0
-        # scan backwards from hi while decode start could still overlap; decode
+        # scan backwards from high while decode start could still overlap; decode
         # durations are bounded (<~0.3s) but we simply scan the candidates whose
-        # start < b and check end >= a.
-        for i in range(hi - 1, -1, -1):
-            s, e2, c = decodes[i]
-            if e2 >= a:
-                if c > best:
-                    best = c
-            # stop once starts are far enough before 'a' that no window reaches
-            if s < a - 400.0:
+        # start < end_ms and check end >= start_ms.
+        for i in range(high - 1, -1, -1):
+            decode_start, decode_end, decode_conc = decodes[i]
+            if decode_end >= start_ms:
+                if decode_conc > best:
+                    best = decode_conc
+            # stop once starts are far enough before start_ms that no window reaches
+            if decode_start < start_ms - 400.0:
                 break
         return best
 
-    slow = [d for d in disp if d[1] > budget * 1.5]
-    outside_all = [max(0.0, d[1] - d[2] - d[3]) for d in disp if d[1] > 0]
+    slow = [display_event for display_event in disp if display_event[1] > budget * 1.5]
+    outside_all = [
+        max(0.0, display_event[1] - display_event[2] - display_event[3])
+        for display_event in disp
+        if display_event[1] > 0
+    ]
 
     # New-frame vs repeat present time. In Play-All-Frames a repeat re-shows the
     # already-resident GPU texture (cheap present), while a NEW frame must upload
@@ -996,12 +1022,12 @@ def analyze_stall_causes(rows, fps):
     # almost entirely on NEW frames, the stall is the synchronous GPU texture
     # upload (threaded upload OFF), not a uniform desktop-compositor/vsync
     # problem -- which points the fix at async/threaded upload or prefetch.
-    new_gap = sorted(d[5] for d in disp if d[6] != 0 and d[5] >= 0)
-    rep_gap = sorted(d[5] for d in disp if d[6] == 0 and d[5] >= 0)
+    new_gap = sorted(display_event[5] for display_event in disp if display_event[6] != 0 and display_event[5] >= 0)
+    rep_gap = sorted(display_event[5] for display_event in disp if display_event[6] == 0 and display_event[5] >= 0)
     if new_gap and rep_gap:
         stall_line = budget * 1.5
-        new_stalls = sum(1 for g in new_gap if g > stall_line)
-        rep_stalls = sum(1 for g in rep_gap if g > stall_line)
+        new_stalls = sum(1 for gap in new_gap if gap > stall_line)
+        rep_stalls = sum(1 for gap in rep_gap if gap > stall_line)
         print("  present (outsideGap) by frame kind:")
         print(
             "      NEW frames (dframe!=0) : median %.2f ms  p95 %.2f  (n=%d)  stalls>%.0fms: %d (%.0f%%)"
@@ -1046,9 +1072,12 @@ def analyze_stall_causes(rows, fps):
             print("         not new-frame texture upload.")
 
     if outside_all:
-        so = sorted(outside_all)
+        sorted_outside = sorted(outside_all)
         print("  'outside' time per redraw (interval - eval - render):")
-        print("      median %.2f ms  p95 %.2f ms  max %.2f ms" % (median(so), percentile(so, 95.0), so[-1]))
+        print(
+            "      median %.2f ms  p95 %.2f ms  max %.2f ms"
+            % (median(sorted_outside), percentile(sorted_outside, 95.0), sorted_outside[-1])
+        )
         print("      (at 60Hz vsync ~16 ms of this is the normal swap wait)")
 
     if not slow:
@@ -1063,9 +1092,9 @@ def analyze_stall_causes(rows, fps):
     # platform that gates requestUpdate() on the display refresh, the window's
     # update request was itself throttled.
     HEARTBEAT_MS = 1000.0 / 120.0
-    slow_reqs = [d[4] for d in slow if d[4] >= 0]
+    slow_reqs = [display_event[4] for display_event in slow if display_event[4] >= 0]
     if slow_reqs:
-        exp = [max(1.0, d[1] / HEARTBEAT_MS) for d in slow if d[4] >= 0]
+        exp = [max(1.0, display_event[1] / HEARTBEAT_MS) for display_event in slow if display_event[4] >= 0]
         got = sorted(slow_reqs)
         print("  heartbeat requests coalesced per stalled paint:")
         print("      observed reqs/paint : median %.1f  p95 %.1f" % (median(got), percentile(got, 95.0)))
@@ -1087,13 +1116,19 @@ def analyze_stall_causes(rows, fps):
     #   outside render_v2  : outsideGap
     #                        (paintGL rest + swapBuffers/vsync + update-request
     #                         delivery + event loop)
-    slow_gap = [d for d in slow if d[5] >= 0]
+    slow_gap = [display_event for display_event in slow if display_event[5] >= 0]
     if slow_gap:
-        og = sorted(d[5] for d in slow_gap)
-        inside = sorted(max(0.0, d[1] - d[5]) for d in slow_gap)
-        rest_rv2 = sorted(max(0.0, d[1] - d[5] - d[2] - d[3]) for d in slow_gap)
-        print("  stalled interval split (where the ~%.0f ms goes):" % median(sorted(d[1] for d in slow_gap)))
-        print("      outside render_v2  : median %.2f ms  (present/swap + event loop)" % median(og))
+        outside_gaps = sorted(display_event[5] for display_event in slow_gap)
+        inside = sorted(max(0.0, display_event[1] - display_event[5]) for display_event in slow_gap)
+        rest_rv2 = sorted(
+            max(0.0, display_event[1] - display_event[5] - display_event[2] - display_event[3])
+            for display_event in slow_gap
+        )
+        print(
+            "  stalled interval split (where the ~%.0f ms goes):"
+            % median(sorted(display_event[1] for display_event in slow_gap))
+        )
+        print("      outside render_v2  : median %.2f ms  (present/swap + event loop)" % median(outside_gaps))
         print("      inside render_v2   : median %.2f ms  (eval + render + frameChangeEvent)" % median(inside))
         print(
             "      rest of render_v2  : median %.2f ms  (frameChangeEvent/graph, excl eval+render)" % median(rest_rv2)
@@ -1105,17 +1140,17 @@ def analyze_stall_causes(rows, fps):
         if perrender:
             handler = []
             swap = []
-            for d in slow_gap:
-                t, gap = d[0], d[5]
-                h = perrender_in(t - gap, t)
-                handler.append(h)
-                swap.append(max(0.0, gap - h))
-            mh = median(sorted(handler))
-            ms = median(sorted(swap))
+            for display_event in slow_gap:
+                timestamp, gap = display_event[0], display_event[5]
+                handler_ms = perrender_in(timestamp - gap, timestamp)
+                handler.append(handler_ms)
+                swap.append(max(0.0, gap - handler_ms))
+            median_handler_ms = median(sorted(handler))
+            median_swap_ms = median(sorted(swap))
             print("      -- outside split (via perrender events) --")
-            print("      event-loop handler : median %.2f ms  (per-render Mu/Python on GUI thread)" % mh)
-            print("      present + swap     : median %.2f ms  (swapBuffers / vsync / req delivery)" % ms)
-            if mh >= ms:
+            print("      event-loop handler : median %.2f ms  (per-render Mu/Python on GUI thread)" % median_handler_ms)
+            print("      present + swap     : median %.2f ms  (swapBuffers / vsync / req delivery)" % median_swap_ms)
+            if median_handler_ms >= median_swap_ms:
                 print("      -> the stall is the PER-RENDER EVENT HANDLER blocking the GUI thread")
                 print("         (userGenericEvent 'per-render-event-processing' -> Mu/Python).")
                 print("         Fix target: make that handler cheap/async, not the present path.")
@@ -1129,13 +1164,17 @@ def analyze_stall_causes(rows, fps):
 
         # GPU-completion probe (only present when run with RV_DIAG_GLFINISH=1).
         if gpu_all:
-            ga = sorted(gpu_all)
+            sorted_gpu = sorted(gpu_all)
             print("      -- GPU probe (RV_DIAG_GLFINISH: glFinish after render) --")
             print(
                 "      gpuFinish (GPU exec) : median %.2f ms  p95 %.2f  max %.2f  (n=%d)"
-                % (median(ga), percentile(ga, 95.0), ga[-1], len(ga))
+                % (median(sorted_gpu), percentile(sorted_gpu, 95.0), sorted_gpu[-1], len(sorted_gpu))
             )
-            slow_gpu = sorted(g for (gp, g) in gpu_gap if (gp + g) > budget * 1.5)
+            slow_gpu = sorted(
+                gpu_finish_ms
+                for (paint_gap_ms, gpu_finish_ms) in gpu_gap
+                if (paint_gap_ms + gpu_finish_ms) > budget * 1.5
+            )
             if slow_gpu:
                 print(
                     "      on stalled paints    : gpuFinish median %.2f ms  p95 %.2f"
@@ -1149,20 +1188,20 @@ def analyze_stall_causes(rows, fps):
                 print("         the synchronous texture upload/render of new frames is the")
                 print("         bottleneck. Fix: async/threaded upload, PBO streaming, prefetch")
                 print("         the next frame, or reduce upload cost -- NOT the present path.")
-            elif percentile(ga, 95.0) > budget * 1.5:
+            elif percentile(sorted_gpu, 95.0) > budget * 1.5:
                 print("      -> GPU execution stalls on the tail: upload/render bound.")
             else:
                 print("      -> GPU finishes fast even on stalls: the block is AFTER the GPU is")
                 print("         done -> the swapBuffers/vsync present path (or the desktop")
                 print("         compositor), not upload.")
-        elif median(og) >= median(inside):
+        elif median(outside_gaps) >= median(inside):
             print("      -> the stall is OUTSIDE render_v2 (present + event loop). Rebuild with the")
             print("         paint/perrender instrumentation to split swap vs event-handler.")
 
-    s_iv = sorted(d[1] for d in slow)
-    s_ev = sorted(d[2] for d in slow)
-    s_rd = sorted(d[3] for d in slow)
-    s_out = sorted(max(0.0, d[1] - d[2] - d[3]) for d in slow)
+    s_iv = sorted(display_event[1] for display_event in slow)
+    s_ev = sorted(display_event[2] for display_event in slow)
+    s_rd = sorted(display_event[3] for display_event in slow)
+    s_out = sorted(max(0.0, display_event[1] - display_event[2] - display_event[3]) for display_event in slow)
     print("  slow redraws (> %.1f ms) : %d" % (budget * 1.5, len(slow)))
     print("      interval  : median %.2f  p95 %.2f  max %.2f ms" % (median(s_iv), percentile(s_iv, 95.0), s_iv[-1]))
     print("      eval      : median %.2f  p95 %.2f ms" % (median(s_ev), percentile(s_ev, 95.0)))
@@ -1176,21 +1215,24 @@ def analyze_stall_causes(rows, fps):
     overlap_hi = 0
     iv_overlap_hi = []
     iv_no_decode = []
-    for d in slow:
-        t, iv = d[0], d[1]
-        mc = max_conc_in(t - iv, t)
-        if mc >= 1:
+    for display_event in slow:
+        timestamp, slow_interval = display_event[0], display_event[1]
+        max_conc = max_conc_in(timestamp - slow_interval, timestamp)
+        if max_conc >= 1:
             overlap_any += 1
-        if mc >= 3:
+        if max_conc >= 3:
             overlap_hi += 1
-            iv_overlap_hi.append(iv)
+            iv_overlap_hi.append(slow_interval)
         else:
-            iv_no_decode.append(iv)
-    n = len(slow)
-    frac_hi = overlap_hi / n if n else 0.0
+            iv_no_decode.append(slow_interval)
+    slow_count = len(slow)
+    frac_hi = overlap_hi / slow_count if slow_count else 0.0
     print("  decode overlap of slow redraws:")
-    print("      overlapped ANY decode      : %d / %d (%.0f%%)" % (overlap_any, n, 100.0 * overlap_any / n))
-    print("      overlapped 3+ concurrent   : %d / %d (%.0f%%)" % (overlap_hi, n, 100.0 * frac_hi))
+    print(
+        "      overlapped ANY decode      : %d / %d (%.0f%%)"
+        % (overlap_any, slow_count, 100.0 * overlap_any / slow_count)
+    )
+    print("      overlapped 3+ concurrent   : %d / %d (%.0f%%)" % (overlap_hi, slow_count, 100.0 * frac_hi))
     if iv_overlap_hi and iv_no_decode:
         print("      median slow-redraw interval when 3+ decodes active : %.2f ms" % median(sorted(iv_overlap_hi)))
         print("      median slow-redraw interval otherwise              : %.2f ms" % median(sorted(iv_no_decode)))
@@ -1204,7 +1246,7 @@ def analyze_stall_causes(rows, fps):
         print("     heartbeat/update timer and vsync swap on the main thread.")
 
     return {
-        "stalls": n,
+        "stalls": slow_count,
         "decode_overlap_frac": frac_hi,
         "median_outside_ms": median(s_out),
     }
@@ -1225,7 +1267,7 @@ def analyze_upload(rows, fps):
       * pbo=1 and cpuGBps high    -> CPU submit is fine; the cost is GPU-side DMA
                                      (see gpuFinish); suspect format conversion
     """
-    ups = [r for r in rows if r["event"] == "upload"]
+    ups = [row for row in rows if row["event"] == "upload"]
     print("=" * 72)
     print("GPU TEXTURE UPLOAD  --  ImageRenderer::uploadPlane() (Option A)")
     print("=" * 72)
@@ -1239,39 +1281,44 @@ def analyze_upload(rows, fps):
     pbo_yes = 0
     update_yes = 0
     by_res = defaultdict(lambda: {"n": 0, "cpu": [], "gbps": [], "pbo": 0, "pbo_gbps": [], "nopbo_gbps": []})
-    for r in ups:
-        e = parse_extra(r["extra"])
-        cpu_ms.append(r["dur_ms"])
+    for row in ups:
+        extra_fields = parse_extra(row["extra"])
+        cpu_ms.append(row["dur_ms"])
         try:
-            g = float(e.get("cpuGBps", "0"))
+            cpu_gbps = float(extra_fields.get("cpuGBps", "0"))
         except ValueError:
-            g = 0.0
-        gbps.append(g)
-        is_pbo = e.get("pbo", "0") == "1"
+            cpu_gbps = 0.0
+        gbps.append(cpu_gbps)
+        is_pbo = extra_fields.get("pbo", "0") == "1"
         if is_pbo:
             pbo_yes += 1
-        if e.get("update", "0") == "1":
+        if extra_fields.get("update", "0") == "1":
             update_yes += 1
-        key = "%sx%s ch%s ty%s" % (e.get("w", "?"), e.get("h", "?"), e.get("ch", "?"), e.get("type", "?"))
-        b = by_res[key]
-        b["n"] += 1
-        b["cpu"].append(r["dur_ms"])
-        b["gbps"].append(g)
+        key = "%sx%s ch%s ty%s" % (
+            extra_fields.get("w", "?"),
+            extra_fields.get("h", "?"),
+            extra_fields.get("ch", "?"),
+            extra_fields.get("type", "?"),
+        )
+        bucket = by_res[key]
+        bucket["n"] += 1
+        bucket["cpu"].append(row["dur_ms"])
+        bucket["gbps"].append(cpu_gbps)
         if is_pbo:
-            b["pbo"] += 1
-            b["pbo_gbps"].append(g)
+            bucket["pbo"] += 1
+            bucket["pbo_gbps"].append(cpu_gbps)
         else:
-            b["nopbo_gbps"].append(g)
+            bucket["nopbo_gbps"].append(cpu_gbps)
 
-    n = len(ups)
+    upload_count = len(ups)
     cpu_s = sorted(cpu_ms)
     gbps_s = sorted(gbps)
-    pbo_frac = pbo_yes / n
+    pbo_frac = pbo_yes / upload_count
 
-    print("  upload events         : %d plane upload(s)" % n)
+    print("  upload events         : %d plane upload(s)" % upload_count)
     print(
         "  PBO fast path used    : %d / %d (%.1f%%)   sub-image updates: %d"
-        % (pbo_yes, n, 100.0 * pbo_frac, update_yes)
+        % (pbo_yes, upload_count, 100.0 * pbo_frac, update_yes)
     )
     print(
         "  CPU submit time (ms)  : mean %.2f  median %.2f  p95 %.2f  max %.2f"
@@ -1280,23 +1327,30 @@ def analyze_upload(rows, fps):
     print("  CPU submit throughput : median %.2f GB/s  min %.2f GB/s" % (median(gbps_s), gbps_s[0]))
     print("")
     print("  by resolution/format  (frame size drives upload cost):")
-    for key, b in sorted(by_res.items(), key=lambda kv: -kv[1]["n"]):
-        cs = sorted(b["cpu"])
-        gs = sorted(b["gbps"])
+    for key, bucket in sorted(by_res.items(), key=lambda item: -item[1]["n"]):
+        sorted_cpu = sorted(bucket["cpu"])
+        sorted_gbps = sorted(bucket["gbps"])
         print(
             "    %-24s n=%-5d cpu med %.2f ms / p95 %.2f ms  cpuGBps med %.2f  pbo %d%%"
-            % (key, b["n"], median(cs), percentile(cs, 95.0), median(gs), int(round(100.0 * b["pbo"] / b["n"])))
+            % (
+                key,
+                bucket["n"],
+                median(sorted_cpu),
+                percentile(sorted_cpu, 95.0),
+                median(sorted_gbps),
+                int(round(100.0 * bucket["pbo"] / bucket["n"])),
+            )
         )
         #  Split throughput PBO vs non-PBO: a plain memcpy into the PBO does
         #  not depend on RGB-vs-RGBA, so if PBO throughput is uniform across
         #  formats the CPU-submit cost is purely the non-PBO fallback; the
         #  RGB16F penalty then lives on the GPU side (gpuFinish).
-        pg = sorted(b["pbo_gbps"])
-        ng = sorted(b["nopbo_gbps"])
-        if pg and ng:
+        sorted_pbo_gbps = sorted(bucket["pbo_gbps"])
+        sorted_nopbo_gbps = sorted(bucket["nopbo_gbps"])
+        if sorted_pbo_gbps and sorted_nopbo_gbps:
             print(
                 "        PBO med %.2f GB/s (n=%d)   non-PBO med %.2f GB/s (n=%d)"
-                % (median(pg), len(pg), median(ng), len(ng))
+                % (median(sorted_pbo_gbps), len(sorted_pbo_gbps), median(sorted_nopbo_gbps), len(sorted_nopbo_gbps))
             )
 
     print("")
@@ -1322,7 +1376,7 @@ def analyze_upload(rows, fps):
         print("     glTexSubImage2D: verify internalFormat vs (format,type) is a")
         print("     natively supported combo for GL_TEXTURE_RECTANGLE half-float.")
 
-    return {"count": n, "pbo_frac": pbo_frac, "cpu_gbps_med": median(gbps_s)}
+    return {"count": upload_count, "pbo_frac": pbo_frac, "cpu_gbps_med": median(gbps_s)}
 
 
 def verdict(dec, aud, buf, slow, disp, cache, fps):
@@ -1440,33 +1494,33 @@ def verdict(dec, aud, buf, slow, disp, cache, fps):
 
     if frame_reasons:
         print("  Frame-side evidence:")
-        for r in frame_reasons:
-            print("    - " + r)
+        for reason in frame_reasons:
+            print("    - " + reason)
     if display_reasons:
         print("  Display-side evidence:")
-        for r in display_reasons:
-            print("    - " + r)
+        for reason in display_reasons:
+            print("    - " + reason)
     if audio_reasons:
         print("  Audio-side evidence:")
-        for r in audio_reasons:
-            print("    - " + r)
+        for reason in audio_reasons:
+            print("    - " + reason)
     if cache_reasons:
         print("  Cache-side evidence:")
-        for r in cache_reasons:
-            print("    - " + r)
+        for reason in cache_reasons:
+            print("    - " + reason)
 
 
 def main(argv):
-    ap = argparse.ArgumentParser(description="Attribute OpenRV playback stutter to frame vs audio decode.")
-    ap.add_argument(
+    parser = argparse.ArgumentParser(description="Attribute OpenRV playback stutter to frame vs audio decode.")
+    parser.add_argument(
         "log",
         nargs="?",
         default="rv-playback-diag.log",
         help="path to the RV_PLAYBACK_DIAG log (default: rv-playback-diag.log)",
     )
-    ap.add_argument("--fps", type=float, default=24.0, help="target playback fps of the session (default: 24)")
-    ap.add_argument("--rvprof", default=None, help="optional .rvprof file from -debug profile")
-    args = ap.parse_args(argv)
+    parser.add_argument("--fps", type=float, default=24.0, help="target playback fps of the session (default: 24)")
+    parser.add_argument("--rvprof", default=None, help="optional .rvprof file from -debug profile")
+    args = parser.parse_args(argv)
 
     if not os.path.isfile(args.log):
         # Do not interpolate untrusted paths into shells or file APIs beyond this
@@ -1479,15 +1533,15 @@ def main(argv):
         sys.stderr.write("ERROR: no diagnostic rows parsed from %s\n" % args.log)
         return 2
 
-    t_min = min(r["t_ms"] for r in rows)
-    t_max = max(r["t_ms"] for r in rows)
+    t_min = min(row["t_ms"] for row in rows)
+    t_max = max(row["t_ms"] for row in rows)
     span_s = max(0.0, (t_max - t_min) / 1000.0)
 
     print("OpenRV playback diagnostics: %s" % args.log)
     print("  rows=%d  span=%.1f s  target_fps=%.3f" % (len(rows), span_s, args.fps))
     print("")
 
-    decode_rows = [r for r in rows if r["event"] == "decode"]
+    decode_rows = [row for row in rows if row["event"] == "decode"]
     dec = analyze_decode(decode_rows, args.fps, span_s)
     print("")
     aud = analyze_audio(rows, span_s)

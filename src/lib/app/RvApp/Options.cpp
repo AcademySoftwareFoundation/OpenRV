@@ -169,14 +169,14 @@ namespace Rv
     int automaticExrThreadCount()
     {
         //  Explicit override wins (for tuning without a rebuild).
-        if (const char* v = getenv("RV_EXR_AUTO_MAX_THREADS"))
+        if (const char* overrideValue = getenv("RV_EXR_AUTO_MAX_THREADS"))
         {
             constexpr int kDecimalBase = 10;
             char* end = nullptr;
-            const long n = strtol(v, &end, kDecimalBase);
-            if (end != v && *end == '\0' && n > 0 && n <= INT_MAX)
+            const long threadCount = strtol(overrideValue, &end, kDecimalBase);
+            if (end != overrideValue && *end == '\0' && threadCount > 0 && threadCount <= INT_MAX)
             {
-                return static_cast<int>(n);
+                return static_cast<int>(threadCount);
             }
         }
 
