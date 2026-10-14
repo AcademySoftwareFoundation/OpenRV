@@ -12,6 +12,7 @@
 #include <QSurfaceFormat>
 #include <QImage>
 #include <QSize>
+#include <string>
 
 class QOpenGLContext;
 class QWindow;
@@ -21,6 +22,10 @@ namespace Rv
     class RvDocument;
     class QTGLVideoDevice;
     class GLWindow;
+
+    // -debug gpu helpers shared by GLView and GLWindow.
+    std::string glDebugEnvOrUnset(const char* name);
+    std::string glDebugFormatSummary(const QSurfaceFormat& format);
 
     //
     //  GLView
@@ -69,7 +74,9 @@ namespace Rv
 
         void stopProcessingEvents();
 
-        void setCursor(const QCursor& cursor);
+        //  Forwards key and shortcut events of a watched object to RV's event
+        //  system (e.g. the Session Manager dock, via mainViewWidget()).
+        bool eventFilter(QObject* object, QEvent* event) override;
 
         bool firstPaintCompleted() const;
 
@@ -110,7 +117,9 @@ namespace Rv
         void reattachGLWindow();
 
     protected:
+        bool event(QEvent* event) override;
         void showEvent(QShowEvent*) override;
+        void resizeEvent(QResizeEvent* event) override;
 
     private:
         RvDocument* m_doc;

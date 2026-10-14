@@ -47,6 +47,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <cmath>
+#include <optional>
 
 #define MIN_WORK_ITEM_THREADS 1
 #define MAX_WORK_ITEM_THREADS 4
@@ -746,6 +747,195 @@ namespace IPCore
         m_rootNode->appendInput(displayGroup);
     }
 
+    namespace
+    {
+        using VideoDeviceList = std::vector<TwkApp::VideoDevice*>;
+
+        VideoDeviceList collectDevices(const IPGraph::VideoModules& modules)
+        {
+            VideoDeviceList devices;
+
+            for (const auto& module : modules)
+            {
+                const TwkApp::VideoModule::VideoDevices& moduleDevices = module->devices();
+                devices.insert(devices.end(), moduleDevices.begin(), moduleDevices.end());
+            }
+
+            return devices;
+        }
+
+        std::string firstStringValue(const DisplayGroupIPNode* group, const std::string& propertyName)
+        {
+            const StringProperty* prop = group->property<StringProperty>(propertyName);
+            return (prop && !prop->empty()) ? prop->front() : "";
+        }
+
+        //
+        //  Match on the stored names, never on physicalDevice(): that pointer
+        //  refers to a device the caller has already destroyed.
+        //
+        std::optional<size_t> findMatchingDevice(const DisplayGroupIPNode* group, const VideoDeviceList& devices,
+                                                 const std::vector<bool>& deviceMatched)
+        {
+            const std::string groupName = firstStringValue(group, "device.name");
+            const std::string groupModule = firstStringValue(group, "device.moduleName");
+
+            for (size_t index = 0; index < devices.size(); ++index)
+            {
+                if (deviceMatched[index])
+                {
+                    continue;
+                }
+
+                const TwkApp::VideoDevice* device = devices[index];
+                const std::string deviceModule = device->module() ? device->module()->name() : "";
+
+                if (device->name() == groupName && deviceModule == groupModule)
+                {
+                    return index;
+                }
+            }
+
+            return std::nullopt;
+        }
+
+        //
+        //  Drop a dangling output pointer: findDisplayGroupByDevice() compares
+        //  pointers and it could alias a new device. The control device is
+        //  still alive, so keep it.
+        //
+        void dropStaleOutputDevice(DisplayGroupIPNode* group, const VideoDeviceList& devices, const TwkApp::VideoDevice* controlDevice)
+        {
+            const TwkApp::VideoDevice* output = group->outputDevice();
+
+            if (!output || output == controlDevice)
+            {
+                return;
+            }
+
+            if (std::find(devices.begin(), devices.end(), output) == devices.end())
+            {
+                group->setOutputVideoDevice(nullptr);
+            }
+        }
+    } // namespace
+
+    void IPGraph::refreshPhysicalDevices(const VideoModules& modules)
+    {
+        beginGraphEdit();
+        refreshPhysicalDevicesInternal(modules);
+        endGraphEdit();
+    }
+
+    void IPGraph::detachDisplayGroup(DisplayGroupIPNode* group)
+    {
+        if (m_rootNode->isInput(group))
+        {
+            m_rootNode->removeInput(group);
+        }
+
+        group->willDelete();
+        group->disconnectInputs();
+    }
+
+    std::string IPGraph::uniqueDisplayGroupName() const
+    {
+        size_t suffix = m_displayGroups.size();
+        std::string name;
+
+        do
+        {
+            name = "displayGroup" + std::to_string(suffix++);
+        } while (findNode(name));
+
+        return name;
+    }
+
+    void IPGraph::refreshPhysicalDevicesInternal(const VideoModules& modules)
+    {
+        //
+        //  Unlike setPhysicalDevicesInternal(), keep the existing display groups
+        //  so their colour pipelines survive. Groups are matched to devices by
+        //  (module name, device name), which is stable while the monitors are.
+        //
+
+        const VideoDeviceList devices = collectDevices(modules);
+
+        //
+        //  Nothing to preserve.
+        //
+        if (devices.empty() || m_displayGroups.empty())
+        {
+            setPhysicalDevicesInternal(modules);
+            return;
+        }
+
+        std::vector<bool> deviceMatched(devices.size(), false);
+        DisplayGroups survivors;
+        DisplayGroups doomed;
+
+        for (DisplayGroupIPNode* group : m_displayGroups)
+        {
+            if (group == m_defaultOutputGroup)
+            {
+                survivors.push_back(group);
+                continue;
+            }
+
+            const std::optional<size_t> match = findMatchingDevice(group, devices, deviceMatched);
+
+            if (!match)
+            {
+                //  The group's device is gone (e.g. a monitor was unplugged).
+                detachDisplayGroup(group);
+                doomed.push_back(group);
+                continue;
+            }
+
+            deviceMatched[*match] = true;
+            group->setPhysicalVideoDevice(devices[*match]);
+            dropStaleOutputDevice(group, devices, m_controlDevice);
+            survivors.push_back(group);
+        }
+
+        //
+        //  Publish the surviving set before deleting anything: ~DisplayGroupIPNode
+        //  calls back into removeDisplayGroup().
+        //
+        m_displayGroups = survivors;
+
+        for (DisplayGroupIPNode* group : doomed)
+        {
+            delete group;
+            m_topologyChanged = true;
+        }
+
+        //
+        //  Unmatched devices are new.
+        //
+        for (size_t index = 0; index < devices.size(); ++index)
+        {
+            if (!deviceMatched[index])
+            {
+                m_displayGroups.push_back(newDisplayGroup(uniqueDisplayGroupName(), devices[index]));
+            }
+        }
+
+        //
+        //  The primary may have been deleted above, so re-establish the view
+        //  connection and the root input for whichever group leads now.
+        //
+        if (DisplayGroupIPNode* displayGroup = primaryDisplayGroup())
+        {
+            displayGroup->setInputs1(m_viewGroupNode);
+
+            if (!m_rootNode->isInput(displayGroup))
+            {
+                m_rootNode->appendInput(displayGroup);
+            }
+        }
+    }
+
     void IPGraph::setPrimaryDisplayGroup(DisplayGroupIPNode* node)
     {
         DisplayGroups::iterator i = std::find(m_displayGroups.begin(), m_displayGroups.end(), node);
@@ -798,7 +988,20 @@ namespace IPCore
             if (newDevice)
             {
                 dnode->setOutputVideoDevice(newDevice);
-                dnode->setPhysicalVideoDevice(newDevice->physicalDevice());
+
+                //
+                //  A view that has not rendered yet reports itself as its own
+                //  physical device. Keep the group's monitor in that case, or
+                //  its device.name no longer matches on refreshPhysicalDevices().
+                //
+                if (const VideoDevice* physical = newDevice->physicalDevice())
+                {
+                    if (physical != newDevice)
+                    {
+                        dnode->setPhysicalVideoDevice(physical);
+                    }
+                }
+
                 m_deviceChangedSignal(oldDevice, newDevice);
             }
         }

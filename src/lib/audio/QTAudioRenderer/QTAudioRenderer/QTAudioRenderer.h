@@ -111,6 +111,12 @@ namespace IPCore
 
         void startMe();
 
+        //
+        //  Stop the device and the thread. Returns false if the thread did
+        //  not exit in time; it must then be leaked, not destroyed.
+        //
+        bool detachAudioOutputDevice();
+
         size_t processedSamples() const;
         void setProcessedSamples(size_t n);
 
@@ -165,7 +171,22 @@ namespace IPCore
     private:
         bool createAudioOutput();
 
-        void detachAudioOutputDevice();
+        //
+        //  True if a BlockingQueuedConnection call to this thread can return:
+        //  it is running an event loop and is not the calling thread.
+        //
+        bool canBlockOnAudioThread() const;
+
+        //
+        //  Bounded wait(); reports once and returns false if the bound is
+        //  reached.
+        //
+        bool waitForAudioThreadToFinish();
+
+        //
+        //  Delete the output objects and null them. Idempotent.
+        //
+        void deleteAudioOutputObjects();
 
     private:
         QMutex m_mutex;

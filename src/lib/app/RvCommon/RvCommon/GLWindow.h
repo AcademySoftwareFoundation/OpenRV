@@ -61,6 +61,8 @@ namespace Rv
 
         bool event(QEvent*) override;
 
+        bool eventFilter(QObject* object, QEvent* event) override;
+
         bool firstPaintCompleted() const { return m_firstPaintCompleted; }
 
         // Absolute (global) top-left position of the surface in pixels.
@@ -83,6 +85,9 @@ namespace Rv
         //  without a change of logical size. See the definition.
         void syncDevicePixelRatio();
 
+        //  Closes the -debug profile sample opened by paintGL() once the window has presented.
+        void endProfilingSwap();
+
         RvDocument* m_doc;
         QTGLVideoDevice* m_videoDevice;
         unsigned int m_lastKey;
@@ -100,6 +105,7 @@ namespace Rv
         bool m_stopProcessingEvents;
         float m_devicePixelRatio;
         bool m_syncingDevicePixelRatio;
+        bool m_profilingSwapPending;
         QOpenGLContext* m_sharedContext;
     };
 
