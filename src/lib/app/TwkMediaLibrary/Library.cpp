@@ -346,7 +346,6 @@ namespace TwkMediaLibrary
         , m_appName(appName)
         , m_name(typeName)
         , m_taskStop(false)
-        , m_taskThread(threadTrampoline, this)
     {
         // globalLibraryMap[typeName] = this;
     }
@@ -359,8 +358,10 @@ namespace TwkMediaLibrary
             m_taskCond.notify_one();
         }
 
-        m_taskThread.join();
-
+        if (m_taskThread.joinable())
+        {
+            m_taskThread.join();
+        }
         //
         //  willDeleteSignal() should be sent by derived classes. Its sent
         //  here as a stop-gap but if this is used is almost certain going
@@ -636,7 +637,7 @@ namespace TwkMediaLibrary
 
     const Task* Library::referencesToNodeASync(const Node*, PropertyQueryResultFunction) const { return 0; }
 
-    void Library::threadTrampoline(Library* library) { library->threadMain(); }
+    void Library::start() { m_taskThread = Thread(&Library::threadMain, this); }
 
     void Library::addTask(Task* item) const
     {
