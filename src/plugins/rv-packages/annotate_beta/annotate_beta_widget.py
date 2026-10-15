@@ -597,7 +597,11 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         with QtCore.QSignalBlocker(combo):
             while self._font_queue and time.perf_counter() < deadline:
                 name = self._font_queue.popleft()
-                if QtGui.QFontDatabase.isSmoothlyScalable(name):
+                # Skip fonts without an 'hhea' table (e.g. macOS "GB18030 Bitmap"): Qt warns
+                # it can't compute their bearings when laying out text.
+                if QtGui.QFontDatabase.isSmoothlyScalable(name) and QtGui.QRawFont.fromFont(
+                    QtGui.QFont(name)
+                ).fontTable("hhea"):
                     combo.addItem(name)
                     if name == self._pending_family:
                         combo.setCurrentIndex(combo.count() - 1)
