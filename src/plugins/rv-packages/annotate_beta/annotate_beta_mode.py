@@ -37,7 +37,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._auto_save_settings = True
 
         self._engine = AnnotateDrawEngine(
-            self._settings, self._update_undo_redo_buttons, self._hide_color_picker, self._sample_eyedropper
+            self._settings, self._update_history_buttons, self._hide_color_picker, self._sample_eyedropper
         )
 
         # sortKey "z" (same as the legacy annotate_mode) orders this mode's global table
@@ -71,7 +71,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         _set_tool_cursor(self._settings.tool)
         self._update_tool_availability()
-        self._update_undo_redo_buttons()
+        self._engine.scan_visible_frames()
+        self._update_history_buttons()
         paint.set_tags()
 
     def deactivate(self):
@@ -303,11 +304,15 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _hide_color_picker(self):
         self._dock.toolbar_widget.hide_popups()
 
-    def _update_undo_redo_buttons(self):
+    def _update_history_buttons(self):
         can_undo, can_redo = self._engine.undo_redo_state()
         toolbar = self._dock.toolbar_widget
         toolbar.set_undo_enabled(can_undo)
         toolbar.set_redo_enabled(can_redo)
+        self._update_clear_buttons()
+
+    def _update_clear_buttons(self):
+        self._dock.toolbar_widget.set_clear_enabled(*self._engine.clear_state())
 
     def _update_tool_availability(self):
         """Enable/disable tools whose RV event categories are currently disabled."""
@@ -347,7 +352,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         if view_node and node == view_node:
             paint.remove_tags()
             paint.set_tags()
-            self._update_undo_redo_buttons()
+            self._update_history_buttons()
 
         event.reject()
 
@@ -357,7 +362,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_after_graph_view_change(self, event):
         paint.set_tags()
-        self._update_undo_redo_buttons()
+        self._update_history_buttons()
         event.reject()
 
     def _on_category_state_changed(self, event):
@@ -370,12 +375,22 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         A remote client's undo/redo/clear changes the annotation state on the current
         frame, so our undo/redo button enabled state may be stale.
         """
-        self._update_undo_redo_buttons()
+        self._update_history_buttons()
         event.reject()
 
     def _on_frame_dependent_state_changed(self, event):
         if not commands.isPlaying():
-            self._update_undo_redo_buttons()
+            self._update_history_buttons()
+        event.reject()
+
+    def _on_graph_state_change(self, event):
+        if self._engine.update_visible_frame(event.contents()):
+            self._update_clear_buttons()
+        event.reject()
+
+    def _on_paint_nodes_changed(self, event):
+        self._engine.scan_visible_frames()
+        self._update_clear_buttons()
         event.reject()
 
     def _on_set_current_annotate_node(self, event):
@@ -397,10 +412,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
                 infos = []
             if any(info.get("nodeType") == "RVPaint" and info.get("node") == node_name for info in infos):
                 self._engine.preferred_paint_node = node_name
-        self._update_undo_redo_buttons()
+        self._update_history_buttons()
         event.reject()
 
     def _on_session_clear(self, event):
+        self._engine.scan_visible_frames()
         self._engine.clear_annotate_history()
         event.reject()
 
@@ -450,6 +466,9 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
             ("frame-changed", self._on_frame_dependent_state_changed, "Update UI"),
             ("play-stop", self._on_frame_dependent_state_changed, "Update UI"),
+            ("graph-state-change", self._on_graph_state_change, "Update UI"),
+            ("after-session-read", self._on_paint_nodes_changed, "Update UI"),
+            ("after-node-delete", self._on_paint_nodes_changed, "Update UI"),
             ("event-category-state-changed", self._on_category_state_changed, "Update tool availability"),
             ("set-current-annotate-mode-node", self._on_set_current_annotate_node, "Set preferred paint node"),
             (
@@ -507,7 +526,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def menu(self):
         configure_items = [
             self._toggle_item(
-                "Draw On Source When Possible", self._settings, "store_on_source", self._update_undo_redo_buttons
+                "Draw On Source When Possible", self._settings, "store_on_source", self._update_history_buttons
             ),
             self._toggle_item("Automatically Mark Annotated Frames", self._settings, "auto_mark"),
             self._toggle_item("Link Tool Colors", self, "_link_tool_colors", self._on_link_colors_toggled),

@@ -93,6 +93,7 @@ class AnnotateDrawEngine:
         self._on_eyedropper = on_eyedropper
 
         self.preferred_paint_node = ""  # Paint node set via set-current-annotate-mode-node
+        self._visible_frames: set[PaintFrame] = set()
 
         # Shape drag state
         self._anchor = None
@@ -675,6 +676,27 @@ class AnnotateDrawEngine:
         paint_frame = self._find_paint_frame()
         return self._history.can_undo(paint_frame), self._history.can_redo(paint_frame)
 
+    def clear_state(self) -> tuple[bool, bool]:
+        return self._find_paint_frame() in self._visible_frames, bool(self._visible_frames)
+
+    def scan_visible_frames(self):
+        """Rebuild the set of frames with visible components from every paint node."""
+        self._visible_frames = {frame for frame in paint.all_annotated_frames() if paint.has_visible_components(frame)}
+
+    def update_visible_frame(self, property_name: str) -> bool:
+        """Track a changed frame order property; return whether it was one."""
+        paint_frame = paint.order_property_frame(property_name)
+
+        if paint_frame is None:
+            return False
+
+        if paint.has_visible_components(paint_frame):
+            self._visible_frames.add(paint_frame)
+        else:
+            self._visible_frames.discard(paint_frame)
+
+        return True
+
     def clear_annotate_history(self):
         self._reset_text()
         self._history.clear()
@@ -730,9 +752,8 @@ class AnnotateDrawEngine:
         self.commit_text_if_active()
         cleared = []
         with self._sync_batch():
-            for paint_node in commands.nodesOfType("RVPaint"):
-                for paint_frame in paint.annotated_frames(paint_node):
-                    cleared.extend(paint.soft_delete_frame(paint_frame))
+            for paint_frame in paint.all_annotated_frames():
+                cleared.extend(paint.soft_delete_frame(paint_frame))
         if not cleared:
             return
 

@@ -102,15 +102,31 @@ def annotated_frames(paint_node: str) -> set[PaintFrame]:
     annotations stored at source-space frame numbers outside the current
     timeline range are still found.
     """
+    frames = (order_property_frame(property_name) for property_name in commands.properties(paint_node))
+    return {frame for frame in frames if frame is not None}
+
+
+def all_annotated_frames() -> set[PaintFrame]:
+    """Return the paint frames that have an order property on every paint node."""
     frames = set()
-    for property_name in commands.properties(paint_node):
-        # property_name is e.g. "RVPaint_1.frame:42.order"
-        parts = property_name.split(".")
-        if len(parts) >= 3 and parts[2] == "order":
-            component_parts = parts[1].split(":")
-            if len(component_parts) == 2 and component_parts[0] == "frame":
-                frames.add(PaintFrame(paint_node, int(component_parts[1])))
+    for paint_node in commands.nodesOfType("RVPaint"):
+        frames.update(annotated_frames(paint_node))
     return frames
+
+
+def order_property_frame(property_name: str) -> PaintFrame | None:
+    """Return the paint frame of a frame order property such as "RVPaint_1.frame:42.order"."""
+    match property_name.split("."):
+        case [paint_node, component, "order"]:
+            kind, _, frame = component.partition(":")
+            if kind == "frame":
+                return PaintFrame(paint_node, int(frame))
+    return None
+
+
+def has_visible_components(paint_frame: PaintFrame) -> bool:
+    order_property = _order_property(paint_frame)
+    return commands.propertyExists(order_property) and bool(commands.getStringProperty(order_property))
 
 
 def soft_delete_frame(paint_frame: PaintFrame) -> list[PaintComponent]:
@@ -118,19 +134,11 @@ def soft_delete_frame(paint_frame: PaintFrame) -> list[PaintComponent]:
     order_property = _order_property(paint_frame)
     if not commands.propertyExists(order_property):
         return []
-    cleared = []
-    surviving = []
-    for name in commands.getStringProperty(order_property):
-        component = PaintComponent(paint_frame, name)
-        deleted_property = f"{_node_name(component)}.softDeleted"
-        # Components without softDeleted (created before the property existed) are left in place.
-        if not commands.propertyExists(deleted_property) or commands.getIntProperty(deleted_property)[0]:
-            surviving.append(name)
-            continue
-        commands.setIntProperty(deleted_property, [1], True)
-        cleared.append(component)
+    cleared = [PaintComponent(paint_frame, name) for name in commands.getStringProperty(order_property)]
+    for component in cleared:
+        commands.setIntProperty(f"{_node_name(component)}.softDeleted", [1], True)
     if cleared:
-        commands.setStringProperty(order_property, surviving, True)
+        commands.setStringProperty(order_property, [], True)
     return cleared
 
 
