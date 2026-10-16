@@ -102,8 +102,6 @@ namespace Rv
         // Promote a live GLView to a VulkanView so a 10-bit request applies immediately.
         void swapGLViewToVulkan();
 #elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        MetalView* metalView() const;
-
         //  Promote a live GLView to a MetalView so a 10-bit request applies
         //  immediately (the forward mirror of fallbackMetalToGLView). The
         //  MetalView's offscreen GL context is created synchronously, so this

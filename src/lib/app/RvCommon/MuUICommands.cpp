@@ -1071,14 +1071,13 @@ namespace Rv
         Session* s = Session::currentSession();
         RvDocument* doc = (RvDocument*)s->opaquePointer();
 
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-        // Hardware stereo needs a stereo QSurfaceFormat on QOpenGLWidget; the
-        // Metal path presents via CALayer/IOSurface and has no GL window surface.
-        if (doc->metalView() && !doc->view())
+        // Hardware stereo needs a stereo QSurfaceFormat on the GLView. The
+        // Vulkan and Metal views present through a single-layer swapchain or
+        // an IOSurface, so there is no quad-buffer surface.
+        if (!doc->view() && doc->viewVideoDevice())
         {
             NODE_RETURN(false);
         }
-#endif
         NODE_RETURN(true);
     }
 

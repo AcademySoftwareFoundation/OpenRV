@@ -1705,10 +1705,6 @@ namespace Rv
         return m_glView ? m_glView->videoDevice() : nullptr;
     }
 
-#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
-    MetalView* RvDocument::metalView() const { return m_metalView; }
-#endif
-
     void RvDocument::center()
     {
         QScreen* screen = QApplication::screenAt(mapToGlobal(QPoint(0, 0)));
