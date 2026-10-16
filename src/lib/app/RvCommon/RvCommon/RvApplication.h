@@ -138,11 +138,11 @@ namespace Rv
         //  Rebuild the desktop presentation devices to match the main view's
         //  backend, re-bind the share device, and re-open the presentation
         //  output if presentation mode is on. shareDevice is null when the main
-        //  view is Vulkan. mainViewIsVulkan comes from the caller because only
-        //  it knows which view widget exists now.
+        //  view is native (Vulkan or Metal). mainViewIsNative comes from the
+        //  caller because only it knows which view widget exists now.
         //
         //  session is the document whose main view changed backend.
-        void rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsVulkan);
+        void rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsNative);
 
         DesktopVideoModule* desktopVideoModule() const { return m_desktopModule; }
 
