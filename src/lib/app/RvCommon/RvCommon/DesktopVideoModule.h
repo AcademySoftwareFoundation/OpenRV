@@ -31,8 +31,8 @@ namespace Rv
 
         //
         //  Rebuild the per-screen presentation devices onto targetNative (Vulkan
-        //  on Linux and Windows, Metal on macOS), the backend the main view is
-        //  actually running (not the persisted preference). Returns false and
+        //  on Linux and Windows, Metal on macOS), the backend the main view runs
+        //  (not the persisted preference). Returns false and
         //  leaves the devices untouched when the backend has not changed. The
         //  caller re-binds the share device and re-opens the session's
         //  presentation output.

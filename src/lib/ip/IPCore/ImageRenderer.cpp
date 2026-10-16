@@ -138,7 +138,7 @@ namespace IPCore
 
             if (!renderer->uploadThreadDevice())
             {
-                renderer->setUseThreadedUpload(false);
+                ImageRenderer::setUseThreadedUpload(false);
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace IPCore
             {
                 std::cerr << "ERROR: [ImageRenderer] upload thread GL context init failed; "
                              "disabling threaded upload\n";
-                renderer->setUseThreadedUpload(false);
+                ImageRenderer::setUseThreadedUpload(false);
                 renderer->notifyDraw();
                 return;
             }

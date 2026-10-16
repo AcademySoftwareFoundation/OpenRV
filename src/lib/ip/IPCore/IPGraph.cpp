@@ -686,26 +686,12 @@ namespace IPCore
         //
 
         //
-        //  Work from a copy: ~DisplayGroupIPNode calls
-        //  IPGraph::removeDisplayGroup(this), which erases the node from
-        //  m_displayGroups. Indexing m_displayGroups directly while deleting
-        //  from it therefore skips every other entry, leaving orphaned
-        //  DisplayGroupIPNodes still wired to m_rootNode and still holding
-        //  pointers to devices the caller is about to destroy. Walking the graph
-        //  afterwards then dereferences freed memory in
-        //  DisplayGroupIPNode::imageDevice(). This only shows up when
-        //  setPhysicalDevices() is called a second time with more than one real
-        //  display group (e.g. rebuilding the desktop devices for a live
-        //  8/10-bit backend switch); at startup the list holds only the default
-        //  group, which is never deleted.
         //
 
         const DisplayGroups groups = m_displayGroups;
 
-        for (size_t i = 0; i < groups.size(); i++)
+        for (DisplayGroupIPNode* node : groups)
         {
-            DisplayGroupIPNode* node = groups[i];
-
             if (node == m_defaultOutputGroup)
             {
                 if (m_rootNode->isInput(m_defaultOutputGroup))
@@ -720,11 +706,11 @@ namespace IPCore
             }
         }
 
-        for (size_t i = 0; i < groups.size(); i++)
+        for (DisplayGroupIPNode* node : groups)
         {
-            if (groups[i] != m_defaultOutputGroup)
+            if (node != m_defaultOutputGroup)
             {
-                delete groups[i];
+                delete node;
             }
         }
 

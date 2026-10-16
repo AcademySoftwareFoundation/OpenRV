@@ -149,7 +149,7 @@ the flip FBO.
 - The GL blit into the IOSurface FBO returns a GL error
 
 On failure, `latchInteropFailure()` disables interop and sets a
-`kInteropRetryFrames` (120 frame) cooldown before the next attempt. A
+`interopRetryFrames` (120 frame) cooldown before the next attempt. A
 one-shot log fires: `"presenting via CPU readback (WxH); zero-copy
 IOSurface interop unavailable — retrying periodically."` Recovery is
 logged when the fast path resumes.

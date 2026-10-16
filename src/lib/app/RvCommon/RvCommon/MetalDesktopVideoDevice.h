@@ -3,12 +3,13 @@
 //
 //  SPDX-License-Identifier: Apache-2.0
 //
-#ifndef __RvCommon__MetalDesktopVideoDevice__h__
-#define __RvCommon__MetalDesktopVideoDevice__h__
+#pragma once
 
 #ifdef PLATFORM_DARWIN
 
 #include <RvCommon/DesktopVideoDevice.h>
+
+#include <memory>
 
 namespace Rv
 {
@@ -51,11 +52,9 @@ namespace Rv
         //  The presentation output window. Owns its own QTMetalVideoDevice
         //  (MetalView::videoDevice()), which is assigned to the base
         //  m_viewDevice so inherited transfer()/transfer2() drive it.
-        MetalView* m_metalView;
+        std::unique_ptr<MetalView> m_metalView;
     };
 
 } // namespace Rv
 
 #endif // PLATFORM_DARWIN
-
-#endif // __RvCommon__MetalDesktopVideoDevice__h__

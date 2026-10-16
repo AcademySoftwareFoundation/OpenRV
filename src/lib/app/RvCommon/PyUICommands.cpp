@@ -242,13 +242,13 @@ namespace Rv
         s->receivingEvents(false);
 
         // viewWidget() is briefly null while the presentation view is being (re)built
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             return;
         }
 
-        QPoint p = view->mapToGlobal(location);
+        const QPoint p = view->mapToGlobal(location);
 
         if (pylist)
         {
@@ -278,7 +278,7 @@ namespace Rv
 
         QPoint lp;
 
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             Py_XINCREF(Py_None);
@@ -313,7 +313,7 @@ namespace Rv
             return NULL;
         }
 
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             Py_XINCREF(Py_None);

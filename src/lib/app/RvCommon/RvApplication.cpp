@@ -1962,6 +1962,29 @@ namespace Rv
         return options.toUtf8().constData();
     }
 
+    namespace
+    {
+        //  Points device at the desktop device in devices on the same screen as its current one.
+        void rebindToSameScreen(TwkGLF::GLVideoDevice* device, const VideoModule::VideoDevices& devices)
+        {
+            const auto* oldDevice = dynamic_cast<const DesktopVideoDevice*>(device->physicalDevice());
+            if (!oldDevice)
+            {
+                return;
+            }
+
+            for (VideoDevice* candidate : devices)
+            {
+                auto* newDevice = dynamic_cast<DesktopVideoDevice*>(candidate);
+                if (newDevice && newDevice != oldDevice && newDevice->qtScreen() == oldDevice->qtScreen())
+                {
+                    device->setPhysicalDevice(newDevice);
+                    return;
+                }
+            }
+        }
+    } // namespace
+
     void RvApplication::rebuildDesktopVideoDevices(RvSession* session, QTGLVideoDevice* shareDevice, bool mainViewIsNative)
     {
         if (!m_desktopModule)
@@ -2005,18 +2028,7 @@ namespace Rv
             const RvDocument* doc = session ? static_cast<const RvDocument*>(session->opaquePointer()) : nullptr;
             if (TwkGLF::GLVideoDevice* control = doc ? doc->viewVideoDevice() : nullptr)
             {
-                if (const DesktopVideoDevice* oldDevice = dynamic_cast<const DesktopVideoDevice*>(control->physicalDevice()))
-                {
-                    for (VideoDevice* device : m_desktopModule->devices())
-                    {
-                        DesktopVideoDevice* newDevice = dynamic_cast<DesktopVideoDevice*>(device);
-                        if (newDevice && newDevice != oldDevice && newDevice->qtScreen() == oldDevice->qtScreen())
-                        {
-                            control->setPhysicalDevice(newDevice);
-                            break;
-                        }
-                    }
-                }
+                rebindToSameScreen(control, m_desktopModule->devices());
             }
 
             //  Only now is it safe to destroy the replaced devices (see

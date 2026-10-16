@@ -90,10 +90,12 @@ namespace Rv
         //
         TwkGLF::GLVideoDevice* viewVideoDevice() const;
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
         // True once close has been accepted or the document is being destroyed.
         bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
+#endif
 
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         // Replace a live VulkanView with GLView after a runtime Vulkan failure.
         void fallbackVulkanToGLView();
 
@@ -101,9 +103,6 @@ namespace Rv
         void swapGLViewToVulkan();
 #elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
         MetalView* metalView() const;
-
-        // True once close has been accepted or the document is being destroyed.
-        bool isClosing() const { return m_currentlyClosing || m_closeEventReceived; }
 
         //  Promote a live GLView to a MetalView so a 10-bit request applies
         //  immediately (the forward mirror of fallbackMetalToGLView). The

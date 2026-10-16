@@ -476,13 +476,13 @@ namespace Rv
         s->receivingEvents(false);
 
         // viewWidget() is briefly null while the presentation view is being (re)built
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             return;
         }
 
-        QPoint p = view->mapToGlobal(location);
+        const QPoint p = view->mapToGlobal(location);
 
         if (array)
         {
@@ -507,7 +507,7 @@ namespace Rv
         DynamicArray* array = NODE_ARG_OBJECT(1, DynamicArray);
         QPoint lp;
 
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             return;
@@ -533,7 +533,7 @@ namespace Rv
         int y = NODE_ARG(1, int);
         DynamicArray* array = NODE_ARG_OBJECT(2, DynamicArray);
 
-        QWidget* view = rvDoc->viewWidget();
+        const QWidget* view = rvDoc->viewWidget();
         if (!view)
         {
             return;
@@ -1075,7 +1075,9 @@ namespace Rv
         // Hardware stereo needs a stereo QSurfaceFormat on QOpenGLWidget; the
         // Metal path presents via CALayer/IOSurface and has no GL window surface.
         if (doc->metalView() && !doc->view())
+        {
             NODE_RETURN(false);
+        }
 #endif
         NODE_RETURN(true);
     }
@@ -1776,7 +1778,9 @@ namespace Rv
         QWidget* w = doc->viewWidget();
 
         if (w == nullptr)
-            NODE_RETURN(Pointer(0));
+        {
+            NODE_RETURN(Pointer(nullptr));
+        }
 
         const QWidgetType* type = c->findSymbolOfTypeByQualifiedName<QWidgetType>(c->internName("qt.QWidget"), false);
 

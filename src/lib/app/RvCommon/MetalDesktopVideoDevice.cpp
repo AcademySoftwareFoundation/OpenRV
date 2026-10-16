@@ -17,8 +17,6 @@
 
 namespace Rv
 {
-    using namespace std;
-
     namespace
     {
         //  Set RV_METAL_DEBUG_PRESENT to trace presentation-output placement and
@@ -35,7 +33,6 @@ namespace Rv
     MetalDesktopVideoDevice::MetalDesktopVideoDevice(TwkApp::VideoModule* module, const std::string& name, int screen,
                                                      const QTGLVideoDevice* shareDevice)
         : DesktopVideoDevice(module, name, screen, shareDevice)
-        , m_metalView(nullptr)
     {
         //
         //  Re-advertise at 10-bit (the base advertised RGB8); only built once
@@ -46,9 +43,9 @@ namespace Rv
         addDefaultDataFormats(10);
     }
 
-    MetalDesktopVideoDevice::~MetalDesktopVideoDevice() { close(); }
+    MetalDesktopVideoDevice::~MetalDesktopVideoDevice() { MetalDesktopVideoDevice::close(); }
 
-    void MetalDesktopVideoDevice::open(const StringVector& args)
+    void MetalDesktopVideoDevice::open(const StringVector& /*args*/)
     {
         if (isOpen())
         {
@@ -59,7 +56,7 @@ namespace Rv
         //  means the MetalView never drives the session and never triggers the
         //  main-window GL fallback. It is composited into and presented by this
         //  device (via the inherited transfer()/transfer2() and syncBuffers()).
-        m_metalView = new MetalView(/*doc*/ nullptr, /*parent*/ nullptr, /*noResize*/ true, /*presentationMode*/ true);
+        m_metalView = std::make_unique<MetalView>(/*doc*/ nullptr, /*parent*/ nullptr, /*noResize*/ true, /*presentationMode*/ true);
 
         //  The MetalView owns its QTMetalVideoDevice; assigning it to the base
         //  m_viewDevice lets the inherited transfer()/transfer2() composite into
@@ -70,9 +67,9 @@ namespace Rv
         m_metalView->setWindowFlag(Qt::WindowDoesNotAcceptFocus, true);
 
         //  Inert, created for parity with the base class's setViewWidget().
-        m_translator = std::make_unique<QTTranslator>(this, m_metalView);
+        m_translator = std::make_unique<QTTranslator>(this, m_metalView.get());
 
-        QRect g = screenGeometry();
+        const QRect g = screenGeometry();
         m_metalView->move(g.x(), g.y());
         m_metalView->setGeometry(g);
 
@@ -99,13 +96,15 @@ namespace Rv
             const QList<QScreen*> screens = QGuiApplication::screens();
             const int idx = qtScreen();
             const QString wantName = (idx >= 0 && idx < screens.size()) ? screens[idx]->name() : QString("<invalid>");
-            QScreen* actual = m_metalView->screen();
-            cout << "INFO: MetalDesktopVideoDevice::open: intended screen " << idx << " '" << wantName.toStdString() << "'; computed geom "
-                 << g.x() << "," << g.y() << " " << g.width() << "x" << g.height() << "; fullscreen=" << (useFullScreen() ? 1 : 0) << endl;
-            cout << "INFO: MetalDesktopVideoDevice::open: actual placed screen '"
-                 << (actual ? actual->name().toStdString() : std::string("<null>")) << "' geom " << m_metalView->geometry().x() << ","
-                 << m_metalView->geometry().y() << " " << m_metalView->geometry().width() << "x" << m_metalView->geometry().height()
-                 << " visible=" << (m_metalView->isVisible() ? 1 : 0) << " windowState=" << int(m_metalView->windowState()) << endl;
+            const QScreen* actual = m_metalView->screen();
+            std::cout << "INFO: MetalDesktopVideoDevice::open: intended screen " << idx << " '" << wantName.toStdString()
+                      << "'; computed geom " << g.x() << "," << g.y() << " " << g.width() << "x" << g.height()
+                      << "; fullscreen=" << (useFullScreen() ? 1 : 0) << std::endl;
+            std::cout << "INFO: MetalDesktopVideoDevice::open: actual placed screen '"
+                      << (actual ? actual->name().toStdString() : std::string("<null>")) << "' geom " << m_metalView->geometry().x() << ","
+                      << m_metalView->geometry().y() << " " << m_metalView->geometry().width() << "x" << m_metalView->geometry().height()
+                      << " visible=" << (m_metalView->isVisible() ? 1 : 0)
+                      << " windowState=" << static_cast<int>(m_metalView->windowState()) << std::endl;
         }
 
         //  Prime the offscreen GL context + FBO so the inherited transfer()'s
@@ -129,8 +128,7 @@ namespace Rv
 
         setViewDevice(nullptr);
 
-        delete m_metalView;
-        m_metalView = nullptr;
+        m_metalView.reset();
 
         m_translator.reset();
     }
@@ -164,7 +162,7 @@ namespace Rv
         {
             if (debugPresent())
             {
-                cout << "INFO: MetalDesktopVideoDevice::syncBuffers[screen " << qtScreen() << "]: presenting" << endl;
+                std::cout << "INFO: MetalDesktopVideoDevice::syncBuffers[screen " << qtScreen() << "]: presenting" << std::endl;
             }
             m_viewDevice->syncBuffers();
         }
@@ -172,9 +170,9 @@ namespace Rv
         {
             //  Shows which guard failed: a black external output whose view never
             //  became visible lands here.
-            cout << "INFO: MetalDesktopVideoDevice::syncBuffers[screen " << qtScreen()
-                 << "]: SKIPPED present (viewDevice=" << (m_viewDevice ? 1 : 0) << " metalView=" << (m_metalView ? 1 : 0)
-                 << " visible=" << (m_metalView && m_metalView->isVisible() ? 1 : 0) << ")" << endl;
+            std::cout << "INFO: MetalDesktopVideoDevice::syncBuffers[screen " << qtScreen()
+                      << "]: SKIPPED present (viewDevice=" << (m_viewDevice ? 1 : 0) << " metalView=" << (m_metalView ? 1 : 0)
+                      << " visible=" << (m_metalView && m_metalView->isVisible() ? 1 : 0) << ")" << std::endl;
         }
     }
 
