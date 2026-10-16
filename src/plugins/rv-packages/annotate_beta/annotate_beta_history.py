@@ -4,7 +4,7 @@
 """Undo/redo history of annotation actions per frame on each paint node."""
 
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -82,6 +82,31 @@ class UndoHistory:
             return False
         undo_stack.pop()
         return True
+
+    def retain_paint_nodes(self, paint_nodes: Collection[str]):
+        """Forget the history of every paint node not in paint_nodes."""
+        paint_frames = self._undo_stacks.keys() | self._redo_stacks.keys()
+        stale_frames = [paint_frame for paint_frame in paint_frames if paint_frame.paint_node not in paint_nodes]
+
+        for paint_frame in stale_frames:
+            self._undo_stacks.pop(paint_frame, None)
+            self._redo_stacks.pop(paint_frame, None)
+
+        self._undo_clear_all_frames = self._retain_action(self._undo_clear_all_frames, paint_nodes)
+        self._redo_clear_all_frames = self._retain_action(self._redo_clear_all_frames, paint_nodes)
+
+    @staticmethod
+    def _retain_action(action: PaintAction | None, paint_nodes: Collection[str]) -> PaintAction | None:
+        if action is None:
+            return None
+
+        components = tuple(
+            component for component in action.components if component.paint_frame.paint_node in paint_nodes
+        )
+        if not components:
+            return None
+
+        return PaintAction(action.type, components)
 
     def clear(self):
         self._undo_stacks.clear()

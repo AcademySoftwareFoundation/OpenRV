@@ -71,7 +71,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         _set_tool_cursor(self._settings.tool)
         self._update_tool_availability()
-        self._engine.scan_visible_frames()
+        self._engine.sync_paint_nodes()
         self._update_history_buttons()
         paint.set_tags()
 
@@ -389,8 +389,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         event.reject()
 
     def _on_paint_nodes_changed(self, event):
-        self._engine.scan_visible_frames()
-        self._update_clear_buttons()
+        self._engine.sync_paint_nodes()
+        self._update_history_buttons()
         event.reject()
 
     def _on_set_current_annotate_node(self, event):
@@ -416,7 +416,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         event.reject()
 
     def _on_session_clear(self, event):
-        self._engine.scan_visible_frames()
+        self._engine.sync_paint_nodes()
         self._engine.clear_annotate_history()
         event.reject()
 

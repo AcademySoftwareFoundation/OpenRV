@@ -188,6 +188,7 @@ class AnnotateDrawEngine:
             ("before-play-start", commit_and_propagate, "Commit text"),
             ("before-session-read", commit_and_propagate, "Commit text"),
             ("before-graph-view-change", commit_and_propagate, "Commit text"),
+            ("before-node-delete", commit_and_propagate, "Commit text"),
         ]
 
     @property
@@ -679,8 +680,9 @@ class AnnotateDrawEngine:
     def clear_state(self) -> tuple[bool, bool]:
         return self._find_paint_frame() in self._visible_frames, bool(self._visible_frames)
 
-    def scan_visible_frames(self):
-        """Rebuild the set of frames with visible components from every paint node."""
+    def sync_paint_nodes(self):
+        """Forget the history of deleted paint nodes and rebuild the frames with visible components."""
+        self._history.retain_paint_nodes(set(commands.nodesOfType("RVPaint")))
         self._visible_frames = {frame for frame in paint.all_annotated_frames() if paint.has_visible_components(frame)}
 
     def update_visible_frame(self, property_name: str) -> bool:
