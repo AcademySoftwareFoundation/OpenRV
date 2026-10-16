@@ -1283,6 +1283,9 @@ namespace Rv
 
         cout << "INFO: RvDocument: switching main view from OpenGL to Metal." << endl;
 
+        // Flush any GLView pending from an earlier swap before reusing m_oldGLView.
+        lazyDeleteGLView();
+
         GLView* oldGLView = m_glView;
         const Qt::KeyboardModifiers cur = oldGLView->videoDevice()->translator().currentModifiers();
 

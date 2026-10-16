@@ -337,6 +337,9 @@ namespace Rv
         if (output && output != videoDevice())
         {
             output->syncBuffers();
+
+            //  The output made its own GL context current; restore ours.
+            m_videoDevice->makeCurrent();
         }
     }
 

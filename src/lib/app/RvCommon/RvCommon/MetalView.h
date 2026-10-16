@@ -129,7 +129,8 @@ namespace Rv
         void paintEvent(QPaintEvent* event) override;
 
     private:
-        //  Presents the session's output device when it is a separate window.
+        //  Presents the session's output device when it is a separate window,
+        //  then makes this view's GL context current again.
         void syncOutputDevice(const IPCore::Session* session) const;
 
         //  Maps events into the output device's domain in mirror display mode.

@@ -145,13 +145,9 @@ namespace Rv
 
     void MetalDesktopVideoDevice::redraw() const
     {
-        //  There is no QOpenGLWidget auto-composite here, so the frame already
-        //  composited into the QTMetalVideoDevice FBO by transfer()/transfer2()
-        //  must be presented explicitly.
-        if (m_viewDevice && m_metalView && m_metalView->isVisible())
-        {
-            m_viewDevice->syncBuffers();
-        }
+        //  Intentionally empty: presenting here would steal the current GL
+        //  context mid-draw. The control view's render() presents this device
+        //  in-frame via syncBuffers().
     }
 
     void MetalDesktopVideoDevice::redrawImmediately() const { redraw(); }

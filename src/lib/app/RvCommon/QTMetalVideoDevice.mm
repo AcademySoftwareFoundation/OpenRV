@@ -124,6 +124,16 @@ namespace
         mutable bool m_versionChecked{false};
     };
 
+    // Empties the GL error queue and returns its first error, or GL_NO_ERROR.
+    GLenum takeGLError()
+    {
+        const GLenum first = glGetError();
+        while (glGetError() != GL_NO_ERROR)
+        {
+        }
+        return first;
+    }
+
     // Blits readFbo into drawFbo, flipping GL's bottom-left origin to the
     // IOSurface top-left origin. The GPU converts RGBA16F to RGB10_A2.
     void blitFlippedY(GLuint readFbo, GLuint drawFbo, int w, int h)
@@ -613,11 +623,15 @@ namespace Rv
         const int slot = m_ringIndex;
         const IOSurfaceSlot& target = m_ioSlots[slot];
 
+        // session->render() can leave errors pending; clear them so the check
+        // below sees only the blit's.
+        takeGLError();
+
         blitFlippedY(m_fbo->fboID(), target.fbo->fboID(), w, h);
-        if (glGetError() != GL_NO_ERROR)
+        if (const GLenum error = takeGLError(); error != GL_NO_ERROR)
         {
-            std::cerr << "[QTMetalVideoDevice] glBlitFramebufferEXT failed; "
-                         "falling back to CPU readback\n";
+            std::cerr << "[QTMetalVideoDevice] glBlitFramebufferEXT failed (GL 0x" << std::hex << error << std::dec
+                      << "); falling back to CPU readback\n";
             latchInteropFailure();
             return false;
         }
