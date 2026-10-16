@@ -379,8 +379,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         event.reject()
 
     def _on_frame_dependent_state_changed(self, event):
-        if not commands.isPlaying():
-            self._update_history_buttons()
+        self._update_history_buttons()
         event.reject()
 
     def _on_graph_state_change(self, event):
@@ -466,6 +465,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
             ("frame-changed", self._on_frame_dependent_state_changed, "Update UI"),
             ("play-stop", self._on_frame_dependent_state_changed, "Update UI"),
+            ("play-start", self._on_frame_dependent_state_changed, "Update UI"),
             ("graph-state-change", self._on_graph_state_change, "Update UI"),
             ("after-session-read", self._on_paint_nodes_changed, "Update UI"),
             ("after-node-delete", self._on_paint_nodes_changed, "Update UI"),

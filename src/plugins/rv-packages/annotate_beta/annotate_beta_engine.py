@@ -674,10 +674,14 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def undo_redo_state(self) -> tuple[bool, bool]:
+        if commands.isPlaying():
+            return False, False
         paint_frame = self._find_paint_frame()
         return self._history.can_undo(paint_frame), self._history.can_redo(paint_frame)
 
     def clear_state(self) -> tuple[bool, bool]:
+        if commands.isPlaying():
+            return False, False
         return self._find_paint_frame() in self._visible_frames, bool(self._visible_frames)
 
     def sync_paint_nodes(self):
