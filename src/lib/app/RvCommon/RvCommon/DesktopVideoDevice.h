@@ -9,6 +9,7 @@
 #ifndef __RvCommon__DesktopVideoDevice__h__
 #define __RvCommon__DesktopVideoDevice__h__
 #include <iostream>
+#include <memory>
 #include <TwkGLF/GLVideoDevice.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/GLPipeline.h>
@@ -17,7 +18,7 @@
 
 #include <RvCommon/QTGLVideoDevice.h>
 #include <QtWidgets/QWidget>
-#include <QOpenGLWidget>
+#include <QOpenGLWindow>
 #include <QOpenGLContext>
 #include <QGuiApplication>
 
@@ -55,22 +56,45 @@ namespace Rv
     class DesktopVideoDevice : public TwkGLF::GLBindableVideoDevice
     {
     public:
-        class ScreenView : public QOpenGLWidget
+        //
+        //  QOpenGLWindow, not a top-level QOpenGLWidget: only a ctor-supplied
+        //  share context guarantees the renderer's share group, which
+        //  transfer() needs to see the renderer's textures. PartialUpdateBlit
+        //  keeps a backing FBO and does not clear before paintGL().
+        //
+        class ScreenWindow : public QOpenGLWindow
         {
         public:
-            //
-            //  glShareContext is the control view's GL context to share with
-            //  (so blits/FBOs are usable across the two surfaces). It comes
-            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
-            //  the control view may be a QOpenGLWidget or a QOpenGLWindow.
-            //
-            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+            ScreenWindow(const QSurfaceFormat& fmt, QOpenGLContext* glShareContext);
 
             void initializeGL() override;
             void paintGL() override;
 
         private:
             QOpenGLContext* m_glShareContext = nullptr;
+
+            //  Size of the backing FBO at the last paint; a change means it
+            //  was (re)allocated empty.
+            QSize m_paintedSize;
+        };
+
+        //  QWidget container for the ScreenWindow, as GLView is for GLWindow.
+        class ScreenView : public QWidget
+        {
+        public:
+            //
+            //  glShareContext is the control view's GL context to share with
+            //  (so blits/FBOs are usable across the two surfaces). It comes
+            //  from QTGLVideoDevice::glShareContext() and is backing-agnostic:
+            //  the control view may be a QOpenGLWidget or a QOpenGLWindow. A
+            //  null share context falls back to Qt's global share context.
+            //
+            ScreenView(const QSurfaceFormat& fmt, QWidget* parent, QOpenGLContext* glShareContext, Qt::WindowFlags flags);
+
+            ScreenWindow* glWindow() const { return m_glWindow; }
+
+        private:
+            ScreenWindow* m_glWindow = nullptr;
         };
 
     public:
@@ -78,9 +102,9 @@ namespace Rv
         //  Types
         //
 
-        typedef std::map<const TwkGLF::GLFBO*, TwkGLF::GLFBO*> FBOMap;
-        typedef boost::mutex Mutex;
-        typedef boost::mutex::scoped_lock ScopedLock;
+        using FBOMap = std::map<const TwkGLF::GLFBO*, std::unique_ptr<TwkGLF::GLFBO>>;
+        using Mutex = boost::mutex;
+        using ScopedLock = boost::mutex::scoped_lock;
 
         enum DesktopStereoMode
         {
@@ -138,7 +162,7 @@ namespace Rv
 
         DesktopVideoDevice(TwkApp::VideoModule*, const std::string& name, int qtscreen, const QTGLVideoDevice* glViewShared);
 
-        virtual ~DesktopVideoDevice();
+        ~DesktopVideoDevice() override;
 
         virtual void redraw() const;
         virtual void redrawImmediately() const;
@@ -154,63 +178,77 @@ namespace Rv
         //  frame packed.
         //
 
-        virtual Resolution internalResolution() const;
-        virtual VideoFormat internalFormat() const;
-        virtual size_t internalHeight() const;
+        Resolution internalResolution() const override;
+        VideoFormat internalFormat() const override;
+        size_t internalHeight() const override;
 
         //
         //  This will try and lock the sync mutex
         //
 
-        virtual void blockUntilSyncComplete() const;
+        void blockUntilSyncComplete() const override;
 
         //
         //  GLBindableVideoDevice API
         //
 
-        virtual bool isStereo() const;
-        virtual bool isDualStereo() const;
+        bool isStereo() const override;
+        bool isDualStereo() const override;
 
         // virtual bool willBlockOnTransfer() const;
-        virtual void transfer(const TwkGLF::GLFBO*) const;
-        virtual void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const;
+        void transfer(const TwkGLF::GLFBO*) const override;
+        void transfer2(const TwkGLF::GLFBO*, const TwkGLF::GLFBO*) const override;
 
-        virtual void unbind() const;
+        void unbind() const override;
 
-        virtual void clearCaches() const {}
+        void clearCaches() const override { releaseFBOClones(); }
+
+        //
+        //  Delete the FBO clones in m_fboMap. Must run while this device's view
+        //  context is still alive, so close() calls it first. Idempotent.
+        //
+        void releaseFBOClones() const;
+
+        //
+        //  This context's cached clone of a renderer FBO, wrapping its colour
+        //  texture (FBOs are not shared across contexts, textures are). The
+        //  cache key is a pointer the renderer can reuse, so hits are
+        //  re-verified. Returns null if no complete clone could be built.
+        //
+        TwkGLF::GLFBO* cloneForSource(const TwkGLF::GLFBO* sourceFbo) const;
 
         //
         //  Configurations
         //
 
-        virtual size_t numVideoFormats() const;
-        virtual VideoFormat videoFormatAtIndex(size_t) const;
+        size_t numVideoFormats() const override;
+        VideoFormat videoFormatAtIndex(size_t) const override;
         virtual VideoFormat videoFormatFromData(void*) const;
-        virtual void setVideoFormat(size_t);
-        virtual size_t currentVideoFormat() const;
+        void setVideoFormat(size_t) override;
+        size_t currentVideoFormat() const override;
 
-        virtual size_t numDataFormats() const;
-        virtual DataFormat dataFormatAtIndex(size_t) const;
-        virtual void setDataFormat(size_t);
-        virtual size_t currentDataFormat() const;
+        size_t numDataFormats() const override;
+        DataFormat dataFormatAtIndex(size_t) const override;
+        void setDataFormat(size_t) override;
+        size_t currentDataFormat() const override;
 
-        virtual size_t numSyncModes() const;
-        virtual SyncMode syncModeAtIndex(size_t) const;
-        virtual void setSyncMode(size_t);
-        virtual size_t currentSyncMode() const;
+        size_t numSyncModes() const override;
+        SyncMode syncModeAtIndex(size_t) const override;
+        void setSyncMode(size_t) override;
+        size_t currentSyncMode() const override;
 
-        virtual size_t numSyncSources() const;
-        virtual SyncSource syncSourceAtIndex(size_t) const;
-        virtual void setSyncSource(size_t);
-        virtual size_t currentSyncSource() const;
+        size_t numSyncSources() const override;
+        SyncSource syncSourceAtIndex(size_t) const override;
+        void setSyncSource(size_t) override;
+        size_t currentSyncSource() const override;
 
         // imported
 
         //  From QTGLVideoDevice
 
-        void setViewWidget(QOpenGLWidget*);
+        void setViewWidget(ScreenView*);
 
-        QOpenGLWidget* viewWidget() const { return m_view; }
+        ScreenView* viewWidget() const { return m_view; }
 
         virtual void makeCurrent() const;
 
@@ -220,19 +258,19 @@ namespace Rv
         //  VideoDevice API
         //
 
-        virtual Resolution resolution() const;
-        virtual Offset offset() const;
-        virtual Timing timing() const;
-        virtual VideoFormat format() const;
+        Resolution resolution() const override;
+        Offset offset() const override;
+        Timing timing() const override;
+        VideoFormat format() const override;
 
-        virtual size_t width() const;
-        virtual size_t height() const;
+        size_t width() const override;
+        size_t height() const override;
 
-        virtual void open(const StringVector&);
-        virtual void close();
-        virtual bool isOpen() const;
+        void open(const StringVector&) override;
+        void close() override;
+        bool isOpen() const override;
 
-        virtual void syncBuffers() const;
+        void syncBuffers() const override;
 
         virtual int qtScreen() const { return m_screen; }
 
@@ -240,6 +278,28 @@ namespace Rv
         QRect screenGeometry() const;
 
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice);
+
+        //  As above, with the backend supplied by the caller. Use once the main view is live.
+        static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
+                                                                   bool useVulkan);
+
+        //
+        //  Presentation backend for the initial build: true for a 10-bit request
+        //  this machine's Vulkan can present. Reads the persisted preference,
+        //  which can differ from the live main-view backend, so it must not be
+        //  used once a view exists. Always false on macOS.
+        //
+        static bool shouldUseVulkanPresentation();
+
+        //  True when the persisted display depth is RGB 10 + A 2.
+        static bool tenBitDisplayRequested();
+
+        //
+        //  An output surface only shows what the control session composites
+        //  into it, so a freshly shown or resized one holds nothing. Asks every
+        //  session driving a separate output device for a new frame.
+        //
+        static void requestOutputRecomposite();
 
     protected:
         void addDefaultDataFormats(size_t bits = 8);
@@ -255,21 +315,27 @@ namespace Rv
         void addDataFormatAtDepth(size_t depth, DesktopStereoMode m);
 
 #ifdef PLATFORM_WINDOWS
-        virtual ColorProfile colorProfile() const;
+        ColorProfile colorProfile() const override;
 #endif
 
     protected:
         const QTGLVideoDevice* m_share;
         const TwkGLF::GLVideoDevice* m_viewDevice;
-        QOpenGLWidget* m_view;
+        ScreenView* m_view;
         DesktopStereoMode m_stereoMode;
         mutable FBOMap m_fboMap;
+
+        //  Last unusable source texture reported, so the report fires once per transition.
+        mutable GLuint m_reportedBadSourceTex{0};
+
+        //  Latches the "no backing FBO" report.
+        mutable bool m_transferStalled{false};
         TwkGLF::GLState* m_glGlobalState;
         DesktopVideoFormats m_videoFormats;
         DesktopDataFormats m_dataFormats;
 
         int m_screen;
-        QTTranslator* m_translator;
+        std::unique_ptr<QTTranslator> m_translator;
         mutable ColorProfile m_colorProfile;
 
         size_t m_videoFormatIndex;

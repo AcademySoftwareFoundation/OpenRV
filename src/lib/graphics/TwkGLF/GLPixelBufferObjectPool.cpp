@@ -8,6 +8,7 @@
 
 #include <TwkGLF/GLPixelBufferObjectPool.h>
 
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLSyncObject.h>
 
 #include <TwkUtil/EnvVar.h>
@@ -316,7 +317,7 @@ namespace TwkGLF
 
         GLPixelBufferObject* _recycle(size_t size)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
 
             GLPixelBufferObject* pbo = NULL;
 
@@ -495,32 +496,51 @@ namespace TwkGLF
 
         ~GLPixelBufferObjectPool()
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _cleanupNoLock(_freePool);
             _cleanupNoLock(_usedPool);
         }
 
+        //
+        //  Release every buffer while a context is still obtainable: the pools
+        //  are statics whose destructors run after Qt is gone. Emptying the
+        //  containers keeps that destructor from walking them again.
+        //
+        void clear()
+        {
+            std::scoped_lock guard(_mutex);
+
+            _cleanupNoLock(_freePool);
+            _cleanupNoLock(_usedPool);
+
+            _freePool.clear();
+            _usedPool.clear();
+
+            _allocSize = 0;
+            _allocNbBuffers = 0;
+        }
+
         void setSoftMaxSize(size_t softMaxSize)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _softMaxSize = softMaxSize;
         }
 
         void setSoftMaxNbBuffers(size_t softMaxNbBuffers)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _softMaxNbBuffers = softMaxNbBuffers;
         }
 
         void setHardMaxMinFreeMemory(float minFreeMemory)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _hardMaxMinFreeMemory = minFreeMemory;
         }
 
         void setRecycleParams(bool exactSizeOnly, float minPercentage = 1.0f)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _recycleExactSizeOnly = exactSizeOnly;
             if (minPercentage == 0.0f)
                 _invRecycleMinPercentage = 0.0f; // threated as inf.
@@ -530,7 +550,7 @@ namespace TwkGLF
 
         void setMaxPBOSize(size_t maxPBOSize)
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _maxPBOSize = maxPBOSize;
         }
 
@@ -551,7 +571,7 @@ namespace TwkGLF
 
                 // Try to purge if the new allocation is going to exceed the
                 // soft maximums.
-                std::unique_lock<decltype(_mutex)> guard(_mutex);
+                std::scoped_lock guard(_mutex);
 
                 bool overSoftMaxSize = false;
                 if (_softMaxSize > 0 && (_allocSize + size) > _softMaxSize)
@@ -586,7 +606,7 @@ namespace TwkGLF
             else
             {
                 // If the pool went above one of the soft maximums try to purge.
-                std::unique_lock<decltype(_mutex)> guard(_mutex);
+                std::scoped_lock guard(_mutex);
 
                 if (_softMaxSize > 0 && _allocSize > _softMaxSize)
                     _purgeNoLock(_allocSize - _softMaxSize, 0);
@@ -608,7 +628,7 @@ namespace TwkGLF
             {
                 size_t size = pbo->getSize();
 
-                std::unique_lock<decltype(_mutex)> guard(_mutex);
+                std::scoped_lock guard(_mutex);
 
                 QueueMap::iterator p = _usedPool.find(size);
                 assert(p != _usedPool.end());
@@ -631,13 +651,13 @@ namespace TwkGLF
 
         void dump()
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
             _dumpNoLock(evDebug.getValue() > 1);
         }
 
         unsigned numPBOs()
         {
-            std::unique_lock<decltype(_mutex)> guard(_mutex);
+            std::scoped_lock guard(_mutex);
 
             unsigned totalNumPBOs = 0;
 
@@ -825,6 +845,7 @@ namespace TwkGLF
                 if (gPoolToGPUInitialized)
                 {
                     gPoolToGPUInitialized = false;
+                    gPoolToGPU.clear();
                 }
             }
             else
@@ -832,6 +853,7 @@ namespace TwkGLF
                 if (gPoolFromGPUInitialized)
                 {
                     gPoolFromGPUInitialized = false;
+                    gPoolFromGPU.clear();
                 }
             }
         }
@@ -922,11 +944,20 @@ namespace TwkGLF
     //
     void UninitPBOPools()
     {
+        //
+        //  Called after the event loop returns, when no view context is left.
+        //
+        const GLContextScope contextScope;
+
         if (prefetchUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::TO_GPU);
+        }
 
         if (writeBehindUsePBOs)
+        {
             PBOWrap::uninitPBOPool(GLPixelBufferObject::FROM_GPU);
+        }
     }
 
 } // namespace TwkGLF

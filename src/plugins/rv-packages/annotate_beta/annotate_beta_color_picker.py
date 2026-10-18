@@ -16,70 +16,70 @@ _PRESETS = [
 class _HSVGradientWidget(QtWidgets.QWidget):
     """Saturation/value square. Hue is controlled via set_hue()."""
 
-    value_changed = QtCore.Signal(float, float)  # sat, val in [0, 1]
+    value_changed = QtCore.Signal(float, float)  # saturation, value in [0, 1]
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._hue = 0.0
-        self._sat = 1.0
-        self._val = 1.0
+        self._saturation = 1.0
+        self._value = 1.0
         self.setFixedSize(160, 120)
         self.setCursor(QtCore.Qt.CrossCursor)
 
-    def set_hue(self, hue_f):
-        self._hue = max(0.0, min(1.0, hue_f))
+    def set_hue(self, hue):
+        self._hue = max(0.0, min(1.0, hue))
         self.update()
 
-    def set_sv(self, sat, val):
-        self._sat = sat
-        self._val = val
+    def set_saturation_value(self, saturation, value):
+        self._saturation = saturation
+        self._value = value
         self.update()
 
-    def sat(self):
-        return self._sat
+    def saturation(self):
+        return self._saturation
 
-    def val(self):
-        return self._val
+    def value(self):
+        return self._value
 
     def paintEvent(self, event):
-        p = QtGui.QPainter(self)
-        p.setRenderHint(QtGui.QPainter.Antialiasing, False)
-        w, h = self.width(), self.height()
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, False)
+        width, height = self.width(), self.height()
 
         full_hue = QtGui.QColor.fromHsvF(self._hue, 1.0, 1.0)
 
-        hg = QtGui.QLinearGradient(0, 0, w, 0)
-        hg.setColorAt(0.0, QtGui.QColor(255, 255, 255))
-        hg.setColorAt(1.0, full_hue)
-        p.fillRect(self.rect(), hg)
+        saturation_gradient = QtGui.QLinearGradient(0, 0, width, 0)
+        saturation_gradient.setColorAt(0.0, QtGui.QColor(255, 255, 255))
+        saturation_gradient.setColorAt(1.0, full_hue)
+        painter.fillRect(self.rect(), saturation_gradient)
 
-        vg = QtGui.QLinearGradient(0, 0, 0, h)
-        vg.setColorAt(0.0, QtGui.QColor(0, 0, 0, 0))
-        vg.setColorAt(1.0, QtGui.QColor(0, 0, 0, 255))
-        p.fillRect(self.rect(), vg)
+        value_gradient = QtGui.QLinearGradient(0, 0, 0, height)
+        value_gradient.setColorAt(0.0, QtGui.QColor(0, 0, 0, 0))
+        value_gradient.setColorAt(1.0, QtGui.QColor(0, 0, 0, 255))
+        painter.fillRect(self.rect(), value_gradient)
 
-        cx = int(self._sat * (w - 1))
-        cy = int((1.0 - self._val) * (h - 1))
-        p.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        p.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 220), 1.5))
-        p.setBrush(QtCore.Qt.NoBrush)
-        p.drawEllipse(cx - 5, cy - 5, 10, 10)
+        marker_x = int(self._saturation * (width - 1))
+        marker_y = int((1.0 - self._value) * (height - 1))
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 220), 1.5))
+        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.drawEllipse(marker_x - 5, marker_y - 5, 10, 10)
 
-    def _update_from_pos(self, pos):
-        w = max(1, self.width() - 1)
-        h = max(1, self.height() - 1)
-        self._sat = max(0.0, min(1.0, pos.x() / w))
-        self._val = max(0.0, min(1.0, 1.0 - pos.y() / h))
+    def _update_from_position(self, position):
+        max_x = max(1, self.width() - 1)
+        max_y = max(1, self.height() - 1)
+        self._saturation = max(0.0, min(1.0, position.x() / max_x))
+        self._value = max(0.0, min(1.0, 1.0 - position.y() / max_y))
         self.update()
-        self.value_changed.emit(self._sat, self._val)
+        self.value_changed.emit(self._saturation, self._value)
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self._update_from_pos(event.position())
+            self._update_from_position(event.position())
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            self._update_from_pos(event.position())
+            self._update_from_position(event.position())
 
 
 class _HueSlider(QtWidgets.QWidget):
@@ -93,34 +93,34 @@ class _HueSlider(QtWidgets.QWidget):
         self.setFixedHeight(16)
         self.setCursor(QtCore.Qt.PointingHandCursor)
 
-    def set_hue(self, hue_f):
-        self._hue = max(0.0, min(1.0, hue_f))
+    def set_hue(self, hue):
+        self._hue = max(0.0, min(1.0, hue))
         self.update()
 
     def hue(self):
         return self._hue
 
     def paintEvent(self, event):
-        p = QtGui.QPainter(self)
-        p.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
 
         # Inset bar so the handle circle doesn't clip at edges
         bar = self.rect().adjusted(6, 3, -6, -3)
 
-        grad = QtGui.QLinearGradient(bar.left(), 0, bar.right(), 0)
-        for i in range(7):
-            grad.setColorAt(i / 6.0, QtGui.QColor.fromHsvF(i / 6.0, 1.0, 1.0))
-        p.setPen(QtCore.Qt.NoPen)
-        p.setBrush(grad)
-        p.drawRoundedRect(bar, 3, 3)
+        gradient = QtGui.QLinearGradient(bar.left(), 0, bar.right(), 0)
+        for stop in range(7):
+            gradient.setColorAt(stop / 6.0, QtGui.QColor.fromHsvF(stop / 6.0, 1.0, 1.0))
+        painter.setPen(QtCore.Qt.NoPen)
+        painter.setBrush(gradient)
+        painter.drawRoundedRect(bar, 3, 3)
 
-        x = bar.left() + int(self._hue * bar.width())
-        cy = self.height() // 2
-        p.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 1.5))
-        p.setBrush(QtGui.QColor.fromHsvF(self._hue, 1.0, 1.0))
-        p.drawEllipse(x - 5, cy - 5, 10, 10)
+        handle_x = bar.left() + int(self._hue * bar.width())
+        center_y = self.height() // 2
+        painter.setPen(QtGui.QPen(QtGui.QColor(255, 255, 255, 200), 1.5))
+        painter.setBrush(QtGui.QColor.fromHsvF(self._hue, 1.0, 1.0))
+        painter.drawEllipse(handle_x - 5, center_y - 5, 10, 10)
 
-    def _update_from_pos(self, x):
+    def _update_from_position(self, x):
         bar_left = 6
         bar_width = max(1, self.width() - 12)
         self._hue = max(0.0, min(1.0, (x - bar_left) / bar_width))
@@ -129,11 +129,11 @@ class _HueSlider(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            self._update_from_pos(event.position().x())
+            self._update_from_position(event.position().x())
 
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            self._update_from_pos(event.position().x())
+            self._update_from_position(event.position().x())
 
 
 class _SwatchButton(QtWidgets.QAbstractButton):
@@ -148,21 +148,18 @@ class _SwatchButton(QtWidgets.QAbstractButton):
         self.setFixedSize(22, 22)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setToolTip(color.name().upper())
+        self.clicked.connect(lambda: self.clicked_color.emit(self._color))
 
     def paintEvent(self, event):
-        p = QtGui.QPainter(self)
-        p.setRenderHint(QtGui.QPainter.Antialiasing, True)
-        p.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
-        p.setBrush(self._color)
-        p.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 3, 3)
-
-    def mousePressEvent(self, event):
-        if event.button() == QtCore.Qt.LeftButton:
-            self.clicked_color.emit(self._color)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing, True)
+        painter.setPen(QtGui.QPen(self.palette().color(self.foregroundRole()), 1))
+        painter.setBrush(self._color)
+        painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 3, 3)
 
 
-class ColorPickerSection(QtWidgets.QWidget):
-    """Inline color picker — shown/hidden inside the secondary panel."""
+class _ColorPickerSection(QtWidgets.QWidget):
+    """Color picker contents: saturation/value square, hue bar and preset swatches."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
 
@@ -170,51 +167,76 @@ class ColorPickerSection(QtWidgets.QWidget):
         super().__init__(parent)
         self._color = QtGui.QColor(255, 255, 255)
 
-        lay = QtWidgets.QVBoxLayout(self)
-        lay.setContentsMargins(10, 10, 10, 10)
-        lay.setSpacing(8)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
-        self._sv = _HSVGradientWidget()
-        self._sv.value_changed.connect(self._on_sv_changed)
-        lay.addWidget(self._sv, alignment=QtCore.Qt.AlignHCenter)
+        self._gradient = _HSVGradientWidget()
+        self._gradient.value_changed.connect(self._on_saturation_value_changed)
+        layout.addWidget(self._gradient, alignment=QtCore.Qt.AlignHCenter)
 
         self._hue_bar = _HueSlider()
         self._hue_bar.hue_changed.connect(self._on_hue_changed)
-        lay.addWidget(self._hue_bar)
+        layout.addWidget(self._hue_bar)
 
         swatch_row = QtWidgets.QWidget()
         swatch_row.setObjectName("swatchRow")
-        srow = QtWidgets.QHBoxLayout(swatch_row)
-        srow.setContentsMargins(0, 0, 0, 0)
-        srow.setSpacing(4)
-        for hex_col in _PRESETS:
-            btn = _SwatchButton(QtGui.QColor(hex_col))
-            btn.clicked_color.connect(self._on_preset_clicked)
-            srow.addWidget(btn)
-        srow.addStretch()
-        lay.addWidget(swatch_row)
+        swatch_layout = QtWidgets.QHBoxLayout(swatch_row)
+        swatch_layout.setContentsMargins(0, 0, 0, 0)
+        swatch_layout.setSpacing(4)
+        for hex_color in _PRESETS:
+            swatch = _SwatchButton(QtGui.QColor(hex_color))
+            swatch.clicked_color.connect(self._on_preset_clicked)
+            swatch_layout.addWidget(swatch)
+        swatch_layout.addStretch()
+        layout.addWidget(swatch_row)
 
     def set_color(self, color):
         """Sync all controls to color without emitting color_changed."""
         self._color = QtGui.QColor(color)
-        h, s, v, _ = self._color.getHsvF()
-        if h < 0:
-            h = 0.0
-        self._sv.set_hue(h)
-        self._sv.set_sv(s, v)
-        self._hue_bar.set_hue(h)
+        hue, saturation, value, _ = self._color.getHsvF()
+        if hue < 0:
+            hue = 0.0
+        self._gradient.set_hue(hue)
+        self._gradient.set_saturation_value(saturation, value)
+        self._hue_bar.set_hue(hue)
 
-    # ------------------------------------------------------------------
-
-    def _on_hue_changed(self, hue_f):
-        self._sv.set_hue(hue_f)
-        self._color = QtGui.QColor.fromHsvF(hue_f, self._sv.sat(), self._sv.val())
+    def _on_hue_changed(self, hue):
+        self._gradient.set_hue(hue)
+        self._color = QtGui.QColor.fromHsvF(hue, self._gradient.saturation(), self._gradient.value())
         self.color_changed.emit(self._color)
 
-    def _on_sv_changed(self, sat, val):
-        self._color = QtGui.QColor.fromHsvF(self._hue_bar.hue(), sat, val)
+    def _on_saturation_value_changed(self, saturation, value):
+        self._color = QtGui.QColor.fromHsvF(self._hue_bar.hue(), saturation, value)
         self.color_changed.emit(self._color)
 
     def _on_preset_clicked(self, color):
         self.set_color(color)
         self.color_changed.emit(color)
+
+
+class ColorPickerPopup(QtWidgets.QFrame):
+    """Floating color picker that appears to the right of the toolbar."""
+
+    color_changed = QtCore.Signal(QtGui.QColor)
+
+    def __init__(self, parent=None):
+        super().__init__(parent, QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
+        self.setObjectName("annotationBetaColorPopup")
+        self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self._picker = _ColorPickerSection()
+        self._picker.color_changed.connect(self.color_changed)
+        layout.addWidget(self._picker)
+        self.adjustSize()
+
+    def show_near(self, anchor_widget):
+        """Position and show the popup to the right of anchor_widget."""
+        position = anchor_widget.mapToGlobal(QtCore.QPoint(anchor_widget.width() + 6, 0))
+        self.move(position)
+        self.show()
+        self.raise_()
+
+    def set_color(self, color):
+        self._picker.set_color(color)
