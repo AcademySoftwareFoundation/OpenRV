@@ -147,6 +147,12 @@ namespace Rv
 
         void updateLayerScale();
 
+        //  Gives nativeView a new CALayer showing the last presented frame.
+        void attachLayer(WId nativeView);
+
+        //  Re-attaches the layer when Qt has replaced the native view.
+        void handleNativeViewChange();
+
         RvDocument* m_doc{nullptr};
         std::unique_ptr<QTMetalVideoDevice> m_videoDevice;
         bool m_presentationMode{false};

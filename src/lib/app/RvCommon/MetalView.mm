@@ -196,6 +196,62 @@ namespace Rv
         layer.contentsScale = std::max<CGFloat>(devicePixelRatioF(), 1.0);
     }
 
+    void MetalView::attachLayer(WId nativeView)
+    {
+        auto* nsView = (__bridge NSView*)reinterpret_cast<void*>(nativeView);
+        if (!nsView)
+        {
+            return;
+        }
+
+        // A plain CALayer whose contents are the presented IOSurface. With
+        // IOSurface contents (not a Metal drawable), the view's backing layer
+        // does not intercept or tile the content.
+        CALayer* caLayer = [CALayer layer];
+        caLayer.opaque = YES;
+        caLayer.contentsGravity = kCAGravityResize; // IOSurface fills layer exactly
+
+        [nsView setWantsLayer:YES];
+        [nsView setLayer:caLayer];
+
+        void* oldLayer = m_caLayer;
+        m_caLayer = (__bridge_retained void*)caLayer;
+        updateLayerScale();
+
+        // The new layer must retain the last frame before the old layer can
+        // release it: m_lastPresentedSurface does not own it.
+        if (m_lastPresentedSurface)
+        {
+            presentIOSurface(m_lastPresentedSurface);
+        }
+
+        if (oldLayer)
+        {
+            CFBridgingRelease(oldLayer);
+        }
+    }
+
+    void MetalView::handleNativeViewChange()
+    {
+        // internalWinId(), unlike winId(), does not create a native view
+        // while Qt is tearing this one down.
+        const WId nativeView = internalWinId();
+        if (!m_initialized || !nativeView)
+        {
+            return;
+        }
+
+        auto* nsView = (__bridge NSView*)reinterpret_cast<void*>(nativeView);
+        if (nsView.layer == (__bridge CALayer*)m_caLayer)
+        {
+            return;
+        }
+
+        std::cout << "INFO: MetalView: native view recreated; re-attaching the presentation layer" << std::endl;
+        attachLayer(nativeView);
+        requestUpdate();
+    }
+
     void MetalView::initialize()
     {
         if (m_initialized)
@@ -204,19 +260,8 @@ namespace Rv
         }
         m_initialized = true;
 
-        // A plain CALayer whose contents are the presented IOSurface.
-        CALayer* caLayer = [CALayer layer];
-        caLayer.opaque = YES;
-        caLayer.contentsGravity = kCAGravityResize; // IOSurface fills layer exactly
-
-        // With IOSurface contents (not a Metal drawable), the view's backing
-        // layer does not intercept or tile the content.
-        NSView* nsView = (__bridge NSView*)reinterpret_cast<void*>(winId());
-        [nsView setWantsLayer:YES];
-        [nsView setLayer:caLayer];
-
-        m_caLayer = (__bridge_retained void*)caLayer;
-        updateLayerScale();
+        // winId() creates the native NSView if Qt has not yet.
+        attachLayer(winId());
 
         //  Session init must not run from here: loading packages can create a
         //  QWebEngineView, which destroys this view's native window while it is
@@ -594,6 +639,15 @@ namespace Rv
         {
             event->accept();
             return true;
+        }
+
+        // Qt recreates the native view when it rebuilds the top-level window,
+        // e.g. when a QWebEngineView panel is added; the old view takes the
+        // layer with it.
+        if (event->type() == QEvent::WinIdChange)
+        {
+            handleNativeViewChange();
+            return QWidget::event(event);
         }
 
         const float activationTime = trackActivity(event);
