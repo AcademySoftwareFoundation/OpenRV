@@ -1206,72 +1206,69 @@ namespace Rv
     void RvDocument::fallbackMetalToGLView()
     {
         // Reached when MetalView::render() loses its GL context and when the
-        // user leaves 10-bit. Mirrors fallbackVulkanToGLView(), with the device
-        // rewiring of rebuildGLView().
-        if (!m_metalView)
+        // user leaves 10-bit. Mirrors fallbackVulkanToGLView().
+        if (!m_metalView || isClosing())
         {
-            // Already on the GL path
-            return;
-        }
-
-        if (isClosing())
-        {
-            // Document is tearing down; nothing to present
-            return;
-        }
-
-        if (!m_session)
-        {
-            // Nothing to rewire devices on without a session
             return;
         }
 
         cout << "INFO: RvDocument: switching main view from Metal to OpenGL." << endl;
 
-        MetalView* oldView = m_metalView;
-        oldView->stopProcessingEvents();
+        MetalView* oldMetalView = m_metalView;
+        m_metalView = nullptr;
+
+        oldMetalView->stopProcessingEvents();
 
         // OpenGL cannot present 10/10/10/2, so a 10-bit request recovers at
-        // 8-bit and keeps the persisted preference. The session already exists,
-        // so GLView::initializeGL()'s initializeSession() is a no-op.
+        // 8-bit and keeps the persisted preference.
         const Rv::Options& opts = Options::sharedOptions();
+        GLView* newGLView = nullptr;
         if (DesktopVideoDevice::tenBitDisplayRequested())
         {
-            m_glView = createGLView(8, 8, 8, 8);
+            newGLView = createGLView(8, 8, 8, 8);
         }
         else
         {
-            m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
+            newGLView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
         }
-        m_viewWidget = m_glView;
-        configureViewWidget(m_glView);
 
-        m_stackedLayout->addWidget(m_glView);
-        m_stackedLayout->removeWidget(oldView);
-        m_metalView = nullptr;
+        newGLView->setContentSize(oldMetalView->sizeHint().width(), oldMetalView->sizeHint().height());
+        newGLView->setMinimumSize(QSize(oldMetalView->minimumSizeHint().width(), oldMetalView->minimumSizeHint().height()));
+        configureViewWidget(newGLView);
 
-        m_glView->show();
-        m_glView->setFocus(Qt::OtherFocusReason);
+        m_stackedLayout->removeWidget(oldMetalView);
+        m_stackedLayout->addWidget(newGLView);
+        oldMetalView->hide();
+
+        m_glView = newGLView;
+        m_viewWidget = newGLView;
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+        newGLView->show();
 
         m_topViewToolBar->setDevice(m_glView->videoDevice());
 
-        // Move the session's control and output devices to the GL device.
-        const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
-        m_session->setEventVideoDevice(nullptr);
-        m_session->setOutputVideoDevice(nullptr);
-        m_session->setControlVideoDevice(m_glView->videoDevice());
-        if (same)
+        if (m_session)
         {
-            m_session->setOutputVideoDevice(m_glView->videoDevice());
-        }
+            const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+            m_session->setEventVideoDevice(nullptr);
+            m_session->setOutputVideoDevice(nullptr);
+            m_session->setControlVideoDevice(m_glView->videoDevice());
+            if (same)
+            {
+                m_session->setOutputVideoDevice(m_glView->videoDevice());
+            }
 
-        m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+            m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+        }
 
         // Move the presentation output to OpenGL too, or it stays black.
         RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
 
-        oldView->hide();
-        oldView->deleteLater();
+        // Deferred: this can be reached from a queued call out of MetalView::render().
+        oldMetalView->deleteLater();
+
+        newGLView->videoDevice()->makeCurrent();
+        newGLView->update();
     }
 
     void RvDocument::swapGLViewToMetal()

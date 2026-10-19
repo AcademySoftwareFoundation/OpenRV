@@ -62,6 +62,8 @@ namespace Rv
 
         QTMetalVideoDevice* videoDevice() const { return m_videoDevice.get(); }
 
+        bool isPresentationMode() const { return m_presentationMode; }
+
         //
         //  True when a Metal device exists and the OS can create the 10-bit
         //  IOSurface format. Static and side-effect-free so RvDocument can pick

@@ -14,6 +14,7 @@
 #import <Metal/Metal.h>
 
 #include <RvCommon/MetalView.h>
+#include <RvCommon/DesktopVideoDevice.h>
 #include <RvCommon/QTMetalVideoDevice.h>
 #include <RvCommon/RvDocument.h>
 #include <RvApp/Options.h>
@@ -455,10 +456,28 @@ namespace Rv
         // QOpenGLWidget repaints after resizeGL(); a plain QWidget must ask,
         // so the FBO and IOSurface rebuild at the new size.
         requestUpdate();
+
+        // A presentation output is only filled by the main view's frame.
+        if (m_presentationMode)
+        {
+            DesktopVideoDevice::requestOutputRecomposite();
+        }
     }
 
     void MetalView::paintEvent(QPaintEvent* /*event*/)
     {
+        // A presentation output shows its last frame instead of blank, then
+        // asks for a real one (there is none on first expose).
+        if (m_presentationMode)
+        {
+            if (m_lastPresentedSurface)
+            {
+                presentIOSurface(m_lastPresentedSurface);
+            }
+            DesktopVideoDevice::requestOutputRecomposite();
+            return;
+        }
+
         // WA_PaintOnScreen means Qt does not restore this surface on expose.
         // Re-present the last IOSurface (no GL readback), or render if there is none.
         if (!m_lastPresentedSurface)

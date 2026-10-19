@@ -278,14 +278,21 @@ namespace Rv
 
         releaseRenderFbo();
 
+        // The control view composites blended passes here, so it needs RGBA16F.
+        // A presentation output only receives already-composited blits, so
+        // RGB10_A2 (the IOSurface format) halves its bandwidth.
+        const bool passiveOutput = m_view && m_view->isPresentationMode();
+        const GLenum fboFormat = passiveOutput ? GL_RGB10_A2 : GL_RGBA16F_ARB;
+        const GLenum fboType = passiveOutput ? GL_UNSIGNED_INT_2_10_10_10_REV : GL_FLOAT;
+
         // GL_RGBA16F_ARB is a valid texture format on macOS GL 2.1 but not a
         // valid renderbuffer format, so attach a rectangle texture.
         glGenTextures(1, &m_fboColorTex);
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
-        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_RGBA16F_ARB, w, h, 0, GL_RGBA, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, w, h, 0, GL_RGBA, fboType, nullptr);
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
-        m_fbo = std::make_unique<TwkGLF::GLFBO>(w, h, GL_RGBA16F_ARB);
+        m_fbo = std::make_unique<TwkGLF::GLFBO>(w, h, fboFormat);
         m_fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
 
         const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
