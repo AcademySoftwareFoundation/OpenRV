@@ -13,6 +13,7 @@
 #include <QtCore/QTimer>
 #include <TwkUtil/Timer.h>
 
+#include <array>
 #include <memory>
 
 class QKeyEvent;
@@ -147,6 +148,15 @@ namespace Rv
 
         void updateLayerScale();
 
+        //  (Re)creates the CPU-fallback surfaces at w x h. On failure keeps the
+        //  old ones, so the last frame stays on screen, and returns false.
+        bool ensureCpuSurfaces(int w, int h);
+        void releaseCpuSurfaces();
+
+        //  The next CPU-fallback surface the window server no longer holds
+        //  (IOSurfaceIsInUse()), else the one not presented last.
+        void* nextCpuSurface();
+
         //  Gives nativeView a new CALayer showing the last presented frame.
         void attachLayer(WId nativeView);
 
@@ -174,10 +184,14 @@ namespace Rv
         QTimer m_eventProcessingTimer;
 
         //  Stored as void* to keep the header pure C++.
-        void* m_caLayer{nullptr};   // CALayer*
-        void* m_ioSurface{nullptr}; // IOSurfaceRef, owned; used only by the CPU fallback
-        int m_ioSurfaceWidth{0};
-        int m_ioSurfaceHeight{0};
+        void* m_caLayer{nullptr}; // CALayer*
+        //  CPU-fallback IOSurfaceRefs, owned. Two, so presentPixelData() never
+        //  writes into the one on screen.
+        static constexpr int cpuSurfaceCount = 2;
+        std::array<void*, cpuSurfaceCount> m_cpuSurfaces{};
+        int m_cpuSurfaceWidth{0};
+        int m_cpuSurfaceHeight{0};
+        int m_cpuSurfaceIndex{0};
 
         //  Last IOSurface on the CALayer, re-presented on expose. Not owned:
         //  the CALayer retains its contents.

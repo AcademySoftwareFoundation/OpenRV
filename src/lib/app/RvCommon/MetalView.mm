@@ -144,11 +144,7 @@ namespace Rv
         // The device's IOSurfaces and GL objects go before the layer that shows them.
         m_videoDevice.reset();
 
-        if (m_ioSurface)
-        {
-            CFRelease(static_cast<IOSurfaceRef>(m_ioSurface));
-            m_ioSurface = nullptr;
-        }
+        releaseCpuSurfaces();
 
         // Balances the __bridge_retained in initialize().
         if (m_caLayer)
@@ -272,35 +268,82 @@ namespace Rv
     // Presentation
     //--------------------------------------------------------------------------
 
+    void MetalView::releaseCpuSurfaces()
+    {
+        for (void*& surface : m_cpuSurfaces)
+        {
+            if (surface)
+            {
+                CFRelease(static_cast<IOSurfaceRef>(surface));
+                surface = nullptr;
+            }
+        }
+        m_cpuSurfaceWidth = 0;
+        m_cpuSurfaceHeight = 0;
+        m_cpuSurfaceIndex = 0;
+    }
+
+    bool MetalView::ensureCpuSurfaces(int w, int h)
+    {
+        if (m_cpuSurfaces[0] && m_cpuSurfaceWidth == w && m_cpuSurfaceHeight == h)
+        {
+            return true;
+        }
+
+        // Allocate the replacements before releasing the old surfaces. The
+        // CALayer retains the one it shows, so releasing ours is safe.
+        std::array<void*, cpuSurfaceCount> fresh{};
+        for (void*& surface : fresh)
+        {
+            surface = createArgb2101010Surface(w, h);
+            if (!surface)
+            {
+                std::cerr << "[MetalView::presentPixelData] IOSurfaceCreate failed " << w << "x" << h << "\n";
+                for (void* created : fresh)
+                {
+                    if (created)
+                    {
+                        CFRelease(static_cast<IOSurfaceRef>(created));
+                    }
+                }
+                return false;
+            }
+        }
+
+        releaseCpuSurfaces();
+        m_cpuSurfaces = fresh;
+        m_cpuSurfaceWidth = w;
+        m_cpuSurfaceHeight = h;
+        return true;
+    }
+
+    void* MetalView::nextCpuSurface()
+    {
+        // Starts at the surface not presented last; if the window server holds
+        // both, writing into that one is the least visible choice.
+        int chosen = m_cpuSurfaceIndex;
+        for (int i = 0; i < cpuSurfaceCount; ++i)
+        {
+            const int slot = (m_cpuSurfaceIndex + i) % cpuSurfaceCount;
+            if (!IOSurfaceIsInUse(static_cast<IOSurfaceRef>(m_cpuSurfaces[slot])))
+            {
+                chosen = slot;
+                break;
+            }
+        }
+        m_cpuSurfaceIndex = (chosen + 1) % cpuSurfaceCount;
+        return m_cpuSurfaces[chosen];
+    }
+
     void MetalView::presentPixelData(const void* pixels, int w, int h)
     {
-        if (!m_caLayer || w <= 0 || h <= 0)
+        if (!m_caLayer || w <= 0 || h <= 0 || !ensureCpuSurfaces(w, h))
         {
             return;
         }
 
-        // Allocate the replacement before releasing the old surface, so a
-        // failed recreate keeps the last good frame on screen.
-        if (!m_ioSurface || m_ioSurfaceWidth != w || m_ioSurfaceHeight != h)
-        {
-            void* newSurf = createArgb2101010Surface(w, h);
-            if (!newSurf)
-            {
-                std::cerr << "[MetalView::presentPixelData] IOSurfaceCreate failed " << w << "x" << h << "\n";
-                return;
-            }
-
-            if (m_ioSurface)
-            {
-                CFRelease(static_cast<IOSurfaceRef>(m_ioSurface));
-            }
-
-            m_ioSurface = newSurf;
-            m_ioSurfaceWidth = w;
-            m_ioSurfaceHeight = h;
-        }
-
-        auto* surf = static_cast<IOSurfaceRef>(m_ioSurface);
+        void* target = nextCpuSurface();
+        auto* surf = static_cast<IOSurfaceRef>(target);
 
         if (IOSurfaceLock(surf, 0, nullptr) != KERN_SUCCESS)
         {
@@ -337,7 +380,7 @@ namespace Rv
 
         IOSurfaceUnlock(surf, 0, nullptr);
 
-        presentIOSurface(m_ioSurface);
+        presentIOSurface(target);
     }
 
     void MetalView::presentIOSurface(void* ioSurfaceRef)

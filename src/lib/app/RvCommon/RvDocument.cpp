@@ -74,7 +74,6 @@
 #ifdef USE_METAL
 #include <RvCommon/MetalView.h>
 #include <RvCommon/QTMetalVideoDevice.h>
-#include <IPCore/ShaderFunction.h>
 #endif
 #endif
 
@@ -241,10 +240,6 @@ namespace Rv
             m_metalView->resize(m_metalView->sizeHint());
             m_metalView->setEventWidget(m_metalView);
             m_viewWidget = m_metalView;
-
-            // Session init, run later by newSessionFromFiles(), can build
-            // Shader::Function objects, which need the GLSL version.
-            IPCore::Shader::Function::useShadingLanguageVersion("1.20");
 
             // Check the offscreen GL context now, so a failure falls back to
             // OpenGL before anything is shown.
@@ -1285,9 +1280,6 @@ namespace Rv
         newMetalView->setMinimumContentSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
         configureViewWidget(newMetalView);
         newMetalView->setEventWidget(newMetalView);
-
-        // IPCore renders through an offscreen GL 2.1 context, as in the constructor.
-        IPCore::Shader::Function::useShadingLanguageVersion("1.20");
 
         // Keep the working GLView if the offscreen context cannot be established.
         newMetalView->videoDevice()->makeCurrent();

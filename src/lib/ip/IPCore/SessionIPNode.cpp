@@ -7,9 +7,6 @@
 //
 #include <IPCore/SessionIPNode.h>
 #include <IPCore/ImageRenderer.h>
-#ifdef PLATFORM_DARWIN
-#include <TwkGLF/GL.h>
-#endif
 
 namespace IPCore
 {
@@ -32,16 +29,7 @@ namespace IPCore
         declareProperty<IntProperty>("paintEffects.ghostAfter", 5);
         setMaxInputs(0);
 
-#ifdef PLATFORM_DARWIN
-        // Defer until Session::queryAndStoreGLInfo() can make the control
-        // device's GL context current (Metal hybrid path at session construction).
-        if (!TwkGLF::safeGLGetString(GL_VERSION).empty())
-        {
-            ImageRenderer::queryGLIntoContainer(this);
-        }
-#else
         ImageRenderer::queryGLIntoContainer(this);
-#endif
     }
 
     SessionIPNode::~SessionIPNode()
