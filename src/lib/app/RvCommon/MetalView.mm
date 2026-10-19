@@ -391,10 +391,13 @@ namespace Rv
 
     void MetalView::render()
     {
-        // A presentation view is rendered and presented by its
-        // MetalDesktopVideoDevice and must never drive the session.
+        // A presentation view is composited by its MetalDesktopVideoDevice and
+        // must never drive the session. Its own UpdateRequests (a skipped
+        // frame's retry, show, resize) re-present what is already composited,
+        // as VulkanWindow::render() does for a passive output.
         if (m_presentationMode)
         {
+            m_videoDevice->syncBuffers();
             return;
         }
 

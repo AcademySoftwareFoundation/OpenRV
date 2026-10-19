@@ -38,6 +38,10 @@ namespace
     // Frames to wait before retrying zero-copy interop (about 2 s at 60 Hz).
     constexpr int interopRetryFrames = 120;
 
+    // A skipped presentation-output frame is forced through after this long,
+    // so the output never freezes under load (as VulkanWindow).
+    constexpr double maxStaleSeconds = 0.1;
+
     size_t toPhysicalPixels(int logical, float dpr) { return static_cast<size_t>(std::lround(static_cast<float>(logical) * dpr)); }
 
     //--------------------------------------------------------------------------
@@ -625,9 +629,52 @@ namespace Rv
     // syncBuffers: GL FBO -> IOSurface -> CALayer
     //--------------------------------------------------------------------------
 
+    std::optional<int> QTMetalVideoDevice::findFreeSlot() const
+    {
+        for (int i = 0; i < ringSize; ++i)
+        {
+            const int slot = (m_ringIndex + i) % ringSize;
+            void* surface = m_ioSlots[slot].surface;
+            if (surface && !IOSurfaceIsInUse(static_cast<IOSurfaceRef>(surface)))
+            {
+                return slot;
+            }
+        }
+        return std::nullopt;
+    }
+
+    bool QTMetalVideoDevice::canPresentNow() const
+    {
+        // The control view never skips: nothing else would present it. No
+        // ring means the CPU fallback or a first frame, which builds one.
+        if (!m_view->isPresentationMode() || !m_ioSlots[0].surface)
+        {
+            return true;
+        }
+
+        if (!m_lastPresentTimer.isRunning() || m_lastPresentTimer.elapsed() > maxStaleSeconds)
+        {
+            return true;
+        }
+
+        if (findFreeSlot())
+        {
+            return true;
+        }
+
+        // Retry once a surface is released; requestUpdate() coalesces.
+        if (m_view->isVisible())
+        {
+            m_view->requestUpdate();
+        }
+        return false;
+    }
+
     bool QTMetalVideoDevice::presentZeroCopy(int w, int h) const
     {
-        const int slot = m_ringIndex;
+        // Every slot is held only on the control view, or on a stale
+        // presentation output: reuse the oldest rather than drop the frame.
+        const int slot = findFreeSlot().value_or(m_ringIndex);
         const IOSurfaceSlot& target = m_ioSlots[slot];
 
         // session->render() can leave errors pending; clear them so the check
@@ -654,6 +701,8 @@ namespace Rv
         m_view->presentIOSurface(target.surface);
 
         m_ringIndex = (slot + 1) % ringSize;
+        m_lastPresentTimer.stop();
+        m_lastPresentTimer.start();
 
         if (m_cpuFallbackLogged)
         {
@@ -709,6 +758,12 @@ namespace Rv
         const int w = static_cast<int>(m_fbo->width());
         const int h = static_cast<int>(m_fbo->height());
         if (w <= 0 || h <= 0)
+        {
+            return;
+        }
+
+        // Before any GL work, as in QTVulkanVideoDevice::syncBuffers().
+        if (!canPresentNow())
         {
             return;
         }

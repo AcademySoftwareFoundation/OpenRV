@@ -8,12 +8,14 @@
 #ifdef PLATFORM_DARWIN
 
 #include <TwkGLF/GLVideoDevice.h>
+#include <TwkUtil/Timer.h>
 #include <RvCommon/QTTranslator.h>
 #include <QOpenGLContext>
 #include <QOffscreenSurface>
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -99,8 +101,9 @@ namespace Rv
             std::unique_ptr<TwkGLF::GLFBO> fbo;
         };
 
-        // Double-buffered so CA can composite one surface while GL renders the other.
-        static constexpr int ringSize = 2;
+        // Three surfaces so GL can render into one while the window server
+        // still holds the last two (see findFreeSlot()).
+        static constexpr int ringSize = 3;
 
         // Makes the GL context current and binds an FBO matching the view size.
         // Returns false when context creation, makeCurrent, or FBO setup fails.
@@ -117,6 +120,15 @@ namespace Rv
         // Turns zero-copy interop off and schedules a retry: failures can be
         // transient (zero-size FBO at startup, a momentary context issue).
         void latchInteropFailure() const;
+
+        // The next ring slot the window server no longer holds
+        // (IOSurfaceIsInUse()), starting at m_ringIndex; empty if all are held.
+        std::optional<int> findFreeSlot() const;
+
+        // False when a presentation output should skip this frame because
+        // every surface is still held; schedules a retry. Always true for
+        // the control view. Mirrors VulkanWindow::canPresentNow().
+        bool canPresentNow() const;
 
         bool presentZeroCopy(int w, int h) const;
         void presentViaCpuReadback(int w, int h) const;
@@ -145,9 +157,10 @@ namespace Rv
         mutable int m_ringIndex{0};
         mutable int m_sharedWidth{0};
         mutable int m_sharedHeight{0};
-        mutable bool m_interopDisabled{false};   // interop currently off (with retry)
-        mutable int m_interopRetryCountdown{0};  // frames until interop is retried
-        mutable bool m_cpuFallbackLogged{false}; // one-shot CPU-fallback log guard
+        mutable bool m_interopDisabled{false};     // interop currently off (with retry)
+        mutable int m_interopRetryCountdown{0};    // frames until interop is retried
+        mutable bool m_cpuFallbackLogged{false};   // one-shot CPU-fallback log guard
+        mutable TwkUtil::Timer m_lastPresentTimer; // time since the last zero-copy present
 
         // CPU fallback: a GL_RGB10_A2 blit target does the float to 10-bit
         // conversion and Y-flip on the GPU, so glReadPixels returns
