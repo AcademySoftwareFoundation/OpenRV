@@ -52,6 +52,20 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         )
 
         commands.bind("default", "global", "session-clear-everything", self._on_session_clear, "Clear annotate history")
+        commands.bind(
+            "default",
+            "global",
+            "remote-annotate-clear-frame",
+            self._on_remote_clear_frame,
+            "Drop frame annotate history",
+        )
+        commands.bind(
+            "default",
+            "global",
+            "remote-annotate-clear-all-frames",
+            self._on_remote_clear_all_frames,
+            "Drop annotate history",
+        )
 
         # Register the named event table AFTER init() so mode name is set.
         self._engine.setup_event_table(self)
@@ -417,6 +431,14 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _on_session_clear(self, event):
         self._engine.sync_paint_nodes()
         self._engine.clear_annotate_history()
+        event.reject()
+
+    def _on_remote_clear_frame(self, event):
+        self._engine.discard_cleared_frame_history(event.contents())
+        event.reject()
+
+    def _on_remote_clear_all_frames(self, event):
+        self._engine.discard_cleared_all_frames_history()
         event.reject()
 
     # ------------------------------------------------------------------

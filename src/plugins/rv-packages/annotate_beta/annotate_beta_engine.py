@@ -708,6 +708,15 @@ class AnnotateDrawEngine:
         self._history.clear()
         self._on_history_changed()
 
+    def discard_cleared_frame_history(self, order_property: str):
+        paint_frame = paint.order_property_frame(order_property)
+        self._history.discard_cleared_frame(paint_frame)
+        self._on_history_changed()
+
+    def discard_cleared_all_frames_history(self):
+        self._history.clear()
+        self._on_history_changed()
+
     def undo(self):
         self.commit_text_if_active()
         action = self._history.undo(self._find_paint_frame())
@@ -752,6 +761,7 @@ class AnnotateDrawEngine:
         commands.redraw()
         self._on_history_changed()
         self._send_paint_event("clear-paint", cleared)
+        commands.sendInternalEvent("annotate-clear-frame", paint.frame_order_property(paint_frame))
 
     def clear_all_frames(self):
         """Soft-delete every visible component on every frame of every paint node."""
@@ -767,6 +777,7 @@ class AnnotateDrawEngine:
         commands.redraw()
         self._on_history_changed()
         self._send_paint_event("clear-all-paint", cleared)
+        commands.sendInternalEvent("annotate-clear-all-frames")
 
     # ------------------------------------------------------------------
     # Stylus eraser-end handlers

@@ -48,13 +48,13 @@ def _node_name(component: PaintComponent) -> str:
     return f"{component.paint_frame.paint_node}.{component.name}"
 
 
-def _order_property(paint_frame: PaintFrame) -> str:
+def frame_order_property(paint_frame: PaintFrame) -> str:
     return f"{paint_frame.paint_node}.frame:{paint_frame.frame}.order"
 
 
 def _add_to_order(component: PaintComponent):
     """Insert the component into the frame draw order."""
-    order_property = _order_property(component.paint_frame)
+    order_property = frame_order_property(component.paint_frame)
     _ensure_property(order_property, commands.StringType, 1)
     if component.name not in commands.getStringProperty(order_property):
         commands.insertStringProperty(order_property, [component.name])
@@ -62,7 +62,7 @@ def _add_to_order(component: PaintComponent):
 
 def _remove_from_order(component: PaintComponent):
     """Remove a component from the frame draw-order list."""
-    order_property = _order_property(component.paint_frame)
+    order_property = frame_order_property(component.paint_frame)
     if not commands.propertyExists(order_property):
         return
     current = list(commands.getStringProperty(order_property))
@@ -125,13 +125,13 @@ def order_property_frame(property_name: str) -> PaintFrame | None:
 
 
 def has_visible_components(paint_frame: PaintFrame) -> bool:
-    order_property = _order_property(paint_frame)
+    order_property = frame_order_property(paint_frame)
     return commands.propertyExists(order_property) and bool(commands.getStringProperty(order_property))
 
 
 def soft_delete_frame(paint_frame: PaintFrame) -> list[PaintComponent]:
     """Soft-delete every visible component on a frame and return them."""
-    order_property = _order_property(paint_frame)
+    order_property = frame_order_property(paint_frame)
     if not commands.propertyExists(order_property):
         return []
     cleared = [PaintComponent(paint_frame, name) for name in commands.getStringProperty(order_property)]

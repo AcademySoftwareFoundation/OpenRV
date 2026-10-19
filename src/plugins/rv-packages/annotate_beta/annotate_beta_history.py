@@ -45,6 +45,11 @@ class UndoHistory:
         self.clear()
         self._undo_clear_all_frames = PaintAction(PaintActionType.CLEAR_ALL_FRAMES, tuple(components))
 
+    def discard_cleared_frame(self, paint_frame: PaintFrame):
+        self._undo_stacks.pop(paint_frame, None)
+        self._redo_stacks.pop(paint_frame, None)
+        self._redo_clear_all_frames = None
+
     def can_undo(self, paint_frame: PaintFrame | None) -> bool:
         return self._undo_clear_all_frames is not None or bool(self._undo_stacks.get(paint_frame))
 
