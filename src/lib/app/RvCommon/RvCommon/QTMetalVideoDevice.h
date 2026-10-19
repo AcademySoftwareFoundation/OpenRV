@@ -112,8 +112,10 @@ namespace Rv
         bool ensureRenderFbo(int w, int h) const;
         void releaseRenderFbo() const;
 
-        // (Re)builds the IOSurface ring at w x h. Returns false, and schedules
-        // a retry, when interop is unavailable. Needs the GL context current.
+        // Ensures the IOSurface ring can hold a w x h frame, growing it to at
+        // least the view's screen so resizes reuse it. The frame occupies the
+        // top-left corner. Returns false, and schedules a retry, when interop
+        // is unavailable. Needs the GL context current.
         bool ensureIOSurfaceTextures(int w, int h) const;
         void cleanupIOSurfaceTextures() const;
 
@@ -155,8 +157,8 @@ namespace Rv
         // header free of CoreVideo types.
         mutable std::array<IOSurfaceSlot, ringSize> m_ioSlots;
         mutable int m_ringIndex{0};
-        mutable int m_sharedWidth{0};
-        mutable int m_sharedHeight{0};
+        mutable int m_ringCapacityWidth{0}; // allocated size, not the frame size
+        mutable int m_ringCapacityHeight{0};
         mutable bool m_interopDisabled{false};     // interop currently off (with retry)
         mutable int m_interopRetryCountdown{0};    // frames until interop is retried
         mutable bool m_cpuFallbackLogged{false};   // one-shot CPU-fallback log guard

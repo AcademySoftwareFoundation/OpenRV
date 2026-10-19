@@ -146,7 +146,8 @@ namespace Rv
         //  True when kevent repeats the previous key event; records kevent.
         bool isRepeatedKey(const QKeyEvent* kevent);
 
-        void updateLayerScale();
+        //  Matches the layer's scale and gravity to the current screen and flip.
+        void updateLayerGeometry();
 
         //  (Re)creates the CPU-fallback surfaces at w x h. On failure keeps the
         //  old ones, so the last frame stays on screen, and returns false.

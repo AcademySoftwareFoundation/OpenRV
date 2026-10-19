@@ -25,6 +25,7 @@
 #include <QGuiApplication>
 #include <QSurfaceFormat>
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -128,6 +129,17 @@ namespace
         mutable bool m_versionChecked{false};
     };
 
+    // The physical pixel size of the screen widget is on, or empty.
+    QSize screenPixelSize(const QWidget* widget)
+    {
+        const QScreen* screen = widget ? widget->screen() : nullptr;
+        if (!screen)
+        {
+            return {};
+        }
+        return (QSizeF(screen->geometry().size()) * screen->devicePixelRatio()).toSize();
+    }
+
     // Empties the GL error queue and returns its first error, or GL_NO_ERROR.
     GLenum takeGLError()
     {
@@ -148,13 +160,18 @@ namespace
     }
 
     // IPCore clears the background with alpha 0 and CA honours per-pixel
-    // IOSurface alpha, so write alpha = 1 into the bound draw FBO, leaving RGB.
-    void forceOpaqueAlpha()
+    // IOSurface alpha, so write alpha = 1 into the w x h frame of the bound
+    // draw FBO, leaving RGB. The scissor skips the unused part of a larger ring
+    // surface.
+    void forceOpaqueAlpha(int w, int h)
     {
+        glPushAttrib(GL_SCISSOR_BIT | GL_COLOR_BUFFER_BIT);
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(0, 0, w, h);
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glPopAttrib();
     }
 
     // Returns a GL_TEXTURE_RECTANGLE_ARB texture whose storage is the
@@ -309,8 +326,6 @@ namespace Rv
 
         m_fboWidth = w;
         m_fboHeight = h;
-        // The IOSurface ring is rebuilt at the new size, so retry interop now.
-        m_interopDisabled = false;
         return true;
     }
 
@@ -485,8 +500,9 @@ namespace Rv
             return false;
         }
 
-        // The ring is rebuilt on a size change, so that is always a fresh attempt.
-        if (m_sharedWidth != w || m_sharedHeight != h)
+        // Outgrowing the ring rebuilds it, so that is always a fresh attempt.
+        const bool fits = w <= m_ringCapacityWidth && h <= m_ringCapacityHeight;
+        if (!fits)
         {
             m_interopDisabled = false;
         }
@@ -500,10 +516,16 @@ namespace Rv
             m_interopDisabled = false;
         }
 
-        if (m_sharedWidth == w && m_sharedHeight == h && m_ioSlots[0].fbo)
+        if (fits && m_ioSlots[0].fbo)
         {
             return true;
         }
+
+        // At least the view's screen, so a drag up to full screen allocates
+        // once (as VulkanWindow::getSharedImageInfo()).
+        const QSize screenSize = screenPixelSize(m_view);
+        const int capacityWidth = std::max({w, screenSize.width(), m_ringCapacityWidth});
+        const int capacityHeight = std::max({h, screenSize.height(), m_ringCapacityHeight});
 
         cleanupIOSurfaceTextures();
 
@@ -526,20 +548,21 @@ namespace Rv
         // Each slot is filled as it is built, so cleanupIOSurfaceTextures() releases partial work.
         for (IOSurfaceSlot& slot : m_ioSlots)
         {
-            slot.surface = createArgb2101010Surface(w, h);
+            slot.surface = createArgb2101010Surface(capacityWidth, capacityHeight);
             if (!slot.surface)
             {
-                std::cerr << "[QTMetalVideoDevice] IOSurfaceCreate failed " << w << "x" << h << "; CPU fallback\n";
+                std::cerr << "[QTMetalVideoDevice] IOSurfaceCreate failed " << capacityWidth << "x" << capacityHeight
+                          << "; CPU fallback\n";
                 return fail();
             }
 
-            slot.texture = createIOSurfaceTexture(cgl, static_cast<IOSurfaceRef>(slot.surface), w, h);
+            slot.texture = createIOSurfaceTexture(cgl, static_cast<IOSurfaceRef>(slot.surface), capacityWidth, capacityHeight);
             if (!slot.texture)
             {
                 return fail();
             }
 
-            slot.fbo = std::make_unique<TwkGLF::GLFBO>(w, h, GL_RGB10_A2);
+            slot.fbo = std::make_unique<TwkGLF::GLFBO>(capacityWidth, capacityHeight, GL_RGB10_A2);
             slot.fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, slot.texture);
 
             const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -551,8 +574,8 @@ namespace Rv
             }
         }
 
-        m_sharedWidth = w;
-        m_sharedHeight = h;
+        m_ringCapacityWidth = capacityWidth;
+        m_ringCapacityHeight = capacityHeight;
         m_ringIndex = 0;
         return true;
     }
@@ -575,8 +598,8 @@ namespace Rv
                 slot.surface = nullptr;
             }
         }
-        m_sharedWidth = 0;
-        m_sharedHeight = 0;
+        m_ringCapacityWidth = 0;
+        m_ringCapacityHeight = 0;
         m_ringIndex = 0;
     }
 
@@ -690,7 +713,7 @@ namespace Rv
             return false;
         }
 
-        forceOpaqueAlpha();
+        forceOpaqueAlpha(w, h);
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fbo->fboID());
 
@@ -724,7 +747,7 @@ namespace Rv
         ensureCpuFallbackTarget(w, h);
 
         blitFlippedY(m_fbo->fboID(), m_cpuFlipFbo, w, h);
-        forceOpaqueAlpha();
+        forceOpaqueAlpha(w, h);
 
         // On GL-on-Metal glReadPixels does not wait for the blit; glFinish commits it.
         glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);

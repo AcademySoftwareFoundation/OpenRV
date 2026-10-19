@@ -186,10 +186,27 @@ namespace Rv
     // Initialisation
     //--------------------------------------------------------------------------
 
-    void MetalView::updateLayerScale()
+    void MetalView::updateLayerGeometry()
     {
         CALayer* layer = (__bridge CALayer*)m_caLayer;
-        layer.contentsScale = std::max<CGFloat>(devicePixelRatioF(), 1.0);
+
+        // Frames are shown 1:1, so the scale must track the current screen;
+        // Qt does not always send a resize when only the pixel ratio changes.
+        const CGFloat scale = std::max<CGFloat>(devicePixelRatioF(), 1.0);
+        if (layer.contentsScale != scale)
+        {
+            layer.contentsScale = scale;
+        }
+
+        // The frame is in the surface's top-left corner (the zero-copy ring can
+        // be larger than the view): pin that corner. Gravity "top" means maximum
+        // Y, which is the visual bottom when the layer's geometry is flipped
+        // (QNSView is).
+        const CALayerContentsGravity gravity = [layer contentsAreFlipped] ? kCAGravityBottomLeft : kCAGravityTopLeft;
+        if (![layer.contentsGravity isEqualToString:gravity])
+        {
+            layer.contentsGravity = gravity;
+        }
     }
 
     void MetalView::attachLayer(WId nativeView)
@@ -205,14 +222,16 @@ namespace Rv
         // does not intercept or tile the content.
         CALayer* caLayer = [CALayer layer];
         caLayer.opaque = YES;
-        caLayer.contentsGravity = kCAGravityResize; // IOSurface fills layer exactly
+        // The zero-copy IOSurfaces can be larger than the view; clip the rest
+        // (see updateLayerGeometry()).
+        caLayer.masksToBounds = YES;
 
         [nsView setWantsLayer:YES];
         [nsView setLayer:caLayer];
 
         void* oldLayer = m_caLayer;
         m_caLayer = (__bridge_retained void*)caLayer;
-        updateLayerScale();
+        updateLayerGeometry();
 
         // The new layer must retain the last frame before the old layer can
         // release it: m_lastPresentedSurface does not own it.
@@ -395,6 +414,7 @@ namespace Rv
         // Disable implicit animations so the new contents show immediately.
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
+        updateLayerGeometry();
         layer.contents = (__bridge id)surf;
         [CATransaction commit];
 
@@ -532,7 +552,7 @@ namespace Rv
         // AppKit resizes the layer frame with the view; only the scale needs updating.
         if (m_caLayer)
         {
-            updateLayerScale();
+            updateLayerGeometry();
         }
 
         if (m_doc)
