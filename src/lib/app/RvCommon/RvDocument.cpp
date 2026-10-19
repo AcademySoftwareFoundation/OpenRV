@@ -242,23 +242,17 @@ namespace Rv
             m_metalView->setEventWidget(m_metalView);
             m_viewWidget = m_metalView;
 
-            // Initialize the session now: MetalView::initialize() runs from an
-            // async showEvent(), but newSessionFromFiles() needs doc->session()
-            // right after doc->show(). Its later initializeSession() call is a no-op.
-            //
-            // Session init can build Shader::Function objects, which need the
-            // GLSL version and a current GL context.
+            // Session init, run later by newSessionFromFiles(), can build
+            // Shader::Function objects, which need the GLSL version.
             IPCore::Shader::Function::useShadingLanguageVersion("1.20");
+
+            // Check the offscreen GL context now, so a failure falls back to
+            // OpenGL before anything is shown.
             m_metalView->videoDevice()->makeCurrent();
 
-            if (m_metalView->videoDevice()->isGLContextReady())
+            if (!m_metalView->videoDevice()->isGLContextReady())
             {
-                initializeSession();
-            }
-            else
-            {
-                // A MetalView without a GL context can never paint, so use the
-                // 8-bit GLView, which initializes the session in initializeGL().
+                // A MetalView without a GL context can never paint.
                 cerr << "WARNING: Metal offscreen GL context unavailable at "
                         "startup; falling back to OpenGL."
                      << endl;

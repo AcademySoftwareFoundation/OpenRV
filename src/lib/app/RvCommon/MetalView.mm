@@ -218,11 +218,9 @@ namespace Rv
         m_caLayer = (__bridge_retained void*)caLayer;
         updateLayerScale();
 
-        // Equivalent to GLView::initializeGL
-        if (m_doc)
-        {
-            m_doc->initializeSession();
-        }
+        //  Session init must not run from here: loading packages can create a
+        //  QWebEngineView, which destroys this view's native window while it is
+        //  on the stack. RvApplication::newSessionFromFiles() does it after show().
     }
 
     //--------------------------------------------------------------------------
