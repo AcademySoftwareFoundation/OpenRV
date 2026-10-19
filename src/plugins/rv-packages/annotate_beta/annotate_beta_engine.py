@@ -52,6 +52,14 @@ class _Vec2(NamedTuple):
     y: float
 
 
+@dataclass(frozen=True)
+class AvailableActions:
+    can_undo: bool = False
+    can_redo: bool = False
+    can_clear_frame: bool = False
+    can_clear_all_frames: bool = False
+
+
 @dataclass
 class ToolState:
     """Style remembered separately for each tool."""
@@ -673,24 +681,22 @@ class AnnotateDrawEngine:
     # Undo / redo / clear
     # ------------------------------------------------------------------
 
-    def undo_redo_state(self) -> tuple[bool, bool]:
+    def available_actions(self) -> AvailableActions:
         if commands.isPlaying():
-            return False, False
+            return AvailableActions()
         paint_frame = self._find_paint_frame()
-        return self._history.can_undo(paint_frame), self._history.can_redo(paint_frame)
-
-    def clear_state(self) -> tuple[bool, bool]:
-        if commands.isPlaying():
-            return False, False
-        return self._find_paint_frame() in self._visible_frames, bool(self._visible_frames)
+        return AvailableActions(
+            can_undo=self._history.can_undo(paint_frame),
+            can_redo=self._history.can_redo(paint_frame),
+            can_clear_frame=paint_frame in self._visible_frames,
+            can_clear_all_frames=bool(self._visible_frames),
+        )
 
     def sync_paint_nodes(self):
-        """Forget the history of deleted paint nodes and rebuild the frames with visible components."""
         self._history.retain_paint_nodes(set(commands.nodesOfType("RVPaint")))
         self._visible_frames = {frame for frame in paint.all_annotated_frames() if paint.has_visible_components(frame)}
 
     def update_visible_frame(self, property_name: str) -> bool:
-        """Track a changed frame order property; return whether it was one."""
         paint_frame = paint.order_property_frame(property_name)
 
         if paint_frame is None:

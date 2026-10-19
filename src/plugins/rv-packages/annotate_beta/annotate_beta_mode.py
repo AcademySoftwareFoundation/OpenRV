@@ -319,14 +319,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._dock.toolbar_widget.hide_popups()
 
     def _update_history_buttons(self):
-        can_undo, can_redo = self._engine.undo_redo_state()
+        actions = self._engine.available_actions()
         toolbar = self._dock.toolbar_widget
-        toolbar.set_undo_enabled(can_undo)
-        toolbar.set_redo_enabled(can_redo)
-        self._update_clear_buttons()
-
-    def _update_clear_buttons(self):
-        self._dock.toolbar_widget.set_clear_enabled(*self._engine.clear_state())
+        toolbar.set_undo_enabled(actions.can_undo)
+        toolbar.set_redo_enabled(actions.can_redo)
+        toolbar.set_clear_enabled(actions.can_clear_frame, actions.can_clear_all_frames)
 
     def _update_tool_availability(self):
         """Enable/disable tools whose RV event categories are currently disabled."""
@@ -398,7 +395,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_graph_state_change(self, event):
         if self._engine.update_visible_frame(event.contents()):
-            self._update_clear_buttons()
+            self._update_history_buttons()
         event.reject()
 
     def _on_paint_nodes_changed(self, event):

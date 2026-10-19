@@ -89,7 +89,6 @@ class UndoHistory:
         return True
 
     def retain_paint_nodes(self, paint_nodes: Collection[str]):
-        """Forget the history of every paint node not in paint_nodes."""
         paint_frames = self._undo_stacks.keys() | self._redo_stacks.keys()
         stale_frames = [paint_frame for paint_frame in paint_frames if paint_frame.paint_node not in paint_nodes]
 
