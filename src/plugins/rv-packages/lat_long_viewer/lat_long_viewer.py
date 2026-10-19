@@ -3,15 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from __future__ import print_function
 
+import sys
+
+import rv.runtime
 from rv import commands as rvc
 from rv import extra_commands as rve
 from rv import rvtypes as rvt
-
-import rv.runtime
-
-import sys
 
 
 def deb(s):
@@ -159,7 +157,6 @@ class LatLongViewerMode(rvt.MinorMode):
             'rvui.startParameterMode("#LatLongViewer.parameters.focalLength", 100.0, 7.0, 1.0)(nil);',
             [],
         )
-        pass
 
     def toggleAdjust(self, event):
         self.adjustAllowed = not self.adjustAllowed

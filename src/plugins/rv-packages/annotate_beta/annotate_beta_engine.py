@@ -7,10 +7,9 @@ from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple
 
-from rv import commands, extra_commands
-
 import annotate_beta_constants as constants
 import annotate_beta_paint as paint
+from rv import commands, extra_commands
 
 _PREFIX = {
     constants.Tool.RECT: "rect",
