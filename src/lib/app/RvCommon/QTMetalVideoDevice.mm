@@ -324,7 +324,7 @@ namespace Rv
         // valid renderbuffer format, so attach a rectangle texture.
         glGenTextures(1, &m_fboColorTex);
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
-        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, w, h, 0, GL_RGBA, fboType, nullptr);
+        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, static_cast<GLint>(fboFormat), w, h, 0, GL_RGBA, fboType, nullptr);
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
         m_fbo = std::make_unique<TwkGLF::GLFBO>(w, h, fboFormat);
@@ -541,6 +541,11 @@ namespace Rv
         const int capacityWidth = std::max({w, screenSize.width(), m_ringCapacityWidth});
         const int capacityHeight = std::max({h, screenSize.height(), m_ringCapacityHeight});
 
+        return buildIOSurfaceRing(capacityWidth, capacityHeight);
+    }
+
+    bool QTMetalVideoDevice::buildIOSurfaceRing(int capacityWidth, int capacityHeight) const
+    {
         cleanupIOSurfaceTextures();
 
         const auto fail = [this](std::string reason)

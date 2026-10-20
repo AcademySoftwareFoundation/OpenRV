@@ -73,14 +73,7 @@ namespace Rv
         m_metalView->move(g.x(), g.y());
         m_metalView->setGeometry(g);
 
-        if (useFullScreen())
-        {
-            m_metalView->setWindowState(Qt::WindowFullScreen);
-        }
-        else
-        {
-            m_metalView->setWindowState(Qt::WindowNoState);
-        }
+        m_metalView->setWindowState(useFullScreen() ? Qt::WindowFullScreen : Qt::WindowNoState);
 
         //  Re-apply: the window-state change above resets the geometry.
         m_metalView->setGeometry(g);
@@ -93,18 +86,7 @@ namespace Rv
 
         if (debugPresent())
         {
-            const QList<QScreen*> screens = QGuiApplication::screens();
-            const int idx = qtScreen();
-            const QString wantName = (idx >= 0 && idx < screens.size()) ? screens[idx]->name() : QString("<invalid>");
-            const QScreen* actual = m_metalView->screen();
-            std::cout << "INFO: MetalDesktopVideoDevice::open: intended screen " << idx << " '" << wantName.toStdString()
-                      << "'; computed geom " << g.x() << "," << g.y() << " " << g.width() << "x" << g.height()
-                      << "; fullscreen=" << (useFullScreen() ? 1 : 0) << std::endl;
-            std::cout << "INFO: MetalDesktopVideoDevice::open: actual placed screen '"
-                      << (actual ? actual->name().toStdString() : std::string("<null>")) << "' geom " << m_metalView->geometry().x() << ","
-                      << m_metalView->geometry().y() << " " << m_metalView->geometry().width() << "x" << m_metalView->geometry().height()
-                      << " visible=" << (m_metalView->isVisible() ? 1 : 0)
-                      << " windowState=" << static_cast<int>(m_metalView->windowState()) << std::endl;
+            logPlacement(g);
         }
 
         //  Prime the offscreen GL context + FBO so the inherited transfer()'s
@@ -114,6 +96,23 @@ namespace Rv
         {
             m_viewDevice->makeCurrent();
         }
+    }
+
+    void MetalDesktopVideoDevice::logPlacement(const QRect& intended) const
+    {
+        const QList<QScreen*> screens = QGuiApplication::screens();
+        const int idx = qtScreen();
+        const QString wantName = (idx >= 0 && idx < screens.size()) ? screens[idx]->name() : QString("<invalid>");
+        const QScreen* actual = m_metalView->screen();
+        const QRect placed = m_metalView->geometry();
+
+        std::cout << "INFO: MetalDesktopVideoDevice::open: intended screen " << idx << " '" << wantName.toStdString() << "'; computed geom "
+                  << intended.x() << "," << intended.y() << " " << intended.width() << "x" << intended.height()
+                  << "; fullscreen=" << (useFullScreen() ? 1 : 0) << std::endl;
+        std::cout << "INFO: MetalDesktopVideoDevice::open: actual placed screen '"
+                  << (actual ? actual->name().toStdString() : std::string("<null>")) << "' geom " << placed.x() << "," << placed.y() << " "
+                  << placed.width() << "x" << placed.height() << " visible=" << (m_metalView->isVisible() ? 1 : 0)
+                  << " windowState=" << static_cast<int>(m_metalView->windowState()) << std::endl;
     }
 
     void MetalDesktopVideoDevice::close()

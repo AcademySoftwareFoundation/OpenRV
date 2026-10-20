@@ -121,6 +121,20 @@ namespace
 
         return true;
     }
+
+    // Sends the session a "view-resized" event with the old and new sizes.
+    void reportResize(const QResizeEvent* event, IPCore::Session* session)
+    {
+        if (!session || event->oldSize().width() == -1 || event->oldSize().height() == -1)
+        {
+            return;
+        }
+
+        std::ostringstream contents;
+        contents << event->oldSize().width() << " " << event->oldSize().height() << "|" << event->size().width() << " "
+                 << event->size().height();
+        session->userGenericEvent("view-resized", contents.str());
+    }
 } // namespace
 
 namespace Rv
@@ -225,7 +239,7 @@ namespace Rv
 
     void MetalView::updateLayerGeometry()
     {
-        CALayer* layer = (__bridge CALayer*)m_caLayer;
+        auto* layer = (__bridge CALayer*)m_caLayer;
 
         // Frames are shown 1:1, so the scale must track the current screen;
         // Qt does not always send a resize when only the pixel ratio changes.
@@ -266,7 +280,7 @@ namespace Rv
         [nsView setWantsLayer:YES];
         [nsView setLayer:caLayer];
 
-        void* oldLayer = m_caLayer;
+        const void* oldLayer = m_caLayer;
         m_caLayer = (__bridge_retained void*)caLayer;
         updateLayerGeometry();
 
@@ -441,7 +455,7 @@ namespace Rv
 
     void MetalView::presentIOSurface(void* ioSurfaceRef)
     {
-        CALayer* layer = (__bridge CALayer*)m_caLayer;
+        auto* layer = (__bridge CALayer*)m_caLayer;
         auto* surf = static_cast<IOSurfaceRef>(ioSurfaceRef);
         if (!layer || !surf)
         {
@@ -507,42 +521,18 @@ namespace Rv
             return;
         }
 
-        m_videoDevice->makeCurrent();
-        if (!m_videoDevice->isGLContextReady())
+        if (!makeContextCurrent())
         {
-            // A persistent failure means this view can never paint, so swap to
-            // the 8-bit GLView. Queued, so this view is not destroyed inside render().
-            if (++m_contextFailureCount == contextFailureThreshold)
-            {
-                std::cerr << "WARNING: [MetalView] offscreen GL context not ready after " << contextFailureThreshold
-                          << " attempts; falling back to OpenGL.\n";
-                QMetaObject::invokeMethod(m_doc, "fallbackMetalToGLView", Qt::QueuedConnection);
-            }
             return;
         }
-
-        m_contextFailureCount = 0;
 
         const bool diag = IPCore::ImageRenderer::debugGpu();
         if (diag)
         {
-            if (m_diagFrameTimer.isRunning())
-            {
-                m_diag.frameIntervalMs += m_diagFrameTimer.elapsed() * msPerSecond;
-            }
-            m_diagFrameTimer.stop();
-            m_diagFrameTimer.start();
+            beginFrameDiagnostics();
         }
 
-        if (m_userActive && m_activityTimer.elapsed() > userIdleSeconds)
-        {
-            if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
-            {
-                const TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice.get());
-                m_videoDevice->sendEvent(aevent);
-                m_userActive = false;
-            }
-        }
+        reportUserInactivity();
 
         int x = 0;
         int y = 0;
@@ -554,16 +544,7 @@ namespace Rv
             session->render();
         }
 
-        // As in GLView::paintGL(): fit and center the window on the first non-empty render.
-        if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
-        {
-            m_postFirstNonEmptyRender = true;
-            if (!session->isFullScreen())
-            {
-                m_doc->resizeToFit(false, false);
-                m_doc->center();
-            }
-        }
+        fitWindowToFirstContent(session);
 
         m_firstPaintCompleted = true;
 
@@ -575,6 +556,67 @@ namespace Rv
         presentFrame(session, diag);
 
         m_eventProcessingTimer.start();
+    }
+
+    bool MetalView::makeContextCurrent()
+    {
+        m_videoDevice->makeCurrent();
+        if (m_videoDevice->isGLContextReady())
+        {
+            m_contextFailureCount = 0;
+            return true;
+        }
+
+        // A persistent failure means this view can never paint, so swap to
+        // the 8-bit GLView. Queued, so this view is not destroyed inside render().
+        if (++m_contextFailureCount == contextFailureThreshold)
+        {
+            std::cerr << "WARNING: [MetalView] offscreen GL context not ready after " << contextFailureThreshold
+                      << " attempts; falling back to OpenGL.\n";
+            QMetaObject::invokeMethod(m_doc, "fallbackMetalToGLView", Qt::QueuedConnection);
+        }
+        return false;
+    }
+
+    void MetalView::beginFrameDiagnostics()
+    {
+        if (m_diagFrameTimer.isRunning())
+        {
+            m_diag.frameIntervalMs += m_diagFrameTimer.elapsed() * msPerSecond;
+        }
+        m_diagFrameTimer.stop();
+        m_diagFrameTimer.start();
+    }
+
+    void MetalView::reportUserInactivity()
+    {
+        if (!m_userActive || m_activityTimer.elapsed() <= userIdleSeconds)
+        {
+            return;
+        }
+
+        if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
+        {
+            const TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice.get());
+            m_videoDevice->sendEvent(aevent);
+            m_userActive = false;
+        }
+    }
+
+    void MetalView::fitWindowToFirstContent(IPCore::Session* session)
+    {
+        // As in GLView::paintGL(): fit and center the window on the first non-empty render.
+        if (m_postFirstNonEmptyRender || !session->postFirstNonEmptyRender())
+        {
+            return;
+        }
+
+        m_postFirstNonEmptyRender = true;
+        if (!session->isFullScreen())
+        {
+            m_doc->resizeToFit(false, false);
+            m_doc->center();
+        }
     }
 
     void MetalView::presentFrame(IPCore::Session* session, bool diag)
@@ -813,6 +855,35 @@ namespace Rv
             }
         }
 
+        handleFocusEvent(event);
+
+        if (event->type() == QEvent::Resize)
+        {
+            if (!isVisible())
+            {
+                return true;
+            }
+            reportResize(static_cast<const QResizeEvent*>(event), session);
+            return QWidget::event(event);
+        }
+
+        if (event->type() == QEvent::UpdateRequest)
+        {
+            m_updatePending = false;
+            render();
+            return true;
+        }
+
+        if (sendToSession(event, session, activationTime))
+        {
+            event->accept();
+            return true;
+        }
+        return QWidget::event(event);
+    }
+
+    void MetalView::handleFocusEvent(const QEvent* event)
+    {
         switch (event->type())
         {
         case QEvent::FocusIn:
@@ -831,35 +902,14 @@ namespace Rv
         default:
             break;
         }
+    }
 
-        if (event->type() == QEvent::Resize)
-        {
-            const auto* e = static_cast<const QResizeEvent*>(event);
-            if (!isVisible())
-            {
-                return true;
-            }
-            if (e->oldSize().width() != -1 && e->oldSize().height() != -1 && session)
-            {
-                std::ostringstream contents;
-                contents << e->oldSize().width() << " " << e->oldSize().height() << "|" << e->size().width() << " "
-                         << e->size().height();
-                session->userGenericEvent("view-resized", contents.str());
-            }
-            return QWidget::event(event);
-        }
-
-        if (event->type() == QEvent::UpdateRequest)
-        {
-            m_updatePending = false;
-            render();
-            return true;
-        }
-
+    bool MetalView::sendToSession(QEvent* event, IPCore::Session* session, float activationTime)
+    {
         // Events can arrive before setEventWidget() creates the translator.
         if (!m_videoDevice->hasTranslator())
         {
-            return QWidget::event(event);
+            return false;
         }
 
         updateTranslatorMapping(session);
@@ -869,12 +919,7 @@ namespace Rv
             session->setEventVideoDevice(videoDevice());
         }
 
-        if (m_videoDevice->translator().sendQTEvent(event, activationTime))
-        {
-            event->accept();
-            return true;
-        }
-        return QWidget::event(event);
+        return m_videoDevice->translator().sendQTEvent(event, activationTime);
     }
 
     bool MetalView::eventFilter(QObject* /*object*/, QEvent* event)

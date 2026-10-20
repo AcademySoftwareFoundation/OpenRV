@@ -149,6 +149,25 @@ namespace Rv
         //  Matches the layer's scale and gravity to the current screen and flip.
         void updateLayerGeometry();
 
+        //  Makes the offscreen GL context current; after repeated failures,
+        //  queues the fallback to the OpenGL GLView.
+        bool makeContextCurrent();
+
+        //  Adds the time since the last frame to the -debug gpu averages.
+        void beginFrameDiagnostics();
+
+        //  Sends "user-inactive" once the user has been idle long enough.
+        void reportUserInactivity();
+
+        //  Fits and centers the window on the first non-empty render.
+        void fitWindowToFirstContent(IPCore::Session* session);
+
+        //  Gives the event widget focus on FocusIn or Enter.
+        void handleFocusEvent(const QEvent* event);
+
+        //  Maps event through the translator into the session; true if consumed.
+        bool sendToSession(QEvent* event, IPCore::Session* session, float activationTime);
+
         //  Presents this view and the output device, then ends the session frame.
         void presentFrame(IPCore::Session* session, bool diag);
 

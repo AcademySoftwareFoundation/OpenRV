@@ -117,6 +117,9 @@ namespace Rv
         // top-left corner. Returns false, and schedules a retry, when interop
         // is unavailable. Needs the GL context current.
         bool ensureIOSurfaceTextures(int w, int h) const;
+        // Replaces the ring with capacityWidth x capacityHeight surfaces;
+        // latches interop off on failure.
+        bool buildIOSurfaceRing(int capacityWidth, int capacityHeight) const;
         void cleanupIOSurfaceTextures() const;
 
         // Turns zero-copy interop off and schedules a retry: failures can be
@@ -124,7 +127,7 @@ namespace Rv
         // reason is reported while the CPU fallback is in use.
         void latchInteropFailure(std::string reason) const;
 
-        enum class PresentPath
+        enum class PresentPath : std::uint8_t
         {
             ZeroCopy,
             CpuReadback

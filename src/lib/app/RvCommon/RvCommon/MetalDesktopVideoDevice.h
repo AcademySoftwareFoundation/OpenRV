@@ -49,6 +49,9 @@ namespace Rv
         void syncBuffers() const override;
 
     private:
+        //  RV_METAL_DEBUG_PRESENT: where the output window was meant to go and where it landed.
+        void logPlacement(const QRect& intended) const;
+
         //  The presentation output window. Owns its own QTMetalVideoDevice
         //  (MetalView::videoDevice()), which is assigned to the base
         //  m_viewDevice so inherited transfer()/transfer2() drive it.
