@@ -197,11 +197,6 @@ class: AnnotateMinorMode : MinorMode
     Point             _shapeLastPei;         // most recent drag position (for shift capture)
     float             _shapeConstraintAngle; // diagonal angle locked when shift is pressed;
                                              // -999.0 = use standard 1:1 / 45° snap
-    // When shift is pressed/released mid-drag, RV synthesizes a release + push pair
-    // whose modifier states differ. The shift key event fires first; we set this flag
-    // to tell the synthetic release/push pair to no-op so the in-progress shape stays
-    // alive across the modifier transition.
-    bool              _shapeShiftTransition;
 
     \: colorToArray (float[]; Color c) { float[] {c.x, c.y, c.z, c.w}; }
     \: arrayToColor (Color; float[] a) { Color(a[0], a[1], a[2], a[3]); }
@@ -1169,8 +1164,7 @@ class: AnnotateMinorMode : MinorMode
     // key-down--shift--shift: shift was pressed. (The double "shift" in the event name
     // is by design — see QTTranslator::sendKeyEvent: m_modifiers gets shift added before
     // modifierString builds the name, so both the modifier prefix and the key name are
-    // "shift".) If a shape is active, mark a transition so the synthetic release/push
-    // RV is about to fire is suppressed, and capture the current diagonal angle.
+    // "shift".) If a shape is active, capture the current diagonal angle.
     method: shapeShiftDown (void; Event event)
     {
         if (_shapeActive)
@@ -1178,30 +1172,19 @@ class: AnnotateMinorMode : MinorMode
             let dx = _shapeLastPei.x - _shapeAnchor.x,
                 dy = _shapeLastPei.y - _shapeAnchor.y;
             _shapeConstraintAngle = atan2(dy, dx);
-            _shapeShiftTransition = true;
         }
     }
 
-    // key-up--shift: shift was released. Clear the constraint and (symmetric to
-    // shapeShiftDown) mark a transition for the upcoming synthetic release/push.
+    // key-up--shift: shift was released. Clear the constraint.
     method: shapeShiftUp (void; Event event)
     {
         _shapeConstraintAngle = -999.0;
-        if (_shapeActive)
-        {
-            _shapeShiftTransition = true;
-        }
     }
 
     // pointer-1--shift--push: starts a new shape with shift held, OR is the synthetic
-    // push half of a modifier-transition pair (clears the flag set by shapeShiftDown).
+    // push half of a modifier-transition pair (shape already active, keep it).
     method: shapePushShift (void; Event event)
     {
-        if (_shapeShiftTransition)
-        {
-            _shapeShiftTransition = false;
-            return;
-        }
         if (!_shapeActive)
         {
             shapePush(event);
@@ -1271,15 +1254,11 @@ class: AnnotateMinorMode : MinorMode
     }
 
     // Mouse-down handler shared by all shape tools.
-    // If this is the synthetic push half of a modifier transition (flag set by
-    // shapeShiftUp), no-op so the in-progress shape continues without interruption.
+    // If a shape is already active, this is the synthetic push half of a modifier
+    // transition: no-op so the in-progress shape continues without interruption.
     method: shapePush (void; Event event)
     {
-        if (_shapeShiftTransition)
-        {
-            _shapeShiftTransition = false;
-            return;
-        }
+        if (_shapeActive && _currentDrawObject neq nil) return;
 
         updateCurrentNode();
         if (_currentNode eq nil) return;
@@ -1296,7 +1275,6 @@ class: AnnotateMinorMode : MinorMode
         _shapeAnchor = pei;
         _shapeLastPei = pei;
         _shapeActive = true;
-        _shapeShiftTransition = false;
 
         let d = _currentDrawMode;
         let shapeInnerColor = if (d.brushName == "arrow")
@@ -1351,23 +1329,31 @@ class: AnnotateMinorMode : MinorMode
     }
 
     // Mouse-up handler: finalise the shape geometry and commit.
-    // If this is the synthetic release half of a modifier transition (flag set by
-    // shapeShiftDown / shapeShiftUp), suppress the commit and keep the shape alive.
-    method: shapeRelease (void; Event event)
+    // constrained is true for the shift release bindings.
+    // On a modifier change mid-drag, QTTranslator::sendMouseEvent sends a synthetic
+    // release named with the old modifiers but carrying the live ones. A real release
+    // always matches, so a shift mismatch means the drag continues.
+    method: shapeRelease (void; bool constrained, Event event)
     {
-        if (!_shapeActive || _currentDrawObject eq nil) return;
+        let noActiveShape    = !_shapeActive || _currentDrawObject eq nil,
+            shiftHeld        = (event.modifiers() & Event.Shift) != 0,
+            syntheticRelease = shiftHeld != constrained;
 
-        if (_shapeShiftTransition)
-        {
-            return;  // matching push will clear the flag
-        }
+        if (noActiveShape || syntheticRelease) return;
 
         let (name, ip) = pointerLocation(event);
         if (name != "")
         {
-            let pei = eventToImageSpace(name, ip, true),
-                d   = _currentDrawMode;
-            updateShape(_currentNode, d.brushName, _shapeAnchor, pei, d.size * 0.005);
+            let pei           = eventToImageSpace(name, ip, true),
+                d             = _currentDrawMode,
+                shapeEndPoint = pei;
+
+            if (constrained)
+            {
+                shapeEndPoint = constrainShapePoint(d.brushName, _shapeAnchor, pei);
+            }
+
+            updateShape(_currentNode, d.brushName, _shapeAnchor, shapeEndPoint, d.size * 0.005);
         }
 
         _shapeActive = false;
@@ -1398,36 +1384,6 @@ class: AnnotateMinorMode : MinorMode
         updateShape(_currentNode, d.brushName, _shapeAnchor,
                     constrainShapePoint(d.brushName, _shapeAnchor, pei),
                     d.size * 0.005);
-    }
-
-    // Shift-constrained release: finalise with constraint applied. As with
-    // shapeRelease, suppress the commit if this is the synthetic release half of a
-    // modifier transition.
-    method: shapeReleaseShift (void; Event event)
-    {
-        if (!_shapeActive || _currentDrawObject eq nil) return;
-
-        if (_shapeShiftTransition)
-        {
-            return;
-        }
-
-        let (name, ip) = pointerLocation(event);
-        if (name != "")
-        {
-            let pei = eventToImageSpace(name, ip, true),
-                d   = _currentDrawMode;
-            updateShape(_currentNode, d.brushName, _shapeAnchor,
-                        constrainShapePoint(d.brushName, _shapeAnchor, pei),
-                        d.size * 0.005);
-        }
-
-        _shapeActive = false;
-        _currentDrawObject = nil;
-
-        undoRedoClearUpdate();
-        redraw();
-        sendInternalEvent("annotate-shape-released");
     }
 
     method: rejectEvent (void; Event event) { event.reject(); }
@@ -3685,10 +3641,10 @@ class: AnnotateMinorMode : MinorMode
              nil,
              [("pointer-1--drag", drawModeEvent(dropperSample, noop, shapeDrag, makeCategoryEventFunc("annotate_category", drag),), "Add to current stroke"),
               ("pointer-1--push", drawModeEvent(dropperStartSample, startTextPlacement, shapePush, makeCategoryEventFunc("annotate_category", push),), "Start New Stroke"),
-              ("pointer-1--release", drawModeEvent(dropperSample, noop, shapeRelease, release,), "End Current Stroke"),
+              ("pointer-1--release", drawModeEvent(dropperSample, noop, shapeRelease(false,), release,), "End Current Stroke"),
               ("pointer-1--shift--push", drawModeEvent(rejectEvent, rejectEvent, shapePushShift, rejectEvent,), "Lock Aspect Ratio or Start Shape"),
               ("pointer-1--shift--drag", drawModeEvent(rejectEvent, rejectEvent, shapeDragShift, rejectEvent,), "Resize Shape (Constrained)"),
-              ("pointer-1--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeReleaseShift, rejectEvent,), "Commit Shape (Constrained)"),
+              ("pointer-1--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeRelease(true,), rejectEvent,), "Commit Shape (Constrained)"),
               ("pointer--move", move, ""),
               ("pointer--shift--move", drawModeEvent(noop, noop, noop, editRadius,), ""),
               ("pointer--enter", enter, ""),
@@ -3703,10 +3659,10 @@ class: AnnotateMinorMode : MinorMode
               ("stylus-pen--drag", drawModeEvent(dropperSample, noop, shapeDrag, makeCategoryEventFunc("annotate_category", drag),), "Pen Drag"),
               ("stylus-pen--shift--push", drawModeEvent(rejectEvent, rejectEvent, shapePushShift, rejectEvent,), "Lock Aspect Ratio or Start Shape"),
               ("stylus-pen--shift--drag", drawModeEvent(rejectEvent, rejectEvent, shapeDragShift, rejectEvent,), "Resize Shape (Constrained)"),
-              ("stylus-pen--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeReleaseShift, rejectEvent,), "Commit Shape (Constrained)"),
+              ("stylus-pen--shift--release", drawModeEvent(rejectEvent, rejectEvent, shapeRelease(true,), rejectEvent,), "Commit Shape (Constrained)"),
               ("stylus-pen--shift--move", drawModeEvent(dropperSample, noop, noop, editRadius,), ""),
               ("stylus-pen--move", drawModeEvent(noop, noop, noop, move,), "Pen Move"),
-              ("stylus-pen--release", drawModeEvent(noop, noop, shapeRelease, release,), "Pen Release"),
+              ("stylus-pen--release", drawModeEvent(noop, noop, shapeRelease(false,), release,), "Pen Release"),
               ("stylus-eraser--push", drawModeEvent(noop, noop, noop, makeCategoryEventFunc("annotate_category", eraserPush),), "Pen Down"),
               ("stylus-eraser--drag", drawModeEvent(noop, noop, noop, makeCategoryEventFunc("annotate_category", drag),), "Pen Drag"),
               ("stylus-eraser--move", drawModeEvent(noop, noop, noop, move,), "Pen Move"),
