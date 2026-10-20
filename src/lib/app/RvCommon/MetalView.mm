@@ -20,6 +20,7 @@
 #include <RvApp/Options.h>
 #include <RvApp/RvSession.h>
 #include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
 #include <TwkApp/Event.h>
 #include <TwkApp/VideoDevice.h>
 
@@ -48,6 +49,42 @@ namespace
 
     // Idle time after which the user is reported inactive.
     constexpr double userIdleSeconds = 1.0;
+
+    constexpr double msPerSecond = 1000.0;
+
+    // -debug gpu averages are logged every this many frames (as VulkanWindow).
+    constexpr unsigned int diagFrames = 60;
+
+    // Adds the scope's duration, in ms, to an accumulator when enabled.
+    class ScopedDiagTimer
+    {
+    public:
+        ScopedDiagTimer(double& accumulatorMs, bool enabled)
+            : m_accumulatorMs(accumulatorMs)
+            , m_enabled(enabled)
+        {
+            if (m_enabled)
+            {
+                m_timer.start();
+            }
+        }
+
+        ~ScopedDiagTimer()
+        {
+            if (m_enabled)
+            {
+                m_accumulatorMs += m_timer.elapsed() * msPerSecond;
+            }
+        }
+
+        ScopedDiagTimer(const ScopedDiagTimer&) = delete;
+        ScopedDiagTimer& operator=(const ScopedDiagTimer&) = delete;
+
+    private:
+        double& m_accumulatorMs;
+        bool m_enabled;
+        TwkUtil::Timer m_timer;
+    };
 
     bool probeTenBitPresentation()
     {
@@ -486,6 +523,17 @@ namespace Rv
 
         m_contextFailureCount = 0;
 
+        const bool diag = IPCore::ImageRenderer::debugGpu();
+        if (diag)
+        {
+            if (m_diagFrameTimer.isRunning())
+            {
+                m_diag.frameIntervalMs += m_diagFrameTimer.elapsed() * msPerSecond;
+            }
+            m_diagFrameTimer.stop();
+            m_diagFrameTimer.start();
+        }
+
         if (m_userActive && m_activityTimer.elapsed() > userIdleSeconds)
         {
             if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
@@ -501,7 +549,10 @@ namespace Rv
         absolutePosition(x, y);
         m_videoDevice->setAbsolutePosition(x, y);
 
-        session->render();
+        {
+            const ScopedDiagTimer timer(m_diag.renderMs, diag);
+            session->render();
+        }
 
         // As in GLView::paintGL(): fit and center the window on the first non-empty render.
         if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
@@ -521,15 +572,50 @@ namespace Rv
             return;
         }
 
-        // Unlike QOpenGLWidget, nothing composites this view implicitly, so
-        // present it even when a separate presentation output is active.
-        m_videoDevice->syncBuffers();
-        syncOutputDevice(session);
-
-        session->addSyncSample();
-        session->postRender();
+        presentFrame(session, diag);
 
         m_eventProcessingTimer.start();
+    }
+
+    void MetalView::presentFrame(IPCore::Session* session, bool diag)
+    {
+        // Unlike QOpenGLWidget, nothing composites this view implicitly, so
+        // present it even when a separate presentation output is active.
+        {
+            const ScopedDiagTimer timer(m_diag.mainPresentMs, diag);
+            m_videoDevice->syncBuffers();
+        }
+        {
+            const ScopedDiagTimer timer(m_diag.outputPresentMs, diag);
+            syncOutputDevice(session);
+        }
+        {
+            const ScopedDiagTimer timer(m_diag.postRenderMs, diag);
+            session->addSyncSample();
+            session->postRender();
+        }
+
+        if (diag && ++m_diag.frames >= diagFrames)
+        {
+            logFrameDiagnostics();
+        }
+    }
+
+    void MetalView::logFrameDiagnostics()
+    {
+        const auto frames = static_cast<double>(m_diag.frames);
+        const double intervalMs = m_diag.frameIntervalMs / frames;
+        const double renderMs = m_diag.renderMs / frames;
+        const double mainPresentMs = m_diag.mainPresentMs / frames;
+        const double outputPresentMs = m_diag.outputPresentMs / frames;
+
+        std::cout << "INFO: MetalView frame avg over " << m_diag.frames << ": session->render()=" << renderMs
+                  << "ms  mainPresent=" << mainPresentMs << "ms  outputPresent=" << outputPresentMs
+                  << "ms  total=" << (renderMs + mainPresentMs + outputPresentMs) << "ms  postRender=" << (m_diag.postRenderMs / frames)
+                  << "ms  frameInterval=" << intervalMs << "ms (" << (intervalMs > 0.0 ? msPerSecond / intervalMs : 0.0) << " fps)"
+                  << std::endl;
+
+        m_diag = FrameDiagnostics{};
     }
 
     //--------------------------------------------------------------------------

@@ -30,6 +30,8 @@
 #include <cmath>
 #include <iostream>
 #include <new>
+#include <sstream>
+#include <string_view>
 
 namespace
 {
@@ -128,6 +130,18 @@ namespace
         std::unique_ptr<QOffscreenSurface> m_surface;
         mutable bool m_versionChecked{false};
     };
+
+    // Forces the CPU readback present path regardless of interop support.
+    bool forceCpuPresentation()
+    {
+        static const bool forced = getenv("RV_METAL_FORCE_CPU_PRESENT") != nullptr;
+        return forced;
+    }
+
+    std::string_view presentPathName(bool zeroCopy)
+    {
+        return zeroCopy ? "GPU zero-copy IOSurface (10-bit)" : "CPU readback (10-bit, slower)";
+    }
 
     // The physical pixel size of the screen widget is on, or empty.
     QSize screenPixelSize(const QWidget* widget)
@@ -486,16 +500,16 @@ namespace Rv
     // Zero-copy IOSurface present ring
     //--------------------------------------------------------------------------
 
-    void QTMetalVideoDevice::latchInteropFailure() const
+    void QTMetalVideoDevice::latchInteropFailure(std::string reason) const
     {
         m_interopDisabled = true;
         m_interopRetryCountdown = interopRetryFrames;
+        m_interopFailReason = std::move(reason);
     }
 
     bool QTMetalVideoDevice::ensureIOSurfaceTextures(int w, int h) const
     {
-        static const bool forceCpu = getenv("RV_METAL_FORCE_CPU_PRESENT") != nullptr;
-        if (forceCpu)
+        if (forceCpuPresentation())
         {
             return false;
         }
@@ -529,10 +543,10 @@ namespace Rv
 
         cleanupIOSurfaceTextures();
 
-        const auto fail = [this]
+        const auto fail = [this](std::string reason)
         {
             cleanupIOSurfaceTextures();
-            latchInteropFailure();
+            latchInteropFailure(std::move(reason));
             return false;
         };
 
@@ -542,7 +556,7 @@ namespace Rv
         {
             std::cerr << "[QTMetalVideoDevice] CGLGetCurrentContext() returned null; "
                          "falling back to CPU readback\n";
-            return fail();
+            return fail("no current CGL context to bind the IOSurfaces into");
         }
 
         // Each slot is filled as it is built, so cleanupIOSurfaceTextures() releases partial work.
@@ -553,13 +567,13 @@ namespace Rv
             {
                 std::cerr << "[QTMetalVideoDevice] IOSurfaceCreate failed " << capacityWidth << "x" << capacityHeight
                           << "; CPU fallback\n";
-                return fail();
+                return fail("IOSurfaceCreate failed for the 10-bit present surfaces");
             }
 
             slot.texture = createIOSurfaceTexture(cgl, static_cast<IOSurfaceRef>(slot.surface), capacityWidth, capacityHeight);
             if (!slot.texture)
             {
-                return fail();
+                return fail("CGLTexImageIOSurface2D could not bind an IOSurface as a GL texture");
             }
 
             slot.fbo = std::make_unique<TwkGLF::GLFBO>(capacityWidth, capacityHeight, GL_RGB10_A2);
@@ -570,7 +584,7 @@ namespace Rv
             {
                 std::cerr << "[QTMetalVideoDevice] IOSurface FBO incomplete: 0x" << std::hex << status << std::dec
                           << "; CPU fallback\n";
-                return fail();
+                return fail("the IOSurface-backed GL framebuffer is incomplete");
             }
         }
 
@@ -709,7 +723,7 @@ namespace Rv
         {
             std::cerr << "[QTMetalVideoDevice] glBlitFramebufferEXT failed (GL 0x" << std::hex << error << std::dec
                       << "); falling back to CPU readback\n";
-            latchInteropFailure();
+            latchInteropFailure("the GL blit into the IOSurface raised a GL error");
             return false;
         }
 
@@ -726,24 +740,83 @@ namespace Rv
         m_ringIndex = (slot + 1) % ringSize;
         m_lastPresentTimer.stop();
         m_lastPresentTimer.start();
-
-        if (m_cpuFallbackLogged)
-        {
-            std::cerr << "INFO: [QTMetalVideoDevice] zero-copy IOSurface interop restored.\n";
-            m_cpuFallbackLogged = false;
-        }
         return true;
+    }
+
+    std::string QTMetalVideoDevice::cpuReadbackReason() const
+    {
+        if (forceCpuPresentation())
+        {
+            return "RV_METAL_FORCE_CPU_PRESENT is set";
+        }
+        if (m_interopFailReason.empty())
+        {
+            return "zero-copy IOSurface interop is unavailable";
+        }
+        return m_interopFailReason + "; retrying periodically";
+    }
+
+    void QTMetalVideoDevice::reportPresentPath(PresentPath path, int w, int h) const
+    {
+        if (m_loggedPresentPath == path)
+        {
+            return;
+        }
+
+        const bool zeroCopy = path == PresentPath::ZeroCopy;
+        const std::string reason = zeroCopy ? std::string() : cpuReadbackReason();
+
+        if (!m_loggedPresentPath)
+        {
+            emitPresentationReport(path, reason, w, h);
+        }
+        m_loggedPresentPath = path;
+
+        std::cout << "INFO: QTMetalVideoDevice: '" << name() << "' " << w << "x" << h << " present path = " << presentPathName(zeroCopy);
+        if (!reason.empty())
+        {
+            std::cout << " (" << reason << ")";
+        }
+        std::cout << std::endl;
+    }
+
+    void QTMetalVideoDevice::emitPresentationReport(PresentPath path, const std::string& reason, int w, int h) const
+    {
+        // Needs the GL context current (glGetString).
+        const auto* renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        const auto* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+        const bool zeroCopy = path == PresentPath::ZeroCopy;
+        const bool passiveOutput = m_view->isPresentationMode();
+
+        std::ostringstream report;
+        report << "INFO: RV Metal presentation report\n";
+        report << "INFO:   Role           : " << (passiveOutput ? "presentation output" : "control viewport") << "\n";
+        report << "INFO:   GL renderer    : " << (renderer ? renderer : "?") << "  GL_VERSION=" << (version ? version : "?") << "\n";
+        report << "INFO:   Present path   : " << presentPathName(zeroCopy) << "\n";
+        if (!reason.empty())
+        {
+            report << "INFO:   Reason         : " << reason << "\n";
+        }
+        report << "INFO:   Surface        : kCVPixelFormatType_ARGB2101010LEPacked, ";
+        if (zeroCopy)
+        {
+            report << ringSize << " x " << m_ringCapacityWidth << "x" << m_ringCapacityHeight << " (frame " << w << "x" << h << ")\n";
+        }
+        else
+        {
+            report << "CPU upload, frame " << w << "x" << h << "\n";
+        }
+        report << "INFO:   Render FBO     : " << (passiveOutput ? "RGB10_A2" : "RGBA16F") << "\n";
+        if (forceCpuPresentation())
+        {
+            report << "INFO:   Override       : RV_METAL_FORCE_CPU_PRESENT is set\n";
+        }
+
+        std::cout << report.str() << std::flush;
     }
 
     void QTMetalVideoDevice::presentViaCpuReadback(int w, int h) const
     {
-        if (!m_cpuFallbackLogged)
-        {
-            std::cerr << "INFO: [QTMetalVideoDevice] presenting via CPU readback (" << w << "x" << h
-                      << "); zero-copy IOSurface interop unavailable, retrying periodically.\n";
-            m_cpuFallbackLogged = true;
-        }
-
         ensureCpuFallbackTarget(w, h);
 
         blitFlippedY(m_fbo->fboID(), m_cpuFlipFbo, w, h);
@@ -798,9 +871,11 @@ namespace Rv
 
         if (ensureIOSurfaceTextures(w, h) && presentZeroCopy(w, h))
         {
+            reportPresentPath(PresentPath::ZeroCopy, w, h);
             return;
         }
 
+        reportPresentPath(PresentPath::CpuReadback, w, h);
         presentViaCpuReadback(w, h);
     }
 

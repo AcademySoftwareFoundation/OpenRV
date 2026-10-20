@@ -150,6 +150,7 @@ the flip FBO.
 
 On failure, `latchInteropFailure()` disables interop and sets a
 `interopRetryFrames` (120 frame) cooldown before the next attempt. A
-one-shot log fires: `"presenting via CPU readback (WxH); zero-copy
-IOSurface interop unavailable — retrying periodically."` Recovery is
-logged when the fast path resumes.
+change of present path is logged with its reason, e.g. `present path = CPU
+readback (10-bit, slower) (<reason>; retrying periodically)`, and again as
+`present path = GPU zero-copy IOSurface (10-bit)` when the fast path resumes.
+The first present also prints a one-off `RV Metal presentation report`.

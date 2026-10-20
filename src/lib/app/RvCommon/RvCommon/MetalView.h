@@ -149,6 +149,12 @@ namespace Rv
         //  Matches the layer's scale and gravity to the current screen and flip.
         void updateLayerGeometry();
 
+        //  Presents this view and the output device, then ends the session frame.
+        void presentFrame(IPCore::Session* session, bool diag);
+
+        //  Logs and resets the -debug gpu frame averages.
+        void logFrameDiagnostics();
+
         //  (Re)creates the CPU-fallback surfaces at w x h. On failure keeps the
         //  old ones, so the last frame stays on screen, and returns false.
         bool ensureCpuSurfaces(int w, int h);
@@ -203,6 +209,20 @@ namespace Rv
 
         //  Consecutive render() calls without a ready GL context; reset on success.
         int m_contextFailureCount{0};
+
+        //  -debug gpu frame-time sums since the last log (as VulkanWindow).
+        struct FrameDiagnostics
+        {
+            unsigned int frames{0};
+            double renderMs{0.0};
+            double mainPresentMs{0.0};
+            double outputPresentMs{0.0};
+            double postRenderMs{0.0};
+            double frameIntervalMs{0.0};
+        };
+
+        FrameDiagnostics m_diag;
+        Timer m_diagFrameTimer;
     };
 
 } // namespace Rv

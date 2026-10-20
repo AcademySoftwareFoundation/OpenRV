@@ -121,7 +121,23 @@ namespace Rv
 
         // Turns zero-copy interop off and schedules a retry: failures can be
         // transient (zero-size FBO at startup, a momentary context issue).
-        void latchInteropFailure() const;
+        // reason is reported while the CPU fallback is in use.
+        void latchInteropFailure(std::string reason) const;
+
+        enum class PresentPath
+        {
+            ZeroCopy,
+            CpuReadback
+        };
+
+        // Logs a change of present path with its reason, and before the first
+        // a one-off presentation report (as QTVulkanVideoDevice::syncBuffers()
+        // and VulkanWindow::emitPresentationRecord()).
+        void reportPresentPath(PresentPath path, int w, int h) const;
+        void emitPresentationReport(PresentPath path, const std::string& reason, int w, int h) const;
+
+        // Why the CPU fallback is in use.
+        std::string cpuReadbackReason() const;
 
         // The next ring slot the window server no longer holds
         // (IOSurfaceIsInUse()), starting at m_ringIndex; empty if all are held.
@@ -159,10 +175,11 @@ namespace Rv
         mutable int m_ringIndex{0};
         mutable int m_ringCapacityWidth{0}; // allocated size, not the frame size
         mutable int m_ringCapacityHeight{0};
-        mutable bool m_interopDisabled{false};     // interop currently off (with retry)
-        mutable int m_interopRetryCountdown{0};    // frames until interop is retried
-        mutable bool m_cpuFallbackLogged{false};   // one-shot CPU-fallback log guard
-        mutable TwkUtil::Timer m_lastPresentTimer; // time since the last zero-copy present
+        mutable bool m_interopDisabled{false};                  // interop currently off (with retry)
+        mutable int m_interopRetryCountdown{0};                 // frames until interop is retried
+        mutable std::string m_interopFailReason;                // last zero-copy failure
+        mutable std::optional<PresentPath> m_loggedPresentPath; // empty until the first present
+        mutable TwkUtil::Timer m_lastPresentTimer;              // time since the last zero-copy present
 
         // CPU fallback: a GL_RGB10_A2 blit target does the float to 10-bit
         // conversion and Y-flip on the GPU, so glReadPixels returns
