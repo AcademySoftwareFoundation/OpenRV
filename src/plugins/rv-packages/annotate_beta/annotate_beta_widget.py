@@ -38,7 +38,7 @@ _TOOLS = {
     constants.Tool.CURSOR: _ToolInfo(page=None, tooltip="Cursor"),
     constants.Tool.EYEDROPPER: _ToolInfo(page=None, tooltip="Eyedropper"),
     constants.Tool.PEN: _ToolInfo(page=_Page.BLEND, tooltip="Pen"),
-    constants.Tool.AIRBRUSH: _ToolInfo(page=_Page.BLEND, tooltip="Airbrush"),
+    constants.Tool.BRUSH: _ToolInfo(page=_Page.BLEND, tooltip="Brush"),
     constants.Tool.ERASER: _ToolInfo(page=_Page.ERASER, tooltip="Eraser"),
     constants.Tool.RECT: _ToolInfo(page=_Page.SHAPE, tooltip="Rectangle"),
     constants.Tool.CIRCLE: _ToolInfo(page=_Page.SHAPE, tooltip="Circle"),
@@ -443,6 +443,10 @@ class _PenPanel(_SliderPanel):
                 self.color_modifier_changed.emit(constants.ColorModifier.NORMAL)
 
 
+class _BrushPanel:
+    pass
+
+
 class _ShapeOptionsPanel(_SliderPanel):
     filled_changed = QtCore.Signal(bool)
 
@@ -660,13 +664,14 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._stack = QtWidgets.QStackedWidget()
         layout.addWidget(self._stack)
 
-        self._brush_panel = _SizeOpacityPanel()  # arrow, line
+        self._size_opacity_panel = _SizeOpacityPanel()  # arrow, line
         self._shape_panel = _ShapeOptionsPanel()  # rect, circle
         self._text_panel = _TextOptionsPanel()
-        self._pen_panel = _PenPanel()  # pen, airbrush
+        self._pen_panel = _PenPanel()
+        self._brush_panel = _BrushPanel()
         self._eraser_panel = _EraserPanel()
         self._pages = {
-            _Page.SIZE_OPACITY: self._brush_panel,
+            _Page.SIZE_OPACITY: self._size_opacity_panel,
             _Page.SHAPE: self._shape_panel,
             _Page.TEXT: self._text_panel,
             _Page.BLEND: self._pen_panel,
@@ -675,7 +680,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
         for page in self._pages.values():
             self._stack.addWidget(page)
 
-        self._slider_panels = (self._brush_panel, self._shape_panel, self._pen_panel, self._eraser_panel)
+        self._slider_panels = (self._size_opacity_panel, self._shape_panel, self._pen_panel, self._eraser_panel)
         for panel in self._slider_panels:
             panel.size_changed.connect(self.size_changed)
             panel.opacity_changed.connect(self.opacity_changed)
@@ -784,7 +789,7 @@ class AnnotateToolStrip(_StyledWidget):
 
         layout.addSpacing(2)
 
-        _group_of([constants.Tool.PEN, constants.Tool.AIRBRUSH, constants.Tool.ERASER])
+        _group_of([constants.Tool.PEN, constants.Tool.BRUSH, constants.Tool.ERASER])
 
         layout.addSpacing(2)
 

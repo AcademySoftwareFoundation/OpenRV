@@ -11,7 +11,7 @@ SETTINGS_GROUP = "AnnotateBeta"
 class Tool(StrEnum):
     CURSOR = "cursor"
     PEN = "pen"
-    AIRBRUSH = "airbrush"
+    BRUSH = "brush"
     ERASER = "eraser"
     RECT = "rect"
     CIRCLE = "circle"
@@ -22,7 +22,7 @@ class Tool(StrEnum):
 
 
 SHAPE_TOOLS = frozenset({Tool.RECT, Tool.CIRCLE, Tool.ARROW, Tool.LINE})
-BRUSH_TOOLS = frozenset({Tool.PEN, Tool.AIRBRUSH, Tool.ERASER})
+BRUSH_TOOLS = frozenset({Tool.PEN, Tool.BRUSH, Tool.ERASER})
 DRAWING_TOOLS = SHAPE_TOOLS | BRUSH_TOOLS | {Tool.TEXT}
 
 
