@@ -134,10 +134,12 @@ def soft_delete_frame(paint_frame: PaintFrame) -> list[PaintComponent]:
     order_property = frame_order_property(paint_frame)
     if not commands.propertyExists(order_property):
         return []
-    cleared = [PaintComponent(paint_frame, name) for name in commands.getStringProperty(order_property)]
+    names = commands.getStringProperty(order_property)
+    cleared = [PaintComponent(paint_frame, name) for name in names if name]
     for component in cleared:
+        _ensure_property(f"{_node_name(component)}.softDeleted", commands.IntType, 1)
         commands.setIntProperty(f"{_node_name(component)}.softDeleted", [1], True)
-    if cleared:
+    if names:
         commands.setStringProperty(order_property, [], True)
     return cleared
 
