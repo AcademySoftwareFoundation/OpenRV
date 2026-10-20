@@ -396,8 +396,8 @@ class _EraserPanel(_SliderPanel):
             self.eraser_brush_changed.emit(constants.Brush.CIRCLE)
 
 
-class _PenPanel(_SliderPanel):
-    """Size + opacity sliders plus Normal / Darken / Additive blend mode buttons."""
+class _BlendModeGroup(QtWidgets.QWidget):
+    """Normal / Burn / Dodge blend mode buttons."""
 
     color_modifier_changed = QtCore.Signal(str)  # ColorModifier value
 
@@ -409,38 +409,56 @@ class _PenPanel(_SliderPanel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self._add_sliders()
-        _add_divider(self._layout)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(1)
 
-        # Blend mode buttons — grouped with 1px gaps, connected border-radius
-        self._blend_group = QtWidgets.QButtonGroup(self)
-        self._blend_buttons = {}
+        self._group = QtWidgets.QButtonGroup(self)
+        self._buttons = {}
         positions = _group_positions(len(self._BLEND_MODES))
-        for index, (key, icon_name, tooltip) in enumerate(self._BLEND_MODES):
-            if index:
-                self._layout.addSpacing(1)
+        for (key, icon_name, tooltip), position in zip(self._BLEND_MODES, positions, strict=True):
             button = _tool_button(tooltip, icon_name=icon_name)
-            button.setProperty("grouppos", positions[index])
+            button.setProperty("grouppos", position)
             button.clicked.connect(partial(self.color_modifier_changed.emit, key))
-            self._blend_group.addButton(button)
-            self._blend_buttons[key] = button
-            self._layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
-        self._blend_buttons[constants.ColorModifier.NORMAL].setChecked(True)
-        self._layout.addStretch()
+            self._group.addButton(button)
+            self._buttons[key] = button
+            layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
+        self._buttons[constants.ColorModifier.NORMAL].setChecked(True)
 
     def set_color_modifier(self, mode):
-        button = self._blend_buttons.get(mode)
+        button = self._buttons.get(mode)
         if button:
             button.setChecked(True)
 
     def set_blend_mode_enabled(self, mode, enabled):
         """Enable or disable a blend mode button (e.g. burn/dodge) by its key."""
-        button = self._blend_buttons.get(mode)
+        button = self._buttons.get(mode)
         if button:
             button.setEnabled(enabled)
             if not enabled and button.isChecked():
-                self._blend_buttons[constants.ColorModifier.NORMAL].setChecked(True)
+                self._buttons[constants.ColorModifier.NORMAL].setChecked(True)
                 self.color_modifier_changed.emit(constants.ColorModifier.NORMAL)
+
+
+class _PenPanel(_SliderPanel):
+    """Size and opacity sliders, and the blend mode buttons."""
+
+    color_modifier_changed = QtCore.Signal(str)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._add_sliders()
+        _add_divider(self._layout)
+        self._blend_modes = _BlendModeGroup()
+        self._blend_modes.color_modifier_changed.connect(self.color_modifier_changed)
+        self._layout.addWidget(self._blend_modes)
+        self._layout.addStretch()
+
+    def set_color_modifier(self, mode):
+        self._blend_modes.set_color_modifier(mode)
+
+    def set_blend_mode_enabled(self, mode, enabled):
+        self._blend_modes.set_blend_mode_enabled(mode, enabled)
 
 
 class _BrushPanel:
