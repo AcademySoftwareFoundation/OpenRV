@@ -1465,6 +1465,18 @@ namespace TwkMovie
         // Find the decoder for the av stream
         switch (avStream->codecpar->codec_id)
         {
+#if defined(__APPLE__)
+        case AV_CODEC_ID_AAC:
+            // Prefer Apple's AudioToolbox AAC decoder when it is built in,
+            // even if FFmpeg's own AAC decoder is enabled too.
+            avCodec = avcodec_find_decoder_by_name("aac_at");
+            if (avCodec == nullptr)
+            {
+                avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
+            }
+            break;
+#endif
+
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
             // we want to read SPS and PPS NALs at the beginning of H.264 and
