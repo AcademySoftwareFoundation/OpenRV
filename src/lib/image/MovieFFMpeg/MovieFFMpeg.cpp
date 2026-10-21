@@ -694,7 +694,17 @@ namespace TwkMovie
 #endif
         };
 
-        const char* supportedEncodingCodecsArray[] = {"dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
+        const char* supportedEncodingCodecsArray[] = {"dvvideo",
+                                                      "libx264",
+                                                      "mjpeg",
+                                                      "pcm_s16be",
+                                                      "rawvideo",
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+                                                      "h264_videotoolbox",
+                                                      "hevc_videotoolbox",
+                                                      "prores_videotoolbox",
+#endif
+                                                      0};
 
         const char* metadataFieldsArray[] = {"album",       "album_artist", "artist",     "author", "comment",  "composer", "copyright",
                                              "description", "encoder",      "episode_id", "genre",  "grouping", "lyrics",   "network",
@@ -4629,17 +4639,32 @@ namespace TwkMovie
                 const enum AVPixelFormat* pix_fmts = NULL;
                 int ret =
                     avcodec_get_supported_config(avCodecContext, avCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, NULL);
-                if (ret >= 0 && pix_fmts)
+                if (ret < 0)
                 {
-                    avCodecContext->pix_fmt = pix_fmts[0];
-                }
-                else
-                {
-                    avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                    pix_fmts = NULL;
                 }
 #else
                 // Old API (FFmpeg < 7.0)
-                avCodecContext->pix_fmt = (avCodec->pix_fmts) ? avCodec->pix_fmts[0] : RV_OUTPUT_FFMPEG_FMT;
+                const enum AVPixelFormat* pix_fmts = avCodec->pix_fmts;
+#endif
+                // Use the first software format. Hardware encoders such as
+                // VideoToolbox list their hardware surface format first,
+                // which frames from system memory cannot be converted into.
+                avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                for (const enum AVPixelFormat* fmt = pix_fmts; fmt && *fmt != AV_PIX_FMT_NONE; fmt++)
+                {
+                    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(*fmt);
+                    if (desc && !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+                    {
+                        avCodecContext->pix_fmt = *fmt;
+                        break;
+                    }
+                }
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
+                if (avCodecContext->pix_fmt == AV_PIX_FMT_NONE)
+                {
+                    avCodecContext->pix_fmt = RV_OUTPUT_FFMPEG_FMT;
+                }
 #endif
 
                 if (m_request.verbose)
@@ -5543,9 +5568,11 @@ namespace TwkMovie
         case AV_OPT_TYPE_CONST:
         case AV_OPT_TYPE_INT:
         case AV_OPT_TYPE_INT64:
-            int integer;
-            invalue >> integer;
-            setopt = av_opt_set_int(avObj, opt->name, integer, 0);
+            // Let FFmpeg parse the value so that integer options can also be
+            // set by the name of one of their constants (e.g. the
+            // prores_videotoolbox "profile" option takes "hq" or "4444"), and
+            // so that 64-bit values are not truncated.
+            setopt = av_opt_set(avObj, opt->name, value.c_str(), 0);
             break;
         case AV_OPT_TYPE_DOUBLE:
         case AV_OPT_TYPE_FLOAT:
