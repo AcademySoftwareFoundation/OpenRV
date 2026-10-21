@@ -128,41 +128,49 @@ class ColorSwatch(QtWidgets.QAbstractButton):
 
 
 class _AnnotationSlider(QtWidgets.QSlider):
-    """Vertical slider for the size and opacity controls."""
+    """Slider for the size, opacity and brush settings controls."""
 
     _WIDTH = 32
-    _MIN_HEIGHT = 110
+    _MIN_LENGTH = 110
     _HANDLE_LENGTH = 18
 
-    def __init__(self, minimum=0, maximum=100, default=50, parent=None):
-        super().__init__(QtCore.Qt.Vertical, parent)
+    def __init__(self, minimum=0, maximum=100, default=50, orientation=QtCore.Qt.Vertical, parent=None):
+        super().__init__(orientation, parent)
         self.setObjectName("annotationSlider")
         self.setRange(minimum, maximum)
         self.setValue(max(minimum, min(maximum, default)))
         self.setPageStep(max(1, (maximum - minimum) // 10))
-        self.setFixedWidth(self._WIDTH)
-        self.setMinimumHeight(self._MIN_HEIGHT)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        if orientation == QtCore.Qt.Vertical:
+            self.setFixedWidth(self._WIDTH)
+            self.setMinimumHeight(self._MIN_LENGTH)
+            self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+        else:
+            self.setMinimumWidth(self._MIN_LENGTH)
+            self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
-    def _value_at(self, y):
-        span = max(1, self.height() - self._HANDLE_LENGTH)
-        bottom = self._HANDLE_LENGTH // 2 + span
+    def _value_at(self, point):
+        if self.orientation() == QtCore.Qt.Vertical:
+            span = max(1, self.height() - self._HANDLE_LENGTH)
+            position = self._HANDLE_LENGTH // 2 + span - int(point.y())
+        else:
+            span = max(1, self.width() - self._HANDLE_LENGTH)
+            position = int(point.x()) - self._HANDLE_LENGTH // 2
 
-        return QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), bottom - int(y), span)
+        return QtWidgets.QStyle.sliderValueFromPosition(self.minimum(), self.maximum(), position, span)
 
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
             self.setSliderDown(True)
-            self.setSliderPosition(self._value_at(event.position().y()))
+            self.setSliderPosition(self._value_at(event.position()))
             event.accept()
         else:
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self.isSliderDown():
-            self.setSliderPosition(self._value_at(event.position().y()))
+            self.setSliderPosition(self._value_at(event.position()))
             event.accept()
         else:
             super().mouseMoveEvent(event)
@@ -189,37 +197,47 @@ class _ValueLineEdit(QtWidgets.QLineEdit):
 
 
 class _SliderSection(QtWidgets.QWidget):
-    """Vertical slider + editable value input."""
+    """Slider + editable value input: stacked when vertical, labelled row when horizontal."""
 
     value_changed = QtCore.Signal(int)
 
-    def __init__(self, label, minimum, maximum, default, suffix="", parent=None):
+    def __init__(self, label, minimum, maximum, default, suffix="", orientation=QtCore.Qt.Vertical, parent=None):
         super().__init__(parent)
         self._suffix = suffix
         self._minimum = minimum
         self._maximum = maximum
 
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
-
-        self._slider = _AnnotationSlider(minimum, maximum, default)
+        self._slider = _AnnotationSlider(minimum, maximum, default, orientation)
         self._slider.setToolTip(label)
         self._slider.valueChanged.connect(self._on_slider_changed)
-        slider_row = QtWidgets.QHBoxLayout()
-        slider_row.setContentsMargins(0, 0, 0, 0)
-        slider_row.addStretch()
-        slider_row.addWidget(self._slider)
-        slider_row.addStretch()
-        layout.addLayout(slider_row, 1)
 
         self._input = _ValueLineEdit(f"{default}{suffix}")
         self._input.setObjectName("sliderValue")
         self._input.setToolTip(label)
-        self._input.setAlignment(QtCore.Qt.AlignCenter)
         self._input.setFixedWidth(48)
         self._input.editingFinished.connect(self._on_input_committed)
-        layout.addWidget(self._input, alignment=QtCore.Qt.AlignHCenter)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(4)
+
+        if orientation == QtCore.Qt.Vertical:
+            slider_row = QtWidgets.QHBoxLayout()
+            slider_row.setContentsMargins(0, 0, 0, 0)
+            slider_row.addStretch()
+            slider_row.addWidget(self._slider)
+            slider_row.addStretch()
+            layout.addLayout(slider_row, 1)
+            self._input.setAlignment(QtCore.Qt.AlignCenter)
+            layout.addWidget(self._input, alignment=QtCore.Qt.AlignHCenter)
+        else:
+            layout.addWidget(QtWidgets.QLabel(label))
+            row = QtWidgets.QHBoxLayout()
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(4)
+            row.addWidget(self._slider, 1)
+            row.addWidget(self._input)
+            layout.addLayout(row)
 
         # Prevents sections in less-constrained panels (no blend buttons) from
         # claiming leftover space. Preferred has GrowFlag set

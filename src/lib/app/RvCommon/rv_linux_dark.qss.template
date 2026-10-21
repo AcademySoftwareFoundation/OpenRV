@@ -1304,6 +1304,9 @@ QWidget#annotationBeta QLineEdit#sliderValue:disabled {
 
 QWidget#annotationBeta QSlider#annotationSlider {
     background: transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider:vertical {
     min-width: 32px;
     max-width: 32px;
 }
@@ -1327,13 +1330,43 @@ QWidget#annotationBeta QSlider#annotationSlider::add-page:vertical {
     border-radius: 1px;
 }
 
-QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+QWidget#annotationBeta QSlider#annotationSlider::handle {
     width: 10px;
     height: 10px;
-    margin: 0px -8px;
     background-color: {{ACCENT_SECONDARY}};
     border: 4px solid {{INPUT_BACKGROUND}};
     border-radius: 9px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+    margin: 0px -8px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:horizontal {
+    margin: -8px 0px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::groove:horizontal {
+    height: 3px;
+    margin: 0px;
+    background: transparent;
+    border: none;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::sub-page:horizontal {
+    background-color: {{ACCENT_SECONDARY}};
+    border-radius: 1px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::add-page:horizontal {
+    background-color: {{CONTROL_HANDLE}};
+    background-clip: padding;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+QWidget#annotationBeta QMenu QSlider#annotationSlider::handle {
+    border-color: {{PRIMARY_BACKGROUND}};
 }
 
 QWidget#annotationBeta QAbstractButton#colorSwatch {
