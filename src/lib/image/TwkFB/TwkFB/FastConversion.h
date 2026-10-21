@@ -108,6 +108,31 @@ extern "C"
                                                     uint16_t* FASTMEMCPYRESTRICT outCr, size_t outStrideY, size_t outStrideCb,
                                                     size_t outStrideCr);
 
+    /// @brief Converts semi-planar format P010 to planar YUV 420 16-bits.
+    ///
+    /// @param width The number of pixels per row.
+    /// @param height The number of rows.
+    /// @param inY The input channel buffer of the Y component.
+    /// @param inCbCr The input channel buffer of the CbCr components.
+    /// @param inStrideY The stride of the input channel buffer of the Y
+    /// component in bytes.
+    /// @param inStrideCbCr The stride of the input channel buffer of the CbCr
+    /// components in bytes.
+    /// @param outY The output channel buffer of the Y component.
+    /// @param outCb The output channel buffer of the Cb component.
+    /// @param outCr The output channel buffer of the Cr component.
+    /// @param outStrideY The stride of the output channel buffer of the Y
+    /// component in bytes.
+    /// @param outStrideCb The stride of the output channel buffer of the Cb
+    /// component in bytes.
+    /// @param outStrideCr The stride of the output channel buffer of the Cr
+    /// component in bytes.
+    TWKFB_EXPORT void planarP010_to_planarYUV420P16(size_t width, size_t height, const uint16_t* FASTMEMCPYRESTRICT inY,
+                                                    const uint16_t* FASTMEMCPYRESTRICT inCbCr, size_t inStrideY, size_t inStrideCbCr,
+                                                    uint16_t* FASTMEMCPYRESTRICT outY, uint16_t* FASTMEMCPYRESTRICT outCb,
+                                                    uint16_t* FASTMEMCPYRESTRICT outCr, size_t outStrideY, size_t outStrideCb,
+                                                    size_t outStrideCr);
+
     /// @brief Converts semi-planar format P416 to planar YUV 444 16-bits.
     ///
     /// @param width The number of bytes per row.
