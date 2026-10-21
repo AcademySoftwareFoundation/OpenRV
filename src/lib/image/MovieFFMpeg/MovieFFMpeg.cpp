@@ -847,12 +847,59 @@ namespace TwkMovie
             bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
             AVPixelFormat best = AV_PIX_FMT_NONE;
 
-            // Planar YUV+
-            if (isPlanar && !isRGB)
+            //
+            // Packed (interleaved) YUV. With FFmpeg 8, the rawvideo decoder
+            // outputs these for uncompressed QuickTime YUV: uyvy422 ('2vuy'),
+            // yuyv422 ('yuvs'), vyu444 ('v308'), uyva ('v408') and v30xle
+            // ('v410').
+            //
+            // Packed YUV is mapped to the planar YUV format with the same
+            // subsampling, at every bit depth, rather than converted to RGB
+            // here. The RGB route goes through sws_scale() with its default
+            // BT.601 coefficients and ignores the stream's color tags, so a
+            // BT.709 file decodes with the wrong matrix. As planar YUV it
+            // reaches RV's own YUV->RGB path, which uses the conversion
+            // recorded from the stream.
+            //
+            // Excludes gray, palette, Bayer, hardware and XYZ formats, which
+            // also lack the RGB and planar flags but are not YUV.
+            //
+            bool isPackedYUV = !isPlanar && !isRGB && desc->nb_components >= 3
+                               && !(desc->flags & (AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_BAYER | AV_PIX_FMT_FLAG_HWACCEL))
+                               && native != AV_PIX_FMT_XYZ12LE && native != AV_PIX_FMT_XYZ12BE;
+
+            // Planar YUV+, and packed YUV mapped to its planar equivalent
+            if ((isPlanar && !isRGB) || isPackedYUV)
             {
-                if (bitSize == 8)
+                int log2w, log2h;
+                av_pix_fmt_get_chroma_sub_sample(native, &log2w, &log2h);
+
+                if (bitSize == 8 && !isPackedYUV)
                 {
                     best = native;
+                }
+                else if (bitSize == 8)
+                {
+                    // 8-bit packed YUV, e.g. '2vuy', 'yuvs', 'v308', 'v408'.
+                    // Deeper packed formats such as 'v410' take the
+                    // bitSize > 8 branch below.
+                    if (log2w == 0 && log2h == 0)
+                    {
+                        best = (hasAlpha) ? AV_PIX_FMT_YUVA444P : AV_PIX_FMT_YUV444P;
+                    }
+                    else if (log2w == 1 && log2h == 0)
+                    {
+                        best = (hasAlpha) ? AV_PIX_FMT_YUVA422P : AV_PIX_FMT_YUV422P;
+                    }
+                    else if (log2w == 1 && log2h == 1)
+                    {
+                        best = (hasAlpha) ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P;
+                    }
+                    else if (log2w == 2 && log2h == 0 && !hasAlpha)
+                    {
+                        best = AV_PIX_FMT_YUV411P;
+                    }
+                    // Otherwise leave best as NONE and fall back to RGB below
                 }
                 else if (bitSize < 8)
                 {
@@ -860,8 +907,6 @@ namespace TwkMovie
                 }
                 else if (bitSize > 8)
                 {
-                    int log2w, log2h;
-                    av_pix_fmt_get_chroma_sub_sample(native, &log2w, &log2h);
                     int usampling = int(pow(2.0f, log2w));
                     int vsampling = int(pow(2.0f, log2h));
                     int hfourcc = 4 / (usampling * vsampling);
@@ -881,7 +926,8 @@ namespace TwkMovie
                     }
                 }
             }
-            else // Everything else
+
+            if (best == AV_PIX_FMT_NONE) // Everything else
             {
                 best = (hasAlpha) ? ((bitSize > 8) ? AV_PIX_FMT_RGBA64 : AV_PIX_FMT_RGBA)
                                   : ((bitSize > 8) ? AV_PIX_FMT_RGB48 : AV_PIX_FMT_RGB24);
@@ -3928,8 +3974,6 @@ namespace TwkMovie
         int bitSize = desc->comp[0].depth - desc->comp[0].shift;
         int numPlanes = 0;
         bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
-        bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
-        bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
         bool convertFormat = false;
         FrameBuffer::DataType dataType = (bitSize > 8) ? FrameBuffer::USHORT : FrameBuffer::UCHAR;
         FrameBuffer::StringVector chans(3);
@@ -3974,18 +4018,34 @@ namespace TwkMovie
             out = new FrameBuffer(width, height, chans.size(), dataType, NULL, &chans);
             break;
         default:
+        {
+            const AVPixelFormat decodedFormat = nativeFormat;
             nativeFormat = getBestRVFormat(nativeFormat);
             outFrame->format = nativeFormat;
-            if (isPlanar && !isRGB)
+
+            // Describe the format we are converting *to*. For packed YUV this
+            // differs from the decoded format: it has been mapped to planar.
+            const AVPixFmtDescriptor* bestDesc = av_pix_fmt_desc_get(nativeFormat);
+            const bool bestIsPlanar = (bestDesc->flags & AV_PIX_FMT_FLAG_PLANAR);
+            const bool bestIsRGB = (bestDesc->flags & AV_PIX_FMT_FLAG_RGB);
+            const bool bestHasAlpha = (bestDesc->flags & AV_PIX_FMT_FLAG_ALPHA);
+
+            if (bestIsPlanar && !bestIsRGB)
             {
-                convertFormat = (bitSize != 8);
+                // Any change of format needs sws_scale(). This is equivalent
+                // to the previous (bitSize != 8) test for planar sources, and
+                // also covers packed YUV repacked to planar.
+                convertFormat = (nativeFormat != decodedFormat);
                 numPlanes = av_pix_fmt_count_planes(nativeFormat);
+                // Line sizes must be for the output format, not the decoded
+                // one (a packed source has only one plane).
+                av_image_fill_arrays(outFrame->data, outFrame->linesize, nullptr, nativeFormat, width, height, 1);
                 int log2w, log2h;
                 av_pix_fmt_get_chroma_sub_sample(nativeFormat, &log2w, &log2h);
                 int usampling = int(pow(2.0f, log2w));
                 int vsampling = int(pow(2.0f, log2h));
                 out = configureYUVPlanes(dataType, width, height, outFrame->linesize[0], outFrame->linesize[1], usampling, vsampling,
-                                         hasAlpha, track->fb.orientation());
+                                         bestHasAlpha, track->fb.orientation());
             }
             else
             {
@@ -3994,6 +4054,7 @@ namespace TwkMovie
                 out = new FrameBuffer(width, height, (hasAlpha) ? 4 : 3, dataType);
             }
             break;
+        }
         }
 
         // Assign the AVFrame data to our frame buffer
