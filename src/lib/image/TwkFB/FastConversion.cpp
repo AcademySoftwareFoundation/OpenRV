@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstring>
 
 using namespace ILMTHREAD_NAMESPACE;
 
@@ -883,6 +884,56 @@ void planarP210_to_planarYUV422P16(size_t width, size_t height, const uint16_t* 
             *outCr = denormalizeY16(normalizeY10(((*inCbCr) & bit_mask) >> bit_shift));
             ++outCr;
             ++inCbCr;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+// Converts semi-planar format P010 to planar YUV 420 16-bits.
+//
+// Context: To optimize the following FFmpeg formats conversion which is
+// required for 10-bit 4:2:0 (e.g. HEVC Main 10) decoding on macOS via
+// VideoToolbox since sws_scale() has no optimized path for it.
+//
+//  AV_PIX_FMT_P010LE && dstFormat -> AV_PIX_FMT_YUV420P16LE
+//
+// AV_PIX_FMT_P010LE - interleaved chroma YUV 4:2:0, 15bpp, data in the high
+// bits, little-endian
+//
+// AV_PIX_FMT_YUV420P16LE - planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2
+// Y samples), little-endian
+//
+// Since P010 stores its samples in the high bits of each 16-bit word, the
+// values are already scaled to the 16-bit range and only need to be
+// deinterleaved.
+//
+void planarP010_to_planarYUV420P16(size_t width, size_t height, const uint16_t* inY, const uint16_t* inCbCr, size_t inStrideY,
+                                   size_t inStrideCbCr, uint16_t* outY, uint16_t* outCb, uint16_t* outCr, size_t outStrideY,
+                                   size_t outStrideCb, size_t outStrideCr)
+{
+    const uint8_t* FASTMEMCPYRESTRICT startInY = reinterpret_cast<const uint8_t*>(inY);
+    const uint8_t* FASTMEMCPYRESTRICT startInCbCr = reinterpret_cast<const uint8_t*>(inCbCr);
+    uint8_t* FASTMEMCPYRESTRICT startOutY = reinterpret_cast<uint8_t*>(outY);
+    uint8_t* FASTMEMCPYRESTRICT startOutCb = reinterpret_cast<uint8_t*>(outCb);
+    uint8_t* FASTMEMCPYRESTRICT startOutCr = reinterpret_cast<uint8_t*>(outCr);
+
+    for (size_t i = 0; i < height; ++i)
+    {
+        memcpy(startOutY + i * outStrideY, startInY + i * inStrideY, width * sizeof(uint16_t));
+    }
+
+    const size_t chromaWidth = (width + 1) / 2;
+    const size_t chromaHeight = (height + 1) / 2;
+
+    for (size_t i = 0; i < chromaHeight; ++i)
+    {
+        const uint16_t* FASTMEMCPYRESTRICT in = reinterpret_cast<const uint16_t*>(startInCbCr + i * inStrideCbCr);
+        uint16_t* FASTMEMCPYRESTRICT cb = reinterpret_cast<uint16_t*>(startOutCb + i * outStrideCb);
+        uint16_t* FASTMEMCPYRESTRICT cr = reinterpret_cast<uint16_t*>(startOutCr + i * outStrideCr);
+        for (size_t j = 0; j < chromaWidth; ++j)
+        {
+            cb[j] = in[2 * j];
+            cr[j] = in[2 * j + 1];
         }
     }
 }

@@ -29,6 +29,7 @@
 #include <stl_ext/string_algo.h>
 #include <string>
 #include <set>
+#include <sstream>
 #include <limits>
 #include <cmath>
 #include <mutex>
@@ -693,7 +694,17 @@ namespace TwkMovie
 #endif
         };
 
-        const char* supportedEncodingCodecsArray[] = {"dvvideo", "libx264", "mjpeg", "pcm_s16be", "rawvideo", 0};
+        const char* supportedEncodingCodecsArray[] = {"dvvideo",
+                                                      "libx264",
+                                                      "mjpeg",
+                                                      "pcm_s16be",
+                                                      "rawvideo",
+#if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+                                                      "h264_videotoolbox",
+                                                      "hevc_videotoolbox",
+                                                      "prores_videotoolbox",
+#endif
+                                                      0};
 
         const char* metadataFieldsArray[] = {"album",       "album_artist", "artist",     "author", "comment",  "composer", "copyright",
                                              "description", "encoder",      "episode_id", "genre",  "grouping", "lyrics",   "network",
@@ -1008,9 +1019,11 @@ namespace TwkMovie
                 return -1;
             }
 
-            AVBufferRef* hardwareDeviceContext = hardwareContext->deviceContext;
+            // The codec may be reopened for the same track (see ContextPool)
+            // so release any device context left from a previous open.
+            av_buffer_unref(&hardwareContext->deviceContext);
 
-            const int result = av_hwdevice_ctx_create(&hardwareDeviceContext, deviceType, nullptr, nullptr, 0);
+            const int result = av_hwdevice_ctx_create(&hardwareContext->deviceContext, deviceType, nullptr, nullptr, 0);
 
             if (result < 0)
             {
@@ -1019,7 +1032,7 @@ namespace TwkMovie
                 return result;
             }
 
-            codecContext->hw_device_ctx = av_buffer_ref(hardwareDeviceContext);
+            codecContext->hw_device_ctx = av_buffer_ref(hardwareContext->deviceContext);
 
             return result;
         }
@@ -1029,23 +1042,87 @@ namespace TwkMovie
             HardwareContext* hardwareContext = static_cast<HardwareContext*>(codecContext->opaque);
             if (hardwareContext != nullptr)
             {
-                const enum AVPixelFormat* pixelFormat = nullptr;
-                AVPixelFormat hardwarePixelFormat = hardwareContext->pixelFormat;
-
-                for (pixelFormat = pixelFormats; *pixelFormat != -1; pixelFormat++)
+                for (const AVPixelFormat* pixelFormat = pixelFormats; *pixelFormat != AV_PIX_FMT_NONE; pixelFormat++)
                 {
-                    if (*pixelFormat == hardwarePixelFormat)
+                    if (*pixelFormat == hardwareContext->pixelFormat)
                     {
                         return *pixelFormat;
                     }
                 }
-                std::cerr << "ERROR: Failed to get hardware surface format.\n";
             }
-            std::cerr << "ERROR: Failed to get hardware context.\n";
+
+            // The hardware format is not offered, e.g. a profile, bit depth or
+            // chroma subsampling the hardware decoder does not handle. Fall
+            // back to the first software format so the stream still decodes.
+            for (const AVPixelFormat* pixelFormat = pixelFormats; *pixelFormat != AV_PIX_FMT_NONE; pixelFormat++)
+            {
+                const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(*pixelFormat);
+                if (desc && !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+                {
+                    static std::once_flag warnOnce;
+                    std::call_once(warnOnce,
+                                   [codecContext]()
+                                   {
+                                       std::cout << "INFO: MovieFFMpeg: Hardware decoding is not supported for this "
+                                                 << codecContext->codec->name << " stream, using software decoding." << std::endl;
+                                   });
+                    return *pixelFormat;
+                }
+            }
+
+            std::cerr << "ERROR: MovieFFMpeg: Failed to get a decoding pixel format.\n";
             return AV_PIX_FMT_NONE;
         }
 
 #if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
+        //
+        // Returns true if VideoToolbox hardware decoding should be attempted
+        // for this codec. The set of codecs can be overridden with the
+        // RV_FFMPEG_VIDEOTOOLBOX_CODECS environment variable, a comma
+        // separated list of FFmpeg decoder names (e.g. "prores,hevc"). Set it
+        // to an empty string to disable hardware decoding entirely.
+        //
+        bool videoToolboxEnabledForCodec(const AVCodec* avCodec)
+        {
+            static const std::string enabledCodecs = []()
+            {
+                const char* env = getenv("RV_FFMPEG_VIDEOTOOLBOX_CODECS");
+                return std::string(env ? env : "prores,h264,hevc,av1");
+            }();
+
+            std::stringstream ss(enabledCodecs);
+            std::string name;
+            while (std::getline(ss, name, ','))
+            {
+                if (name == avCodec->name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Check if the hardware decoder of this machine supports the codec
+        bool videoToolboxHardwareSupported(AVCodecID codecId)
+        {
+            switch (codecId)
+            {
+            case AV_CODEC_ID_PRORES:
+                return VTIsHardwareDecodeSupported(kCMVideoCodecType_AppleProRes4444)
+                       && VTIsHardwareDecodeSupported(kCMVideoCodecType_AppleProRes422);
+            case AV_CODEC_ID_H264:
+                return VTIsHardwareDecodeSupported(kCMVideoCodecType_H264);
+            case AV_CODEC_ID_HEVC:
+                return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
+            case AV_CODEC_ID_AV1:
+                // AV1 hardware decoding requires Apple M3 or later
+                return VTIsHardwareDecodeSupported(kCMVideoCodecType_AV1);
+            default:
+                return false;
+            }
+        }
+
         bool videoToolboxInit(const AVCodec* avCodec, AVCodecContext** avCodecContext, HardwareContext* hardwareContext)
         {
             if (avCodec == nullptr || avCodecContext == nullptr || *avCodecContext == nullptr || hardwareContext == nullptr)
@@ -1054,36 +1131,35 @@ namespace TwkMovie
                 return false;
             }
 
-            // Check if the ProRes codec is supported by the hardware decoder
-            if (avCodec->id == AV_CODEC_ID_PRORES)
-            {
-                if (!VTIsHardwareDecodeSupported(kCMVideoCodecType_AppleProRes4444)
-                    || !VTIsHardwareDecodeSupported(kCMVideoCodecType_AppleProRes422))
-                {
-                    return false;
-                }
-            }
-
             const AVHWDeviceType deviceType = av_hwdevice_find_type_by_name("videotoolbox");
             if (deviceType == AV_HWDEVICE_TYPE_NONE)
             {
-                std::cerr << "ERROR: Device type" << deviceType << "is not supported.\n";
+                std::cerr << "ERROR: Device type videotoolbox is not supported.\n";
                 return false;
             }
 
-            const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, 0);
-            if (config == nullptr)
+            // Find the decoder's hardware configuration for VideoToolbox
+            hardwareContext->pixelFormat = AV_PIX_FMT_NONE;
+            for (int i = 0;; ++i)
+            {
+                const AVCodecHWConfig* config = avcodec_get_hw_config(avCodec, i);
+                if (config == nullptr)
+                {
+                    break;
+                }
+
+                if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0 && config->device_type == deviceType)
+                {
+                    hardwareContext->pixelFormat = config->pix_fmt;
+                    break;
+                }
+            }
+
+            if (hardwareContext->pixelFormat == AV_PIX_FMT_NONE)
             {
                 std::cerr << "ERROR: Decoder " << avCodec->name << " does not support device type " << av_hwdevice_get_type_name(deviceType)
                           << '\n';
                 return false;
-            }
-
-            // Check if the hardware device context flag is set and the device
-            // type matches
-            if ((config->methods & AV_CODEC_HW_CONFIG_METHOD_HW_DEVICE_CTX) != 0 && config->device_type == deviceType)
-            {
-                hardwareContext->pixelFormat = config->pix_fmt;
             }
 
             (*avCodecContext)->opaque = hardwareContext;
@@ -1091,6 +1167,10 @@ namespace TwkMovie
 
             if (hardwareDecoderInit(*avCodecContext, deviceType) < 0)
             {
+                // Leave the codec context configured for software decoding
+                (*avCodecContext)->opaque = nullptr;
+                (*avCodecContext)->get_format = avcodec_default_get_format;
+                hardwareContext->pixelFormat = AV_PIX_FMT_NONE;
                 return false;
             }
 
@@ -1395,6 +1475,18 @@ namespace TwkMovie
         // Find the decoder for the av stream
         switch (avStream->codecpar->codec_id)
         {
+#if defined(__APPLE__)
+        case AV_CODEC_ID_AAC:
+            // Prefer Apple's AudioToolbox AAC decoder when it is built in,
+            // even if FFmpeg's own AAC decoder is enabled too.
+            avCodec = avcodec_find_decoder_by_name("aac_at");
+            if (avCodec == nullptr)
+            {
+                avCodec = avcodec_find_decoder(avStream->codecpar->codec_id);
+            }
+            break;
+#endif
+
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
             // we want to read SPS and PPS NALs at the beginning of H.264 and
@@ -1429,10 +1521,37 @@ namespace TwkMovie
             return false;
         }
 
+        bool useHardwareDecoder = false;
+
 #if defined(RV_FFMPEG_USE_VIDEOTOOLBOX)
-        if (avStream->codecpar->codec_id == AV_CODEC_ID_PRORES)
+        if (avStream->codecpar->codec_id == AV_CODEC_ID_AV1 && videoToolboxHardwareSupported(AV_CODEC_ID_AV1))
         {
-            if (!videoToolboxInit(avCodec, avCodecContext, hardwareContext))
+            // The default AV1 decoder (libdav1d) is software only. FFmpeg's
+            // native AV1 decoder can only decode through a hwaccel, so switch
+            // to it only once VideoToolbox is successfully set up for it and
+            // otherwise keep the libdav1d context.
+            const AVCodec* nativeAV1 = avcodec_find_decoder_by_name("av1");
+            if (nativeAV1 != nullptr && nativeAV1 != avCodec && videoToolboxEnabledForCodec(nativeAV1))
+            {
+                AVCodecContext* nativeContext = avcodec_alloc_context3(nativeAV1);
+                if (nativeContext != nullptr && avcodec_parameters_to_context(nativeContext, avStream->codecpar) >= 0
+                    && videoToolboxInit(nativeAV1, &nativeContext, hardwareContext))
+                {
+                    avcodec_free_context(avCodecContext);
+                    *avCodecContext = nativeContext;
+                    avCodec = nativeAV1;
+                    useHardwareDecoder = true;
+                }
+                else
+                {
+                    avcodec_free_context(&nativeContext);
+                }
+            }
+        }
+        else if (videoToolboxEnabledForCodec(avCodec) && videoToolboxHardwareSupported(avStream->codecpar->codec_id))
+        {
+            useHardwareDecoder = videoToolboxInit(avCodec, avCodecContext, hardwareContext);
+            if (!useHardwareDecoder)
             {
                 static std::once_flag warnOnce;
                 std::call_once(warnOnce,
@@ -1448,6 +1567,21 @@ namespace TwkMovie
 
         // Open the codec
         (*avCodecContext)->thread_count = m_io->codecThreads();
+        if (useHardwareDecoder)
+        {
+            static std::mutex reportedMutex;
+            static std::set<std::string> reportedCodecs;
+            std::lock_guard<std::mutex> lock(reportedMutex);
+            if (reportedCodecs.insert(avCodec->name).second)
+            {
+                std::cout << "INFO: MovieFFMpeg: Using VideoToolbox hardware decoding for " << avCodec->name << std::endl;
+            }
+
+            // The VideoToolbox hwaccel is not frame thread safe: FFmpeg would
+            // serialize the frame threads around it, adding latency without
+            // any speedup. Slice threading (e.g. ProRes) is unaffected.
+            (*avCodecContext)->thread_type &= ~FF_THREAD_FRAME;
+        }
         if (avcodec_open2(*avCodecContext, avCodec, nullptr) < 0)
         {
             std::cerr << "ERROR: MovieFFMpeg: Failed to open codec '" << avCodec->name << "' for " << m_filename << '\n';
@@ -2989,10 +3123,14 @@ namespace TwkMovie
         // Whereas it was 3 ms, 2 ms and 2 ms with the following custom
         // functions.
         bool isProRes422 = srcFrame->format == AV_PIX_FMT_P210LE && dstFrame->format == AV_PIX_FMT_YUV422P16LE;
-        bool isProRes4444WithoutAlpha = srcFrame->format == AV_PIX_FMT_P416LE && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+        // P410 (e.g. 10-bit 4:4:4 HEVC) has the same layout as P416 with the
+        // samples in the high bits, so it is copied the same way.
+        bool isProRes4444WithoutAlpha =
+            (srcFrame->format == AV_PIX_FMT_P416LE || srcFrame->format == AV_PIX_FMT_P410LE) && dstFrame->format == AV_PIX_FMT_YUV444P16LE;
+        bool is420P10 = srcFrame->format == AV_PIX_FMT_P010LE && dstFrame->format == AV_PIX_FMT_YUV420P16LE;
         bool isProRes4444WithAlpha = srcFrame->format == AV_PIX_FMT_AYUV64LE && dstFrame->format == AV_PIX_FMT_YUVA444P16LE;
 
-        if (isProRes422 || isProRes4444WithoutAlpha)
+        if (isProRes422 || isProRes4444WithoutAlpha || is420P10)
         {
             const uint16_t* srcY = reinterpret_cast<const uint16_t*>(srcFrame->data[0]);
             const uint16_t* srcCbCr = reinterpret_cast<const uint16_t*>(srcFrame->data[1]);
@@ -3011,6 +3149,14 @@ namespace TwkMovie
             if (isProRes422)
             {
                 planarP210_to_planarYUV422P16(width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr, dstY, dstCb, dstCr, dstStrideY,
+                                              dstStrideCb, dstStrideCr);
+
+                return;
+            }
+
+            if (is420P10)
+            {
+                planarP010_to_planarYUV420P16(width, height, srcY, srcCbCr, srcStrideY, srcStrideCbCr, dstY, dstCb, dstCr, dstStrideY,
                                               dstStrideCb, dstStrideCr);
 
                 return;
@@ -3978,7 +4124,11 @@ namespace TwkMovie
             outFrame->format = nativeFormat;
             if (isPlanar && !isRGB)
             {
-                convertFormat = (bitSize != 8);
+                // A hardware decoded frame transferred to system memory is in
+                // the hardware's layout (e.g. NV12 or P010 from VideoToolbox)
+                // rather than the codec's software format, so it must be
+                // converted even when the bit depth already matches.
+                convertFormat = (bitSize != 8) || (videoFrame->format != nativeFormat);
                 numPlanes = av_pix_fmt_count_planes(nativeFormat);
                 int log2w, log2h;
                 av_pix_fmt_get_chroma_sub_sample(nativeFormat, &log2w, &log2h);
@@ -4015,6 +4165,10 @@ namespace TwkMovie
         double duration = m_timingDetails->pauseTimer("copyFrame");
         DBL(DB_TIMING, "frame: " << inframe << " copyFrame: " << duration);
 #endif
+
+        // A frame transferred from a hardware surface was decoded by the
+        // hardware decoder; otherwise it fell back to software decoding.
+        const bool decodedWithHardware = (softwareFrame != nullptr);
 
         // Clean up
         av_frame_free(&outFrame);
@@ -4053,6 +4207,27 @@ namespace TwkMovie
 
             delete out;
             out = Yrot;
+        }
+
+        //
+        // Record which decoder produced this frame, e.g. "VideoToolbox (hevc)"
+        // or "Software (libdav1d)", for display in Image Info.
+        //
+
+        {
+            const string codecName = videoCodecContext->codec->name;
+            string decoder = decodedWithHardware ? "VideoToolbox (" + codecName + ")" : "Software (" + codecName + ")";
+            if (track->useOpenJPH)
+            {
+                decoder = "OpenJPH";
+            }
+#if defined(RV_USE_APPLE_PRORES_SDK)
+            if (track->useAppleProRes)
+            {
+                decoder = "Apple ProRes SDK";
+            }
+#endif
+            out->newAttribute("VideoDecoder", decoder);
         }
 
         //
@@ -4464,17 +4639,32 @@ namespace TwkMovie
                 const enum AVPixelFormat* pix_fmts = NULL;
                 int ret =
                     avcodec_get_supported_config(avCodecContext, avCodec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, NULL);
-                if (ret >= 0 && pix_fmts)
+                if (ret < 0)
                 {
-                    avCodecContext->pix_fmt = pix_fmts[0];
-                }
-                else
-                {
-                    avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                    pix_fmts = NULL;
                 }
 #else
                 // Old API (FFmpeg < 7.0)
-                avCodecContext->pix_fmt = (avCodec->pix_fmts) ? avCodec->pix_fmts[0] : RV_OUTPUT_FFMPEG_FMT;
+                const enum AVPixelFormat* pix_fmts = avCodec->pix_fmts;
+#endif
+                // Use the first software format. Hardware encoders such as
+                // VideoToolbox list their hardware surface format first,
+                // which frames from system memory cannot be converted into.
+                avCodecContext->pix_fmt = AV_PIX_FMT_NONE;
+                for (const enum AVPixelFormat* fmt = pix_fmts; fmt && *fmt != AV_PIX_FMT_NONE; fmt++)
+                {
+                    const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(*fmt);
+                    if (desc && !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+                    {
+                        avCodecContext->pix_fmt = *fmt;
+                        break;
+                    }
+                }
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(61, 13, 100)
+                if (avCodecContext->pix_fmt == AV_PIX_FMT_NONE)
+                {
+                    avCodecContext->pix_fmt = RV_OUTPUT_FFMPEG_FMT;
+                }
 #endif
 
                 if (m_request.verbose)
@@ -5378,9 +5568,11 @@ namespace TwkMovie
         case AV_OPT_TYPE_CONST:
         case AV_OPT_TYPE_INT:
         case AV_OPT_TYPE_INT64:
-            int integer;
-            invalue >> integer;
-            setopt = av_opt_set_int(avObj, opt->name, integer, 0);
+            // Let FFmpeg parse the value so that integer options can also be
+            // set by the name of one of their constants (e.g. the
+            // prores_videotoolbox "profile" option takes "hq" or "4444"), and
+            // so that 64-bit values are not truncated.
+            setopt = av_opt_set(avObj, opt->name, value.c_str(), 0);
             break;
         case AV_OPT_TYPE_DOUBLE:
         case AV_OPT_TYPE_FLOAT:

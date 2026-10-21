@@ -229,6 +229,12 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
       "vp9_v4l2m2m"
   )
 
+  # On macOS, aac_at decodes AAC with Apple's AudioToolbox framework, i.e. the decoder that ships with the OS, rather than FFmpeg's own AAC implementation, so
+  # it is enabled by default there. The other AAC decoders stay disabled unless listed in RV_FFMPEG_NON_FREE_DECODERS_TO_ENABLE.
+  IF(APPLE)
+    LIST(REMOVE_ITEM NON_FREE_DECODERS_TO_DISABLE "aac_at")
+  ENDIF()
+
   # FFmpeg 8 introduced the prores_raw decoder, which (like the prores decoder) pulls in libavcodec/x86/proresdsp_init.o. That C init references the SSE2 asm
   # symbol ff_prores_idct_put_10_sse2, but the asm that defines it (x86/proresdsp.o) is only built when CONFIG_PRORES_DECODER is enabled. Because we disable the
   # non-free prores decoder above, leaving prores_raw enabled produces an undefined symbol in libavcodec on x86 (mio_ffmpeg fails to dlopen). Disable prores_raw
