@@ -494,6 +494,7 @@ namespace IPCore
                 , cacheUpdated(false)
                 , lastCommand(0)
                 , commandExecuted(0)
+                , useOverlayMatrix(false)
             {
             }
 
@@ -510,6 +511,16 @@ namespace IPCore
             IPImage::PaintCommands commands;
             GLState* glState;
             size_t commandExecuted;
+            //
+            //  When true, renderPaintCommands will use the image's
+            //  overlayImageMatrix (rotation stripped) as the modelview for
+            //  these commands instead of the regular imageMatrix. Set by
+            //  ImageRenderer::renderPaint when rendering the overlay batch
+            //  (i.e. commands appearing before the ExecuteAllBefore sentinel
+            //  emitted by OverlayIPNode), so that mattes/HUD overlays do
+            //  not rotate with the image while user annotations still do.
+            //
+            bool useOverlayMatrix;
         };
 
         void renderPaintCommands(PaintContext&);
