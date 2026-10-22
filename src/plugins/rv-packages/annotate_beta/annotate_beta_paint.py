@@ -5,10 +5,12 @@
 
 import os
 import uuid
+from collections.abc import Iterable
 
 from rv import commands
 
 import annotate_beta_constants as constants
+from annotate_beta_types import PaintComponent, PaintFrame
 
 BOX_PREFIXES = frozenset({"rect", "ellipse"})
 
@@ -34,107 +36,111 @@ def _next_id(paint_node):
     return next_id
 
 
-def _unique_name(paint_node, prefix, frame):
-    node_id = _next_id(paint_node)
+def _new_component(paint_frame: PaintFrame, prefix: str) -> PaintComponent:
+    node_id = _next_id(paint_frame.paint_node)
     host = commands.myNetworkHost().replace(".", "_")
     process_id = os.getpid()
-    return f"{paint_node}.{prefix}:{node_id}:{frame}:{host}_{process_id}"
+    return PaintComponent(paint_frame, f"{prefix}:{node_id}:{paint_frame.frame}:{host}_{process_id}")
 
 
-def _component_name(node_name):
-    """Extract the component key from a full property path.
-
-    e.g. "RVPaint_1.rect:3:42:host_1234"  →  "rect:3:42:host_1234"
-    """
-    return node_name.split(".", 1)[1] if "." in node_name else node_name
+def _node_name(component: PaintComponent) -> str:
+    """Return the property path prefix of a component, e.g. "RVPaint_1.rect:3:42:host_1234"."""
+    return f"{component.paint_frame.paint_node}.{component.name}"
 
 
-def _add_to_order(paint_node, frame, node_name):
+def frame_order_property(paint_frame: PaintFrame) -> str:
+    return f"{paint_frame.paint_node}.frame:{paint_frame.frame}.order"
+
+
+def _add_to_order(component: PaintComponent):
     """Insert the component into the frame draw order."""
-    component = _component_name(node_name)
-    order_property = f"{paint_node}.frame:{frame}.order"
+    order_property = frame_order_property(component.paint_frame)
     _ensure_property(order_property, commands.StringType, 1)
-    if component not in commands.getStringProperty(order_property):
-        commands.insertStringProperty(order_property, [component])
+    if component.name not in commands.getStringProperty(order_property):
+        commands.insertStringProperty(order_property, [component.name])
 
 
-def _remove_from_order(paint_node, frame, node_name):
+def _remove_from_order(component: PaintComponent):
     """Remove a component from the frame draw-order list."""
-    order_property = f"{paint_node}.frame:{frame}.order"
+    order_property = frame_order_property(component.paint_frame)
     if not commands.propertyExists(order_property):
         return
-    component = _component_name(node_name)
     current = list(commands.getStringProperty(order_property))
-    if component in current:
-        current.remove(component)
+    if component.name in current:
+        current.remove(component.name)
         commands.setStringProperty(order_property, current, True)
 
 
-def _restore_to_order(paint_node, frame, node_name):
-    """Re-append a component to the frame draw-order list."""
-    order_property = f"{paint_node}.frame:{frame}.order"
-    if not commands.propertyExists(order_property):
-        return
-    component = _component_name(node_name)
-    current = list(commands.getStringProperty(order_property))
-    if component not in current:
-        commands.insertStringProperty(order_property, [component])
-
-
-def soft_delete(paint_node, frame, node_name):
-    _remove_from_order(paint_node, frame, node_name)
-    commands.setIntProperty(f"{node_name}.softDeleted", [1], True)
-
-
-def restore(paint_node, frame, node_name):
-    _restore_to_order(paint_node, frame, node_name)
-    commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
-
-
-def uuid_for(node_name):
-    """Return the UUID stored on a paint node, or empty string if unavailable."""
-    uuid_property = f"{node_name}.uuid"
+def _uuid_for(component: PaintComponent) -> str:
+    """Return the UUID stored on a component, or empty string if unavailable."""
+    uuid_property = f"{_node_name(component)}.uuid"
     if commands.propertyExists(uuid_property):
         return commands.getStringProperty(uuid_property)[0]
     return ""
 
 
-def annotated_frames(paint_node):
-    """Return the set of frame numbers that have an order property on paint_node.
+def uuids_for(components: Iterable[PaintComponent]) -> list[str]:
+    """Return the UUIDs stored on the components, skipping components without one."""
+    uuids = (_uuid_for(component) for component in components)
+    return [component_uuid for component_uuid in uuids if component_uuid]
+
+
+def soft_delete(component: PaintComponent):
+    _remove_from_order(component)
+    commands.setIntProperty(f"{_node_name(component)}.softDeleted", [1], True)
+
+
+def restore(component: PaintComponent):
+    _add_to_order(component)
+    commands.setIntProperty(f"{_node_name(component)}.softDeleted", [0], True)
+
+
+def annotated_frames(paint_node: str) -> set[PaintFrame]:
+    """Return the paint frames that have an order property on paint_node.
 
     Scans actual properties rather than iterating a frame range so that
     annotations stored at source-space frame numbers outside the current
     timeline range are still found.
     """
+    frames = (order_property_frame(property_name) for property_name in commands.properties(paint_node))
+    return {frame for frame in frames if frame is not None}
+
+
+def all_annotated_frames() -> set[PaintFrame]:
+    """Return the paint frames that have an order property on every paint node."""
     frames = set()
-    for property_name in commands.properties(paint_node):
-        # property_name is e.g. "RVPaint_1.frame:42.order"
-        parts = property_name.split(".")
-        if len(parts) >= 3 and parts[2] == "order":
-            component_parts = parts[1].split(":")
-            if len(component_parts) == 2 and component_parts[0] == "frame":
-                frames.add(int(component_parts[1]))
+    for paint_node in commands.nodesOfType("RVPaint"):
+        frames.update(annotated_frames(paint_node))
     return frames
 
 
-def soft_delete_frame(paint_node, frame):
-    """Soft-delete every visible component on a frame and return their node names."""
-    order_property = f"{paint_node}.frame:{frame}.order"
+def order_property_frame(property_name: str) -> PaintFrame | None:
+    """Return the paint frame of a frame order property such as "RVPaint_1.frame:42.order"."""
+    match property_name.split("."):
+        case [paint_node, component, "order"]:
+            kind, _, frame = component.partition(":")
+            if kind == "frame":
+                return PaintFrame(paint_node, int(frame))
+    return None
+
+
+def has_visible_components(paint_frame: PaintFrame) -> bool:
+    order_property = frame_order_property(paint_frame)
+    return commands.propertyExists(order_property) and bool(commands.getStringProperty(order_property))
+
+
+def soft_delete_frame(paint_frame: PaintFrame) -> list[PaintComponent]:
+    """Soft-delete every visible component on a frame and return them."""
+    order_property = frame_order_property(paint_frame)
     if not commands.propertyExists(order_property):
         return []
-    cleared = []
-    surviving = []
-    for component in commands.getStringProperty(order_property):
-        node_name = f"{paint_node}.{component}"
-        deleted_property = f"{node_name}.softDeleted"
-        # Components without softDeleted (created before the property existed) are left in place.
-        if not commands.propertyExists(deleted_property) or commands.getIntProperty(deleted_property)[0]:
-            surviving.append(component)
-            continue
-        commands.setIntProperty(deleted_property, [1], True)
-        cleared.append(node_name)
-    if cleared:
-        commands.setStringProperty(order_property, surviving, True)
+    names = commands.getStringProperty(order_property)
+    cleared = [PaintComponent(paint_frame, name) for name in names if name]
+    for component in cleared:
+        _ensure_property(f"{_node_name(component)}.softDeleted", commands.IntType, 1)
+        commands.setIntProperty(f"{_node_name(component)}.softDeleted", [1], True)
+    if names:
+        commands.setStringProperty(order_property, [], True)
     return cleared
 
 
@@ -159,10 +165,11 @@ def remove_tags():
 # ----------------------------------------------------------------------
 
 
-def new_shape(paint_node, frame, prefix, anchor, current, style, border_width):
-    """Create a rect/ellipse/arrow/line component and return its property path."""
-    _ensure_visible(paint_node)
-    node_name = _unique_name(paint_node, prefix, frame)
+def new_shape(paint_frame, prefix, anchor, current, style, border_width):
+    """Create a rect/ellipse/arrow/line component and return it."""
+    _ensure_visible(paint_frame.paint_node)
+    component = _new_component(paint_frame, prefix)
+    node_name = _node_name(component)
     color = style.color
     alpha = style.opacity / 100.0
     filled = prefix == "arrow" or (style.filled and prefix in BOX_PREFIXES)
@@ -173,7 +180,7 @@ def new_shape(paint_node, frame, prefix, anchor, current, style, border_width):
     _ensure_property(f"{node_name}.startFrame", commands.IntType, 1)
     _ensure_property(f"{node_name}.duration", commands.IntType, 1)
     _ensure_property(f"{node_name}.eye", commands.IntType, 1)
-    commands.setIntProperty(f"{node_name}.startFrame", [frame], True)
+    commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setIntProperty(f"{node_name}.eye", [2], True)
 
@@ -207,17 +214,18 @@ def new_shape(paint_node, frame, prefix, anchor, current, style, border_width):
     commands.setStringProperty(f"{node_name}.uuid", [shape_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
 
-    _add_to_order(paint_node, frame, node_name)
+    _add_to_order(component)
     commands.redraw()
-    return node_name
+    return component
 
 
-def update_shape(shape_node, prefix, anchor, current):
+def update_shape(component: PaintComponent, prefix, anchor, current):
+    node_name = _node_name(component)
     if prefix in BOX_PREFIXES:
-        commands.setFloatProperty(f"{shape_node}.min", [min(anchor.x, current.x), min(anchor.y, current.y)], True)
-        commands.setFloatProperty(f"{shape_node}.max", [max(anchor.x, current.x), max(anchor.y, current.y)], True)
+        commands.setFloatProperty(f"{node_name}.min", [min(anchor.x, current.x), min(anchor.y, current.y)], True)
+        commands.setFloatProperty(f"{node_name}.max", [max(anchor.x, current.x), max(anchor.y, current.y)], True)
     else:
-        commands.setFloatProperty(f"{shape_node}.endPos", [current.x, current.y], True)
+        commands.setFloatProperty(f"{node_name}.endPos", [current.x, current.y], True)
     commands.redraw()
 
 
@@ -226,10 +234,11 @@ def update_shape(shape_node, prefix, anchor, current):
 # ----------------------------------------------------------------------
 
 
-def new_text_node(paint_node, frame, position, settings, font_size):
-    """Create an empty text component at position and return its property path."""
-    _ensure_visible(paint_node)
-    node_name = _unique_name(paint_node, "text", frame)
+def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> PaintComponent:
+    """Create an empty text component at position and return it."""
+    _ensure_visible(paint_frame.paint_node)
+    component = _new_component(paint_frame, "text")
+    node_name = _node_name(component)
     shape_uuid = str(uuid.uuid4())
 
     color = settings.tool_state.color
@@ -265,7 +274,7 @@ def new_text_node(paint_node, frame, position, settings, font_size):
     commands.setStringProperty(f"{node_name}.text", ["|"], True)
     commands.setStringProperty(f"{node_name}.origin", [""], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
-    commands.setIntProperty(f"{node_name}.startFrame", [frame], True)
+    commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setIntProperty(f"{node_name}.mode", [0], True)
 
@@ -291,13 +300,13 @@ def new_text_node(paint_node, frame, position, settings, font_size):
     commands.setStringProperty(f"{node_name}.uuid", [shape_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
 
-    _add_to_order(paint_node, frame, node_name)
+    _add_to_order(component)
     commands.redraw()
-    return node_name
+    return component
 
 
-def set_text(text_node, text):
-    commands.setStringProperty(f"{text_node}.text", [text], True)
+def set_text(component: PaintComponent, text: str):
+    commands.setStringProperty(f"{_node_name(component)}.text", [text], True)
     commands.redraw()
 
 
@@ -306,10 +315,11 @@ def set_text(text_node, text):
 # ----------------------------------------------------------------------
 
 
-def new_stroke(paint_node, frame, first_point, first_point_width, brush, erase_mode, style):
-    """Create a new pen/eraser stroke component and return its property path."""
-    _ensure_visible(paint_node)
-    node_name = _unique_name(paint_node, "pen", frame)
+def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, style):
+    """Create a new pen/eraser stroke component and return it."""
+    _ensure_visible(paint_frame.paint_node)
+    component = _new_component(paint_frame, "pen")
+    node_name = _node_name(component)
     stroke_uuid = str(uuid.uuid4())
 
     color = style.color
@@ -370,7 +380,7 @@ def new_stroke(paint_node, frame, first_point, first_point_width, brush, erase_m
     commands.insertFloatProperty(f"{node_name}.width", [first_point_width])  # insert, see above
     commands.setStringProperty(f"{node_name}.brush", [brush], True)
     commands.setIntProperty(f"{node_name}.mode", [stroke_mode], True)
-    commands.setIntProperty(f"{node_name}.startFrame", [frame], True)
+    commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setStringProperty(f"{node_name}.uuid", [stroke_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
@@ -386,11 +396,12 @@ def new_stroke(paint_node, frame, first_point, first_point_width, brush, erase_m
         f"{node_name}.blendMode", [2 if blend_mode == constants.ColorModifier.ADDITIVE else 0], True
     )
 
-    _add_to_order(paint_node, frame, node_name)
+    _add_to_order(component)
     commands.redraw()
-    return node_name
+    return component
 
 
-def append_stroke_point(stroke_node, point, width):
-    commands.insertFloatProperty(f"{stroke_node}.points", [point.x, point.y])
-    commands.insertFloatProperty(f"{stroke_node}.width", [width])
+def append_stroke_point(component: PaintComponent, point, width):
+    node_name = _node_name(component)
+    commands.insertFloatProperty(f"{node_name}.points", [point.x, point.y])
+    commands.insertFloatProperty(f"{node_name}.width", [width])

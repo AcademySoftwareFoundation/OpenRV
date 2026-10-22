@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import math
+from collections.abc import Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import partial
@@ -12,6 +13,7 @@ from rv import commands, extra_commands
 import annotate_beta_constants as constants
 import annotate_beta_history as history
 import annotate_beta_paint as paint
+from annotate_beta_types import PaintComponent, PaintFrame
 
 _PREFIX = {
     constants.Tool.RECT: "rect",
@@ -48,6 +50,14 @@ _FONT_SIZE_WCS_BASE = {
 class _Vec2(NamedTuple):
     x: float
     y: float
+
+
+@dataclass(frozen=True)
+class AvailableActions:
+    can_undo: bool = False
+    can_redo: bool = False
+    can_clear_frame: bool = False
+    can_clear_all_frames: bool = False
 
 
 @dataclass
@@ -90,13 +100,13 @@ class AnnotateDrawEngine:
         self._on_draw_started = on_draw_started
         self._on_eyedropper = on_eyedropper
 
-        # Paint node set via set-current-annotate-mode-node; see _find_paint_node.
-        self.preferred_paint_node = ""
+        self.preferred_paint_node = ""  # Paint node set via set-current-annotate-mode-node
+        self._visible_frames: set[PaintFrame] = set()
 
         # Shape drag state
         self._anchor = None
         self._last_image_point = None
-        self._current_shape = None
+        self._current_shape: PaintComponent | None = None
         self._shape_type = None
         self._shape_active = False
         self._shift_transition = False
@@ -105,15 +115,11 @@ class AnnotateDrawEngine:
         # Text editing state
         self._text_active = False
         self._text_buffer = ""
-        self._text_node = None
-        self._text_paint_node = None
-        self._text_frame = None
+        self._text_component: PaintComponent | None = None
         self._text_registered = False
 
         # Pen/eraser stroke state
-        self._pen_stroke = None  # current stroke node name (set on push, cleared on release)
-        self._pen_paint_node = None
-        self._pen_frame = None
+        self._pen_stroke: PaintComponent | None = None  # set on push, cleared on release
         self._pen_stroke_width = 0.0  # base width for the active stroke, scaled by pressure per point
         self._pen_last_point = None  # last point recorded into the active stroke
         # True while the physical eraser end of a Wacom stylus is in use; forces erase
@@ -190,6 +196,7 @@ class AnnotateDrawEngine:
             ("before-play-start", commit_and_propagate, "Commit text"),
             ("before-session-read", commit_and_propagate, "Commit text"),
             ("before-graph-view-change", commit_and_propagate, "Commit text"),
+            ("before-node-delete", commit_and_propagate, "Commit text"),
         ]
 
     @property
@@ -242,12 +249,11 @@ class AnnotateDrawEngine:
     # Paint node resolution
     # ------------------------------------------------------------------
 
-    def _find_paint_node(self) -> tuple[str | None, int | None]:
-        frame = commands.frame()
+    def _find_paint_frame(self) -> PaintFrame | None:
         try:
-            infos = commands.metaEvaluate(frame, commands.viewNode())
+            infos = commands.metaEvaluate(commands.frame(), commands.viewNode())
         except Exception:  # raised when the view node name is invalid
-            return None, None
+            return None
 
         # If an external package has nominated a specific paint node (via
         # set-current-annotate-mode-node), prefer it so that RV-drawn
@@ -255,7 +261,7 @@ class AnnotateDrawEngine:
         if self.preferred_paint_node:
             for info in infos:
                 if info.get("node") == self.preferred_paint_node:
-                    return self.preferred_paint_node, info["frame"]
+                    return PaintFrame(self.preferred_paint_node, info["frame"])
             # Preferred node isn't part of the current view (e.g. it was set
             # while viewing a different view/layout) — fall through to normal
             # resolution below rather than trusting a stale override. Matches
@@ -268,16 +274,12 @@ class AnnotateDrawEngine:
                     node = info["node"]
                     group = commands.nodeGroup(node)
                     if group and commands.nodeType(group) == "RVSourceGroup":
-                        return node, info["frame"]
+                        return PaintFrame(node, info["frame"])
 
         for info in infos:
             if info.get("nodeType") == "RVPaint":
-                return info["node"], info["frame"]
-        return None, frame
-
-    def _current_paint_frame(self) -> history.PaintFrame | None:
-        paint_node, frame = self._find_paint_node()
-        return history.PaintFrame(paint_node, frame) if paint_node else None
+                return PaintFrame(info["node"], info["frame"])
+        return None
 
     def _auto_mark_frame(self):
         if self._settings.auto_mark:
@@ -329,28 +331,22 @@ class AnnotateDrawEngine:
     # Text editing state
     # ------------------------------------------------------------------
 
-    def _push_create(self, paint_node: str, frame: int, node_name: str):
-        action = history.PaintAction(history.PaintActionType.CREATE, [node_name])
-        self._history.push(history.PaintFrame(paint_node, frame), action)
-
     def _register_text_undo(self):
         if self._text_registered:
             return
 
         self._auto_mark_frame()
-        self._push_create(self._text_paint_node, self._text_frame, self._text_node)
+        self._history.push_create(self._text_component)
         self._text_registered = True
         self._on_history_changed()
 
     def _update_text_display(self, cursor=True):
-        paint.set_text(self._text_node, self._text_buffer + "|" if cursor else self._text_buffer)
+        paint.set_text(self._text_component, self._text_buffer + "|" if cursor else self._text_buffer)
 
     def _reset_text(self):
         self._text_active = False
-        self._text_node = None
+        self._text_component = None
         self._text_buffer = ""
-        self._text_paint_node = None
-        self._text_frame = None
         self._text_registered = False
 
     def _commit_text(self):
@@ -364,14 +360,11 @@ class AnnotateDrawEngine:
 
     def _cancel_text(self):
         self._update_text_display(cursor=False)
-        paint.soft_delete(self._text_paint_node, self._text_frame, self._text_node)
+        paint.soft_delete(self._text_component)
         commands.redraw()
 
-        if self._text_registered:
-            paint_frame = history.PaintFrame(self._text_paint_node, self._text_frame)
-            text_action = history.PaintAction(history.PaintActionType.CREATE, [self._text_node])
-            if self._history.discard_if_latest(paint_frame, text_action):
-                self._on_history_changed()
+        if self._text_registered and self._history.discard_latest_create(self._text_component):
+            self._on_history_changed()
 
         self._reset_text()
 
@@ -395,8 +388,8 @@ class AnnotateDrawEngine:
         if commands.isPlaying():
             commands.stop()
         self._begin_sync()
-        paint_node, frame = self._find_paint_node()
-        if paint_node is None:
+        paint_frame = self._find_paint_frame()
+        if paint_frame is None:
             self._end_sync()
             event.reject()
             return
@@ -426,13 +419,16 @@ class AnnotateDrawEngine:
             else:
                 brush = constants.Brush.CIRCLE
         self._pen_stroke = paint.new_stroke(
-            paint_node, frame, image_point, self._pressure_width(event), brush, erase, self._settings.tool_state
+            paint_frame,
+            image_point,
+            self._pressure_width(event),
+            brush,
+            erase,
+            self._settings.tool_state,
         )
         self._auto_mark_frame()
-        self._pen_paint_node = paint_node
-        self._pen_frame = frame
         self._pen_last_point = image_point
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
+        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # sync accumulation is still open — will be flushed at _pen_release
 
     def _pen_drag(self, event):
@@ -454,12 +450,10 @@ class AnnotateDrawEngine:
         source_name, image_point = self._pointer_location(event)
         if source_name and image_point and not self._pen_point_too_close(image_point):
             paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
-        self._push_create(self._pen_paint_node, self._pen_frame, self._pen_stroke)
+        self._history.push_create(self._pen_stroke)
         self._on_history_changed()
         commands.sendInternalEvent("annotate-stroke-released")
         self._pen_stroke = None
-        self._pen_paint_node = None
-        self._pen_frame = None
         self._pen_last_point = None
         commands.redraw()
         # End the whole-stroke accumulation started in _pen_push and flush to network.
@@ -498,26 +492,31 @@ class AnnotateDrawEngine:
     # Common shape push / release
     # ------------------------------------------------------------------
 
-    def _do_push(self, image_point, paint_node, frame):
+    def _do_push(self, image_point, paint_frame: PaintFrame):
         if commands.isPlaying():
             commands.stop()
-            commands.setFrame(frame)
+            commands.setFrame(paint_frame.frame)
         prefix = _PREFIX[self._settings.tool]
         self._anchor = image_point
         self._last_image_point = image_point
         self._shape_type = prefix
         self._shape_active = True
         self._shift_transition = False
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_node)
+        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # Open a sync accumulation block that stays open until _do_release so the
         # entire shape (push → drag → release) is sent as one batch to remote
         # clients instead of immediately broadcasting the initial zero-size shape.
         self._begin_sync()
         self._current_shape = paint.new_shape(
-            paint_node, frame, prefix, image_point, image_point, self._settings.tool_state, self._border_width()
+            paint_frame,
+            prefix,
+            image_point,
+            image_point,
+            self._settings.tool_state,
+            self._border_width(),
         )
         self._auto_mark_frame()
-        self._push_create(paint_node, frame, self._current_shape)
+        self._history.push_create(self._current_shape)
         self._on_history_changed()
 
     def _do_release(self, image_point):
@@ -552,8 +551,8 @@ class AnnotateDrawEngine:
         if self._shift_transition:
             self._shift_transition = False
             return
-        paint_node, frame = self._find_paint_node()
-        if paint_node is None:
+        paint_frame = self._find_paint_frame()
+        if paint_frame is None:
             event.reject()
             return
         source_name, image_point = self._pointer_location(event)
@@ -562,7 +561,7 @@ class AnnotateDrawEngine:
             return
         self._current_source_name = source_name
         self._constraint_angle = None
-        self._do_push(image_point, paint_node, frame)
+        self._do_push(image_point, paint_frame)
 
     def on_drag(self, event, constrained=False):
         tool = self._settings.tool
@@ -609,16 +608,14 @@ class AnnotateDrawEngine:
             event.reject()
             return
         self._current_source_name = source_name
-        paint_node, frame = self._find_paint_node()
-        if paint_node is None:
+        paint_frame = self._find_paint_frame()
+        if paint_frame is None:
             event.reject()
             return
         self._text_active = True
         self._text_buffer = ""
-        self._text_paint_node = paint_node
-        self._text_frame = frame
         with self._sync_batch(force=False):
-            self._text_node = paint.new_text_node(paint_node, frame, image_point, self._settings, self._font_size())
+            self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._font_size())
 
     def on_shift_down(self, event):
         if self._text_active:
@@ -684,102 +681,109 @@ class AnnotateDrawEngine:
     # Undo / redo / clear
     # ------------------------------------------------------------------
 
-    def undo_redo_state(self) -> tuple[bool, bool]:
-        paint_frame = self._current_paint_frame()
-        return self._history.can_undo(paint_frame), self._history.can_redo(paint_frame)
+    def available_actions(self) -> AvailableActions:
+        if commands.isPlaying():
+            return AvailableActions()
+        paint_frame = self._find_paint_frame()
+        return AvailableActions(
+            can_undo=self._history.can_undo(paint_frame),
+            can_redo=self._history.can_redo(paint_frame),
+            can_clear_frame=paint_frame in self._visible_frames,
+            can_clear_all_frames=bool(self._visible_frames),
+        )
+
+    def sync_paint_nodes(self):
+        self._history.retain_paint_nodes(set(commands.nodesOfType("RVPaint")))
+        self._visible_frames = {frame for frame in paint.all_annotated_frames() if paint.has_visible_components(frame)}
+
+    def update_visible_frame(self, property_name: str) -> bool:
+        paint_frame = paint.order_property_frame(property_name)
+
+        if paint_frame is None:
+            return False
+
+        if paint.has_visible_components(paint_frame):
+            self._visible_frames.add(paint_frame)
+        else:
+            self._visible_frames.discard(paint_frame)
+
+        return True
 
     def clear_annotate_history(self):
         self._reset_text()
         self._history.clear()
         self._on_history_changed()
 
+    def discard_cleared_frame_history(self, order_property: str):
+        paint_frame = paint.order_property_frame(order_property)
+        self._history.discard_cleared_frame(paint_frame)
+        self._on_history_changed()
+
+    def discard_cleared_all_frames_history(self):
+        self._history.clear()
+        self._on_history_changed()
+
     def undo(self):
         self.commit_text_if_active()
-        paint_frame = self._current_paint_frame()
-        action = self._history.undo(paint_frame)
+        action = self._history.undo(self._find_paint_frame())
         if action is None:
             return
-
-        with self._sync_batch():
-            for node_name in action.node_names:
-                paint.soft_delete(paint_frame.paint_node, paint_frame.frame, node_name)
-
-        commands.redraw()
-        self._on_history_changed()
-        uuids = [shape_uuid for node_name in action.node_names if (shape_uuid := paint.uuid_for(node_name))]
-        commands.sendInternalEvent("undo-paint", "|".join(uuids))
+        self._apply_history_action(action, hide=action.type == history.PaintActionType.CREATE, event="undo-paint")
 
     def redo(self):
         self.commit_text_if_active()
-        paint_frame = self._current_paint_frame()
-        action = self._history.redo(paint_frame)
+        action = self._history.redo(self._find_paint_frame())
         if action is None:
             return
+        self._apply_history_action(action, hide=action.type != history.PaintActionType.CREATE, event="redo-paint")
 
+    def _apply_history_action(self, action: history.PaintAction, hide: bool, event: str):
+        update = paint.soft_delete if hide else paint.restore
         with self._sync_batch():
-            for node_name in action.node_names:
-                paint.restore(paint_frame.paint_node, paint_frame.frame, node_name)
+            for component in action.components:
+                update(component)
 
         commands.redraw()
         self._on_history_changed()
-        uuids = [shape_uuid for node_name in action.node_names if (shape_uuid := paint.uuid_for(node_name))]
-        commands.sendInternalEvent("redo-paint", "|".join(uuids))
+        self._send_paint_event(event, action.components)
+
+    def _send_paint_event(self, event: str, components: Iterable[PaintComponent]):
+        uuids = paint.uuids_for(components)
+        if uuids:
+            commands.sendInternalEvent(event, "|".join(uuids))
 
     def clear_frame(self):
-        """Remove all visible nodes on the current frame from the draw order.
-
-        Iterates every RVPaint node so that annotations received from remote
-        clients (which land on the annotation source group's node)
-        are cleared along with locally drawn ones.
-        """
+        """Soft-delete every visible component on the current paint frame."""
         self.commit_text_if_active()
-        _, frame = self._find_paint_node()
-        if frame is None:
-            return
-        all_paint_nodes = commands.nodesOfType("RVPaint")
-        if not all_paint_nodes:
+        paint_frame = self._find_paint_frame()
+        if paint_frame is None:
             return
         with self._sync_batch():
-            cleared = [
-                (paint_node, frame, node_name)
-                for paint_node in all_paint_nodes
-                for node_name in paint.soft_delete_frame(paint_node, frame)
-            ]
-        for paint_node, frame, node_name in cleared:
-            self._push_create(paint_node, frame, node_name)
-        if cleared:
-            commands.redraw()
+            cleared = paint.soft_delete_frame(paint_frame)
+        if not cleared:
+            return
+
+        self._history.push_clear_all(paint_frame, cleared)
+        commands.redraw()
         self._on_history_changed()
-        cleared_uuids = [shape_uuid for _, _, node_name in cleared if (shape_uuid := paint.uuid_for(node_name))]
-        payload = "|".join(cleared_uuids) if cleared_uuids else f"{all_paint_nodes[0]}:{frame}"
-        commands.sendInternalEvent("clear-paint", payload)
+        self._send_paint_event("clear-paint", cleared)
+        commands.sendInternalEvent("annotate-clear-frame", paint.frame_order_property(paint_frame))
 
     def clear_all_frames(self):
-        """Soft-delete all visible nodes on every frame across all paint nodes.
-
-        Iterates every RVPaint node and discovers annotated frames from actual
-        properties (matching the old annotate_mode.mu behaviour) so that remote
-        annotations and source-space frame numbers outside the timeline range
-        are also cleared.
-        """
+        """Soft-delete every visible component on every frame of every paint node."""
         self.commit_text_if_active()
-        all_paint_nodes = commands.nodesOfType("RVPaint")
-        if not all_paint_nodes:
-            return
+        cleared = []
         with self._sync_batch():
-            cleared = [
-                node_name
-                for paint_node in all_paint_nodes
-                for frame in paint.annotated_frames(paint_node)
-                for node_name in paint.soft_delete_frame(paint_node, frame)
-            ]
-        self._history.clear()
+            for paint_frame in paint.all_annotated_frames():
+                cleared.extend(paint.soft_delete_frame(paint_frame))
+        if not cleared:
+            return
+
+        self._history.push_clear_all_frames(cleared)
+        commands.redraw()
         self._on_history_changed()
-        if cleared:
-            commands.redraw()
-        cleared_uuids = [shape_uuid for node_name in cleared if (shape_uuid := paint.uuid_for(node_name))]
-        payload = "|".join(cleared_uuids) if cleared_uuids else all_paint_nodes[0]
-        commands.sendInternalEvent("clear-all-paint", payload)
+        self._send_paint_event("clear-all-paint", cleared)
+        commands.sendInternalEvent("annotate-clear-all-frames")
 
     # ------------------------------------------------------------------
     # Stylus eraser-end handlers
