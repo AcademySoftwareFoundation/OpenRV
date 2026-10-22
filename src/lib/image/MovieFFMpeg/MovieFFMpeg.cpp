@@ -29,6 +29,7 @@
 #include <stl_ext/string_algo.h>
 #include <string>
 #include <set>
+#include <list>
 #include <limits>
 #include <cmath>
 #include <mutex>
@@ -63,6 +64,7 @@ extern "C"
 #endif
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
+static ENVVAR_INT(evContextPoolSize, "TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE", 500); // max open decoder threads; 0 disables the pool
 
 namespace TwkMovie
 {
@@ -513,7 +515,7 @@ namespace TwkMovie
         //  this context.
         //
 
-        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads)
+        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads && !gcp.m_openContexts.empty())
         {
             Context& closeContext = *gcp.m_openContexts.back();
             gcp.m_openContexts.pop_back();
@@ -538,10 +540,22 @@ namespace TwkMovie
 
                 avcodec_free_context(&closeContext.avContext);
 
+                //
+                //  The track still points at the freed context; clear it so
+                //  openAVCodec() allocates a new one (FFmpeg 6 cannot reopen
+                //  a closed context).
+                //
+
                 if (closeContext.vTrack)
+                {
+                    closeContext.vTrack->avCodecContext = nullptr;
                     closeContext.vTrack->isOpen = false;
+                }
                 if (closeContext.aTrack)
+                {
+                    closeContext.aTrack->avCodecContext = nullptr;
                     closeContext.aTrack->isOpen = false;
+                }
             }
         }
     }
@@ -1154,11 +1168,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_audioTracks.size(); i++)
         {
             AudioTrack* track = m_audioTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_audioTracks.resize(0);
@@ -1166,11 +1180,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_videoTracks.resize(0);
@@ -2304,6 +2318,13 @@ namespace TwkMovie
 
         collectPlaybackTiming(heroVideoTracks, heroAudioTracks);
 
+        //
+        //  Keep the video contexts reserved until initializeVideo() below is done
+        //  with them, so the pool cannot close them in the meantime.
+        //
+
+        std::list<ContextPool::Reservation> videoReservations;
+
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             AVStream* tsStream = m_avFormatContext->streams[i];
@@ -2318,7 +2339,7 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Video Track: " << i);
                 if (heroVideoTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
+                    videoReservations.emplace_back(this, i);
                     VideoTrack* track = new VideoTrack;
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
@@ -2441,7 +2462,12 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Audio Track: " << i);
                 if (heroAudioTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
+                    //
+                    //  No pool reservation: this context is only opened to read
+                    //  the stream parameters and initializeAudio() frees it.
+                    //  Decoding reopens it under a reservation in audioFillBuffer().
+                    //
+
                     AudioTrack* track = new AudioTrack;
                     if (openAVCodec(i, &track->avCodecContext))
                     {
@@ -2740,8 +2766,7 @@ namespace TwkMovie
             AVChannelLayout layout = audioCodecContext->ch_layout;
             audioChannels = idAudioChannels(layout, numChannels);
 
-            // XXX Assume this thread will never decode audio
-            avcodec_free_context(&audioCodecContext);
+            avcodec_free_context(&track->avCodecContext); // the track's pointer, so it does not dangle
             track->isOpen = false;
         }
 
@@ -5944,28 +5969,25 @@ namespace TwkMovie
             addType(formatsItr->first, formatsItr->second.first, formatsItr->second.second, video, audio, separams, sdparams);
         }
 
-        // Note : No longer using the global context pool (since FFmpeg 6.0)
-        // Rationale: The global context pool was based on the premise that a
-        // context could be opened and closed multiple times. However, with
-        // FFmpeg 6.0, this premise is no longer valid and was causing crashes.
-        // As per the FFmpeg 6 documentation:
-        // https://ffmpeg.org/doxygen/trunk/deprecated.html: "Opening and
-        // closing a codec context multiple times is not supported anymore – use
-        // multiple codec contexts instead."
+        // The global context pool caps the number of decoder threads kept open across all
+        // readers. Without it every reader keeps its decoder (and its per-thread frame
+        // buffers) open until the source is unloaded, so memory grows with each clip played.
+        // FFmpeg 6 does not support reopening a closed codec context, so when the pool closes
+        // a context it frees it and nulls the track's pointer; openAVCodec() then allocates a
+        // fresh context on next use.
 
-        // if (!globalContextPool)
-        // {
-        //     int poolSize = 500;
-        //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-        //     {
-        //         int poolSize = atoi(c);
-        //     }
-        //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-        //     else
-        //     {
-        //         report("Disabling mio_ffmpeg context thread pool.", true);
-        //     }
-        // }
+        if (globalContextPool == nullptr)
+        {
+            const int poolSize = evContextPoolSize.getValue();
+            if (poolSize > 0)
+            {
+                globalContextPool = new ContextPool(poolSize);
+            }
+            else
+            {
+                report("Disabling mio_ffmpeg context thread pool.", true);
+            }
+        }
     }
 
     MovieFFMpegIO::~MovieFFMpegIO()
