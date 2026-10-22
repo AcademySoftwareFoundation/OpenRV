@@ -1340,6 +1340,11 @@ QWidget#annotationBeta QSlider#annotationSlider {
 QWidget#annotationBeta QSlider#annotationSlider:vertical {
     min-width: 32px;
     max-width: 32px;
+    min-height: 110px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider:horizontal {
+    min-width: 132px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
@@ -1398,6 +1403,29 @@ QWidget#annotationBeta QSlider#annotationSlider::add-page:horizontal {
 
 QWidget#annotationBeta QMenu QSlider#annotationSlider::handle {
     border-color: rgb(34, 34, 34);
+}
+
+QWidget#annotationBeta QMenu#brushSettingsMenu {
+    padding: 4px 0px;
+}
+
+QWidget#annotationBeta QMenu#brushSettingsMenu::separator {
+    margin: 4px 0px;
+}
+
+QWidget#annotationBeta QMenu#brushSettingsMenu::item {
+    padding: 6px 0px;
+    padding-left: 6px;
+    font-weight: bold;
+}
+
+QWidget#annotationBeta QLabel#sliderSectionTitle {
+    color: rgb(200,200,200);
+}
+
+QWidget#annotationBeta QLabel#brushSettingsGroupTitle {
+    color: rgb(160, 160, 160);
+    font-weight: bold;
 }
 
 QWidget#annotationBeta QAbstractButton#colorSwatch {

@@ -1094,6 +1094,11 @@ background: transparent;
 QWidget#annotationBeta QSlider#annotationSlider:vertical {
 min-width: 32px;
 max-width: 32px;
+min-height: 110px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider:horizontal {
+min-width: 132px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {

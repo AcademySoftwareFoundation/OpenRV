@@ -7,7 +7,7 @@ import sys
 import time
 
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum, StrEnum, auto
 from functools import partial
 
 from PySide6 import QtCore, QtWidgets, QtGui
@@ -25,6 +25,7 @@ class _Page(Enum):
     SHAPE = auto()
     TEXT = auto()
     BLEND = auto()
+    BRUSH = auto()
     ERASER = auto()
 
 
@@ -38,7 +39,7 @@ _TOOLS = {
     constants.Tool.CURSOR: _ToolInfo(page=None, tooltip="Cursor"),
     constants.Tool.EYEDROPPER: _ToolInfo(page=None, tooltip="Eyedropper"),
     constants.Tool.PEN: _ToolInfo(page=_Page.BLEND, tooltip="Pen"),
-    constants.Tool.BRUSH: _ToolInfo(page=_Page.BLEND, tooltip="Brush"),
+    constants.Tool.BRUSH: _ToolInfo(page=_Page.BRUSH, tooltip="Brush"),
     constants.Tool.ERASER: _ToolInfo(page=_Page.ERASER, tooltip="Eraser"),
     constants.Tool.RECT: _ToolInfo(page=_Page.SHAPE, tooltip="Rectangle"),
     constants.Tool.CIRCLE: _ToolInfo(page=_Page.SHAPE, tooltip="Circle"),
@@ -72,10 +73,14 @@ def _separator(width):
     return separator
 
 
+def _insert_divider(layout, index, spacing=16):
+    layout.insertSpacing(index, spacing)
+    layout.insertWidget(index + 1, _separator(30), alignment=QtCore.Qt.AlignHCenter)
+    layout.insertSpacing(index + 2, spacing)
+
+
 def _add_divider(layout, spacing=16):
-    layout.addSpacing(spacing)
-    layout.addWidget(_separator(30), alignment=QtCore.Qt.AlignHCenter)
-    layout.addSpacing(spacing)
+    _insert_divider(layout, layout.count(), spacing)
 
 
 def _group_positions(count):
@@ -130,8 +135,6 @@ class ColorSwatch(QtWidgets.QAbstractButton):
 class _AnnotationSlider(QtWidgets.QSlider):
     """Slider for the size, opacity and brush settings controls."""
 
-    _WIDTH = 32
-    _MIN_LENGTH = 110
     _HANDLE_LENGTH = 18
 
     def __init__(self, minimum=0, maximum=100, default=50, orientation=QtCore.Qt.Vertical, parent=None):
@@ -141,11 +144,8 @@ class _AnnotationSlider(QtWidgets.QSlider):
         self.setValue(max(minimum, min(maximum, default)))
         self.setPageStep(max(1, (maximum - minimum) // 10))
         if orientation == QtCore.Qt.Vertical:
-            self.setFixedWidth(self._WIDTH)
-            self.setMinimumHeight(self._MIN_LENGTH)
             self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         else:
-            self.setMinimumWidth(self._MIN_LENGTH)
             self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.setCursor(QtCore.Qt.PointingHandCursor)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
@@ -219,19 +219,21 @@ class _SliderSection(QtWidgets.QWidget):
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
 
         if orientation == QtCore.Qt.Vertical:
+            layout.setSpacing(4)
             slider_row = QtWidgets.QHBoxLayout()
             slider_row.setContentsMargins(0, 0, 0, 0)
             slider_row.addStretch()
             slider_row.addWidget(self._slider)
             slider_row.addStretch()
             layout.addLayout(slider_row, 1)
-            self._input.setAlignment(QtCore.Qt.AlignCenter)
             layout.addWidget(self._input, alignment=QtCore.Qt.AlignHCenter)
         else:
-            layout.addWidget(QtWidgets.QLabel(label))
+            layout.setSpacing(0)
+            title = QtWidgets.QLabel(label)
+            title.setObjectName("sliderSectionTitle")
+            layout.addWidget(title)
             row = QtWidgets.QHBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(4)
@@ -320,12 +322,10 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
-class _MenuToolButton(QtWidgets.QToolButton):
-    """Tool button with a checkable drop-down menu."""
+class _PopupToolButton(QtWidgets.QToolButton):
+    """Tool button that opens its menu on click."""
 
-    selection_changed = QtCore.Signal(str)
-
-    def __init__(self, tooltip, items, icon_size=None, parent=None):
+    def __init__(self, tooltip, parent=None):
         super().__init__(parent)
         self.setObjectName("menuToolButton")
         self.setProperty("tbstyle", "palette")
@@ -333,6 +333,15 @@ class _MenuToolButton(QtWidgets.QToolButton):
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         self.setFixedHeight(30)
         self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
+
+class _MenuToolButton(_PopupToolButton):
+    """Tool button with a checkable drop-down menu."""
+
+    selection_changed = QtCore.Signal(str)
+
+    def __init__(self, tooltip, items, icon_size=None, parent=None):
+        super().__init__(tooltip, parent)
 
         if icon_size is not None:
             self.setIconSize(QtCore.QSize(icon_size, icon_size))
@@ -479,8 +488,94 @@ class _PenPanel(_SliderPanel):
         self._blend_modes.set_blend_mode_enabled(mode, enabled)
 
 
-class _BrushPanel:
-    pass
+class _BrushSettingGroup(StrEnum):
+    BRUSH = "BRUSH"
+    VARIATION = "VARIATION"
+
+
+@dataclass(frozen=True)
+class _BrushSettingInfo:
+    group: _BrushSettingGroup
+    label: str
+
+
+_BRUSH_SETTINGS = {
+    constants.BrushSetting.HARDNESS: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Hardness"),
+    constants.BrushSetting.SPACING: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Spacing"),
+    constants.BrushSetting.SIZE_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Size"),
+    constants.BrushSetting.OPACITY_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Opacity"),
+    constants.BrushSetting.ROTATION_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Rotation"),
+    constants.BrushSetting.SPACING_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Spacing"),
+}
+
+
+class _BrushSettings(QtWidgets.QWidget):
+    """Titled group of brush settings sliders shown in the brush settings dropdown."""
+
+    def __init__(self, group, parent=None):
+        super().__init__(parent)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(8, 4, 8, 4)
+        layout.setSpacing(1)
+
+        title = QtWidgets.QLabel(group)
+        title.setObjectName("brushSettingsGroupTitle")
+        layout.addWidget(title)
+        layout.addSpacing(12)
+
+        self._sections = {}
+        for setting, info in _BRUSH_SETTINGS.items():
+            if info.group is not group:
+                continue
+            section = _SliderSection(
+                info.label,
+                constants.BRUSH_SETTING_MIN,
+                constants.BRUSH_SETTING_MAX,
+                constants.DEFAULT_BRUSH_SETTINGS[setting],
+                suffix="%",
+                orientation=QtCore.Qt.Horizontal,
+            )
+            layout.addWidget(section)
+            self._sections[setting] = section
+
+    def reset(self):
+        for setting, section in self._sections.items():
+            section.set_value(constants.DEFAULT_BRUSH_SETTINGS[setting])
+
+
+class _BrushSettingsButton(_PopupToolButton):
+    """Tool button whose drop-down holds the brush settings sliders and a reset action."""
+
+    def __init__(self, parent=None):
+        super().__init__("Brush settings", parent)
+        self.setIcon(_load_icon("brush_settings"))
+        self.setIconSize(QtCore.QSize(16, 16))
+
+        menu = QtWidgets.QMenu(self)
+        menu.setObjectName("brushSettingsMenu")
+        self._groups = []
+        for group in _BrushSettingGroup:
+            settings = _BrushSettings(group)
+            settings_action = QtWidgets.QWidgetAction(menu)
+            settings_action.setDefaultWidget(settings)
+            menu.addAction(settings_action)
+            menu.addSeparator()
+            self._groups.append(settings)
+        menu.addAction("Reset all to default", self._reset)
+        self.setMenu(menu)
+
+    def _reset(self):
+        for settings in self._groups:
+            settings.reset()
+
+
+class _BrushPanel(_PenPanel):
+    """Brush settings dropdown, size and opacity sliders, and the blend mode buttons."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._layout.insertWidget(0, _BrushSettingsButton())
+        _insert_divider(self._layout, 1)
 
 
 class _ShapeOptionsPanel(_SliderPanel):
@@ -711,23 +806,36 @@ class AnnotateSecondaryPanel(_StyledWidget):
             _Page.SHAPE: self._shape_panel,
             _Page.TEXT: self._text_panel,
             _Page.BLEND: self._pen_panel,
+            _Page.BRUSH: self._brush_panel,
             _Page.ERASER: self._eraser_panel,
         }
         for page in self._pages.values():
             self._stack.addWidget(page)
 
-        self._slider_panels = (self._size_opacity_panel, self._shape_panel, self._pen_panel, self._eraser_panel)
+        self._slider_panels = (
+            self._size_opacity_panel,
+            self._shape_panel,
+            self._pen_panel,
+            self._brush_panel,
+            self._eraser_panel,
+        )
         for panel in self._slider_panels:
             panel.size_changed.connect(self.size_changed)
             panel.opacity_changed.connect(self.opacity_changed)
+        self._blend_panels = (self._pen_panel, self._brush_panel)
+        for panel in self._blend_panels:
+            panel.color_modifier_changed.connect(partial(self._on_color_modifier_changed, panel))
         self._shape_panel.filled_changed.connect(self.filled_changed)
-        self._pen_panel.color_modifier_changed.connect(self.color_modifier_changed)
         self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
         self._text_panel.font_family_changed.connect(self.font_family_changed)
         self._text_panel.font_size_changed.connect(self.font_size_changed)
         self._text_panel.font_bold_changed.connect(self.font_bold_changed)
         self._text_panel.font_italic_changed.connect(self.font_italic_changed)
         self._text_panel.font_underline_changed.connect(self.font_underline_changed)
+
+    def _on_color_modifier_changed(self, panel, mode):
+        if self._stack.currentWidget() is panel:
+            self.color_modifier_changed.emit(mode)
 
     def set_page_for_tool(self, tool):
         page = _TOOLS[tool].page
@@ -752,10 +860,12 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._shape_panel.set_filled(value)
 
     def set_color_modifier(self, mode):
-        self._pen_panel.set_color_modifier(mode)
+        for panel in self._blend_panels:
+            panel.set_color_modifier(mode)
 
     def set_blend_mode_enabled(self, mode, enabled):
-        self._pen_panel.set_blend_mode_enabled(mode, enabled)
+        for panel in self._blend_panels:
+            panel.set_blend_mode_enabled(mode, enabled)
 
     def set_eraser_brush(self, brush):
         self._eraser_panel.set_eraser_brush(brush)
