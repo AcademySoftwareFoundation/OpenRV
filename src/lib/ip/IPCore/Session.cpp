@@ -22,6 +22,7 @@
 #include <IPCore/NodeManager.h>
 #include <IPCore/FBCache.h>
 #include <TwkApp/Event.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkContainer/GTOReader.h>
 #include <TwkContainer/GTOWriter.h>
 #include <TwkContainer/PropertyContainer.h>
@@ -1144,6 +1145,11 @@ namespace IPCore
 
     void Session::clearVideoDeviceCaches()
     {
+        //
+        //  Runs from RenderContextChangeEvent and shutdown, outside a render.
+        //
+        const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(m_controlVideoDevice));
+
         if (m_controlVideoDevice)
             m_controlVideoDevice->clearCaches();
         if (m_outputVideoDevice)
@@ -1156,6 +1162,11 @@ namespace IPCore
     {
         if (d == m_outputVideoDevice || d == m_controlVideoDevice)
         {
+            //
+            //  Arrives from a resize, outside a render.
+            //
+            const TwkGLF::GLContextScope contextScope(dynamic_cast<const TwkGLF::GLVideoDevice*>(d));
+
             m_renderer->flushImageFBOs();
         }
 

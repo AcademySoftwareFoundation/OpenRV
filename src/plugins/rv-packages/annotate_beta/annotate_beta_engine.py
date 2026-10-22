@@ -7,9 +7,10 @@ from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple
 
-from rv import commands
+from rv import commands, extra_commands
 
 import annotate_beta_constants as constants
+import annotate_beta_history as history
 import annotate_beta_paint as paint
 
 _PREFIX = {
@@ -78,10 +79,11 @@ class DrawSettings:
 
 
 class AnnotateDrawEngine:
-    def __init__(self, settings, on_history_changed, on_draw_started):
+    def __init__(self, settings, on_history_changed, on_draw_started, on_eyedropper):
         self._settings = settings
         self._on_history_changed = on_history_changed
         self._on_draw_started = on_draw_started
+        self._on_eyedropper = on_eyedropper
 
         # Paint node set via set-current-annotate-mode-node; see _find_paint_node.
         self.preferred_paint_node = ""
@@ -117,10 +119,7 @@ class AnnotateDrawEngine:
         # screen-constant across different zoom levels and image aspect ratios.
         self._current_source_name = None
 
-        # Undo/redo stacks — each entry: (paint_node, frame, node_name)
-        # node_name is the full prop path prefix, e.g. "RVPaint_1.rect:3:42:host_123"
-        self._undo_stack = []
-        self._redo_stack = []
+        self._history = history.UndoHistory()
 
     # ------------------------------------------------------------------
     # Event table setup
@@ -131,15 +130,17 @@ class AnnotateDrawEngine:
         mode.defineEventTableRegex(constants.EVENT_TABLE_NAME, self.regex_bindings)
 
     @property
-    def bindings(self):
+    def pointer_bindings(self):
+        """Pointer and stylus bindings for the mode's global table.
+
+        They live in the global table rather than the pushed EVENT_TABLE_NAME so that
+        widgets with a bounding box (timeline, timeline magnifier) get pointer
+        events inside their area first.
+        """
         push_constrained = partial(self.on_push, constrained=True)
         drag_constrained = partial(self.on_drag, constrained=True)
         release_constrained = partial(self.on_release, constrained=True)
-        commit = partial(self.on_text_commit, reject=False)
-        commit_and_propagate = partial(self.on_text_commit, reject=True)
-        insert_new_line = partial(self._append_text, text="\n")
         return [
-            # Pointer events (shapes, strokes and text placement)
             ("pointer-1--push", self.on_push, "Start shape/text"),
             ("pointer-1--drag", self.on_drag, "Update shape"),
             ("pointer-1--release", self.on_release, "Commit shape"),
@@ -155,6 +156,14 @@ class AnnotateDrawEngine:
             ("stylus-eraser--push", self.on_stylus_eraser_push, "Start (stylus eraser end)"),
             ("stylus-eraser--drag", self.on_stylus_eraser_drag, "Draw (stylus eraser end)"),
             ("stylus-eraser--release", self.on_stylus_eraser_release, "Commit (stylus eraser end)"),
+        ]
+
+    @property
+    def bindings(self):
+        commit = partial(self.on_text_commit, reject=False)
+        commit_and_propagate = partial(self.on_text_commit, reject=True)
+        insert_new_line = partial(self._append_text, text="\n")
+        return [
             # Shape shift-constraint tracking
             ("key-down--shift--shift", self.on_shift_down, "Constrain shape"),
             ("key-up--shift", self.on_shift_up, "Release constraint"),
@@ -227,7 +236,7 @@ class AnnotateDrawEngine:
     # Paint node resolution
     # ------------------------------------------------------------------
 
-    def _find_paint_node(self):
+    def _find_paint_node(self) -> tuple[str | None, int | None]:
         frame = commands.frame()
         try:
             infos = commands.metaEvaluate(frame, commands.viewNode())
@@ -260,6 +269,10 @@ class AnnotateDrawEngine:
                 return info["node"], info["frame"]
         return None, frame
 
+    def _current_paint_frame(self) -> history.PaintFrame | None:
+        paint_node, frame = self._find_paint_node()
+        return history.PaintFrame(paint_node, frame) if paint_node else None
+
     def _auto_mark_frame(self):
         if self._settings.auto_mark:
             commands.markFrame(commands.frame(), True)
@@ -280,6 +293,12 @@ class AnnotateDrawEngine:
         default sequence) the innermost entry may be a virtual composite image whose
         source name is not valid for eventToImageSpace.
         """
+        # Update RV's shared pointer state
+        try:
+            extra_commands.recordPixelInfo(event)
+        except Exception:
+            pass  # A failure here must not interrupt the stroke
+
         pointer = event.pointer()
         device_pixel_ratio = commands.devicePixelRatio()
         device_pointer = (pointer[0] * device_pixel_ratio, pointer[1] * device_pixel_ratio)
@@ -304,13 +323,16 @@ class AnnotateDrawEngine:
     # Text editing state
     # ------------------------------------------------------------------
 
+    def _push_create(self, paint_node: str, frame: int, node_name: str):
+        action = history.PaintAction(history.PaintActionType.CREATE, [node_name])
+        self._history.push(history.PaintFrame(paint_node, frame), action)
+
     def _register_text_undo(self):
         if self._text_registered:
             return
 
         self._auto_mark_frame()
-        self._undo_stack.append((self._text_paint_node, self._text_frame, self._text_node))
-        self._redo_stack.clear()
+        self._push_create(self._text_paint_node, self._text_frame, self._text_node)
         self._text_registered = True
         self._on_history_changed()
 
@@ -339,10 +361,10 @@ class AnnotateDrawEngine:
         paint.soft_delete(self._text_paint_node, self._text_frame, self._text_node)
         commands.redraw()
 
-        if self._text_registered and self._undo_stack:
-            _, _, last_node = self._undo_stack[-1]
-            if last_node == self._text_node:
-                self._undo_stack.pop()
+        if self._text_registered:
+            paint_frame = history.PaintFrame(self._text_paint_node, self._text_frame)
+            text_action = history.PaintAction(history.PaintActionType.CREATE, [self._text_node])
+            if self._history.discard_if_latest(paint_frame, text_action):
                 self._on_history_changed()
 
         self._reset_text()
@@ -417,8 +439,7 @@ class AnnotateDrawEngine:
         source_name, image_point = self._pointer_location(event)
         if source_name and image_point:
             paint.append_stroke_point(self._pen_stroke, image_point, self._pressure_width(event))
-        self._undo_stack.append((self._pen_paint_node, self._pen_frame, self._pen_stroke))
-        self._redo_stack.clear()
+        self._push_create(self._pen_paint_node, self._pen_frame, self._pen_stroke)
         self._on_history_changed()
         commands.sendInternalEvent("annotate-stroke-released")
         self._pen_stroke = None
@@ -480,8 +501,7 @@ class AnnotateDrawEngine:
             paint_node, frame, prefix, image_point, image_point, self._settings.tool_state, self._border_width()
         )
         self._auto_mark_frame()
-        self._undo_stack.append((paint_node, frame, self._current_shape))
-        self._redo_stack.clear()
+        self._push_create(paint_node, frame, self._current_shape)
         self._on_history_changed()
 
     def _do_release(self, image_point):
@@ -498,17 +518,20 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def on_push(self, event, constrained=False):
-        self._on_draw_started()
         tool = self._settings.tool
+        if tool == constants.Tool.EYEDROPPER and not constrained:
+            self._on_eyedropper(event)
+            return
+        if tool not in constants.DRAWING_TOOLS:
+            event.reject()
+            return
+        self._on_draw_started()
         if tool == constants.Tool.TEXT:
             if not constrained:
                 self._start_text(event)
             return
         if tool in constants.BRUSH_TOOLS:
             self._pen_push(event)
-            return
-        if tool not in constants.SHAPE_TOOLS:
-            event.reject()
             return
         if self._shift_transition:
             self._shift_transition = False
@@ -645,47 +668,46 @@ class AnnotateDrawEngine:
     # Undo / redo / clear
     # ------------------------------------------------------------------
 
-    def has_undo(self):
-        return bool(self._undo_stack)
-
-    def has_redo(self):
-        return bool(self._redo_stack)
+    def undo_redo_state(self) -> tuple[bool, bool]:
+        paint_frame = self._current_paint_frame()
+        return self._history.can_undo(paint_frame), self._history.can_redo(paint_frame)
 
     def clear_annotate_history(self):
         self._reset_text()
-        self._undo_stack.clear()
-        self._redo_stack.clear()
+        self._history.clear()
         self._on_history_changed()
 
     def undo(self):
         self.commit_text_if_active()
-        if not self._undo_stack:
+        paint_frame = self._current_paint_frame()
+        action = self._history.undo(paint_frame)
+        if action is None:
             return
-        paint_node, frame, node_name = self._undo_stack.pop()
+
         with self._sync_batch():
-            try:
-                paint.soft_delete(paint_node, frame, node_name)
-                commands.redraw()
-            except Exception as error:
-                print(f"[annotate_beta] undo error: {error}")
-        self._redo_stack.append((paint_node, frame, node_name))
+            for node_name in action.node_names:
+                paint.soft_delete(paint_frame.paint_node, paint_frame.frame, node_name)
+
+        commands.redraw()
         self._on_history_changed()
-        commands.sendInternalEvent("undo-paint", paint.uuid_for(node_name))
+        uuids = [shape_uuid for node_name in action.node_names if (shape_uuid := paint.uuid_for(node_name))]
+        commands.sendInternalEvent("undo-paint", "|".join(uuids))
 
     def redo(self):
         self.commit_text_if_active()
-        if not self._redo_stack:
+        paint_frame = self._current_paint_frame()
+        action = self._history.redo(paint_frame)
+        if action is None:
             return
-        paint_node, frame, node_name = self._redo_stack.pop()
+
         with self._sync_batch():
-            try:
-                paint.restore(paint_node, frame, node_name)
-                commands.redraw()
-            except Exception as error:
-                print(f"[annotate_beta] redo error: {error}")
-        self._undo_stack.append((paint_node, frame, node_name))
+            for node_name in action.node_names:
+                paint.restore(paint_frame.paint_node, paint_frame.frame, node_name)
+
+        commands.redraw()
         self._on_history_changed()
-        commands.sendInternalEvent("redo-paint", paint.uuid_for(node_name))
+        uuids = [shape_uuid for node_name in action.node_names if (shape_uuid := paint.uuid_for(node_name))]
+        commands.sendInternalEvent("redo-paint", "|".join(uuids))
 
     def clear_frame(self):
         """Remove all visible nodes on the current frame from the draw order.
@@ -707,9 +729,9 @@ class AnnotateDrawEngine:
                 for paint_node in all_paint_nodes
                 for node_name in paint.soft_delete_frame(paint_node, frame)
             ]
+        for paint_node, frame, node_name in cleared:
+            self._push_create(paint_node, frame, node_name)
         if cleared:
-            self._undo_stack.extend(cleared)
-            self._redo_stack.clear()
             commands.redraw()
         self._on_history_changed()
         cleared_uuids = [shape_uuid for _, _, node_name in cleared if (shape_uuid := paint.uuid_for(node_name))]
@@ -735,8 +757,7 @@ class AnnotateDrawEngine:
                 for frame in paint.annotated_frames(paint_node)
                 for node_name in paint.soft_delete_frame(paint_node, frame)
             ]
-        self._undo_stack.clear()
-        self._redo_stack.clear()
+        self._history.clear()
         self._on_history_changed()
         if cleared:
             commands.redraw()
@@ -749,15 +770,26 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     def on_stylus_eraser_push(self, event):
-        """Physical eraser end of stylus: always draws with erase mode regardless of tool."""
+        """Physical eraser end of stylus: erases with any drawing tool selected."""
+        if self._settings.tool not in constants.DRAWING_TOOLS:
+            event.reject()
+            return
         self._on_draw_started()
         self._stylus_erasing = True
         self._pen_push(event)
+        if not self._pen_stroke:
+            self._stylus_erasing = False
 
     def on_stylus_eraser_drag(self, event):
+        if not self._stylus_erasing:
+            event.reject()
+            return
         self._pen_drag(event)
 
     def on_stylus_eraser_release(self, event):
+        if not self._stylus_erasing:
+            event.reject()
+            return
         self._pen_release(event)
         self._stylus_erasing = False
 

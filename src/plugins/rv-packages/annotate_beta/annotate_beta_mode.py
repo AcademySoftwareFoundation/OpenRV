@@ -36,13 +36,19 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._link_tool_colors = False
         self._auto_save_settings = True
 
-        self._engine = AnnotateDrawEngine(self._settings, self._update_undo_redo_buttons, self._hide_color_picker)
+        self._engine = AnnotateDrawEngine(
+            self._settings, self._update_undo_redo_buttons, self._hide_color_picker, self._sample_eyedropper
+        )
 
+        # sortKey "z" (same as the legacy annotate_mode) orders this mode's global table
+        # below widgets such as the timeline, so their bounding boxes take pointer
+        # events first and every tool can scrub.
         self.init(
             constants.MODE_NAME,
-            self.global_bindings,
+            self.global_bindings + self._engine.pointer_bindings,
             [],
             self.menu,
+            "z",
         )
 
         commands.bind("default", "global", "session-clear-everything", self._on_session_clear, "Clear annotate history")
@@ -298,9 +304,10 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._dock.toolbar_widget.hide_popups()
 
     def _update_undo_redo_buttons(self):
+        can_undo, can_redo = self._engine.undo_redo_state()
         toolbar = self._dock.toolbar_widget
-        toolbar.set_undo_enabled(self._engine.has_undo())
-        toolbar.set_redo_enabled(self._engine.has_redo())
+        toolbar.set_undo_enabled(can_undo)
+        toolbar.set_redo_enabled(can_redo)
 
     def _update_tool_availability(self):
         """Enable/disable tools whose RV event categories are currently disabled."""
@@ -340,6 +347,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         if view_node and node == view_node:
             paint.remove_tags()
             paint.set_tags()
+            self._update_undo_redo_buttons()
 
         event.reject()
 
@@ -349,6 +357,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def _on_after_graph_view_change(self, event):
         paint.set_tags()
+        self._update_undo_redo_buttons()
         event.reject()
 
     def _on_category_state_changed(self, event):
@@ -362,6 +371,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         frame, so our undo/redo button enabled state may be stale.
         """
         self._update_undo_redo_buttons()
+        event.reject()
+
+    def _on_frame_dependent_state_changed(self, event):
+        if not commands.isPlaying():
+            self._update_undo_redo_buttons()
         event.reject()
 
     def _on_set_current_annotate_node(self, event):
@@ -383,6 +397,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
                 infos = []
             if any(info.get("nodeType") == "RVPaint" and info.get("node") == node_name for info in infos):
                 self._engine.preferred_paint_node = node_name
+        self._update_undo_redo_buttons()
         event.reject()
 
     def _on_session_clear(self, event):
@@ -394,16 +409,17 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _toggle_item(label, target, attribute):
+    def _toggle_item(label, target, attribute, on_toggled=None):
         """Menu entry that flips the boolean `attribute` on `target`."""
 
         def toggle(event):
             setattr(target, attribute, not getattr(target, attribute))
+            if on_toggled:
+                on_toggled()
 
         return (label, toggle, None, lambda: _menu_state(getattr(target, attribute)))
 
-    def _toggle_link_colors(self, event):
-        self._link_tool_colors = not self._link_tool_colors
+    def _on_link_colors_toggled(self):
         if self._link_tool_colors:
             self._on_color_changed(self._settings.tool_state.color)
 
@@ -429,11 +445,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     @property
     def global_bindings(self):
         return [
-            ("pointer-1--push", self._on_eyedropper_click, "Eyedropper sample"),
-            ("stylus-pen--push", self._on_eyedropper_click, "Eyedropper sample (stylus)"),
             ("graph-node-inputs-changed", self._on_node_inputs_changed, "Update UI"),
             ("before-graph-view-change", self._on_before_graph_view_change, "Update UI"),
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
+            ("frame-changed", self._on_frame_dependent_state_changed, "Update UI"),
+            ("play-stop", self._on_frame_dependent_state_changed, "Update UI"),
             ("event-category-state-changed", self._on_category_state_changed, "Update tool availability"),
             ("set-current-annotate-mode-node", self._on_set_current_annotate_node, "Set preferred paint node"),
             (
@@ -448,10 +464,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             ("key-down--alt-shift--left", self._previous_annotated_frame, "Previous Annotated Frame"),
         ]
 
-    def _on_eyedropper_click(self, event):
-        if self._settings.tool != constants.Tool.EYEDROPPER:
-            event.reject()
-            return
+    def _sample_eyedropper(self, event):
         pointer = event.pointer()
         device_pixel_ratio = commands.devicePixelRatio()
         x = pointer[0] * device_pixel_ratio
@@ -493,9 +506,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     @property
     def menu(self):
         configure_items = [
-            self._toggle_item("Draw On Source When Possible", self._settings, "store_on_source"),
+            self._toggle_item(
+                "Draw On Source When Possible", self._settings, "store_on_source", self._update_undo_redo_buttons
+            ),
             self._toggle_item("Automatically Mark Annotated Frames", self._settings, "auto_mark"),
-            ("Link Tool Colors", self._toggle_link_colors, None, lambda: _menu_state(self._link_tool_colors)),
+            self._toggle_item("Link Tool Colors", self, "_link_tool_colors", self._on_link_colors_toggled),
             (
                 "Live Drawing in Sync",
                 self._toggle_live_drawing,
