@@ -19,14 +19,12 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
-#include <QtCore/QVersionNumber>
 #include <QtGui/QResizeEvent>
 #include <QtGui/QShowEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPlatformSurfaceEvent>
 #include <QtGui/QWindow>
-#include <QtGui/QVulkanInstance>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <QtWidgets/QMenu>
@@ -358,28 +356,82 @@ namespace Rv
     }
 
     //
-    //  One process-lifetime QVulkanInstance, shared by the 10-bit probe and
-    //  every VulkanWindow, never destroyed: destroying a VkInstance shortly
-    //  before another init corrupts RADV's X11 WSI state and segfaults in
+    //  One process-lifetime VkInstance, shared by the 10-bit probe and every
+    //  VulkanWindow, never destroyed: destroying a VkInstance shortly before
+    //  another init corrupts RADV's X11 WSI state and segfaults in
     //  vkGetPhysicalDeviceSurfaceSupportKHR.
+    //
+    //  Instance and surfaces are created directly rather than through
+    //  QVulkanInstance, which only exists when Qt is built with Vulkan.
     //
     namespace
     {
-        QVulkanInstance* sharedVulkanInstance()
+#ifdef PLATFORM_WINDOWS
+        constexpr const char* platformSurfaceExtension = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+#else
+        constexpr const char* platformSurfaceExtension = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+#endif
+
+        VkInstance sharedVulkanInstance()
         {
-            static QVulkanInstance* instance = []() -> QVulkanInstance*
+            static const VkInstance instance = []() -> VkInstance
             {
-                auto inst = std::make_unique<QVulkanInstance>();
+                const std::array<const char*, 2> extensions = {VK_KHR_SURFACE_EXTENSION_NAME, platformSurfaceExtension};
+
+                VkApplicationInfo appInfo = {};
+                appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
                 // 1.3 for synchronization2 (vkQueueSubmit2 / vkCmdPipelineBarrier2).
-                inst->setApiVersion(QVersionNumber(1, 3));
-                if (!inst->create())
+                appInfo.apiVersion = VK_API_VERSION_1_3;
+
+                VkInstanceCreateInfo createInfo = {};
+                createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+                createInfo.pApplicationInfo = &appInfo;
+                createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+                createInfo.ppEnabledExtensionNames = extensions.data();
+
+                VkInstance created = VK_NULL_HANDLE;
+                const VkResult result = vkCreateInstance(&createInfo, nullptr, &created);
+                if (result != VK_SUCCESS)
                 {
-                    std::cerr << "ERROR: VulkanWindow: shared QVulkanInstance create failed" << std::endl;
-                    return nullptr;
+                    std::cerr << "ERROR: VulkanWindow: shared VkInstance create failed (VkResult " << result << ")" << std::endl;
+                    return VK_NULL_HANDLE;
                 }
-                return inst.release();
+                return created;
             }();
             return instance;
+        }
+
+        // The caller owns the returned surface and must destroy it before the
+        // native window goes away.
+        VkSurfaceKHR createSurface(VkInstance instance, QWindow* window)
+        {
+            VkSurfaceKHR surface = VK_NULL_HANDLE;
+#ifdef PLATFORM_WINDOWS
+            VkWin32SurfaceCreateInfoKHR createInfo = {};
+            createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+            createInfo.hinstance = GetModuleHandle(nullptr);
+            createInfo.hwnd = reinterpret_cast<HWND>(window->winId());
+            const VkResult result = vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface);
+#else
+            // X11 only: the loader is built without Wayland WSI.
+            auto* x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+            if (!x11)
+            {
+                std::cerr << "ERROR: VulkanWindow: Vulkan presentation requires the xcb Qt platform" << std::endl;
+                return VK_NULL_HANDLE;
+            }
+            VkXcbSurfaceCreateInfoKHR createInfo = {};
+            createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+            createInfo.connection = x11->connection();
+            createInfo.window = static_cast<xcb_window_t>(window->winId());
+            const VkResult result = vkCreateXcbSurfaceKHR(instance, &createInfo, nullptr, &surface);
+#endif
+            if (result != VK_SUCCESS)
+            {
+                std::cerr << "ERROR: VulkanWindow: surface create failed (VkResult " << result << ")" << std::endl;
+                return VK_NULL_HANDLE;
+            }
+            return surface;
         }
     } // namespace
 
@@ -388,19 +440,14 @@ namespace Rv
         //  A fixed hardware property: probe once per process.
         static const bool cached = []() -> bool
         {
-            QVulkanInstance* qtVkInst = sharedVulkanInstance();
-            if (!qtVkInst)
-            {
-                return false;
-            }
-
-            VkInstance instance = qtVkInst->vkInstance();
+            VkInstance instance = sharedVulkanInstance();
             if (instance == VK_NULL_HANDLE)
             {
                 return false;
             }
 
-            //  Leaked for the same RADV WSI reason as sharedVulkanInstance().
+            //  Window and surface are leaked for the same RADV WSI reason as
+            //  sharedVulkanInstance().
             static QWindow* dummyWindow = []() -> QWindow*
             {
                 auto* window = new QWindow();
@@ -408,9 +455,8 @@ namespace Rv
                 window->create();
                 return window;
             }();
-            dummyWindow->setVulkanInstance(qtVkInst);
 
-            VkSurfaceKHR dummySurface = qtVkInst->surfaceForWindow(dummyWindow);
+            VkSurfaceKHR dummySurface = createSurface(instance, dummyWindow);
             if (!dummySurface)
             {
                 std::cerr << "ERROR: VulkanWindow: supports10BitPresentation: failed to create dummy surface" << std::endl;
@@ -465,14 +511,12 @@ namespace Rv
 
     bool VulkanWindow::initVulkan()
     {
-        QVulkanInstance* qtVkInst = sharedVulkanInstance();
-        if (!qtVkInst)
+        m_vkInstance = sharedVulkanInstance();
+        if (m_vkInstance == VK_NULL_HANDLE)
         {
-            std::cerr << "ERROR: VulkanWindow: shared QVulkanInstance unavailable" << std::endl;
+            std::cerr << "ERROR: VulkanWindow: shared VkInstance unavailable" << std::endl;
             return false;
         }
-
-        m_vkInstance = qtVkInst->vkInstance();
 
         // Re-creating after a reparent can get here before the platform window.
         if (!handle())
@@ -480,9 +524,7 @@ namespace Rv
             create();
         }
 
-        setVulkanInstance(qtVkInst);
-
-        m_vkSurface = qtVkInst->surfaceForWindow(this);
+        m_vkSurface = createSurface(m_vkInstance, this);
         if (!m_vkSurface)
         {
             std::cerr << "ERROR: VulkanWindow: Failed to create Vulkan surface" << std::endl;
@@ -696,8 +738,12 @@ namespace Rv
         cleanupSwapchain();
         cleanupVulkan();
 
-        //  Owned by QVulkanInstance; not destroyed here.
-        m_vkSurface = VK_NULL_HANDLE;
+        //  After the swapchain, before the native window.
+        if (m_vkSurface)
+        {
+            vkDestroySurfaceKHR(m_vkInstance, m_vkSurface, nullptr);
+            m_vkSurface = VK_NULL_HANDLE;
+        }
         m_vkPhysicalDevice = VK_NULL_HANDLE;
         m_vkSwapchainFormat = VK_FORMAT_UNDEFINED;
         m_vkSwapchainExtent = {};
@@ -759,7 +805,6 @@ namespace Rv
         }
         m_vkQueue = VK_NULL_HANDLE;
         m_externalInteropSupported = false;
-        // The VkSurfaceKHR is owned by QVulkanInstance; do not destroy it here.
     }
 
     //
@@ -2757,8 +2802,8 @@ namespace Rv
     {
         //
         //  Before every guard below: this is the last point the Vulkan objects
-        //  can legally be destroyed. The VkSurfaceKHR dies with the
-        //  QPlatformWindow, and QWindowContainer destroys it before deleting
+        //  can legally be destroyed. The VkSurfaceKHR must go before the
+        //  QPlatformWindow, and QWindowContainer destroys that before deleting
         //  this window, so releasing later segfaults inside the driver.
         //
         if (event->type() == QEvent::PlatformSurface)

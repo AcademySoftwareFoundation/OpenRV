@@ -488,9 +488,9 @@ IF(RV_TARGET_LINUX
     ${_target}
     PRIVATE Vulkan::Vulkan
   )
-  # Activate the Win32-specific bits of <vulkan/vulkan.h>: VK_KHR_external_memory_win32 and VK_KHR_external_semaphore_win32 (struct types, enum values, and
-  # PFN_vkGet*Win32HandleKHR typedefs are gated behind this macro). Linux does not need an equivalent define because the FD external-handle symbols live in
-  # vulkan_core.h and are unconditionally exported.
+  # Activate the platform-specific bits of <vulkan/vulkan.h>. Windows: the Win32 surface plus VK_KHR_external_memory_win32 and VK_KHR_external_semaphore_win32
+  # (struct types, enum values, and PFN_vkGet*Win32HandleKHR typedefs are gated behind the macro). Linux: the XCB surface only; the FD external-handle symbols
+  # live in vulkan_core.h and are unconditionally exported.
   IF(RV_TARGET_WINDOWS)
     # WIN32_LEAN_AND_MEAN: vulkan_win32.h unconditionally includes <windows.h>; without WIN32_LEAN_AND_MEAN that drags in legacy winsock.h, which collides with
     # the winsock2.h pulled in via Qt headers (ws2def.h struct redefinition errors). Promote the existing per-file convention to target scope so every RvCommon
@@ -498,6 +498,12 @@ IF(RV_TARGET_LINUX
     TARGET_COMPILE_DEFINITIONS(
       ${_target}
       PRIVATE VK_USE_PLATFORM_WIN32_KHR WIN32_LEAN_AND_MEAN
+    )
+  ELSE()
+    # The xcb headers are already required by the Vulkan-Loader build (BUILD_WSI_XCB_SUPPORT).
+    TARGET_COMPILE_DEFINITIONS(
+      ${_target}
+      PRIVATE VK_USE_PLATFORM_XCB_KHR
     )
   ENDIF()
 ENDIF()
