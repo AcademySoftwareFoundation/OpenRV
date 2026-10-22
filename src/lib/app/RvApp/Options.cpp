@@ -42,6 +42,7 @@
 #include <fstream>
 #include <iostream>
 #include <stl_ext/string_algo.h>
+#include <stl_ext/thread_group.h>
 
 extern void TwkMovie_GenericIO_setDebug(bool);
 extern void TwkFB_GenericIO_setDebug(bool);
