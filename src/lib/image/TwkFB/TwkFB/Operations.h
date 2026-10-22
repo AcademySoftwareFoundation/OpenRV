@@ -327,6 +327,11 @@ namespace TwkFB
 
     TWKFB_EXPORT void linearRGBA709pixelValue(const FrameBuffer* fb, int x, int y, float* result);
 
+    // get a raw linear pixel value. I don't see the value of converting pixel sampler
+    // values to a Rec.709 gamut.
+
+    TWKFB_EXPORT void linearRGBARawPixelValue(const FrameBuffer* fb, int x, int y, float* result);
+
 } // namespace TwkFB
 
 #endif // __TwkFB__Operations__h__
