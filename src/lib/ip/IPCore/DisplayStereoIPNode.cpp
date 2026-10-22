@@ -34,6 +34,24 @@ namespace IPCore
     namespace
     {
 
+        // Recursively stamps the eye's paint target region on every IPImage in
+        // the subtree so the renderer can find it on whichever descendant
+        // actually carries the paint commands. (might not be needed)
+        void propagatePaintRegion(IPImage* img, float rx, float ry, float rw, float rh)
+        {
+            if (!img)
+                return;
+            img->paintTargetRegionX = rx;
+            img->paintTargetRegionY = ry;
+            img->paintTargetRegionW = rw;
+            img->paintTargetRegionH = rh;
+            for (IPImage* c = img->children; c; c = c->next)
+            {
+                propagatePaintRegion(c, rx, ry, rw, rh);
+            }
+        }
+
+        // Note that each eye in stereo stores FBO separately
         void prepareForStereo(IPImage* img, bool isLeftEye, bool mirror, bool vertical, Vec3f offset, Vec3f roffset, Vec3f scale)
         {
             if (img->destination == IPImage::OutputTexture)
@@ -59,6 +77,24 @@ namespace IPCore
                 }
 
                 img->transformMatrix = img->transformMatrix * S * T;
+
+                // Set the target paint regions for cache when rendering
+                float rx, ry, rw, rh;
+                if (vertical)
+                {
+                    rx = 0.0f;
+                    rw = 1.0f;
+                    ry = isLeftEye ? 0.0f : 0.5f;
+                    rh = 0.5f;
+                }
+                else
+                {
+                    ry = 0.0f;
+                    rh = 1.0f;
+                    rx = isLeftEye ? 0.0f : 0.5f;
+                    rw = 0.5f;
+                }
+                propagatePaintRegion(img, rx, ry, rw, rh);
             }
         }
 
