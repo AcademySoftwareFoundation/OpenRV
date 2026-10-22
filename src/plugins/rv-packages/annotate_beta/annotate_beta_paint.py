@@ -357,20 +357,26 @@ def new_stroke(paint_node, frame, first_point, first_point_width, brush, erase_m
     else:
         stroke_mode = 0
 
-    # Write every other property before .points: setting .points fires
+    # Write every other property before .points: writing .points fires
     # graph-state-change, and listeners may read the whole stroke at that point.
+    #
+    # .width and .points are inserted, not set. sync.mu filters out sets on
+    # RVPaint .points/.width to save bandwidth (MatchNoStateChange) and only
+    # relays inserts, so a set first point never reaches remote sync peers.
+    # Both properties are new and empty here, so the local result is the same.
+    # Matches newStroke/addToStroke in annotate_mode.mu.
     _ensure_property(f"{node_name}.softDeleted", commands.IntType, 1)
     commands.setFloatProperty(f"{node_name}.color", rgba, True)
-    commands.setFloatProperty(f"{node_name}.width", [first_point_width], True)
+    commands.insertFloatProperty(f"{node_name}.width", [first_point_width])  # insert, see above
     commands.setStringProperty(f"{node_name}.brush", [brush], True)
     commands.setIntProperty(f"{node_name}.mode", [stroke_mode], True)
     commands.setIntProperty(f"{node_name}.startFrame", [frame], True)
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setStringProperty(f"{node_name}.uuid", [stroke_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
-    commands.setFloatProperty(f"{node_name}.points", [first_point.x, first_point.y], True)
-    commands.setIntProperty(f"{node_name}.join", [1], True)  # BevelJoin
-    commands.setIntProperty(f"{node_name}.cap", [2], True)  # RoundCap
+    commands.insertFloatProperty(f"{node_name}.points", [first_point.x, first_point.y])  # insert, see above
+    commands.setIntProperty(f"{node_name}.join", [3], True)  # RoundJoin
+    commands.setIntProperty(f"{node_name}.cap", [1], True)  # SquareCap, rendered round by the radial shader
     commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.Brush.GAUSS else 0], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setFloatProperty(f"{node_name}.smoothingWidth", [1.0], True)
