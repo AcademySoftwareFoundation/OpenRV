@@ -569,13 +569,49 @@ class _BrushSettingsButton(_PopupToolButton):
             settings.reset()
 
 
-class _BrushPanel(_PenPanel):
-    """Brush settings dropdown, size and opacity sliders, and the blend mode buttons."""
+class _WidePopupComboBox(QtWidgets.QComboBox):
+    """Combo box whose popup is as wide as its widest item, even when the closed field is narrow."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+
+    def showPopup(self):
+        view = self.view()
+        scrollbar_width = view.verticalScrollBar().sizeHint().width()
+        view.setMinimumWidth(view.sizeHintForColumn(0) + scrollbar_width + 2 * view.frameWidth())
+        super().showPopup()
+
+
+class _BrushTypeComboBox(_WidePopupComboBox):
+    """Combo box whose closed field shows the selected brush's image instead of its name."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setToolTip("Brush types")
+        self.setItemDelegate(_CheckedItemDelegate(self))
+        self._icon = _load_icon("erase_gauss")  # placeholder icon
+        self.addItems(["BrushNameHere"] * 20)  # placeholder brush items
+
+    def paintEvent(self, event):
+        painter = QtWidgets.QStylePainter(self)
+        style_option = QtWidgets.QStyleOptionComboBox()
+        self.initStyleOption(style_option)
+        style_option.currentText = ""
+        style_option.currentIcon = self._icon
+        painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, style_option)
+        painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
+
+
+class _BrushPanel(_PenPanel):
+    """Brush type and settings dropdowns, size and opacity sliders, and the blend mode buttons."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        _insert_divider(self._layout, 0)
         self._layout.insertWidget(0, _BrushSettingsButton())
-        _insert_divider(self._layout, 1)
+        self._layout.insertSpacing(0, 8)
+        self._layout.insertWidget(0, _BrushTypeComboBox())
 
 
 class _ShapeOptionsPanel(_SliderPanel):
@@ -595,25 +631,13 @@ class _ShapeOptionsPanel(_SliderPanel):
             self._filled.setChecked(value)
 
 
-class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
-    """Renders each font name in its own typeface and ticks the current one."""
+class _CheckedItemDelegate(QtWidgets.QStyledItemDelegate):
+    """Ticks the current item of the combo box it belongs to."""
 
     def initStyleOption(self, option, index):
         super().initStyleOption(option, index)
         option.features |= QtWidgets.QStyleOptionViewItem.HasDecoration
         option.decorationSize = QtCore.QSize(12, 12)
-
-        font_name = index.data()
-        if font_name:
-            font = QtGui.QFont(font_name)
-            point_size = option.font.pointSize()
-            if point_size > 0:
-                font.setPointSize(point_size)
-            else:
-                pixel_size = option.font.pixelSize()
-                if pixel_size > 0:
-                    font.setPixelSize(pixel_size)
-            option.font = font
 
     def paint(self, painter, option, index):
         super().paint(painter, option, index)
@@ -631,7 +655,26 @@ class _FontNameDelegate(QtWidgets.QStyledItemDelegate):
         return size
 
 
-class _FontComboBox(QtWidgets.QComboBox):
+class _FontNameDelegate(_CheckedItemDelegate):
+    """Renders each font name in its own typeface."""
+
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+
+        font_name = index.data()
+        if font_name:
+            font = QtGui.QFont(font_name)
+            point_size = option.font.pointSize()
+            if point_size > 0:
+                font.setPointSize(point_size)
+            else:
+                pixel_size = option.font.pixelSize()
+                if pixel_size > 0:
+                    font.setPixelSize(pixel_size)
+            option.font = font
+
+
+class _FontComboBox(_WidePopupComboBox):
     """Combo box whose closed field always shows "Aa" in the selected font."""
 
     def __init__(self, parent=None):
@@ -683,7 +726,6 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.setPlaceholderText("Aa")
         self._font_combo.currentTextChanged.connect(self._on_font_selected)
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
-        self._font_combo.view().setMinimumWidth(160)
         layout.addWidget(self._font_combo)
 
         self._size_button = _MenuToolButton("Size", self._SIZES)
