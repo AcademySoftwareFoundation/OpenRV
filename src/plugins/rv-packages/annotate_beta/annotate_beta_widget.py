@@ -530,6 +530,7 @@ class _TextOptionsPanel(QtWidgets.QWidget):
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
+    opacity_changed = QtCore.Signal(int)
 
     _SIZES = (
         (constants.FontSize.SMALL, "S", None),
@@ -576,6 +577,14 @@ class _TextOptionsPanel(QtWidgets.QWidget):
             button.toggled.connect(signal)
             layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
             self._style_buttons[key] = button
+
+        _add_divider(layout, spacing=5)
+
+        self._opacity = _SliderSection(
+            "Opacity", constants.OPACITY_MIN, constants.OPACITY_MAX, constants.DEFAULT_OPACITY, suffix="%"
+        )
+        self._opacity.value_changed.connect(self.opacity_changed)
+        layout.addWidget(self._opacity)
 
         layout.addStretch()
 
@@ -638,6 +647,9 @@ class _TextOptionsPanel(QtWidgets.QWidget):
     def set_underline(self, value):
         self._set_style("underline", value)
 
+    def set_opacity(self, value):
+        self._opacity.set_value(value)
+
 
 # ---------------------------------------------------------------------------
 # Secondary panel
@@ -695,6 +707,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
         self._text_panel.font_bold_changed.connect(self.font_bold_changed)
         self._text_panel.font_italic_changed.connect(self.font_italic_changed)
         self._text_panel.font_underline_changed.connect(self.font_underline_changed)
+        self._text_panel.opacity_changed.connect(self.opacity_changed)
 
     def set_page_for_tool(self, tool):
         page = _TOOLS[tool].page
@@ -714,6 +727,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
     def set_opacity(self, value):
         for panel in self._slider_panels:
             panel.set_opacity(value)
+        self._text_panel.set_opacity(value)
 
     def set_filled(self, value):
         self._shape_panel.set_filled(value)
