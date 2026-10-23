@@ -76,7 +76,8 @@ namespace Rv
 
     GLWindow::GLWindow(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red, int green,
                        int blue, int alpha, bool noResize)
-        : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate)
+        // The share context must be set before Qt creates the context; setting it later has no effect.
+        : QOpenGLWindow(sharedContext, QOpenGLWindow::NoPartialUpdate)
         , m_doc(doc)
         , m_red(red)
         , m_green(green)
@@ -91,7 +92,6 @@ namespace Rv
         , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
         , m_syncingDevicePixelRatio(false)
         , m_profilingSwapPending(false)
-        , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
 
@@ -148,11 +148,6 @@ namespace Rv
         {
             initializeGLExtensions();
             initializeOpenGLFunctions();
-
-            if (m_sharedContext)
-            {
-                context()->setShareContext(m_sharedContext);
-            }
 
             //
             //  NOTE: session initialization is deliberately NOT driven from

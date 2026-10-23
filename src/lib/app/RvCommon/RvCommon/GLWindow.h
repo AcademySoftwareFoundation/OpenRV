@@ -106,7 +106,6 @@ namespace Rv
         float m_devicePixelRatio;
         bool m_syncingDevicePixelRatio;
         bool m_profilingSwapPending;
-        QOpenGLContext* m_sharedContext;
     };
 
 } // namespace Rv
