@@ -71,6 +71,10 @@
 #ifdef PLATFORM_DARWIN
 #include <RvCommon/DisplayLink.h>
 #include <RvCommon/CGDesktopVideoDevice.h>
+#ifdef USE_METAL
+#include <RvCommon/MetalView.h>
+#include <RvCommon/QTMetalVideoDevice.h>
+#endif
 #endif
 
 #include <QDockWidget>
@@ -98,7 +102,7 @@ namespace Rv
 #define DBL(level, x)
 #endif
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
     namespace
     {
         // Input and layout settings shared by every main view widget.
@@ -210,7 +214,56 @@ namespace Rv
         //
         //
 
-#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //
+        //  10-bit (RGB 10 + A 2) presents through Metal when the hardware
+        //  supports it; everything else stays on the 8-bit OpenGL GLView.
+        //
+        const bool want10bit = DesktopVideoDevice::tenBitDisplayRequested();
+
+        // Shared with the presentation output so both stay on the same backend.
+        const bool useMetal = DesktopVideoDevice::shouldUseNativePresentation();
+
+        if (want10bit && !useMetal)
+        {
+            cerr << "INFO: 10-bit display requested but Metal 10-bit "
+                    "presentation is unavailable; falling back to OpenGL."
+                 << endl;
+        }
+
+        if (useMetal)
+        {
+            // A plain QWidget, so no createWindowContainer() wrapping is needed.
+            m_metalView = new MetalView(this, m_centralWidget, !m_startupResize);
+
+            configureViewWidget(m_metalView);
+            m_metalView->resize(m_metalView->sizeHint());
+            m_metalView->setEventWidget(m_metalView);
+            m_viewWidget = m_metalView;
+
+            // Check the offscreen GL context now, so a failure falls back to
+            // OpenGL before anything is shown.
+            m_metalView->videoDevice()->makeCurrent();
+
+            if (!m_metalView->videoDevice()->isGLContextReady())
+            {
+                // A MetalView without a GL context can never paint.
+                cerr << "WARNING: Metal offscreen GL context unavailable at "
+                        "startup; falling back to OpenGL."
+                     << endl;
+                m_metalView->setEventWidget(nullptr);
+                delete m_metalView;
+                m_metalView = nullptr;
+                m_glView = createGLView(8, 8, 8, 8);
+                m_viewWidget = m_glView;
+            }
+        }
+        else
+        {
+            m_glView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
+            m_viewWidget = m_glView;
+        }
+#elif defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         //
         //  10-bit (RGB 10 + A 2) presents through Vulkan, since GLX/WGL
         //  pixel-format negotiation truncates to 8-bit; everything else stays
@@ -225,13 +278,13 @@ namespace Rv
         }
 
         // Shared with the presentation output so both stay on the same backend.
-        const bool useVulkan = DesktopVideoDevice::shouldUseVulkanPresentation();
+        const bool useVulkan = DesktopVideoDevice::shouldUseNativePresentation();
 
         if (want10bit)
         {
             if (ImageRenderer::debugGpu())
             {
-                cout << "INFO: RvDocument: shouldUseVulkanPresentation()=" << (useVulkan ? "true" : "false") << endl;
+                cout << "INFO: RvDocument: shouldUseNativePresentation()=" << (useVulkan ? "true" : "false") << endl;
             }
             if (!useVulkan)
             {
@@ -683,6 +736,12 @@ namespace Rv
                     m_vulkanView->videoDevice()->translator().setRelativeDomain(w, h);
                 }
                 else
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+                if (m_metalView)
+                {
+                    m_metalView->videoDevice()->translator().setRelativeDomain(w, h);
+                }
+                else
 #endif
                 {
                     if (m_glView)
@@ -1132,6 +1191,154 @@ namespace Rv
         QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
     }
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    void RvDocument::fallbackMetalToGLView()
+    {
+        // Reached when MetalView::render() loses its GL context and when the
+        // user leaves 10-bit. Mirrors fallbackVulkanToGLView().
+        if (!m_metalView || isClosing())
+        {
+            return;
+        }
+
+        cout << "INFO: RvDocument: switching main view from Metal to OpenGL." << endl;
+
+        MetalView* oldMetalView = m_metalView;
+        m_metalView = nullptr;
+
+        oldMetalView->stopProcessingEvents();
+
+        // OpenGL cannot present 10/10/10/2, so a 10-bit request recovers at
+        // 8-bit and keeps the persisted preference.
+        const Rv::Options& opts = Options::sharedOptions();
+        GLView* newGLView = nullptr;
+        if (DesktopVideoDevice::tenBitDisplayRequested())
+        {
+            newGLView = createGLView(8, 8, 8, 8);
+        }
+        else
+        {
+            newGLView = createGLView(opts.dispRedBits, opts.dispGreenBits, opts.dispBlueBits, opts.dispAlphaBits);
+        }
+
+        newGLView->setContentSize(oldMetalView->sizeHint().width(), oldMetalView->sizeHint().height());
+        newGLView->setMinimumSize(QSize(oldMetalView->minimumSizeHint().width(), oldMetalView->minimumSizeHint().height()));
+        configureViewWidget(newGLView);
+
+        m_stackedLayout->removeWidget(oldMetalView);
+        m_stackedLayout->addWidget(newGLView);
+        oldMetalView->hide();
+
+        m_glView = newGLView;
+        m_viewWidget = newGLView;
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+        newGLView->show();
+
+        m_topViewToolBar->setDevice(m_glView->videoDevice());
+
+        if (m_session)
+        {
+            const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+            m_session->setEventVideoDevice(nullptr);
+            m_session->setOutputVideoDevice(nullptr);
+            m_session->setControlVideoDevice(m_glView->videoDevice());
+            if (same)
+            {
+                m_session->setOutputVideoDevice(m_glView->videoDevice());
+            }
+
+            m_glView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("gl-context-changed", m_glView->videoDevice()));
+        }
+
+        // Move the presentation output to OpenGL too, or it stays black.
+        RvApp()->rebuildDesktopVideoDevices(m_session, m_glView->videoDevice(), false);
+
+        // Deferred: this can be reached from a queued call out of MetalView::render().
+        oldMetalView->deleteLater();
+
+        newGLView->videoDevice()->makeCurrent();
+        newGLView->update();
+    }
+
+    void RvDocument::swapGLViewToMetal()
+    {
+        if (!m_glView || isClosing() || !m_session)
+        {
+            return;
+        }
+
+        cout << "INFO: RvDocument: switching main view from OpenGL to Metal." << endl;
+
+        // Flush any GLView pending from an earlier swap before reusing m_oldGLView.
+        lazyDeleteGLView();
+
+        GLView* oldGLView = m_glView;
+        const Qt::KeyboardModifiers cur = oldGLView->videoDevice()->translator().currentModifiers();
+
+        auto* newMetalView = new MetalView(this, m_centralWidget, !m_startupResize);
+        newMetalView->setContentSize(oldGLView->sizeHint().width(), oldGLView->sizeHint().height());
+        newMetalView->setMinimumContentSize(oldGLView->minimumSizeHint().width(), oldGLView->minimumSizeHint().height());
+        configureViewWidget(newMetalView);
+        newMetalView->setEventWidget(newMetalView);
+
+        // Keep the working GLView if the offscreen context cannot be established.
+        newMetalView->videoDevice()->makeCurrent();
+        if (!newMetalView->videoDevice()->isGLContextReady())
+        {
+            cerr << "WARNING: RvDocument: Metal offscreen GL context unavailable; "
+                    "staying on OpenGL."
+                 << endl;
+            delete newMetalView;
+            return;
+        }
+
+        m_stackedLayout->addWidget(newMetalView);
+        oldGLView->stopProcessingEvents();
+
+        m_metalView = newMetalView;
+        m_viewWidget = newMetalView;
+        // Backend-neutral code in RvDocument keys the active backend on !m_glView.
+        m_glView = nullptr;
+
+        newMetalView->show();
+
+        m_stackedLayout->removeWidget(oldGLView);
+        oldGLView->hide();
+
+        m_viewWidget->setFocus(Qt::OtherFocusReason);
+
+        m_topViewToolBar->setDevice(m_metalView->videoDevice());
+
+        const bool same = m_session->outputVideoDevice() == m_session->controlVideoDevice();
+        m_session->setEventVideoDevice(nullptr);
+        m_session->setOutputVideoDevice(nullptr);
+        m_session->setControlVideoDevice(m_metalView->videoDevice());
+        if (same)
+        {
+            m_session->setOutputVideoDevice(m_metalView->videoDevice());
+        }
+
+        m_metalView->videoDevice()->sendEvent(TwkApp::RenderContextChangeEvent("metal-context-changed", m_metalView->videoDevice()));
+
+        // Move the presentation output to Metal too, or it stays black. There is
+        // no GL share device; Qt::AA_ShareOpenGLContexts still shares resources.
+        RvApp()->rebuildDesktopVideoDevices(m_session, nullptr, true);
+
+        // translator() dereferences a translator that exists only after setEventWidget().
+        if (m_metalView->videoDevice()->hasTranslator())
+        {
+            m_metalView->videoDevice()->translator().setCurrentModifiers(cur);
+        }
+
+        // As in rebuildGLView(): deleting the old GLView inline can crash.
+        m_oldGLView = oldGLView;
+        QTimer::singleShot(100, this, SLOT(lazyDeleteGLView()));
+
+        m_metalView->videoDevice()->makeCurrent();
+        m_metalView->update();
+    }
+#endif
+
     void RvDocument::showDiagnostics()
     {
         if (m_diagnosticsDock)
@@ -1140,11 +1347,34 @@ namespace Rv
         }
     }
 
+#if defined(PLATFORM_DARWIN) && defined(USE_METAL)
+    namespace
+    {
+        void warnMetalDisplaySurfaceOptionIgnored()
+        {
+            static bool logged = false;
+            if (!logged)
+            {
+                cout << "INFO: OpenGL surface options (stereo, vsync, double-buffer, "
+                        "pixel format) do not apply on the Metal presentation backend."
+                     << endl;
+                logged = true;
+            }
+        }
+    } // namespace
+#endif
+
     void RvDocument::setStereo(bool b)
     {
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
         {
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1170,6 +1400,12 @@ namespace Rv
         {
             return;
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
+            return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1189,6 +1425,12 @@ namespace Rv
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
         if (!m_glView)
         {
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (!m_glView)
+        {
+            warnMetalDisplaySurfaceOptionIgnored();
             return;
         }
 #endif
@@ -1286,6 +1528,45 @@ namespace Rv
             fallbackVulkanToGLView();
             return;
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        //
+        //  10-bit goes through Metal (IOSurface + CALayer): macOS OpenGL cannot
+        //  present 10-bit through a QOpenGLWidget, so a GL context rebuild at
+        //  10-bit fails validity and pops a misleading "Display Configuration is
+        //  Invalid" dialog.
+        //
+        if (type == OpenGL1010102)
+        {
+            // Already on Metal.
+            if (!m_glView)
+            {
+                return;
+            }
+
+            if (MetalView::supports10BitPresentation())
+            {
+                swapGLViewToMetal();
+                return;
+            }
+
+            QMessageBox box(this);
+            box.setWindowModality(Qt::WindowModal);
+            box.setIcon(QMessageBox::Critical);
+            box.setWindowTitle(tr(UI_APPLICATION_NAME ": 10-bit Display Output Unavailable"));
+            box.setText(tr("This display cannot present 10-bit output"));
+            box.setInformativeText(tr("This graphics hardware does not provide a 10-bit presentation surface. " UI_APPLICATION_NAME
+                                      " cannot output 10-bit on this display and will continue in 8-bit."));
+
+            box.exec();
+            return;
+        }
+
+        // Leaving 10-bit while Metal is live: swap back to OpenGL.
+        if (!m_glView)
+        {
+            fallbackMetalToGLView();
+            return;
+        }
 #endif
         const bool vsync = m_glView->format().swapInterval() == 1;
         const bool stereo = m_glView->format().stereo();
@@ -1337,6 +1618,12 @@ namespace Rv
             m_vulkanView->setContentSize(w, h);
             return;
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            m_metalView->setContentSize(w, h);
+            return;
+        }
 #endif
         if (m_glView)
         {
@@ -1350,6 +1637,12 @@ namespace Rv
         if (m_vulkanView)
         {
             m_vulkanView->setMinimumContentSize(w, h);
+            return;
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            m_metalView->setMinimumContentSize(w, h);
             return;
         }
 #endif
@@ -1366,6 +1659,11 @@ namespace Rv
         {
             return m_vulkanView->firstPaintCompleted();
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            return m_metalView->firstPaintCompleted();
+        }
 #endif
         return m_glView && m_glView->firstPaintCompleted();
     }
@@ -1380,6 +1678,11 @@ namespace Rv
         if (m_vulkanView)
         {
             return m_vulkanView->videoDevice();
+        }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            return m_metalView->videoDevice();
         }
 #endif
         return m_glView ? m_glView->videoDevice() : nullptr;
