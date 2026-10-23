@@ -1,0 +1,67 @@
+## [Unreleased]
+
+### Features
+
+- SG-43947: Present through Vulkan for 10-bit output on Linux and Windows ([#1427](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1427)) ([32a8cee](https://github.com/AcademySoftwareFoundation/OpenRV/commit/32a8cee5046c0a2e8907544479e90d8e08c838bc))
+- SG-43127: SG-43594: 10-bit Vulkan presentation (Linux + Windows) ([#1319](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1319)) ([7dfa91b](https://github.com/AcademySoftwareFoundation/OpenRV/commit/7dfa91bcabbede50ef1df3eb065b65b47586fc46))
+- SG-44907 - CY2026 - Add support for Qt 6.8.x ([#1393](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1393)) ([bd45ad0](https://github.com/AcademySoftwareFoundation/OpenRV/commit/bd45ad022dbb2358e0de9eb7906653da0b1d152d))
+- SG-43509: Add rebind and rebindRegex commands ([#1284](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1284)) ([3762724](https://github.com/AcademySoftwareFoundation/OpenRV/commit/37627242a789b8337d4d6566e147ba044e5f95b5))
+- SG-44604: RVLinkLauncher - Save RV selection that was made in previous session ([#1385](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1385)) ([c79b7be](https://github.com/AcademySoftwareFoundation/OpenRV/commit/c79b7be3e2b7f6ccc929caf9e762ab4237025603))
+- SG-43305: Add new annotation UI to expose new features ([#1359](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1359)) ([00867cf](https://github.com/AcademySoftwareFoundation/OpenRV/commit/00867cf4336ef3d05e910b3cd701a474c78d83dc))
+
+### Bug Fixes
+
+- SG-43367: eliminate EXR+WAV playback stuttering ([#1350](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1350)) ([8c0edc0](https://github.com/AcademySoftwareFoundation/OpenRV/commit/8c0edc095f5cab95a3497ae7ddf92ac0371f0716))
+- SG-44427: Fix clearing frames with new annotation tool ([#1456](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1456)) ([2567cdf](https://github.com/AcademySoftwareFoundation/OpenRV/commit/2567cdf0a02cb40aea55a95f288c1464bb0003d2))
+- SG-43388: Cap open FFmpeg decoders to stop memory growth during playback ([#1459](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1459)) ([722625e](https://github.com/AcademySoftwareFoundation/OpenRV/commit/722625e6cec71e01fe390aea2d7f62f9379cea4e))
+- SG-45435: Fix artifacts at the ends of annotate_beta strokes ([#1449](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1449)) ([f74ff56](https://github.com/AcademySoftwareFoundation/OpenRV/commit/f74ff56a54c335527c5b5b0c6bfb43e13fcf21b1))
+- SG-45449: Make undo and redo stacks per frame ([#1454](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1454)) ([d66d297](https://github.com/AcademySoftwareFoundation/OpenRV/commit/d66d297b2bf5706100f854e5b9143ec4e3e084a6))
+- SG-45532: Update presentation pointer while drawing with Annotation (Beta) ([#1451](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1451)) ([666c9a2](https://github.com/AcademySoftwareFoundation/OpenRV/commit/666c9a287c0edb076dee13dd9520f6bf2a8f654e))
+- SG-45066: Load annotation font list without blocking first activation ([#1444](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1444)) ([fb93f77](https://github.com/AcademySoftwareFoundation/OpenRV/commit/fb93f778d8070e90736d8546c390e7a6ac369e3f))
+- SG-44536: Skip fonts without an hhea table in the new annotation tools ([#1443](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1443)) ([328e8fe](https://github.com/AcademySoftwareFoundation/OpenRV/commit/328e8fe4f95bceaabe599e0ceb71e83577127bcb))
+- SG-45135: Stop paint scratch FBOs sharing the image's cache key ([#1440](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1440)) ([94e3f14](https://github.com/AcademySoftwareFoundation/OpenRV/commit/94e3f1474cec6a559b8ae81bd803708c243779f0))
+- SG-44480: Let every annotation tool scrub the timeline ([#1442](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1442)) ([ad0ec6e](https://github.com/AcademySoftwareFoundation/OpenRV/commit/ad0ec6ee4579b2bff0d3f5872f120c04c4292faf))
+- SG-45332: Restore viewport cursor shapes on the GL view ([#1445](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1445)) ([5d1c8ca](https://github.com/AcademySoftwareFoundation/OpenRV/commit/5d1c8ca6b32b130decafa51c67b948342a6e52ff))
+- SG-45332: Restore RV hotkeys while the Session Manager has focus ([#1446](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1446)) ([2434576](https://github.com/AcademySoftwareFoundation/OpenRV/commit/2434576f5b52ac20a21be4f0cef486b20e972f7a))
+- SG-45154: Restore view-resized event for Lock Pixel Scale During Resize ([#1448](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1448)) ([6093aa5](https://github.com/AcademySoftwareFoundation/OpenRV/commit/6093aa55f0ad9c184a01cbdf953f8f5924599a56))
+- SG-45332: Fix crash with -debug profile ([#1447](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1447)) ([0daf03f](https://github.com/AcademySoftwareFoundation/OpenRV/commit/0daf03ff6c367b11de46a9da05b3c41a2130a1e3))
+- Clean up Annotate Beta package ([#1441](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1441)) ([0142e97](https://github.com/AcademySoftwareFoundation/OpenRV/commit/0142e979f8590b24927d6ad31bfe6ae7078213df))
+- SG-45412: Fix undo-redo shortcuts in the new annotation tool ([#1435](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1435)) ([a771271](https://github.com/AcademySoftwareFoundation/OpenRV/commit/a7712716356ce0fe677dc920e68130c4fad60088))
+- SG-45139: Fix viewport scaling when moving RV between displays with different DPI ([#1407](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1407)) ([13472ee](https://github.com/AcademySoftwareFoundation/OpenRV/commit/13472eeaf8edb6249755078ca9429a7e51b22796))
+- Make the ShibokenHelpers.cmake patch safe to re-run ([#1434](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1434)) ([838bf2e](https://github.com/AcademySoftwareFoundation/OpenRV/commit/838bf2e76f2ddc583089228b87dbb91e11436a9f))
+- SG-44859: Fix RVOverlay text ignoring size and scale ([#1433](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1433)) ([e2cfce3](https://github.com/AcademySoftwareFoundation/OpenRV/commit/e2cfce388332808b0a1f1c0ac8484188179b91f2))
+- SG-44505: Fix undo/redo state on session clear event ([#1431](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1431)) ([092014d](https://github.com/AcademySoftwareFoundation/OpenRV/commit/092014dc01119760cb707525c603aa6b96199f1d))
+- SG-45168: Fix dock settings not saved between sessions ([#1423](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1423)) ([b8d4a7f](https://github.com/AcademySoftwareFoundation/OpenRV/commit/b8d4a7f6b7d6167719e5dffea3b5f61165a3aafa))
+- SG-44988, SG-44488: Fix annotations drawn on empty canvas with new annotation package ([#1422](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1422)) ([332efb3](https://github.com/AcademySoftwareFoundation/OpenRV/commit/332efb324a04e52855345ea204bfd33594bd0b0b))
+- Update openrv-pub submodule ([#1429](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1429)) ([7171ec9](https://github.com/AcademySoftwareFoundation/OpenRV/commit/7171ec9e06ed4f7758bcc7b7daee1ef4050ccc8e))
+- SG-45240: Fix annotation cursor ([#1415](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1415)) ([b50d160](https://github.com/AcademySoftwareFoundation/OpenRV/commit/b50d160378739e05e41ae8c1ecf6e8b090505fd4))
+- SG-44534: Fix missing text caret on push events ([#1416](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1416)) ([a909af9](https://github.com/AcademySoftwareFoundation/OpenRV/commit/a909af9ecbdcb563ad99a029ed54daf6988ba3f2))
+- SG-44284: Feed raw points directly to StampPath in PaintIPNode ([#1411](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1411)) ([8be16d5](https://github.com/AcademySoftwareFoundation/OpenRV/commit/8be16d552fa52c7738f1cc64e860d592e81a159a))
+- SG-44522: Update QSS of the new annotation tool ([#1402](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1402)) ([812ede5](https://github.com/AcademySoftwareFoundation/OpenRV/commit/812ede5dec8a5557f49f500deff1cb4050f5d154))
+- SG-40934: Defer -eval/-pyeval until display groups exist ([#1384](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1384)) ([a104ba4](https://github.com/AcademySoftwareFoundation/OpenRV/commit/a104ba479fa4b936f754cd3c8d4739e9bcf4afe3))
+- SG-44533: Insert new line on keyboard shortcut ([#1397](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1397)) ([163c5ca](https://github.com/AcademySoftwareFoundation/OpenRV/commit/163c5cafa2acb9a2cb40c65bc33aa90807820b6b))
+- SG-44509: Fix automatically mark frame ([#1401](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1401)) ([86a6b35](https://github.com/AcademySoftwareFoundation/OpenRV/commit/86a6b35dc81f2d9ad3ec06a2809b17887df9970c))
+- SG-44508: Fix snapping shapes with stylus on hotkey ([#1400](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1400)) ([00a67aa](https://github.com/AcademySoftwareFoundation/OpenRV/commit/00a67aa4be502cff2c20b70937d76137705f8e17))
+- SG-44910: defer HDPI resize workaround until after window is shown ([#1392](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1392)) ([09930b8](https://github.com/AcademySoftwareFoundation/OpenRV/commit/09930b81f8e905751f4b603b9ee8aefe6232b1b3))
+- SG-44546: Fix annotations always enabled ([#1373](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1373)) ([31d17a7](https://github.com/AcademySoftwareFoundation/OpenRV/commit/31d17a7419ca1d4c39b61d2965f9f20b20e33759))
+- SG-44428: Fix text cursor ([#1360](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1360)) ([794fd78](https://github.com/AcademySoftwareFoundation/OpenRV/commit/794fd783a2237a2e9a96f201bd0139cc496a253c))
+- SG-43605: OTIO export failing when OCIO is active, and support reversed-order stack blending ([#1291](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1291)) ([f00641e](https://github.com/AcademySoftwareFoundation/OpenRV/commit/f00641e7e84f1bde1e04850bb95770bfe499cd4c))
+
+### Performance Improvements
+
+- SG-43585: Performance improvement of pyevaluate and pyexec ([#1375](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1375)) ([a8498fd](https://github.com/AcademySoftwareFoundation/OpenRV/commit/a8498fdd0c52912e367b0d23e0c67a4a9e7a657c))
+
+### Build System
+
+- SG-45024 - Support C++20 ([#1399](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1399)) ([c620e3f](https://github.com/AcademySoftwareFoundation/OpenRV/commit/c620e3f6dba89486145f9db3f6f3708bbbd8544a))
+- Change label name in Conan workflow for the right VFX platform ([#1396](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1396)) ([eb0efa0](https://github.com/AcademySoftwareFoundation/OpenRV/commit/eb0efa0fffba1a827e570d354b07f787de91ddf6))
+- SG-44926: add PySide6 fallback mappings for clang 18 through 22 ([#1383](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1383)) ([577eaf3](https://github.com/AcademySoftwareFoundation/OpenRV/commit/577eaf35221d86ad49fcd013b7ff253a69ac0e6d))
+- Apple ProRes SDK dependency edge missing on Linux/macOS causing header race ([#1398](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1398)) ([92d8b07](https://github.com/AcademySoftwareFoundation/OpenRV/commit/92d8b0762e34c45f6e809c2b937d06fda11948c4))
+- Fix Windows Debug OTIO pip build (cmake 4.4.1+ FindPython, python311_d.lib) ([#1376](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1376)) ([515073f](https://github.com/AcademySoftwareFoundation/OpenRV/commit/515073fae3833928e95c887760011fbde832831d))
+- Fix stale FFmpeg libs not restaged after decoder config change ([#1388](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1388)) ([300c357](https://github.com/AcademySoftwareFoundation/OpenRV/commit/300c35762d54a341a837fa30274f7d743d16e502))
+
+### GitHub Actions
+
+- Add fallback mirror for pyside6 ([#1414](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1414)) ([1052003](https://github.com/AcademySoftwareFoundation/OpenRV/commit/1052003d80d95b2a14a0b5bad1f477a2f472b5e1))
+- Uncomment if conditions in Conan workflow ([#1382](https://github.com/AcademySoftwareFoundation/OpenRV/pull/1382)) ([8dc11a8](https://github.com/AcademySoftwareFoundation/OpenRV/commit/8dc11a8a00bf77d9f2f94c4f5acb21f633e3dee3))
+
