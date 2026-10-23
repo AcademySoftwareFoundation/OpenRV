@@ -85,7 +85,7 @@ QListView {
     border: 0px;
 }
 
-QListView::item:hover {
+QListView::item:hover:!selected {
     background-color: transparent;
     color: white;
 }
