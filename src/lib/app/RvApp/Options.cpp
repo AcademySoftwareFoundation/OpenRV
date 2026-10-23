@@ -61,6 +61,7 @@ namespace Rv
     static Options* globalOptions = 0;
 
     static ENVVAR_INT(evProgressiveSourceLoading, "RV_PROGRESSIVE_SOURCE_LOADING", 0);
+    static ENVVAR_INT(evExrAutoMaxThreads, "RV_EXR_AUTO_MAX_THREADS", 0);
 
     // If you add a new debugging switch, please update getDebugCategories for
     // the help menu too.
@@ -161,6 +162,40 @@ namespace Rv
                "imagefbolog, "
                "nodes, "
                "plugins";
+    }
+
+    int automaticExrThreadCount()
+    {
+        //  Explicit override wins (for tuning without a rebuild); 0 or unset
+        //  means automatic.
+        if (const int threadCount = evExrAutoMaxThreads.getValue(); threadCount > 0)
+        {
+            return threadCount;
+        }
+
+        const int cores = static_cast<int>(TwkUtil::SystemInfo::numCPUs());
+        if (cores <= 1)
+        {
+            return 1;
+        }
+
+        //  Up to 16 logical cores keep the previous behavior (all but one).
+        //  Above that, add one thread per four extra cores. The decode work
+        //  needed for playback is bounded by the media, not the core count, so
+        //  a large pool (which all readers share) only adds contention with the
+        //  main/UI, audio, caching and compositor threads and drops frames.
+        //  The curve is continuous and monotonic so moving to a machine with
+        //  more cores never lowers the count (e.g. 16 -> 15, 24 -> 17,
+        //  64 -> 27, 128 -> 43). On a 64-logical-core system, 12-32 threads
+        //  played back best and 40+ degraded.
+        constexpr int kAllButOneMaxCores = 16;
+        constexpr int kExtraCoresPerThread = 4;
+        if (cores <= kAllButOneMaxCores)
+        {
+            return cores - 1;
+        }
+
+        return (kAllButOneMaxCores - 1) + ((cores - kAllButOneMaxCores) / kExtraCoresPerThread);
     }
 
     int collectParams(Options::Params& p, const Options::Files& inputFiles, int index)
