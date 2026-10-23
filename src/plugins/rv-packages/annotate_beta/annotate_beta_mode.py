@@ -284,6 +284,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._save_tool_state(tool)
 
     def _on_tool_state_changed(self, attribute, value):
+        self._engine.commit_text_if_active()
         setattr(self._settings.tool_state, attribute, value)
         self._save_tool_state(self._settings.tool)
 
