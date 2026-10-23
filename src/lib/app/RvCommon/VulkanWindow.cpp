@@ -343,6 +343,8 @@ namespace Rv
         if (!initVulkan())
         {
             std::cerr << "ERROR: VulkanWindow: initVulkan failed; falling back to OpenGL" << std::endl;
+            //  initVulkan() can fail after creating the surface or device.
+            releaseVulkanResources();
             requestGLFallback();
             return;
         }
@@ -376,7 +378,7 @@ namespace Rv
         {
             static const VkInstance instance = []() -> VkInstance
             {
-                const std::array<const char*, 2> extensions = {VK_KHR_SURFACE_EXTENSION_NAME, platformSurfaceExtension};
+                const std::array extensions{VK_KHR_SURFACE_EXTENSION_NAME, platformSurfaceExtension};
 
                 VkApplicationInfo appInfo = {};
                 appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
