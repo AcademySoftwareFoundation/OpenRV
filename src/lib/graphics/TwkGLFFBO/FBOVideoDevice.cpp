@@ -260,6 +260,17 @@ namespace TwkGLF
     {
         makeCurrent();
 
+        //
+        //  Delete the FBOs while the context is still current. m_fbo is one of them, so clear it to keep
+        //  ~GLVideoDevice from deleting it again after the context is gone.
+        //
+        for (const GLFBO* fbo : m_fbos)
+        {
+            delete fbo;
+        }
+        m_fbos.clear();
+        m_fbo = nullptr;
+
         if (m_imp)
         {
 #if defined(PLATFORM_DARWIN)
