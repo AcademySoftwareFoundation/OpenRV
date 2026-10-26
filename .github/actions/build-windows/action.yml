@@ -16,6 +16,9 @@ inputs:
     required: true
   msvc-compiler:
     required: true
+  qt-arch:
+    required: false
+    default: 'msvc2019_64'
   windows_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtactiveqt qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -141,7 +144,7 @@ runs:
         version: '${{ inputs.qt-version }}'
         host: 'windows'
         target: 'desktop'
-        arch: 'win64_msvc2019_64'
+        arch: 'win64_${{ inputs.qt-arch }}'
         dir: "c:/"
         install-deps: 'false'
         modules: ${{ inputs.windows_qt6_modules }}
@@ -175,7 +178,7 @@ runs:
     - name: Configure OpenRV
       run: |
         cmake --version
-        export QT_HOME=c:/Qt/${{ inputs.qt-version }}/msvc2019_64
+        export QT_HOME=c:/Qt/${{ inputs.qt-version }}/${{ inputs.qt-arch }}
         cmake -B _build -G "Visual Studio 17 2022" -A x64 -DRV_DEPS_WIN_PERL_ROOT=c:/Strawberry/perl/bin -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DRV_DEPS_QT_LOCATION=$QT_HOME -DRV_VFX_PLATFORM=${{ inputs.vfx-platform }}
       shell: msys2 {0}
 
