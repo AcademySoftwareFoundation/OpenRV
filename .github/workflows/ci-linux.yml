@@ -55,6 +55,7 @@ jobs:
             cmake-version: "3.31.6"
             python-version: "3.13.9"
             vfx-platform: "CY2026"
+            qt-arch: "linux_gcc_64"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -65,6 +66,7 @@ jobs:
             cmake-version: "3.31.6"
             python-version: "3.13.9"
             vfx-platform: "CY2026"
+            qt-arch: "linux_gcc_64"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -83,6 +85,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
+          qt-arch: ${{ matrix.qt-arch }}
 
   # CY2026 Debug - runs when cmake files change or on full matrix
   rocky-linux-debug:
@@ -126,6 +129,7 @@ jobs:
             cmake-version: "3.31.6"
             python-version: "3.13.9"
             vfx-platform: "CY2026"
+            qt-arch: "linux_gcc_64"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -136,6 +140,7 @@ jobs:
             cmake-version: "3.31.6"
             python-version: "3.13.9"
             vfx-platform: "CY2026"
+            qt-arch: "linux_gcc_64"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -154,6 +159,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
+          qt-arch: ${{ matrix.qt-arch }}
 
   # CY2025 - full matrix only (daily/push/dispatch)
   rocky-linux-cy2025:

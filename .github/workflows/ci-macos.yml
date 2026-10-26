@@ -13,6 +13,10 @@ on:
         type: string
         default: 'true'
 
+env:
+  # Qt 6.8.3 has no debug_info module on macOS.
+  CY2026_QT6_MODULES: 'qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+
 jobs:
   # Always runs - CY2026 Release only (PR scope)
   macos-pr:
@@ -58,6 +62,7 @@ jobs:
           cmake-version: ${{ matrix.cmake-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          macos_qt6_modules: ${{ env.CY2026_QT6_MODULES }}
 
   # CY2026 Debug - runs when cmake files change or on full matrix
   macos-debug:
@@ -104,6 +109,7 @@ jobs:
           cmake-version: ${{ matrix.cmake-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          macos_qt6_modules: ${{ env.CY2026_QT6_MODULES }}
 
   macos-cy2025:
     if: ${{ inputs.full_matrix == 'true' }}
