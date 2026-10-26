@@ -12,6 +12,8 @@ from functools import partial
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
+from rv import commands
+
 from annotate_beta_color_picker import ColorPickerPopup
 import annotate_beta_constants as constants
 
@@ -24,9 +26,6 @@ class _Page(Enum):
     TEXT = auto()
     BLEND = auto()
     ERASER = auto()
-
-
-_ICON_SIZE = 16
 
 
 @dataclass(frozen=True)
@@ -53,12 +52,15 @@ _TOOLS = {
 # ---------------------------------------------------------------------------
 
 
-def _tool_button(tooltip="", checkable=True):
+def _tool_button(tooltip: str = "", checkable: bool = True, icon_name: str | None = None):
     button = QtWidgets.QToolButton()
     button.setToolTip(tooltip)
     button.setCheckable(checkable)
     button.setFixedSize(30, 30)
+    button.setIconSize(QtCore.QSize(16, 16))
     button.setProperty("tbstyle", "palette")
+    if icon_name:
+        button.setIcon(_load_icon(icon_name))
     return button
 
 
@@ -300,14 +302,6 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
-def _apply_icon(button, name):
-    icon = _load_icon(name)
-    if not icon.isNull():
-        button.setIcon(icon)
-        button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
-        button.setText("")
-
-
 class _MenuToolButton(QtWidgets.QToolButton):
     """Tool button with a checkable drop-down menu."""
 
@@ -425,9 +419,8 @@ class _PenPanel(_SliderPanel):
         for index, (key, icon_name, tooltip) in enumerate(self._BLEND_MODES):
             if index:
                 self._layout.addSpacing(1)
-            button = _tool_button(tooltip)
+            button = _tool_button(tooltip, icon_name=icon_name)
             button.setProperty("grouppos", positions[index])
-            _apply_icon(button, icon_name)
             button.clicked.connect(partial(self.color_modifier_changed.emit, key))
             self._blend_group.addButton(button)
             self._blend_buttons[key] = button
@@ -566,16 +559,15 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         _add_divider(layout, spacing=5)
 
         self._style_buttons = {}
-        for key, label, signal in (
+        for icon_name, label, signal in (
             ("bold", "Bold", self.font_bold_changed),
             ("italic", "Italic", self.font_italic_changed),
             ("underline", "Underline", self.font_underline_changed),
         ):
-            button = _tool_button(label)
-            _apply_icon(button, key)
+            button = _tool_button(label, icon_name=icon_name)
             button.toggled.connect(signal)
             layout.addWidget(button, alignment=QtCore.Qt.AlignHCenter)
-            self._style_buttons[key] = button
+            self._style_buttons[icon_name] = button
 
         layout.addStretch()
 
@@ -773,8 +765,7 @@ class AnnotateToolStrip(_StyledWidget):
         self._buttons = {}
 
         def _add_tool(tool, grouppos=None):
-            button = _tool_button(_TOOLS[tool].tooltip)
-            _apply_icon(button, tool)
+            button = _tool_button(_TOOLS[tool].tooltip, icon_name=tool)
             if grouppos:
                 button.setProperty("grouppos", grouppos)
             button.clicked.connect(partial(self.tool_changed.emit, tool))
@@ -821,7 +812,6 @@ class AnnotateToolStrip(_StyledWidget):
         self._undo_action.triggered.connect(self.undo_requested)
 
         self._undo_button = _tool_button(checkable=False)
-        self._undo_button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
         self._undo_button.setDefaultAction(self._undo_action)
         self._undo_button.setObjectName("actionButton")
         layout.addWidget(self._undo_button)
@@ -838,35 +828,34 @@ class AnnotateToolStrip(_StyledWidget):
         self._redo_action.triggered.connect(self.redo_requested)
 
         self._redo_button = _tool_button(checkable=False)
-        self._redo_button.setIconSize(QtCore.QSize(_ICON_SIZE, _ICON_SIZE))
         self._redo_button.setDefaultAction(self._redo_action)
         self._redo_button.setObjectName("actionButton")
         layout.addWidget(self._redo_button)
 
         layout.addSpacing(1)
 
-        self._clear_button = _tool_button("Clear Frame", checkable=False)
+        self._clear_frame_action = QtGui.QAction("Clear Frame", self)
+        self._clear_frame_action.triggered.connect(self.clear_requested)
+        self._clear_all_frames_action = QtGui.QAction("Clear All Frames on Timeline", self)
+        self._clear_all_frames_action.triggered.connect(self._on_clear_all_triggered)
+
+        self._clear_button = _tool_button("Clear Frame", checkable=False, icon_name="clear")
         self._clear_button.setObjectName("actionButton")
-        _apply_icon(self._clear_button, "clear")
-        self._clear_button.clicked.connect(self._on_clear_clicked)
+        self._clear_button.setEnabled(False)
+
+        clear_menu = QtWidgets.QMenu(self._clear_button)
+        clear_menu.addActions([self._clear_frame_action, self._clear_all_frames_action])
+        self._clear_button.setMenu(clear_menu)
+        self._clear_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         layout.addWidget(self._clear_button)
 
         self._buttons[constants.Tool.PEN].setChecked(True)
 
-    def _on_clear_clicked(self):
-        menu = QtWidgets.QMenu(self)
-        menu.addAction("Clear Frame", self.clear_requested.emit)
-        menu.addAction("Clear All Frames on Timeline", self._on_clear_all_confirmed)
-        position = self._clear_button.mapToGlobal(QtCore.QPoint(self._clear_button.width() + 2, 0))
-        menu.exec(position)
-
-    def _on_clear_all_confirmed(self):
-        dialog = QtWidgets.QMessageBox(self)
-        dialog.setWindowTitle("Clear Annotations")
-        dialog.setText("Clear all annotations from the current timeline?")
-        dialog.setStandardButtons(QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
-        dialog.setDefaultButton(QtWidgets.QMessageBox.Cancel)
-        if dialog.exec() == QtWidgets.QMessageBox.Ok:
+    def _on_clear_all_triggered(self):
+        choice = commands.alertPanel(
+            True, commands.InfoAlert, "Clear all annotations from the current timeline?", None, "OK", "Cancel", None
+        )
+        if choice == 0:
             self.clear_all_requested.emit()
 
     def set_active_tool(self, tool):
@@ -888,6 +877,11 @@ class AnnotateToolStrip(_StyledWidget):
 
     def set_redo_enabled(self, enabled):
         self._redo_action.setEnabled(enabled)
+
+    def set_clear_enabled(self, clear_frame_enabled, clear_all_frames_enabled):
+        self._clear_frame_action.setEnabled(clear_frame_enabled)
+        self._clear_all_frames_action.setEnabled(clear_all_frames_enabled)
+        self._clear_button.setEnabled(clear_all_frames_enabled)
 
     def set_color(self, color):
         """Update the swatch color display."""
@@ -1002,6 +996,9 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
 
     def set_redo_enabled(self, enabled):
         self._strip.set_redo_enabled(enabled)
+
+    def set_clear_enabled(self, clear_frame_enabled, clear_all_frames_enabled):
+        self._strip.set_clear_enabled(clear_frame_enabled, clear_all_frames_enabled)
 
     def set_tool_enabled(self, tool, enabled):
         self._strip.set_tool_enabled(tool, enabled)

@@ -112,7 +112,6 @@ namespace IPCore
     using namespace TwkGLF;
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
-    static ENVVAR_INT(evMaxConcurrentPBOs, "RV_RENDERING_MAX_CONCURRENT_PBOS", 10);
 
 #define NOT_A_FRAME (std::numeric_limits<int>::min())
 #define NOT_A_COORDINATE (GLuint(-1))
@@ -4279,22 +4278,14 @@ namespace IPCore
         const size_t totalBytes = d->width * d->height * d->depth * d->pixelSize;
         d->id = m_glState->createGLTexture(totalBytes);
 
-        // Note: The minimum size restriction is to prevent an NVIDIA driver
-        // issue The problem is that once a PBO has been used for a transfer <
-        // 128KB it becomes slow when used for larger transfers.
-        // --
-        // Note: The upper limit restriction set on the number of concurrent
-        // PBOs is to prevent an explosion of PBOs allocated when the user
-        // switches to a large layout say with over 20 clips. These extra PBOs
-        // can really stress a system and also make the default layout slow to
-        // appear due to the time it takes to allocate all those extra PBOs.
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && totalBytes > 128 * 1024
-                            && m_uploadedTextures.size() < evMaxConcurrentPBOs.getValue();
-        if (usePBO)
-        {
-            d->pPBOToGPU = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
-        }
+        //  NOTE: The staging PBO used to be allocated here and stored on the
+        //  TextureDescription, which pinned one pool buffer for the whole cache
+        //  lifetime of the texture (~10+ frames). With a large look-ahead cache
+        //  that starved the small fixed pool, forcing most large streaming
+        //  frames onto the slow synchronous client-memory upload path. The PBO
+        //  is now acquired transiently in uploadPlane() and released back to the
+        //  pool immediately after the upload is issued, so a handful of buffers
+        //  can serve an unbounded streaming cache. See uploadPlane().
     }
 
     void ImageRenderer::assignAuxImages(const IPImage* img)
@@ -4675,8 +4666,29 @@ namespace IPCore
         // We should support non-contiguous pixel data in the PBO path.
         const bool contiguousData = (fb->scanlineSize() / fb->pixelSize()) == fb->width();
 
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes && contiguousData;
+        //  Transient staging PBO: acquire it from the pool for this single
+        //  upload (the 128KB minimum avoids an NVIDIA driver slowdown where a
+        //  PBO first used for a tiny transfer stays slow for large ones). It is
+        //  released immediately after the upload is issued (see below), so a
+        //  small pool of buffers can serve an unbounded streaming cache instead
+        //  of one buffer being pinned per resident texture for its cache life.
+        constexpr size_t kMinPBOUploadBytes = 128UL * 1024UL;
+        const bool pboEligible = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
+                                 && fb->scanlinePixelPadding() == 0 && contiguousData && totalBytes > kMinPBOUploadBytes;
+
+        if (pboEligible && !d->pPBOToGPU)
+        {
+            auto pbo = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
+            //  pop() hands back a zero-sized wrapper when the pool is exhausted
+            //  or the request exceeds the max PBO size; fall back to the
+            //  client-memory path in that case.
+            if (pbo->getSize() >= totalBytes)
+            {
+                d->pPBOToGPU = pbo;
+            }
+        }
+
+        const bool usePBO = pboEligible && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes;
 
         bool updateOnly = d->uploaded ? true : false;
 
@@ -4762,6 +4774,13 @@ namespace IPCore
 
             d->pPBOToGPU->unbind();
             d->uploaded = true;
+
+            //  Return the staging PBO to the pool right away so the next frame's
+            //  upload can recycle it instead of it being pinned to this cached
+            //  texture. The pool fences the buffer, so it will not be handed out
+            //  again until this upload's DMA has completed -- releasing now is
+            //  safe and is what lets a small pool serve the whole stream.
+            d->pPBOToGPU.reset();
         }
         else
         {
