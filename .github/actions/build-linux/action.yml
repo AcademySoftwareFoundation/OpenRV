@@ -16,6 +16,9 @@ inputs:
     required: true
   extra_repo:
     required: true
+  qt-arch:
+    required: false
+    default: 'gcc_64'
   rocky_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -210,7 +213,8 @@ runs:
         version: '${{ inputs.qt-version }}'
         host: 'linux'
         target: 'desktop'
-        arch: 'gcc_64'
+        # Qt 6.7+ names this arch linux_gcc_64. aqt installs both into gcc_64.
+        arch: '${{ inputs.qt-arch }}'
         dir: "${{ github.workspace }}/deps"
         install-deps: 'false'
         modules: ${{ inputs.rocky_qt6_modules }}
