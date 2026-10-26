@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import collections
+import math
 import os
 import sys
 import time
@@ -586,12 +587,37 @@ class _WidePopupComboBox(QtWidgets.QComboBox):
 class _BrushTypeComboBox(_WidePopupComboBox):
     """Combo box whose closed field shows the selected brush's image instead of its name."""
 
+    _STAMP_SIZE = 10
+    _STROKE_STEP = _STAMP_SIZE // 4
+    _STROKE_AMPLITUDE = _STAMP_SIZE // 2
+    _STROKE_COUNT = 40
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setToolTip("Brush types")
-        self.setItemDelegate(_CheckedItemDelegate(self))
         self._icon = _load_icon("erase_gauss")  # placeholder icon
-        self.addItems(["BrushNameHere"] * 20)  # placeholder brush items
+        self.setItemDelegate(_BrushItemDelegate(self))
+        preview = self._paint_stroke_preview()
+        for name in ["BrushNameHere"] * 20:  # placeholder brush items
+            self.addItem(name)
+            self.setItemData(self.count() - 1, preview, _BrushItemDelegate.PREVIEW_ROLE)
+
+    def _paint_stroke_preview(self):
+        device_pixel_ratio = self.devicePixelRatioF()
+        width = (self._STROKE_COUNT - 1) * self._STROKE_STEP + self._STAMP_SIZE
+        height = self._STAMP_SIZE + 2 * self._STROKE_AMPLITUDE
+        pixmap = QtGui.QPixmap(round(width * device_pixel_ratio), round(height * device_pixel_ratio))
+        pixmap.setDevicePixelRatio(device_pixel_ratio)
+        pixmap.fill(QtCore.Qt.transparent)
+        painter = QtGui.QPainter(pixmap)
+        for i in range(self._STROKE_COUNT):
+            x = i * self._STROKE_STEP
+            y = self._STROKE_AMPLITUDE - round(
+                self._STROKE_AMPLITUDE * math.sin(2 * math.pi * i / (self._STROKE_COUNT - 1))
+            )
+            self._icon.paint(painter, QtCore.QRect(x, y, self._STAMP_SIZE, self._STAMP_SIZE))
+        painter.end()
+        return pixmap
 
     def paintEvent(self, event):
         painter = QtWidgets.QStylePainter(self)
@@ -653,6 +679,30 @@ class _CheckedItemDelegate(QtWidgets.QStyledItemDelegate):
         size = super().sizeHint(option, index)
         size.setHeight(option.fontMetrics.height() + 8)
         return size
+
+
+class _BrushItemDelegate(_CheckedItemDelegate):
+    """Draws the brush name with its preview stroke underneath."""
+
+    PREVIEW_ROLE = QtCore.Qt.UserRole
+
+    def paint(self, painter, option, index):
+        style = QtWidgets.QApplication.style()
+        style.drawPrimitive(QtWidgets.QStyle.PE_PanelItemViewItem, option, painter, option.widget)
+        preview = index.data(self.PREVIEW_ROLE)
+        size = preview.deviceIndependentSize().toSize()
+        name_option = QtWidgets.QStyleOptionViewItem(option)
+        name_option.rect.setHeight(option.rect.height() - size.height())
+        super().paint(painter, name_option, index)
+        self.initStyleOption(name_option, index)
+        text_rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemText, name_option, None)
+        x = text_rect.left() + (text_rect.width() - size.width()) // 2
+        painter.drawPixmap(x, name_option.rect.bottom() + 1, preview)
+
+    def sizeHint(self, option, index):
+        size = super().sizeHint(option, index)
+        preview_size = index.data(self.PREVIEW_ROLE).deviceIndependentSize().toSize()
+        return QtCore.QSize(max(size.width(), preview_size.width()), size.height() + preview_size.height())
 
 
 class _FontNameDelegate(_CheckedItemDelegate):
