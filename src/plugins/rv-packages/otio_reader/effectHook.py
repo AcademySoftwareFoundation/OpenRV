@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import sys
-from rv import commands
+
 import opentimelineio as otio
+from rv import commands
 
 SET_NODE_TYPE_MAP = {
     float: commands.setFloatProperty,
@@ -44,7 +45,7 @@ def set_rv_effect_props(node_component, prop_map):
     """
     for prop, value in prop_map.items():
         if value is not None:
-            _set_rv_prop("{}.{}".format(node_component, prop), _get_rv_value(value))
+            _set_rv_prop(f"{node_component}.{prop}", _get_rv_value(value))
 
 
 def add_rv_effect_props(node_component, prop_map):
@@ -60,7 +61,7 @@ def add_rv_effect_props(node_component, prop_map):
     """
     for prop, value in prop_map.items():
         if value is not None:
-            prop_name = "{}.{}".format(node_component, prop)
+            prop_name = f"{node_component}.{prop}"
             rv_value = _get_rv_value(value)
 
             commands.newProperty(prop_name, ADD_NODE_TYPE_MAP[type(rv_value[0])], len(rv_value))
@@ -96,7 +97,7 @@ def get_otio_metadata(node_component):
         node_component : str
             The RV node and component containing the metadata
     """
-    metadata_prop = "{}.otio_metadata".format(node_component)
+    metadata_prop = f"{node_component}.otio_metadata"
     if commands.propertyExists(metadata_prop):
         metadata_str = commands.getStringProperty(metadata_prop)[0]
         return otio.core.deserialize_json_from_string(metadata_str)
@@ -115,4 +116,4 @@ def _set_rv_prop(prop_name, value):
     try:
         SET_NODE_TYPE_MAP[type(value[0])](prop_name, value, True)
     except KeyError:
-        raise NoMappingForRvNode("No RV node found for type {}".format(type(value[0])))
+        raise NoMappingForRvNode(f"No RV node found for type {type(value[0])}")

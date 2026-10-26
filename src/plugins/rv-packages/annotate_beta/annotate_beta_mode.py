@@ -3,14 +3,12 @@
 
 from functools import partial
 
-from rv import commands, extra_commands, rvtypes, qtutils
-
-from PySide6 import QtCore, QtWidgets, QtGui
-
 import annotate_beta_constants as constants
 import annotate_beta_paint as paint
 from annotate_beta_engine import AnnotateDrawEngine, DrawSettings, ToolState
 from annotate_beta_widget import AnnotateToolbarDockWidget
+from PySide6 import QtCore, QtGui, QtWidgets
+from rv import commands, extra_commands, qtutils, rvtypes
 
 _TOOL_CURSORS = {constants.Tool.CURSOR: QtCore.Qt.ArrowCursor, constants.Tool.TEXT: QtCore.Qt.IBeamCursor}
 

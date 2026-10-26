@@ -83,6 +83,7 @@ If you need to, RV can load sources asynchronously, also known as progressive so
 
 ```python
 from rv import commands as rvc
+
 rvc.setProgressiveSourceLoading(True)
 ```
 
@@ -120,7 +121,7 @@ You can expect this sequence of events:
 Enabling progressive source loading significantly increases the complexity of scripting. Consider the following example:
 
 ```python
-rv.commands.addSource('/my/clip/1')
+rv.commands.addSource("/my/clip/1")
 rv.commands.setFPS(60.00)
 ```
 
@@ -201,7 +202,7 @@ A full property name has three parts: the node name, the component name, and the
 or in Python:
 
 ```py
-setFloatProperty("display.color.gamma",  [2.2, 2.2, 2.2], True) 
+setFloatProperty("display.color.gamma", [2.2, 2.2, 2.2], True)
 ```
 
 In this case the value is being set to 2.2.
@@ -231,7 +232,7 @@ setFloatProperty("#RVColor.color.exposure", float[] {2.0, 2.0, 2.0}, true)
 or in Python:
 
 ```py
-setFloatProperty("#RVColor.color.exposure", [2.0, 2.0, 2.0], True) 
+setFloatProperty("#RVColor.color.exposure", [2.0, 2.0, 2.0], True)
 ```
 
 In sequence mode (i.e. the default case), only one RVColor node is usually active at a time (the one belonging to the source being viewed at the current frame). In stack mode, the RVColor nodes for all of the sources could be active. In that case, they will all have their exposure set. In the UI, properties are almost exclusively addressed in this manner so that making changes affects the currently visible sources only. See figure [2.9](#active-nodes-in-the-image-processing-graph) for a diagrammatic explanation.

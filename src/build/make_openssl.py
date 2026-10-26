@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # *****************************************************************************
 # Copyright 2020 Autodesk, Inc. All rights reserved.
@@ -12,12 +11,11 @@ import argparse
 import glob
 import os
 import pathlib
+import platform
 import shutil
 import subprocess
-import platform
 import tempfile
 import uuid
-from typing import List
 
 SOURCE_DIR = ""
 OUTPUT_DIR = ""
@@ -26,7 +24,7 @@ PERL_ROOT = ""
 LIB_DIR = ""
 
 
-def get_openssl_args(root) -> List[str]:
+def get_openssl_args(root) -> list[str]:
     """
     Return the path to the openssl binary given a package root.
 

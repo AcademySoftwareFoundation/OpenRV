@@ -7,10 +7,9 @@ import os
 import uuid
 from collections.abc import Iterable
 
-from rv import commands
-
 import annotate_beta_constants as constants
 from annotate_beta_types import PaintComponent, PaintFrame
+from rv import commands
 
 BOX_PREFIXES = frozenset({"rect", "ellipse"})
 

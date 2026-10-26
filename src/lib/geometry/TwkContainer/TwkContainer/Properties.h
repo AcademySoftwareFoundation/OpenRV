@@ -42,13 +42,13 @@ namespace TwkContainer
     // };
 
     // #define PROPERTY_TRAITS(PTYPENAME, TYPE, TYPENAME, LAYOUT, WIDTH)       \
-// template <> const char* PropertyTraits<TYPE>::typeName();               \
-// template <> Property::Layout PropertyTraits<TYPE>::layout();            \
-// template <> size_t PropertyTraits<TYPE>::xsize();                       \
-// template <> size_t PropertyTraits<TYPE>::ysize();                       \
-// template <> size_t PropertyTraits<TYPE>::zsize();                       \
-// typedef TypedProperty<PropertyTraits<TYPE>::Container,                  \
-//                 WIDTH, 0, 0, Property::LAYOUT> PTYPENAME;
+    // template <> const char* PropertyTraits<TYPE>::typeName();               \
+    // template <> Property::Layout PropertyTraits<TYPE>::layout();            \
+    // template <> size_t PropertyTraits<TYPE>::xsize();                       \
+    // template <> size_t PropertyTraits<TYPE>::ysize();                       \
+    // template <> size_t PropertyTraits<TYPE>::zsize();                       \
+    // typedef TypedProperty<PropertyTraits<TYPE>::Container,                  \
+    //                 WIDTH, 0, 0, Property::LAYOUT> PTYPENAME;
 
 #define PROPERTY_TRAITS(PTYPENAME, TYPE, TYPENAME, LAYOUT, WIDTH) \
     typedef TypedProperty<std::vector<TYPE>, WIDTH, 0, 0, 0, Property::LAYOUT> PTYPENAME;
