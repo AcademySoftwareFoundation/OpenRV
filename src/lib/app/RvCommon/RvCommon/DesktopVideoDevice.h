@@ -281,15 +281,16 @@ namespace Rv
 
         //  As above, with the backend supplied by the caller. Use once the main view is live.
         static std::vector<VideoDevice*> createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                   bool useVulkan);
+                                                                   bool useNative);
 
         //
         //  Presentation backend for the initial build: true for a 10-bit request
-        //  this machine's Vulkan can present. Reads the persisted preference,
-        //  which can differ from the live main-view backend, so it must not be
-        //  used once a view exists. Always false on macOS.
+        //  this machine's native backend (Vulkan on Linux and Windows, Metal on
+        //  macOS) can present. Reads the persisted preference, which can differ
+        //  from the live main-view backend, so it must not be used once a view
+        //  exists.
         //
-        static bool shouldUseVulkanPresentation();
+        static bool shouldUseNativePresentation();
 
         //  True when the persisted display depth is RGB 10 + A 2.
         static bool tenBitDisplayRequested();
