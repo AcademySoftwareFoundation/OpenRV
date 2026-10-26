@@ -4,7 +4,7 @@ Open RV 2025 can be built for Windows using the [VFX reference platform](https:/
 
 Select your VFX reference platform by clicking on the appropriate tab. Install instructions follows.
 
-* NOTE: CY2025 and CY2026 are experimental.  Noteably CY2026 for RV is still on Qt 6.5.3 pending changes necessary for 6.8.3
+* NOTE: CY2026 is the default. Pass `-DRV_VFX_PLATFORM=CY2025` (or another year) to the CMake configure step to build a different VFX platform.
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2026
@@ -16,7 +16,7 @@ OCIO                : 2.5.0
 OpenEXR             : 3.4.3
 OpenSSL             : 3.6.0
 Python              : 3.13.9
-Qt                  : 6.8.3 ** RV Still on 6.5.3 pending work
+Qt                  : 6.8.3
 Visual Studio       : 2022 (MSVC v143 14.40.X)
 
 ```

@@ -14,7 +14,7 @@ OCIO                : 2.5.0
 OpenEXR             : 3.4.3
 OpenSSL             : 3.6.0
 Python              : 3.13.9
-Qt                  : 6.8.3 ** RV Still on 6.5.3 pending work
+Qt                  : 6.8.3
 
 Config manager repo : powertools  (Rocky 8)
 Config manager repo : crb         (Rocky 9)
