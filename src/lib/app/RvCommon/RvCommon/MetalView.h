@@ -1,0 +1,249 @@
+//
+//  Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
+//
+//  SPDX-License-Identifier: Apache-2.0
+//
+#pragma once
+
+#ifdef PLATFORM_DARWIN
+
+#include <QWidget>
+#include <QtCore/QSize>
+#include <QtCore/QEvent>
+#include <QtCore/QTimer>
+#include <TwkUtil/Timer.h>
+
+#include <array>
+#include <memory>
+
+class QKeyEvent;
+
+namespace IPCore
+{
+    class Session;
+}
+
+namespace Rv
+{
+    class RvDocument;
+    class QTMetalVideoDevice;
+
+    //  Creates a w x h kCVPixelFormatType_ARGB2101010LEPacked IOSurface.
+    //  Returns a retained IOSurfaceRef (the caller CFReleases it), or nullptr.
+    void* createArgb2101010Surface(int w, int h);
+
+    //
+    //  MetalView
+    //
+    //  A QWidget whose native NSView hosts a CALayer backed by an IOSurface,
+    //  for true 10-bit display on macOS. IPCore renders in OpenGL through
+    //  QTMetalVideoDevice's offscreen context; the IOSurface only delivers the
+    //  final pixels.
+    //
+    //  CAMetalLayer is not used because the CA compositor tiles
+    //  MTLPixelFormatBGR10A2Unorm 4x horizontally; it composites
+    //  kCVPixelFormatType_ARGB2101010LEPacked IOSurfaces correctly at 8 and
+    //  10 bits. A QWidget (not a QWindow) gets Qt layout and event routing,
+    //  and Qt's backing store does not affect the layer's contents.
+    //
+    //  Use this class only when USE_METAL is defined.
+    //
+    class MetalView : public QWidget
+    {
+        Q_OBJECT
+
+    public:
+        using Timer = TwkUtil::Timer;
+
+        //  presentationMode builds a passive second-display surface driven by a
+        //  MetalDesktopVideoDevice: doc must be null, and the view never drives
+        //  the session or triggers the main-window GL fallback.
+        explicit MetalView(RvDocument* doc, QWidget* parent = nullptr, bool noResize = true, bool presentationMode = false);
+        ~MetalView() override;
+
+        QTMetalVideoDevice* videoDevice() const { return m_videoDevice.get(); }
+
+        bool isPresentationMode() const { return m_presentationMode; }
+
+        //
+        //  True when a Metal device exists and the OS can create the 10-bit
+        //  IOSurface format. Static and side-effect-free so RvDocument can pick
+        //  the Metal (10-bit) or OpenGL (8-bit) backend before building a view.
+        //  Mirrors VulkanView::supports10BitPresentation().
+        //
+        static bool supports10BitPresentation();
+
+        //  Pixels go through the CALayer/IOSurface, so Qt gets no paint engine
+        //  (see WA_PaintOnScreen in the .mm).
+        QPaintEngine* paintEngine() const override { return nullptr; }
+
+        void setEventWidget(QWidget* widget);
+
+        void stopProcessingEvents();
+
+        bool event(QEvent* event) override;
+        bool eventFilter(QObject* object, QEvent* event) override;
+
+        bool firstPaintCompleted() const { return m_firstPaintCompleted; }
+
+        void setContentSize(int w, int h) { m_csize = QSize(w, h); }
+
+        void setMinimumContentSize(int w, int h) { m_msize = QSize(w, h); }
+
+        QSize sizeHint() const override { return m_csize; }
+
+        QSize minimumSizeHint() const override { return m_msize; }
+
+        void absolutePosition(int& x, int& y) const;
+
+        float devicePixelRatio() const;
+
+        //
+        //  CPU-fallback present, called by QTMetalVideoDevice::syncBuffers().
+        //  pixels: packed ARGB2101010LE, (3<<30)|(R<<20)|(G<<10)|B, row 0 at
+        //  the top (the caller flips GL's bottom-left origin). w, h are
+        //  physical pixels (view size x DPR).
+        //
+        void presentPixelData(const void* pixels, int w, int h);
+
+        //  Shows an IOSurface the caller owns (the zero-copy path) and records
+        //  it for re-present on expose.
+        void presentIOSurface(void* ioSurfaceRef);
+
+        //  Posts at most one QEvent::UpdateRequest per event-loop cycle, the
+        //  coalescing QWidget::update() gives the GL path.
+        void requestUpdate();
+
+        // Synchronous render (used by redrawImmediately); bypasses UpdateRequest coalescing.
+        void renderImmediately();
+
+    public slots:
+        void eventProcessingTimeout();
+
+    protected:
+        //  Called once when the widget is first shown.
+        void initialize();
+
+        //  Called each time a new frame should be rendered.
+        void render();
+
+        void showEvent(QShowEvent* event) override;
+        void resizeEvent(QResizeEvent* event) override;
+        void paintEvent(QPaintEvent* event) override;
+
+    private:
+        //  Presents the session's output device when it is a separate window,
+        //  then makes this view's GL context current again.
+        void syncOutputDevice(const IPCore::Session* session) const;
+
+        //  Maps events into the output device's domain in mirror display mode.
+        void updateTranslatorMapping(const IPCore::Session* session);
+
+        //  Restarts the activity timers; returns the seconds from window
+        //  activation to the first click, else 0.
+        float trackActivity(const QEvent* event);
+
+        //  True when kevent repeats the previous key event; records kevent.
+        bool isRepeatedKey(const QKeyEvent* kevent);
+
+        //  Matches the layer's scale and gravity to the current screen and flip.
+        void updateLayerGeometry();
+
+        //  Makes the offscreen GL context current; after repeated failures,
+        //  queues the fallback to the OpenGL GLView.
+        bool makeContextCurrent();
+
+        //  Adds the time since the last frame to the -debug gpu averages.
+        void beginFrameDiagnostics();
+
+        //  Sends "user-inactive" once the user has been idle long enough.
+        void reportUserInactivity();
+
+        //  Fits and centers the window on the first non-empty render.
+        void fitWindowToFirstContent(IPCore::Session* session);
+
+        //  Gives the event widget focus on FocusIn or Enter.
+        void handleFocusEvent(const QEvent* event);
+
+        //  Maps event through the translator into the session; true if consumed.
+        bool sendToSession(QEvent* event, IPCore::Session* session, float activationTime);
+
+        //  Presents this view and the output device, then ends the session frame.
+        void presentFrame(IPCore::Session* session, bool diag);
+
+        //  Logs and resets the -debug gpu frame averages.
+        void logFrameDiagnostics();
+
+        //  (Re)creates the CPU-fallback surfaces at w x h. On failure keeps the
+        //  old ones, so the last frame stays on screen, and returns false.
+        bool ensureCpuSurfaces(int w, int h);
+        void releaseCpuSurfaces();
+
+        //  The next CPU-fallback surface the window server no longer holds
+        //  (IOSurfaceIsInUse()), else the one not presented last.
+        void* nextCpuSurface();
+
+        //  Gives nativeView a new CALayer showing the last presented frame.
+        void attachLayer(WId nativeView);
+
+        //  Re-attaches the layer when Qt has replaced the native view.
+        void handleNativeViewChange();
+
+        RvDocument* m_doc{nullptr};
+        std::unique_ptr<QTMetalVideoDevice> m_videoDevice;
+        bool m_presentationMode{false};
+
+        bool m_initialized{false};
+        bool m_firstPaintCompleted{false};
+        bool m_postFirstNonEmptyRender{false}; // mirrors GLView::m_postFirstNonEmptyRender
+        bool m_stopProcessingEvents{false};
+        bool m_userActive{true};
+
+        QSize m_csize{1024, 576};
+        QSize m_msize{128, 128};
+        QWidget* m_eventWidget{nullptr};
+
+        int m_lastKey{0};
+        QEvent::Type m_lastKeyType{QEvent::None};
+        Timer m_activityTimer;
+        Timer m_activationTimer;
+        QTimer m_eventProcessingTimer;
+
+        //  Stored as void* to keep the header pure C++.
+        void* m_caLayer{nullptr}; // CALayer*
+        //  CPU-fallback IOSurfaceRefs, owned. Two, so presentPixelData() never
+        //  writes into the one on screen.
+        static constexpr int cpuSurfaceCount = 2;
+        std::array<void*, cpuSurfaceCount> m_cpuSurfaces{};
+        int m_cpuSurfaceWidth{0};
+        int m_cpuSurfaceHeight{0};
+        int m_cpuSurfaceIndex{0};
+
+        //  Last IOSurface on the CALayer, re-presented on expose. Not owned:
+        //  the CALayer retains its contents.
+        void* m_lastPresentedSurface{nullptr};
+
+        //  Set while an UpdateRequest posted by requestUpdate() is pending.
+        bool m_updatePending{false};
+
+        //  Consecutive render() calls without a ready GL context; reset on success.
+        int m_contextFailureCount{0};
+
+        //  -debug gpu frame-time sums since the last log (as VulkanWindow).
+        struct FrameDiagnostics
+        {
+            unsigned int frames{0};
+            double renderMs{0.0};
+            double mainPresentMs{0.0};
+            double outputPresentMs{0.0};
+            double postRenderMs{0.0};
+            double frameIntervalMs{0.0};
+        };
+
+        FrameDiagnostics m_diag;
+        Timer m_diagFrameTimer;
+    };
+
+} // namespace Rv
+
+#endif // PLATFORM_DARWIN
