@@ -281,6 +281,12 @@ runs:
         rm -rf _build/_deps
       shell: bash
 
+    # The install removes absolute RUNPATH entries in place (src/build/remove_absolute_runpath.py). Its self-test includes a real program that must still load
+    # its library once the absolute directory is gone.
+    - name: Check the RUNPATH cleanup
+      run: python3 src/build/test_remove_absolute_runpath.py
+      shell: bash
+
     - name: Install OpenRV
       run: cmake --install _build --prefix $(pwd)/_install --config ${{ inputs.build-type }}
       shell: bash
