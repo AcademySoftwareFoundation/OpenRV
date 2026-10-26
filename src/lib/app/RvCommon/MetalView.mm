@@ -108,15 +108,14 @@ namespace
         }
         CFRelease(probe);
 
-        // Informational only: an SDR panel still composites 10-bit content but
-        // may dither or truncate it at scanout (Vulkan also presents 10-bit there).
+        // Informational only. macOS does not expose the scanout bit depth, and
+        // NSScreen depth reports 8 bits even on 10-bit panels, so log the EDR
+        // headroom instead (> 1.0 means the display is HDR/EDR capable).
         if (NSScreen* screen = [NSScreen mainScreen])
         {
-            const NSInteger bps = NSBitsPerSampleFromDepth([screen depth]);
-            const char* note = bps >= 10 ? " (deep color: 10-bit reaches the panel).\n"
-                                         : " (SDR 8-bit: 10-bit content is composited but "
-                                           "may be dithered/truncated at scanout).\n";
-            std::cerr << "INFO: [MetalView] main display bits-per-sample = " << static_cast<long>(bps) << note;
+            const CGFloat headroom = [screen maximumPotentialExtendedDynamicRangeColorComponentValue];
+            const char* note = headroom > 1.0 ? " (HDR/EDR capable).\n" : " (SDR).\n";
+            std::cerr << "INFO: [MetalView] main display EDR headroom = " << static_cast<double>(headroom) << note;
         }
 
         return true;

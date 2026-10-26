@@ -1139,13 +1139,9 @@ namespace Rv
     }
 
     std::vector<VideoDevice*> DesktopVideoDevice::createDesktopVideoDevices(TwkApp::VideoModule* module, const QTGLVideoDevice* shareDevice,
-                                                                            bool useNative)
+                                                                            [[maybe_unused]] bool useNative)
     {
         std::vector<VideoDevice*> devices;
-
-#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
-        (void)useNative;
-#endif
 
         const auto screens = QGuiApplication::screens();
         for (int screen = 0; screen < screens.size(); screen++)

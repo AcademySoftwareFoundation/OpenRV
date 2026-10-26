@@ -523,6 +523,11 @@ namespace Rv
         {
             m_vulkanView->stopProcessingEvents();
         }
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+        if (m_metalView)
+        {
+            m_metalView->stopProcessingEvents();
+        }
 #endif
 
         if (IPCore::debugProfile)

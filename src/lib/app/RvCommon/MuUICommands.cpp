@@ -1074,11 +1074,7 @@ namespace Rv
         // Hardware stereo needs a stereo QSurfaceFormat on the GLView. The
         // Vulkan and Metal views present through a single-layer swapchain or
         // an IOSurface, so there is no quad-buffer surface.
-        if (!doc->view() && doc->viewVideoDevice())
-        {
-            NODE_RETURN(false);
-        }
-        NODE_RETURN(true);
+        NODE_RETURN(doc->view() != nullptr || doc->viewVideoDevice() == nullptr);
     }
 
     NODE_IMPLEMENTATION(watchFile, void)

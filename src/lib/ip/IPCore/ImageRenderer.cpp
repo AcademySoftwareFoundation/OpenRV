@@ -47,6 +47,7 @@
 #include <half.h>
 #include <atomic>
 #include <iostream>
+#include <mutex>
 #include <stl_ext/string_algo.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -666,13 +667,13 @@ namespace IPCore
         m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
         if (!m_uploadThreadDevice)
         {
-            static bool logged = false;
-            if (!logged)
-            {
-                logged = true;
-                std::cerr << "WARNING: [ImageRenderer] threaded GPU upload unavailable; "
-                             "falling back to synchronous upload\n";
-            }
+            static std::once_flag logged;
+            std::call_once(logged,
+                           []
+                           {
+                               std::cerr << "WARNING: [ImageRenderer] threaded GPU upload unavailable; "
+                                            "falling back to synchronous upload\n";
+                           });
             setUseThreadedUpload(false);
             return;
         }
