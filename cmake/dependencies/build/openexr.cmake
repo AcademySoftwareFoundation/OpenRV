@@ -55,12 +55,12 @@ ENDIF()
 # OpenEXR tools are not needed.
 LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
 
-# OpenEXR 3.4+ needs OpenJPH for HTJ2K. Point it at RV's OpenJPH, as OIIO does. Otherwise it fetches its own copy from GitHub at configure time, ships a second
-# OpenJPH, and a stale openjph config left by a previous build makes the fetched target collide with an imported one.
+# CY2026+ (OpenEXR 3.4+) needs OpenJPH for HTJ2K. Point OpenEXR at RV's OpenJPH, as OIIO does. Otherwise it fetches its own copy from GitHub at configure time,
+# ships a second OpenJPH, and a stale openjph config left by a previous build makes the fetched target collide with an imported one.
 SET(_openexr_depends
     Imath::Imath ZLIB::ZLIB
 )
-IF(RV_DEPS_OPENEXR_VERSION VERSION_GREATER_EQUAL "3.4")
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2026")
   LIST(APPEND _configure_options "-Dopenjph_ROOT=${RV_DEPS_OPENJPH_ROOT_DIR}")
   LIST(APPEND _openexr_depends OpenJph::OpenJph)
 ENDIF()
