@@ -55,6 +55,16 @@ ENDIF()
 # OpenEXR tools are not needed.
 LIST(APPEND _configure_options "-DOPENEXR_BUILD_TOOLS=OFF")
 
+# OpenEXR 3.4+ needs OpenJPH for HTJ2K. Point it at RV's OpenJPH, as OIIO does. Otherwise it fetches its own copy from GitHub at configure time, ships a second
+# OpenJPH, and a stale openjph config left by a previous build makes the fetched target collide with an imported one.
+SET(_openexr_depends
+    Imath::Imath ZLIB::ZLIB
+)
+IF(RV_DEPS_OPENEXR_VERSION VERSION_GREATER_EQUAL "3.4")
+  LIST(APPEND _configure_options "-Dopenjph_ROOT=${RV_DEPS_OPENJPH_ROOT_DIR}")
+  LIST(APPEND _openexr_depends OpenJph::OpenJph)
+ENDIF()
+
 # Disable OpenEXR's automatic rpath setup to avoid conflicts with RV's rpath management OpenEXR 3.3+ automatically adds @loader_path/../lib which conflicts with
 # our install scripts
 LIST(APPEND _configure_options "-DCMAKE_INSTALL_RPATH=")
@@ -67,7 +77,7 @@ EXTERNALPROJECT_ADD(
   DOWNLOAD_DIR ${RV_DEPS_DOWNLOAD_DIR}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
   SOURCE_DIR ${RV_DEPS_BASE_DIR}/${_target}/src
-  DEPENDS Imath::Imath ZLIB::ZLIB
+  DEPENDS ${_openexr_depends}
   INSTALL_DIR ${_install_dir}
   PATCH_COMMAND ${_patch_command}
   CONFIGURE_COMMAND ${CMAKE_COMMAND} ${_configure_options}
