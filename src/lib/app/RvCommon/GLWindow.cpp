@@ -27,6 +27,7 @@
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QApplication>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 #include <cmath>
@@ -68,6 +69,57 @@ namespace Rv
 
         GLFrameDiag s_glDiag;
         TwkUtil::Timer s_glDiagLoopTimer;
+
+        //
+        //  While a widget popup (e.g. the right-click menu) is open, hand it
+        //  the mouse presses and key events that land on this window, as
+        //  QWidgetWindow does for widget windows. This window is a plain
+        //  QWindow, so Qt does not do it for us. Without it, the popup on macOS
+        //  never sees the outside click or the Escape key that should close it,
+        //  because Cocoa popups do not grab input. X11 popups grab the pointer
+        //  and keyboard, so on Linux the events reach the popup anyway.
+        //
+        bool forwardToActivePopup(QEvent* event)
+        {
+            QWidget* popup = QApplication::activePopupWidget();
+            if (popup == nullptr)
+            {
+                return false;
+            }
+
+            switch (event->type())
+            {
+            case QEvent::MouseButtonPress:
+            case QEvent::MouseButtonDblClick:
+            {
+                //  The popup closes itself (and its parent menus) on a press
+                //  outside its rect.
+                const auto* mouseEvent = dynamic_cast<const QMouseEvent*>(event);
+                if (mouseEvent == nullptr)
+                {
+                    return false;
+                }
+
+                const QPointF globalPosition = mouseEvent->globalPosition();
+                QMouseEvent popupEvent(QEvent::MouseButtonPress, popup->mapFromGlobal(globalPosition), globalPosition, mouseEvent->button(),
+                                       mouseEvent->buttons(), mouseEvent->modifiers(), mouseEvent->pointingDevice());
+                QCoreApplication::sendEvent(popup, &popupEvent);
+                break;
+            }
+            case QEvent::KeyPress:
+            case QEvent::KeyRelease:
+            {
+                QWidget* receiver = popup->focusWidget() != nullptr ? popup->focusWidget() : popup;
+                QCoreApplication::sendEvent(receiver, event);
+                break;
+            }
+            default:
+                return false;
+            }
+
+            event->accept();
+            return true;
+        }
     } // namespace
 
     using namespace std;
@@ -528,6 +580,11 @@ namespace Rv
         if (m_stopProcessingEvents)
         {
             event->accept();
+            return true;
+        }
+
+        if (forwardToActivePopup(event))
+        {
             return true;
         }
 
