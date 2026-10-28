@@ -242,7 +242,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     shape_uuid = str(uuid.uuid4())
 
     color = settings.tool_state.color
-    rgba = [color.redF(), color.greenF(), color.blueF(), 1.0]
+    rgba = [color.redF(), color.greenF(), color.blueF(), settings.tool_state.opacity / 100.0]
     font_weight = "bold" if settings.font_bold else "normal"
     font_style = "italic" if settings.font_italic else "normal"
     text_decoration = "underline" if settings.font_underline else "none"
