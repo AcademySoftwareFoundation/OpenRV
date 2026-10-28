@@ -13,8 +13,12 @@ on:
         type: string
         default: 'true'
 
+env:
+  # Qt 6.8.3 has no debug_info module on macOS.
+  CY2026_QT6_MODULES: 'qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
+
 jobs:
-  # Always runs — CY2025 Release only (PR scope)
+  # Always runs - CY2026 Release only (PR scope)
   macos-pr:
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
@@ -30,19 +34,19 @@ jobs:
           - os: "macos-15"
             arch-type: "x86_64"
             build-type: "Release"
-            qt-version: "6.5.3"
-            qt-version-short: "6.5"
-            python-version: "3.11"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2025"
+            vfx-platform: "CY2026"
           - os: "macos-14"
             arch-type: "arm64"
             build-type: "Release"
-            qt-version: "6.5.3"
-            qt-version-short: "6.5"
-            python-version: "3.11"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2025"
+            vfx-platform: "CY2026"
     steps:
       - name: Check out repository code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
@@ -58,8 +62,9 @@ jobs:
           cmake-version: ${{ matrix.cmake-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          macos_qt6_modules: ${{ env.CY2026_QT6_MODULES }}
 
-  # CY2025 Debug — runs when cmake files change or on full matrix
+  # CY2026 Debug - runs when cmake files change or on full matrix
   macos-debug:
     if: ${{ inputs.run_debug == 'true' }}
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
@@ -76,19 +81,19 @@ jobs:
           - os: "macos-15"
             arch-type: "x86_64"
             build-type: "Debug"
-            qt-version: "6.5.3"
-            qt-version-short: "6.5"
-            python-version: "3.11"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2025"
+            vfx-platform: "CY2026"
           - os: "macos-14"
             arch-type: "arm64"
             build-type: "Debug"
-            qt-version: "6.5.3"
-            qt-version-short: "6.5"
-            python-version: "3.11"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2025"
+            vfx-platform: "CY2026"
     steps:
       - name: Check out repository code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
@@ -104,8 +109,9 @@ jobs:
           cmake-version: ${{ matrix.cmake-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          macos_qt6_modules: ${{ env.CY2026_QT6_MODULES }}
 
-  macos-cy2024:
+  macos-cy2025:
     if: ${{ inputs.full_matrix == 'true' }}
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
@@ -125,7 +131,7 @@ jobs:
             qt-version-short: "6.5"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
           - os: "macos-14"
             arch-type: "arm64"
             build-type: "Release"
@@ -133,7 +139,7 @@ jobs:
             qt-version-short: "6.5"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
           - os: "macos-15"
             arch-type: "x86_64"
             build-type: "Debug"
@@ -141,7 +147,7 @@ jobs:
             qt-version-short: "6.5"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
           - os: "macos-14"
             arch-type: "arm64"
             build-type: "Debug"
@@ -149,7 +155,7 @@ jobs:
             qt-version-short: "6.5"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
     steps:
       - name: Check out repository code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2

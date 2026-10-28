@@ -16,6 +16,9 @@ inputs:
     required: true
   extra_repo:
     required: true
+  qt-arch:
+    required: false
+    default: 'gcc_64'
   rocky_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -68,7 +71,7 @@ runs:
              dnf groupinstall "Development Tools" -y && \
              dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Time-Piece && \
              dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel && \
-             dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel && \
+             dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel libatomic && \
              if [ "${{ inputs.rocky-version }}" = "9" ]; then \
                dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel; \
              else \
@@ -210,7 +213,8 @@ runs:
         version: '${{ inputs.qt-version }}'
         host: 'linux'
         target: 'desktop'
-        arch: 'gcc_64'
+        # Qt 6.7+ names this arch linux_gcc_64. aqt installs both into gcc_64.
+        arch: '${{ inputs.qt-arch }}'
         dir: "${{ github.workspace }}/deps"
         install-deps: 'false'
         modules: ${{ inputs.rocky_qt6_modules }}

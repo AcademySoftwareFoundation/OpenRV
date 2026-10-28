@@ -89,7 +89,8 @@ SET(_build_dir
 
 # PySide6's pyside-tools and standalone packaging assume Qt Designer/Assistant/Linguist were bundled. macOS .app installs, Linux patchelf rpath patching, and
 # Windows/Linux designer-plugin copies all fail when the Qt build does not ship those tools. CY2026's Qt 6.8 build omits Designer; the patch makes each step
-# skip-with-warning like the individual tool file install loop.
+# skip-with-warning like the individual tool file install loop. It also backports the PySide 6.10 fix that finds Windows debug modules (QtCore_d.pyd), which pyi
+# generation needs.
 SET(_pyside_patch_command
     ${CMAKE_COMMAND} -E true
 )
