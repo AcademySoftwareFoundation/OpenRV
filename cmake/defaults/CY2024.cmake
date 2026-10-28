@@ -109,12 +109,11 @@ IF(RV_VFX_PLATFORM STREQUAL "CY2024")
 
   # Python https://www.python.org/downloads/source/
   SET(RV_DEPS_PYTHON_VERSION
-      "3.11.9"
+      "3.11.18"
   )
   SET(RV_DEPS_PYTHON_DOWNLOAD_HASH
-      "392eccd4386936ffcc46ed08057db3e7"
+      "c307c28e687bb1d4824dd8caa5a789c9"
   )
-  # SET(RV_DEPS_PYTHON_VERSION "3.11.14") SET(RV_DEPS_PYTHON_DOWNLOAD_HASH "5f43ab9d5a74b9ac0dd2e20f58740f9e")
 
   # Qt
   SET(RV_DEPS_QT_VERSION
