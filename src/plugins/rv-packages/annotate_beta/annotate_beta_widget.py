@@ -14,7 +14,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 
 from rv import commands, qtutils
 
-from annotate_beta_color_picker import ColorPickerPopup
+from annotate_beta_color_picker import ColorPickerPopup, add_next_custom_slot_highlight
 import annotate_beta_constants as constants
 
 
@@ -977,6 +977,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
             self._color_dialog = QtWidgets.QColorDialog(qtutils.sessionWindow())
             self._color_dialog.setOption(QtWidgets.QColorDialog.DontUseNativeDialog, True)
             self._color_dialog.setOption(QtWidgets.QColorDialog.ShowAlphaChannel, False)
+            add_next_custom_slot_highlight(self._color_dialog)
             # Only colorSelected (OK) applies; browsing and Cancel don't
             self._color_dialog.colorSelected.connect(self._on_color_dialog_selected)
 

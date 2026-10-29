@@ -12,6 +12,9 @@ _PRESETS = [
     "#FFFFFF",  # white
 ]
 
+_CUSTOM_COLOR_ROWS = 2
+_CUSTOM_COLOR_COLUMNS = 8
+
 
 class _HSVGradientWidget(QtWidgets.QWidget):
     """Saturation/value square. Hue is controlled via set_hue()."""
@@ -224,6 +227,68 @@ class _ColorPickerSection(QtWidgets.QWidget):
     def _on_preset_clicked(self, color):
         self.set_color(color)
         self.color_changed.emit(color)
+
+
+class _NextCustomSlotOverlay(QtWidgets.QWidget):
+    """Outlines the custom color slot that "Add to Custom Colors" will write into.
+
+    QColorDialog keeps that slot private, so it is mirrored from the same two
+    signals Qt updates it from (_q_nextCustom and _q_addCustom in qcolordialog.cpp).
+    """
+
+    def __init__(self, well, add_button):
+        super().__init__(well)
+        self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+        self._well = well
+        self._index = 0
+        grid = well.sizeHint()
+        self._cell_width = grid.width() // _CUSTOM_COLOR_COLUMNS
+        self._cell_height = grid.height() // _CUSTOM_COLOR_ROWS
+        self.setGeometry(QtCore.QRect(QtCore.QPoint(0, 0), grid))
+        QtCore.QObject.connect(well, QtCore.SIGNAL("currentChanged(int,int)"), self._on_current_changed)
+        add_button.clicked.connect(self._on_added)
+
+    def _on_current_changed(self, row, column):
+        self._index = row + _CUSTOM_COLOR_ROWS * column
+        self.update()
+
+    def _on_added(self):
+        self._index = (self._index + 1) % (_CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS)
+        self.update()
+
+    def paintEvent(self, event):
+        if not 0 <= self._index < _CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS:
+            return
+        row = self._index % _CUSTOM_COLOR_ROWS
+        column = self._index // _CUSTOM_COLOR_ROWS
+        if self._well.isRightToLeft():
+            column = _CUSTOM_COLOR_COLUMNS - column - 1
+        cell = QtCore.QRect(column * self._cell_width, row * self._cell_height, self._cell_width, self._cell_height)
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtGui.QPen(self.palette().color(QtGui.QPalette.Highlight), 2))
+        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.drawRect(cell.adjusted(1, 1, -1, -1))
+
+
+def add_next_custom_slot_highlight(dialog):
+    """Outline the next custom color slot in a non-native QColorDialog.
+
+    Does nothing if the dialog's layout isn't the expected one.
+    """
+    translate = QtCore.QCoreApplication.translate
+    labels = [
+        label
+        for label in dialog.findChildren(QtWidgets.QLabel)
+        if label.text() == translate("QColorDialog", "&Custom colors")
+    ]
+    buttons = [
+        button
+        for button in dialog.findChildren(QtWidgets.QPushButton)
+        if button.text() == translate("QColorDialog", "&Add to Custom Colors")
+    ]
+    if len(labels) != 1 or len(buttons) != 1 or labels[0].buddy() is None:
+        return
+    _NextCustomSlotOverlay(labels[0].buddy(), buttons[0])
 
 
 class ColorPickerPopup(QtWidgets.QFrame):
