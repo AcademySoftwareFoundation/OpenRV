@@ -12,7 +12,7 @@ from functools import partial
 
 from PySide6 import QtCore, QtWidgets, QtGui
 
-from rv import commands
+from rv import commands, qtutils
 
 from annotate_beta_color_picker import ColorPickerPopup
 import annotate_beta_constants as constants
@@ -113,6 +113,9 @@ class ColorSwatch(QtWidgets.QAbstractButton):
     def set_color(self, color):
         self._color = QtGui.QColor(color)
         self.update()
+
+    def color(self):
+        return QtGui.QColor(self._color)
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -928,8 +931,12 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         layout.addWidget(self._panel)
 
         # Floating color picker popup (no parent — truly floating)
-        self._picker_popup = ColorPickerPopup()
+        self._picker_popup = ColorPickerPopup(_load_icon("palette_settings"))
         self._picker_popup.color_changed.connect(self._on_color_changed)
+        self._picker_popup.dialog_requested.connect(self._on_color_dialog_requested)
+
+        # Full Qt color dialog, created on first use. Its custom colors are Qt's process-wide ones.
+        self._color_dialog = None
 
         self._strip.tool_changed.connect(self._on_tool_changed)
         self._strip.undo_requested.connect(self.undo_requested)
@@ -965,14 +972,40 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     def hide_popups(self):
         self._picker_popup.hide()
 
+    def _on_color_dialog_requested(self):
+        if self._color_dialog is None:
+            self._color_dialog = QtWidgets.QColorDialog(qtutils.sessionWindow())
+            self._color_dialog.setOption(QtWidgets.QColorDialog.DontUseNativeDialog, True)
+            self._color_dialog.setOption(QtWidgets.QColorDialog.ShowAlphaChannel, False)
+            # Only colorSelected (OK) applies; browsing and Cancel don't
+            self._color_dialog.colorSelected.connect(self._on_color_dialog_selected)
+
+        self._picker_popup.hide()
+        self._color_dialog.setCurrentColor(self._strip.swatch.color())
+        self._color_dialog.show()
+        self._color_dialog.raise_()
+        self._color_dialog.activateWindow()
+
+    def _on_color_dialog_selected(self, color):
+        color = QtGui.QColor(color.rgb())  # RGB only; opacity has its own slider
+        self._picker_popup.set_color(color)
+        self._on_color_changed(color)
+
+    def _sync_color_dialog(self, color):
+        # Only colorSelected is connected, so this can't re-apply a color
+        if self._color_dialog is not None and self._color_dialog.isVisible():
+            self._color_dialog.setCurrentColor(color)
+
     def _on_color_changed(self, color):
         self._strip.set_color(color)
+        self._sync_color_dialog(color)
         self.color_changed.emit(color)
 
     def set_color(self, color):
         """Programmatically set the active color (e.g. on tool switch)."""
         self._strip.set_color(color)
         self._picker_popup.set_color(color)
+        self._sync_color_dialog(color)
 
     def set_size(self, value):
         self._panel.set_size(value)

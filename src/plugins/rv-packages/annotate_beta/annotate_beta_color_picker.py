@@ -162,8 +162,9 @@ class _ColorPickerSection(QtWidgets.QWidget):
     """Color picker contents: saturation/value square, hue bar and preset swatches."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
+    dialog_requested = QtCore.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, dialog_icon, parent=None):
         super().__init__(parent)
         self._color = QtGui.QColor(255, 255, 255)
 
@@ -189,6 +190,16 @@ class _ColorPickerSection(QtWidgets.QWidget):
             swatch.clicked_color.connect(self._on_preset_clicked)
             swatch_layout.addWidget(swatch)
         swatch_layout.addStretch()
+
+        dialog_button = QtWidgets.QToolButton()
+        dialog_button.setObjectName("colorDialogButton")
+        dialog_button.setIcon(dialog_icon)
+        dialog_button.setFixedSize(22, 22)
+        dialog_button.setAutoRaise(True)
+        dialog_button.setCursor(QtCore.Qt.PointingHandCursor)
+        dialog_button.setToolTip("More Colors...")
+        dialog_button.clicked.connect(self.dialog_requested)
+        swatch_layout.addWidget(dialog_button)
         layout.addWidget(swatch_row)
 
     def set_color(self, color):
@@ -219,15 +230,17 @@ class ColorPickerPopup(QtWidgets.QFrame):
     """Floating color picker that appears to the right of the toolbar."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
+    dialog_requested = QtCore.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, dialog_icon, parent=None):
         super().__init__(parent, QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
         self.setObjectName("annotationBetaColorPopup")
         self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        self._picker = _ColorPickerSection()
+        self._picker = _ColorPickerSection(dialog_icon)
         self._picker.color_changed.connect(self.color_changed)
+        self._picker.dialog_requested.connect(self.dialog_requested)
         layout.addWidget(self._picker)
         self.adjustSize()
 
