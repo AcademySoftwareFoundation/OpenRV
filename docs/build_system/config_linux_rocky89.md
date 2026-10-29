@@ -13,7 +13,7 @@ NumPy               : 2.3.0
 OCIO                : 2.5.0
 OpenEXR             : 3.4.3
 OpenSSL             : 3.6.0
-Python              : 3.13.9
+Python              : 3.13.18
 Qt                  : 6.8.3 ** RV Still on 6.5.3 pending work
 
 Config manager repo : powertools  (Rocky 8)
@@ -28,7 +28,7 @@ NumPy               : 1.26.4
 OCIO                : 2.4.2
 OpenEXR             : 3.3.6
 OpenSSL             : 3.4.0
-Python              : 3.11.14
+Python              : 3.11.18
 Qt                  : 6.5.3
 
 Config manager repo : powertools  (Rocky 8)
@@ -43,7 +43,7 @@ NumPy               : 1.24.4
 OCIO                : 2.3.2
 OpenEXR             : 3.2.5
 OpenSSL             : 3.4.0
-Python              : 3.11.14
+Python              : 3.11.18
 Qt                  : 6.5.3
 
 Config manager repo : powertools  (Rocky 8)

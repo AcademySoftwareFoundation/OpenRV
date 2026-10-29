@@ -1063,6 +1063,7 @@ class: EventFilter : QObject
     method: eventFilter (bool; QObject obj, QEvent event)
     {
         let view = mainViewWidget();
+        if (view eq nil) return false;
         return view.eventFilter(obj, event);
     }
 }
