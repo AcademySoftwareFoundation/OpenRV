@@ -316,5 +316,13 @@ class ColorPickerPopup(QtWidgets.QFrame):
         self.show()
         self.raise_()
 
+    def hideEvent(self, event):
+        # Clear hover state so no button shows as hovered when the popup reopens
+        for widget in self.findChildren(QtWidgets.QWidget):
+            if widget.testAttribute(QtCore.Qt.WA_UnderMouse):
+                widget.setAttribute(QtCore.Qt.WA_UnderMouse, False)
+                widget.update()
+        super().hideEvent(event)
+
     def set_color(self, color):
         self._picker.set_color(color)
