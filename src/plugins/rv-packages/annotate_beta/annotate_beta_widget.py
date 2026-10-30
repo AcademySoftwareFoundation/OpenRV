@@ -745,19 +745,130 @@ class _FontComboBox(_WidePopupComboBox):
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
 
+class _MenuValueLineEdit(_ValueLineEdit):
+    """Value box hosted in a QMenu.
+
+    Keeps Enter from reaching the menu, which would highlight its first item, and reports Up/Down
+    because the menu does not take focus back from the box on its own.
+    """
+
+    navigate_requested = QtCore.Signal(int)  # -1 for Up, +1 for Down
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down):
+            self.navigate_requested.emit(-1 if key == QtCore.Qt.Key_Up else 1)
+            event.accept()
+            return
+        super().keyPressEvent(event)
+        if key in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
+            event.accept()
+
+
+class _FontSizeButton(QtWidgets.QToolButton):
+    """Drop-down of named size presets with a value box for any other size."""
+
+    font_size_changed = QtCore.Signal(int)
+
+    # (size, closed-button label, menu label)
+    _SIZE_PRESETS = (
+        (constants.FontSize.SMALL, "S", "Small"),
+        (constants.FontSize.MEDIUM, "M", "Medium"),
+        (constants.FontSize.LARGE, "L", "Large"),
+    )
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("menuToolButton")
+        self.setProperty("tbstyle", "palette")
+        self.setToolTip("Size")
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        self.setFixedHeight(30)
+        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+
+        self._font_size = constants.DEFAULT_FONT_SIZE
+        self._menu = QtWidgets.QMenu(self)
+        preset_group = QtGui.QActionGroup(self._menu)
+        preset_group.setExclusive(True)
+        for preset_size, _, menu_label in self._SIZE_PRESETS:
+            preset_action = self._menu.addAction(menu_label)
+            preset_action.setCheckable(True)
+            preset_action.setData(int(preset_size))
+            preset_group.addAction(preset_action)
+        self._menu.triggered.connect(self._on_preset_triggered)
+        self._menu.aboutToHide.connect(self._release_size_input)
+
+        self._size_input = _MenuValueLineEdit()
+        self._size_input.setObjectName("sliderValue")
+        self._size_input.setToolTip("Size")
+        self._size_input.setAlignment(QtCore.Qt.AlignCenter)
+        self._size_input.editingFinished.connect(self._on_size_input_committed)
+        self._size_input.returnPressed.connect(self._on_size_input_confirmed)
+        self._size_input.navigate_requested.connect(self._move_menu_highlight)
+        self._size_input_action = QtWidgets.QWidgetAction(self._menu)
+        self._size_input_action.setDefaultWidget(self._size_input)
+        self._menu.addSeparator()
+        self._menu.addAction(self._size_input_action)
+        self.setMenu(self._menu)
+
+        self.set_font_size(self._font_size)
+
+    def set_font_size(self, font_size):
+        """Show `font_size` without emitting font_size_changed."""
+        self._font_size = font_size
+        self._size_input.setText(str(font_size))
+        for action in self._menu.actions():
+            if action.data() is not None:
+                action.setChecked(action.data() == font_size)
+        preset_labels = {preset_size: short_label for preset_size, short_label, _ in self._SIZE_PRESETS}
+        self.setText(preset_labels.get(font_size, str(font_size)))
+
+    def _change_font_size(self, font_size):
+        changed = font_size != self._font_size
+        self.set_font_size(font_size)
+        if changed:
+            self.font_size_changed.emit(font_size)
+
+    def _on_preset_triggered(self, action):
+        if action.data() is not None:
+            self._change_font_size(action.data())
+
+    def _release_size_input(self):
+        # The line edit keeps focus (and its select-all highlight) after the menu closes.
+        # Dropping uncommitted text first makes Escape and click-away cancel the edit.
+        self._size_input.setText(str(self._font_size))
+        self._size_input.clearFocus()
+        self._size_input.deselect()
+
+    def _on_size_input_committed(self):
+        try:
+            typed_size = int(round(float(self._size_input.text().strip())))
+        except (ValueError, OverflowError):
+            self._size_input.setText(str(self._font_size))
+            return
+        self._change_font_size(max(constants.FONT_SIZE_MIN, min(constants.FONT_SIZE_MAX, typed_size)))
+
+    def _on_size_input_confirmed(self):
+        self._on_size_input_committed()
+        self._menu.hide()
+
+    def _move_menu_highlight(self, direction):
+        # Take focus off the box, otherwise it keeps every key and the menu highlight cannot move.
+        navigable_actions = [action for action in self._menu.actions() if not action.isSeparator()]
+        current_index = navigable_actions.index(self._size_input_action)
+        target_action = navigable_actions[(current_index + direction) % len(navigable_actions)]
+        self._size_input.clearFocus()
+        self._menu.setFocus()
+        self._menu.setActiveAction(target_action)
+
+
 class _TextOptionsPanel(QtWidgets.QWidget):
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
     opacity_changed = QtCore.Signal(int)
-
-    _SIZES = (
-        (constants.FontSize.SMALL, "S", None),
-        (constants.FontSize.MEDIUM, "M", None),
-        (constants.FontSize.LARGE, "L", None),
-    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -779,10 +890,9 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         layout.addWidget(self._font_combo)
 
-        self._size_button = _MenuToolButton("Size", self._SIZES)
-        self._size_button.set_selection(constants.FontSize.MEDIUM)
-        self._size_button.selection_changed.connect(self.font_size_changed)
-        layout.addWidget(self._size_button)
+        self._font_size_button = _FontSizeButton()
+        self._font_size_button.font_size_changed.connect(self.font_size_changed)
+        layout.addWidget(self._font_size_button)
 
         _add_divider(layout, spacing=5)
 
@@ -851,7 +961,7 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.sync_display_font(name)
 
     def set_font_size(self, size):
-        self._size_button.set_selection(size if self._size_button.has_item(size) else constants.FontSize.MEDIUM)
+        self._font_size_button.set_font_size(size)
 
     def _set_style(self, key, value):
         with QtCore.QSignalBlocker(self._style_buttons[key]):
@@ -882,7 +992,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
@@ -1161,7 +1271,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
