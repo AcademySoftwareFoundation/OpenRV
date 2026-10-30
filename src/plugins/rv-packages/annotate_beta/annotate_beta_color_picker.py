@@ -12,6 +12,9 @@ _PRESETS = [
     "#FFFFFF",  # white
 ]
 
+_CUSTOM_COLOR_ROWS = 2
+_CUSTOM_COLOR_COLUMNS = 8
+
 
 class _HSVGradientWidget(QtWidgets.QWidget):
     """Saturation/value square. Hue is controlled via set_hue()."""
@@ -162,8 +165,9 @@ class _ColorPickerSection(QtWidgets.QWidget):
     """Color picker contents: saturation/value square, hue bar and preset swatches."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
+    dialog_requested = QtCore.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, dialog_icon, parent=None):
         super().__init__(parent)
         self._color = QtGui.QColor(255, 255, 255)
 
@@ -189,6 +193,16 @@ class _ColorPickerSection(QtWidgets.QWidget):
             swatch.clicked_color.connect(self._on_preset_clicked)
             swatch_layout.addWidget(swatch)
         swatch_layout.addStretch()
+
+        dialog_button = QtWidgets.QToolButton()
+        dialog_button.setObjectName("colorDialogButton")
+        dialog_button.setIcon(dialog_icon)
+        dialog_button.setFixedSize(22, 22)
+        dialog_button.setAutoRaise(True)
+        dialog_button.setCursor(QtCore.Qt.PointingHandCursor)
+        dialog_button.setToolTip("More Colors...")
+        dialog_button.clicked.connect(self.dialog_requested)
+        swatch_layout.addWidget(dialog_button)
         layout.addWidget(swatch_row)
 
     def set_color(self, color):
@@ -215,19 +229,83 @@ class _ColorPickerSection(QtWidgets.QWidget):
         self.color_changed.emit(color)
 
 
+class _NextCustomSlotOverlay(QtWidgets.QWidget):
+    """Outlines the custom color slot that "Add to Custom Colors" will write into.
+
+    QColorDialog keeps that slot private, so it is mirrored from the same two
+    signals Qt updates it from (_q_nextCustom and _q_addCustom in qcolordialog.cpp).
+    """
+
+    def __init__(self, well, add_button):
+        super().__init__(well)
+        self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
+        self._well = well
+        self._index = 0
+        grid = well.sizeHint()
+        self._cell_width = grid.width() // _CUSTOM_COLOR_COLUMNS
+        self._cell_height = grid.height() // _CUSTOM_COLOR_ROWS
+        self.setGeometry(QtCore.QRect(QtCore.QPoint(0, 0), grid))
+        QtCore.QObject.connect(well, QtCore.SIGNAL("currentChanged(int,int)"), self._on_current_changed)
+        add_button.clicked.connect(self._on_added)
+
+    def _on_current_changed(self, row, column):
+        self._index = row + _CUSTOM_COLOR_ROWS * column
+        self.update()
+
+    def _on_added(self):
+        self._index = (self._index + 1) % (_CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS)
+        self.update()
+
+    def paintEvent(self, event):
+        if not 0 <= self._index < _CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS:
+            return
+        row = self._index % _CUSTOM_COLOR_ROWS
+        column = self._index // _CUSTOM_COLOR_ROWS
+        if self._well.isRightToLeft():
+            column = _CUSTOM_COLOR_COLUMNS - column - 1
+        cell = QtCore.QRect(column * self._cell_width, row * self._cell_height, self._cell_width, self._cell_height)
+        painter = QtGui.QPainter(self)
+        painter.setPen(QtGui.QPen(self.palette().color(QtGui.QPalette.Highlight), 2))
+        painter.setBrush(QtCore.Qt.NoBrush)
+        painter.drawRect(cell.adjusted(1, 1, -1, -1))
+
+
+def add_next_custom_slot_highlight(dialog):
+    """Outline the next custom color slot in a non-native QColorDialog.
+
+    Does nothing if the dialog's layout isn't the expected one.
+    """
+    translate = QtCore.QCoreApplication.translate
+    labels = [
+        label
+        for label in dialog.findChildren(QtWidgets.QLabel)
+        if label.text() == translate("QColorDialog", "&Custom colors")
+    ]
+    buttons = [
+        button
+        for button in dialog.findChildren(QtWidgets.QPushButton)
+        if button.text() == translate("QColorDialog", "&Add to Custom Colors")
+    ]
+    if len(labels) != 1 or len(buttons) != 1 or labels[0].buddy() is None:
+        return
+    _NextCustomSlotOverlay(labels[0].buddy(), buttons[0])
+
+
 class ColorPickerPopup(QtWidgets.QFrame):
     """Floating color picker that appears to the right of the toolbar."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
+    dialog_requested = QtCore.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, dialog_icon, parent=None):
         super().__init__(parent, QtCore.Qt.Tool | QtCore.Qt.FramelessWindowHint)
         self.setObjectName("annotationBetaColorPopup")
         self.setAttribute(QtCore.Qt.WA_ShowWithoutActivating)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        self._picker = _ColorPickerSection()
+        self._picker = _ColorPickerSection(dialog_icon)
         self._picker.color_changed.connect(self.color_changed)
+        self._picker.dialog_requested.connect(self.dialog_requested)
         layout.addWidget(self._picker)
         self.adjustSize()
 
@@ -237,6 +315,14 @@ class ColorPickerPopup(QtWidgets.QFrame):
         self.move(position)
         self.show()
         self.raise_()
+
+    def hideEvent(self, event):
+        # Clear hover state so no button shows as hovered when the popup reopens
+        for widget in self.findChildren(QtWidgets.QWidget):
+            if widget.testAttribute(QtCore.Qt.WA_UnderMouse):
+                widget.setAttribute(QtCore.Qt.WA_UnderMouse, False)
+                widget.update()
+        super().hideEvent(event)
 
     def set_color(self, color):
         self._picker.set_color(color)
