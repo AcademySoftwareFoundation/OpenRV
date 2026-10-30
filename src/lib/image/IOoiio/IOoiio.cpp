@@ -7,6 +7,7 @@
 #include <OpenImageIO/imageio.h>
 #include <IOoiio/IOoiio.h>
 #include <TwkFB/Exception.h>
+#include <TwkFB/Operations.h>
 #include <TwkUtil/ByteSwap.h>
 #include <TwkUtil/File.h>
 #include <half.h>
@@ -474,7 +475,120 @@ namespace TwkFB
 
     void IOoiio::writeImage(const FrameBuffer& img, const std::string& filename, const WriteRequest& request) const
     {
-        FrameBufferIO::writeImage(img, filename, request);
+        TypeDesc format = TypeDesc::UNKNOWN;
+        switch (img.dataType())
+        {
+        case FrameBuffer::UCHAR:
+            format = TypeDesc::UINT8;
+            break;
+        case FrameBuffer::USHORT:
+            format = TypeDesc::UINT16;
+            break;
+        case FrameBuffer::UINT:
+            format = TypeDesc::UINT32;
+            break;
+        case FrameBuffer::HALF:
+            format = TypeDesc::HALF;
+            break;
+        case FrameBuffer::FLOAT:
+            format = TypeDesc::FLOAT;
+            break;
+        case FrameBuffer::DOUBLE:
+            format = TypeDesc::DOUBLE;
+            break;
+        default:
+            TWK_THROW_STREAM(IOException, "OIIO: unsupported pixel type for writing \"" << filename << "\"");
+        }
+
+        const FrameBuffer* outfb = &img;
+
+        //
+        //  Convert to UCHAR packed if not already.
+        //
+
+        if (img.isPlanar())
+        {
+            const FrameBuffer* fb = outfb;
+            outfb = mergePlanes(outfb);
+            if (fb != &img)
+                delete fb;
+        }
+
+        //
+        //  Flop to get in the right orientation
+        //
+
+        bool needflop = false;
+
+        switch (outfb->orientation())
+        {
+        case FrameBuffer::TOPRIGHT:
+        case FrameBuffer::BOTTOMRIGHT:
+            needflop = true;
+            break;
+        default:
+            break;
+        }
+
+        if (needflop)
+        {
+            if (outfb == &img)
+                outfb = img.copy();
+            flop(const_cast<FrameBuffer*>(outfb));
+        }
+
+        ImageSpec spec(outfb->width(), outfb->height(), outfb->numChannels(), format);
+        spec.channelnames = outfb->channelNames();
+
+        if (request.quality > 0.0f && request.quality <= 1.0f)
+        {
+            spec.attribute("CompressionQuality", static_cast<int>(request.quality * 100.0f));
+        }
+
+        if (request.pixelAspect != 1.0f)
+        {
+            spec.attribute("PixelAspectRatio", request.pixelAspect);
+        }
+
+        std::unique_ptr<ImageOutput> out = ImageOutput::create(filename);
+        if (!out)
+        {
+            if (outfb != &img)
+                delete outfb;
+            TWK_THROW_STREAM(IOException, "OIIO: unable to create output for \"" << filename << "\". " << geterror());
+        }
+
+        if (!out->open(filename, spec))
+        {
+            if (outfb != &img)
+                delete outfb;
+            TWK_THROW_STREAM(IOException, "OIIO: unable to open \"" << filename << "\" for writing. " << out->geterror());
+        }
+
+        // Pass explicit strides to handle any scanline padding in the FrameBuffer.
+        const OIIO::stride_t xstride = static_cast<OIIO::stride_t>(outfb->pixelSize());
+        const OIIO::stride_t ystride = static_cast<OIIO::stride_t>(outfb->scanlinePaddedSize());
+
+        // OIIO writes rows top-to-bottom. Bottom-origin FrameBuffers store
+        // row 0 at the bottom, so start from the last row and use a negative
+        // ystride to walk backwards through memory, producing a correctly-
+        // oriented output.
+        const bool flipped = (outfb->orientation() != FrameBuffer::TOPLEFT && outfb->orientation() != FrameBuffer::TOPRIGHT);
+        const void* data = flipped ? static_cast<const void*>(outfb->scanline<unsigned char>(outfb->height() - 1)) : outfb->pixels<void>();
+        const OIIO::stride_t effective_ystride = flipped ? -ystride : ystride;
+
+        if (!out->write_image(format, data, xstride, effective_ystride, OIIO::AutoStride))
+        {
+            out->close();
+            if (outfb != &img)
+                delete outfb;
+            TWK_THROW_STREAM(IOException, "OIIO: failed to write \"" << filename << "\". " << out->geterror());
+        }
+
+        out->close();
+
+        if (outfb != &img)
+            delete outfb;
     }
 
 } //  End namespace TwkFB
