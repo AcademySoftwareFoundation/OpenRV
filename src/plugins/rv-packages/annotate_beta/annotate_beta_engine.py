@@ -39,15 +39,11 @@ _BORDER_WIDTH_MIN = 0.001
 # Shift bit of event.modifiers() (TwkApp ModifierEvent::Shift).
 _SHIFT_MODIFIER = 1 << 0
 
-# Base WCS fractions for each font size tier (desired px at zoom=1 / 1080).
-# Multiplied by _screen_scale() when the text is created, so:
+# Font sizes are desired px at zoom=1 over this reference height. The WCS size
+# is multiplied by _screen_scale() when the text is created, so:
 #   - new text has the same initial screen size regardless of zoom
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
-_FONT_SIZE_WCS_BASE = {
-    constants.FontSize.SMALL: 24.0 / 1080.0,
-    constants.FontSize.MEDIUM: 48.0 / 1080.0,
-    constants.FontSize.LARGE: 72.0 / 1080.0,
-}
+_FONT_SIZE_REFERENCE_HEIGHT = 1080.0
 
 
 class _Vec2(NamedTuple):
@@ -82,7 +78,7 @@ class DrawSettings:
     tool: constants.Tool = constants.Tool.PEN
     eraser_brush: constants.Brush = constants.Brush.CIRCLE
     font_family: str = constants.DEFAULT_FONT_FAMILY
-    font_size: constants.FontSize = constants.FontSize.MEDIUM
+    font_size: int = constants.DEFAULT_FONT_SIZE
     font_bold: bool = False
     font_italic: bool = False
     font_underline: bool = False
@@ -240,8 +236,7 @@ class AnnotateDrawEngine:
         return view_height / max(pixels_per_unit, 0.1)
 
     def _font_size(self):
-        base = _FONT_SIZE_WCS_BASE.get(self._settings.font_size, _FONT_SIZE_WCS_BASE[constants.FontSize.MEDIUM])
-        return base * self._screen_scale()
+        return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
     def _border_width(self):
         scale = self._screen_scale() if self._settings.scale_brush else 1.0

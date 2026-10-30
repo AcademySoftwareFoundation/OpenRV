@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from enum import StrEnum, auto
+from enum import IntEnum, StrEnum, auto
 
 MODE_NAME = "annotate_beta_mode"
 EVENT_TABLE_NAME = "annotate_beta_shape"
@@ -39,10 +39,12 @@ class Brush(StrEnum):
     GAUSS = auto()
 
 
-class FontSize(StrEnum):
-    SMALL = auto()
-    MEDIUM = auto()
-    LARGE = auto()
+class FontSize(IntEnum):
+    """Preset font sizes, in pixels."""
+
+    SMALL = 24
+    MEDIUM = 48
+    LARGE = 72
 
 
 class BrushSetting(StrEnum):
@@ -52,6 +54,11 @@ class BrushSetting(StrEnum):
     OPACITY_VARIATION = auto()
     ROTATION_VARIATION = auto()
     SPACING_VARIATION = auto()
+
+
+FONT_SIZE_MIN = 1
+FONT_SIZE_MAX = 100
+DEFAULT_FONT_SIZE = FontSize.MEDIUM
 
 
 DEFAULT_COLOR = "#ffdc00"
