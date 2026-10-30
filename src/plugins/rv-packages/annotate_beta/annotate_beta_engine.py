@@ -103,7 +103,7 @@ class AnnotateDrawEngine:
         self._on_draw_started = on_draw_started
         self._on_eyedropper = on_eyedropper
 
-        self.preferred_paint_node = ""  # Paint node set via set-current-annotate-mode-node
+        self.preferred_paint_node = ""  # Paint node set by external packages via set-current-annotate-mode-node
         self._visible_frames: set[PaintFrame] = set()
 
         # Shape drag state
@@ -251,6 +251,11 @@ class AnnotateDrawEngine:
     # Paint node resolution
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _is_in_source_group(node: str) -> bool:
+        group = commands.nodeGroup(node)
+        return bool(group) and commands.nodeType(group) == "RVSourceGroup"
+
     def _find_paint_frame(self) -> PaintFrame | None:
         try:
             infos = commands.metaEvaluate(commands.frame(), commands.viewNode())
@@ -270,18 +275,17 @@ class AnnotateDrawEngine:
             # legacy annotate_mode.mu's updateCurrentNode(), which never uses
             # _userSelectedNode unless it's found in the current metaEvaluate.
 
-        if self._settings.store_on_source:
-            for info in infos:
-                if info.get("nodeType") == "RVPaint":
-                    node = info["node"]
-                    group = commands.nodeGroup(node)
-                    if group and commands.nodeType(group) == "RVSourceGroup":
-                        return PaintFrame(node, info["frame"])
+        paint_infos = [info for info in infos if info.get("nodeType") == "RVPaint"]
+        if not paint_infos:
+            return None
 
-        for info in infos:
-            if info.get("nodeType") == "RVPaint":
-                return PaintFrame(info["node"], info["frame"])
-        return None
+        # Only draw on a source when exactly one is visible. With several (e.g. layout), use the view's own paint node.
+        if self._settings.store_on_source:
+            source_infos = [info for info in paint_infos if self._is_in_source_group(info["node"])]
+            if len(source_infos) == 1:
+                return PaintFrame(source_infos[0]["node"], source_infos[0]["frame"])
+
+        return PaintFrame(paint_infos[0]["node"], paint_infos[0]["frame"])
 
     def _auto_mark_frame(self):
         if self._settings.auto_mark:
@@ -430,7 +434,6 @@ class AnnotateDrawEngine:
         )
         self._auto_mark_frame()
         self._pen_last_point = image_point
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # sync accumulation is still open — will be flushed at _pen_release
 
     def _pen_drag(self, event):
@@ -503,7 +506,6 @@ class AnnotateDrawEngine:
         self._last_image_point = image_point
         self._shape_type = prefix
         self._shape_active = True
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # Open a sync accumulation block that stays open until _do_release so the
         # entire shape (push → drag → release) is sent as one batch to remote
         # clients instead of immediately broadcasting the initial zero-size shape.
