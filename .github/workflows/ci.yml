@@ -45,6 +45,7 @@ jobs:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       full_matrix: ${{ github.event_name != 'pull_request' }}
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
+      nightly: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
 
   macos:
     if: github.repository_owner == 'AcademySoftwareFoundation'
@@ -54,6 +55,7 @@ jobs:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       full_matrix: ${{ github.event_name != 'pull_request' }}
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
+      nightly: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
 
   windows:
     if: github.repository_owner == 'AcademySoftwareFoundation'
@@ -63,3 +65,4 @@ jobs:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       full_matrix: ${{ github.event_name != 'pull_request' }}
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
+      nightly: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
