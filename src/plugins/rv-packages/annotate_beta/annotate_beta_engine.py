@@ -414,7 +414,7 @@ class AnnotateDrawEngine:
             brush = self._settings.eraser_brush
         else:
             erase = tool == constants.Tool.ERASER
-            if tool == constants.Tool.AIRBRUSH:
+            if tool == constants.Tool.BRUSH:
                 brush = constants.Brush.GAUSS
             elif tool == constants.Tool.ERASER:
                 brush = self._settings.eraser_brush
