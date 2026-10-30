@@ -252,7 +252,7 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _is_source_paint_node(node: str) -> bool:
+    def _is_in_source_group(node: str) -> bool:
         group = commands.nodeGroup(node)
         return bool(group) and commands.nodeType(group) == "RVSourceGroup"
 
@@ -265,8 +265,6 @@ class AnnotateDrawEngine:
         # If an external package has nominated a specific paint node (via
         # set-current-annotate-mode-node), prefer it so that RV-drawn
         # annotations land on the annotation source group's node rather than the local pipeline node.
-        # This engine never sends that event itself: pinning the last drawn node would make it stick
-        # across view changes (e.g. Sequence -> Layout) and override the external package's choice.
         if self.preferred_paint_node:
             for info in infos:
                 if info.get("node") == self.preferred_paint_node:
@@ -283,12 +281,10 @@ class AnnotateDrawEngine:
 
         # Only draw on a source when exactly one is visible. With several (e.g. layout), use the view's own paint node.
         if self._settings.store_on_source:
-            source_infos = [info for info in paint_infos if self._is_source_paint_node(info["node"])]
+            source_infos = [info for info in paint_infos if self._is_in_source_group(info["node"])]
             if len(source_infos) == 1:
-                # Return the paint frame for the single source node.
                 return PaintFrame(source_infos[0]["node"], source_infos[0]["frame"])
 
-        # Return the paint frame for the view's own paint node.
         return PaintFrame(paint_infos[0]["node"], paint_infos[0]["frame"])
 
     def _auto_mark_frame(self):
