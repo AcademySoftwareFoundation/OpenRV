@@ -143,6 +143,7 @@ namespace Rv
         , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
         , m_syncingDevicePixelRatio(false)
         , m_profilingSwapPending(false)
+        , m_syncSamplePending(false)
         , m_sharedContext(sharedContext)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
@@ -158,15 +159,25 @@ namespace Rv
         //  reports the new value.
         connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
 
-        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::endProfilingSwap);
+        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::onFrameSwapped);
     }
 
     GLWindow::~GLWindow() {}
 
     void GLWindow::stopProcessingEvents() { m_stopProcessingEvents = true; }
 
-    void GLWindow::endProfilingSwap()
+    void GLWindow::onFrameSwapped()
     {
+        if (m_syncSamplePending)
+        {
+            m_syncSamplePending = false;
+
+            if (IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr)
+            {
+                session->addSyncSample();
+            }
+        }
+
         if (!m_profilingSwapPending)
         {
             return;
@@ -488,7 +499,8 @@ namespace Rv
             m_profilingSwapPending = true;
         }
 
-        session->addSyncSample();
+        //  The sync sample is taken in onFrameSwapped().
+        m_syncSamplePending = true;
         session->postRender();
 
         //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
