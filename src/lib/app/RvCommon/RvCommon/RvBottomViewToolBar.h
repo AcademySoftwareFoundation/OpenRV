@@ -85,6 +85,13 @@ namespace Rv
         void updateActionAvailability();
         void updatePlayModeButtonState();
 
+        void schedulePlayButtonIconUpdate();
+        void updatePlayButtonIcons();
+
+        bool m_playButtonIconUpdatePending = false;
+        bool m_backwardShowsPause = false;
+        bool m_forwardShowsPause = false;
+
         IPCore::Session* m_session;
         QString m_customCannotUseTooltip;
         QString m_customDisabledPrefix;
