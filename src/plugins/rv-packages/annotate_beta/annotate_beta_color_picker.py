@@ -12,9 +12,6 @@ _PRESETS = [
     "#FFFFFF",  # white
 ]
 
-_CUSTOM_COLOR_ROWS = 2
-_CUSTOM_COLOR_COLUMNS = 8
-
 
 class _HSVGradientWidget(QtWidgets.QWidget):
     """Saturation/value square. Hue is controlled via set_hue()."""
@@ -195,12 +192,11 @@ class _ColorPickerSection(QtWidgets.QWidget):
         swatch_layout.addStretch()
 
         dialog_button = QtWidgets.QToolButton()
-        dialog_button.setObjectName("colorDialogButton")
         dialog_button.setIcon(dialog_icon)
         dialog_button.setFixedSize(22, 22)
         dialog_button.setAutoRaise(True)
         dialog_button.setCursor(QtCore.Qt.PointingHandCursor)
-        dialog_button.setToolTip("More Colors...")
+        dialog_button.setToolTip("Color palette")
         dialog_button.clicked.connect(self.dialog_requested)
         swatch_layout.addWidget(dialog_button)
         layout.addWidget(swatch_row)
@@ -236,33 +232,37 @@ class _NextCustomSlotOverlay(QtWidgets.QWidget):
     signals Qt updates it from (_q_nextCustom and _q_addCustom in qcolordialog.cpp).
     """
 
+    _CUSTOM_COLOR_ROWS = 2
+    _CUSTOM_COLOR_COLUMNS = 8
+    _CUSTOM_COLOR_COUNT = _CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS
+
     def __init__(self, well, add_button):
         super().__init__(well)
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
         self._well = well
         self._index = 0
         grid = well.sizeHint()
-        self._cell_width = grid.width() // _CUSTOM_COLOR_COLUMNS
-        self._cell_height = grid.height() // _CUSTOM_COLOR_ROWS
+        self._cell_width = grid.width() // self._CUSTOM_COLOR_COLUMNS
+        self._cell_height = grid.height() // self._CUSTOM_COLOR_ROWS
         self.setGeometry(QtCore.QRect(QtCore.QPoint(0, 0), grid))
         QtCore.QObject.connect(well, QtCore.SIGNAL("currentChanged(int,int)"), self._on_current_changed)
         add_button.clicked.connect(self._on_added)
 
     def _on_current_changed(self, row, column):
-        self._index = row + _CUSTOM_COLOR_ROWS * column
+        self._index = row + self._CUSTOM_COLOR_ROWS * column
         self.update()
 
     def _on_added(self):
-        self._index = (self._index + 1) % (_CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS)
+        self._index = (self._index + 1) % self._CUSTOM_COLOR_COUNT
         self.update()
 
     def paintEvent(self, event):
-        if not 0 <= self._index < _CUSTOM_COLOR_ROWS * _CUSTOM_COLOR_COLUMNS:
+        if self._index not in range(self._CUSTOM_COLOR_COUNT):
             return
-        row = self._index % _CUSTOM_COLOR_ROWS
-        column = self._index // _CUSTOM_COLOR_ROWS
+        row = self._index % self._CUSTOM_COLOR_ROWS
+        column = self._index // self._CUSTOM_COLOR_ROWS
         if self._well.isRightToLeft():
-            column = _CUSTOM_COLOR_COLUMNS - column - 1
+            column = self._CUSTOM_COLOR_COLUMNS - column - 1
         cell = QtCore.QRect(column * self._cell_width, row * self._cell_height, self._cell_width, self._cell_height)
         painter = QtGui.QPainter(self)
         painter.setPen(QtGui.QPen(self.palette().color(QtGui.QPalette.Highlight), 2))
