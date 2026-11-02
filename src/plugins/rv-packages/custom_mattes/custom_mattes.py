@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import commands, rvtypes, extra_commands
 import os
+
+from rv import commands, extra_commands, rvtypes
 
 
 class KnownError(Exception):
@@ -27,7 +28,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
             if os.path.exists(definition):
                 self.updateMattesFromFile(definition)
         except KnownError as inst:
-            print((str(inst)))
+            print(str(inst))
         self.setMenuAndBindings()
 
         lastMatte = str(commands.readSettings("CUSTOM_MATTES", "customMatteName", ""))
@@ -71,7 +72,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         try:
             self.updateMattesFromFile(definition)
         except KnownError as inst:
-            print((str(inst)))
+            print(str(inst))
         self.setMenuAndBindings()
 
     def setMenuAndBindings(self):
@@ -131,7 +132,7 @@ class CustomMatteMinorMode(rvtypes.MinorMode):
         # parameters
         order = []
         mattes = {}
-        for line in open(filename).readlines():
+        for line in open(filename):
             tokens = line.strip("\n").split(",")
             if len(tokens) == 6:
                 order.append(tokens[0])

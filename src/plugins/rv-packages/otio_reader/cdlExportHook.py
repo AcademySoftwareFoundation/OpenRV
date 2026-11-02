@@ -3,8 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import commands, extra_commands
 import opentimelineio as otio
+from rv import commands, extra_commands
 
 
 def hook_function(in_timeline, argument_map):
@@ -12,13 +12,13 @@ def hook_function(in_timeline, argument_map):
     if not rv_node_name:
         return
 
-    node_base = "{}.CDL".format(rv_node_name)
+    node_base = f"{rv_node_name}.CDL"
 
     return otio.schemadef.CDL.CDL(
         name=extra_commands.uiName(rv_node_name),
-        slope=commands.getFloatProperty("{}.slope".format(node_base)),
-        power=commands.getFloatProperty("{}.power".format(node_base)),
-        offset=commands.getFloatProperty("{}.offset".format(node_base)),
-        saturation=commands.getFloatProperty("{}.saturation".format(node_base))[0],
-        visible=commands.getIntProperty("{}.active".format(node_base))[0] != 0,
+        slope=commands.getFloatProperty(f"{node_base}.slope"),
+        power=commands.getFloatProperty(f"{node_base}.power"),
+        offset=commands.getFloatProperty(f"{node_base}.offset"),
+        saturation=commands.getFloatProperty(f"{node_base}.saturation")[0],
+        visible=commands.getIntProperty(f"{node_base}.active")[0] != 0,
     )
