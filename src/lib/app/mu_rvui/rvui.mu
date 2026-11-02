@@ -1762,6 +1762,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     State state = data();
     state.scrubFrameOrigin = frame();
     state.playingBefore = (isPlaying());
+    state.scrubbed = false;
     state.pushed = true;
 }
 
@@ -1770,18 +1771,32 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
     State state = data();
     if (!state.pushed) return;
 
+    let isPointer3 = (event.name() == "pointer-3--release");
+
     try
     {
         recordPixelInfo(event);
-        qt.QTimer ct = state.clickTimer;
-        ct.start();
+        if (!isPointer3)
+        {
+            qt.QTimer ct = state.clickTimer;
+            ct.start();
+        }
         scrubAudio(false);
     }
     catch (...) {;}
     state.pushed = false;
+
+    //
+    //  If this release came from pointer-3 and the user did not scrub,
+    //  fall back to the normal right-click popup menu.
+    //
+    if (!state.scrubbed && isPointer3)
+    {
+        popupMenu(event, nil);
+    }
 }
 
-\: dragScrub (void; bool enable, Event event)
+\: dragScrub (void; bool enable, float speed, Event event)
 {
     State state = data();
     if (!state.pushed) return;
@@ -1791,7 +1806,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
         d  = event.domain(),
         relScale = numFrames()/d.x,
         absScale = 1.0/3.0, 
-        nf = min(relScale,absScale) * (p1.x - p0.x) + state.scrubFrameOrigin;
+        nf = min(relScale,absScale) * speed * (p1.x - p0.x) + state.scrubFrameOrigin;
 
     if (!state.scrubAudio) scrubAudio(false);
 
@@ -6962,7 +6977,7 @@ global bool debugGC = false;
     bind("pointer-1--control--drag", "panzoom_category", dragZoom);
     bind("pointer-1--control--push", "panzoom_category", beginMoveOrZoom);
     bind("pointer-1--control-shift--push", "panzoom_category", beginMoveOrZoom);
-    bind("pointer-1--drag", "playcontrol_category", dragScrub(false,), "Scrub Frames");
+    bind("pointer-1--drag", "playcontrol_category", dragScrub(false, 1.0,), "Scrub Frames");
     bind("pointer-1--push", "playcontrol_category", beginScrub);
     bind("pointer-1--release", "playcontrol_category", releaseScrub);
     bind("pointer-1--double", "playcontrol_category", doubleClick);
@@ -6980,7 +6995,9 @@ global bool debugGC = false;
     bind("pointer-2--shift--drag", "panzoom_category", dragMoveLocked(true,), "Translate View");
     bind("pointer-2--push", "panzoom_category", beginMoveOrZoom);
     bind("pointer-2--shift--push", "panzoom_category", beginMoveOrZoom);
-    bind("pointer-3--push", popupMenu(,nil), "Popup Menu");
+    bind("pointer-3--push", "playcontrol_category", beginScrub);
+    bind("pointer-3--drag", "playcontrol_category", dragScrub(false, 10.0,), "Scrub Frames 10x");
+    bind("pointer-3--release", "playcontrol_category", releaseScrub);
 
     bind("toggle-hud-info-widget", "system_category", toggleInfo, "Toggle info widget via event");
     bind("toggle-hud-timeline-widget", "system_category", toggleTimeline, "Toggle timeline widget via event");
@@ -6990,10 +7007,10 @@ global bool debugGC = false;
     //  back-door scrubbing, works even if scrubbing is "disabled"
     //
     bind("pointer-1--control-shift--push", "playcontrol_category", beginScrub);
-    bind("pointer-1--control-shift--drag", "playcontrol_category", dragScrub(true,), "Scrub Frames");
+    bind("pointer-1--control-shift--drag", "playcontrol_category", dragScrub(true, 1.0,), "Scrub Frames");
     bind("pointer-1--control-shift--release", "playcontrol_category", releaseScrub);
     bind("stylus-pen--control-shift--push", "playcontrol_category", beginScrub);
-    bind("stylus-pen--control-shift--drag", "playcontrol_category", dragScrub(true,), "Scrub Frames");
+    bind("stylus-pen--control-shift--drag", "playcontrol_category", dragScrub(true, 1.0,), "Scrub Frames");
     bind("stylus-pen--control-shift--release", "playcontrol_category", releaseScrub);
 
     bind("pointer-1--shift--push", "info_category", \: (void; Event event)
@@ -7024,7 +7041,7 @@ global bool debugGC = false;
     bind("stylus-pen--control--drag", "viewmode_category", dragZoom);
     bind("stylus-pen--control--push", "viewmode_category", beginMoveOrZoom);
     bind("stylus-pen--control-shift--push", "viewmode_category", beginMoveOrZoom);
-    bind("stylus-pen--drag", "playcontrol_category", dragScrub(false,), "Scrub Frames");
+    bind("stylus-pen--drag", "playcontrol_category", dragScrub(false, 1.0,), "Scrub Frames");
     bind("stylus-pen--push", "viewmode_category", beginScrub);
     bind("stylus-pen--release", "viewmode_category", releaseScrub);
     bind("stylus-eraser--push", "", popupMenu(,nil), "Popup Menu");

@@ -12,6 +12,13 @@ on:
       run_debug:
         type: string
         default: 'true'
+      nightly:
+        type: string
+        default: 'false'
+
+env:
+  # Qt 6.8.3 has no debug_info module on macOS.
+  CY2026_QT6_MODULES: 'qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwebchannel qtwebengine qtwebsockets qtwebview'
 
 jobs:
   # Always runs — CY2025 Release only (PR scope)
@@ -165,3 +172,66 @@ jobs:
           cmake-version: ${{ matrix.cmake-version }}
           vfx-platform: ${{ matrix.vfx-platform }}
           skip_deps_cache: ${{ inputs.skip_deps_cache }}
+
+  # CY2026 - nightly and manual dispatch only
+  macos-cy2026:
+    if: ${{ inputs.nightly == 'true' }}
+    name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
+      <qt=${{ matrix.qt-version }},
+       python=${{ matrix.python-version }},
+       arch=${{ matrix.arch-type }},
+       config=${{ matrix.build-type }}>'
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: "macos-15"
+            arch-type: "x86_64"
+            build-type: "Release"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2026"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Release"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2026"
+          - os: "macos-15"
+            arch-type: "x86_64"
+            build-type: "Debug"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2026"
+          - os: "macos-14"
+            arch-type: "arm64"
+            build-type: "Debug"
+            qt-version: "6.8.3"
+            qt-version-short: "6.8"
+            python-version: "3.13"
+            cmake-version: "3.31.6"
+            vfx-platform: "CY2026"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/build-macos
+        with:
+          arch-type: ${{ matrix.arch-type }}
+          build-type: ${{ matrix.build-type }}
+          qt-version: ${{ matrix.qt-version }}
+          qt-version-short: ${{ matrix.qt-version-short }}
+          python-version: ${{ matrix.python-version }}
+          cmake-version: ${{ matrix.cmake-version }}
+          vfx-platform: ${{ matrix.vfx-platform }}
+          skip_deps_cache: ${{ inputs.skip_deps_cache }}
+          macos_qt6_modules: ${{ env.CY2026_QT6_MODULES }}
