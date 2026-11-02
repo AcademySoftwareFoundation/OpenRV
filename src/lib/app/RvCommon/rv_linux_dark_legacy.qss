@@ -1134,8 +1134,16 @@ margin: 0px;
 
 QWidget#annotationBeta QSlider#annotationSlider {
 background: transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider:vertical {
 min-width: 32px;
 max-width: 32px;
+min-height: 110px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider:horizontal {
+min-width: 132px;
 }
 
 QWidget#annotationBeta QSlider#annotationSlider::groove:vertical {
@@ -1157,13 +1165,39 @@ background-color: rgb(42, 42, 255);
 border-radius: 1px;
 }
 
-QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+QWidget#annotationBeta QSlider#annotationSlider::handle {
 width: 10px;
 height: 10px;
-margin: 0px -8px;
 background-color: rgb(42, 42, 255);
 border: 4px solid rgb(50, 50, 50);
 border-radius: 9px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:vertical {
+margin: 0px -8px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::handle:horizontal {
+margin: -8px 0px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::groove:horizontal {
+height: 3px;
+margin: 0px;
+border: none;
+background: transparent;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::sub-page:horizontal {
+background-color: rgb(42, 42, 255);
+border-radius: 1px;
+}
+
+QWidget#annotationBeta QSlider#annotationSlider::add-page:horizontal {
+background-color: rgb(153, 153, 153);
+background-clip: padding;
+border-top: 1px solid transparent;
+border-bottom: 1px solid transparent;
 }
 
 QWidget#annotationBeta QWidget#separator {

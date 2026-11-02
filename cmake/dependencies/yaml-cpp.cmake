@@ -51,7 +51,22 @@ TARGET_INCLUDE_DIRECTORIES(
   INTERFACE ${_yaml_cpp_include_dir}
 )
 
-SET(RV_DEPS_YAML_CPP_VERSION
+SET(_yaml_cpp_version
     "0.7.0"
+)
+# CY2026+ (OCIO 2.5+) builds yaml-cpp 0.8, whose headers use dllimport on Windows unless YAML_CPP_STATIC_DEFINE is set. OCIO's own target sets it
+# (jbeder/yaml-cpp#1339). Without it, Debug links fail with unresolved __imp_ YAML symbols.
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2026")
+  SET(_yaml_cpp_version
+      "0.8.0"
+  )
+  TARGET_COMPILE_DEFINITIONS(
+    yaml_cpp
+    INTERFACE YAML_CPP_STATIC_DEFINE
+  )
+ENDIF()
+
+SET(RV_DEPS_YAML_CPP_VERSION
+    "${_yaml_cpp_version}"
     CACHE INTERNAL "" FORCE
 )
