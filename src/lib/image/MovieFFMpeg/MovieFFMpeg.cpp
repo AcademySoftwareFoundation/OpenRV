@@ -33,6 +33,7 @@
 #include <limits>
 #include <cmath>
 #include <mutex>
+#include <optional>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/thread/mutex.hpp>
@@ -817,19 +818,80 @@ namespace TwkMovie
             return (smallest != -1 && (smallest < (frameDur * 0.5) || finalPacket)) ? diffs[smallest] : goalTS;
         }
 
-        bool fpsEquals(double& fps, double f)
+        bool fpsMatches(double fps, double standardFps)
         {
-            //
-            //  We get fps from all kinds of places, may have varying sig figs,
-            //  so compare to "standard" values loosely.
-            //
+            constexpr double kFpsTolerance = 0.01;
+            return fabs(fps - standardFps) < kFpsTolerance;
+        }
 
-            if (fabs(fps - f) < 0.01)
+        //
+        //  The NTSC rates are the integer rates scaled by 1000/1001. Return the exact rational if fps is one of them.
+        //
+        std::optional<AVRational> ntscFrameRate(double fps)
+        {
+            struct NtscFrameRate
             {
-                fps = f;
-                return true;
+                double fps;
+                AVRational rate;
+            };
+
+            static constexpr std::array<NtscFrameRate, 7> kNtscFrameRates = {{
+                {23.976, {24000, 1001}},
+                {29.97, {30000, 1001}},
+                {47.952, {48000, 1001}},
+                {59.94, {60000, 1001}},
+                {71.928, {72000, 1001}},
+                {95.904, {96000, 1001}},
+                {119.88, {120000, 1001}},
+            }};
+
+            const auto match = std::find_if(kNtscFrameRates.begin(), kNtscFrameRates.end(),
+                                            [fps](const NtscFrameRate& entry) { return fpsMatches(fps, entry.fps); });
+            if (match == kNtscFrameRates.end())
+            {
+                return std::nullopt;
             }
-            return false;
+
+            return match->rate;
+        }
+
+        AVRational frameRateFromFps(double fps)
+        {
+            if (const std::optional<AVRational> ntscRate = ntscFrameRate(fps))
+            {
+                return *ntscRate;
+            }
+
+            return av_d2q(fps, INT_MAX);
+        }
+
+        struct TimeScaleAndDuration
+        {
+            int timeScale;
+            int duration;
+        };
+
+        //
+        //  Writer time base for fps: one frame lasts duration / timeScale seconds. The integer rates keep their legacy
+        //  x100 values rather than e.g. 24/1, since MOV derives its track timescale from the time base denominator.
+        //
+        TimeScaleAndDuration timeScaleAndDurationFromFps(double fps)
+        {
+            if (const std::optional<AVRational> ntscRate = ntscFrameRate(fps))
+            {
+                return {ntscRate->num, ntscRate->den};
+            }
+
+            constexpr int kIntegerRateDuration = 100;
+            const double wholeFps = std::round(fps);
+            if (wholeFps >= 1.0 && fpsMatches(fps, wholeFps))
+            {
+                return {static_cast<int>(wholeFps) * kIntegerRateDuration, kIntegerRateDuration};
+            }
+
+            constexpr int kFractionalRateDuration = 1000;
+            const int timeScale = static_cast<int>(std::lround(fps * kFractionalRateDuration));
+            return {timeScale, kFractionalRateDuration};
         }
 
         AVPixelFormat getBestAVFormat(AVPixelFormat native)
@@ -4453,7 +4515,7 @@ namespace TwkMovie
         {
             avStream->time_base.num = m_duration;
             avStream->time_base.den = m_timeScale;
-            avStream->avg_frame_rate = av_d2q(m_info.fps, INT_MAX);
+            avStream->avg_frame_rate = frameRateFromFps(m_info.fps);
             avCodecContext->time_base.num = m_duration;
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
@@ -4902,56 +4964,11 @@ namespace TwkMovie
                     m_request.parameters[movflagsIdx].second += "|write_colr";
             }
 
-            double fps = m_info.fps;
-            if (timeScale && duration)
+            if (timeScale == 0 || duration == 0)
             {
-            }
-            else if (fpsEquals(fps, 60))
-            {
-                timeScale = 6000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 59.94))
-            {
-                timeScale = 5994;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 50))
-            {
-                timeScale = 5000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 30))
-            {
-                timeScale = 3000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 29.97))
-            {
-                timeScale = 30000;
-                duration = 1001;
-            }
-            else if (fpsEquals(fps, 25))
-            {
-                timeScale = 2500;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 24))
-            {
-                timeScale = 2400;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 23.98) || fpsEquals(fps, 23.97599))
-            {
-                timeScale = 23976;
-                duration = 1000;
-            }
-            else
-            {
-                // Must add 0.001 so that 29.969... gets properly cropped
-                // to 29.97
-                timeScale = (fps + 0.001) * 1000;
-                duration = timeScale / fps;
+                const TimeScaleAndDuration timeBase = timeScaleAndDurationFromFps(m_info.fps);
+                timeScale = timeBase.timeScale;
+                duration = timeBase.duration;
             }
             m_timeScale = timeScale;
             m_duration = duration;
