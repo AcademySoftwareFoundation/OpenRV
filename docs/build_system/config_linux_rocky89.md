@@ -113,7 +113,7 @@ sudo dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel 
 ```
 
 ```bash
-sudo dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+sudo dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel libatomic
 ```
 
 ````{tabs}
