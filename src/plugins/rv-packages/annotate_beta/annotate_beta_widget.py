@@ -369,9 +369,6 @@ class _MenuToolButton(_PopupToolButton):
     def _action_for(self, item_id):
         return next((action for action in self._menu.actions() if action.data() == item_id), None)
 
-    def has_item(self, item_id):
-        return self._action_for(item_id) is not None
-
     def selection(self):
         return self._selection
 
@@ -765,7 +762,7 @@ class _MenuValueLineEdit(_ValueLineEdit):
             event.accept()
 
 
-class _FontSizeButton(QtWidgets.QToolButton):
+class _FontSizeButton(_PopupToolButton):
     """Drop-down of named size presets with a value box for any other size."""
 
     font_size_changed = QtCore.Signal(int)
@@ -778,13 +775,7 @@ class _FontSizeButton(QtWidgets.QToolButton):
     )
 
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("menuToolButton")
-        self.setProperty("tbstyle", "palette")
-        self.setToolTip("Size")
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        self.setFixedHeight(30)
-        self.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        super().__init__("", parent)
 
         self._font_size = constants.DEFAULT_FONT_SIZE
         self._menu = QtWidgets.QMenu(self)
@@ -800,8 +791,7 @@ class _FontSizeButton(QtWidgets.QToolButton):
 
         self._size_input = _MenuValueLineEdit()
         self._size_input.setObjectName("sliderValue")
-        self._size_input.setToolTip("Size")
-        self._size_input.setAlignment(QtCore.Qt.AlignCenter)
+        self._size_input.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self._size_input.editingFinished.connect(self._on_size_input_committed)
         self._size_input.returnPressed.connect(self._on_size_input_confirmed)
         self._size_input.navigate_requested.connect(self._move_menu_highlight)
