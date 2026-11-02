@@ -1,0 +1,14 @@
+--- a/sources/pyside6/PySide6/__init__.py.in	2026-10-27 09:56:26
++++ b/sources/pyside6/PySide6/__init__.py.in	2026-10-27 09:56:26
+@@ -103,8 +103,9 @@
+     # and create the __all__ list on demand when needed.
+     location = Path(__file__).resolve().parent
+     files = os.listdir(location)
+-    unordered = set(name[: name.find(".")] for name in files if name.startswith("Qt") and (
+-                                                                name.endswith((".pyd", ".so"))))
++    # Windows debug builds name modules QtCore_d.<tag>.pyd. Backport of the PySide 6.10 fix.
++    unordered = set(name[: name.find(".")].removesuffix("_d") for name in files
++                    if name.startswith("Qt") and name.endswith((".pyd", ".so")))
+     ordered_part = __pre_all__
+     result = []
+     for name in ordered_part:
