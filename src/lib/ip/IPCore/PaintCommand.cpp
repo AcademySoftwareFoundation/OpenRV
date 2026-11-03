@@ -245,73 +245,87 @@ namespace IPCore
             glActiveTexture(GL_TEXTURE0);
         }
 
-        // verts owns the vertex data; primData holds a raw pointer into verts.data().
-        // std::vector move keeps the allocation intact, so the pointer survives RVO.
-        struct StampQuads
+        namespace
         {
-            std::vector<float> verts;
-            PrimitiveData primData;
-            std::vector<VertexAttribute> attrs;
-        };
-
-        // CPU-batches stamp instances into GL_QUADS vertex data.
-        // VBO layout matches PolyLine::build(): tightly packed, no index buffer.
-        // Each stamp is 4 vertices with UV in [0,1], rotated by angle, scaled by radius/squish.
-        // NOTE: can be replaced by VAO + glDrawArraysInstanced (GL 3.3) if OpenGL is upgraded.
-        // The CPU vertex expansion loop below would be eliminated entirely.
-        static StampQuads buildStampQuads(const std::vector<StampInstance>& stamps)
-        {
-            const size_t N = stamps.size();
-            const size_t Nv = 4 * N; // 4 vertices per quad
-
-            StampQuads result;
-
-            // Vertex buffer layout: one block per attribute, each with one entry per vertex:
-            // UV block:       u0 v0 u1 v1 ... (2 floats per vertex)
-            // Position block: x0 y0 x1 y1 ... (2 floats per vertex)
-            // Opacity block:  a0 a1 a2 ...    (1 float per vertex)
-
-            const size_t positionBlockOffset = 2 * Nv;
-            const size_t opacityBlockOffset = positionBlockOffset + (2 * Nv);
-            result.verts.resize(opacityBlockOffset + Nv);
-
-            // UV block: BL=(0,0)  BR=(1,0)  TR=(1,1)  TL=(0,1)
-            static const float kUV[4][2] = {{0.f, 0.f}, {1.f, 0.f}, {1.f, 1.f}, {0.f, 1.f}};
-            for (size_t i = 0; i < N; ++i)
+            // primitiveData points into vertexData so moving the struct is safe, copying it would dangle.
+            struct StampQuads
             {
-                for (int v = 0; v < 4; ++v)
-                {
-                    result.verts[(2 * (4 * i + v)) + 0] = kUV[v][0];
-                    result.verts[(2 * (4 * i + v)) + 1] = kUV[v][1];
-                }
-            }
+                std::vector<float> vertexData;
+                PrimitiveData primitiveData;
+                std::vector<VertexAttribute> vertexAttributes;
+            };
 
-            // Position block: local corners (half-extents: radius x, radius*squish y),
-            // rotated by stamp.angle degrees and translated to stamp.pos.
-            static std::array<const float, 4> kCX = {-1.f, 1.f, 1.f, -1.f};
-            static std::array<const float, 4> kCY = {-1.f, -1.f, 1.f, 1.f};
-            static constexpr float kPi = 3.14159265f;
-            for (size_t i = 0; i < N; ++i)
+            // CPU-batches stamp instances into GL_QUADS vertex data.
+            // VBO layout matches PolyLine::build(): tightly packed, no index buffer.
+            // Each stamp is 4 vertices with UV in [0,1], rotated by angle, scaled by radius/squish.
+            // NOTE: can be replaced by VAO + glDrawArraysInstanced (GL 3.3) if OpenGL is upgraded.
+            // The CPU vertex expansion loop below would be eliminated entirely.
+            StampQuads buildStampQuads(const std::vector<StampInstance>& stamps)
             {
-                const auto& s = stamps[i];
-                const float ca = std::cos(s.angle * (kPi / 180.f));
-                const float sa = std::sin(s.angle * (kPi / 180.f));
-                for (int v = 0; v < 4; ++v)
-                {
-                    const float lx = kCX[v] * s.radius;
-                    const float ly = kCY[v] * s.radius * s.squish;
-                    result.verts[positionBlockOffset + (2 * (4 * i + v)) + 0] = s.pos.x + lx * ca - ly * sa;
-                    result.verts[positionBlockOffset + (2 * (4 * i + v)) + 1] = s.pos.y + lx * sa + ly * ca;
-                    result.verts[opacityBlockOffset + (4 * i + v)] = s.opacity;
-                }
-            }
+                constexpr size_t kVerticesPerQuad = 4;
+                constexpr float kDegreesToRadians = 3.14159265f / 180.f;
 
-            result.primData = PrimitiveData(result.verts.data(), nullptr, GL_QUADS, Nv, N, result.verts.size() * sizeof(float));
-            result.attrs.emplace_back("in_TexCoord0", GL_FLOAT, 2, 0, 0);
-            result.attrs.emplace_back("in_Position", GL_FLOAT, 2, static_cast<int>(positionBlockOffset * sizeof(float)), 0);
-            result.attrs.emplace_back("in_Opacity", GL_FLOAT, 1, static_cast<int>(opacityBlockOffset * sizeof(float)), 0);
-            return result;
-        }
+                const size_t stampCount = stamps.size();
+                const size_t vertexCount = kVerticesPerQuad * stampCount;
+
+                StampQuads result;
+
+                // Vertex buffer layout: one block per attribute, each with one entry per vertex:
+                // UV block:       u0 v0 u1 v1 ... (2 floats per vertex)
+                // Position block: x0 y0 x1 y1 ... (2 floats per vertex)
+                // Opacity block:  a0 a1 a2 ...    (1 float per vertex)
+
+                const size_t positionBlockOffset = 2 * vertexCount;
+                const size_t opacityBlockOffset = positionBlockOffset + (2 * vertexCount);
+                result.vertexData.resize(opacityBlockOffset + vertexCount);
+
+                struct QuadCorner
+                {
+                    float u;
+                    float v;
+                    float offsetX;
+                    float offsetY;
+                };
+
+                // Corner order: bottom-left, bottom-right, top-right, top-left
+                constexpr std::array<QuadCorner, kVerticesPerQuad> kQuadCorners = {{
+                    {0.f, 0.f, -1.f, -1.f},
+                    {1.f, 0.f, 1.f, -1.f},
+                    {1.f, 1.f, 1.f, 1.f},
+                    {0.f, 1.f, -1.f, 1.f},
+                }};
+
+                for (size_t i = 0; i < stampCount; ++i)
+                {
+                    const auto& stamp = stamps[i];
+                    const float cosAngle = std::cos(stamp.angle * kDegreesToRadians);
+                    const float sinAngle = std::sin(stamp.angle * kDegreesToRadians);
+                    size_t vertexIndex = kVerticesPerQuad * i;
+                    for (const QuadCorner& corner : kQuadCorners)
+                    {
+                        result.vertexData[(2 * vertexIndex) + 0] = corner.u;
+                        result.vertexData[(2 * vertexIndex) + 1] = corner.v;
+
+                        const float localX = corner.offsetX * stamp.radius;
+                        const float localY = corner.offsetY * stamp.radius * stamp.squish;
+                        result.vertexData[positionBlockOffset + (2 * vertexIndex) + 0] =
+                            stamp.pos.x + localX * cosAngle - localY * sinAngle;
+                        result.vertexData[positionBlockOffset + (2 * vertexIndex) + 1] =
+                            stamp.pos.y + localX * sinAngle + localY * cosAngle;
+                        result.vertexData[opacityBlockOffset + vertexIndex] = stamp.opacity;
+
+                        ++vertexIndex;
+                    }
+                }
+
+                result.primitiveData = PrimitiveData(result.vertexData.data(), nullptr, GL_QUADS, vertexCount, stampCount,
+                                                     result.vertexData.size() * sizeof(float));
+                result.vertexAttributes.emplace_back("in_TexCoord0", GL_FLOAT, 2, 0, 0);
+                result.vertexAttributes.emplace_back("in_Position", GL_FLOAT, 2, static_cast<int>(positionBlockOffset * sizeof(float)), 0);
+                result.vertexAttributes.emplace_back("in_Opacity", GL_FLOAT, 1, static_cast<int>(opacityBlockOffset * sizeof(float)), 0);
+                return result;
+            }
+        } // namespace
 
         void PolyLine::execute(CommandContext& context) const
         {
@@ -423,7 +437,7 @@ namespace IPCore
                               context.stencilBox[3] - context.stencilBox[1]);
                 }
 
-                auto sq = buildStampQuads(localPoly->stampInstances);
+                auto stampQuads = buildStampQuads(localPoly->stampInstances);
 
                 // BlendMarker and ghost mode both use two-pass isolation: GL_MAX into
                 // a cleared currentFBO (prevents intra-stroke opacity accumulation),
@@ -439,7 +453,8 @@ namespace IPCore
                     glBlendEquationSeparate(GL_MAX, GL_MAX);
                     glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
                     {
-                        RenderPrimitives rpStamp(glState->activeGLProgram(), sq.primData, sq.attrs, glState->vboList());
+                        RenderPrimitives rpStamp(glState->activeGLProgram(), stampQuads.primitiveData, stampQuads.vertexAttributes,
+                                                 glState->vboList());
                         rpStamp.setupAndRender();
                     }
                     glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
@@ -468,7 +483,8 @@ namespace IPCore
                         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
                     else
                         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-                    RenderPrimitives rpStamp(glState->activeGLProgram(), sq.primData, sq.attrs, glState->vboList());
+                    RenderPrimitives rpStamp(glState->activeGLProgram(), stampQuads.primitiveData, stampQuads.vertexAttributes,
+                                             glState->vboList());
                     rpStamp.setupAndRender();
                 }
 
