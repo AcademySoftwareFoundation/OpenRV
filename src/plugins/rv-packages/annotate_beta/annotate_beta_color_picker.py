@@ -12,12 +12,6 @@ _PRESETS = [
     "#FFFFFF",  # white
 ]
 
-# Gap in logical pixels between the popup and its anchor widget (the toolbar
-# color swatch). Chosen visually: the tool strip pads the swatch by 4 logical
-# pixels on each side, so 6 places the popup just clear of the toolbar edge
-# without detaching it.
-_POPUP_ANCHOR_SPACING = 6
-
 
 class _HSVGradientWidget(QtWidgets.QWidget):
     """Saturation/value square. Hue is controlled via set_hue()."""
@@ -243,15 +237,21 @@ class ColorPickerPopup(QtWidgets.QFrame):
         Opens to the right of the anchor, flipping to the left when it would
         overflow the screen (e.g. toolbar docked on the right in fullscreen).
         """
+        # Gap in logical pixels between the popup and the toolbar color swatch.
+        # Chosen visually: the tool strip pads the swatch by 4 logical pixels
+        # on each side, so 6 places the popup just clear of the toolbar edge
+        # without detaching it.
+        anchor_spacing = 6
+
         self.adjustSize()
         anchor = anchor_widget.mapToGlobal(QtCore.QPoint(0, 0))
         screen = anchor_widget.screen().availableGeometry()
         screen_right = screen.x() + screen.width()
         screen_bottom = screen.y() + screen.height()
 
-        x = anchor.x() + anchor_widget.width() + _POPUP_ANCHOR_SPACING
+        x = anchor.x() + anchor_widget.width() + anchor_spacing
         if x + self.width() > screen_right:
-            x = anchor.x() - _POPUP_ANCHOR_SPACING - self.width()
+            x = anchor.x() - anchor_spacing - self.width()
         x = max(screen.x(), min(x, screen_right - self.width()))
         y = max(screen.y(), min(anchor.y(), screen_bottom - self.height()))
 
