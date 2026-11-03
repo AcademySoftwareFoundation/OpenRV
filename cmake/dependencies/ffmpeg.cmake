@@ -365,6 +365,19 @@ IF(RV_FFMPEG_POST_CONFIGURE_STEP)
   )
 ENDIF()
 
+# TEMPORARY: diagnostics for the Windows awk failure in FFmpeg's dependency command. Remove before merge.
+IF(RV_TARGET_WINDOWS)
+  EXTERNALPROJECT_ADD_STEP(
+    ${_target} rv_windows_diag
+    COMMAND sh "${CMAKE_CURRENT_LIST_DIR}/ffmpeg_windows_diag.sh"
+    COMMAND ${CMAKE_COMMAND} -E echo "(make started from MSBuild)"
+    COMMAND ${_make_command} -f ffbuild/rv_diag.mk
+    WORKING_DIRECTORY <SOURCE_DIR>
+    DEPENDEES configure
+    DEPENDERS build
+  )
+ENDIF()
+
 FILE(MAKE_DIRECTORY ${_include_dir})
 
 FOREACH(
