@@ -249,7 +249,7 @@ jobs:
           python3 -c "import site; print(f'Site packages dirs: {site.getsitepackages()}')"
           
           echo "=== Installed packages location check ==="
-          python3 -c "import six; import dateutil; import yaml;"
+          python3 -c "import six; import yaml;"
           
           echo "=== Verifying Conan installation ==="
           # Try to find conan in the Python environment first
@@ -261,7 +261,7 @@ jobs:
             echo "Found Conan in user bin: /github/home/.local/bin/conan"
             /github/home/.local/bin/conan --version || {
               echo "ERROR: Conan in user bin failed, attempting to reinstall to pyenv environment..."
-              python3 -m pip install --force-reinstall six python-dateutil setuptools
+              python3 -m pip install --force-reinstall six setuptools
               python3 -m pip install --force-reinstall conan
               # Try again with pyenv conan
               NEW_CONAN_PATH=$(python3 -c "import sys, os; print(os.path.join(sys.prefix, 'bin', 'conan'))" 2>/dev/null)
@@ -312,7 +312,7 @@ jobs:
             echo "ERROR: Failed to get Conan home path with $CONAN_CMD"
             echo "Conan output: $CONAN_HOME_OUTPUT"
             echo "Last attempt - trying to import required modules..."
-            python3 -c "import six; import dateutil;"
+            python3 -c "import six;"
             exit 1
           }
           echo "Conan home path: $CONAN_HOME_OUTPUT"
