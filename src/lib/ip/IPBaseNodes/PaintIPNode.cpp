@@ -373,10 +373,7 @@ namespace IPCore
         p.tipTexture = tipTexture;
         p.stampBlendMode = (Paint::PolyLine::StampBlendMode)blendMode;
 
-        // Classify the brush type once — drives all downstream data paths. The
-        // legacy "circle"/"gauss" names stay on the ribbon (non-stamp) path;
-        // everything else (including future UI-driven brushes) is stamp-based.
-        const bool isStampBrush = (brush != "circle" && brush != "gauss");
+        const bool isStampBrush = !tipTexture.empty();
 
         // Per-point widths are present when widthP has one entry per point.
         // Allow widthP to lag pointsP by one: the Mu layer inserts the point and

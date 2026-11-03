@@ -10,6 +10,7 @@
 #include <IPBaseNodes/PaintIPNode.h>
 #include <TwkPaint/StampPath.h>
 #include <TwkMath/Function.h>
+#include <array>
 #include <cmath>
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLPipeline.h>
@@ -254,8 +255,7 @@ namespace IPCore
         };
 
         // CPU-batches stamp instances into GL_QUADS vertex data.
-        // VBO layout matches PolyLine::build(): texcoord block [all (u,v)] then
-        // position block [all (x,y)], tightly packed, no index buffer.
+        // VBO layout matches PolyLine::build(): tightly packed, no index buffer.
         // Each stamp is 4 vertices with UV in [0,1], rotated by angle, scaled by radius/squish.
         // NOTE: can be replaced by VAO + glDrawArraysInstanced (GL 3.3) if OpenGL is upgraded.
         // The CPU vertex expansion loop below would be eliminated entirely.
@@ -266,24 +266,31 @@ namespace IPCore
 
             StampQuads result;
 
-            // [all UVs: u0 v0 u1 v1 ... | all positions: x0 y0 x1 y1 ...]
-            result.verts.resize(4 * Nv);
+            // Vertex buffer layout: one block per attribute, each with one entry per vertex:
+            // UV block:       u0 v0 u1 v1 ... (2 floats per vertex)
+            // Position block: x0 y0 x1 y1 ... (2 floats per vertex)
+            // Opacity block:  a0 a1 a2 ...    (1 float per vertex)
+
+            const size_t positionBlockOffset = 2 * Nv;
+            const size_t opacityBlockOffset = positionBlockOffset + (2 * Nv);
+            result.verts.resize(opacityBlockOffset + Nv);
 
             // UV block: BL=(0,0)  BR=(1,0)  TR=(1,1)  TL=(0,1)
             static const float kUV[4][2] = {{0.f, 0.f}, {1.f, 0.f}, {1.f, 1.f}, {0.f, 1.f}};
             for (size_t i = 0; i < N; ++i)
+            {
                 for (int v = 0; v < 4; ++v)
                 {
-                    result.verts[2 * (4 * i + v) + 0] = kUV[v][0];
-                    result.verts[2 * (4 * i + v) + 1] = kUV[v][1];
+                    result.verts[(2 * (4 * i + v)) + 0] = kUV[v][0];
+                    result.verts[(2 * (4 * i + v)) + 1] = kUV[v][1];
                 }
+            }
 
             // Position block: local corners (half-extents: radius x, radius*squish y),
             // rotated by stamp.angle degrees and translated to stamp.pos.
-            static const float kCX[4] = {-1.f, 1.f, 1.f, -1.f};
-            static const float kCY[4] = {-1.f, -1.f, 1.f, 1.f};
+            static std::array<const float, 4> kCX = {-1.f, 1.f, 1.f, -1.f};
+            static std::array<const float, 4> kCY = {-1.f, -1.f, 1.f, 1.f};
             static constexpr float kPi = 3.14159265f;
-            const size_t posOff = 2 * Nv;
             for (size_t i = 0; i < N; ++i)
             {
                 const auto& s = stamps[i];
@@ -293,14 +300,16 @@ namespace IPCore
                 {
                     const float lx = kCX[v] * s.radius;
                     const float ly = kCY[v] * s.radius * s.squish;
-                    result.verts[posOff + 2 * (4 * i + v) + 0] = s.pos.x + lx * ca - ly * sa;
-                    result.verts[posOff + 2 * (4 * i + v) + 1] = s.pos.y + lx * sa + ly * ca;
+                    result.verts[positionBlockOffset + (2 * (4 * i + v)) + 0] = s.pos.x + lx * ca - ly * sa;
+                    result.verts[positionBlockOffset + (2 * (4 * i + v)) + 1] = s.pos.y + lx * sa + ly * ca;
+                    result.verts[opacityBlockOffset + (4 * i + v)] = s.opacity;
                 }
             }
 
             result.primData = PrimitiveData(result.verts.data(), nullptr, GL_QUADS, Nv, N, result.verts.size() * sizeof(float));
-            result.attrs.push_back(VertexAttribute("in_TexCoord0", GL_FLOAT, 2, 0, 0));
-            result.attrs.push_back(VertexAttribute("in_Position", GL_FLOAT, 2, static_cast<int>(2 * Nv * sizeof(float)), 0));
+            result.attrs.emplace_back("in_TexCoord0", GL_FLOAT, 2, 0, 0);
+            result.attrs.emplace_back("in_Position", GL_FLOAT, 2, static_cast<int>(positionBlockOffset * sizeof(float)), 0);
+            result.attrs.emplace_back("in_Opacity", GL_FLOAT, 1, static_cast<int>(opacityBlockOffset * sizeof(float)), 0);
             return result;
         }
 
@@ -388,33 +397,24 @@ namespace IPCore
 
             if (isStamp)
             {
-                // Brush properties come straight from the stroke's own properties
-                // (see PaintIPNode::compilePenComponent) — resolve the tip texture,
-                // if any, at render time since that's the only place with a GL context.
-                const unsigned int textureId = tipTexture.empty() ? 0 : BrushTextureManager::instance().getTexture(tipTexture);
+                // Brush properties come straight from the stroke's own properties (see PaintIPNode::compilePenComponent) — resolve the tip
+                // texture at render time since that's the only place with a GL context.
+                const unsigned int textureId = BrushTextureManager::instance().getTexture(tipTexture);
 
-                const GLProgram* stampProg = textureId ? texturePaintReplaceGLProgram() : softPaintReplaceGLProgram();
-                GLPipeline* stampPipeline = glState->useGLProgram(stampProg);
+                GLPipeline* stampPipeline = glState->useGLProgram(texturePaintReplaceGLProgram());
                 stampPipeline->setProjection(context.projMatrix);
                 stampPipeline->setModelview(context.modelviewMatrix);
                 stampPipeline->setViewport(0, 0, w, h);
-                stampPipeline->setUniformFloat("uniformColor", 4, &(pcolor[0]));
 
-                if (textureId)
-                {
-                    int tipUnit = 1;
-                    stampPipeline->setUniformInt("brushTip", 1, &tipUnit);
-                    glActiveTexture(GL_TEXTURE0 + 1);
-                    glBindTexture(GL_TEXTURE_2D, textureId);
-                }
-                else
-                {
-                    // Procedural (tip-less) brushes get a continuously variable
-                    // edge from the `hardness` uniform instead of a hard cutover
-                    // between two shaders — see soft_stamp_frag.glsl.
-                    const float normalizedHardness = hardness / 100.0f;
-                    stampPipeline->setUniformFloat("hardness", 1, (float*)&normalizedHardness);
-                }
+                stampPipeline->setUniformFloat("uniformColor", 3, &(pcolor[0]));
+
+                int tipUnit = 1;
+                stampPipeline->setUniformInt("brushTip", 1, &tipUnit);
+                glActiveTexture(GL_TEXTURE0 + 1);
+                glBindTexture(GL_TEXTURE_2D, textureId);
+
+                float normalizedHardness = hardness / 100.0f;
+                stampPipeline->setUniformFloat("hardness", 1, &normalizedHardness);
 
                 if (context.hasStencil)
                 {

@@ -266,7 +266,7 @@ namespace IPCore
 
             // Stamp brush properties, set directly from the stroke's own properties
             StampBlendMode stampBlendMode{BlendNormal};
-            float hardness{100.0f};   ///< edge hardness 0-100; drives the `hardness` uniform in soft_stamp_frag.glsl
+            float hardness{100.0f};   ///< edge hardness 0-100
             std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time; empty = procedural
 
             mutable HashValue idhash;
