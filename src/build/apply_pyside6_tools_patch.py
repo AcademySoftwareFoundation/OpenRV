@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""Apply PySide6 patches that tolerate missing Qt Designer tooling."""
+"""Apply the CY2026 PySide6 6.8.3 patches: tolerate missing Qt Designer tooling, and find Windows debug modules."""
 
 from __future__ import annotations
 
@@ -41,14 +41,12 @@ def main() -> int:
 
     platform_patch = patch_dir / "pyside6_tools_optional_qt_app_bundles.patch"
     cmake_patch = patch_dir / "pyside6_tools_optional_qt_app_bundles_cmake683.patch"
+    debug_suffix_patch = patch_dir / "pyside6_debug_module_suffix_683.patch"
 
-    if not apply_patch(source_dir, platform_patch):
-        print(f"ERROR: Failed to apply {platform_patch}", file=sys.stderr)
-        return 1
-
-    if not apply_patch(source_dir, cmake_patch):
-        print(f"ERROR: Failed to apply {cmake_patch}", file=sys.stderr)
-        return 1
+    for patch_file in (platform_patch, cmake_patch, debug_suffix_patch):
+        if not apply_patch(source_dir, patch_file):
+            print(f"ERROR: Failed to apply {patch_file}", file=sys.stderr)
+            return 1
 
     return 0
 

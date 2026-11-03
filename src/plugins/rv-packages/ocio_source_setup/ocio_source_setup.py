@@ -526,6 +526,9 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
     def selectConfig(self, event):
         try:
             config = commands.openFileDialog(True, False, False, "ocio|OCIO Config", None)[0]
+        except Exception:
+            return  # File dialog cancelled
+        try:
             self.config = OCIO.Config.CreateFromFile(config)
             OCIO.SetCurrentConfig(self.config)
             for source in commands.nodesOfType("RVFileSource") + commands.nodesOfType("RVImageSource"):
@@ -542,8 +545,8 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
                 self.useDisplayOCIO(group)
             commands.defineModeMenu("OCIO Source Setup", self.buildOCIOMenu(), True)
             commands.writeSettings("ocio_source_setup", "ocio_config", config)
-        except Exception as inst:
-            print(inst)
+        except Exception as error:
+            print(f"ERROR: Unable to select OCIO config: {error}")
 
     def buildOCIOMenu(self):
         #
@@ -735,10 +738,18 @@ class OCIOSourceSetupMode(rvtypes.MinorMode):
         if os.getenv("OCIO") is None:
             config = commands.readSettings("ocio_source_setup", "ocio_config", "")
             if config != "" and os.path.isfile(config):
-                self.config = OCIO.Config.CreateFromFile(config)
-                OCIO.SetCurrentConfig(self.config)
+                try:
+                    self.config = OCIO.Config.CreateFromFile(config)
+                    OCIO.SetCurrentConfig(self.config)
+                except Exception as error:
+                    print(f"ERROR: Unable to load OCIO config from RV settings: {error}")
             else:
                 print("WARNING: $OCIO environment variable unset!")
+        else:
+            try:
+                OCIO.GetCurrentConfig()
+            except Exception as error:
+                print(f"ERROR: Unable to load OCIO config: {error}")
 
         self.init(
             "OCIO Source Setup",

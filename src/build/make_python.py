@@ -550,6 +550,10 @@ def install_python_vfx2024() -> None:
             tk_dll = os.path.join(build_path, "tk86t.dll")
             shutil.copyfile(tcl_dll, os.path.join(dst_dir, "tcl86t.dll"))
             shutil.copyfile(tk_dll, os.path.join(dst_dir, "tk86t.dll"))
+            # Tcl 8.6.15 (Python 3.13) also needs zlib1.dll. Older Tcl builds do not ship it.
+            zlib_dll = os.path.join(build_path, "zlib1.dll")
+            if os.path.exists(zlib_dll):
+                shutil.copyfile(zlib_dll, os.path.join(dst_dir, "zlib1.dll"))
 
     else:
         # -j1: Python's make install has a known upstream race condition under parallel jobs.
