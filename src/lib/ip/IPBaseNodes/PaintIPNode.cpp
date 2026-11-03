@@ -399,7 +399,7 @@ namespace IPCore
                     if (!p.stampPlacer)
                     {
                         TwkPaint::BrushParams params;
-                        params.radius = p.width * 0.5f;
+                        params.radius = p.width;
                         params.opacity = p.color[3];
                         p.stampPlacer = std::make_unique<TwkPaint::StampPath>(params);
                         p.stampInstances.clear();
@@ -408,7 +408,7 @@ namespace IPCore
                     const size_t wi = (hasPerPointWidths && widthsCount > 0) ? std::min(i, widthsCount - 1) : static_cast<size_t>(-1);
                     const float w = (wi != static_cast<size_t>(-1)) ? static_cast<const float*>(widthP->rawData())[wi] : p.width;
 
-                    p.stampPlacer->add_point(rawPts[i], w * 0.5f);
+                    p.stampPlacer->add_point(rawPts[i], w);
                     TwkPaint::StampInstance s;
                     while (p.stampPlacer->next(s))
                         p.stampInstances.push_back(s);
