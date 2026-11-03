@@ -750,9 +750,12 @@ class _MenuValueLineEdit(_ValueLineEdit):
     """
 
     navigate_requested = QtCore.Signal(int)  # -1 for Up, +1 for Down
+    cancel_requested = QtCore.Signal()
 
     def keyPressEvent(self, event):
         key = event.key()
+        if key == QtCore.Qt.Key_Escape:
+            self.cancel_requested.emit()
         if key in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down):
             self.navigate_requested.emit(-1 if key == QtCore.Qt.Key_Up else 1)
             event.accept()
@@ -787,7 +790,7 @@ class _FontSizeButton(_PopupToolButton):
             preset_action.setData(int(preset_size))
             preset_group.addAction(preset_action)
         self._menu.triggered.connect(self._on_preset_triggered)
-        self._menu.aboutToHide.connect(self._release_size_input)
+        self._menu.aboutToHide.connect(self._on_menu_hidden)
 
         self._size_input = _MenuValueLineEdit()
         self._size_input.setObjectName("sliderValue")
@@ -795,6 +798,7 @@ class _FontSizeButton(_PopupToolButton):
         self._size_input.editingFinished.connect(self._on_size_input_committed)
         self._size_input.returnPressed.connect(self._on_size_input_confirmed)
         self._size_input.navigate_requested.connect(self._move_menu_highlight)
+        self._size_input.cancel_requested.connect(self._revert_size_input)
         self._size_input_action = QtWidgets.QWidgetAction(self._menu)
         self._size_input_action.setDefaultWidget(self._size_input)
         self._menu.addSeparator()
@@ -823,10 +827,12 @@ class _FontSizeButton(_PopupToolButton):
         if action.data() is not None:
             self._change_font_size(action.data())
 
-    def _release_size_input(self):
-        # The line edit keeps focus (and its select-all highlight) after the menu closes.
-        # Dropping uncommitted text first makes Escape and click-away cancel the edit.
+    def _revert_size_input(self):
         self._size_input.setText(str(self._font_size))
+
+    def _on_menu_hidden(self):
+        # Clicking away confirms the typed size (Escape reverts it first).
+        self._on_size_input_committed()
         self._size_input.clearFocus()
         self._size_input.deselect()
 
