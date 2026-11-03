@@ -45,6 +45,7 @@
 #include <TwkFB/FastMemcpy.h>
 
 #include <algorithm>
+#include <ios>
 #include <cstdlib> // atof, atoi
 #include <string>
 #include <fstream>
@@ -1018,6 +1019,39 @@ namespace AJADevices
                 cout << "INFO: KONA video format (" << (int)f.value << ") = " << f.desc << endl;
             if (m_infoFeedback)
                 cout << "INFO: KONA data format (" << (int)d.value << ") = " << d.desc << endl;
+
+            //
+            //  Reject video formats that a 12G single-link output cannot carry:
+            //
+            //  - The 12G output combines four 1080-line quadrants into one
+            //    2160-line raster, so HD (and 8K) formats would silently come
+            //    out as UHD/4K DCI. HD fits in 3G SDI, so point to the 3G formats.
+            //
+            //  - RGB 4:4:4 at 4K high frame rates needs more bandwidth than a
+            //    single 12G SDI link can carry.
+            //
+            if ((d.flags & TwelveG) != 0)
+            {
+                const bool isUnsupportedRaster = !NTV2_IS_QUAD_FRAME_FORMAT(f.value);
+                const bool isUnsupportedRGBRate = rgb && NTV2_IS_4K_HFR_VIDEO_FORMAT(f.value);
+
+                if (isUnsupportedRaster || isUnsupportedRGBRate)
+                {
+                    delete m_card;
+                    m_card = nullptr;
+                    m_open = false;
+
+                    if (isUnsupportedRaster)
+                    {
+                        TWK_THROW_EXC_STREAM("AJA: " << d.desc << " requires a UHD or 4K DCI video format (selected: " << f.desc
+                                                     << "), for HD video formats use a non-12G data format such as "
+                                                        "10 Bit YCrCb 4:2:2 or 12 Bit 3G RGB");
+                    }
+
+                    TWK_THROW_EXC_STREAM("AJA: " << d.desc << " does not support high frame rate 4K video formats (selected: " << f.desc
+                                                 << "), use a 24/25/30 fps format or 10 Bit 12G Single-link YCrCb 4:2:2");
+                }
+            }
 
             if (m_acquire)
             {
@@ -1993,18 +2027,53 @@ namespace AJADevices
         if (m_infoFeedback)
             std::cout << "INFO: KONA 12G single-link RGB format\n";
 
-        ULWord vpidA;
-        CNTV2VPID::SetVPIDData(vpidA, videoFormat.value, dataFormat.value, false, false, VPIDChannel_3);
+        //
+        //  The VPID must identify the signal as 2160-line single-link 12G
+        //  (two-sample interleave, RGB 4:4:4 carried as dual-link Level B
+        //  sub-images). A 12G receiver cannot tell RGB 4:4:4 at 24/25/30 fps
+        //  apart from YCbCr 4:2:2 at 48/50/60 fps from the line rate alone,
+        //  so a wrong VPID makes it decode the RGB picture as YCbCr.
+        //
+        const bool isRGB48Bit = dataFormat.value == NTV2_FBF_48BIT_RGB;
+        ULWord vpid = 0;
+        CNTV2VPID::SetVPIDData(vpid, videoFormat.value,
+                               true,          // inIsDualLinkRGB
+                               isRGB48Bit,    // inIsRGB48Bit
+                               true,          // inIsOutput3Gb
+                               true,          // inIsSMPTE425 (TSI)
+                               VPIDChannel_1, // forced to channel 1 by the SDK for 6G/12G
+                               true,          // inUseVPIDChannel
+                               false,         // inOutputIs6G
+                               true);         // inOutputIs12G
+
+        if (m_infoFeedback)
+        {
+            std::cout << "INFO: KONA 12G single-link RGB VPID = 0x" << std::hex << vpid << std::dec << "\n";
+        }
 
         m_card->SetSDITransmitEnable(NTV2_CHANNEL3, true);
 
-        m_card->SetSDIOutputStandard(NTV2_CHANNEL3, standard);
+        // The 12G output carries a 2160-line raster, not the 1080-line raster of each quadrant
+        m_card->SetSDIOutputStandard(NTV2_CHANNEL3, GetNTV2StandardFromVideoFormat(videoFormat.value));
         m_card->SetMode(NTV2_CHANNEL1, NTV2_MODE_DISPLAY);
         m_card->SetMode(NTV2_CHANNEL2, NTV2_MODE_DISPLAY);
 
         m_card->SubscribeOutputVerticalEvent(NTV2_CHANNEL1);
 
-        m_card->SetSDIOutVPID(vpidA, 0, NTV2_CHANNEL3);
+        m_card->SetSDIOutVPID(vpid, vpid, NTV2_CHANNEL3);
+
+        //
+        //  Each SDI output feeding the 12G muxer receives the two data streams
+        //  of a dual-link widget, so it must be in 3G Level B (dual stream)
+        //  mode, with RGB Level A conversion off. This matches what the AJA
+        //  driver programs for this routing and what the VPID above declares.
+        //
+        for (const NTV2Channel sdiChannel : {NTV2_CHANNEL1, NTV2_CHANNEL2, NTV2_CHANNEL3, NTV2_CHANNEL4})
+        {
+            m_card->SetSDIOutRGBLevelAConversion(sdiChannel, false);
+            m_card->SetSDIOut3GEnable(sdiChannel, true);
+            m_card->SetSDIOut3GbEnable(sdiChannel, true);
+        }
 
         // FB 1 + FB 2 -> TSI Mux 1 + TSI Mux 2
         m_card->Connect(NTV2_Xpt425Mux1AInput, NTV2_XptFrameBuffer1RGB);
