@@ -22,5 +22,22 @@ all:
 MK
 echo "(make started from sh)"
 make -f ffbuild/rv_diag.mk 2>&1
+echo "--- installed packages"
+pacman -Q make bash dash msys2-runtime gawk coreutils 2>&1
+ls -l /usr/bin/sh /usr/bin/bash 2>&1
+cmp /usr/bin/sh /usr/bin/bash >/dev/null 2>&1 && echo "sh is a copy of bash" || echo "sh differs from bash"
+env | grep -iE '^(MAKE|MFLAGS|GNUMAKEFLAGS|SHELL|BASH_ENV|ENV|SHELLOPTS)' 2>&1
+printf '%s\n' '--- sh without make (expect a\\b from both; echo can differ if sh has xpg_echo)'
+# Built with printf so no shell quoting touches the two backslashes: the command is  echo 'a\\b'
+sh_cmd=$(printf "echo '%s'" 'a\\b')
+printf 'command passed to sh -c: %s\n' "$sh_cmd"
+sh -c "$sh_cmd"
+sh_cmd_ext=$(printf "/usr/bin/printf '%%s\\\\n' '%s'" 'a\\b')
+printf 'command passed to sh -c: %s\n' "$sh_cmd_ext"
+sh -c "$sh_cmd_ext"
+echo "--- make --trace --debug=j"
+make --trace --debug=j -f ffbuild/rv_diag.mk 2>&1
+echo "--- make with SHELL=/usr/bin/bash"
+make SHELL=/usr/bin/bash -f ffbuild/rv_diag.mk 2>&1
 echo "=== RV FFMPEG DIAG: sh part end"
 exit 0
