@@ -129,6 +129,9 @@ class AnnotateDrawEngine:
         # screen-constant across different zoom levels and image aspect ratios.
         self._current_source_name = None
 
+        self._last_device_pointer = (0.0, 0.0)
+        self._last_pointer_source_name = ""
+
         self._history = history.UndoHistory()
 
     # ------------------------------------------------------------------
@@ -166,6 +169,12 @@ class AnnotateDrawEngine:
             ("stylus-eraser--push", self.on_stylus_eraser_push, "Start (stylus eraser end)"),
             ("stylus-eraser--drag", self.on_stylus_eraser_drag, "Draw (stylus eraser end)"),
             ("stylus-eraser--release", self.on_stylus_eraser_release, "Commit (stylus eraser end)"),
+            ("pointer--move", self.on_hover, "Track brush size ring"),
+            ("pointer--shift--move", self.on_hover, "Track brush size ring"),
+            ("stylus-pen--move", self.on_hover, "Track brush size ring (stylus)"),
+            ("stylus-pen--shift--move", self.on_hover, "Track brush size ring (stylus)"),
+            ("stylus-eraser--move", self.on_hover, "Track brush size ring (stylus eraser end)"),
+            ("pointer--leave", self.on_pointer_leave, "Hide brush size ring"),
         ]
 
     @property
@@ -218,15 +227,17 @@ class AnnotateDrawEngine:
     # State helpers
     # ------------------------------------------------------------------
 
-    def _screen_scale(self):
+    def _screen_scale(self, source_name=None):
         """Scale factor that makes image-space widths screen-constant.
 
         Returns the view height divided by the image height in event pixels, so
         doubling the zoom halves the result and the rendered width stays the same.
         Because it is based on the displayed image height, it also gives the same
         screen-pixel width for any image aspect ratio.
+
+        Measured against `source_name`, or the source captured on the last push.
         """
-        source_name = self._current_source_name
+        source_name = source_name or self._current_source_name
         if not source_name:
             return 1.0
         view_height = commands.viewSize()[1]
@@ -238,8 +249,21 @@ class AnnotateDrawEngine:
     def _font_size(self):
         return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
-    def _border_width(self):
-        scale = self._screen_scale() if self._settings.scale_brush else 1.0
+    def _stroke_width(self, source_name):
+        """Full-pressure pen/eraser width in image space, as drawn on `source_name`.
+
+        The ribbon brushes offset each edge by the width, so this is also the
+        stroke radius.
+        """
+        size_fraction = (self._settings.tool_state.size - constants.SIZE_MIN) / (
+            constants.SIZE_MAX - constants.SIZE_MIN
+        )
+        scale = self._screen_scale(source_name) if self._settings.scale_brush else 1.0
+        return (_PEN_WIDTH_MIN + size_fraction * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
+
+    def _border_width(self, source_name=None):
+        """Shape outline half-width in image space."""
+        scale = self._screen_scale(source_name) if self._settings.scale_brush else 1.0
         return max(_BORDER_WIDTH_MIN, self._settings.tool_state.size * _SIZE_SCALE * scale)
 
     # ------------------------------------------------------------------
@@ -308,9 +332,15 @@ class AnnotateDrawEngine:
         except Exception:
             pass  # A failure here must not interrupt the stroke
 
+        return self._resolve_pointer(event)
+
+    def _resolve_pointer(self, event):
+        """Resolve the event pointer to (image_name, _Vec2) and record it for the brush size ring."""
         pointer = event.pointer()
         device_pixel_ratio = commands.devicePixelRatio()
         device_pointer = (pointer[0] * device_pixel_ratio, pointer[1] * device_pixel_ratio)
+        self._last_device_pointer = device_pointer
+        self._last_pointer_source_name = ""
 
         image_infos = commands.imagesAtPixel(pointer, "annotate")
         if not image_infos:
@@ -322,11 +352,57 @@ class AnnotateDrawEngine:
                 continue
             try:
                 image_point = commands.eventToImageSpace(source_name, device_pointer, True)
-                return source_name, _Vec2(image_point[0], image_point[1])
             except Exception:
                 continue
+            self._last_pointer_source_name = source_name
+            return source_name, _Vec2(image_point[0], image_point[1])
 
         return "", None
+
+    # ------------------------------------------------------------------
+    # Brush size ring
+    # ------------------------------------------------------------------
+
+    def _redraw_brush_ring(self):
+        # Playback already redraws every frame.
+        if self._settings.tool in constants.BRUSH_RING_TOOLS and not commands.isPlaying():
+            commands.redraw()
+
+    def on_hover(self, event):
+        self._resolve_pointer(event)
+        self._redraw_brush_ring()
+        event.reject()
+
+    def on_pointer_leave(self, event):
+        self.hide_brush_ring()
+        event.reject()
+
+    def hide_brush_ring(self):
+        self._last_pointer_source_name = ""
+        self._redraw_brush_ring()
+
+    def brush_ring(self):
+        """Return ((x, y), radius) of the brush size ring in device pixels, or None.
+
+        The radius is the full-pressure stroke width for brush tools and the
+        outline half-width for shape tools, mapped from image space to the
+        screen at the pointer, so the ring lines up with what gets drawn.
+        """
+        source_name = self._last_pointer_source_name
+        tool = self._settings.tool
+        if not source_name or tool not in constants.BRUSH_RING_TOOLS:
+            return None
+        try:
+            image_point = commands.eventToImageSpace(source_name, self._last_device_pointer, True)
+            if tool in constants.BRUSH_TOOLS:
+                width = self._stroke_width(source_name)
+            else:
+                width = self._border_width(source_name)
+            center = commands.imageToEventSpace(source_name, image_point, True)
+            edge = commands.imageToEventSpace(source_name, (image_point[0], image_point[1] + width), True)
+        except Exception:  # the source went away since the last pointer event
+            return None
+        return self._last_device_pointer, math.hypot(edge[0] - center[0], edge[1] - center[1])
 
     # ------------------------------------------------------------------
     # Text editing state
@@ -402,11 +478,7 @@ class AnnotateDrawEngine:
         self._current_source_name = source_name
         # Refresh cached stroke width so _pressure_width() uses the current
         # zoom's _screen_scale(), not the stale value from the previous stroke.
-        size_fraction = (self._settings.tool_state.size - constants.SIZE_MIN) / (
-            constants.SIZE_MAX - constants.SIZE_MIN
-        )
-        scale = self._screen_scale() if self._settings.scale_brush else 1.0
-        self._pen_stroke_width = (_PEN_WIDTH_MIN + size_fraction * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
+        self._pen_stroke_width = self._stroke_width(source_name)
         tool = self._settings.tool
         if self._stylus_erasing:
             erase = True
