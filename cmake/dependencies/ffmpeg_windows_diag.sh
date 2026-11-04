@@ -19,11 +19,18 @@ all:
 	@echo 'make=$(MAKE) SHELL=$(SHELL) MAKE_VERSION=$(MAKE_VERSION)'
 	-@echo 'single-quoted: gsub(/\\/, "/")'
 	-@printf '%s\n' 'C:\a\b' | awk '{ gsub(/\\/, "/"); print "awk result: " $$0 }'
+	-@/usr/bin/printf '%s\n' 'no shell, expect a\\b: a\\b'
 MK
 echo "(make started from sh)"
 make -f ffbuild/rv_diag.mk 2>&1
 echo "--- installed packages"
 pacman -Q make bash dash msys2-runtime gawk coreutils 2>&1
+echo "--- who owns and links make"
+pacman -Qo /usr/bin/make /usr/bin/sh /usr/bin/awk 2>&1
+type -P make
+cygcheck "$(type -P make)" 2>&1 | head -20
+grep -l 'usr/bin/make' /var/lib/pacman/local/*/files 2>&1 | head
+ls -l /usr/bin/make* 2>&1
 ls -l /usr/bin/sh /usr/bin/bash 2>&1
 cmp /usr/bin/sh /usr/bin/bash >/dev/null 2>&1 && echo "sh is a copy of bash" || echo "sh differs from bash"
 env | grep -iE '^(MAKE|MFLAGS|GNUMAKEFLAGS|SHELL|BASH_ENV|ENV|SHELLOPTS)' 2>&1
