@@ -121,9 +121,9 @@ class _HueSlider(QtWidgets.QWidget):
         painter.drawEllipse(handle_x - 5, center_y - 5, 10, 10)
 
     def _update_from_position(self, x):
-        bar_left = 6
+        BAR_LEFT = 6
         bar_width = max(1, self.width() - 12)
-        self._hue = max(0.0, min(1.0, (x - bar_left) / bar_width))
+        self._hue = max(0.0, min(1.0, (x - BAR_LEFT) / bar_width))
         self.update()
         self.hue_changed.emit(self._hue)
 
@@ -241,7 +241,7 @@ class ColorPickerPopup(QtWidgets.QFrame):
         # Chosen visually: the tool strip pads the swatch by 4 logical pixels
         # on each side, so 6 places the popup just clear of the toolbar edge
         # without detaching it.
-        anchor_spacing = 6
+        ANCHOR_SPACING = 6
 
         self.adjustSize()
         anchor = anchor_widget.mapToGlobal(QtCore.QPoint(0, 0))
@@ -249,9 +249,9 @@ class ColorPickerPopup(QtWidgets.QFrame):
         screen_right = screen.x() + screen.width()
         screen_bottom = screen.y() + screen.height()
 
-        x = anchor.x() + anchor_widget.width() + anchor_spacing
+        x = anchor.x() + anchor_widget.width() + ANCHOR_SPACING
         if x + self.width() > screen_right:
-            x = anchor.x() - anchor_spacing - self.width()
+            x = anchor.x() - ANCHOR_SPACING - self.width()
         x = max(screen.x(), min(x, screen_right - self.width()))
         y = max(screen.y(), min(anchor.y(), screen_bottom - self.height()))
 
