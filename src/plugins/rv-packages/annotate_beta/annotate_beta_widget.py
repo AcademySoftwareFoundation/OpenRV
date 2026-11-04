@@ -189,6 +189,14 @@ class _AnnotationSlider(QtWidgets.QSlider):
 # ---------------------------------------------------------------------------
 
 
+def _parse_clamped_int(text, minimum, maximum):
+    """Return `text` rounded to an int and clamped to [minimum, maximum], or None if it is not a number."""
+    try:
+        return max(minimum, min(maximum, round(float(text))))
+    except (ValueError, OverflowError):
+        return None
+
+
 class _ValueLineEdit(QtWidgets.QLineEdit):
     """QLineEdit that selects all text when it receives focus."""
 
@@ -256,9 +264,8 @@ class _SliderSection(QtWidgets.QWidget):
         text = self._input.text().strip()
         if self._suffix and text.endswith(self._suffix):
             text = text[: -len(self._suffix)].strip()
-        try:
-            value = max(self._minimum, min(self._maximum, int(round(float(text)))))
-        except (ValueError, OverflowError):
+        value = _parse_clamped_int(text, self._minimum, self._maximum)
+        if value is None:
             self._input.setText(f"{self._slider.value()}{self._suffix}")
             return
         self._slider.setValue(value)
@@ -323,6 +330,16 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
+def _add_checkable_actions(menu, items):
+    """Add one checkable action per (item_id, label, icon_name) to `menu`, in an exclusive group."""
+    group = QtGui.QActionGroup(menu)
+    for item_id, label, icon_name in items:
+        action = menu.addAction(_load_icon(icon_name), label) if icon_name else menu.addAction(label)
+        action.setCheckable(True)
+        action.setData(item_id)
+        group.addAction(action)
+
+
 class _PopupToolButton(QtWidgets.QToolButton):
     """Tool button that opens its menu on click."""
 
@@ -349,13 +366,7 @@ class _MenuToolButton(_PopupToolButton):
 
         self._selection = None
         self._menu = QtWidgets.QMenu(self)
-        group = QtGui.QActionGroup(self._menu)
-        group.setExclusive(True)
-        for item_id, label, icon_name in items:
-            action = self._menu.addAction(_load_icon(icon_name), label) if icon_name else self._menu.addAction(label)
-            action.setCheckable(True)
-            action.setData(item_id)
-            group.addAction(action)
+        _add_checkable_actions(self._menu, items)
         self._menu.triggered.connect(self._on_triggered)
         self.setMenu(self._menu)
 
@@ -776,19 +787,16 @@ class _FontSizeButton(_PopupToolButton):
         (constants.FontSize.MEDIUM, "M", "Medium"),
         (constants.FontSize.LARGE, "L", "Large"),
     )
+    _SHORT_LABELS = {preset_size: short_label for preset_size, short_label, _ in _SIZE_PRESETS}
 
     def __init__(self, parent=None):
         super().__init__("", parent)
 
         self._font_size = constants.DEFAULT_FONT_SIZE
         self._menu = QtWidgets.QMenu(self)
-        preset_group = QtGui.QActionGroup(self._menu)
-        preset_group.setExclusive(True)
-        for preset_size, _, menu_label in self._SIZE_PRESETS:
-            preset_action = self._menu.addAction(menu_label)
-            preset_action.setCheckable(True)
-            preset_action.setData(int(preset_size))
-            preset_group.addAction(preset_action)
+        _add_checkable_actions(
+            self._menu, [(int(preset_size), menu_label, None) for preset_size, _, menu_label in self._SIZE_PRESETS]
+        )
         self._menu.triggered.connect(self._on_preset_triggered)
         self._menu.aboutToHide.connect(self._on_menu_hidden)
 
@@ -813,8 +821,7 @@ class _FontSizeButton(_PopupToolButton):
         for action in self._menu.actions():
             if action.data() is not None:
                 action.setChecked(action.data() == font_size)
-        preset_labels = {preset_size: short_label for preset_size, short_label, _ in self._SIZE_PRESETS}
-        self.setText(preset_labels.get(font_size, str(font_size)))
+        self.setText(self._SHORT_LABELS.get(font_size, str(font_size)))
 
     def _change_font_size(self, font_size):
         changed = font_size != self._font_size
@@ -836,12 +843,11 @@ class _FontSizeButton(_PopupToolButton):
         self._size_input.deselect()
 
     def _on_size_input_committed(self):
-        try:
-            typed_size = int(round(float(self._size_input.text().strip())))
-        except (ValueError, OverflowError):
+        typed_size = _parse_clamped_int(self._size_input.text(), constants.FONT_SIZE_MIN, constants.FONT_SIZE_MAX)
+        if typed_size is None:
             self._size_input.setText(str(self._font_size))
             return
-        self._change_font_size(max(constants.FONT_SIZE_MIN, min(constants.FONT_SIZE_MAX, typed_size)))
+        self._change_font_size(typed_size)
 
     def _on_size_input_confirmed(self):
         self._on_size_input_committed()
