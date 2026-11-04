@@ -1229,6 +1229,10 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     def hide_popups(self):
         self._picker_popup.hide()
 
+    def hide_color_dialog(self):
+        if self._color_dialog is not None:
+            self._color_dialog.hide()
+
     def _on_color_dialog_requested(self):
         if self._color_dialog is None:
             self._color_dialog = QtWidgets.QColorDialog(qtutils.sessionWindow())

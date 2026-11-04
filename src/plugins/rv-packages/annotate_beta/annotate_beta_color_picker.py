@@ -159,7 +159,7 @@ class _SwatchButton(QtWidgets.QAbstractButton):
 
 
 class _ColorPickerSection(QtWidgets.QWidget):
-    """Color picker contents: saturation/value square, hue bar and preset swatches."""
+    """Color picker contents: saturation/value square, hue bar, preset swatches and a color dialog button."""
 
     color_changed = QtCore.Signal(QtGui.QColor)
     dialog_requested = QtCore.Signal()
@@ -241,10 +241,10 @@ class _NextCustomSlotOverlay(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents)
         self._well = well
         self._index = 0
-        grid = well.sizeHint()
-        self._cell_width = grid.width() // self._CUSTOM_COLOR_COLUMNS
-        self._cell_height = grid.height() // self._CUSTOM_COLOR_ROWS
-        self.setGeometry(QtCore.QRect(QtCore.QPoint(0, 0), grid))
+        grid_size = well.sizeHint()
+        self._cell_width = grid_size.width() // self._CUSTOM_COLOR_COLUMNS
+        self._cell_height = grid_size.height() // self._CUSTOM_COLOR_ROWS
+        self.setGeometry(QtCore.QRect(QtCore.QPoint(0, 0), grid_size))
         QtCore.QObject.connect(well, QtCore.SIGNAL("currentChanged(int,int)"), self._on_current_changed)
         add_button.clicked.connect(self._on_added)
 
@@ -308,15 +308,28 @@ class ColorPickerPopup(QtWidgets.QFrame):
         self._picker.dialog_requested.connect(self.dialog_requested)
         layout.addWidget(self._picker)
         self.adjustSize()
+        self._anchor_widget = None
 
     def show_near(self, anchor_widget):
         """Position and show the popup to the right of anchor_widget."""
+        self._anchor_widget = anchor_widget
         position = anchor_widget.mapToGlobal(QtCore.QPoint(anchor_widget.width() + 6, 0))
         self.move(position)
         self.show()
         self.raise_()
+        QtWidgets.QApplication.instance().installEventFilter(self)
+
+    def eventFilter(self, watched, event):
+        # Close on any press outside the popup. The anchor toggles the popup itself.
+        if event.type() in (QtCore.QEvent.MouseButtonPress, QtCore.QEvent.TabletPress):
+            press_position = event.globalPosition().toPoint()
+            anchor_rect = QtCore.QRect(self._anchor_widget.mapToGlobal(QtCore.QPoint(0, 0)), self._anchor_widget.size())
+            if not self.frameGeometry().contains(press_position) and not anchor_rect.contains(press_position):
+                self.hide()
+        return False
 
     def hideEvent(self, event):
+        QtWidgets.QApplication.instance().removeEventFilter(self)
         # Clear hover state so no button shows as hovered when the popup reopens
         for widget in self.findChildren(QtWidgets.QWidget):
             if widget.testAttribute(QtCore.Qt.WA_UnderMouse):
