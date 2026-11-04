@@ -92,6 +92,7 @@ def get_dependencies_info(versions, app_name, platform=""):
         ("libtiff", get_version("tiff"), "libtiff License"),
         ("libwebp", get_version("webp"), "BSD 3-Clause"),
         ("nanobind", get_version("nanobind"), "BSD 3-Clause"),
+        ("nlohmann/json", get_version("nlohmann_json"), "MIT License"),
         ("OpenJPEG", get_version("openjpeg"), "BSD 2-Clause"),
         ("OpenJPH", get_version("openjph"), "BSD 2-Clause"),
         ("OpenSSL", get_version("OpenSSL"), "Apache License 2.0"),

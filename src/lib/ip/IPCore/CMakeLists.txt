@@ -283,6 +283,7 @@ TARGET_LINK_LIBRARIES(
           IPBaseNodes
           PNG::PNG
           Qt::Core
+          nlohmann_json::nlohmann_json
 )
 
 IF(RV_TARGET_WINDOWS)
