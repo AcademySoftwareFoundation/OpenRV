@@ -189,6 +189,14 @@ class _AnnotationSlider(QtWidgets.QSlider):
 # ---------------------------------------------------------------------------
 
 
+def _parse_clamped_int(text, minimum, maximum):
+    """Return `text` rounded to an int and clamped to [minimum, maximum], or None if it is not a number."""
+    try:
+        return max(minimum, min(maximum, round(float(text))))
+    except (ValueError, OverflowError):
+        return None
+
+
 class _ValueLineEdit(QtWidgets.QLineEdit):
     """QLineEdit that selects all text when it receives focus."""
 
@@ -256,9 +264,8 @@ class _SliderSection(QtWidgets.QWidget):
         text = self._input.text().strip()
         if self._suffix and text.endswith(self._suffix):
             text = text[: -len(self._suffix)].strip()
-        try:
-            value = max(self._minimum, min(self._maximum, int(round(float(text)))))
-        except (ValueError, OverflowError):
+        value = _parse_clamped_int(text, self._minimum, self._maximum)
+        if value is None:
             self._input.setText(f"{self._slider.value()}{self._suffix}")
             return
         self._slider.setValue(value)
@@ -323,6 +330,16 @@ def _load_icon(name):
     return QtGui.QIcon()
 
 
+def _add_checkable_actions(menu, items):
+    """Add one checkable action per (item_id, label, icon_name) to `menu`, in an exclusive group."""
+    group = QtGui.QActionGroup(menu)
+    for item_id, label, icon_name in items:
+        action = menu.addAction(_load_icon(icon_name), label) if icon_name else menu.addAction(label)
+        action.setCheckable(True)
+        action.setData(item_id)
+        group.addAction(action)
+
+
 class _PopupToolButton(QtWidgets.QToolButton):
     """Tool button that opens its menu on click."""
 
@@ -349,13 +366,7 @@ class _MenuToolButton(_PopupToolButton):
 
         self._selection = None
         self._menu = QtWidgets.QMenu(self)
-        group = QtGui.QActionGroup(self._menu)
-        group.setExclusive(True)
-        for item_id, label, icon_name in items:
-            action = self._menu.addAction(_load_icon(icon_name), label) if icon_name else self._menu.addAction(label)
-            action.setCheckable(True)
-            action.setData(item_id)
-            group.addAction(action)
+        _add_checkable_actions(self._menu, items)
         self._menu.triggered.connect(self._on_triggered)
         self.setMenu(self._menu)
 
@@ -368,9 +379,6 @@ class _MenuToolButton(_PopupToolButton):
 
     def _action_for(self, item_id):
         return next((action for action in self._menu.actions() if action.data() == item_id), None)
-
-    def has_item(self, item_id):
-        return self._action_for(item_id) is not None
 
     def selection(self):
         return self._selection
@@ -745,19 +753,123 @@ class _FontComboBox(_WidePopupComboBox):
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
 
+class _MenuValueLineEdit(_ValueLineEdit):
+    """Value box hosted in a QMenu.
+
+    Keeps Enter from reaching the menu, which would highlight its first item, and reports Up/Down
+    because the menu does not take focus back from the box on its own.
+    """
+
+    navigate_requested = QtCore.Signal(int)  # -1 for Up, +1 for Down
+    cancel_requested = QtCore.Signal()
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        if key == QtCore.Qt.Key_Escape:
+            self.cancel_requested.emit()
+        if key in (QtCore.Qt.Key_Up, QtCore.Qt.Key_Down):
+            self.navigate_requested.emit(-1 if key == QtCore.Qt.Key_Up else 1)
+            event.accept()
+            return
+        super().keyPressEvent(event)
+        if key in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
+            event.accept()
+
+
+class _FontSizeButton(_PopupToolButton):
+    """Drop-down of named size presets with a value box for any other size."""
+
+    font_size_changed = QtCore.Signal(int)
+
+    # (size, closed-button label, menu label)
+    _SIZE_PRESETS = (
+        (constants.FontSize.SMALL, "S", "Small"),
+        (constants.FontSize.MEDIUM, "M", "Medium"),
+        (constants.FontSize.LARGE, "L", "Large"),
+    )
+    _SHORT_LABELS = {preset_size: short_label for preset_size, short_label, _ in _SIZE_PRESETS}
+
+    def __init__(self, parent=None):
+        super().__init__("", parent)
+
+        self._font_size = constants.DEFAULT_FONT_SIZE
+        self._menu = QtWidgets.QMenu(self)
+        _add_checkable_actions(
+            self._menu, [(int(preset_size), menu_label, None) for preset_size, _, menu_label in self._SIZE_PRESETS]
+        )
+        self._menu.triggered.connect(self._on_preset_triggered)
+        self._menu.aboutToHide.connect(self._on_menu_hidden)
+
+        self._size_input = _MenuValueLineEdit()
+        self._size_input.setObjectName("sliderValue")
+        self._size_input.editingFinished.connect(self._on_size_input_committed)
+        self._size_input.returnPressed.connect(self._on_size_input_confirmed)
+        self._size_input.navigate_requested.connect(self._move_menu_highlight)
+        self._size_input.cancel_requested.connect(self._revert_size_input)
+        self._size_input_action = QtWidgets.QWidgetAction(self._menu)
+        self._size_input_action.setDefaultWidget(self._size_input)
+        self._menu.addSeparator()
+        self._menu.addAction(self._size_input_action)
+        self.setMenu(self._menu)
+
+        self.set_font_size(self._font_size)
+
+    def set_font_size(self, font_size):
+        """Show `font_size` without emitting font_size_changed."""
+        self._font_size = font_size
+        self._size_input.setText(str(font_size))
+        for action in self._menu.actions():
+            if action.data() is not None:
+                action.setChecked(action.data() == font_size)
+        self.setText(self._SHORT_LABELS.get(font_size, str(font_size)))
+
+    def _change_font_size(self, font_size):
+        changed = font_size != self._font_size
+        self.set_font_size(font_size)
+        if changed:
+            self.font_size_changed.emit(font_size)
+
+    def _on_preset_triggered(self, action):
+        if action.data() is not None:
+            self._change_font_size(action.data())
+
+    def _revert_size_input(self):
+        self._size_input.setText(str(self._font_size))
+
+    def _on_menu_hidden(self):
+        # Clicking away confirms the typed size (Escape reverts it first).
+        self._on_size_input_committed()
+        self._size_input.clearFocus()
+        self._size_input.deselect()
+
+    def _on_size_input_committed(self):
+        typed_size = _parse_clamped_int(self._size_input.text(), constants.FONT_SIZE_MIN, constants.FONT_SIZE_MAX)
+        if typed_size is None:
+            self._size_input.setText(str(self._font_size))
+            return
+        self._change_font_size(typed_size)
+
+    def _on_size_input_confirmed(self):
+        self._on_size_input_committed()
+        self._menu.hide()
+
+    def _move_menu_highlight(self, direction):
+        # Take focus off the box, otherwise it keeps every key and the menu highlight cannot move.
+        navigable_actions = [action for action in self._menu.actions() if not action.isSeparator()]
+        current_index = navigable_actions.index(self._size_input_action)
+        target_action = navigable_actions[(current_index + direction) % len(navigable_actions)]
+        self._size_input.clearFocus()
+        self._menu.setFocus()
+        self._menu.setActiveAction(target_action)
+
+
 class _TextOptionsPanel(QtWidgets.QWidget):
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
     opacity_changed = QtCore.Signal(int)
-
-    _SIZES = (
-        (constants.FontSize.SMALL, "S", None),
-        (constants.FontSize.MEDIUM, "M", None),
-        (constants.FontSize.LARGE, "L", None),
-    )
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -779,10 +891,9 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.currentTextChanged.connect(self.font_family_changed)
         layout.addWidget(self._font_combo)
 
-        self._size_button = _MenuToolButton("Size", self._SIZES)
-        self._size_button.set_selection(constants.FontSize.MEDIUM)
-        self._size_button.selection_changed.connect(self.font_size_changed)
-        layout.addWidget(self._size_button)
+        self._font_size_button = _FontSizeButton()
+        self._font_size_button.font_size_changed.connect(self.font_size_changed)
+        layout.addWidget(self._font_size_button)
 
         _add_divider(layout, spacing=5)
 
@@ -851,7 +962,7 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo.sync_display_font(name)
 
     def set_font_size(self, size):
-        self._size_button.set_selection(size if self._size_button.has_item(size) else constants.FontSize.MEDIUM)
+        self._font_size_button.set_font_size(size)
 
     def _set_style(self, key, value):
         with QtCore.QSignalBlocker(self._style_buttons[key]):
@@ -882,7 +993,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
@@ -1161,7 +1272,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
     font_family_changed = QtCore.Signal(str)
-    font_size_changed = QtCore.Signal(str)
+    font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
     font_italic_changed = QtCore.Signal(bool)
     font_underline_changed = QtCore.Signal(bool)
