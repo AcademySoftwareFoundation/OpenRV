@@ -70,6 +70,9 @@ namespace IPCore
 
         root->transformMatrix = current->transformMatrix;
         images[0]->transformMatrix = Matrix();
+        // Mirror the transform move for the overlay chain.
+        root->overlayTransformMatrix = current->overlayTransformMatrix;
+        images[0]->overlayTransformMatrix = Matrix();
 
         //
         //  Prep merge
