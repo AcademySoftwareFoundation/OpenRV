@@ -411,8 +411,8 @@ namespace IPCore
 
             if (isStamp)
             {
-                // Brush properties come straight from the stroke's own properties (see PaintIPNode::compilePenComponent) — resolve the tip
-                // texture at render time since that's the only place with a GL context.
+                // Brush properties come from the brush catalogue and the stroke's own overrides (see PaintIPNode::compilePenComponent) —
+                // resolve the tip texture at render time since that's the only place with a GL context.
                 const unsigned int textureId = BrushTextureManager::instance().getTexture(tipTexture);
 
                 GLPipeline* stampPipeline = glState->useGLProgram(texturePaintReplaceGLProgram());
@@ -427,8 +427,8 @@ namespace IPCore
                 glActiveTexture(GL_TEXTURE0 + 1);
                 glBindTexture(GL_TEXTURE_2D, textureId);
 
-                float normalizedHardness = hardness / 100.0f;
-                stampPipeline->setUniformFloat("hardness", 1, &normalizedHardness);
+                float stampHardness = hardness;
+                stampPipeline->setUniformFloat("hardness", 1, &stampHardness);
 
                 if (context.hasStencil)
                 {

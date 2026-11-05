@@ -264,10 +264,10 @@ namespace IPCore
             int debug;
             bool ownPoints;
 
-            // Stamp brush properties, set directly from the stroke's own properties
+            // Stamp brush properties, set from the brush catalogue unless the stroke overrides them
             StampBlendMode stampBlendMode{BlendNormal};
-            float hardness{100.0f};   ///< edge hardness 0-100
-            std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time; empty = procedural
+            float hardness{1.0f};     ///< edge hardness 0-1
+            std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time
 
             mutable HashValue idhash;
 
