@@ -62,6 +62,12 @@ namespace TwkFB
         addType("pgm", "Portable Network Graphics", rw, codecs);
         addType("ppm", "Portable Network Grapics", rw, codecs);
 
+        // Only register JXL if OIIO was built with libjxl support.
+        if (OIIO::is_imageio_format_name("jpegxl"))
+        {
+            addType("jxl", "JPEG XL", rw, codecs);
+        }
+
         // These are handled by their respective plugins
         // io_<something> in RV. This code is here to
         // test oiio handling of these image types.
