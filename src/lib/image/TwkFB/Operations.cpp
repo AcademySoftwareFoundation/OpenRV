@@ -3481,7 +3481,7 @@ namespace TwkFB
         return nfb;
     }
 
-    void linearRGBA709pixelValue(const FrameBuffer* fb, int x, int y, float* p)
+    void linearRGBARawPixelValue(const FrameBuffer* fb, int x, int y, float* p)
     {
         p[3] = 1.0;
 
@@ -3514,6 +3514,15 @@ namespace TwkFB
         {
             fb->getPixel4f(x, y, p);
         }
+    }
+
+    void linearRGBA709pixelValue(const FrameBuffer* fb, int x, int y, float* p)
+    {
+        // Populate p[] with raw pixel values
+        linearRGBARawPixelValue(fb, x, y, p);
+
+        bool YUVp = fb->isYUVPlanar();
+        bool YRYBYp = fb->isYRYBYPlanar();
 
         float& r = p[0];
         float& g = p[1];
