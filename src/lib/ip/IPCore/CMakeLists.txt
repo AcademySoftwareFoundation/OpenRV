@@ -28,6 +28,7 @@ SET(_target
 )
 
 SET(_sources
+    BrushCatalogue.cpp
     BrushTextureManager.cpp
     Session.cpp
     Exception.cpp

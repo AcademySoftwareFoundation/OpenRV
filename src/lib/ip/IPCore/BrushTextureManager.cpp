@@ -3,13 +3,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
+#include <IPCore/BrushCatalogue.h>
 #include <IPCore/BrushTextureManager.h>
-#include <TwkApp/Bundle.h>
 #include <TwkGLF/GL.h>
-#include <QDir>
-#include <QFileInfo>
-#include <QString>
-#include <QStringList>
 #include <png.h>
 #include <cstdio>
 #include <cstring>
@@ -105,22 +101,6 @@ namespace IPCore
             return s;
         }
 
-        std::string BrushTextureManager::tipDir()
-        {
-            if (const char* env = std::getenv("RV_BRUSH_DIR"))
-                return env;
-            if (TwkApp::Bundle* b = TwkApp::Bundle::mainBundle())
-            {
-#if defined(PLATFORM_DARWIN)
-                // DarwinBundle::top() is RV.app/; keep brush assets under Contents/Resources for codesign.
-                return b->top() + "/Contents/Resources/assets/brushes";
-#else
-                return b->top() + "/assets/brushes";
-#endif
-            }
-            return "";
-        }
-
         unsigned int BrushTextureManager::getTexture(const std::string& tipFile)
         {
             if (tipFile.empty())
@@ -131,22 +111,13 @@ namespace IPCore
             if (it != m_textures.end())
                 return it->second;
 
-            const QString path = QString::fromStdString(tipDir()) + "/" + QString::fromStdString(tipFile);
-            const unsigned int texId = uploadGrayscalePng(path.toStdString());
+            const std::string path = bundledCatalogue().tipPath(tipFile).string();
+            const unsigned int texId = uploadGrayscalePng(path);
             if (!texId)
-                std::cerr << "[BrushTextureManager] failed to load tip: " << path.toStdString() << "\n";
+                std::cerr << "[BrushTextureManager] failed to load tip: " << path << "\n";
 
             m_textures[tipFile] = texId; // cache failures too, so a bad path isn't retried every frame
             return texId;
-        }
-
-        std::vector<std::string> BrushTextureManager::listTipFiles() const
-        {
-            std::vector<std::string> files;
-            const QDir dir(QString::fromStdString(tipDir()));
-            for (const QFileInfo& fi : dir.entryInfoList(QStringList() << "*.png", QDir::Files, QDir::Name))
-                files.push_back(fi.fileName().toStdString());
-            return files;
         }
 
         void BrushTextureManager::clear()
