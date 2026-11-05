@@ -1,10 +1,13 @@
 # Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import math
 from functools import partial
 
 from rv import commands, extra_commands, rvtypes, qtutils
 
+from OpenGL import GL
+from OpenGL import GLU
 from PySide6 import QtCore, QtWidgets, QtGui
 
 import annotate_beta_constants as constants
@@ -91,6 +94,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
     def deactivate(self):
         commands.setCursor(QtCore.Qt.ArrowCursor.value)
+        self._engine.hide_brush_ring()
         self._pop_shape_table()
         self._engine.commit_text_if_active()
         self._dock.toolbar_widget.hide_popups()
@@ -102,6 +106,49 @@ class AnnotateBetaMode(rvtypes.MinorMode):
 
         paint.remove_tags()
         super().deactivate()
+
+    def render(self, event):
+        RING_ANGLES = [step * math.pi / 10.0 for step in range(21)]
+
+        ring = self._engine.brush_ring()
+        if ring is None:
+            return
+        (x, y), radius = ring
+        color = self._settings.tool_state.color
+
+        GL.glPushAttrib(GL.GL_ENABLE_BIT | GL.GL_CURRENT_BIT | GL.GL_POINT_BIT | GL.GL_COLOR_BUFFER_BIT)
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glPushMatrix()
+        GL.glLoadIdentity()
+        width, height = event.domain()
+        if event.domainVerticalFlip():
+            GLU.gluOrtho2D(0.0, width - 1, height - 1, 0.0)
+        else:
+            GLU.gluOrtho2D(0.0, width - 1, 0.0, height - 1)
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glPushMatrix()
+        GL.glLoadIdentity()
+
+        # The paint renderer leaves its blend function set, so set ours explicitly.
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+        GL.glEnable(GL.GL_POINT_SMOOTH)
+        GL.glBegin(GL.GL_POINTS)
+        for angle in RING_ANGLES:
+            point_x = x + math.sin(angle) * radius
+            point_y = y + math.cos(angle) * radius
+            # Black then the tool color, so the ring shows on light and dark images.
+            GL.glColor4f(0.0, 0.0, 0.0, 1.0)
+            GL.glVertex2f(point_x, point_y)
+            GL.glColor4f(color.redF(), color.greenF(), color.blueF(), 1.0)
+            GL.glVertex2f(point_x, point_y)
+        GL.glEnd()
+
+        GL.glPopMatrix()
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glPopMatrix()
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glPopAttrib()
 
     # ------------------------------------------------------------------
     # Event table push / pop
@@ -278,6 +325,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._pop_shape_table()
 
         _set_tool_cursor(tool)
+        if outgoing_tool in constants.BRUSH_RING_TOOLS or tool in constants.BRUSH_RING_TOOLS:
+            commands.redraw()  # show, resize or clear the brush size ring
 
     def _on_color_changed(self, color):
         tools = constants.Tool if self._link_tool_colors else [self._settings.tool]
