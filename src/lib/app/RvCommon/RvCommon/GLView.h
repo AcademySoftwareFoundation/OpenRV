@@ -65,6 +65,9 @@ namespace Rv
         QSurfaceFormat format() const;
         void makeCurrent();
 
+        // Create the viewport's GL context now so startup GL setup lands in it.
+        void ensureViewportContext();
+
         //  Compatibility shim for the former QOpenGLWidget::isValid(): the
         //  native GL window is created up-front, so the viewport is considered
         //  valid once the window exists.
