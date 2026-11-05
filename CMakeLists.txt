@@ -11,7 +11,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 # cmake-format: off
 SET(RV_MAJOR_VERSION "4" CACHE STRING "RV's version major")
 SET(RV_MINOR_VERSION "0" CACHE STRING "RV's version minor")
-SET(RV_REVISION_NUMBER "0" CACHE STRING "RV's revision number")
+SET(RV_REVISION_NUMBER "2" CACHE STRING "RV's revision number")
 SET(RV_VERSION_YEAR "2026" CACHE STRING "RV's year of release.")
 # cmake-format: on
 
