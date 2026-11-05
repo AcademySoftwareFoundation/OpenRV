@@ -24,6 +24,7 @@
 #include <boost/signals2.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <stl_ext/thread_group.h>
 
 namespace IPCore
 {
