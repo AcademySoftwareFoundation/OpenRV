@@ -148,9 +148,11 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._settings.font_family = commands.readSettings(
             constants.SETTINGS_GROUP, "font_family", constants.DEFAULT_FONT_FAMILY
         )
-        self._settings.font_size = commands.readSettings(
-            constants.SETTINGS_GROUP, "font_size", constants.FontSize.MEDIUM
-        )
+        font_size = commands.readSettings(constants.SETTINGS_GROUP, "font_size", constants.DEFAULT_FONT_SIZE)
+        # A size saved by an earlier version as "small", "medium" or "large" reads back as 0.
+        if font_size < constants.FONT_SIZE_MIN:
+            font_size = constants.DEFAULT_FONT_SIZE
+        self._settings.font_size = min(constants.FONT_SIZE_MAX, font_size)
         self._settings.font_bold = commands.readSettings(constants.SETTINGS_GROUP, "font_bold", False)
         self._settings.font_italic = commands.readSettings(constants.SETTINGS_GROUP, "font_italic", False)
         self._settings.font_underline = commands.readSettings(constants.SETTINGS_GROUP, "font_underline", False)
