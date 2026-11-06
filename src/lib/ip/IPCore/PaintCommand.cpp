@@ -870,19 +870,27 @@ namespace IPCore
                 return family;
             }
 
-            // Lays out plain text with the annotation font and no margin, so the first line's top-left
-            // corner is at (0, 0). Runs are styled over the base font; runs outside the text are skipped.
+            // Lays out plain text with the annotation font and no margin, so the first line's top-left corner is at (0, 0).
+            // Annotation text also wraps at its wrapWidth, breaking long words, and its runs inside the text are styled.
             void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice,
-                                   const std::vector<PaintIPNode::TextRun>& runs)
+                                   const PaintIPNode::LocalText* localText, float pixelsPerUnit)
             {
                 document.documentLayout()->setPaintDevice(paintDevice);
                 document.setDocumentMargin(0);
                 document.setDefaultFont(font);
+                if (localText != nullptr && localText->wrapWidth > 0)
+                {
+                    document.setTextWidth(localText->wrapWidth * pixelsPerUnit);
+                }
                 document.setPlainText(text);
+                if (localText == nullptr)
+                {
+                    return;
+                }
 
                 const int textLength = document.characterCount() - 1;
                 QTextCursor cursor(&document);
-                for (const PaintIPNode::TextRun& run : runs)
+                for (const PaintIPNode::TextRun& run : localText->runs)
                 {
                     if (run.start < 0 || run.length <= 0 || run.start + run.length > textLength)
                     {
@@ -974,8 +982,6 @@ namespace IPCore
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;
             const auto [caret, selection] = editingState(localText);
-            const std::vector<PaintIPNode::TextRun> noRuns;
-            const std::vector<PaintIPNode::TextRun>& textRuns = localText != nullptr ? localText->runs : noRuns;
 
             {
                 const GLFBO* currentFBO = context.currentRender;
@@ -1039,7 +1045,7 @@ namespace IPCore
                 }
                 QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
                 QTextDocument document;
-                setUpTextDocument(document, qfont, qtext, &refImg, textRuns);
+                setUpTextDocument(document, qfont, qtext, &refImg, localText, fbH);
 
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.

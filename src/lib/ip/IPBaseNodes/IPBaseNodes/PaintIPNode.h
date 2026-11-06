@@ -141,6 +141,8 @@ namespace IPCore
             // Selected range [start, end) as QTextCursor positions (UTF-16 code units). Only set while text is selected.
             std::optional<std::pair<int, int>> selection;
             std::vector<TextRun> runs;
+            // Line width in the same WCS units as fontSize, 0 for no wrapping
+            float wrapWidth{0.0f};
 
             void hash(std::ostream& o) const override;
         };

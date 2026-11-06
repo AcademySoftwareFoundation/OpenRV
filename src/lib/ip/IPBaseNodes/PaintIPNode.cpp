@@ -497,6 +497,7 @@ namespace IPCore
         {
             o << ';' << run.start << ',' << run.length << ',' << run.flags;
         }
+        o << ';' << wrapWidth;
     }
 
     namespace
@@ -561,6 +562,7 @@ namespace IPCore
                           ? std::optional{std::pair{(*selectionProp)[0], (*selectionProp)[1]}}
                           : std::nullopt;
         p.runs = readTextRuns(c);
+        p.wrapWidth = readProp<FloatProperty>(c, "wrapWidth", 0.0f);
     }
 
     void PaintIPNode::compileRectComponent(Component* c)
