@@ -249,7 +249,7 @@ jobs:
           python3 -c "import site; print(f'Site packages dirs: {site.getsitepackages()}')"
           
           echo "=== Installed packages location check ==="
-          python3 -c "import six; import dateutil; import yaml;"
+          python3 -c "import six; import yaml;"
           
           echo "=== Verifying Conan installation ==="
           # Try to find conan in the Python environment first
@@ -261,7 +261,7 @@ jobs:
             echo "Found Conan in user bin: /github/home/.local/bin/conan"
             /github/home/.local/bin/conan --version || {
               echo "ERROR: Conan in user bin failed, attempting to reinstall to pyenv environment..."
-              python3 -m pip install --force-reinstall six python-dateutil setuptools
+              python3 -m pip install --force-reinstall six setuptools
               python3 -m pip install --force-reinstall conan
               # Try again with pyenv conan
               NEW_CONAN_PATH=$(python3 -c "import sys, os; print(os.path.join(sys.prefix, 'bin', 'conan'))" 2>/dev/null)
@@ -312,7 +312,7 @@ jobs:
             echo "ERROR: Failed to get Conan home path with $CONAN_CMD"
             echo "Conan output: $CONAN_HOME_OUTPUT"
             echo "Last attempt - trying to import required modules..."
-            python3 -c "import six; import dateutil;"
+            python3 -c "import six;"
             exit 1
           }
           echo "Conan home path: $CONAN_HOME_OUTPUT"
@@ -801,11 +801,17 @@ jobs:
       - name: Build and install OpenRV dependencies
         run: |
           source ~/.bash_profile
+          # Dependency builds clone with the git CMake finds, which in this shell is msys2's own: started from native cmake and MSBuild it intermittently
+          # hangs on its first clone with no output until the job times out. find_program searches CMAKE_PROGRAM_PATH before PATH, in every CMake below this
+          # one, so this points them all at Git for Windows. PATH itself is left alone: putting Git for Windows first on it broke FFmpeg's build.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
           conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Build OpenRV main executable
         run: |
+          # Git for Windows for every CMake below this one; see the step above.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
           conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 

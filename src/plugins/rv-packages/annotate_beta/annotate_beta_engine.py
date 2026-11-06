@@ -39,15 +39,11 @@ _BORDER_WIDTH_MIN = 0.001
 # Shift bit of event.modifiers() (TwkApp ModifierEvent::Shift).
 _SHIFT_MODIFIER = 1 << 0
 
-# Base WCS fractions for each font size tier (desired px at zoom=1 / 1080).
-# Multiplied by _screen_scale() when the text is created, so:
+# Font sizes are desired px at zoom=1 over this reference height. The WCS size
+# is multiplied by _screen_scale() when the text is created, so:
 #   - new text has the same initial screen size regardless of zoom
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
-_FONT_SIZE_WCS_BASE = {
-    constants.FontSize.SMALL: 24.0 / 1080.0,
-    constants.FontSize.MEDIUM: 48.0 / 1080.0,
-    constants.FontSize.LARGE: 72.0 / 1080.0,
-}
+_FONT_SIZE_REFERENCE_HEIGHT = 1080.0
 
 
 class _Vec2(NamedTuple):
@@ -82,7 +78,7 @@ class DrawSettings:
     tool: constants.Tool = constants.Tool.PEN
     eraser_brush: constants.Brush = constants.Brush.CIRCLE
     font_family: str = constants.DEFAULT_FONT_FAMILY
-    font_size: constants.FontSize = constants.FontSize.MEDIUM
+    font_size: int = constants.DEFAULT_FONT_SIZE
     font_bold: bool = False
     font_italic: bool = False
     font_underline: bool = False
@@ -103,7 +99,7 @@ class AnnotateDrawEngine:
         self._on_draw_started = on_draw_started
         self._on_eyedropper = on_eyedropper
 
-        self.preferred_paint_node = ""  # Paint node set via set-current-annotate-mode-node
+        self.preferred_paint_node = ""  # Paint node set by external packages via set-current-annotate-mode-node
         self._visible_frames: set[PaintFrame] = set()
 
         # Shape drag state
@@ -240,8 +236,7 @@ class AnnotateDrawEngine:
         return view_height / max(pixels_per_unit, 0.1)
 
     def _font_size(self):
-        base = _FONT_SIZE_WCS_BASE.get(self._settings.font_size, _FONT_SIZE_WCS_BASE[constants.FontSize.MEDIUM])
-        return base * self._screen_scale()
+        return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
     def _border_width(self):
         scale = self._screen_scale() if self._settings.scale_brush else 1.0
@@ -250,6 +245,11 @@ class AnnotateDrawEngine:
     # ------------------------------------------------------------------
     # Paint node resolution
     # ------------------------------------------------------------------
+
+    @staticmethod
+    def _is_in_source_group(node: str) -> bool:
+        group = commands.nodeGroup(node)
+        return bool(group) and commands.nodeType(group) == "RVSourceGroup"
 
     def _find_paint_frame(self) -> PaintFrame | None:
         try:
@@ -270,18 +270,17 @@ class AnnotateDrawEngine:
             # legacy annotate_mode.mu's updateCurrentNode(), which never uses
             # _userSelectedNode unless it's found in the current metaEvaluate.
 
-        if self._settings.store_on_source:
-            for info in infos:
-                if info.get("nodeType") == "RVPaint":
-                    node = info["node"]
-                    group = commands.nodeGroup(node)
-                    if group and commands.nodeType(group) == "RVSourceGroup":
-                        return PaintFrame(node, info["frame"])
+        paint_infos = [info for info in infos if info.get("nodeType") == "RVPaint"]
+        if not paint_infos:
+            return None
 
-        for info in infos:
-            if info.get("nodeType") == "RVPaint":
-                return PaintFrame(info["node"], info["frame"])
-        return None
+        # Only draw on a source when exactly one is visible. With several (e.g. layout), use the view's own paint node.
+        if self._settings.store_on_source:
+            source_infos = [info for info in paint_infos if self._is_in_source_group(info["node"])]
+            if len(source_infos) == 1:
+                return PaintFrame(source_infos[0]["node"], source_infos[0]["frame"])
+
+        return PaintFrame(paint_infos[0]["node"], paint_infos[0]["frame"])
 
     def _auto_mark_frame(self):
         if self._settings.auto_mark:
@@ -414,7 +413,7 @@ class AnnotateDrawEngine:
             brush = self._settings.eraser_brush
         else:
             erase = tool == constants.Tool.ERASER
-            if tool == constants.Tool.AIRBRUSH:
+            if tool == constants.Tool.BRUSH:
                 brush = constants.Brush.GAUSS
             elif tool == constants.Tool.ERASER:
                 brush = self._settings.eraser_brush
@@ -430,7 +429,6 @@ class AnnotateDrawEngine:
         )
         self._auto_mark_frame()
         self._pen_last_point = image_point
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # sync accumulation is still open — will be flushed at _pen_release
 
     def _pen_drag(self, event):
@@ -503,7 +501,6 @@ class AnnotateDrawEngine:
         self._last_image_point = image_point
         self._shape_type = prefix
         self._shape_active = True
-        commands.sendInternalEvent("set-current-annotate-mode-node", paint_frame.paint_node)
         # Open a sync accumulation block that stays open until _do_release so the
         # entire shape (push → drag → release) is sent as one batch to remote
         # clients instead of immediately broadcasting the initial zero-size shape.
