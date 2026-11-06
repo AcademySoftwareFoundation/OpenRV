@@ -46,6 +46,7 @@
 #include <mutex>
 #include <optional>
 #include <utility>
+#include <vector>
 
 // Shader source strings embedded at compile time via quote_file() in
 // IPCore/CMakeLists.txt.  Defined at global scope by the generated .cpp files.
@@ -869,14 +870,32 @@ namespace IPCore
                 return family;
             }
 
-            // Lays out plain text with the annotation font and no margin, so the
-            // first line's top-left corner is at (0, 0).
-            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice)
+            // Lays out plain text with the annotation font and no margin, so the first line's top-left
+            // corner is at (0, 0). Runs are styled over the base font; runs outside the text are skipped.
+            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice,
+                                   const std::vector<PaintIPNode::TextRun>& runs)
             {
                 document.documentLayout()->setPaintDevice(paintDevice);
                 document.setDocumentMargin(0);
                 document.setDefaultFont(font);
                 document.setPlainText(text);
+
+                const int textLength = document.characterCount() - 1;
+                QTextCursor cursor(&document);
+                for (const PaintIPNode::TextRun& run : runs)
+                {
+                    if (run.start < 0 || run.length <= 0 || run.start + run.length > textLength)
+                    {
+                        continue;
+                    }
+                    cursor.setPosition(run.start);
+                    cursor.setPosition(run.start + run.length, QTextCursor::KeepAnchor);
+                    QTextCharFormat format;
+                    format.setFontWeight((run.flags & PaintIPNode::TextRunFlags::kBold) != 0 ? QFont::Bold : QFont::Normal);
+                    format.setFontItalic((run.flags & PaintIPNode::TextRunFlags::kItalic) != 0);
+                    format.setFontUnderline((run.flags & PaintIPNode::TextRunFlags::kUnderline) != 0);
+                    cursor.mergeCharFormat(format);
+                }
             }
 
             // Caret rectangle in document pixels, or nullopt outside the text.
@@ -955,6 +974,8 @@ namespace IPCore
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;
             const auto [caret, selection] = editingState(localText);
+            const std::vector<PaintIPNode::TextRun> noRuns;
+            const std::vector<PaintIPNode::TextRun>& textRuns = localText != nullptr ? localText->runs : noRuns;
 
             {
                 const GLFBO* currentFBO = context.currentRender;
@@ -1018,7 +1039,7 @@ namespace IPCore
                 }
                 QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
                 QTextDocument document;
-                setUpTextDocument(document, qfont, qtext, &refImg);
+                setUpTextDocument(document, qfont, qtext, &refImg, textRuns);
 
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.

@@ -258,6 +258,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
         (".text", commands.StringType, 1),
         (".caret", commands.IntType, 1),
         (".selection", commands.IntType, 1),
+        (".runs", commands.IntType, 1),
         (".origin", commands.StringType, 1),
         (".debug", commands.IntType, 1),
         (".startFrame", commands.IntType, 1),
@@ -276,6 +277,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     commands.setStringProperty(f"{node_name}.text", [""], True)
     commands.setIntProperty(f"{node_name}.caret", [0], True)
     commands.setIntProperty(f"{node_name}.selection", [], True)
+    commands.setIntProperty(f"{node_name}.runs", [], True)
     commands.setStringProperty(f"{node_name}.origin", [""], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
@@ -309,11 +311,16 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     return component
 
 
-def set_text(component: PaintComponent, text: str, caret: int, selection: tuple[int, int] | None):
-    """Update an active text box. caret and selection (start, end) are QTextCursor positions (UTF-16 code units), not indices into text."""
+def set_text(component: PaintComponent, text: str, caret: int, selection: tuple[int, int] | None, runs: list[int]):
+    """Update an active text box.
+
+    caret, selection (start, end) and runs ([start, length, flags] triples) are QTextCursor positions
+    (UTF-16 code units), not indices into text.
+    """
     node_name = _node_name(component)
     commands.setIntProperty(f"{node_name}.caret", [caret], True)
     commands.setIntProperty(f"{node_name}.selection", list(selection) if selection else [], True)
+    commands.setIntProperty(f"{node_name}.runs", runs, True)
     commands.setStringProperty(f"{node_name}.text", [text], True)
     commands.redraw()
 
