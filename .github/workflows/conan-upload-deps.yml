@@ -12,7 +12,7 @@ name: Conan Upload Deps
 # Covers every platform in conan.yml's build matrix:
 #
 #   rocky8   - amd64/rockylinux:8 + gcc-toolset-11      (profile x86_64_rocky8)
-#   macos    - macos-14 (arm64) + Apple clang           (profile arm64_apple_release)
+#   macos    - macos-15 (arm64) + Apple clang           (profile arm64_apple_release)
 #   windows  - windows-2022 + MSVC + MSYS2              (profile x86_64_windows)
 #
 # Rocky 9 is intentionally NOT uploaded. Its Conan profile is identical
@@ -137,7 +137,7 @@ jobs:
   rocky8:
     name: "rocky8: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
     needs: prepare-matrix
-    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',rocky8,')
+    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',rocky8,') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     container:
       image: amd64/rockylinux:8
@@ -266,13 +266,13 @@ jobs:
         run: conan search "${{ matrix.name }}/${{ matrix.version }}@openrv/${{ matrix.channel }}" -r "$REMOTE_NAME"
 
   # ---------------------------------------------------------------------------
-  # macOS arm64 - macos-14 native runner, Apple clang, Python 3.11 via setup-python.
+  # macOS arm64 - macos-15 native runner, Apple clang, Python 3.11 via setup-python.
   # ---------------------------------------------------------------------------
   macos:
     name: "macos-arm64: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
     needs: prepare-matrix
-    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',macos,')
-    runs-on: macos-14
+    if: needs.prepare-matrix.outputs.count_nonwindows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',macos,') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: macos-15
 
     strategy:
       fail-fast: false
@@ -387,7 +387,7 @@ jobs:
   windows:
     name: "windows-x86_64: ${{ matrix.name }}/${{ matrix.version }} -> ${{ inputs.remote || 'aswftesting' }}"
     needs: prepare-matrix
-    if: needs.prepare-matrix.outputs.count_windows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',windows,')
+    if: needs.prepare-matrix.outputs.count_windows != '0' && contains(format(',{0},', inputs.platforms || 'rocky8,macos,windows'), ',windows,') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: windows-2022
 
     strategy:
