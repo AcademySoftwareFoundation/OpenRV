@@ -18,6 +18,7 @@
 #include <IPCore/ShaderCommon.h>
 #include <string>
 #include <tuple>
+#include <utility>
 
 namespace
 {
@@ -452,7 +453,8 @@ namespace IPCore
     void PaintIPNode::LocalText::hash(std::ostream& o) const
     {
         Paint::Text::hash(o);
-        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration << caret.value_or(-1);
+        const auto [selectionStart, selectionEnd] = selection.value_or(std::pair{-1, -1});
+        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration << caret.value_or(-1) << selectionStart << selectionEnd;
     }
 
     void PaintIPNode::compileTextComponent(Component* c)
@@ -491,6 +493,10 @@ namespace IPCore
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));
         p.caret = readProp<IntProperty>(c, "caret", std::optional<int>{});
+        const IntProperty* selectionProp = c->property<IntProperty>("selection");
+        p.selection = (selectionProp != nullptr && selectionProp->size() == 2)
+                          ? std::optional{std::pair{(*selectionProp)[0], (*selectionProp)[1]}}
+                          : std::nullopt;
     }
 
     void PaintIPNode::compileRectComponent(Component* c)

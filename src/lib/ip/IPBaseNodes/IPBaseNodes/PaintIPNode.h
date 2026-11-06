@@ -13,6 +13,7 @@
 #include <memory>
 #include <optional>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 namespace IPCore
@@ -121,6 +122,8 @@ namespace IPCore
             // Editing caret as a QTextCursor position (UTF-16 code units), not an index into the UTF-8 text.
             // Only set while the text box is being edited.
             std::optional<int> caret;
+            // Selected range [start, end) as QTextCursor positions (UTF-16 code units). Only set while text is selected.
+            std::optional<std::pair<int, int>> selection;
 
             void hash(std::ostream& o) const override;
         };
