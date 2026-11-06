@@ -392,6 +392,13 @@ IF(RV_TARGET_WINDOWS)
   CMAKE_PATH(GET CMAKE_COMMAND PARENT_PATH _cmake_bin_dir)
   LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_cmake_bin_dir}")
 
+  # pip clones git+ requirements with "git" from PATH, which inside msys2 is msys2's git. Prepend the directory of the git CMake found (GIT_EXECUTABLE, which
+  # honors CMAKE_PROGRAM_PATH) so pip clones with the same git as the rest of the build.
+  IF(GIT_EXECUTABLE)
+    CMAKE_PATH(GET GIT_EXECUTABLE PARENT_PATH _git_bin_dir)
+    LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_git_bin_dir}")
+  ENDIF()
+
   # Also prepend the MSVC compiler directory so nested CMake invocations (e.g. from OTIO's setup.py / scikit-build) can find cl.exe. On MSVC, CMAKE_C_COMPILER
   # and CMAKE_CXX_COMPILER both point to cl.exe in the same HostX64\x64 directory, so a single PATH prepend covers both C and C++ compilation. We use
   # CMAKE_C_COMPILER to locate the directory; if for any reason it differs from CMAKE_CXX_COMPILER's directory, we prepend both.

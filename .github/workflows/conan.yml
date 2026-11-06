@@ -606,6 +606,7 @@ jobs:
           arch: '${{ matrix.arch-type }}'
 
       - name: Setup msys2 and install dependencies
+        id: msys2
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -669,13 +670,13 @@ jobs:
         run: |
           CMAKE_BIN=$(cygpath -u "C:/Program Files/CMake/bin")
           WIN_PYTHON_DIR=$(cygpath -u "$WIN_PYTHON_DIR")
-          echo "export PATH=\"$CMAKE_BIN:$WIN_PYTHON_DIR:/c/msys64/mingw64/bin:\$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/ProgramData/Chocolatey/bin:/c/ProgramData/Chocolatey/lib/jom/tools\"" >> ~/.bash_profile
+          echo "export PATH=\"$CMAKE_BIN:$WIN_PYTHON_DIR:\$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/ProgramData/Chocolatey/bin:/c/ProgramData/Chocolatey/lib/jom/tools\"" >> ~/.bash_profile
           echo "export WIN_PYTHON_DIR=\"$WIN_PYTHON_DIR\"" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Set ACLOCAL_PATH environment variable
         run: |
-          echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
+          echo "export ACLOCAL_PATH=/usr/share/aclocal" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Add MSVC compiler to PATH for msys2
@@ -805,14 +806,14 @@ jobs:
           # hangs on its first clone with no output until the job times out. find_program searches CMAKE_PROGRAM_PATH before PATH, in every CMake below this
           # one, so this points them all at Git for Windows. PATH itself is left alone: putting Git for Windows first on it broke FFmpeg's build.
           export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
-          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
+          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path="$(cygpath -m '${{ steps.msys2.outputs.msys2-location }}')/usr/bin/bash.exe" -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Build OpenRV main executable
         run: |
           # Git for Windows for every CMake below this one; see the step above.
           export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
-          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
+          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path="$(cygpath -m '${{ steps.msys2.outputs.msys2-location }}')/usr/bin/bash.exe" -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Tests
