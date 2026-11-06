@@ -153,6 +153,7 @@ class AnnotateDrawEngine:
         self._text_origin: _Vec2 | None = None  # image-space anchor of the active text box
         self._text_font_size = 0.0  # WCS font size of the active text box
         self._text_depth_limit: float | None = None  # document pixels from the first baseline to the image bottom
+        self._text_wrap_width = 0.0  # WCS line width of the active text box, 0 for no wrapping
         self._text_selecting = False  # True while the pointer drags a selection
         self._text_base_style = TextStyle(0)  # toolbar style of the active text box
         self._text_component: PaintComponent | None = None
@@ -312,15 +313,15 @@ class AnnotateDrawEngine:
     def _font_size(self):
         return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
-    def _new_text_document(self, line_width: float) -> QtGui.QTextDocument:
-        """Editing document for a new text box, with the renderer's font and wrap settings.
+    def _new_text_document(self, line_width: float, pixel_size: int = _TEXT_EDIT_PIXEL_SIZE) -> QtGui.QTextDocument:
+        """Document for a text box with the renderer's font and wrap settings.
 
         line_width is in document pixels, 0 for no wrapping.
         """
         font = QtGui.QFont()
         if self._settings.font_family:
             font.setFamily(self._settings.font_family)
-        font.setPixelSize(self._TEXT_EDIT_PIXEL_SIZE)
+        font.setPixelSize(pixel_size)
         font.setBold(self._settings.font_bold)
         font.setItalic(self._settings.font_italic)
         font.setUnderline(self._settings.font_underline)
@@ -517,6 +518,7 @@ class AnnotateDrawEngine:
         self._text_cursor = None
         self._text_origin = None
         self._text_depth_limit = None
+        self._text_wrap_width = 0.0
         self._text_selecting = False
         self._text_registered = False
 
@@ -525,12 +527,44 @@ class AnnotateDrawEngine:
         if not self._text().strip():
             self._cancel_text()
             return
-        paint.finish_text(self._text_component, self._text())
+        self._bake_line_breaks()
+        paint.finish_text(self._text_component, self._text(), self._text_runs())
         self._reset_text()
         commands.sendInternalEvent("annotate-text-committed")
 
+    def _bake_line_breaks(self):
+        """Turn the soft wraps of the active box into line breaks in its text.
+
+        Committed text then shows the same lines everywhere, including OTIO Text.1 consumers that have no wrap
+        width. The breaks come from a layout at the renderer's pixel size, so the text doesn't move on commit.
+        """
+        if self._text_wrap_width <= 0:
+            return
+        # Same framebuffer height and font size clamp as PaintCommand.cpp Text::execute.
+        MAX_RENDER_FONT_PIXELS = 2000
+        framebuffer_height = commands.viewSize()[1] * commands.devicePixelRatio()
+        render_font_size = min(MAX_RENDER_FONT_PIXELS, max(1.0, self._text_font_size * framebuffer_height))
+        pixel_size = math.floor(render_font_size + 0.5)  # std::lround, not Python's round-half-to-even
+        layout_document = self._new_text_document(self._text_wrap_width * framebuffer_height, pixel_size)
+        QtGui.QTextCursor(layout_document).insertFragment(QtGui.QTextDocumentFragment(self._text_document))
+        # The document lays out lazily, and the line positions below need the layout.
+        layout_document.size()
+        breaks = []
+        block = layout_document.firstBlock()
+        while block.isValid():
+            layout = block.layout()
+            breaks += [block.position() + layout.lineAt(index).textStart() for index in range(1, layout.lineCount())]
+            block = block.next()
+        # From last to first so earlier positions stay valid. A break after a space replaces the space.
+        cursor = QtGui.QTextCursor(self._text_document)
+        for position in reversed(breaks):
+            cursor.setPosition(position)
+            if self._text_document.characterAt(position - 1) == " ":
+                cursor.setPosition(position - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.insertText("\n")
+
     def _cancel_text(self):
-        paint.finish_text(self._text_component, self._text())
+        paint.finish_text(self._text_component, self._text(), self._text_runs())
         paint.soft_delete(self._text_component)
         commands.redraw()
 
@@ -794,6 +828,7 @@ class AnnotateDrawEngine:
             right_edge, bottom_edge = bottom_right
             wrap_width = max(0.0, right_edge - image_point.x)
             self._text_depth_limit = (image_point.y - bottom_edge) * pixels_per_unit
+        self._text_wrap_width = wrap_width
         self._text_document = self._new_text_document(wrap_width * pixels_per_unit)
         self._text_cursor = QtGui.QTextCursor(self._text_document)
         self._text_base_style = _text_style(

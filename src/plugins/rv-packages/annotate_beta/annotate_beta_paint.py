@@ -330,11 +330,15 @@ def set_text(component: PaintComponent, text: str, caret: int, selection: tuple[
     commands.redraw()
 
 
-def finish_text(component: PaintComponent, text: str):
-    """Remove the caret and selection and write the final text."""
+def finish_text(component: PaintComponent, text: str, runs: list[int]):
+    """Remove the editing-only properties and write the final text and runs.
+
+    The final text already has the wrapped lines as line breaks, so .wrapWidth goes with .caret and .selection.
+    """
     node_name = _node_name(component)
-    commands.deleteProperty(f"{node_name}.caret")
-    commands.deleteProperty(f"{node_name}.selection")
+    for editing_property in ("caret", "selection", "wrapWidth"):
+        commands.deleteProperty(f"{node_name}.{editing_property}")
+    commands.setIntProperty(f"{node_name}.runs", runs, True)
     # Deleting a property doesn't recompile the paint node, so the text must be set after it.
     commands.setStringProperty(f"{node_name}.text", [text], True)
     commands.redraw()
