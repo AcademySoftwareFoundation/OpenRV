@@ -152,6 +152,7 @@ class AnnotateDrawEngine:
         self._text_cursor: QtGui.QTextCursor | None = None
         self._text_origin: _Vec2 | None = None  # image-space anchor of the active text box
         self._text_font_size = 0.0  # WCS font size of the active text box
+        self._text_depth_limit: float | None = None  # document pixels from the first baseline to the image bottom
         self._text_selecting = False  # True while the pointer drags a selection
         self._text_base_style = TextStyle(0)  # toolbar style of the active text box
         self._text_component: PaintComponent | None = None
@@ -311,8 +312,11 @@ class AnnotateDrawEngine:
     def _font_size(self):
         return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
-    def _new_text_document(self) -> QtGui.QTextDocument:
-        """Editing document for a new text box, with the renderer's font settings."""
+    def _new_text_document(self, line_width: float) -> QtGui.QTextDocument:
+        """Editing document for a new text box, with the renderer's font and wrap settings.
+
+        line_width is in document pixels, 0 for no wrapping.
+        """
         font = QtGui.QFont()
         if self._settings.font_family:
             font.setFamily(self._settings.font_family)
@@ -325,6 +329,8 @@ class AnnotateDrawEngine:
         document = QtGui.QTextDocument()
         document.setDocumentMargin(0)
         document.setDefaultFont(font)
+        if line_width > 0:
+            document.setTextWidth(line_width)
         return document
 
     def _border_width(self):
@@ -496,7 +502,8 @@ class AnnotateDrawEngine:
         if inside_only:
             size = layout.documentSize()
             margin = first_line.height() / 2
-            inside_horizontally = -margin <= x <= size.width() + margin
+            # documentSize() spans the whole wrap width, idealWidth() only the widest line.
+            inside_horizontally = -margin <= x <= self._text_document.idealWidth() + margin
             inside_vertically = 0 <= y <= size.height()
             if not (inside_horizontally and inside_vertically):
                 return None
@@ -508,6 +515,7 @@ class AnnotateDrawEngine:
         self._text_document = None
         self._text_cursor = None
         self._text_origin = None
+        self._text_depth_limit = None
         self._text_selecting = False
         self._text_registered = False
 
@@ -776,15 +784,68 @@ class AnnotateDrawEngine:
             event.reject()
             return
         self._text_active = True
-        self._text_document = self._new_text_document()
-        self._text_cursor = QtGui.QTextCursor(self._text_document)
         self._text_origin = image_point
         self._text_font_size = self._font_size()
+        pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
+        wrap_width = 0.0
+        edges = self._image_edges(source_name)
+        if edges:
+            right_edge, bottom_edge = edges
+            wrap_width = max(0.0, right_edge - image_point.x)
+            self._text_depth_limit = (image_point.y - bottom_edge) * pixels_per_unit
+        self._text_document = self._new_text_document(wrap_width * pixels_per_unit)
+        self._text_cursor = QtGui.QTextCursor(self._text_document)
         self._text_base_style = _text_style(
             self._settings.font_bold, self._settings.font_italic, self._settings.font_underline
         )
         with self._sync_batch(force=False):
-            self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._text_font_size)
+            self._text_component = paint.new_text_node(
+                paint_frame, image_point, self._settings, self._text_font_size, wrap_width
+            )
+
+    @staticmethod
+    def _image_edges(source_name) -> tuple[float, float] | None:
+        """Image-space (right x, bottom y) of the image, or None when they are unknown."""
+        # imageGeometry() returns the on-screen corners in the viewport space eventToImageSpace() takes.
+        try:
+            corners = [
+                commands.eventToImageSpace(source_name, corner, True) for corner in commands.imageGeometry(source_name)
+            ]
+            return max(corner[0] for corner in corners), min(corner[1] for corner in corners)
+        except Exception:
+            return None
+
+    def _insert_text(self, text) -> bool:
+        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom."""
+        document, cursor = self._text_document, self._text_cursor
+        height_before = document.size().height()
+        anchor, position, pending_format = cursor.anchor(), cursor.position(), cursor.charFormat()
+        # One edit block per insertion so undo() reverts only this one.
+        cursor.beginEditBlock()
+        cursor.insertText(text)
+        cursor.endEditBlock()
+        if self._text_fits_in_image(height_before):
+            return True
+        document.undo(cursor)
+        cursor.setPosition(anchor)
+        cursor.setPosition(position, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        if not cursor.hasSelection():
+            cursor.setCharFormat(pending_format)
+        return False
+
+    def _text_fits_in_image(self, height_before) -> bool:
+        if self._text_depth_limit is None:
+            return True
+        document = self._text_document
+        # Edits that don't add lines are always allowed, so a box started at the bottom edge keeps one line.
+        if document.size().height() <= height_before:
+            return True
+        first_line_ascent = document.firstBlock().layout().lineAt(0).ascent()
+        last_block = document.lastBlock()
+        last_line = last_block.layout().lineAt(last_block.layout().lineCount() - 1)
+        last_baseline = document.documentLayout().blockBoundingRect(last_block).y() + last_line.y() + last_line.ascent()
+        # Compare baselines rather than line boxes: the descent and line gap of the last line may be clipped.
+        return last_baseline - first_line_ascent <= self._text_depth_limit
 
     def _place_text_cursor(self, event) -> bool:
         """Move the caret to a push inside the active text box and start a drag selection."""
@@ -834,7 +895,8 @@ class AnnotateDrawEngine:
         if not self._text_active:
             event.reject()
             return
-        self._text_cursor.insertText(text)
+        if not self._insert_text(text):
+            return
         self._register_text_undo()
         self._update_text_display()
 

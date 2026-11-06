@@ -234,8 +234,11 @@ def update_shape(component: PaintComponent, prefix, anchor, current):
 # ----------------------------------------------------------------------
 
 
-def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> PaintComponent:
-    """Create an empty text component at position and return it."""
+def new_text_node(paint_frame: PaintFrame, position, settings, font_size, wrap_width) -> PaintComponent:
+    """Create an empty text component at position and return it.
+
+    wrap_width is the line width in the same units as font_size, 0 for no wrapping.
+    """
     _ensure_visible(paint_frame.paint_node)
     component = _new_component(paint_frame, "text")
     node_name = _node_name(component)
@@ -287,6 +290,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     for suffix, property_type, width in (
         (".fontFamily", commands.StringType, 1),
         (".fontSize", commands.FloatType, 1),
+        (".wrapWidth", commands.FloatType, 1),
         (".fontWeight", commands.StringType, 1),
         (".fontStyle", commands.StringType, 1),
         (".textDecoration", commands.StringType, 1),
@@ -296,6 +300,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
 
     commands.setStringProperty(f"{node_name}.fontFamily", [settings.font_family], True)
     commands.setFloatProperty(f"{node_name}.fontSize", [font_size], True)
+    commands.setFloatProperty(f"{node_name}.wrapWidth", [wrap_width], True)
     commands.setStringProperty(f"{node_name}.fontWeight", [font_weight], True)
     commands.setStringProperty(f"{node_name}.fontStyle", [font_style], True)
     commands.setStringProperty(f"{node_name}.textDecoration", [text_decoration], True)
