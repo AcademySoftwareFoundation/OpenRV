@@ -321,6 +321,14 @@ namespace IPCore
 
             Matrix parentMatrix;
             Matrix parentMatrixGlobal; //  includes intermediate buffer transitions
+            //
+            //  Parent matrix for the "overlay" chain -- a parallel accumulation
+            //  of transforms that intentionally omits any arbitrary rotation
+            //  applied by Transform2DIPNode. Used to render overlay paint
+            //  commands (mattes, HUD rectangles, text, etc.) so they follow
+            //  scale/translate but do not rotate with the image.
+            //
+            Matrix parentOverlayMatrix;
             size_t outputWidth;
             size_t outputHeight;
             Matrix projectionMatrix;
@@ -388,8 +396,19 @@ namespace IPCore
         //  Geometric State
         //
 
-        const MovieInfo* info;         // original source info
-        Matrix transformMatrix;        // image geometry transform (rotation, etc)
+        const MovieInfo* info;  // original source info
+        Matrix transformMatrix; // image geometry transform (rotation, etc)
+        //
+        //  overlayTransformMatrix mirrors transformMatrix, but any nodes that
+        //  contribute an arbitrary rotation (i.e. Transform2DIPNode) may
+        //  intentionally omit that rotation here. It is otherwise updated in
+        //  lockstep with transformMatrix. This gives us a rotation-stripped
+        //  local transform to feed the "overlay" paint pass so that mattes
+        //  and other overlays do not rotate with the image while still
+        //  tracking user-applied scale/translate. See OverlayIPNode and
+        //  ImageRenderer::renderPaint.
+        //
+        Matrix overlayTransformMatrix;
         Matrix modelViewMatrix;        // modelView matrix
         Matrix modelViewMatrixGlobal;  // modelView matrix (including
                                        // intermediate buffer transitions)
@@ -397,6 +416,15 @@ namespace IPCore
         Matrix projectionMatrixGlobal; // perspective matrix (including
                                        // intermediate buffer transitions)
         Matrix imageMatrix;
+        //
+        //  overlayImageMatrix is the accumulated global "overlay" transform
+        //  computed from overlayTransformMatrix in the same way imageMatrix
+        //  is computed from transformMatrix. It is used as the modelview
+        //  when rendering overlay paint commands (mattes, HUD rectangles,
+        //  text, windows). When Session.matte.rotateWithImage != 0 this ends
+        //  up numerically identical to imageMatrix.
+        //
+        Matrix overlayImageMatrix;
         Matrix orientationMatrix; // NOTE that the orientation matrix actually
                                   // holds the orientation which is needed by
                                   // the UI for example but its not part of the
