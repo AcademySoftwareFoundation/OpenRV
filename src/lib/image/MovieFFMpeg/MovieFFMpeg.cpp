@@ -6080,6 +6080,10 @@ namespace TwkMovie
         formats["mp4"] = make_pair("MPEG-4 Movie Container", vidcap);
         formats["mpg"] = make_pair("MPEG Format", vidcap);
         formats["mxf"] = make_pair("Material eXchange Format", vidcap);
+        // Unreal Engine Tiled Mipmap Video: an MP4 container with an APV (apv1) track. Read-only;
+        // FFmpeg decodes the primary (full resolution) frame and ignores the mip frames.
+        formats["tmv"] =
+            make_pair("Unreal Tiled Mipmap Video (APV in MP4)", MovieIO::MovieRead | MovieIO::MovieReadAudio | MovieIO::AttributeRead);
         //    formats["ogv"]  = make_pair("OGG Video", vidcap);
         //    formats["webm"] = make_pair("WEBM Video", vidcap);
 
