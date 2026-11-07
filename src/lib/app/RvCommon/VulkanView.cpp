@@ -13,7 +13,9 @@
 #include <RvApp/RvSession.h>
 #include <IPCore/Session.h>
 
+#include <QtCore/QEvent>
 #include <QtCore/QTimer>
+#include <QtGui/QCursor>
 #include <QtGui/QWindow>
 #include <QtWidgets/QVBoxLayout>
 
@@ -120,6 +122,28 @@ namespace Rv
         //  nested inside this show, so also check one event-loop turn later.
         watchParentWindow();
         QTimer::singleShot(0, this, &VulkanView::watchParentWindow);
+    }
+
+    bool VulkanView::event(QEvent* event)
+    {
+        //
+        //  Qt does not propagate a widget's cursor to an embedded native window,
+        //  so forward QWidget::setCursor() / unsetCursor() on the view to the
+        //  viewport window (as in GLView::event()).
+        //
+        if (event->type() == QEvent::CursorChange && m_vulkanWindow != nullptr)
+        {
+            if (testAttribute(Qt::WA_SetCursor))
+            {
+                m_vulkanWindow->setCursor(cursor());
+            }
+            else
+            {
+                m_vulkanWindow->unsetCursor();
+            }
+        }
+
+        return QWidget::event(event);
     }
 
     void VulkanView::watchParentWindow()
