@@ -413,6 +413,11 @@ namespace IPCore
                 // ── Stamp path: feed raw points directly into StampPath ────────
                 const size_t widthsCount = hasPerPointWidths ? widthP->size() : 0;
 
+                if (p.rawPointsSmoothed == 1 && rawCount > 1)
+                {
+                    p.stampInstances.clear();
+                }
+
                 for (size_t i = p.rawPointsSmoothed; i < rawCount; ++i)
                 {
                     // The placer is created lazily on the first point so that p.width
@@ -437,10 +442,16 @@ namespace IPCore
                     const size_t wi = (hasPerPointWidths && widthsCount > 0) ? std::min(i, widthsCount - 1) : static_cast<size_t>(-1);
                     const float w = (wi != static_cast<size_t>(-1)) ? static_cast<const float*>(widthP->rawData())[wi] : p.width;
 
-                    p.stampPlacer->add_point(rawPts[i], w);
+                    const Vec2f& point = (*pointsP)[i];
+                    p.stampPlacer->add_point(point, w);
                     TwkPaint::StampInstance s;
                     while (p.stampPlacer->next(s))
                         p.stampInstances.push_back(s);
+
+                    if (rawCount == 1)
+                    {
+                        p.stampInstances.push_back({point, w, p.color[3], angle, squish});
+                    }
                 }
 
                 p.rawPointsSmoothed = rawCount;
