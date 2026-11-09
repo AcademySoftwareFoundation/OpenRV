@@ -3,9 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+from rv import commands, extra_commands
 from rv.rvtypes import MinorMode
-import rv.commands as commands
-import rv.extra_commands as extra_commands
 
 
 class PyMyStuffMode(MinorMode):

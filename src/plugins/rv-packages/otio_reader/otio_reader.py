@@ -30,13 +30,11 @@
 #
 
 import logging
-from rv import commands
-from rv import extra_commands
-
 import os
+from contextlib import contextmanager
 
 import opentimelineio as otio
-from contextlib import contextmanager
+from rv import commands, extra_commands
 
 
 @contextmanager
@@ -83,7 +81,7 @@ def _run_hook(hook_name, otio_obj, context={}, optional=True):
         return otio.hooks.run(hook_name, otio_obj, context)
     except KeyError:
         if not optional:
-            raise NoMappingForOtioTypeError(str(type(otio_obj)) + " on object: {}".format(otio_obj))
+            raise NoMappingForOtioTypeError(str(type(otio_obj)) + f" on object: {otio_obj}")
 
 
 def create_rv_node_from_otio(otio_obj, context=None):
@@ -98,16 +96,16 @@ def create_rv_node_from_otio(otio_obj, context=None):
     }
 
     if type(otio_obj) in WRITE_TYPE_MAP:
-        process_schema = _run_hook("pre_hook_{}".format(otio_obj.schema_name()), otio_obj, context)
+        process_schema = _run_hook(f"pre_hook_{otio_obj.schema_name()}", otio_obj, context)
         if process_schema is False:
             return None
 
         result = WRITE_TYPE_MAP[type(otio_obj)](otio_obj, context)
         with set_context(context, post_schema=result):
-            _run_hook("post_hook_{}".format(otio_obj.schema_name()), otio_obj, context)
+            _run_hook(f"post_hook_{otio_obj.schema_name()}", otio_obj, context)
         return result
 
-    return _run_hook("{}_to_rv".format(otio_obj.schema_name()), otio_obj, context, optional=False)
+    return _run_hook(f"{otio_obj.schema_name()}_to_rv", otio_obj, context, optional=False)
 
 
 def _retime_trx_input(pre_item, post_item, context=None):
@@ -167,7 +165,7 @@ def _create_transition(pre_item, in_trx, post_item, context=None):
 
     num_frames = (in_trx.in_offset + in_trx.out_offset).rescaled_to(pre_item.trimmed_range().duration.rate).value
 
-    in_offset_prop = "{}.otio.in_offset".format(rv_trx)
+    in_offset_prop = f"{rv_trx}.otio.in_offset"
     commands.newProperty(in_offset_prop, commands.IntType, 1)
     commands.setIntProperty(in_offset_prop, [in_trx.in_offset.to_frames()], True)
 
@@ -205,7 +203,7 @@ def _create_stack(in_stack, context=None):
 
     # disable reversed order blending so the top node is on top
     stack_node = extra_commands.nodesInGroupOfType(new_stack, "RVStack")[0]
-    commands.setIntProperty("{}.mode.supportReversedOrderBlending".format(stack_node), [0])
+    commands.setIntProperty(f"{stack_node}.mode.supportReversedOrderBlending", [0])
 
     return new_stack
 
@@ -261,7 +259,7 @@ def _create_track(in_seq, context=None):
         _add_metadata_to_node(in_seq, new_seq)
 
         # disable reversed order blending so the top node is on top
-        commands.setIntProperty("{}.mode.supportReversedOrderBlending".format(seq_node), [0])
+        commands.setIntProperty(f"{seq_node}.mode.supportReversedOrderBlending", [0])
 
     return new_seq
 
@@ -338,11 +336,11 @@ def _set_sequence_edl(sequence, edl_time, edl):
 
     # This effectively forces each cut to use the otio trimmed_range, regardless
     # of effects or other modifications to a sources timing.
-    commands.setIntProperty("{}.edl.in".format(sequence), edl["in"])
-    commands.setIntProperty("{}.edl.out".format(sequence), edl["out"])
-    commands.setIntProperty("{}.edl.frame".format(sequence), edl["frame"])
-    commands.setIntProperty("{}.edl.source".format(sequence), list(range(len(edl["frame"]))))
-    commands.setIntProperty("{}.mode.autoEDL".format(sequence), [0])
+    commands.setIntProperty(f"{sequence}.edl.in", edl["in"])
+    commands.setIntProperty(f"{sequence}.edl.out", edl["out"])
+    commands.setIntProperty(f"{sequence}.edl.frame", edl["frame"])
+    commands.setIntProperty(f"{sequence}.edl.source", list(range(len(edl["frame"]))))
+    commands.setIntProperty(f"{sequence}.mode.autoEDL", [0])
 
 
 def _get_in_out_frame(it, range_to_read, seq_rate=None):
@@ -373,7 +371,7 @@ def _create_timeline(tl, context=None):
 
         # also add the timeline name if it has one
         if tl.name:
-            name_prop = "{}.otio.timeline_name".format(stack)
+            name_prop = f"{stack}.otio.timeline_name"
 
             commands.newProperty(name_prop, commands.StringType, 1)
             commands.setStringProperty(name_prop, [tl.name], True)
@@ -409,7 +407,7 @@ def _create_media(media_ref, trimmed_range, context=None):
     elif isinstance(media_ref, otio.schema.ImageSequenceReference):
         return [
             _get_media_path(
-                str(media_ref.abstract_target_url(symbol="%0{n}d".format(n=media_ref.frame_zero_padding))),
+                str(media_ref.abstract_target_url(symbol=f"%0{media_ref.frame_zero_padding}d")),
                 context,
             )
         ]
@@ -443,7 +441,7 @@ def _create_sources(item, context=None):
             new_cmd_args = cmd_args + (media,)
             src = cmd(*new_cmd_args)
         except Exception as e:
-            print("ERROR adding media (replacing with smptebars): {}".format(e))
+            print(f"ERROR adding media (replacing with smptebars): {e}")
             error_media = _create_movieproc(item.trimmed_range(), "smptebars")
             src = commands.addSourceVerbose([error_media])
 
@@ -483,7 +481,7 @@ def _create_sources(item, context=None):
 
         switch_group = commands.nodeConnections(source_group)[1][0]
         switch = extra_commands.nodesInGroupOfType(switch_group, "RVSwitch")[0]
-        commands.setIntProperty("{}.mode.autoEDL".format(switch), [0])
+        commands.setIntProperty(f"{switch}.mode.autoEDL", [0])
 
         return switch_group, active_source
 
@@ -530,7 +528,7 @@ def _create_item(it, context=None):
     range_to_read = it.trimmed_range()
 
     if not range_to_read:
-        raise otio.exceptions.OTIOError("No valid range on clip: {0}.".format(str(it)))
+        raise otio.exceptions.OTIOError(f"No valid range on clip: {it!s}.")
 
     src_or_switch_group, active_src = _create_sources(it, context)
     _add_metadata_to_node(it, src_or_switch_group)
@@ -550,12 +548,7 @@ def _create_item(it, context=None):
 
 
 def _create_movieproc(time_range, kind="blank"):
-    movieproc = "{},start={},end={},fps={}.movieproc".format(
-        kind,
-        time_range.start_time.value,
-        time_range.end_time_inclusive().value,
-        time_range.duration.rate,
-    )
+    movieproc = f"{kind},start={time_range.start_time.value},end={time_range.end_time_inclusive().value},fps={time_range.duration.rate}.movieproc"
     return movieproc
 
 
@@ -585,16 +578,16 @@ def _add_markers(it, node):
 
     if frames:
         ins, outs = map(list, zip(*frames))
-        commands.setStringProperty("{}.markers.name".format(node), names, True)
-        commands.setIntProperty("{}.markers.in".format(node), ins, True)
-        commands.setIntProperty("{}.markers.out".format(node), outs, True)
+        commands.setStringProperty(f"{node}.markers.name", names, True)
+        commands.setIntProperty(f"{node}.markers.in", ins, True)
+        commands.setIntProperty(f"{node}.markers.out", outs, True)
         commands.setFloatProperty(
-            "{}.markers.color".format(node),
+            f"{node}.markers.color",
             [color for rgba in colors for color in rgba],
             True,
         )
-        commands.newProperty("{}.markers.otio_metadata".format(node), commands.StringType, 1)
-        commands.setStringProperty("{}.markers.otio_metadata".format(node), metadata, True)
+        commands.newProperty(f"{node}.markers.otio_metadata", commands.StringType, 1)
+        commands.setStringProperty(f"{node}.markers.otio_metadata", metadata, True)
 
 
 def _get_color_from_name(name, defaultColor="PURPLE"):
@@ -651,20 +644,20 @@ def _add_source_bounds(media_ref, src, active_src, context=None):
 
     transform_node = extra_commands.associatedNode("RVTransform2D", src)
 
-    commands.setFloatProperty("{}.transform.scale".format(transform_node), [scale.x / aspect_ratio, scale.y])
-    commands.setFloatProperty("{}.transform.translate".format(transform_node), [translate.x, translate.y])
+    commands.setFloatProperty(f"{transform_node}.transform.scale", [scale.x / aspect_ratio, scale.y])
+    commands.setFloatProperty(f"{transform_node}.transform.translate", [translate.x, translate.y])
 
     # write the bounds global_scale and global_translate to the node so we can
     # preserve the original values if we round-trip
-    commands.newProperty("{}.otio.global_scale".format(transform_node), commands.FloatType, 2)
-    commands.newProperty("{}.otio.global_translate".format(transform_node), commands.FloatType, 2)
+    commands.newProperty(f"{transform_node}.otio.global_scale", commands.FloatType, 2)
+    commands.newProperty(f"{transform_node}.otio.global_translate", commands.FloatType, 2)
     commands.setFloatProperty(
-        "{}.otio.global_scale".format(transform_node),
+        f"{transform_node}.otio.global_scale",
         [global_scale.x, global_scale.y],
         True,
     )
     commands.setFloatProperty(
-        "{}.otio.global_translate".format(transform_node),
+        f"{transform_node}.otio.global_translate",
         [global_translate.x, global_translate.y],
         True,
     )
@@ -675,7 +668,7 @@ def _add_metadata_to_node(item, rv_node, prop_name="metadata"):
     Add metadata from otio "item" to rv_node
     """
     if item.metadata:
-        otio_metadata_property = "{}.otio.{}".format(rv_node, prop_name)
+        otio_metadata_property = f"{rv_node}.otio.{prop_name}"
         otio_metadata = otio.core.serialize_json_to_string(item.metadata, indent=-1)
         commands.newProperty(otio_metadata_property, commands.StringType, 1)
         commands.setStringProperty(otio_metadata_property, [otio_metadata], True)

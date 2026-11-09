@@ -16,7 +16,6 @@ import sys
 from pathlib import Path
 
 import yaml
-
 from _common import CONAN_USER, conan_exec, load_packages
 
 
