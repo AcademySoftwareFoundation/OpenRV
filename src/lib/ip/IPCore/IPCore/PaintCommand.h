@@ -183,7 +183,7 @@ namespace IPCore
             enum StampBlendMode
             {
                 BlendNormal,   ///< GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
-                BlendMarker,   ///< marker wetness approximation (same GL blend as Normal)
+                BlendMarker,   ///< marker wetness approximation: GL_MAX into a cleared buffer so stamps don't accumulate opacity
                 BlendAdditive, ///< glow: GL_SRC_ALPHA, GL_ONE
                 BlendEraser    ///< reserved; stamp erasure not yet implemented
             };

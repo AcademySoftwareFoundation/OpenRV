@@ -439,10 +439,10 @@ namespace IPCore
 
                 auto stampQuads = buildStampQuads(localPoly->stampInstances);
 
-                // BlendMarker and ghost mode both use two-pass isolation: GL_MAX into
-                // a cleared currentFBO (prevents intra-stroke opacity accumulation),
-                // then composite the background under the result via ONE_MINUS_DST_ALPHA.
-                if (stampBlendMode == BlendMarker || isGhostOn)
+                // BlendMarker uses two-pass isolation: GL_MAX into a cleared currentFBO
+                // (prevents intra-stroke opacity accumulation), then composite the
+                // background under the result via ONE_MINUS_DST_ALPHA.
+                if (stampBlendMode == BlendMarker)
                 {
 
                     // Pass 1: stamps into cleared currentFBO
