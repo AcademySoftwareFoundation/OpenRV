@@ -401,7 +401,7 @@ jobs:
             #python-version: "3.11"
             #cmake-version: "3.31.6"
             #vfx-platform: "CY2025"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Release"
             qt-version: "6.5.3"

@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "6.5.3"
@@ -42,7 +42,7 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2025"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Release"
             qt-version: "6.5.3"
@@ -80,7 +80,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "6.5.3"
@@ -88,7 +88,7 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2025"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Debug"
             qt-version: "6.5.3"
@@ -125,7 +125,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "6.5.3"
@@ -133,7 +133,7 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Release"
             qt-version: "6.5.3"
@@ -141,7 +141,7 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "6.5.3"
@@ -149,7 +149,7 @@ jobs:
             python-version: "3.11"
             cmake-version: "3.31.6"
             vfx-platform: "CY2024"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Debug"
             qt-version: "6.5.3"
@@ -187,7 +187,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Release"
             qt-version: "6.8.3"
@@ -195,7 +195,7 @@ jobs:
             python-version: "3.13"
             cmake-version: "3.31.6"
             vfx-platform: "CY2026"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Release"
             qt-version: "6.8.3"
@@ -203,7 +203,7 @@ jobs:
             python-version: "3.13"
             cmake-version: "3.31.6"
             vfx-platform: "CY2026"
-          - os: "macos-15"
+          - os: "macos-15-intel"
             arch-type: "x86_64"
             build-type: "Debug"
             qt-version: "6.8.3"
@@ -211,7 +211,7 @@ jobs:
             python-version: "3.13"
             cmake-version: "3.31.6"
             vfx-platform: "CY2026"
-          - os: "macos-14"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Debug"
             qt-version: "6.8.3"
