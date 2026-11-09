@@ -68,6 +68,8 @@ namespace Rv
     protected:
         void showEvent(QShowEvent* event) override;
 
+        bool event(QEvent* event) override;
+
     private:
         RvDocument* m_doc;
         VulkanWindow* m_vulkanWindow{nullptr};
