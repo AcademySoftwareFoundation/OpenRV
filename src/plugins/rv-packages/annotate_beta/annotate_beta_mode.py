@@ -6,14 +6,17 @@ from functools import partial
 
 from rv import commands, extra_commands, rvtypes, qtutils
 
-from OpenGL import GL
-from OpenGL import GLU
+from OpenGL import GL, GLU
 from PySide6 import QtCore, QtWidgets, QtGui
 
 import annotate_beta_constants as constants
 import annotate_beta_paint as paint
 from annotate_beta_engine import AnnotateDrawEngine, DrawSettings, ToolState
 from annotate_beta_widget import AnnotateToolbarDockWidget
+
+# The last dot lands on the first, closing the loop like the Mu package.
+_RING_DOT_COUNT = 21
+_RING_ANGLES = [math.tau * step / (_RING_DOT_COUNT - 1) for step in range(_RING_DOT_COUNT)]
 
 _TOOL_CURSORS = {constants.Tool.CURSOR: QtCore.Qt.ArrowCursor, constants.Tool.TEXT: QtCore.Qt.IBeamCursor}
 
@@ -108,8 +111,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         super().deactivate()
 
     def render(self, event):
-        RING_ANGLES = [step * math.pi / 10.0 for step in range(21)]
-
         ring = self._engine.brush_ring()
         if ring is None:
             return
@@ -134,7 +135,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glBegin(GL.GL_POINTS)
-        for angle in RING_ANGLES:
+        for angle in _RING_ANGLES:
             point_x = x + math.sin(angle) * radius
             point_y = y + math.cos(angle) * radius
             # Black then the tool color, so the ring shows on light and dark images.

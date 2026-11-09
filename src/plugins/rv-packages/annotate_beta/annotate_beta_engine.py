@@ -369,8 +369,12 @@ class AnnotateDrawEngine:
             commands.redraw()
 
     def on_hover(self, event):
-        self._resolve_pointer(event)
-        self._redraw_brush_ring()
+        if self._settings.tool in constants.BRUSH_RING_TOOLS:
+            self._resolve_pointer(event)
+            self._redraw_brush_ring()
+        else:
+            # Forget the position so the ring doesn't reappear stale after switching to a ring tool.
+            self._last_pointer_source_name = ""
         event.reject()
 
     def on_pointer_leave(self, event):
