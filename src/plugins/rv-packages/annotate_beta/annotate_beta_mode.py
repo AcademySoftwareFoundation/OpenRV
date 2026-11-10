@@ -130,9 +130,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         GL.glPushMatrix()
         GL.glLoadIdentity()
 
-        # The paint renderer leaves its blend function set, so set ours explicitly.
-        GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+        # No blending, like the Mu ring on unpainted frames, so smoothed dots keep full color over light images.
+        GL.glDisable(GL.GL_BLEND)
         GL.glEnable(GL.GL_POINT_SMOOTH)
         GL.glBegin(GL.GL_POINTS)
         for angle in _RING_ANGLES:
