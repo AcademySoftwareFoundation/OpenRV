@@ -2583,6 +2583,9 @@ namespace Rv
             }
         }
 
+        //  True once this frame has opened a -debug profile sample.
+        bool profiling = false;
+
         if (m_doc && session && m_videoDevice)
         {
             m_videoDevice->makeCurrent();
@@ -2605,9 +2608,24 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            //  Session::render() writes into the current profiling sample.
+            if (IPCore::debugProfile)
+            {
+                Session::ProfilingRecord& profilingRecord = session->beginProfilingSample();
+                profilingRecord.renderStart = session->profilingElapsedTime();
+                profiling = true;
+            }
+
             {
                 ScopedDiagTimer diagTimer(s_diag.renderMs, IPCore::ImageRenderer::debugGpu());
                 session->render();
+            }
+
+            if (profiling)
+            {
+                Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+                profilingRecord.renderEnd = session->profilingElapsedTime();
+                profilingRecord.swapStart = profilingRecord.renderEnd;
             }
 
             if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
@@ -2648,6 +2666,13 @@ namespace Rv
                 //  The output made its own GL context current; restore ours.
                 m_videoDevice->makeCurrent();
             }
+        }
+
+        if (profiling)
+        {
+            Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+            profilingRecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
         }
 
         if (session)

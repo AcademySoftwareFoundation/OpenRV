@@ -538,9 +538,24 @@ namespace Rv
         absolutePosition(x, y);
         m_videoDevice->setAbsolutePosition(x, y);
 
+        // Session::render() writes into the current profiling sample;
+        // presentFrame() closes it.
+        if (IPCore::debugProfile)
+        {
+            IPCore::Session::ProfilingRecord& profilingRecord = session->beginProfilingSample();
+            profilingRecord.renderStart = session->profilingElapsedTime();
+        }
+
         {
             const ScopedDiagTimer timer(m_diag.renderMs, diag);
             session->render();
+        }
+
+        if (IPCore::debugProfile)
+        {
+            IPCore::Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+            profilingRecord.renderEnd = session->profilingElapsedTime();
+            profilingRecord.swapStart = profilingRecord.renderEnd;
         }
 
         fitWindowToFirstContent(session);
@@ -630,6 +645,14 @@ namespace Rv
             const ScopedDiagTimer timer(m_diag.outputPresentMs, diag);
             syncOutputDevice(session);
         }
+
+        if (IPCore::debugProfile)
+        {
+            IPCore::Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+            profilingRecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
+        }
+
         {
             const ScopedDiagTimer timer(m_diag.postRenderMs, diag);
             session->addSyncSample();
