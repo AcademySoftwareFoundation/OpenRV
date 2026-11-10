@@ -291,6 +291,11 @@ namespace Rv
         }
     }
 
+    bool VulkanView::eventFilter(QObject* object, QEvent* event)
+    {
+        return m_vulkanWindow != nullptr && m_vulkanWindow->eventFilter(object, event);
+    }
+
     bool VulkanView::firstPaintCompleted() const { return m_vulkanWindow && m_vulkanWindow->firstPaintCompleted(); }
 
     bool VulkanView::supports10BitPresentation() { return VulkanWindow::supports10BitPresentation(); }
