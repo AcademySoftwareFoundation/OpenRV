@@ -261,9 +261,8 @@ class AnnotateDrawEngine:
         scale = self._screen_scale(source_name) if self._settings.scale_brush else 1.0
         return (_PEN_WIDTH_MIN + size_fraction * (_PEN_WIDTH_MAX - _PEN_WIDTH_MIN)) * scale
 
-    def _border_width(self, source_name=None):
-        """Shape outline half-width in image space."""
-        scale = self._screen_scale(source_name) if self._settings.scale_brush else 1.0
+    def _border_width(self):
+        scale = self._screen_scale() if self._settings.scale_brush else 1.0
         return max(_BORDER_WIDTH_MIN, self._settings.tool_state.size * _SIZE_SCALE * scale)
 
     # ------------------------------------------------------------------
@@ -365,15 +364,15 @@ class AnnotateDrawEngine:
 
     def _redraw_brush_ring(self):
         # Playback already redraws every frame.
-        if self._settings.tool in constants.BRUSH_RING_TOOLS and not commands.isPlaying():
+        if self._settings.tool in constants.BRUSH_TOOLS and not commands.isPlaying():
             commands.redraw()
 
     def on_hover(self, event):
-        if self._settings.tool in constants.BRUSH_RING_TOOLS:
+        if self._settings.tool in constants.BRUSH_TOOLS:
             self._resolve_pointer(event)
             self._redraw_brush_ring()
         else:
-            # Forget the position so the ring doesn't reappear stale after switching to a ring tool.
+            # Forget the position so the ring doesn't reappear stale after switching to a brush tool.
             self._last_pointer_source_name = ""
         event.reject()
 
@@ -388,20 +387,15 @@ class AnnotateDrawEngine:
     def brush_ring(self):
         """Return ((x, y), radius) of the brush size ring in device pixels, or None.
 
-        The radius is the full-pressure stroke width for brush tools and the
-        outline half-width for shape tools, mapped from image space to the
-        screen at the pointer, so the ring lines up with what gets drawn.
+        The radius is the full-pressure stroke width, mapped from image space to
+        the screen at the pointer, so the ring lines up with what gets drawn.
         """
         source_name = self._last_pointer_source_name
-        tool = self._settings.tool
-        if not source_name or tool not in constants.BRUSH_RING_TOOLS:
+        if not source_name or self._settings.tool not in constants.BRUSH_TOOLS:
             return None
         try:
             image_point = commands.eventToImageSpace(source_name, self._last_device_pointer, True)
-            if tool in constants.BRUSH_TOOLS:
-                width = self._stroke_width(source_name)
-            else:
-                width = self._border_width(source_name)
+            width = self._stroke_width(source_name)
             center = commands.imageToEventSpace(source_name, image_point, True)
             edge = commands.imageToEventSpace(source_name, (image_point[0], image_point[1] + width), True)
         except Exception:  # the source went away since the last pointer event

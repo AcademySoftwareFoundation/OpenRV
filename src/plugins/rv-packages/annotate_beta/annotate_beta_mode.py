@@ -17,6 +17,7 @@ from annotate_beta_widget import AnnotateToolbarDockWidget
 # The last dot lands on the first, closing the loop like the Mu package.
 _RING_DOT_COUNT = 21
 _RING_ANGLES = [math.tau * step / (_RING_DOT_COUNT - 1) for step in range(_RING_DOT_COUNT)]
+_RING_DOT_SIZE = 3.0
 
 _TOOL_CURSORS = {constants.Tool.CURSOR: QtCore.Qt.ArrowCursor, constants.Tool.TEXT: QtCore.Qt.IBeamCursor}
 
@@ -117,7 +118,9 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         (x, y), radius = ring
         color = self._settings.tool_state.color
 
-        GL.glPushAttrib(GL.GL_ENABLE_BIT | GL.GL_CURRENT_BIT | GL.GL_POINT_BIT | GL.GL_COLOR_BUFFER_BIT)
+        GL.glPushAttrib(
+            GL.GL_ENABLE_BIT | GL.GL_CURRENT_BIT | GL.GL_POINT_BIT | GL.GL_COLOR_BUFFER_BIT | GL.GL_TRANSFORM_BIT
+        )
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPushMatrix()
         GL.glLoadIdentity()
@@ -133,6 +136,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         # No blending, like the Mu ring on unpainted frames, so smoothed dots keep full color over light images.
         GL.glDisable(GL.GL_BLEND)
         GL.glEnable(GL.GL_POINT_SMOOTH)
+        GL.glPointSize(_RING_DOT_SIZE * commands.devicePixelRatio())
         GL.glBegin(GL.GL_POINTS)
         for angle in _RING_ANGLES:
             point_x = x + math.sin(angle) * radius
@@ -147,7 +151,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         GL.glPopMatrix()
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glPopMatrix()
-        GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glPopAttrib()
 
     # ------------------------------------------------------------------
@@ -325,7 +328,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._pop_shape_table()
 
         _set_tool_cursor(tool)
-        if outgoing_tool in constants.BRUSH_RING_TOOLS or tool in constants.BRUSH_RING_TOOLS:
+        if outgoing_tool in constants.BRUSH_TOOLS or tool in constants.BRUSH_TOOLS:
             commands.redraw()  # show, resize or clear the brush size ring
 
     def _on_color_changed(self, color):

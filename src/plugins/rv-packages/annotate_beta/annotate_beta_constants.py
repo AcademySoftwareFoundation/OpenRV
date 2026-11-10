@@ -24,7 +24,6 @@ class Tool(StrEnum):
 SHAPE_TOOLS = frozenset({Tool.RECT, Tool.CIRCLE, Tool.ARROW, Tool.LINE})
 BRUSH_TOOLS = frozenset({Tool.PEN, Tool.BRUSH, Tool.ERASER})
 DRAWING_TOOLS = SHAPE_TOOLS | BRUSH_TOOLS | {Tool.TEXT}
-BRUSH_RING_TOOLS = SHAPE_TOOLS | BRUSH_TOOLS
 
 
 class ColorModifier(StrEnum):
