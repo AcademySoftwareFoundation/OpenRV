@@ -32,6 +32,9 @@ TARGET_LINK_LIBRARIES(
   PRIVATE TwkAudio asound
 )
 
+# The include directories above come from RvApp, including those of its external dependencies (GC through Mu), so build after RvApp.
+ADD_DEPENDENCIES(${_target} RvApp)
+
 ADD_LINK_OPTIONS("-Wl,-E")
 
 RV_STAGE(TYPE "SHARED_LIBRARY" TARGET ${_target})
