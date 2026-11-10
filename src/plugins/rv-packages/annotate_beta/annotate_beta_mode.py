@@ -94,6 +94,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._pop_shape_table()
         self._engine.commit_text_if_active()
         self._dock.toolbar_widget.hide_popups()
+        self._dock.toolbar_widget.hide_color_dialog()
         self._dock.hide()
 
         if self._auto_save_settings:
