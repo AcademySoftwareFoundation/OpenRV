@@ -2589,7 +2589,11 @@ namespace Rv
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
-                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
+                //  Once this window has focus, QWindowContainer clears the
+                //  container's focus, so check both.
+                const bool viewportHasFocus = m_eventWidget && (m_eventWidget->hasFocus() || QGuiApplication::focusWindow() == this);
+
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && viewportHasFocus)
                 {
                     TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
@@ -2802,7 +2806,8 @@ namespace Rv
             }
         }
 
-        if (event->type() != QEvent::Paint)
+        //  Playback posts an UpdateRequest every frame; it is not user activity.
+        if (event->type() != QEvent::Paint && event->type() != QEvent::UpdateRequest)
         {
             m_activityTimer.stop();
             m_activityTimer.start();
