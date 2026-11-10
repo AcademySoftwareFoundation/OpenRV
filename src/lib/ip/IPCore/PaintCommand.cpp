@@ -27,9 +27,13 @@
 #include <QString>
 #include <QFont>
 #include <QFontDatabase>
-#include <QFontMetricsF>
+#include <QAbstractTextDocumentLayout>
 #include <QImage>
 #include <QPainter>
+#include <QPalette>
+#include <QTextBlock>
+#include <QTextDocument>
+#include <QTextLayout>
 #include <functional>
 #include <iostream>
 #include <mutex>
@@ -841,6 +845,16 @@ namespace IPCore
                 return family;
             }
 
+            // Lays out plain text with the annotation font and no margin, so the
+            // first line's top-left corner is at (0, 0).
+            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice)
+            {
+                document.documentLayout()->setPaintDevice(paintDevice);
+                document.setDocumentMargin(0);
+                document.setDefaultFont(font);
+                document.setPlainText(text);
+            }
+
         } // namespace
 
         void Text::execute(CommandContext& context) const
@@ -914,26 +928,19 @@ namespace IPCore
                 qfont.setKerning(false);
                 qfont.setHintingPreference(QFont::PreferVerticalHinting);
 
-                // ── Measure text ──────────────────────────────────────────────
+                // ── Lay out text ──────────────────────────────────────────────
                 const QString qtext = QString::fromStdString(text);
                 if (qtext.isEmpty())
                     return;
                 QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
-                QFontMetricsF fm(qfont, &refImg);
-                // For multi-line text, measure each line separately: take the
-                // max advance width and accumulate lineSpacing() per line so
-                // the image is tall enough for all lines.
-                const auto lines = qtext.split('\n');
-                float maxLineWidth = 0.0f;
-                for (const auto& line : lines)
-                {
-                    const float lw = line.isEmpty() ? 0.0f : static_cast<float>(fm.horizontalAdvance(line));
-                    if (lw > maxLineWidth)
-                        maxLineWidth = lw;
-                }
-                const int lineCount = std::max(1, static_cast<int>(lines.size()));
-                const int imgW = static_cast<int>(std::ceil(maxLineWidth)) + 4;
-                const int imgH = static_cast<int>(std::ceil(fm.lineSpacing() * lineCount)) + 4;
+                QTextDocument document;
+                setUpTextDocument(document, qfont, qtext, &refImg);
+
+                // idealWidth() includes italic overhang past the last advance, so
+                // slanted glyphs are not clipped at the right edge of the image.
+                constexpr int imagePaddingPixels = 4;
+                const int imgW = static_cast<int>(std::ceil(document.idealWidth())) + imagePaddingPixels;
+                const int imgH = static_cast<int>(std::ceil(document.documentLayout()->documentSize().height())) + imagePaddingPixels;
 
                 if (imgW <= 0 || imgH <= 0)
                     return;
@@ -943,13 +950,14 @@ namespace IPCore
                 img.fill(Qt::transparent);
                 {
                     QPainter painter(&img);
-                    painter.setFont(qfont);
-                    auto toQColorComponent = [](float v) { return static_cast<int>(std::max(0.0f, std::min(1.0f, v)) * 255); };
-                    painter.setPen(QColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y), toQColorComponent(textColor.z),
-                                          toQColorComponent(textColor.w)));
                     painter.setRenderHint(QPainter::TextAntialiasing, true);
-                    // Draw at baseline. AlignLeft|AlignVCenter within the padded rect.
-                    painter.drawText(QRectF(0, 0, imgW, imgH), Qt::AlignLeft | Qt::AlignTop, qtext);
+                    constexpr int maxColorComponent = 255;
+                    auto toQColorComponent = [](float value)
+                    { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * maxColorComponent); };
+                    QAbstractTextDocumentLayout::PaintContext paintContext;
+                    paintContext.palette.setColor(QPalette::Text, QColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y),
+                                                                         toQColorComponent(textColor.z), toQColorComponent(textColor.w)));
+                    document.documentLayout()->draw(&painter, paintContext);
                 }
 
                 // ── Upload as GL texture (OpenGL 2.1 compatible) ───────────────
@@ -1000,7 +1008,8 @@ namespace IPCore
                 // appended -- already-typed lines hold their position and new
                 // lines extend the block downward, instead of the whole block
                 // (and every existing line) sliding upward off pos as it grows.
-                const float qyTop = pos.y + ((fbH > 0) ? static_cast<float>(fm.ascent()) / fbH : 0.001f);
+                const float firstLineAscent = static_cast<float>(document.firstBlock().layout()->lineAt(0).ascent());
+                const float qyTop = pos.y + ((fbH > 0) ? firstLineAscent / fbH : 0.001f);
                 const float qy = qyTop - th;
 
                 // Vertices: (x,y, u,v) quads — position + texcoord
