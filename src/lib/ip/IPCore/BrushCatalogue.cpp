@@ -6,6 +6,7 @@
 
 #include <IPCore/BrushCatalogue.h>
 #include <TwkApp/Bundle.h>
+#include <TwkUtil/File.h>
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
@@ -24,25 +25,26 @@ namespace IPCore::Paint
 
     namespace
     {
-        std::filesystem::path brushAssetsDirectory()
+        std::string brushAssetsDirectory()
         {
-            const std::filesystem::path applicationRoot = TwkApp::Bundle::mainBundle()->top();
+            const std::string applicationRoot = TwkApp::Bundle::mainBundle()->top();
 
 #if defined(PLATFORM_DARWIN)
             // Since DarwinBundle::top() is RV.app/, we need to keep brush assets under Contents/Resources for codesign.
-            return applicationRoot / "Contents" / "Resources" / "assets" / "brushes";
+            return applicationRoot + "/Contents/Resources/assets/brushes";
 #else
-            return applicationRoot / "assets" / "brushes";
+            return applicationRoot + "/assets/brushes";
 #endif
         }
 
-        BrushCatalogue parseBrushCatalogue(const std::filesystem::path& path)
+        BrushCatalogue parseBrushCatalogue(const std::string& directory)
         {
-            std::ifstream file(path);
+            const std::string path = directory + "/catalogue.json";
+            std::ifstream file(UNICODE_C_STR(path.c_str()));
 
             if (!file.is_open())
             {
-                throw std::runtime_error("Cannot open " + path.string());
+                throw std::runtime_error("Cannot open " + path);
             }
 
             nlohmann::json catalogue = nlohmann::json::parse(file);
@@ -51,14 +53,14 @@ namespace IPCore::Paint
 
             if (version != kCatalogueVersion)
             {
-                throw std::runtime_error("Unsupported catalogue version " + std::to_string(version) + " in " + path.string());
+                throw std::runtime_error("Unsupported catalogue version " + std::to_string(version) + " in " + path);
             }
 
-            return {path.parent_path(), catalogue.at("brushes").get<std::vector<BrushEntry>>()};
+            return {directory, catalogue.at("brushes").get<std::vector<BrushEntry>>()};
         }
     } // namespace
 
-    BrushCatalogue::BrushCatalogue(std::filesystem::path directory, std::vector<BrushEntry> entries)
+    BrushCatalogue::BrushCatalogue(std::string directory, std::vector<BrushEntry> entries)
         : m_directory(std::move(directory))
         , m_entries(std::move(entries))
     {
@@ -68,11 +70,11 @@ namespace IPCore::Paint
     {
         static const BrushCatalogue catalogue = []()
         {
-            const std::filesystem::path directory = brushAssetsDirectory();
+            const std::string directory = brushAssetsDirectory();
 
             try
             {
-                return parseBrushCatalogue(directory / "catalogue.json");
+                return parseBrushCatalogue(directory);
             }
             catch (const std::exception& exception)
             {
@@ -97,8 +99,5 @@ namespace IPCore::Paint
         return std::nullopt;
     }
 
-    std::filesystem::path BrushCatalogue::tipPath(std::string_view tipFile) const
-    {
-        return m_directory / std::filesystem::path(tipFile).filename();
-    }
+    std::string BrushCatalogue::tipPath(const std::string& tipFile) const { return m_directory + "/" + tipFile; }
 } // namespace IPCore::Paint

@@ -122,7 +122,7 @@ namespace Rv
                 }
 
                 PyObject* brush = Py_BuildValue("{s:s,s:s,s:N}", "name", entry.name.c_str(), "tipPath",
-                                                catalogue.tipPath(entry.tip).string().c_str(), "defaults", defaults);
+                                                catalogue.tipPath(entry.tip).c_str(), "defaults", defaults);
 
                 if (brush == nullptr)
                 {

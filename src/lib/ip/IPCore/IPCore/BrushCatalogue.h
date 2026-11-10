@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <filesystem>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -38,15 +37,15 @@ namespace IPCore::Paint
     class BrushCatalogue
     {
     public:
-        BrushCatalogue(std::filesystem::path directory, std::vector<BrushEntry> entries);
+        BrushCatalogue(std::string directory, std::vector<BrushEntry> entries);
         [[nodiscard]] std::optional<BrushEntry> brushEntry(std::string_view brushName) const;
 
         [[nodiscard]] const std::vector<BrushEntry>& entries() const { return m_entries; }
 
-        [[nodiscard]] std::filesystem::path tipPath(std::string_view tipFile) const;
+        [[nodiscard]] std::string tipPath(const std::string& tipFile) const;
 
     private:
-        std::filesystem::path m_directory;
+        std::string m_directory;
         std::vector<BrushEntry> m_entries;
     };
 

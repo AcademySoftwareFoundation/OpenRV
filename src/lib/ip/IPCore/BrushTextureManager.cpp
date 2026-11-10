@@ -6,6 +6,7 @@
 #include <IPCore/BrushTextureManager.h>
 #include <IPCore/BrushCatalogue.h>
 #include <TwkGLF/GL.h>
+#include <TwkUtil/File.h>
 #include <png.h>
 #include <fstream>
 #include <iostream>
@@ -29,7 +30,7 @@ namespace IPCore::Paint
 
         std::vector<png_byte> readFileBytes(const std::string& path)
         {
-            std::ifstream file(path, std::ios::binary);
+            std::ifstream file(UNICODE_C_STR(path.c_str()), std::ios::binary);
             return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
         }
 
@@ -118,7 +119,7 @@ namespace IPCore::Paint
             return cached->second;
         }
 
-        const std::string path = bundledCatalogue().tipPath(tipFile).string();
+        const std::string path = bundledCatalogue().tipPath(tipFile);
         const std::optional<unsigned int> uploadedPng = uploadBrushTipPng(path);
         if (!uploadedPng.has_value())
         {
