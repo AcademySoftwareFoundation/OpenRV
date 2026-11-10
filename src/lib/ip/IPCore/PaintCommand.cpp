@@ -950,6 +950,7 @@ namespace IPCore
                 img.fill(Qt::transparent);
                 {
                     QPainter painter(&img);
+                    painter.setRenderHint(QPainter::TextAntialiasing, true);
                     constexpr int maxColorComponent = 255;
                     auto toQColorComponent = [](float value)
                     { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * maxColorComponent); };
