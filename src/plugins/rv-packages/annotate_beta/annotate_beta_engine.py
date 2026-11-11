@@ -328,6 +328,20 @@ class AnnotateDrawEngine:
 
         return "", None
 
+    def eyedropper_target(self, event):
+        """Return (paint_node, image_point) where a stroke at the pointer would land, or None.
+
+        Uses the same paint node and coordinates as a stroke, so a color sampled there
+        renders identically when painted back.
+        """
+        paint_frame = self._find_paint_frame()
+        if paint_frame is None:
+            return None
+        source_name, image_point = self._pointer_location(event)
+        if not source_name:
+            return None
+        return paint_frame.paint_node, image_point
+
     # ------------------------------------------------------------------
     # Text editing state
     # ------------------------------------------------------------------

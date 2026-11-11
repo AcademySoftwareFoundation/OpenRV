@@ -30,6 +30,7 @@
 #include <QFontMetricsF>
 #include <QImage>
 #include <QPainter>
+#include <array>
 #include <functional>
 #include <iostream>
 #include <mutex>
@@ -1481,6 +1482,61 @@ namespace IPCore
         void ShapeLine::hash(ostream& o) const { o << startPos << endPos << borderColor << borderWidth; }
 
         size_t ShapeLine::getType() const { return Command::ShapeLineType; }
+
+        // ── SamplePixel ───────────────────────────────────────────────────────
+
+        void SamplePixel::execute(CommandContext& context) const
+        {
+            const GLFBO* textureFBO = context.currentTexture;
+            const GLFBO* currentFBO = context.currentRender;
+
+            // Pass-through: carry the composited image forward unchanged so the
+            // ping-pong between temporary buffers keeps every previous command.
+            textureFBO->copyTo(currentFBO);
+
+            if (!onSampled)
+            {
+                return;
+            }
+
+            // Multisampled buffers cannot be read back directly.
+            if (currentFBO->multiSampleSize() > 1)
+            {
+                return;
+            }
+
+            // Same mapping the strokes use: paint space -> clip space -> FBO pixel
+            // (the paint viewport always covers the whole FBO).
+            const Mat44f transform = context.projMatrix * context.modelviewMatrix;
+            const Vec4 clipPosition = transform * Vec4(position.x, position.y, 0.0f, 1.0f);
+            if (clipPosition.w == 0.0f)
+            {
+                return;
+            }
+
+            const auto fboWidth = static_cast<float>(currentFBO->width());
+            const auto fboHeight = static_cast<float>(currentFBO->height());
+            const int pixelX = static_cast<int>(std::floor((clipPosition.x / clipPosition.w * 0.5f + 0.5f) * fboWidth));
+            const int pixelY = static_cast<int>(std::floor((clipPosition.y / clipPosition.w * 0.5f + 0.5f) * fboHeight));
+
+            if (pixelX < 0 || pixelY < 0 || pixelX >= static_cast<int>(currentFBO->width())
+                || pixelY >= static_cast<int>(currentFBO->height()))
+            {
+                return;
+            }
+
+            std::array<float, 4> rgba{};
+            currentFBO->bind();
+            glReadPixels(pixelX, pixelY, 1, 1, GL_RGBA, GL_FLOAT, rgba.data());
+            TWK_GLDEBUG;
+            currentFBO->unbind();
+
+            onSampled(Vec4(rgba[0], rgba[1], rgba[2], rgba[3]));
+        }
+
+        void SamplePixel::hash(ostream& stream) const { stream << "sample" << position << requestSerial; }
+
+        size_t SamplePixel::getType() const { return Command::SamplePixelType; }
 
         void renderPaintCommands(PaintContext& context)
         {

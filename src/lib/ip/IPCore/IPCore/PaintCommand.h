@@ -14,6 +14,7 @@
 #include <TwkGLF/GLRenderPrimitives.h>
 #include <TwkPaint/Path.h>
 #include <IPCore/IPImage.h>
+#include <functional>
 #include <vector>
 
 namespace IPCore
@@ -137,7 +138,8 @@ namespace IPCore
                 ShapeRectType,
                 ShapeEllipseType,
                 ShapeArrowType,
-                ShapeLineType
+                ShapeLineType,
+                SamplePixelType
             };
 
             float offset;
@@ -478,6 +480,28 @@ namespace IPCore
 
             void execute(CommandContext& context) const override;
             void hash(std::ostream& o) const override;
+            [[nodiscard]] size_t getType() const override;
+        };
+
+        /// Pass-through command that reads back the composited pixel under `position`
+        /// (paint-node space) after every preceding paint command has been rendered.
+        /// Strokes are rasterized into this same buffer, so the sampled value is exactly
+        /// the color a new stroke must have to match what the user sees. Used by the
+        /// annotation eyedropper. It must be the last command of the image.
+        class SamplePixel : public Command
+        {
+        public:
+            using ResultCallback = std::function<void(const Vec4&)>;
+
+            SamplePixel() = default;
+            SamplePixel(const SamplePixel&) = default;
+
+            Vec2 position{0.0f, 0.0f};
+            unsigned int requestSerial{0};
+            ResultCallback onSampled;
+
+            void execute(CommandContext& context) const override;
+            void hash(std::ostream& stream) const override;
             [[nodiscard]] size_t getType() const override;
         };
 
