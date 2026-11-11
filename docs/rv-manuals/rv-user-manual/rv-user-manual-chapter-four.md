@@ -55,10 +55,6 @@ The Ghost and Hold display controls help manage how annotations appear during pl
 
 **Hold annotations**: Keeps the current annotation visible during playback, holding it on screen until the next annotation. Important feedback remains visible even during fast playback, preventing viewers from missing critical notes.
 
-##### About the annotation eyedropper
-
-The annotation tool's eyedropper (**Sample Color**) samples the color where annotations are drawn: the image and any existing annotations, before the transforms that RV applies afterwards to both (for example, an OCIO view or sRGB display transform). Drawing with a sampled color produces the color you see under the eyedropper, whatever the display setup. Values above 1.0 in HDR images are kept.
-
 #### Additional Access Points
 
 - Upper toolbar functions (frame content, display device settings, channel view, stereo mode) are also available in the **View** menu
