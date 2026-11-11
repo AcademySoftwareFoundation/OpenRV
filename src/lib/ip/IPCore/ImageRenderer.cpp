@@ -5113,6 +5113,7 @@ namespace IPCore
         paintContext.hasStencil = hasStencil;
         paintContext.stencilBox = stencil;
         paintContext.lastCommand = root->commands.back();
+        paintContext.devicePixelRatio = currentDevice()->devicePixelRatio();
 
         fbo->unbind();
 
