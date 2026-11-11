@@ -323,6 +323,11 @@ int main(int argc, char* argv[])
     // Device.
     QApplication::setAttribute(Qt::AA_DontCheckOpenGLContextThreadAffinity);
 
+    // Share GL resources across all QOpenGLContexts, as the non-macOS entry point does.
+    // RV caches GL objects (shaders, font textures) process-wide, not per context.
+    // Must be set before the QApplication is constructed.
+    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+
     // On macOS, ensure that the widget-based implementation is used instead of the native dialog.
     // Rationale:
     // - This prevents this Tahoe specific Qt bug (dialog buttons not clickable on macOS 26 Tahoe) :

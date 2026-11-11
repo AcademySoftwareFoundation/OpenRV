@@ -119,8 +119,9 @@ namespace Rv
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        // QOpenGLWindow creates its context lazily, and only if the platform surface exists.
-        if (m_window && m_window->handle())
+        // QOpenGLWindow::makeCurrent() is a no-op until isValid(), which the platform surface
+        // (handle()) precedes. A context that outlives its surface uses the teardown surface below.
+        if (m_window && m_window->handle() && m_window->isValid())
         {
             m_window->makeCurrent();
             TWK_GLDEBUG;
