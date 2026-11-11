@@ -349,12 +349,6 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, s
         (".smoothingWidth", commands.FloatType, 1),
         (".startFrame", commands.IntType, 1),
         (".duration", commands.IntType, 1),
-        # Stamp-brush properties (only take effect for brush names other than
-        # "circle"/"gauss" — see PaintIPNode::compilePenComponent). Not yet
-        # exposed in this UI; written here so future sliders/pickers have a
-        # ready-made property to set.
-        (".hardness", commands.FloatType, 1),
-        (".tipTexture", commands.StringType, 1),
         (".blendMode", commands.IntType, 1),
     ):
         _ensure_property(f"{node_name}{suffix}", property_type, width)
@@ -390,8 +384,6 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, s
     commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.Brush.GAUSS else 0], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setFloatProperty(f"{node_name}.smoothingWidth", [1.0], True)
-    commands.setFloatProperty(f"{node_name}.hardness", [100.0], True)
-    commands.setStringProperty(f"{node_name}.tipTexture", [""], True)
     commands.setIntProperty(
         f"{node_name}.blendMode", [2 if blend_mode == constants.ColorModifier.ADDITIVE else 0], True
     )

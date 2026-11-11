@@ -488,7 +488,7 @@ class AnnotateDrawEngine:
             elif tool == constants.Tool.ERASER:
                 brush = self._settings.eraser_brush
             else:
-                brush = constants.Brush.CIRCLE
+                brush = constants.Brush.PEN
         self._pen_stroke = paint.new_stroke(
             paint_frame,
             image_point,

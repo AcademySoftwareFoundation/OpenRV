@@ -33,10 +33,11 @@ class ColorModifier(StrEnum):
 
 
 class Brush(StrEnum):
-    """Paint brush names understood by PaintIPNode's ribbon (non-stamp) path."""
+    """Paint brush names. CIRCLE and GAUSS use PaintIPNode's ribbon path. PEN is a brush catalogue entry for the stamp path."""
 
     CIRCLE = auto()
     GAUSS = auto()
+    PEN = auto()
 
 
 class FontSize(IntEnum):
