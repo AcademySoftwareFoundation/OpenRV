@@ -401,6 +401,7 @@ namespace Rv
         qInstallMessageHandler(myMsgHandlerQT);
         init();
 
+        // Tooltip animations run on main-thread timers and delay viewer paints (late frames) during playback.
         QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
         QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
 
