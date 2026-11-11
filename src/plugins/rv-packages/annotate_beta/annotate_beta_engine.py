@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple
 
+from PySide6 import QtGui
 from rv import commands, extra_commands
 
 import annotate_beta_constants as constants
@@ -112,7 +113,8 @@ class AnnotateDrawEngine:
 
         # Text editing state
         self._text_active = False
-        self._text_buffer = ""
+        self._text_document: QtGui.QTextDocument | None = None
+        self._text_cursor: QtGui.QTextCursor | None = None
         self._text_component: PaintComponent | None = None
         self._text_registered = False
 
@@ -178,8 +180,14 @@ class AnnotateDrawEngine:
             ("key-down--shift--shift", self.on_shift_down, "Constrain shape"),
             ("key-up--shift", self.on_shift_up, "Release constraint"),
             # Text editing — explicit keys
-            ("key-down--backspace", self.on_text_backspace, "Delete char"),
-            ("key-down--delete", self.on_text_backspace, "Delete char"),
+            ("key-down--backspace", self.on_text_backspace, "Delete previous char"),
+            ("key-down--delete", self.on_text_delete, "Delete next char"),
+            ("key-down--left", partial(self.on_text_move, move=QtGui.QTextCursor.Left), "Cursor left"),
+            ("key-down--right", partial(self.on_text_move, move=QtGui.QTextCursor.Right), "Cursor right"),
+            ("key-down--up", partial(self.on_text_move, move=QtGui.QTextCursor.Up), "Cursor up"),
+            ("key-down--down", partial(self.on_text_move, move=QtGui.QTextCursor.Down), "Cursor down"),
+            ("key-down--home", partial(self.on_text_move, move=QtGui.QTextCursor.StartOfLine), "Cursor to line start"),
+            ("key-down--end", partial(self.on_text_move, move=QtGui.QTextCursor.EndOfLine), "Cursor to line end"),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
             ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
@@ -237,6 +245,23 @@ class AnnotateDrawEngine:
 
     def _font_size(self):
         return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
+
+    def _new_text_document(self) -> QtGui.QTextDocument:
+        """Editing document for a new text box, with the renderer's font settings."""
+        # Only relative glyph widths matter here (Up/Down keep the caret's column), so any fixed size works.
+        TEXT_EDIT_PIXEL_SIZE = 100
+        font = QtGui.QFont()
+        if self._settings.font_family:
+            font.setFamily(self._settings.font_family)
+        font.setPixelSize(TEXT_EDIT_PIXEL_SIZE)
+        font.setBold(self._settings.font_bold)
+        font.setItalic(self._settings.font_italic)
+        font.setUnderline(self._settings.font_underline)
+        font.setKerning(False)
+        document = QtGui.QTextDocument()
+        document.setDocumentMargin(0)
+        document.setDefaultFont(font)
+        return document
 
     def _border_width(self):
         scale = self._screen_scale() if self._settings.scale_brush else 1.0
@@ -341,26 +366,30 @@ class AnnotateDrawEngine:
         self._text_registered = True
         self._on_history_changed()
 
-    def _update_text_display(self, cursor=True):
-        paint.set_text(self._text_component, self._text_buffer + "|" if cursor else self._text_buffer)
+    def _text(self) -> str:
+        return self._text_document.toPlainText()
+
+    def _update_text_display(self):
+        paint.set_text(self._text_component, self._text(), self._text_cursor.position())
 
     def _reset_text(self):
         self._text_active = False
         self._text_component = None
-        self._text_buffer = ""
+        self._text_document = None
+        self._text_cursor = None
         self._text_registered = False
 
     def _commit_text(self):
-        # Nothing typed — clean up the placeholder node rather than leaving an empty annotation
-        if not self._text_buffer.strip():
+        # Nothing typed: clean up the placeholder node rather than leaving an empty annotation
+        if not self._text().strip():
             self._cancel_text()
             return
-        self._update_text_display(cursor=False)
+        paint.finish_text(self._text_component, self._text())
         self._reset_text()
         commands.sendInternalEvent("annotate-text-committed")
 
     def _cancel_text(self):
-        self._update_text_display(cursor=False)
+        paint.finish_text(self._text_component, self._text())
         paint.soft_delete(self._text_component)
         commands.redraw()
 
@@ -613,7 +642,8 @@ class AnnotateDrawEngine:
             event.reject()
             return
         self._text_active = True
-        self._text_buffer = ""
+        self._text_document = self._new_text_document()
+        self._text_cursor = QtGui.QTextCursor(self._text_document)
         with self._sync_batch(force=False):
             self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._font_size())
 
@@ -641,17 +671,32 @@ class AnnotateDrawEngine:
         if not self._text_active:
             event.reject()
             return
-        self._text_buffer += text
+        self._text_cursor.insertText(text)
         self._register_text_undo()
-        self._update_text_display(cursor=True)
+        self._update_text_display()
 
     def on_text_backspace(self, event):
         if not self._text_active:
             event.reject()
             return
-        if self._text_buffer:
-            self._text_buffer = self._text_buffer[:-1]
-        self._update_text_display(cursor=True)
+        self._text_cursor.deletePreviousChar()
+        self._update_text_display()
+
+    def on_text_delete(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        self._text_cursor.deleteChar()
+        self._update_text_display()
+
+    def on_text_move(self, event, move):
+        if not self._text_active:
+            event.reject()
+            return
+        # The document lays out lazily, and Up/Down/Home/End need line geometry.
+        self._text_document.size()
+        self._text_cursor.movePosition(move)
+        self._update_text_display()
 
     def on_text_commit(self, event, reject):
         if not self._text_active:

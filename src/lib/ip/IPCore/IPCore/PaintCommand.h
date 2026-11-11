@@ -112,6 +112,7 @@ namespace IPCore
             GLState* glState;
             int imageWidth;
             int imageHeight;
+            float devicePixelRatio{1.0f};
         };
 
         class Command
@@ -510,6 +511,7 @@ namespace IPCore
             IPImage::PaintCommands commands;
             GLState* glState;
             size_t commandExecuted;
+            float devicePixelRatio{1.0f};
         };
 
         void renderPaintCommands(PaintContext&);
