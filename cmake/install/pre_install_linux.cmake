@@ -94,6 +94,8 @@ FUNCTION(after_copy_platform FILE_PATH FILES_TO_FIX_RPATH)
   ENDIF()
 ENDFUNCTION()
 
+# Absolute RUNPATH entries name the machine a dependency was built on: its build directory. They are removed once everything is installed, as
+# remove_absolute_rpath.py does on macOS, with $ORIGIN kept or added so that each library still finds the dependencies installed beside it.
 MACRO(post_install_platform)
-
+  EXECUTE_PROCESS(COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../../src/build/remove_absolute_runpath.py ${CMAKE_INSTALL_PREFIX} COMMAND_ERROR_IS_FATAL ANY)
 ENDMACRO()
