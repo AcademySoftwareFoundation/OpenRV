@@ -15,6 +15,7 @@ OpenEXR             : 3.4.3
 OpenSSL             : 3.6.0
 Python              : 3.13.18
 Qt                  : 6.8.3 ** RV Still on 6.5.3 pending work
+GCC                 : 14.2        (gcc-toolset-14, Rocky 8.10+ / 9.5+)
 
 Config manager repo : powertools  (Rocky 8)
 Config manager repo : crb         (Rocky 9)
@@ -122,6 +123,21 @@ sudo dnf install -y mesa-libOSMesa mesa-libOSMesa-devel
 ```
 ```{code-tab} bash Rocky 9
 sudo dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel
+```
+````
+
+Install the compiler for your VFX reference platform. CY2026 uses GCC 14 from gcc-toolset-14 on both Rocky 8 and Rocky 9. Older platforms use gcc-toolset-11 on Rocky 8 and the system GCC on Rocky 9.
+
+````{tabs}
+```{code-tab} bash VFX-CY2026
+sudo dnf install -y gcc-toolset-14-toolchain
+# Enable it in every shell used to configure and build Open RV
+source /opt/rh/gcc-toolset-14/enable
+```
+```{code-tab} bash VFX-CY2023-CY2025 (Rocky 8)
+sudo dnf install -y gcc-toolset-11-toolchain
+# Enable it in every shell used to configure and build Open RV
+source /opt/rh/gcc-toolset-11/enable
 ```
 ````
 
@@ -284,6 +300,18 @@ docker run -d openrv-rocky9 /bin/bash -c "sleep infinity"
 cd dockerfiles
 docker build -t openrv-rocky8 -f Dockerfile.Linux-Rocky8 .
 docker run -d openrv-rocky8 /bin/bash -c "sleep infinity"
+```
+
+```{code-tab} bash Rocky 9 CY2026
+cd dockerfiles
+docker build -t openrv-rocky9-cy2026 -f Dockerfile.Linux-Rocky9-CY2026 .
+docker run -d openrv-rocky9-cy2026 /bin/bash -c "sleep infinity"
+```
+
+```{code-tab} bash Rocky 8 CY2026
+cd dockerfiles
+docker build -t openrv-rocky8-cy2026 -f Dockerfile.Linux-Rocky8-CY2026 .
+docker run -d openrv-rocky8-cy2026 /bin/bash -c "sleep infinity"
 ```
 ````
 
