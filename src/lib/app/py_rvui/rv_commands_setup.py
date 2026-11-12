@@ -238,6 +238,8 @@ all_mu_commands = [
     "beginCompoundCommand",
     "setCacheMode",
     "sourcePixelValue",
+    "requestPaintPixelSample",
+    "paintPixelSample",
     "framebufferPixelValue",
     "setByteProperty",
     "inc",

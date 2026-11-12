@@ -17,6 +17,7 @@
 #include <IPCore/ShaderCommon.h>
 #include <string>
 #include <tuple>
+#include <utility>
 
 namespace
 {
@@ -304,9 +305,38 @@ namespace IPCore
         declareProperty<StringProperty>("paint.include");
 
         m_tag = createComponent("tag");
+
+        m_pixelProbe.onSampled = [this](const Vec4& value)
+        {
+            std::lock_guard<std::mutex> probeGuard{m_pixelProbeMutex};
+            if (m_pixelProbePending)
+            {
+                m_pixelSample = value;
+                m_pixelProbePending = false;
+            }
+        };
     }
 
     PaintIPNode::~PaintIPNode() {}
+
+    void PaintIPNode::requestPixelSample(const Vec2& position)
+    {
+        // Lock order matches evaluate(): commands first, then probe state.
+        std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
+        std::lock_guard<std::mutex> probeGuard{m_pixelProbeMutex};
+        m_pixelProbe.position = position;
+        // A new serial changes the image render ID, so a cached render cannot
+        // skip the read-back.
+        m_pixelProbe.requestSerial++;
+        m_pixelProbePending = true;
+        m_pixelSample.reset();
+    }
+
+    std::optional<PaintIPNode::Vec4> PaintIPNode::takePixelSample()
+    {
+        std::lock_guard<std::mutex> probeGuard{m_pixelProbeMutex};
+        return std::exchange(m_pixelSample, std::nullopt);
+    }
 
     void PaintIPNode::compilePenComponent(Component* c)
     {
@@ -872,6 +902,20 @@ namespace IPCore
                 }
             }
         }
+
+        if (context.thread != IPNode::CacheEvalThread)
+        {
+            // A pending eyedropper sample rides along as the last paint command:
+            // the renderer then gives this image its own buffer (as for strokes)
+            // and the probe reads the pixel after every stroke is rasterized.
+            std::lock_guard<std::mutex> commandsGuard{m_commandsMutex};
+            std::lock_guard<std::mutex> probeGuard{m_pixelProbeMutex};
+            if (m_pixelProbePending)
+            {
+                head->commands.push_back(&m_pixelProbe);
+            }
+        }
+
         if (m_tag = component("tag"))
         {
             const Component::Container& props = m_tag->properties();

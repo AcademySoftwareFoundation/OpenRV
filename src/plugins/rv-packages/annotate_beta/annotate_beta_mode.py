@@ -33,6 +33,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         self._shape_table_pushed = False
 
         self._settings = DrawSettings(tool_states={})
+        self._pending_sample_node = None
         self._link_tool_colors = False
         self._auto_save_settings = True
 
@@ -484,6 +485,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def global_bindings(self):
         return [
             ("graph-node-inputs-changed", self._on_node_inputs_changed, "Update UI"),
+            ("post-render", self._on_post_render, "Apply eyedropper sample"),
             ("before-graph-view-change", self._on_before_graph_view_change, "Update UI"),
             ("after-graph-view-change", self._on_after_graph_view_change, "Update UI"),
             ("frame-changed", self._on_frame_dependent_state_changed, "Update UI"),
@@ -507,20 +509,34 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         ]
 
     def _sample_eyedropper(self, event):
-        pointer = event.pointer()
-        device_pixel_ratio = commands.devicePixelRatio()
-        x = pointer[0] * device_pixel_ratio
-        y = pointer[1] * device_pixel_ratio
-        pixel = commands.framebufferPixelValue(x, y)
-        if pixel and len(pixel) >= 3:
-            color = QtGui.QColor.fromRgbF(
-                min(1.0, max(0.0, pixel[0])),
-                min(1.0, max(0.0, pixel[1])),
-                min(1.0, max(0.0, pixel[2])),
-            )
-            self._settings.tool_state.color = color
-            self._dock.toolbar_widget.set_color(color)
-            self._save_tool_state(self._settings.tool)
+        # Sample at the paint node, in the buffer strokes are drawn into, not the
+        # final framebuffer: the transforms after the paint stage (e.g. the
+        # display transform) apply to strokes too, so a display-referred sample
+        # would be transformed twice. The value arrives after the next render.
+        target = self._engine.eyedropper_target(event)
+        if target is None:
+            return
+        paint_node, image_point = target
+        commands.requestPaintPixelSample(paint_node, (image_point.x, image_point.y))
+        self._pending_sample_node = paint_node
+
+    def _on_post_render(self, event):
+        event.reject()
+        paint_node = self._pending_sample_node
+        if not paint_node:
+            return
+        if not commands.nodeExists(paint_node):
+            self._pending_sample_node = None
+            return
+        sample = commands.paintPixelSample(paint_node)
+        if len(sample) < 3:
+            return  # Not rendered yet
+        self._pending_sample_node = None
+        # Keep values above 1.0 (HDR): QColor switches to ExtendedRgb for them.
+        color = QtGui.QColor.fromRgbF(*(max(0.0, channel) for channel in sample[:3]))
+        self._settings.tool_state.color = color
+        self._dock.toolbar_widget.set_color(color)
+        self._save_tool_state(self._settings.tool)
 
     # ------------------------------------------------------------------
     # Next/Previous Annotated Frame navigation

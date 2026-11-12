@@ -10,6 +10,7 @@
 #include <RvApp/RvSession.h>
 #include <IPBaseNodes/FileSourceIPNode.h>
 #include <IPBaseNodes/ImageSourceIPNode.h>
+#include <IPBaseNodes/PaintIPNode.h>
 #include <IPBaseNodes/SequenceIPNode.h>
 #include <IPBaseNodes/SourceGroupIPNode.h>
 #include <IPBaseNodes/SourceIPNode.h>
@@ -77,6 +78,7 @@
 #include <algorithm>
 #include <chrono>
 #include <fstream>
+#include <optional>
 #include <half.h>
 #include <iostream>
 #include <iterator>
@@ -1156,6 +1158,60 @@ namespace Rv
         NODE_RETURN(p);
     }
 
+    namespace
+    {
+        PaintIPNode* paintNodeArgument(const Mu::Node& node, Mu::Thread& thread, const StringType::String* name)
+        {
+            if (!name)
+            {
+                throwBadArgumentException(node, thread, "nil node name");
+            }
+
+            Session* session = Session::currentSession();
+            auto* paintNode = dynamic_cast<PaintIPNode*>(session->graph().findNode(name->c_str()));
+            if (!paintNode)
+            {
+                ostringstream message;
+                message << "\"" << name->c_str() << "\" is not a paint node";
+                throwBadArgumentException(node, thread, message.str().c_str());
+            }
+            return paintNode;
+        }
+    } // namespace
+
+    NODE_IMPLEMENTATION(requestPaintPixelSample, void)
+    {
+        const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+        const Vector2f position = NODE_ARG(1, Vector2f);
+
+        PaintIPNode* paintNode = paintNodeArgument(NODE_THIS, NODE_THREAD, name);
+        paintNode->requestPixelSample(Vec2f(position[0], position[1]));
+
+        // The sample is read back by the next render.
+        Session::currentSession()->askForRedraw();
+    }
+
+    NODE_IMPLEMENTATION(paintPixelSample, Mu::Pointer)
+    {
+        const StringType::String* name = NODE_ARG_OBJECT(0, StringType::String);
+        PaintIPNode* paintNode = paintNodeArgument(NODE_THIS, NODE_THREAD, name);
+
+        const auto* arrayType = static_cast<const DynamicArrayType*>(NODE_THIS.type());
+        auto* array = new DynamicArray(arrayType, 1);
+
+        if (const std::optional<Vec4f> sample = paintNode->takePixelSample())
+        {
+            constexpr size_t kRgbaChannelCount = 4;
+            array->resize(kRgbaChannelCount);
+            for (size_t channel = 0; channel < kRgbaChannelCount; ++channel)
+            {
+                array->element<float>(channel) = (*sample)[channel];
+            }
+        }
+
+        NODE_RETURN(array);
+    }
+
     NODE_IMPLEMENTATION(sourceDisplayChannelNames, Mu::Pointer)
     {
         Process* p = NODE_THREAD.process();
@@ -2029,6 +2085,12 @@ namespace Rv
 
             new Function(c, "sourcePixelValue", sourcePixelValue, None, Return, "vector float[4]", Parameters,
                          new Param(c, "sourceName", "string"), new Param(c, "px", "float"), new Param(c, "py", "float"), End),
+
+            new Function(c, "requestPaintPixelSample", requestPaintPixelSample, None, Return, "void", Parameters,
+                         new Param(c, "paintNode", "string"), new Param(c, "position", "vector float[2]"), End),
+
+            new Function(c, "paintPixelSample", paintPixelSample, None, Return, "float[]", Parameters, new Param(c, "paintNode", "string"),
+                         End),
 
             new Function(c, "sourceAttributes", sourceAttributes, None, Return, "(string,string)[]", Parameters,
                          new Param(c, "sourceName", "string"), new Param(c, "mediaName", "string", Value()), End),
