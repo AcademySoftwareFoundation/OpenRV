@@ -45,7 +45,8 @@ jobs:
       skip_deps_cache: ${{ inputs.SKIP_DEPS_CACHE || 'false' }}
       full_matrix: ${{ github.event_name != 'pull_request' }}
       run_debug: ${{ github.event_name != 'pull_request' || needs.detect-changes.outputs.cmake_changed == 'true' }}
-      nightly: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      # TEMP: force the CY2026 Linux jobs on this PR to test GCC 14. Revert before merging.
+      nightly: 'true'
 
   macos:
     if: github.repository_owner == 'AcademySoftwareFoundation'
