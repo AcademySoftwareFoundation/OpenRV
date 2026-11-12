@@ -256,6 +256,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
         (".spacing", commands.FloatType, 1),
         (".font", commands.StringType, 1),
         (".text", commands.StringType, 1),
+        (".caret", commands.IntType, 1),
         (".origin", commands.StringType, 1),
         (".debug", commands.IntType, 1),
         (".startFrame", commands.IntType, 1),
@@ -271,7 +272,8 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     commands.setFloatProperty(f"{node_name}.rotation", [0.0], True)
     commands.setFloatProperty(f"{node_name}.spacing", [0.8], True)
     commands.setStringProperty(f"{node_name}.font", [""], True)
-    commands.setStringProperty(f"{node_name}.text", ["|"], True)
+    commands.setStringProperty(f"{node_name}.text", [""], True)
+    commands.setIntProperty(f"{node_name}.caret", [0], True)
     commands.setStringProperty(f"{node_name}.origin", [""], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
@@ -305,8 +307,20 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     return component
 
 
-def set_text(component: PaintComponent, text: str):
-    commands.setStringProperty(f"{_node_name(component)}.text", [text], True)
+def set_text(component: PaintComponent, text: str, caret: int):
+    """Update an active text box. caret is a QTextCursor position (UTF-16 code units), not an index into text."""
+    node_name = _node_name(component)
+    commands.setIntProperty(f"{node_name}.caret", [caret], True)
+    commands.setStringProperty(f"{node_name}.text", [text], True)
+    commands.redraw()
+
+
+def finish_text(component: PaintComponent, text: str):
+    """Remove the caret and write the final text."""
+    node_name = _node_name(component)
+    commands.deleteProperty(f"{node_name}.caret")
+    # Deleting a property doesn't recompile the paint node, so the text must be set after it.
+    commands.setStringProperty(f"{node_name}.text", [text], True)
     commands.redraw()
 
 

@@ -27,12 +27,21 @@
 #include <QString>
 #include <QFont>
 #include <QFontDatabase>
-#include <QFontMetricsF>
+#include <QAbstractTextDocumentLayout>
+#include <QColor>
 #include <QImage>
 #include <QPainter>
+#include <QPalette>
+#include <QPointF>
+#include <QRectF>
+#include <QTextBlock>
+#include <QTextDocument>
+#include <QTextLayout>
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <mutex>
+#include <optional>
 
 // Shader source strings embedded at compile time via quote_file() in
 // IPCore/CMakeLists.txt.  Defined at global scope by the generated .cpp files.
@@ -841,6 +850,43 @@ namespace IPCore
                 return family;
             }
 
+            // Lays out plain text with the annotation font and no margin, so the
+            // first line's top-left corner is at (0, 0).
+            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice)
+            {
+                document.documentLayout()->setPaintDevice(paintDevice);
+                document.setDocumentMargin(0);
+                document.setDefaultFont(font);
+                document.setPlainText(text);
+            }
+
+            // Caret rectangle in document pixels, or nullopt without a caret or outside the text.
+            // Drawn by hand because QTextLayout::drawCursor inverts the destination, which leaves a
+            // transparent texture unchanged.
+            std::optional<QRectF> caretRect(const QTextDocument& document, std::optional<int> position, qreal caretWidth)
+            {
+                if (!position)
+                {
+                    return std::nullopt;
+                }
+
+                const QTextBlock block = document.findBlock(*position);
+                if (!block.isValid())
+                {
+                    return std::nullopt;
+                }
+
+                const int positionInBlock = *position - block.position();
+                const QTextLine line = block.layout()->lineForTextPosition(positionInBlock);
+                if (!line.isValid())
+                {
+                    return std::nullopt;
+                }
+
+                const QPointF blockOrigin = document.documentLayout()->blockBoundingRect(block).topLeft();
+                return QRectF(blockOrigin.x() + line.cursorToX(positionInBlock), blockOrigin.y() + line.y(), caretWidth, line.height());
+            }
+
         } // namespace
 
         void Text::execute(CommandContext& context) const
@@ -860,6 +906,7 @@ namespace IPCore
             const std::string& effectiveFontWeight = localText ? localText->fontWeight : PaintIPNode::FontWeight::Normal;
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;
+            const std::optional<int> caret = localText ? localText->caret : std::nullopt;
 
             {
                 const GLFBO* currentFBO = context.currentRender;
@@ -914,26 +961,26 @@ namespace IPCore
                 qfont.setKerning(false);
                 qfont.setHintingPreference(QFont::PreferVerticalHinting);
 
-                // ── Measure text ──────────────────────────────────────────────
+                // ── Lay out text ──────────────────────────────────────────────
+                // An empty text box still draws its caret.
                 const QString qtext = QString::fromStdString(text);
-                if (qtext.isEmpty())
-                    return;
-                QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
-                QFontMetricsF fm(qfont, &refImg);
-                // For multi-line text, measure each line separately: take the
-                // max advance width and accumulate lineSpacing() per line so
-                // the image is tall enough for all lines.
-                const auto lines = qtext.split('\n');
-                float maxLineWidth = 0.0f;
-                for (const auto& line : lines)
+                if (qtext.isEmpty() && !caret)
                 {
-                    const float lw = line.isEmpty() ? 0.0f : static_cast<float>(fm.horizontalAdvance(line));
-                    if (lw > maxLineWidth)
-                        maxLineWidth = lw;
+                    return;
                 }
-                const int lineCount = std::max(1, static_cast<int>(lines.size()));
-                const int imgW = static_cast<int>(std::ceil(maxLineWidth)) + 4;
-                const int imgH = static_cast<int>(std::ceil(fm.lineSpacing() * lineCount)) + 4;
+                QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
+                QTextDocument document;
+                setUpTextDocument(document, qfont, qtext, &refImg);
+
+                // idealWidth() includes italic overhang past the last advance, so
+                // slanted glyphs are not clipped at the right edge of the image.
+                constexpr int imagePaddingPixels = 4;
+                // 1pt like a native caret, rounded to whole pixels because fillRect is not antialiased
+                const qreal caretWidth = std::max<qreal>(1.0, std::round(context.devicePixelRatio));
+                const std::optional<QRectF> caretArea = caretRect(document, caret, caretWidth);
+                const qreal contentWidth = std::max(document.idealWidth(), caretArea.value_or(QRectF()).right());
+                const int imgW = static_cast<int>(std::ceil(contentWidth)) + imagePaddingPixels;
+                const int imgH = static_cast<int>(std::ceil(document.documentLayout()->documentSize().height())) + imagePaddingPixels;
 
                 if (imgW <= 0 || imgH <= 0)
                     return;
@@ -943,13 +990,19 @@ namespace IPCore
                 img.fill(Qt::transparent);
                 {
                     QPainter painter(&img);
-                    painter.setFont(qfont);
-                    auto toQColorComponent = [](float v) { return static_cast<int>(std::max(0.0f, std::min(1.0f, v)) * 255); };
-                    painter.setPen(QColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y), toQColorComponent(textColor.z),
-                                          toQColorComponent(textColor.w)));
                     painter.setRenderHint(QPainter::TextAntialiasing, true);
-                    // Draw at baseline. AlignLeft|AlignVCenter within the padded rect.
-                    painter.drawText(QRectF(0, 0, imgW, imgH), Qt::AlignLeft | Qt::AlignTop, qtext);
+                    constexpr int maxColorComponent = 255;
+                    auto toQColorComponent = [](float value)
+                    { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * maxColorComponent); };
+                    const QColor qtextColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y), toQColorComponent(textColor.z),
+                                            toQColorComponent(textColor.w));
+                    QAbstractTextDocumentLayout::PaintContext paintContext;
+                    paintContext.palette.setColor(QPalette::Text, qtextColor);
+                    document.documentLayout()->draw(&painter, paintContext);
+                    if (caretArea)
+                    {
+                        painter.fillRect(*caretArea, qtextColor);
+                    }
                 }
 
                 // ── Upload as GL texture (OpenGL 2.1 compatible) ───────────────
@@ -1000,7 +1053,8 @@ namespace IPCore
                 // appended -- already-typed lines hold their position and new
                 // lines extend the block downward, instead of the whole block
                 // (and every existing line) sliding upward off pos as it grows.
-                const float qyTop = pos.y + ((fbH > 0) ? static_cast<float>(fm.ascent()) / fbH : 0.001f);
+                const float firstLineAscent = static_cast<float>(document.firstBlock().layout()->lineAt(0).ascent());
+                const float qyTop = pos.y + ((fbH > 0) ? firstLineAscent / fbH : 0.001f);
                 const float qy = qyTop - th;
 
                 // Vertices: (x,y, u,v) quads — position + texcoord
@@ -1540,6 +1594,8 @@ namespace IPCore
 
                 CommandContext commandContext(proj, model, fbo, textureFBO, currentFBO, context.glState, context.hasStencil,
                                               context.stencilBox, root->width, root->height);
+
+                commandContext.devicePixelRatio = context.devicePixelRatio;
 
                 //
                 // to speed up the rendering, we execute all consecutive text
