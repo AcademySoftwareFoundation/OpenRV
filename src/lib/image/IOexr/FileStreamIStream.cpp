@@ -7,6 +7,8 @@
 //
 #include <IOexr/FileStreamIStream.h>
 #include <TwkExc/Exception.h>
+#include <algorithm>
+#include <cstdint>
 #include <string.h>
 
 namespace TwkFB
@@ -64,5 +66,45 @@ namespace TwkFB
     {
         // m_index = 0;
     }
+
+#ifdef IOEXR_HAS_STATELESS_ISTREAM
+
+    int64_t FileStreamIStream::size() { return m_stream.size(); }
+
+    //
+    //  The entire file lives in one contiguous, read-only buffer, so
+    //  concurrent reads from different offsets are safe.
+    //
+    bool FileStreamIStream::isStatelessRead() const { return true; }
+
+    int64_t FileStreamIStream::read(void* buffer, uint64_t requestedBytes, uint64_t offset)
+    {
+        const char* data = static_cast<const char*>(m_stream.data());
+        const int64_t streamSize = m_stream.size();
+
+        if (data == nullptr || streamSize < 0)
+        {
+            return -1;
+        }
+
+        const auto fileSize = static_cast<uint64_t>(streamSize);
+
+        //
+        //  Per the OpenEXR contract a read at or past EOF is not an error:
+        //  return 0, and clamp a read that would run past the end.
+        //
+        if (offset >= fileSize)
+        {
+            return 0;
+        }
+
+        const uint64_t toCopy = std::min(requestedBytes, fileSize - offset);
+
+        std::copy_n(data + offset, toCopy, static_cast<char*>(buffer));
+
+        return static_cast<int64_t>(toCopy);
+    }
+
+#endif // IOEXR_HAS_STATELESS_ISTREAM
 
 } // namespace TwkFB

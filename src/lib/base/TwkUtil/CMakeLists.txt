@@ -47,6 +47,7 @@ SET(_sources
     sgcJobDispatcher.cpp
     sgcRefCounted.cpp
     FileLogger.cpp
+    CrashHandler.cpp
 )
 
 ADD_LIBRARY(
@@ -64,6 +65,30 @@ TARGET_LINK_LIBRARIES(
   PUBLIC Boost::thread TwkExc TwkMath spdlog::spdlog
   PRIVATE Boost::system Qt::Core stl_ext
 )
+
+# Link Crashpad libraries if available
+IF(RV_DEPS_CRASHPAD_VERSION)
+  TARGET_LINK_LIBRARIES(
+    ${_target}
+    PRIVATE crashpad::client crashpad::util crashpad::minichromium
+  )
+
+  # Link macOS frameworks required by Crashpad
+  IF(RV_TARGET_DARWIN)
+    TARGET_LINK_LIBRARIES(
+      ${_target}
+      PRIVATE "-framework Foundation" "-framework Security" "-framework IOKit" "-framework ApplicationServices" bsm
+    )
+  ENDIF()
+
+  IF(RV_TARGET_LINUX)
+    # With -O3 the compiler eliminates the `static volatile pointer_to_note_section = CRASHPAD_NOTE_REFERENCE` initializer in CrashpadInfo::GetCrashpadInfo(),
+    # so the linker never sees a reference to CRASHPAD_NOTE_REFERENCE and skips the crashpad_info_note.S.o object (which contains the .note.crashpad.info ELF
+    # note that lets the crashpad handler discover this module's annotation list). --undefined forces the linker to resolve CRASHPAD_NOTE_REFERENCE, pulling in
+    # that object and the note section regardless of optimisation level.
+    TARGET_LINK_OPTIONS(${_target} PRIVATE "LINKER:--undefined=CRASHPAD_NOTE_REFERENCE")
+  ENDIF()
+ENDIF()
 
 IF(RV_TARGET_LINUX)
   SET(THREADS_PREFER_PTHREAD_FLAG

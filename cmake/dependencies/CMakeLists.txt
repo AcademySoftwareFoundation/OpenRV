@@ -106,6 +106,13 @@ IF(RV_TARGET_DARWIN
   INCLUDE(gc)
   INCLUDE(glew)
 ENDIF()
+# Vulkan (headers + loader) is fetched on Linux and Windows for the 10-bit presentation backend. On Linux the loader is libvulkan.so; on Windows it is
+# vulkan-1.dll plus its import library.
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  INCLUDE(vulkan)
+ENDIF()
 INCLUDE(imath)
 INCLUDE(zlib)
 INCLUDE(ffmpeg)
@@ -134,6 +141,10 @@ INCLUDE(yaml-cpp) # depends on OCIO
 
 INCLUDE(bmd.cmake)
 INCLUDE(spdlog)
+INCLUDE(crashpad)
+IF(NOT RV_TARGET_WINDOWS)
+  INCLUDE(breakpad)
+ENDIF()
 INCLUDE(aja.cmake)
 INCLUDE(prores.cmake)
 
@@ -163,6 +174,11 @@ IF(RV_TARGET_DARWIN
   MESSAGE(STATUS "Using GC:           ${RV_DEPS_GC_VERSION}")
   MESSAGE(STATUS "Using GLEW:         ${RV_DEPS_GLEW_VERSION}")
 ENDIF()
+IF(RV_TARGET_LINUX
+   OR RV_TARGET_WINDOWS
+)
+  MESSAGE(STATUS "Using Vulkan:       ${RV_DEPS_VULKAN_VERSION}")
+ENDIF()
 MESSAGE(STATUS "Using Imath:        ${RV_DEPS_IMATH_VERSION}")
 MESSAGE(STATUS "Using JpegTurbo:    ${RV_DEPS_JPEGTURBO_VERSION}")
 MESSAGE(STATUS "Using OpenEXR:      ${RV_DEPS_OPENEXR_VERSION}")
@@ -184,3 +200,6 @@ MESSAGE(STATUS "Using WebP:         ${RV_DEPS_WEBP_VERSION}")
 MESSAGE(STATUS "Using Yaml-CPP:     ${RV_DEPS_YAML_CPP_VERSION} (Using OCIO's own copy)")
 MESSAGE(STATUS "Using zlib:         ${RV_DEPS_ZLIB_VERSION}")
 MESSAGE(STATUS "Using spdlog:       ${RV_DEPS_SPDLOG_VERSION}")
+IF(RV_DEPS_BREAKPAD_VERSION)
+  MESSAGE(STATUS "Using Breakpad:     ${RV_DEPS_BREAKPAD_VERSION}")
+ENDIF()

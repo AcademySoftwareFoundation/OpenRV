@@ -120,6 +120,8 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
     _current_sources = []
     _current_media_rep_name = None
 
+    _hovered_source = ""
+
     # Media representation widgets
     _bottomToolBar = None
     _media_representation_btn = None
@@ -413,17 +415,61 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
         self._current_media_rep_name = rep
         self._show_media_representation(rep != "")
 
+    def _in_layout_mode(self):
+        """
+        Returns True when the current view node is a layout group.
+        """
+        try:
+            return rvc.nodeType(rvc.viewNode()) == "RVLayoutGroup"
+        except Exception:
+            return False
+
+    def _set_resolution_and_extension(self, sources):
+        """
+        Sets the resolution and extension labels from the common media info of
+        the given source nodes.
+        """
+        infos = utils.get_common_source_media_infos(sources)
+        self._media_resolution_lbl.setText(infos.resolution)
+        self._media_extension_lbl.setText(infos.extension)
+
     def _update_resolution_and_extension(self):
         """
         Updates the resolution and extension labels based on the media info of
         the current sources.
         Note: when there are multiple sources at the current frame then the
-        resolution and extension is only shown when they are common to all
+        resolution of the first source is shown by default or the hovered source.
         """
-        common_source_media_infos = utils.get_common_source_media_infos(self._current_sources)
+        if self._in_layout_mode():
+            sources = self._current_sources or []
+            self._hovered_source = ""
+            self._set_resolution_and_extension(sources[:1])
+            return
 
-        self._media_resolution_lbl.setText(common_source_media_infos.resolution)
-        self._media_extension_lbl.setText(common_source_media_infos.extension)
+        self._set_resolution_and_extension(self._current_sources)
+
+    def _on_pointer_move(self, event):
+        """
+        Show resolution of hovered source when moving pointer if we're in layout mode.
+        """
+        event.reject()
+
+        if not self._in_layout_mode():
+            return
+
+        sources = self._current_sources or []
+        if not sources:
+            return
+
+        hovered = utils.get_source_at_pixel(event.pointer())
+        if not hovered:
+            hovered = sources[0]
+
+        if hovered == self._hovered_source:
+            return
+        self._hovered_source = hovered
+
+        self._set_resolution_and_extension([hovered])
 
     def _update_media_info(self, event):
         """
@@ -543,6 +589,7 @@ class MultipleSourceMediaRepMode(rvtypes.MinorMode):
                 ("before-source-delete", self._before_source_delete, ""),
                 ("source-group-complete", self._update_media_info, ""),
                 ("frame-changed", self._update_media_info, ""),
+                ("pointer--move", self._on_pointer_move, ""),
                 ("session-clear-everything", self._update_media_info, ""),
                 ("source-media-set", self._on_force_update_media_info, ""),
                 ("source-modified", self._on_force_update_media_info, ""),

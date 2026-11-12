@@ -701,7 +701,7 @@ namespace Rv
             if (string(extension(infiles[i])) == "rv")
                 ++rvFileCount;
 
-        if (rvFileCount > 1)
+        if (rvFileCount && infiles.size() > 1)
             merge = true;
 
         //  PROGLOAD  this func should take tag for when called from mu
@@ -2126,6 +2126,7 @@ namespace Rv
             newRequest.setOption("sessionProtocol", string("RVSession"));
             newRequest.setOption("sessionProtocolVersion", 4);
             newRequest.setOption("sessionName", string("rv"));
+            newRequest.setOption("saveAs", writeAsCopy);
             newRequest.setOption("version", 2);
             if (bigFile)
                 newRequest.setOption("compressed", true);
@@ -2144,7 +2145,6 @@ namespace Rv
             //
 
             Session::write(filename, newRequest);
-            setFileName(filename.c_str());
 
             //
             //  post write events
@@ -2336,7 +2336,10 @@ namespace Rv
 
         void* ignored = callPythonFunction("setup");
         disposeOfPythonObject(ignored);
+    }
 
+    void RvSession::evalCommandLineScripts()
+    {
         //
         //  Mu init / command-line eval
         //
@@ -2912,8 +2915,10 @@ namespace Rv
                     ++m_gtoSourceTotal;
 
                 // Optimization: Start preloading media if this is an
-                // RVFileSource with active media
-                if (p == "RVFileSource" && !Options::sharedOptions().progressiveSourceLoading)
+                // RVFileSource with active media. Preloading is not
+                // supported in rvio/batch mode
+                if (p == "RVFileSource" && !Options::sharedOptions().progressiveSourceLoading
+                    && Options::sharedOptions().delaySessionLoading)
                 {
                     IntProperty* mediaActive = pc->property<IntProperty>("media.active");
                     if (mediaActive && !mediaActive->empty() && mediaActive->front() == 1)
@@ -3920,7 +3925,37 @@ namespace Rv
             setSequenceEvents();
     }
 
-    void RvSession::onGraphMediaSetEmpty() { userGenericEvent("after-progressive-loading", ""); }
+    void RvSession::onGraphMediaSetEmpty()
+    {
+        // The media-loading set can become transiently empty *between* sources
+        // while we are still progressively adding the sources of a single load
+        // request (e.g. when dropping multiple files). continueLoading() adds
+        // one source per event-loop iteration, so source N can finish loading
+        // in the gap before source N+1 starts, momentarily emptying the set.
+        //
+        // While m_loadState is still alive, more sources are about to be added
+        // and more media will start loading, so an empty set here is only
+        // transient. Emitting after-progressive-loading in that case would
+        // produce one after-progressive-loading event per source for a single
+        // before-progressive-loading event.
+        //
+        // We therefore only emit the event once the load request has been fully
+        // consumed (m_loadState == nullptr), i.e. once every source has been
+        // added and all of their media have finished loading. This guarantees a
+        // single after-progressive-loading event matching the single
+        // before-progressive-loading event.
+        //
+        // Note: this runs on the main thread (media completion is marshalled via
+        // dispatchToMainThread), serialized with continueLoading() which deletes
+        // m_loadState before returning -- so this read of m_loadState is safe and
+        // always observes the final state.
+        if (m_loadState != nullptr)
+        {
+            return;
+        }
+
+        userGenericEvent("after-progressive-loading", "");
+    }
 
     // connects events from the sequence IP node
     //

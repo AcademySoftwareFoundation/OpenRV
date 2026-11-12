@@ -12,6 +12,7 @@
 #include <MuTwkApp/FunctionAction.h>
 #include <MuTwkApp/MenuItem.h>
 #include <MuTwkApp/MenuState.h>
+#include <MuTwkApp/MuCrashObserver.h>
 #include <Mu/Function.h>
 #include <Mu/MachineRep.h>
 #include <Mu/NodeAssembler.h>
@@ -437,6 +438,10 @@ namespace TwkApp
         {
             g_appThread = muAppThread();
         }
+
+        // Keep mu_* crash annotations current as Mu executes (counterpart of the
+        // Python trace hook). Idempotent; runs on the main thread at init.
+        installMuCrashObserver();
     }
 
     void initWithString(MuLangContext* context, Process* process, const Context::ModuleList& modules, const char* p)

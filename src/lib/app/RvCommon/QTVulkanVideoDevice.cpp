@@ -1,0 +1,984 @@
+//
+//  Copyright (c) 2026 Autodesk, Inc. All Rights Reserved.
+//
+//  SPDX-License-Identifier: Apache-2.0
+//
+
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+
+#include <GL/glew.h>
+#include <RvCommon/QTVulkanVideoDevice.h>
+#include <RvCommon/VulkanWindow.h>
+#include <RvCommon/DesktopVideoDevice.h>
+#include <TwkApp/Application.h>
+#include <TwkApp/VideoModule.h>
+#include <TwkApp/Event.h>
+#include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
+#include <TwkGLF/GLFBO.h>
+
+#include <QScreen>
+#include <QGuiApplication>
+#include <QSurfaceFormat>
+#include <QOpenGLContext>
+#include <QOffscreenSurface>
+
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <optional>
+#include <string>
+#include <string_view>
+#ifdef PLATFORM_WINDOWS
+// WIN32_LEAN_AND_MEAN prevents <windows.h> from including the legacy
+// <winsock.h>, which otherwise collides with the <winsock2.h> already
+// pulled in transitively by Qt headers above.
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
+#ifndef GL_EXT_memory_object
+#define GL_EXT_memory_object 1
+#define GL_TEXTURE_TILING_EXT 0x9580
+#define GL_DEDICATED_MEMORY_OBJECT_EXT 0x9581
+#define GL_NUM_TILING_TYPES_EXT 0x9582
+#define GL_TILING_TYPES_EXT 0x9583
+#define GL_OPTIMAL_TILING_EXT 0x9584
+#define GL_LINEAR_TILING_EXT 0x9585
+#define GL_NUM_DEVICE_UUIDS_EXT 0x9596
+#define GL_DEVICE_UUID_EXT 0x9597
+#define GL_DRIVER_UUID_EXT 0x9598
+#define GL_UUID_SIZE_EXT 16
+#endif
+
+#ifndef GL_EXT_memory_object_fd
+#define GL_EXT_memory_object_fd 1
+#define GL_HANDLE_TYPE_OPAQUE_FD_EXT 0x9586
+#endif
+
+#ifndef GL_EXT_memory_object_win32
+#define GL_EXT_memory_object_win32 1
+#define GL_HANDLE_TYPE_OPAQUE_WIN32_EXT 0x9587
+#define GL_HANDLE_TYPE_OPAQUE_WIN32_KMT_EXT 0x9588
+#endif
+
+#ifndef GL_EXT_semaphore_win32
+#define GL_EXT_semaphore_win32 1
+#endif
+
+#ifndef GL_EXT_semaphore
+#define GL_EXT_semaphore 1
+#define GL_NUM_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958A
+#define GL_SUPPORTED_SEMAPHORE_WAIT_LAYOUTS_EXT 0x958B
+#define GL_NUM_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958C
+#define GL_SUPPORTED_SEMAPHORE_SIGNAL_LAYOUTS_EXT 0x958D
+#define GL_LAYOUT_COLOR_ATTACHMENT_EXT 0x958E
+#define GL_LAYOUT_DEPTH_STENCIL_ATTACHMENT_EXT 0x958F
+#define GL_LAYOUT_DEPTH_STENCIL_READ_ONLY_EXT 0x9590
+#define GL_LAYOUT_SHADER_READ_ONLY_EXT 0x9591
+#define GL_LAYOUT_TRANSFER_SRC_EXT 0x9592
+#define GL_LAYOUT_TRANSFER_DST_EXT 0x9593
+#define GL_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_EXT 0x9530
+#define GL_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_EXT 0x9531
+#endif
+
+#ifdef PLATFORM_WINDOWS
+// The bundled src/pub/glew does not declare the EXT_memory_object /
+// EXT_semaphore (+ _win32) entry points, so resolve them via wglGetProcAddress.
+// If any are missing, presentation falls back to the CPU path.
+using PFNGLCREATEMEMORYOBJECTSEXTPROC_RV = void(GLAPIENTRY*)(GLsizei n, GLuint* memoryObjects);
+using PFNGLDELETEMEMORYOBJECTSEXTPROC_RV = void(GLAPIENTRY*)(GLsizei n, const GLuint* memoryObjects);
+using PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV = void(GLAPIENTRY*)(GLuint memoryObject, GLenum pname, const GLint* params);
+using PFNGLTEXSTORAGEMEM2DEXTPROC_RV = void(GLAPIENTRY*)(GLenum target, GLsizei levels, GLenum internalFormat, GLsizei width,
+                                                         GLsizei height, GLuint memory, GLuint64 offset);
+using PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV = void(GLAPIENTRY*)(GLuint memory, GLuint64 size, GLenum handleType, void* handle);
+using PFNGLGENSEMAPHORESEXTPROC_RV = void(GLAPIENTRY*)(GLsizei n, GLuint* semaphores);
+using PFNGLDELETESEMAPHORESEXTPROC_RV = void(GLAPIENTRY*)(GLsizei n, const GLuint* semaphores);
+using PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV = void(GLAPIENTRY*)(GLuint semaphore, GLenum handleType, void* handle);
+using PFNGLWAITSEMAPHOREEXTPROC_RV = void(GLAPIENTRY*)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
+                                                       GLuint numTextureBarriers, const GLuint* textures, const GLenum* dstLayouts);
+using PFNGLSIGNALSEMAPHOREEXTPROC_RV = void(GLAPIENTRY*)(GLuint semaphore, GLuint numBufferBarriers, const GLuint* buffers,
+                                                         GLuint numTextureBarriers, const GLuint* textures, const GLenum* srcLayouts);
+
+namespace
+{
+    PFNGLCREATEMEMORYOBJECTSEXTPROC_RV g_glCreateMemoryObjectsEXT = nullptr;
+    PFNGLDELETEMEMORYOBJECTSEXTPROC_RV g_glDeleteMemoryObjectsEXT = nullptr;
+    PFNGLMEMORYOBJECTPARAMETERIVEXTPROC_RV g_glMemoryObjectParameterivEXT = nullptr;
+    PFNGLTEXSTORAGEMEM2DEXTPROC_RV g_glTexStorageMem2DEXT = nullptr;
+    PFNGLIMPORTMEMORYWIN32HANDLEEXTPROC_RV g_glImportMemoryWin32HandleEXT = nullptr;
+    PFNGLGENSEMAPHORESEXTPROC_RV g_glGenSemaphoresEXT = nullptr;
+    PFNGLDELETESEMAPHORESEXTPROC_RV g_glDeleteSemaphoresEXT = nullptr;
+    PFNGLIMPORTSEMAPHOREWIN32HANDLEEXTPROC_RV g_glImportSemaphoreWin32HandleEXT = nullptr;
+    PFNGLWAITSEMAPHOREEXTPROC_RV g_glWaitSemaphoreEXT = nullptr;
+    PFNGLSIGNALSEMAPHOREEXTPROC_RV g_glSignalSemaphoreEXT = nullptr;
+
+    bool g_glInteropProbed = false;
+    bool g_glInteropAvailable = false;
+
+    // Null when the driver does not expose the entry point.
+    template <typename Proc> void resolveGL(Proc& function, const char* name)
+    {
+        function = reinterpret_cast<Proc>(wglGetProcAddress(name));
+    }
+
+    // Must be called with a current GL context.
+    bool loadGLInteropExtensions()
+    {
+        if (g_glInteropProbed)
+        {
+            return g_glInteropAvailable;
+        }
+        g_glInteropProbed = true;
+
+        resolveGL(g_glCreateMemoryObjectsEXT, "glCreateMemoryObjectsEXT");
+        resolveGL(g_glDeleteMemoryObjectsEXT, "glDeleteMemoryObjectsEXT");
+        resolveGL(g_glMemoryObjectParameterivEXT, "glMemoryObjectParameterivEXT");
+        resolveGL(g_glTexStorageMem2DEXT, "glTexStorageMem2DEXT");
+        resolveGL(g_glImportMemoryWin32HandleEXT, "glImportMemoryWin32HandleEXT");
+        resolveGL(g_glGenSemaphoresEXT, "glGenSemaphoresEXT");
+        resolveGL(g_glDeleteSemaphoresEXT, "glDeleteSemaphoresEXT");
+        resolveGL(g_glImportSemaphoreWin32HandleEXT, "glImportSemaphoreWin32HandleEXT");
+        resolveGL(g_glWaitSemaphoreEXT, "glWaitSemaphoreEXT");
+        resolveGL(g_glSignalSemaphoreEXT, "glSignalSemaphoreEXT");
+
+        g_glInteropAvailable = g_glCreateMemoryObjectsEXT && g_glDeleteMemoryObjectsEXT && g_glMemoryObjectParameterivEXT
+                               && g_glTexStorageMem2DEXT && g_glImportMemoryWin32HandleEXT && g_glGenSemaphoresEXT
+                               && g_glDeleteSemaphoresEXT && g_glImportSemaphoreWin32HandleEXT && g_glWaitSemaphoreEXT
+                               && g_glSignalSemaphoreEXT;
+
+        // Unconditional (runs once): identifies the GL driver, e.g. the GDI
+        // Generic software renderer, which cannot do interop.
+        const GLubyte* vendor = glGetString(GL_VENDOR);
+        const GLubyte* renderer = glGetString(GL_RENDERER);
+        const GLubyte* version = glGetString(GL_VERSION);
+
+        std::cout << "INFO: QTVulkanVideoDevice: GL_VENDOR='" << (vendor ? reinterpret_cast<const char*>(vendor) : "?") << "' GL_RENDERER='"
+                  << (renderer ? reinterpret_cast<const char*>(renderer) : "?") << "' GL_VERSION='"
+                  << (version ? reinterpret_cast<const char*>(version) : "?") << "'" << std::endl;
+
+        if (!g_glInteropAvailable)
+        {
+            std::cout << "INFO: QTVulkanVideoDevice: GL_EXT_memory_object_win32 / GL_EXT_semaphore_win32 NOT available; "
+                         "falling back to CPU presentation path"
+                      << std::endl;
+        }
+        else
+        {
+            std::cout << "INFO: QTVulkanVideoDevice: GL interop extensions resolved (GPU-interop available)" << std::endl;
+        }
+
+        return g_glInteropAvailable;
+    }
+} // namespace
+
+// Redirect direct GL extension references in this translation unit to the
+// dynamically resolved pointers. Linux still uses the real GLEW symbols.
+#define glCreateMemoryObjectsEXT g_glCreateMemoryObjectsEXT
+#define glDeleteMemoryObjectsEXT g_glDeleteMemoryObjectsEXT
+#define glMemoryObjectParameterivEXT g_glMemoryObjectParameterivEXT
+#define glTexStorageMem2DEXT g_glTexStorageMem2DEXT
+#define glImportMemoryWin32HandleEXT g_glImportMemoryWin32HandleEXT
+#define glGenSemaphoresEXT g_glGenSemaphoresEXT
+#define glDeleteSemaphoresEXT g_glDeleteSemaphoresEXT
+#define glImportSemaphoreWin32HandleEXT g_glImportSemaphoreWin32HandleEXT
+#define glWaitSemaphoreEXT g_glWaitSemaphoreEXT
+#define glSignalSemaphoreEXT g_glSignalSemaphoreEXT
+#endif // PLATFORM_WINDOWS
+
+namespace Rv
+{
+    using namespace std;
+    using namespace TwkApp;
+    using namespace IPCore;
+
+    namespace
+    {
+        // Forces the CPU pack-and-upload present path regardless of GPU/driver.
+        bool forceCpuPresentation()
+        {
+            static const bool forced = getenv("RV_VULKAN_FORCE_CPU_PRESENT") != nullptr;
+            return forced;
+        }
+
+        void drainGLErrors()
+        {
+            while (glGetError() != GL_NO_ERROR)
+            {
+            }
+        }
+    } // namespace
+
+    QTVulkanVideoDevice::QTVulkanVideoDevice(VideoModule* module, const string& name, VulkanWindow* window, QWidget* eventWidget)
+        : TwkGLF::GLVideoDevice(module, name, VideoDevice::ImageOutput | VideoDevice::ProvidesSync | VideoDevice::SubWindow)
+        , m_window(window)
+        , m_translator(eventWidget ? std::make_unique<QTTranslator>(this, eventWidget) : nullptr)
+    {
+        assert(window);
+    }
+
+    QTVulkanVideoDevice::~QTVulkanVideoDevice()
+    {
+        //  Every slot, unconditionally: the imports live in the global share
+        //  group and would outlive m_glContext, pinning the Vulkan memory.
+        if (m_glContext && m_offscreenSurface && m_glContext->makeCurrent(m_offscreenSurface.get()))
+        {
+            m_fbo.reset();
+            if (m_fboColorTex)
+            {
+                glDeleteTextures(1, &m_fboColorTex);
+                m_fboColorTex = 0;
+            }
+            cleanupAllSharedGLObjects();
+            cleanupCpuFallbackTarget();
+            m_glContext->doneCurrent();
+        }
+
+        m_offscreenSurface.reset();
+
+        m_glContext.reset();
+
+        m_translator.reset();
+    }
+
+    //--------------------------------------------------------------------------
+
+    void QTVulkanVideoDevice::ensureGLContext() const
+    {
+        if (!m_glContext)
+        {
+            QSurfaceFormat fmt;
+            fmt.setRenderableType(QSurfaceFormat::OpenGL);
+            fmt.setMajorVersion(2);
+            fmt.setMinorVersion(1);
+
+            m_glContext = std::make_unique<QOpenGLContext>();
+            m_glContext->setFormat(fmt);
+
+            // Join the global share group, or FTGL font-atlas textures created
+            // elsewhere have no storage here and glyph uploads fail.
+            m_glContext->setShareContext(QOpenGLContext::globalShareContext());
+
+            if (!m_glContext->create())
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: QOpenGLContext::create() failed" << endl;
+                m_glContext.reset();
+                return;
+            }
+
+            m_offscreenSurface = std::make_unique<QOffscreenSurface>();
+            m_offscreenSurface->setFormat(m_glContext->format());
+            m_offscreenSurface->create();
+
+            if (!m_offscreenSurface->isValid())
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: QOffscreenSurface::create() failed" << endl;
+                m_offscreenSurface.reset();
+                m_glContext.reset();
+                return;
+            }
+
+            m_glContext->makeCurrent(m_offscreenSurface.get());
+            glewExperimental = GL_TRUE;
+#ifdef PLATFORM_WINDOWS
+            // The bundled Windows GLEW's glewInit takes a loader; nullptr
+            // selects the default, as at the other Windows call sites.
+            GLenum err = glewInit(nullptr);
+#else
+            GLenum err = glewInit();
+#endif
+            if (err != GLEW_OK)
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: glewInit failed: " << glewGetErrorString(err) << endl;
+                m_glContext->doneCurrent();
+                m_offscreenSurface.reset();
+                m_glContext.reset();
+                return;
+            }
+        }
+
+        if (!m_glContext->makeCurrent(m_offscreenSurface.get()))
+        {
+            cerr << "ERROR: QTVulkanVideoDevice: makeCurrent() failed" << endl;
+            return;
+        }
+
+        //  Size used before the window exists or while it reports zero.
+        constexpr int fallbackPixelSize = 128;
+
+        int pixelWidth = m_window ? toDevicePixels(m_window->width()) : fallbackPixelSize;
+        int pixelHeight = m_window ? toDevicePixels(m_window->height()) : fallbackPixelSize;
+        if (pixelWidth < 1)
+        {
+            pixelWidth = fallbackPixelSize;
+        }
+        if (pixelHeight < 1)
+        {
+            pixelHeight = fallbackPixelSize;
+        }
+
+        if (!m_fbo || m_fboWidth != pixelWidth || m_fboHeight != pixelHeight)
+        {
+            m_fbo.reset();
+            if (m_fboColorTex)
+            {
+                glDeleteTextures(1, &m_fboColorTex);
+                m_fboColorTex = 0;
+            }
+
+            // The control viewport composites blended passes here, so it needs
+            // RGBA16F. A passive output only receives already-composited blits,
+            // so RGB10_A2 (the shared image's format) halves its bandwidth.
+            const bool passiveOutput = m_window && m_window->isPassiveOutput();
+            const GLenum fboFormat = passiveOutput ? GL_RGB10_A2 : GL_RGBA16F_ARB;
+
+            glGenTextures(1, &m_fboColorTex);
+            glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
+            if (passiveOutput)
+            {
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, pixelWidth, pixelHeight, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV,
+                             nullptr);
+            }
+            else
+            {
+                glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, fboFormat, pixelWidth, pixelHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+            }
+            glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
+
+            m_fbo = std::make_unique<TwkGLF::GLFBO>(pixelWidth, pixelHeight, fboFormat);
+            m_fbo->attachColorTexture(GL_TEXTURE_RECTANGLE_ARB, m_fboColorTex);
+
+            GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+            if (status != GL_FRAMEBUFFER_COMPLETE_EXT)
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: FBO incomplete: 0x" << hex << status << dec << endl;
+            }
+
+            m_fboWidth = pixelWidth;
+            m_fboHeight = pixelHeight;
+        }
+
+        m_fbo->bind();
+
+        GLVideoDevice::makeCurrent();
+    }
+
+    //--------------------------------------------------------------------------
+
+    void QTVulkanVideoDevice::setAbsolutePosition(int x, int y)
+    {
+        if (x != m_x || y != m_y || !m_refresh)
+        {
+            std::optional<float> refresh;
+
+            const int windowWidth = m_window ? m_window->width() : 0;
+            const int windowHeight = m_window ? m_window->height() : 0;
+            const int centerX = x + windowWidth / 2;
+            const int centerY = y + windowHeight / 2;
+
+            if (const TwkApp::VideoModule* mod = TwkApp::App()->primaryVideoModule())
+            {
+                if (TwkApp::VideoDevice* device = mod->deviceFromPosition(centerX, centerY))
+                {
+                    setPhysicalDevice(device);
+                    refresh = device->timing().hz;
+
+                    VideoDeviceContextChangeEvent event("video-device-changed", this, this, device);
+                    sendEvent(event);
+                }
+            }
+
+            if (refresh != m_refresh)
+            {
+                if (refresh && *refresh > 0)
+                {
+                    m_refresh = refresh;
+                }
+                else if (IPCore::debugPlayback)
+                {
+                    cout << "WARNING: ignoring intended desktop refresh rate = " << refresh.value_or(-1.0f) << endl;
+                }
+
+                if (IPCore::debugPlayback)
+                {
+                    cout << "INFO: new desktop refresh rate " << m_refresh.value_or(-1.0f) << endl;
+                }
+            }
+        }
+        m_x = x;
+        m_y = y;
+    }
+
+    void QTVulkanVideoDevice::setPhysicalDevice(VideoDevice* device)
+    {
+        TwkApp::VideoDevice::setPhysicalDevice(device);
+
+        m_devicePixelRatio = 1.0f;
+
+        static bool noQtHighDPISupport = (getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr);
+        if (noQtHighDPISupport)
+        {
+            return;
+        }
+
+        if (const DesktopVideoDevice* desktopDev = dynamic_cast<const DesktopVideoDevice*>(device))
+        {
+            const QList<QScreen*> screens = QGuiApplication::screens();
+            const int screen = desktopDev->qtScreen();
+            if (screen >= 0 && screen < screens.size())
+            {
+                m_devicePixelRatio = screens[screen]->devicePixelRatio();
+            }
+        }
+    }
+
+    float QTVulkanVideoDevice::devicePixelRatio() const
+    {
+        if (m_window)
+        {
+            return static_cast<float>(m_window->devicePixelRatioF());
+        }
+        return m_devicePixelRatio;
+    }
+
+    //--------------------------------------------------------------------------
+    // GLVideoDevice API
+    //--------------------------------------------------------------------------
+
+    void QTVulkanVideoDevice::makeCurrent() const { ensureGLContext(); }
+
+    TwkGLF::GLFBO* QTVulkanVideoDevice::defaultFBO()
+    {
+        ensureGLContext();
+        return m_fbo.get();
+    }
+
+    const TwkGLF::GLFBO* QTVulkanVideoDevice::defaultFBO() const
+    {
+        ensureGLContext();
+        return m_fbo.get();
+    }
+
+    std::string QTVulkanVideoDevice::hardwareIdentification() const { return "vulkan-hybrid"; }
+
+    GLuint QTVulkanVideoDevice::fboID() const { return m_fbo ? m_fbo->fboID() : 0; }
+
+    void QTVulkanVideoDevice::cleanupSharedGLObjects(uint32_t slot) const
+    {
+        if (m_glShared[slot].drawFbo)
+        {
+            glDeleteFramebuffersEXT(1, &m_glShared[slot].drawFbo);
+            m_glShared[slot].drawFbo = 0;
+        }
+        if (m_glShared[slot].texture)
+        {
+            glDeleteTextures(1, &m_glShared[slot].texture);
+            m_glShared[slot].texture = 0;
+        }
+        if (m_glShared[slot].memoryObject)
+        {
+            glDeleteMemoryObjectsEXT(1, &m_glShared[slot].memoryObject);
+            m_glShared[slot].memoryObject = 0;
+        }
+        if (m_glShared[slot].glReadySemaphore)
+        {
+            glDeleteSemaphoresEXT(1, &m_glShared[slot].glReadySemaphore);
+            m_glShared[slot].glReadySemaphore = 0;
+        }
+        if (m_glShared[slot].vkReadySemaphore)
+        {
+            glDeleteSemaphoresEXT(1, &m_glShared[slot].vkReadySemaphore);
+            m_glShared[slot].vkReadySemaphore = 0;
+        }
+        m_glShared[slot].width = 0;
+        m_glShared[slot].height = 0;
+    }
+
+    void QTVulkanVideoDevice::cleanupAllSharedGLObjects() const
+    {
+        for (uint32_t slot = 0; slot < VulkanWindow::framesInFlight; ++slot)
+        {
+            cleanupSharedGLObjects(slot);
+        }
+    }
+
+    void QTVulkanVideoDevice::releaseSharedGLObjects()
+    {
+        //  No context means nothing was ever imported.
+        if (!m_glContext || !m_offscreenSurface)
+        {
+            return;
+        }
+
+        if (!m_glContext->makeCurrent(m_offscreenSurface.get()))
+        {
+            return;
+        }
+        cleanupAllSharedGLObjects();
+        m_glContext->doneCurrent();
+    }
+
+    void QTVulkanVideoDevice::ensureCpuFallbackTarget(int targetWidth, int targetHeight) const
+    {
+        if (m_cpuFlipFbo && m_cpuFlipWidth == targetWidth && m_cpuFlipHeight == targetHeight)
+        {
+            return;
+        }
+
+        cleanupCpuFallbackTarget();
+
+        // RGB10_A2 color target so the Y-flip blit quantizes to 10-bit and the
+        // packed readback below is a direct copy (no conversion in glReadPixels).
+        glGenTextures(1, &m_cpuFlipTex);
+        glBindTexture(GL_TEXTURE_2D, m_cpuFlipTex);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, targetWidth, targetHeight, 0, GL_RGBA, GL_UNSIGNED_INT_2_10_10_10_REV, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glGenFramebuffersEXT(1, &m_cpuFlipFbo);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_cpuFlipTex, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+        m_cpuFlipWidth = targetWidth;
+        m_cpuFlipHeight = targetHeight;
+    }
+
+    void QTVulkanVideoDevice::cleanupCpuFallbackTarget() const
+    {
+        if (m_cpuFlipFbo)
+        {
+            glDeleteFramebuffersEXT(1, &m_cpuFlipFbo);
+            m_cpuFlipFbo = 0;
+        }
+        if (m_cpuFlipTex)
+        {
+            glDeleteTextures(1, &m_cpuFlipTex);
+            m_cpuFlipTex = 0;
+        }
+        m_cpuFlipWidth = 0;
+        m_cpuFlipHeight = 0;
+    }
+
+    bool QTVulkanVideoDevice::interopGLFailed(const char* what) const
+    {
+        GLenum first = glGetError();
+
+        if (first == GL_NO_ERROR)
+        {
+            return false;
+        }
+
+        //  Drain the rest so the next step starts from a clean queue.
+        drainGLErrors();
+
+        cerr << "ERROR: QTVulkanVideoDevice: " << what << " failed (GL 0x" << hex << first << dec << "); demoting '" << name()
+             << "' to CPU presentation." << endl;
+
+        m_interopDisabled = true;
+
+        return true;
+    }
+
+    bool QTVulkanVideoDevice::glDeviceMatchesVulkan() const
+    {
+        if (m_glVulkanDeviceMatch)
+        {
+            return *m_glVulkanDeviceMatch;
+        }
+        if (!m_glContext || !m_window || !m_window->isInitialized())
+        {
+            return false;
+        }
+
+        using GetUnsignedByteIndexedProc = void(GLAPIENTRY*)(GLenum, GLuint, GLubyte*);
+        const auto getUnsignedByteIndexed =
+            reinterpret_cast<GetUnsignedByteIndexedProc>(m_glContext->getProcAddress("glGetUnsignedBytei_vEXT"));
+
+        GLint deviceCount = 0;
+        if (getUnsignedByteIndexed)
+        {
+            glGetIntegerv(GL_NUM_DEVICE_UUIDS_EXT, &deviceCount);
+        }
+
+        bool matched = false;
+        for (GLint i = 0; i < deviceCount && !matched; ++i)
+        {
+            std::array<GLubyte, GL_UUID_SIZE_EXT> uuid{};
+            getUnsignedByteIndexed(GL_DEVICE_UUID_EXT, static_cast<GLuint>(i), uuid.data());
+            matched = m_window->physicalDeviceMatchesUUID(uuid.data(), uuid.size());
+        }
+
+        m_glVulkanDeviceMatch = matched;
+        if (!matched && ImageRenderer::debugGpu())
+        {
+            cout << "INFO: QTVulkanVideoDevice: GL/Vulkan device UUIDs do not match or are unavailable; using CPU fallback." << endl;
+        }
+        return matched;
+    }
+
+    void QTVulkanVideoDevice::presentCpuFallback(int frameWidth, int frameHeight) const
+    {
+        TwkGLF::GLFBO* fbo = m_fbo.get();
+
+        // With GL_UNSIGNED_INT_2_10_10_10_REV, GL_RGBA packs A2B10G10R10 and
+        // GL_BGRA packs A2R10G10B10, so the read format matches the swapchain.
+        const VkFormat swapchainFormat = m_window ? m_window->swapchainFormat() : VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+        const GLenum readFormat = (swapchainFormat == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? GL_BGRA : GL_RGBA;
+
+        ensureCpuFallbackTarget(frameWidth, frameHeight);
+
+        // Y-flip (GL bottom-left to Vulkan top-left) into the RGB10_A2 target.
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, fbo->fboID());
+        glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+        glBlitFramebufferEXT(0, 0, frameWidth, frameHeight, 0, frameHeight, frameWidth, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, m_cpuFlipFbo);
+
+        m_cpuPackedScratch.resize(static_cast<size_t>(frameWidth) * frameHeight);
+        glReadPixels(0, 0, frameWidth, frameHeight, readFormat, GL_UNSIGNED_INT_2_10_10_10_REV, m_cpuPackedScratch.data());
+        m_window->presentPixelData(m_cpuPackedScratch.data(), frameWidth, frameHeight);
+
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo->fboID()); // restore
+    }
+
+    //--------------------------------------------------------------------------
+    // syncBuffers
+    //--------------------------------------------------------------------------
+
+    void QTVulkanVideoDevice::syncBuffers() const
+    {
+        if (!m_window)
+        {
+            return;
+        }
+
+        if (!m_glContext || !m_fbo)
+        {
+            return;
+        }
+
+        // The Vulkan in-flight slot; presentSharedImage() advances it only at
+        // frame end, so it is stable for the whole call.
+        const uint32_t slot = m_window->currentFrame();
+
+        TwkGLF::GLFBO* fbo = m_fbo.get();
+        const int frameWidth = static_cast<int>(fbo->width());
+        const int frameHeight = static_cast<int>(fbo->height());
+
+        if (frameWidth <= 0 || frameHeight <= 0)
+        {
+            return;
+        }
+
+        // No swapchain before the first expose; exposeEvent() calls us again.
+        if (!m_window->isInitialized())
+        {
+            return;
+        }
+
+        // Skip the frame, before any GL work, while a passive output's previous
+        // GPU work is still in flight. Always true for the control viewport.
+        if (m_window->isPassiveOutput() && !m_window->canPresentNow())
+        {
+            return;
+        }
+
+        if (!m_glContext->makeCurrent(m_offscreenSurface.get()))
+        {
+            return;
+        }
+
+#ifdef PLATFORM_WINDOWS
+        const bool glExtensionsAvailable = loadGLInteropExtensions();
+#else
+        const bool glExtensionsAvailable =
+            GLEW_EXT_memory_object && GLEW_EXT_semaphore && GLEW_EXT_memory_object_fd && GLEW_EXT_semaphore_fd;
+#endif
+        const bool glInteropAvailable = !forceCpuPresentation() && !m_interopDisabled && glExtensionsAvailable && glDeviceMatchesVulkan();
+        const VulkanWindow::SharedImageInfo* sharedInfo =
+            glInteropAvailable ? m_window->getSharedImageInfo(frameWidth, frameHeight) : nullptr;
+
+        //  Logged on every transition: the first call can precede swapchain
+        //  creation.
+        const bool gpuInterop = sharedInfo != nullptr;
+        if (m_loggedPresentPath != gpuInterop)
+        {
+            m_loggedPresentPath = gpuInterop;
+            const VkFormat swapchainFormat = m_window ? m_window->swapchainFormat() : VK_FORMAT_UNDEFINED;
+            cout << "INFO: QTVulkanVideoDevice: syncBuffers: '" << name() << "' " << frameWidth << "x" << frameHeight
+                 << " present path = " << (sharedInfo ? "GPU-interop" : "CPU-fallback") << "  swapchainFormat=" << swapchainFormat
+                 << (swapchainFormat == VK_FORMAT_A2B10G10R10_UNORM_PACK32   ? " (A2B10G10R10 / 10-bit)"
+                     : swapchainFormat == VK_FORMAT_A2R10G10B10_UNORM_PACK32 ? " (A2R10G10B10 / 10-bit)"
+                     : swapchainFormat == VK_FORMAT_UNDEFINED                ? " (UNDEFINED -- swapchain not created yet)"
+                                                                             : " (NOT 10-bit)")
+                 << endl;
+        }
+
+        if (!sharedInfo)
+        {
+            std::string reason;
+            if (forceCpuPresentation())
+            {
+                reason = "RV_VULKAN_FORCE_CPU_PRESENT is set";
+            }
+            else if (m_interopDisabled)
+            {
+                reason = "an earlier GL call on the interop path failed; the device is demoted for the rest of the session";
+            }
+            else if (!glExtensionsAvailable)
+            {
+                reason = "the GL driver does not expose the EXT_memory_object / EXT_semaphore interop entry points";
+            }
+            else if (!glDeviceMatchesVulkan())
+            {
+                reason = "the GL context and the Vulkan device are different GPUs, so external-memory interop is unsafe";
+            }
+            else
+            {
+                const VulkanWindow::InteropConfig& config = m_window->interopConfig();
+                reason = config.rejectReason.empty() ? "the Vulkan side declined to allocate a shared image" : config.rejectReason;
+            }
+            m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, reason);
+
+            presentCpuFallback(frameWidth, frameHeight);
+            return;
+        }
+
+        // Re-import only when the shared image's capacity changed; the slot's
+        // width and height cache the imported capacity, not the used size.
+        if (m_glShared[slot].width != sharedInfo->strideWidth || m_glShared[slot].height != sharedInfo->capacityHeight
+            || !m_glShared[slot].memoryObject)
+        {
+            cleanupSharedGLObjects(slot);
+
+            //  Start from a clean error queue so interopGLFailed() below cannot
+            //  attribute an unrelated earlier error to the import.
+            drainGLErrors();
+
+            glCreateMemoryObjectsEXT(1, &m_glShared[slot].memoryObject);
+
+            //  Both sides must agree on dedicated allocation before the import;
+            //  a mismatch corrupts the image silently, so always set it.
+            {
+                const GLint dedicated = sharedInfo->dedicatedAllocation ? GL_TRUE : GL_FALSE;
+                glMemoryObjectParameterivEXT(m_glShared[slot].memoryObject, GL_DEDICATED_MEMORY_OBJECT_EXT, &dedicated);
+            }
+#ifdef PLATFORM_WINDOWS
+            // The Win32 import does not take ownership of the HANDLE;
+            // VulkanWindow::cleanupSharedImage() closes it.
+            glImportMemoryWin32HandleEXT(m_glShared[slot].memoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                         static_cast<HANDLE>(sharedInfo->memoryHandle));
+#else
+            const auto dupFailed = [&](std::string_view fdName)
+            {
+                cerr << "ERROR: QTVulkanVideoDevice: dup(" << fdName << ") failed." << endl;
+                cleanupSharedGLObjects(slot);
+                m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "dup() of a shared image FD failed");
+                presentCpuFallback(frameWidth, frameHeight);
+            };
+
+            // Duplicate the FD because glImportMemoryFdEXT takes ownership
+            int memFd = dup(sharedInfo->memoryFd);
+            if (memFd == -1)
+            {
+                dupFailed("memoryFd");
+                return;
+            }
+            glImportMemoryFdEXT(m_glShared[slot].memoryObject, sharedInfo->size, GL_HANDLE_TYPE_OPAQUE_FD_EXT, memFd);
+#endif
+
+            glGenTextures(1, &m_glShared[slot].texture);
+            glBindTexture(GL_TEXTURE_2D, m_glShared[slot].texture);
+
+            //  Must match the Vulkan image's tiling, or pixels scramble within
+            //  each tile.
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_TILING_EXT,
+                            sharedInfo->tiling == VK_IMAGE_TILING_OPTIMAL ? GL_OPTIMAL_TILING_EXT : GL_LINEAR_TILING_EXT);
+
+            // Allocated at capacity; the blit below writes only the used region.
+            glTexStorageMem2DEXT(GL_TEXTURE_2D, 1, GL_RGB10_A2, sharedInfo->strideWidth, sharedInfo->capacityHeight,
+                                 m_glShared[slot].memoryObject, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glGenSemaphoresEXT(1, &m_glShared[slot].glReadySemaphore);
+            glGenSemaphoresEXT(1, &m_glShared[slot].vkReadySemaphore);
+#ifdef PLATFORM_WINDOWS
+            glImportSemaphoreWin32HandleEXT(m_glShared[slot].glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                            static_cast<HANDLE>(sharedInfo->glReadySemaphoreHandle));
+            glImportSemaphoreWin32HandleEXT(m_glShared[slot].vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_WIN32_EXT,
+                                            static_cast<HANDLE>(sharedInfo->vkReadySemaphoreHandle));
+#else
+            int glReadyFd = dup(sharedInfo->glReadySemaphoreFd);
+            if (glReadyFd == -1)
+            {
+                dupFailed("glReadySemaphoreFd");
+                return;
+            }
+            glImportSemaphoreFdEXT(m_glShared[slot].glReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, glReadyFd);
+
+            int vkReadyFd = dup(sharedInfo->vkReadySemaphoreFd);
+            if (vkReadyFd == -1)
+            {
+                dupFailed("vkReadySemaphoreFd");
+                return;
+            }
+            glImportSemaphoreFdEXT(m_glShared[slot].vkReadySemaphore, GL_HANDLE_TYPE_OPAQUE_FD_EXT, vkReadyFd);
+#endif
+
+            //  The import calls above report failure only through glGetError().
+            if (interopGLFailed("GL<->Vulkan shared image import"))
+            {
+                //  Interop is now off for good, so release every slot.
+                cleanupAllSharedGLObjects();
+                m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "GL import of the shared image raised a GL error");
+                presentCpuFallback(frameWidth, frameHeight);
+                return;
+            }
+
+            m_glShared[slot].width = sharedInfo->strideWidth;
+            m_glShared[slot].height = sharedInfo->capacityHeight;
+
+            m_window->reportGLImportState(sharedInfo->tiling, sharedInfo->dedicatedAllocation);
+        }
+
+        //  session->render() can leave errors pending; drain them so the check
+        //  below sees only the wait/blit/signal sequence's errors.
+        drainGLErrors();
+
+        constexpr GLenum waitSrcLayout = GL_LAYOUT_TRANSFER_SRC_EXT;
+        glWaitSemaphoreEXT(m_glShared[slot].vkReadySemaphore, 0, nullptr, 1, &m_glShared[slot].texture, &waitSrcLayout);
+
+        GLuint readFbo = fbo->fboID();
+        if (!m_glShared[slot].drawFbo)
+        {
+            glGenFramebuffersEXT(1, &m_glShared[slot].drawFbo);
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_glShared[slot].drawFbo);
+            glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_glShared[slot].texture, 0);
+        }
+        else
+        {
+            glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, m_glShared[slot].drawFbo);
+        }
+
+        glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, readFbo);
+
+        // Flip Y: GL origin is bottom-left, Vulkan origin is top-left.
+        glBlitFramebufferEXT(0, 0, frameWidth, frameHeight, 0, frameHeight, frameWidth, 0, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, readFbo); // restore
+
+        constexpr GLenum signalDstLayout = GL_LAYOUT_COLOR_ATTACHMENT_EXT;
+        glSignalSemaphoreEXT(m_glShared[slot].glReadySemaphore, 0, nullptr, 1, &m_glShared[slot].texture, &signalDstLayout);
+
+        glFlush();
+
+        if (interopGLFailed("GL<->Vulkan shared image blit"))
+        {
+            cleanupAllSharedGLObjects();
+            m_window->reportPresentPath(VulkanWindow::PresentPath::CpuReadback, "GL blit into the shared image raised a GL error");
+            presentCpuFallback(frameWidth, frameHeight);
+            return;
+        }
+
+        m_window->reportPresentPath(VulkanWindow::PresentPath::ZeroCopy, std::string());
+        m_window->presentSharedImage();
+    }
+
+    //--------------------------------------------------------------------------
+    // VideoDevice API
+    //--------------------------------------------------------------------------
+
+    void QTVulkanVideoDevice::redraw() const
+    {
+        // requestUpdate() coalesces, so a burst of redraws renders once.
+        if (m_window)
+        {
+            m_window->requestUpdate();
+        }
+    }
+
+    void QTVulkanVideoDevice::redrawImmediately() const { redraw(); }
+
+    void QTVulkanVideoDevice::clearCaches() const {}
+
+    int QTVulkanVideoDevice::toDevicePixels(int logical) const
+    {
+        const float dpr = m_window->devicePixelRatioF();
+        return static_cast<int>(logical * dpr + 0.5f);
+    }
+
+    VideoDevice::Resolution QTVulkanVideoDevice::resolution() const
+    {
+        if (!m_window)
+        {
+            return Resolution(0, 0, 1.0f, 1.0f);
+        }
+        return Resolution(toDevicePixels(m_window->width()), toDevicePixels(m_window->height()), 1.0f, 1.0f);
+    }
+
+    VideoDevice::Offset QTVulkanVideoDevice::offset() const { return Offset(m_x, m_y); }
+
+    VideoDevice::Timing QTVulkanVideoDevice::timing() const { return Timing(m_refresh.value_or(0.0f)); }
+
+    VideoDevice::VideoFormat QTVulkanVideoDevice::format() const
+    {
+        if (!m_window)
+        {
+            return VideoFormat(0, 0, 1.0, 1.0, 0.0, hardwareIdentification());
+        }
+        return VideoFormat(toDevicePixels(m_window->width()), toDevicePixels(m_window->height()), 1.0, 1.0, m_refresh.value_or(0.0f),
+                           hardwareIdentification());
+    }
+
+    size_t QTVulkanVideoDevice::width() const
+    {
+        if (!m_window)
+        {
+            return 0;
+        }
+        return static_cast<size_t>(toDevicePixels(m_window->width()));
+    }
+
+    size_t QTVulkanVideoDevice::height() const
+    {
+        if (!m_window)
+        {
+            return 0;
+        }
+        return static_cast<size_t>(toDevicePixels(m_window->height()));
+    }
+
+    void QTVulkanVideoDevice::open(const StringVector& /*args*/)
+    {
+        if (m_window)
+        {
+            m_window->show();
+        }
+    }
+
+    void QTVulkanVideoDevice::close()
+    {
+        if (m_window)
+        {
+            m_window->hide();
+        }
+    }
+
+    bool QTVulkanVideoDevice::isOpen() const
+    {
+        if (m_window)
+        {
+            return m_window->isVisible();
+        }
+        return false;
+    }
+
+} // namespace Rv
+
+#endif // PLATFORM_LINUX || PLATFORM_WINDOWS

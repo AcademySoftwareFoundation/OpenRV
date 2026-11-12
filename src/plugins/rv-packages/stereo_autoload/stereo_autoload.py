@@ -122,8 +122,8 @@ class StereoAutoloadMode(rvtypes.MinorMode):
         rightMedia = leftMedia
         for pair in self._pairs:
             rightMedia = re.sub(
-                "(^|[._/,\- ])%s([._/,\- ])" % pair[0],
-                "\g<1>%s\g<2>" % pair[1],
+                r"(^|[._/,\- ])%s([._/,\- ])" % pair[0],
+                r"\g<1>%s\g<2>" % pair[1],
                 rightMedia,
             )
 
@@ -138,8 +138,8 @@ class StereoAutoloadMode(rvtypes.MinorMode):
         rightMedia = leftMedia
         for pair in self._pairs:
             rightMedia = re.sub(
-                "(^|[._/,\- ])%s([._/,\- ])" % pair[0],
-                "\g<1>%s\g<2>" % pair[1].lower(),
+                r"(^|[._/,\- ])%s([._/,\- ])" % pair[0],
+                r"\g<1>%s\g<2>" % pair[1].lower(),
                 rightMedia,
             )
 
@@ -152,8 +152,8 @@ class StereoAutoloadMode(rvtypes.MinorMode):
         rightMedia = leftMedia
         for pair in self._pairs:
             rightMedia = re.sub(
-                "(^|[._/,\- ])%s([._/,\- ])" % pair[0],
-                "\g<1>%s\g<2>" % pair[1].upper(),
+                r"(^|[._/,\- ])%s([._/,\- ])" % pair[0],
+                r"\g<1>%s\g<2>" % pair[1].upper(),
                 rightMedia,
             )
 

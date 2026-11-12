@@ -14,6 +14,8 @@
 #include <QOpenGLContext>
 #include <QImage>
 
+#include <cassert>
+
 /// #define NDEBUG
 
 namespace TwkGLF
@@ -83,7 +85,26 @@ namespace TwkGLF
 
     GLFBO::~GLFBO()
     {
-        if (m_id && m_ownsFBOHandle)
+        //
+        //  A GLFBO wrapping a device's bound framebuffer owns no GL names and
+        //  needs no context to destroy.
+        //
+        const bool ownsHandles = (m_id != 0 && m_ownsFBOHandle);
+        const bool issuesGL = ownsHandles || (m_pbo != 0);
+
+        //
+        //  With no context current the deletes below are silent no-ops. Report
+        //  the leak here (without asserting) and skip the GL calls.
+        //
+        bool canIssueGL = true;
+
+        if (issuesGL && !twkGlAnyContextIsCurrent())
+        {
+            twkGlPrintError(__FILE__, __FUNCTION__, __LINE__, "");
+            canIssueGL = false;
+        }
+
+        if (canIssueGL && ownsHandles)
         {
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
             TWK_GLDEBUG;
@@ -115,11 +136,20 @@ namespace TwkGLF
 
         if (m_pbo)
         {
-            if (m_fence)
+            //
+            //  A fence wait with no context current can never complete.
+            //
+            if (m_fence && canIssueGL)
+            {
                 m_fence->wait();
+            }
             delete m_fence;
-            glDeleteBuffers(1, &m_pbo);
-            TWK_GLDEBUG;
+
+            if (canIssueGL)
+            {
+                glDeleteBuffers(1, &m_pbo);
+                TWK_GLDEBUG;
+            }
         }
     }
 
@@ -474,6 +504,19 @@ namespace TwkGLF
         }
     }
 
+    bool GLFBO::isComplete() const
+    {
+        //
+        //  GLFBO must be bound for glCheckFramebufferStatus()
+        //
+        bind();
+
+        const GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+        TWK_GLDEBUG;
+
+        return status == GL_FRAMEBUFFER_COMPLETE_EXT;
+    }
+
     void GLFBO::bindColorTexture(size_t i) const
     {
         assert(i < m_attachments.size());
@@ -531,6 +574,7 @@ namespace TwkGLF
         destinationGLFBO->bind(GL_DRAW_FRAMEBUFFER_EXT);
 
         glBlitFramebufferEXT(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        TWK_GLDEBUG;
 
         HOP_CALL(glFinish();)
     }

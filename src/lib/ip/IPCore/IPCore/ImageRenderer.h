@@ -678,9 +678,9 @@ namespace IPCore
 
         static bool useThreadedUpload() { return m_useThreadedUpload && m_hasThreadedUpload; }
 
-        static void reportGL(bool b) { m_reportGL = b; }
+        static void debugGpu(bool b) { m_debugGpu = b; }
 
-        static bool reportGL() { return m_reportGL; }
+        static bool debugGpu() { return m_debugGpu; }
 
         static void setPBOs(bool b) { m_pixelBuffers = b; }
 
@@ -799,7 +799,7 @@ namespace IPCore
         //
 
         void renderImage(InternalRenderContext&);
-        void renderPaint(const IPImage*, const GLFBO*);
+        void renderPaint(const IPImage*, const GLFBO*, int frame);
 
         void renderExternal(InternalRenderContext&);
         void renderRootBuffer(InternalRenderContext&);
@@ -930,6 +930,7 @@ namespace IPCore
         FastPath findFastPath(const FrameBuffer*) const;
         std::string imageToFBOIdentifier(const IPImage* image) const;
         bool imageHasEraseCommands(const IPImage* image) const;
+        bool imageHasFrameDependentCommands(const IPImage* image) const;
 
         void createGLContexts();
 
@@ -1019,7 +1020,7 @@ namespace IPCore
         static bool m_drawPixelsOnly;
         static bool m_defaultAllowPBOs;
         static bool m_ycbcrApple;
-        static bool m_reportGL;
+        static bool m_debugGpu;
         static bool m_nonPowerOf2;
         static bool m_softwareGLRenderer;
         static int m_ALUinsnLimit;

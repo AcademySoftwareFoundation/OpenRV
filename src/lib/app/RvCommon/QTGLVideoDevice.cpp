@@ -19,13 +19,28 @@
 #include <TwkApp/Application.h>
 #include <TwkApp/VideoModule.h>
 
+#include <QOpenGLContext>
 #include <QScreen>
+
+#include <atomic>
+#include <iostream>
 
 namespace Rv
 {
     using namespace std;
     using namespace TwkGLF;
     using namespace TwkApp;
+
+    namespace
+    {
+        //  RV_NO_QT_HDPI_SUPPORT pins the ratio to 1 so RV renders at logical
+        //  size on HDPI displays.
+        bool qtHighDPISupportDisabled()
+        {
+            static const bool disabled = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
+            return disabled;
+        }
+    } // namespace
 
     QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWidget* view)
         : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
@@ -47,6 +62,18 @@ namespace Rv
     {
     }
 
+    QTGLVideoDevice::QTGLVideoDevice(VideoModule* m, const string& name, QOpenGLWindow* window, QWidget* eventWidget)
+        : GLVideoDevice(m, name, ImageOutput | ProvidesSync | SubWindow)
+        , m_view(0)
+        , m_window(window)
+        , m_translator(new QTTranslator(this, eventWidget))
+        , m_x(0)
+        , m_y(0)
+        , m_refresh(-1.0)
+    {
+        assert(window);
+    }
+
     QTGLVideoDevice::QTGLVideoDevice(const string& name, QOpenGLWidget* view)
         : GLVideoDevice(NULL, name, NoCapabilities)
         , m_view(view)
@@ -66,26 +93,84 @@ namespace Rv
         m_translator = new QTTranslator(this, m_view);
     }
 
+    void QTGLVideoDevice::setWindow(QOpenGLWindow* window, QWidget* eventWidget)
+    {
+        m_window = window;
+
+        if (m_translator)
+            m_translator->setWidet(eventWidget);
+        else
+            m_translator = new QTTranslator(this, eventWidget);
+    }
+
     GLVideoDevice* QTGLVideoDevice::newSharedContextWorkerDevice() const
     {
-        // NOTE_QT: QOpenGLWidget does not take a share parameter anymore. Try
-        // to share with setShareContext.
-        QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view->parentWidget());
-        openGLWidget->context()->setShareContext(m_view->context());
+        // A freshly constructed QOpenGLWidget has no context() yet -- it is
+        // created lazily on first show/makeCurrent -- so the previous
+        // openGLWidget->context()->setShareContext(...) here dereferenced a null
+        // context and crashed (reachable via ImageRenderer::createGLContexts()
+        // when "Multithread GPU Upload" is enabled). Explicit sharing is also
+        // unnecessary: Qt::AA_ShareOpenGLContexts (set in main.cpp) makes all GL
+        // contexts in the process share resources, so this worker context shares
+        // with the control viewport automatically.
+        QOpenGLWidget* openGLWidget = new QOpenGLWidget(m_view ? m_view->parentWidget() : nullptr);
         return new QTGLVideoDevice(name() + "-workerContextDevice", openGLWidget);
     }
 
     void QTGLVideoDevice::makeCurrent() const
     {
-        if (m_view->context() && m_view->context()->isValid())
+        // QOpenGLWindow creates its context lazily, and only if the platform surface exists.
+        if (m_window && m_window->handle())
+        {
+            m_window->makeCurrent();
+            TWK_GLDEBUG;
+
+            // Needs a live context to copy the format from.
+            if (!m_teardownSurface && m_window->context())
+            {
+                m_teardownSurface = std::make_unique<QOffscreenSurface>();
+                m_teardownSurface->setFormat(m_window->context()->format());
+                m_teardownSurface->create();
+            }
+
+            GLint surfaceFBO = m_window->defaultFramebufferObject();
+            if (surfaceFBO != 0)
+            {
+                glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surfaceFBO);
+            }
+            TWK_GLDEBUG;
+        }
+        else if (m_view && m_view->context() && m_view->context()->isValid())
         {
             m_view->makeCurrent();
             TWK_GLDEBUG;
 
             GLint widgetFBO = m_view->defaultFramebufferObject();
             if (widgetFBO != 0)
+            {
                 glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, widgetFBO);
+            }
             TWK_GLDEBUG;
+        }
+        else if (m_window && m_window->context() && m_teardownSurface && m_teardownSurface->isValid()
+                 && m_window->context()->makeCurrent(m_teardownSurface.get()))
+        {
+            // Surface gone, context alive: GL deletion only needs a current context.
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            // Callers assume a current context afterwards, so report the failure once.
+            static std::atomic<bool> reported{false};
+            if (!reported.exchange(true))
+            {
+                cerr << "ERROR: QTGLVideoDevice::makeCurrent: '" << name() << "' cannot make a context current (window="
+                     << (!m_window ? "destroyed" : (m_window->handle() ? "alive" : "no surface"))
+                     << " widget=" << (m_view ? "alive" : "null")
+                     << " currentContext=" << (QOpenGLContext::currentContext() ? "yes" : "none")
+                     << " ownContext=" << (m_window && m_window->context() ? "alive" : "null")
+                     << "); the caller's GL work has no current context" << endl;
+            }
         }
 
         if (!isWorkerDevice())
@@ -94,10 +179,31 @@ namespace Rv
 
     GLuint QTGLVideoDevice::fboID() const
     {
+        if (m_window)
+            return m_window->defaultFramebufferObject();
         if (m_view)
             return m_view->defaultFramebufferObject();
 
         return 0;
+    }
+
+    float QTGLVideoDevice::devicePixelRatio() const
+    {
+        if (qtHighDPISupportDisabled())
+        {
+            return 1.0f;
+        }
+
+        //  m_devicePixelRatio is a cache refreshed only from
+        //  setPhysicalDevice(), so it can disagree with the surface while the
+        //  window moves between displays. Widget-backed presentation and
+        //  worker devices keep the cache.
+        if (m_window)
+        {
+            return static_cast<float>(m_window->devicePixelRatio());
+        }
+
+        return m_devicePixelRatio;
     }
 
     void QTGLVideoDevice::setPhysicalDevice(VideoDevice* d)
@@ -109,8 +215,7 @@ namespace Rv
         // may differ from the logical pixel ratio on a per screen basis.
         m_devicePixelRatio = 1.0f;
 
-        static bool noQtHighDPISupport = getenv("RV_NO_QT_HDPI_SUPPORT") != nullptr;
-        if (noQtHighDPISupport)
+        if (qtHighDPISupportDisabled())
         {
             return;
         }
@@ -129,25 +234,39 @@ namespace Rv
     {
         if (!isWorkerDevice())
         {
-            QSize s = m_view->size();
-            m_view->update();
+            if (m_window)
+                m_window->update();
+            else if (m_view)
+                m_view->update();
         }
     }
 
     void QTGLVideoDevice::redrawImmediately() const
     {
-        if (!isWorkerDevice())
+        if (isWorkerDevice())
+            return;
+
+        if (m_window)
+        {
+            if (m_window->isVisible())
+                m_window->update();
+            else
+                redraw();
+            return;
+        }
+
+        if (m_view)
         {
             if (m_view->isVisible())
             {
 #ifdef PLATFORM_DARWIN
-                // Make sure that the QGLWidget gets redrawn by updateGL() even
+                // Make sure that the view gets redrawn by update() even
                 // when completely overlapped by another window.
-                // Note that on macOS, Qt correctly detects when the QGLWidget
+                // Note that on macOS, Qt correctly detects when the view
                 // is completely overlapped by another window and in which case
                 // resets the Qt::WA_Mapped attribute. This will prevent the
                 // GLView::paintGL() operation from being called by
-                // m_view->updateGL(), which will result in automatically
+                // m_view->update(), which will result in automatically
                 // interrupting any video playback that might be in progress
                 // while the RV window is completely overlapped. This is an
                 // undesirable behaviour during a review session, especially if
@@ -164,14 +283,22 @@ namespace Rv
         }
     }
 
+    int QTGLVideoDevice::surfaceWidth() const { return m_window ? m_window->width() : (m_view ? m_view->width() : 1); }
+
+    int QTGLVideoDevice::surfaceHeight() const { return m_window ? m_window->height() : (m_view ? m_view->height() : 1); }
+
     VideoDevice::Resolution QTGLVideoDevice::resolution() const
     {
-        return Resolution(m_view->width() * devicePixelRatio(), m_view->height() * devicePixelRatio(), 1.0f, 1.0f);
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
+        return Resolution(w * devicePixelRatio(), h * devicePixelRatio(), 1.0f, 1.0f);
     }
 
     VideoDevice::Resolution QTGLVideoDevice::internalResolution() const
     {
-        return Resolution(m_view->width(), m_view->height(), 1.0f, 1.0f);
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
+        return Resolution(w, h, 1.0f, 1.0f);
     }
 
     VideoDevice::Offset QTGLVideoDevice::offset() const { return Offset(m_x, m_y); }
@@ -180,45 +307,52 @@ namespace Rv
 
     VideoDevice::VideoFormat QTGLVideoDevice::format() const
     {
-        return VideoFormat(m_view->width() * devicePixelRatio(), m_view->height() * devicePixelRatio(), 1.0, 1.0,
-                           (m_refresh != -1.0) ? m_refresh : 0.0, hardwareIdentification());
+        const int w = surfaceWidth();
+        const int h = surfaceHeight();
+        return VideoFormat(w * devicePixelRatio(), h * devicePixelRatio(), 1.0, 1.0, (m_refresh != -1.0) ? m_refresh : 0.0,
+                           hardwareIdentification());
     }
 
     void QTGLVideoDevice::open(const StringVector& args)
     {
-        if (!isWorkerDevice())
+        if (isWorkerDevice())
+            return;
+        if (m_window)
+            m_window->show();
+        else if (m_view)
             m_view->show();
     }
 
     void QTGLVideoDevice::close()
     {
-        if (!isWorkerDevice())
+        if (isWorkerDevice())
+            return;
+        if (m_window)
+            m_window->hide();
+        else if (m_view)
             m_view->hide();
     }
 
     bool QTGLVideoDevice::isOpen() const
     {
         if (isWorkerDevice())
-        {
             return false;
-        }
-        else
-        {
-            return m_view->isVisible();
-        }
+        return m_window ? m_window->isVisible() : (m_view ? m_view->isVisible() : false);
     }
 
-    size_t QTGLVideoDevice::width() const { return m_view->width() * devicePixelRatio(); }
+    size_t QTGLVideoDevice::width() const { return surfaceWidth() * devicePixelRatio(); }
 
-    size_t QTGLVideoDevice::height() const { return m_view->height() * devicePixelRatio(); }
+    size_t QTGLVideoDevice::height() const { return surfaceHeight() * devicePixelRatio(); }
 
     void QTGLVideoDevice::syncBuffers() const
     {
-        if (!isWorkerDevice())
-        {
-            makeCurrent();
+        if (isWorkerDevice())
+            return;
+        makeCurrent();
+        if (m_window)
+            m_window->context()->swapBuffers(m_window);
+        else if (m_view)
             m_view->context()->swapBuffers(m_view->context()->surface());
-        }
     }
 
     void QTGLVideoDevice::setAbsolutePosition(int x, int y)

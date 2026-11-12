@@ -19,6 +19,7 @@
 #include <IPCore/PaintCommand.h>
 #include <TwkExc/TwkExcException.h>
 #include <TwkGLF/GL.h>
+#include <TwkGLF/GLContextScope.h>
 #include <TwkGLF/GLState.h>
 #include <TwkGLF/BasicGLProgram.h>
 #include <TwkGLF/GLRenderPrimitives.h>
@@ -26,6 +27,7 @@
 #include <TwkFB/Operations.h>
 #include <TwkFB/FastMemcpy.h>
 #include <TwkUtil/SystemInfo.h>
+#include <TwkUtil/CrashHandler.h>
 #include <TwkMath/Function.h>
 #include <TwkMath/Iostream.h>
 #include <TwkMath/Vec2.h>
@@ -43,7 +45,9 @@
 #include <TwkUtil/ThreadName.h>
 #include <assert.h>
 #include <half.h>
+#include <atomic>
 #include <iostream>
+#include <mutex>
 #include <stl_ext/string_algo.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/regex.hpp>
@@ -109,7 +113,6 @@ namespace IPCore
     using namespace TwkGLF;
 
     static ENVVAR_BOOL(evUsePBOs, "RV_RENDERING_USE_PBOS", true);
-    static ENVVAR_INT(evMaxConcurrentPBOs, "RV_RENDERING_MAX_CONCURRENT_PBOS", 10);
 
 #define NOT_A_FRAME (std::numeric_limits<int>::min())
 #define NOT_A_COORDINATE (GLuint(-1))
@@ -133,7 +136,22 @@ namespace IPCore
             //
             setThreadName("PBO Upload");
 
+            if (!renderer->uploadThreadDevice())
+            {
+                ImageRenderer::setUseThreadedUpload(false);
+                return;
+            }
+
             renderer->uploadThreadDevice()->makeCurrent();
+
+            if (TwkGLF::safeGLGetString(GL_VERSION).empty())
+            {
+                std::cerr << "ERROR: [ImageRenderer] upload thread GL context init failed; "
+                             "disabling threaded upload\n";
+                ImageRenderer::setUseThreadedUpload(false);
+                renderer->notifyDraw();
+                return;
+            }
 
             while (true)
             {
@@ -154,6 +172,14 @@ namespace IPCore
                 // probably not significant.
                 //
                 renderer->manager()->insertTextureFence(renderer->uploadRootHash());
+
+                // The fence was created on THIS (worker) GL context. glClientWaitSync's
+                // GL_SYNC_FLUSH_COMMANDS_BIT on the main thread only flushes the main
+                // context, not this one, so without an explicit flush here the sync
+                // object never reaches the GPU and the main thread stalls on the 10s
+                // fence timeout every frame. Flushing publishes the uploads + fence so
+                // the waiter wakes immediately.
+                glFlush();
 
                 // signal renderer to proceed
                 renderer->notifyDraw();
@@ -181,6 +207,8 @@ namespace IPCore
 
     void ImageRenderer::Device::clearFBOs()
     {
+        const TwkGLF::GLContextScope contextScope(glDevice);
+
         for (size_t i = 0; i < fboRingBuffer.size(); i++)
         {
             FBOVector& views = fboRingBuffer[i].views;
@@ -246,7 +274,7 @@ namespace IPCore
     bool ImageRenderer::m_defaultAllowPBOs = true;
     bool ImageRenderer::m_fragmentProgram = true;
     bool ImageRenderer::m_ycbcrApple = false;
-    bool ImageRenderer::m_reportGL = false;
+    bool ImageRenderer::m_debugGpu = false;
     bool ImageRenderer::m_softwareGLRenderer = false;
     int ImageRenderer::m_ALUinsnLimit = 0;
     int ImageRenderer::m_tempLimit = 0;
@@ -477,6 +505,11 @@ namespace IPCore
             m_uploadThread.join();
         }
 
+        //
+        //  Everything from here down deletes GL objects.
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearState();
 
         // clean up
@@ -609,6 +642,11 @@ namespace IPCore
 
     void ImageRenderer::clearState()
     {
+        //
+        //  Covers flushProgramCache() too, not just flushImageFBOs().
+        //
+        const TwkGLF::GLContextScope contextScope(m_controlDevice.glDevice);
+
         clearRenderedImages();
 
         // clear state will unbind the FBO currently bound
@@ -624,9 +662,21 @@ namespace IPCore
 
     void ImageRenderer::createGLContexts()
     {
-        m_setGLContext = true;
         delete m_uploadThreadDevice;
         m_uploadThreadDevice = controlDevice().glDevice->newSharedContextWorkerDevice();
+        if (!m_uploadThreadDevice)
+        {
+            static std::once_flag logged;
+            std::call_once(logged,
+                           []
+                           {
+                               std::cerr << "WARNING: [ImageRenderer] threaded GPU upload unavailable; "
+                                            "falling back to synchronous upload\n";
+                           });
+            setUseThreadedUpload(false);
+            return;
+        }
+        m_setGLContext = true;
         controlDevice().glDevice->makeCurrent();
     }
 
@@ -773,6 +823,9 @@ namespace IPCore
         const string glren = TwkGLF::safeGLGetString(GL_RENDERER);
         TWK_GLDEBUG;
 
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_vendor", glven);
+        TwkUtil::CrashHandler::instance().addAnnotation("gpu_renderer", glren);
+
         vector<string> tokens;
         stl_ext::tokenize(tokens, glren);
         m_softwareGLRenderer = (tokens.size() && tokens[0] == "Mesa");
@@ -848,7 +901,7 @@ namespace IPCore
         m_maxH = maxt;
         m_maxW = maxt;
 
-        if (m_reportGL)
+        if (m_debugGpu)
         {
             cout << "INFO: GL version            = " << glver << endl;
             cout << "INFO: GLSL version          = " << glslver << endl;
@@ -1310,8 +1363,29 @@ namespace IPCore
         //  unique device pair (controller and output).
         //
 
+        //
+        //  m_outputDevice.glDevice is null for GLBindableVideoDevice outputs
+        //  (presentation, AJA, NDI). Fall back to the control device, whose
+        //  context owns the FBOs released below.
+        //
         if (m_outputDevice.glDevice)
+        {
             m_outputDevice.glDevice->makeCurrent();
+        }
+        else if (m_controlDevice.glDevice)
+        {
+            m_controlDevice.glDevice->makeCurrent();
+        }
+        else
+        {
+            static std::atomic<bool> reported{false};
+            if (!reported.exchange(true))
+            {
+                cerr << "ERROR: ImageRenderer::setOutputDevice: neither the output nor the control device is a GLVideoDevice; "
+                        "the GL objects released below have no current context"
+                     << endl;
+            }
+        }
         TWK_GLDEBUG;
 
         if (d)
@@ -1554,11 +1628,17 @@ namespace IPCore
         {
             createGLContexts();
 
-            // upload thread initialization
-            m_uploadThread = Thread(uploadThreadTrampoline, this); // func and data
+            if (!GLContextNotSet())
+            {
+                // upload thread initialization
+                m_uploadThread = Thread(uploadThreadTrampoline, this);
+            }
         }
 
-        notifyUpload();
+        if (useThreadedUpload())
+        {
+            notifyUpload();
+        }
     }
 
     void ImageRenderer::renderBegin(const InternalRenderContext& context)
@@ -1598,6 +1678,11 @@ namespace IPCore
                     }
                     m_uploadThreadPrefetch = (root == uploadRoot) ? false : true;
 
+                    // Texture object creation (glGenTextures, PBO alloc) must run
+                    // on the control device's GL context — especially on the Metal
+                    // offscreen path where nothing else guarantees it is current.
+                    controlDevice().glDevice->makeCurrent();
+
                     //
                     // traverse our IPTree, and create gl textures/buffers for
                     // all texture uploads the upload thread will need the
@@ -1622,6 +1707,13 @@ namespace IPCore
 
                     prepareTextureDescriptionsForUpload(uploadRoot);
                     setupUploadThread(uploadRoot);
+
+                    // Worker creation may fail (e.g. Metal offscreen share setup);
+                    // fall back to synchronous upload for this frame.
+                    if (!useThreadedUpload())
+                    {
+                        prefetch(uploadRoot);
+                    }
                 }
                 else
                 {
@@ -1895,7 +1987,7 @@ namespace IPCore
 
         renderImage(context);
         if (!context.norender)
-            renderPaint(context.image, context.targetFBO);
+            renderPaint(context.image, context.targetFBO, context.frame);
     }
 
     void ImageRenderer::renderAllChildren(InternalRenderContext& context)
@@ -2410,7 +2502,7 @@ namespace IPCore
         //  or waiting for the sync to complete before continuing.
         //
         //  NOTE: I still think its possible to get stomped on -- you can
-        //  tell if that's happen by setting m_reportGL (-debug gpu in RV)
+        //  tell if that has happened by setting m_debugGpu (-debug gpu in RV)
         //  which will cause some debug code to clear to blue. If you see
         //  blue flashing on the pres device that's the problem.
         //
@@ -2442,7 +2534,7 @@ namespace IPCore
         {
             clearBackground(fbo);
 
-            if (m_reportGL && !controller)
+            if (m_debugGpu && !controller)
             {
                 glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
                 TWK_GLDEBUG;
@@ -4240,22 +4332,14 @@ namespace IPCore
         const size_t totalBytes = d->width * d->height * d->depth * d->pixelSize;
         d->id = m_glState->createGLTexture(totalBytes);
 
-        // Note: The minimum size restriction is to prevent an NVIDIA driver
-        // issue The problem is that once a PBO has been used for a transfer <
-        // 128KB it becomes slow when used for larger transfers.
-        // --
-        // Note: The upper limit restriction set on the number of concurrent
-        // PBOs is to prevent an explosion of PBOs allocated when the user
-        // switches to a large layout say with over 20 clips. These extra PBOs
-        // can really stress a system and also make the default layout slow to
-        // appear due to the time it takes to allocate all those extra PBOs.
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && totalBytes > 128 * 1024
-                            && m_uploadedTextures.size() < evMaxConcurrentPBOs.getValue();
-        if (usePBO)
-        {
-            d->pPBOToGPU = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
-        }
+        //  NOTE: The staging PBO used to be allocated here and stored on the
+        //  TextureDescription, which pinned one pool buffer for the whole cache
+        //  lifetime of the texture (~10+ frames). With a large look-ahead cache
+        //  that starved the small fixed pool, forcing most large streaming
+        //  frames onto the slow synchronous client-memory upload path. The PBO
+        //  is now acquired transiently in uploadPlane() and released back to the
+        //  pool immediately after the upload is issued, so a handful of buffers
+        //  can serve an unbounded streaming cache. See uploadPlane().
     }
 
     void ImageRenderer::assignAuxImages(const IPImage* img)
@@ -4636,8 +4720,29 @@ namespace IPCore
         // We should support non-contiguous pixel data in the PBO path.
         const bool contiguousData = (fb->scanlineSize() / fb->pixelSize()) == fb->width();
 
-        const bool usePBO = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
-                            && fb->scanlinePixelPadding() == 0 && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes && contiguousData;
+        //  Transient staging PBO: acquire it from the pool for this single
+        //  upload (the 128KB minimum avoids an NVIDIA driver slowdown where a
+        //  PBO first used for a tiny transfer stays slow for large ones). It is
+        //  released immediately after the upload is issued (see below), so a
+        //  small pool of buffers can serve an unbounded streaming cache instead
+        //  of one buffer being pinned per resident texture for its cache life.
+        constexpr size_t kMinPBOUploadBytes = 128UL * 1024UL;
+        const bool pboEligible = m_pixelBuffers && (d->channels != 3 || d->channelType != GL_UNSIGNED_SHORT) && !useAppleClientStorage()
+                                 && fb->scanlinePixelPadding() == 0 && contiguousData && totalBytes > kMinPBOUploadBytes;
+
+        if (pboEligible && !d->pPBOToGPU)
+        {
+            auto pbo = std::make_shared<TwkGLF::GLPixelBufferObjectFromPool>(TwkGLF::GLPixelBufferObject::TO_GPU, totalBytes);
+            //  pop() hands back a zero-sized wrapper when the pool is exhausted
+            //  or the request exceeds the max PBO size; fall back to the
+            //  client-memory path in that case.
+            if (pbo->getSize() >= totalBytes)
+            {
+                d->pPBOToGPU = pbo;
+            }
+        }
+
+        const bool usePBO = pboEligible && d->pPBOToGPU && d->pPBOToGPU->getSize() >= totalBytes;
 
         bool updateOnly = d->uploaded ? true : false;
 
@@ -4723,6 +4828,13 @@ namespace IPCore
 
             d->pPBOToGPU->unbind();
             d->uploaded = true;
+
+            //  Return the staging PBO to the pool right away so the next frame's
+            //  upload can recycle it instead of it being pinned to this cached
+            //  texture. The pool fences the buffer, so it will not be handed out
+            //  again until this upload's DMA has completed -- releasing now is
+            //  safe and is what lets a small pool serve the whole stream.
+            d->pPBOToGPU.reset();
         }
         else
         {
@@ -4815,7 +4927,17 @@ namespace IPCore
         return hasErase;
     }
 
-    void ImageRenderer::renderPaint(const IPImage* root, const GLFBO* fbo)
+    bool ImageRenderer::imageHasFrameDependentCommands(const IPImage* root) const
+    {
+        for (size_t i = 0; i < root->commands.size(); ++i)
+        {
+            if (root->commands[i]->frameDependent)
+                return true;
+        }
+        return false;
+    }
+
+    void ImageRenderer::renderPaint(const IPImage* root, const GLFBO* fbo, int frame)
     {
         //
         // if this image has overlay commands, such as matts, these commands
@@ -4853,8 +4975,6 @@ namespace IPCore
         if (root->commands.empty())
             return;
 
-        const string prenderID = imageToFBOIdentifier(root);
-
         assert(fbo);
 
         //////////////////////////////caching////////////////////////////////
@@ -4891,9 +5011,22 @@ namespace IPCore
             // a recompute of the renderID which is a unique identifier
             // associated with the render.
 
+            // If we have erase commands that allow us to see underlying sources, or commands whose
+            // effective rendering varies by frame (e.g. Hold & Ghost, which keep reusing the same
+            // command objects across many frames), we must consider the frame number in the cache
+            // key. If we do not and we composite a frame-invariant source (gap, colour source, etc)
+            // on top of source media, we will generate the same cache key across all frames. Thus if
+            // we are holding or ghosting frames, we will re-use the first cached frame across all
+            // frames in the sequence, rendering on top of a static cached backdrop instead of the
+            // current frame's actual composited image.
+            const bool needsFrameInCacheKey = imageHasFrameDependentCommands(root) || imageHasEraseCommands(root);
+
             ostringstream newRenderID;
             newRenderID << root->renderIDWithPartialPaint(true /*force_recompute*/) << " " << m_filter << " " << m_bgpattern << " "
-                        << fbo->width() << "x" << fbo->height() << " paintCmdNo" << curCmdNum - 1;
+                        << fbo->width() << "x" << fbo->height();
+            if (needsFrameInCacheKey)
+                newRenderID << " frame" << frame;
+            newRenderID << " paintCmdNo" << curCmdNum - 1;
 
             cachedFBO =
                 m_imageFBOManager.findExistingPaintFBO(fbo, newRenderID.str(), foundCachedFBO, lastCmdNum, m_fullRenderSerialNumber);
@@ -4909,9 +5042,11 @@ namespace IPCore
             }
         }
 
-        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused
-        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
-        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, prenderID)->fbo();
+        // Allocate temp FBOs AFTER cache lookup so the cached FBO is protected from being reused.
+        // No identifier, so findExistingImageFBO() never returns a scratch buffer in place of the
+        // image's cached render.
+        const GLFBO* tempfbo1 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, "")->fbo();
+        const GLFBO* tempfbo2 = m_imageFBOManager.newImageFBO(fbo, m_fullRenderSerialNumber, "")->fbo();
 
         // Copy initial render to temp buffer
         if (root->commands.size() > 1)

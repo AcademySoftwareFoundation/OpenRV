@@ -193,11 +193,6 @@ IF(FALSE)
   LIST(APPEND RV_FFMPEG_COMMON_CONFIG_OPTIONS "--disable-stripping")
 ENDIF()
 
-# Controls the EXTERNALPROJECT_ADD/BUILD_ALWAYS option
-SET(${_force_rebuild}
-    FALSE
-)
-
 IF(RV_TARGET_APPLE_ARM64)
   SET(RV_FFMPEG_USE_VIDEOTOOLBOX_DEFAULT_VALUE
       ON
@@ -233,6 +228,24 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
       "vp9_rkmpp"
       "vp9_v4l2m2m"
   )
+
+  # FFmpeg 8 introduced the prores_raw decoder, which (like the prores decoder) pulls in libavcodec/x86/proresdsp_init.o. That C init references the SSE2 asm
+  # symbol ff_prores_idct_put_10_sse2, but the asm that defines it (x86/proresdsp.o) is only built when CONFIG_PRORES_DECODER is enabled. Because we disable the
+  # non-free prores decoder above, leaving prores_raw enabled produces an undefined symbol in libavcodec on x86 (mio_ffmpeg fails to dlopen). Disable prores_raw
+  # too for consistency with our non-free ProRes policy. Guarded on RV_FFMPEG_8 since the decoder does not exist in FFmpeg 6/7 and --disable-decoder on an
+  # unknown decoder makes FFmpeg's configure fail.
+  IF(RV_FFMPEG_8)
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "prores_raw")
+
+    # We disable the non-free ac3 decoder above, which (via eac3_decoder_select="ac3_decoder") also disables the eac3 decoder, so CONFIG_EAC3_DECODER=0. But the
+    # ac3_fixed decoder is left enabled, so libavcodec/ac3dec_fixed.c (which #includes ac3dec.c) is still compiled. With eac3 disabled, eac3dec.c -- which
+    # defines the static ff_eac3_parse_header -- is never included into that TU, yet ac3dec.c still names the symbol in its `if (CONFIG_EAC3_DECODER)` branch.
+    # GCC/Clang dead-code-eliminate the dead branch and only warn, but MSVC treats the referenced-but-undefined static as a fatal error C2129, breaking the
+    # FFmpeg 8 build on Windows. ac3_fixed is the same non-free AC3 codec, so disable it (and eac3 explicitly) to drop the offending TU. Guarded on RV_FFMPEG_8
+    # to keep the existing FFmpeg 6/7 builds unchanged.
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "ac3_fixed")
+    LIST(APPEND NON_FREE_DECODERS_TO_DISABLE "eac3")
+  ENDIF()
 
   FOREACH(
     NON_FREE_DECODER_TO_DISABLE
@@ -277,16 +290,6 @@ IF(NOT RV_FFMPEG_CONFIG_OPTIONS)
   SET(RV_FFMPEG_CONFIG_OPTIONS
       ${_disabled_decoders} ${_disabled_encoders} ${_disabled_filters} ${_disabled_parsers} ${_disabled_protocols}
   )
-
-  IF(NOT RV_FFMPEG_CONFIG_OPTIONS STREQUAL RV_FFMPEG_CONFIG_OPTIONS_CACHE)
-    SET(${_force_rebuild}
-        TRUE
-    )
-    SET(RV_FFMPEG_CONFIG_OPTIONS_CACHE
-        ${RV_FFMPEG_CONFIG_OPTIONS}
-        CACHE STRING "FFmpeg config options" FORCE
-    )
-  ENDIF()
 ENDIF()
 
 LIST(REMOVE_DUPLICATES RV_FFMPEG_DEPENDS)
@@ -349,7 +352,6 @@ EXTERNALPROJECT_ADD(
   BUILD_COMMAND ${_make_command} -j${_cpu_count}
   INSTALL_COMMAND ${_make_command} install
   BUILD_IN_SOURCE TRUE
-  BUILD_ALWAYS ${_force_rebuild}
   BUILD_BYPRODUCTS ${_build_byproducts}
   USES_TERMINAL_BUILD TRUE
 )

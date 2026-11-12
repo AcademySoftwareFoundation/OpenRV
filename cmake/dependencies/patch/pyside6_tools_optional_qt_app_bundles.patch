@@ -1,0 +1,50 @@
+--- a/build_scripts/platforms/macos.py
++++ b/build_scripts/platforms/macos.py
+@@ -18,6 +18,9 @@
+     upper_name = name.capitalize()
+     bundle = f"{{st_build_dir}}/{{st_package_name}}/{upper_name}.app".format(**_vars)
+     binary = f"{bundle}/Contents/MacOS/{upper_name}"
++    if not Path(binary).exists():
++        log.info(f"**Skipping rpath patching of {binary}. Tool was not bundled.")
++        return
+     rpath = "@loader_path/../../../Qt/lib"
+     macos_add_rpath(rpath, binary)
+ 
+@@ -174,6 +177,7 @@
+                     plugins_target / "designer",
+                     _filter=filters,
+                     recursive=False,
++                    force=False,
+                     _vars=_vars)
+ 
+     if copy_qml:
+--- a/build_scripts/platforms/linux.py
++++ b/build_scripts/platforms/linux.py
+@@ -79,6 +79,9 @@
+ 
+         for tool in PYSIDE_UNIX_BUNDLED_TOOLS:
+             tool_path = destination_dir / tool
++            if not tool_path.exists():
++                log.info(f"**Skipping rpath patching of {tool_path}. Tool was not bundled.")
++                continue
+             linux_patch_executable(pyside_build._patchelf_path, tool_path)
+ 
+     if pyside_build.is_webengine_built(built_modules):
+@@ -101,6 +104,7 @@
+                     plugins_target / "designer",
+                     _filter=["*.so"],
+                     recursive=False,
++                    force=False,
+                     _vars=_vars)
+ 
+         copied_plugins = pyside_build.get_shared_libraries_in_path_recursively(
+--- a/build_scripts/platforms/windows_desktop.py
++++ b/build_scripts/platforms/windows_desktop.py
+@@ -393,6 +393,7 @@
+                     f"{plugins_target}/designer",
+                     _filter=["*.dll"],
+                     recursive=False,
++                    force=False,
+                     _vars=_vars)
+ 
+     if copy_translations:

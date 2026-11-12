@@ -152,7 +152,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return makeqtype<QPointType>(c, arg0.operator+=(arg1), "qt.QPoint");
+        return makeqtype<QPointType>(c, arg0 += arg1, "qt.QPoint");
     }
 
     Pointer qt_QPoint_operatorMinus_EQ__QPoint_QPoint_QPoint(Mu::Thread& NODE_THREAD, Pointer param_this, Pointer param_point)
@@ -160,7 +160,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
         const QPoint arg1 = getqtype<QPointType>(param_point);
-        return makeqtype<QPointType>(c, arg0.operator-=(arg1), "qt.QPoint");
+        return makeqtype<QPointType>(c, arg0 -= arg1, "qt.QPoint");
     }
 
     Pointer qt_QPoint_operatorSlash_EQ__QPoint_QPoint_double(Mu::Thread& NODE_THREAD, Pointer param_this, double param_divisor)
@@ -168,7 +168,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QPoint arg0 = getqtype<QPointType>(param_this);
         qreal arg1 = (double)(param_divisor);
-        return makeqtype<QPointType>(c, arg0.operator/=(arg1), "qt.QPoint");
+        return makeqtype<QPointType>(c, arg0 /= arg1, "qt.QPoint");
     }
 
     static NODE_IMPLEMENTATION(_n_QPoint0, Pointer)

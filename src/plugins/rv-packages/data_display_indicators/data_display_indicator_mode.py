@@ -60,7 +60,7 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
         pa = 1.0
         for a in attrs:
             if a[0] == "EXR/dataWindow":
-                clean = re.sub("[\(\)]", " ", a[1])
+                clean = re.sub(r"[\(\)]", " ", a[1])
                 parts = clean.split(" ")
 
                 dataX = float(parts[1])
@@ -69,7 +69,7 @@ class EXRWindowIndicatorMode(rvt.MinorMode):
                 dataH = float(parts[7]) + 1.0 - dataY
 
             if a[0] == "EXR/displayWindow":
-                clean = re.sub("[\(\)]", " ", a[1])
+                clean = re.sub(r"[\(\)]", " ", a[1])
                 parts = clean.split(" ")
 
                 dispX = float(parts[1])

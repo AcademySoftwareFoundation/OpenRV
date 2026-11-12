@@ -517,10 +517,19 @@ namespace TwkContainer
         }
     }
 
+    //
+    //  front() on an empty container is undefined behaviour (and asserts in
+    //  MSVC debug builds), so an empty property returns null.
+    //
     template <class Container, size_t xsize, size_t ysize, size_t zsize, size_t wsize, Property::Layout layout>
     typename TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::const_value_pointer
     TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::data() const
     {
+        if (m_container.empty())
+        {
+            return nullptr;
+        }
+
         return &(m_container.front());
     }
 
@@ -528,6 +537,11 @@ namespace TwkContainer
     typename TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::value_pointer
     TypedProperty<Container, xsize, ysize, zsize, wsize, layout>::data()
     {
+        if (m_container.empty())
+        {
+            return nullptr;
+        }
+
         return &(m_container.front());
     }
 

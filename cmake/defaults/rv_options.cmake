@@ -28,24 +28,6 @@ IF(NOT EXISTS (${RV_DEPS_DOWNLOAD_DIR}))
   FILE(MAKE_DIRECTORY ${RV_DEPS_DOWNLOAD_DIR})
 ENDIF()
 
-SET(RV_CPP_STANDARD
-    "17"
-    CACHE STRING "RV's general C++ coding standard"
-)
-SET_PROPERTY(
-  CACHE RV_CPP_STANDARD
-  PROPERTY STRINGS 14 17
-)
-
-SET(RV_C_STANDARD
-    "17"
-    CACHE STRING "RV's general C coding standard"
-)
-SET_PROPERTY(
-  CACHE RV_C_STANDARD
-  PROPERTY STRINGS C99 11 17
-)
-
 #
 # VFX Platform option
 #
@@ -82,6 +64,45 @@ SET_PROPERTY(
 )
 
 #
+# C/C++ standard options
+#
+# The C++ standard follows the VFX Reference Platform: CY2026 and later require C++20, earlier years stay on C++17. It is derived from RV_VFX_PLATFORM rather
+# than set by the user, so that the standard RV is built with always matches the one its dependencies are built with.
+#
+IF(RV_VFX_PLATFORM STRGREATER_EQUAL "CY2026")
+  SET(_RV_CPP_STANDARD
+      "20"
+  )
+ELSE()
+  SET(_RV_CPP_STANDARD
+      "17"
+  )
+ENDIF()
+
+# Re-derived on every configure (FORCE), like RV_VFX_PLATFORM above. Without it an existing build tree reconfigured to a newer VFX platform would keep the
+# standard cached by its first configure and silently build CY2026 with C++17.
+SET(RV_CPP_STANDARD
+    "${_RV_CPP_STANDARD}"
+    CACHE STRING "RV's general C++ coding standard" FORCE
+)
+SET_PROPERTY(
+  CACHE RV_CPP_STANDARD
+  PROPERTY STRINGS ${_RV_CPP_STANDARD}
+)
+
+# The C standard stays at C17 on every VFX platform. It is deliberately not tied to RV_CPP_STANDARD: there is no C20, and CMake silently ignores an invalid
+# C_STANDARD value (emitting no -std flag at all, which would un-pin the C standard). C17 is the newest C standard with universal MSVC/GCC/Clang support, and
+# the VFX Reference Platform pins only the C++ standard.
+SET(RV_C_STANDARD
+    "17"
+    CACHE STRING "RV's general C coding standard"
+)
+SET_PROPERTY(
+  CACHE RV_C_STANDARD
+  PROPERTY STRINGS 99 11 17
+)
+
+#
 # FFmpeg option
 #
 # This option is to control the version of FFmpeg that OpenRV downloads and installs.
@@ -95,7 +116,7 @@ SET(RV_FFMPEG_SUPPORTED_OPTIONS
 )
 # Default option
 SET(_RV_FFMPEG
-    "6"
+    "8"
 )
 
 IF(DEFINED RV_FFMPEG)

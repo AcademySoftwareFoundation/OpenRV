@@ -60,6 +60,10 @@ ADD_COMPILE_OPTIONS(
   -Zi
 )
 
+# Generate PDB files in Release builds for crash dump symbolication. /DEBUG tells the linker to emit a PDB. /OPT:REF and /OPT:ICF restore the dead-code
+# elimination and COMDAT folding that /DEBUG disables by default.
+ADD_LINK_OPTIONS("$<$<CONFIG:Release>:/DEBUG>" "$<$<CONFIG:Release>:/OPT:REF>" "$<$<CONFIG:Release>:/OPT:ICF>")
+
 # Increasing default stack size to 8MB which would be on par with Linux and most macOS versions. Visual Studio usually sets a 1MB default stack size which is
 # quite lower than what's available on macOS or Linux
 #

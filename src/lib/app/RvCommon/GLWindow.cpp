@@ -1,0 +1,749 @@
+//******************************************************************************
+// Copyright (c) 2007 Tweak Inc.
+// All rights reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+//******************************************************************************
+
+#ifdef PLATFORM_WINDOWS
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#endif
+
+#include <RvCommon/GLWindow.h>
+#include <RvCommon/GLView.h>
+#include <RvCommon/QTGLVideoDevice.h>
+#include <RvCommon/InitGL.h>
+#include <RvCommon/RvDocument.h>
+#include <RvApp/Options.h>
+#include <IPCore/Session.h>
+#include <IPCore/ImageRenderer.h>
+#include <TwkApp/Event.h>
+#include <TwkApp/VideoDevice.h>
+#include <TwkGLF/GLVideoDevice.h>
+#include <QOpenGLContext>
+#include <QKeyEvent>
+#include <QResizeEvent>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QApplication>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+
+namespace Rv
+{
+
+    namespace
+    {
+        //  Sets a flag for the duration of a scope. Declare it as a named
+        //  local: an unnamed temporary guards nothing.
+        struct ScopedFlag
+        {
+            explicit ScopedFlag(bool& f)
+                : m_flag(f)
+            {
+                m_flag = true;
+            }
+
+            ~ScopedFlag() { m_flag = false; }
+
+            ScopedFlag(const ScopedFlag&) = delete;
+            ScopedFlag& operator=(const ScopedFlag&) = delete;
+
+            bool& m_flag;
+        };
+
+        //  -debug gpu frame-time accumulators, mirroring VulkanWindow's.
+        struct GLFrameDiag
+        {
+            unsigned int frames{0};
+            double renderMs{0.0};
+            double outPresentMs{0.0};
+            //  Time between paintGL() entries; includes the implicit swap after paintGL.
+            double loopMs{0.0};
+        };
+
+        GLFrameDiag s_glDiag;
+        TwkUtil::Timer s_glDiagLoopTimer;
+
+        //
+        //  While a widget popup (e.g. the right-click menu) is open, hand it
+        //  the mouse presses and key events that land on this window, as
+        //  QWidgetWindow does for widget windows. This window is a plain
+        //  QWindow, so Qt does not do it for us. Without it, the popup on macOS
+        //  never sees the outside click or the Escape key that should close it,
+        //  because Cocoa popups do not grab input. X11 popups grab the pointer
+        //  and keyboard, so on Linux the events reach the popup anyway.
+        //
+        bool forwardToActivePopup(QEvent* event)
+        {
+            QWidget* popup = QApplication::activePopupWidget();
+            if (popup == nullptr)
+            {
+                return false;
+            }
+
+            switch (event->type())
+            {
+            case QEvent::MouseButtonPress:
+            case QEvent::MouseButtonDblClick:
+            {
+                //  The popup closes itself (and its parent menus) on a press
+                //  outside its rect.
+                const auto* mouseEvent = dynamic_cast<const QMouseEvent*>(event);
+                if (mouseEvent == nullptr)
+                {
+                    return false;
+                }
+
+                const QPointF globalPosition = mouseEvent->globalPosition();
+                QMouseEvent popupEvent(QEvent::MouseButtonPress, popup->mapFromGlobal(globalPosition), globalPosition, mouseEvent->button(),
+                                       mouseEvent->buttons(), mouseEvent->modifiers(), mouseEvent->pointingDevice());
+                QCoreApplication::sendEvent(popup, &popupEvent);
+                break;
+            }
+            case QEvent::KeyPress:
+            case QEvent::KeyRelease:
+            {
+                QWidget* receiver = popup->focusWidget() != nullptr ? popup->focusWidget() : popup;
+                QCoreApplication::sendEvent(receiver, event);
+                break;
+            }
+            default:
+                return false;
+            }
+
+            event->accept();
+            return true;
+        }
+    } // namespace
+
+    using namespace std;
+    using namespace TwkApp;
+    using namespace IPCore;
+
+    GLWindow::GLWindow(QOpenGLContext* sharedContext, RvDocument* doc, bool stereo, bool vsync, bool doubleBuffer, int red, int green,
+                       int blue, int alpha, bool noResize)
+        : QOpenGLWindow(QOpenGLWindow::NoPartialUpdate)
+        , m_doc(doc)
+        , m_red(red)
+        , m_green(green)
+        , m_blue(blue)
+        , m_alpha(alpha)
+        , m_lastKey(0)
+        , m_lastKeyType(QEvent::None)
+        , m_userActive(true)
+        , m_firstPaintCompleted(false)
+        , m_postFirstNonEmptyRender(noResize)
+        , m_stopProcessingEvents(false)
+        , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
+        , m_syncingDevicePixelRatio(false)
+        , m_profilingSwapPending(false)
+        , m_sharedContext(sharedContext)
+    {
+        setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
+
+        m_videoDevice = nullptr; // set later by the hosting GLView
+
+        m_activityTimer.start();
+
+        m_eventProcessingTimer.setSingleShot(true);
+        connect(&m_eventProcessingTimer, SIGNAL(timeout()), this, SLOT(eventProcessingTimeout()));
+
+        //  Queued: screenChanged() is emitted before devicePixelRatio()
+        //  reports the new value.
+        connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
+
+        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::endProfilingSwap);
+    }
+
+    GLWindow::~GLWindow() {}
+
+    void GLWindow::stopProcessingEvents() { m_stopProcessingEvents = true; }
+
+    void GLWindow::endProfilingSwap()
+    {
+        if (!m_profilingSwapPending)
+        {
+            return;
+        }
+
+        m_profilingSwapPending = false;
+
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+        if (session != nullptr)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
+        }
+    }
+
+    void GLWindow::eventProcessingTimeout() { m_doc->session()->userGenericEvent("per-render-event-processing", ""); }
+
+    float GLWindow::devicePixelRatioF() const { return static_cast<float>(devicePixelRatio()); }
+
+    void GLWindow::absolutePosition(int& x, int& y) const
+    {
+        QPoint gp = mapToGlobal(QPoint(0, 0));
+        x = gp.x();
+        y = gp.y();
+    }
+
+    void GLWindow::initializeGL()
+    {
+        if (context()->isValid())
+        {
+            initializeGLExtensions();
+            initializeOpenGLFunctions();
+
+            if (m_sharedContext)
+            {
+                context()->setShareContext(m_sharedContext);
+            }
+
+            //
+            //  NOTE: session initialization is deliberately NOT driven from
+            //  here. Loading packages creates web panels, and adding a
+            //  QWebEngineView makes Qt tear down the main window's native
+            //  subtree -- destroying this very window while this method is
+            //  still on the stack, so every later member access is a
+            //  use-after-free. RvApplication::newSessionFromFiles() calls
+            //  RvDocument::initializeSession() after show() instead, with no
+            //  GL callback in the call chain.
+            //
+
+            QSurfaceFormat f = context()->format();
+
+            //  One-shot -debug gpu baseline: requested vs negotiated format, driver and display server.
+            static bool baselineLogged = false;
+            if (ImageRenderer::debugGpu() && !baselineLogged)
+            {
+                baselineLogged = true;
+
+                QScreen* scr = screen();
+                if (!scr)
+                {
+                    scr = QGuiApplication::primaryScreen();
+                }
+
+                const GLubyte* glVendor = glGetString(GL_VENDOR);
+                const GLubyte* glRenderer = glGetString(GL_RENDERER);
+                const GLubyte* glVersion = glGetString(GL_VERSION);
+                const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+                cout << "INFO: GLWindow runtime baseline begin" << endl;
+                cout << "INFO: Qt platform name: " << QGuiApplication::platformName().toStdString() << endl;
+                cout << "INFO: Qt version: " << qVersion() << endl;
+                cout << "INFO: Constructor-requested color bits: rgba " << m_red << " " << m_green << " " << m_blue << " " << m_alpha
+                     << endl;
+                cout << "INFO: QOpenGLWindow::format() (post-negotiation): " << glDebugFormatSummary(format()) << endl;
+                cout << "INFO: Actual QOpenGLContext format: " << glDebugFormatSummary(f) << endl;
+                if (scr)
+                {
+                    cout << "INFO: Screen name: " << scr->name().toStdString() << ", depth: " << scr->depth() << endl;
+                }
+                else
+                {
+                    cout << "INFO: Screen name: <unknown>, depth: <unknown>" << endl;
+                }
+
+                cout << "INFO: GL vendor: " << (glVendor ? reinterpret_cast<const char*>(glVendor) : "<unknown>") << endl;
+                cout << "INFO: GL renderer: " << (glRenderer ? reinterpret_cast<const char*>(glRenderer) : "<unknown>") << endl;
+                cout << "INFO: GL version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "<unknown>") << endl;
+                cout << "INFO: GLSL version: " << (glslVersion ? reinterpret_cast<const char*>(glslVersion) : "<unknown>") << endl;
+#ifdef PLATFORM_LINUX
+                cout << "INFO: Linux display env: XDG_SESSION_TYPE=" << glDebugEnvOrUnset("XDG_SESSION_TYPE")
+                     << ", WAYLAND_DISPLAY=" << glDebugEnvOrUnset("WAYLAND_DISPLAY") << ", DISPLAY=" << glDebugEnvOrUnset("DISPLAY")
+                     << ", XDG_CURRENT_DESKTOP=" << glDebugEnvOrUnset("XDG_CURRENT_DESKTOP")
+                     << ", DESKTOP_SESSION=" << glDebugEnvOrUnset("DESKTOP_SESSION") << endl;
+#endif
+                cout << "INFO: GLWindow runtime baseline end" << endl;
+            }
+
+#ifndef PLATFORM_DARWIN
+            if (f.redBufferSize() != m_red && m_red != 0)
+            {
+                ostringstream str;
+                str << "WARNING: asked for"
+                    << " " << m_red << " " << m_green << " " << m_blue << " " << m_alpha << " RGBA color but got"
+                    << " " << f.redBufferSize() << " " << f.greenBufferSize() << " " << f.blueBufferSize() << " "
+                    << (f.alphaBufferSize() <= 0 ? 0 : f.alphaBufferSize()) << " RGBA instead";
+                cout << str.str() << endl;
+            }
+#endif
+            if (f.stencilBufferSize() == 0)
+            {
+                cout << "WARNING: no stencil buffer available" << endl;
+            }
+        }
+        else
+        {
+            cout << "WARNING: invalid GL context" << endl;
+        }
+    }
+
+    void GLWindow::resizeGL(int w, int h)
+    {
+        if (m_doc)
+            m_doc->viewSizeChanged(w, h);
+    }
+
+    void GLWindow::syncDevicePixelRatio()
+    {
+        const auto currentRatio = static_cast<float>(devicePixelRatio());
+
+        //  Below any real difference between two displays, above the
+        //  last-bit jitter a fractionally scaled ratio can show.
+        constexpr float DevicePixelRatioTolerance = 1e-4f;
+
+        if (std::abs(currentRatio - m_devicePixelRatio) < DevicePixelRatioTolerance || m_syncingDevicePixelRatio)
+        {
+            return;
+        }
+
+        //  Everything below re-enters this function.
+        const ScopedFlag syncing(m_syncingDevicePixelRatio);
+
+        m_devicePixelRatio = currentRatio;
+
+        //  Qt only pushes a new surface size down on a change of *logical*
+        //  geometry, so a DPI change leaves the drawable at the old pixel size
+        //  and GL clips the frame to it. A one-pixel round trip forces the
+        //  push; RvDocument::showEvent() does the same on first show.
+        const QSize restore = size();
+        resize(restore.width() + 1, restore.height());
+        resize(restore);
+
+        //  Flushes the renderer's image FBOs and fires "view-size-changed".
+        //  Idempotent: resizeGL() does it too where the poke is synchronous.
+        if (m_doc)
+        {
+            m_doc->viewSizeChanged(width(), height());
+        }
+
+        requestUpdate();
+    }
+
+    QImage GLWindow::readPixels(int x, int y, int w, int h)
+    {
+        const int pw = width() * devicePixelRatio();
+        const int ph = height() * devicePixelRatio();
+
+        // If out of bounds, return an empty image.
+        if (x < 0 || y < 0 || (x + w) > pw || (y + h) > ph)
+            return QImage(0, 0, QImage::Format_RGBA8888);
+
+        if (m_videoDevice)
+            m_videoDevice->makeCurrent();
+        else
+            makeCurrent();
+
+        QImage image(w, h, QImage::Format_RGBA8888);
+        glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+
+        return image;
+    }
+
+    void GLWindow::paintGL()
+    {
+        TWK_GLDEBUG;
+
+        constexpr double msPerSecond = 1000.0;
+
+        IPCore::Session* session = m_doc->session();
+        const bool debug = IPCore::debugProfile && session != nullptr;
+
+        if (!m_postFirstNonEmptyRender && session && session->postFirstNonEmptyRender())
+        {
+            m_postFirstNonEmptyRender = true;
+
+            if (!session->isFullScreen())
+            {
+                m_doc->resizeToFit(false, false);
+                m_doc->center();
+                TWK_GLDEBUG;
+            }
+        }
+
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->beginProfilingSample();
+            trecord.renderStart = session->profilingElapsedTime();
+        }
+
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            if (s_glDiagLoopTimer.isRunning())
+            {
+                s_glDiag.loopMs += s_glDiagLoopTimer.elapsed() * msPerSecond;
+            }
+            s_glDiagLoopTimer.start();
+        }
+
+        if (m_doc && session && m_videoDevice)
+        {
+            m_videoDevice->makeCurrent();
+            TWK_GLDEBUG;
+
+            if (m_userActive && m_activityTimer.elapsed() > 1.0)
+            {
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible())
+                {
+                    TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
+                    m_videoDevice->sendEvent(aevent);
+                    TWK_GLDEBUG;
+                    m_userActive = false;
+                }
+            }
+
+            //
+            //  Make sure the video device knows where it is on screen.
+            //
+            int x = 0, y = 0;
+            absolutePosition(x, y);
+            m_videoDevice->setAbsolutePosition(x, y);
+
+            TWK_GLDEBUG;
+            const bool diagTiming = IPCore::ImageRenderer::debugGpu();
+            Timer diagTimer;
+            if (diagTiming)
+            {
+                diagTimer.start();
+            }
+
+            session->render();
+
+            if (diagTiming)
+            {
+                s_glDiag.renderMs += diagTimer.elapsed() * msPerSecond;
+            }
+            TWK_GLDEBUG;
+
+            m_firstPaintCompleted = true;
+
+            // Force the resulting alpha channel to 1 so the surface is fully
+            // opaque (matches the former GLView behavior).
+            glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, QOpenGLContext::currentContext()->defaultFramebufferObject());
+            TWK_GLDEBUG;
+            glPushAttrib(GL_COLOR_BUFFER_BIT);
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glPopAttrib();
+            TWK_GLDEBUG;
+        }
+        else
+        {
+            glClearColor(0.f, 0.f, 0.f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            TWK_GLDEBUG;
+        }
+
+        if (m_stopProcessingEvents || session == nullptr)
+        {
+            return;
+        }
+
+        if (debug)
+        {
+            Session::ProfilingRecord& trecord = session->currentProfilingSample();
+            trecord.renderEnd = session->profilingElapsedTime();
+            trecord.swapStart = trecord.renderEnd;
+        }
+
+        // If a separate output device is presenting, sync it. The control
+        // (window) surface presents itself: QOpenGLWindow swaps automatically
+        // after paintGL returns.
+        const bool diagPresent = IPCore::ImageRenderer::debugGpu();
+        Timer diagPresentTimer;
+
+        if (session->outputVideoDevice() != m_videoDevice)
+        {
+            if (diagPresent)
+            {
+                diagPresentTimer.start();
+            }
+
+            session->outputVideoDevice()->syncBuffers();
+
+            if (diagPresent)
+            {
+                s_glDiag.outPresentMs += diagPresentTimer.elapsed() * msPerSecond;
+            }
+
+            if (debug)
+            {
+                Session::ProfilingRecord& trecord = session->currentProfilingSample();
+                trecord.swapEnd = session->profilingElapsedTime();
+                session->endProfilingSample();
+            }
+        }
+        else if (debug)
+        {
+            m_profilingSwapPending = true;
+        }
+
+        session->addSyncSample();
+        session->postRender();
+
+        //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
+        if (IPCore::ImageRenderer::debugGpu())
+        {
+            if (++s_glDiag.frames >= 60)
+            {
+                const double frameCount = static_cast<double>(s_glDiag.frames);
+                const double loopMs = s_glDiag.loopMs / frameCount;
+                cout << "INFO: GLWindow frame avg over " << s_glDiag.frames << ": session->render()=" << (s_glDiag.renderMs / frameCount)
+                     << "ms  outputPresent=" << (s_glDiag.outPresentMs / frameCount)
+                     << "ms  total=" << ((s_glDiag.renderMs + s_glDiag.outPresentMs) / frameCount) << "ms  frameInterval=" << loopMs
+                     << "ms (" << (loopMs > 0.0 ? msPerSecond / loopMs : 0.0) << " fps)" << endl;
+                s_glDiag = {};
+            }
+        }
+
+        m_eventProcessingTimer.start();
+
+        TWK_GLDEBUG;
+    }
+
+    bool GLWindow::eventFilter(QObject* /*object*/, QEvent* event)
+    {
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease || event->type() == QEvent::Shortcut
+            || event->type() == QEvent::ShortcutOverride)
+        {
+            //
+            //  Qt can deliver both ShortcutOverride and KeyPress for the same
+            //  key; filter the duplicate here. Remember the new key/type,
+            //  otherwise any number of ShortcutOverride/Press pairs get
+            //  filtered out and auto-repeat doesn't work.
+            //
+            if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
+            {
+                if (m_lastKey == kevent->key()
+                    && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress)
+                        || (m_lastKeyType == kevent->type())))
+                {
+                    m_lastKey = kevent->key();
+                    m_lastKeyType = kevent->type();
+                    event->accept();
+                    return true;
+                }
+
+                m_lastKeyType = kevent->type();
+                m_lastKey = kevent->key();
+            }
+
+            Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+            if (session != nullptr && m_videoDevice != nullptr)
+            {
+                session->setEventVideoDevice(m_videoDevice);
+                m_videoDevice->translator().sendQTEvent(event);
+            }
+
+            event->accept();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool GLWindow::event(QEvent* event)
+    {
+        //  Before the base class paints, else one frame presents at the wrong
+        //  scale. UpdateRequest comes from requestUpdate(), Paint from a
+        //  backing-scale change.
+        switch (event->type())
+        {
+        case QEvent::UpdateRequest:
+        case QEvent::Paint:
+        case QEvent::Expose:
+        case QEvent::Move:
+            syncDevicePixelRatio();
+            break;
+        default:
+            break;
+        }
+
+        // The device (and its translator) is wired by the hosting GLView just
+        // after construction; ignore any events that arrive before then.
+        if (!m_videoDevice)
+            return QOpenGLWindow::event(event);
+
+        bool keyevent = false;
+        Rv::Session* session = m_doc->session();
+
+        if (m_stopProcessingEvents)
+        {
+            event->accept();
+            return true;
+        }
+
+        if (forwardToActivePopup(event))
+        {
+            return true;
+        }
+
+        if (event->type() == QEvent::WindowActivate)
+            m_activationTimer.start();
+
+        float activationTime = 0.0;
+        if (m_activationTimer.isRunning())
+        {
+            if (event->type() == QEvent::MouseButtonPress)
+            {
+                activationTime = m_activationTimer.elapsed();
+                m_activationTimer.stop();
+            }
+            if (event->type() == QEvent::MouseMove)
+                m_activationTimer.stop();
+        }
+
+        if (event->type() != QEvent::Paint && event->type() != QEvent::UpdateRequest)
+        {
+            m_activityTimer.stop();
+            m_activityTimer.start();
+
+            if (!m_userActive)
+            {
+                TwkApp::ActivityChangeEvent aevent("user-active", m_videoDevice);
+                m_userActive = true;
+                m_videoDevice->sendEvent(aevent);
+            }
+        }
+
+        if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+        {
+            keyevent = true;
+
+            if (m_lastKey == kevent->key()
+                && (m_lastKeyType == QEvent::ShortcutOverride && (kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
+            {
+                m_lastKey = kevent->key();
+                m_lastKeyType = kevent->type();
+                event->accept();
+                return true;
+            }
+
+            m_lastKeyType = kevent->type();
+            m_lastKey = kevent->key();
+        }
+
+        switch (event->type())
+        {
+        case QEvent::FocusIn:
+            //
+            //  Qt has already made this the focus window by the time FocusIn is
+            //  delivered, so there is nothing to activate here. The case exists
+            //  only to drop modifier state that went stale while the keyboard
+            //  was elsewhere. (The missing break let execution fall into the
+            //  hover case below.)
+            //
+            m_videoDevice->translator().resetModifiers();
+            break;
+
+        case QEvent::Enter:
+            //
+            //  Hovering hands the keyboard to the viewport as a *widget* focus
+            //  change, never as a window activation. QWidget::setFocus() only
+            //  delivers FocusIn when the top-level is already active; otherwise
+            //  it just records the window's focus_child and the keyboard arrives
+            //  once the user activates RV. That is what keeps a hover from
+            //  stealing activation from another top-level of ours (the Console)
+            //  or from another application: requestActivate() on a native child
+            //  window activates the whole top-level, and on Windows it will even
+            //  AttachThreadInput/SetForegroundWindow when RV is not the active
+            //  application.
+            //
+            //  The container is GLView's focus proxy, so setFocus() on the view
+            //  lands on it, and QWindowContainer turns its FocusIn into the
+            //  QWindow::requestActivate() that hands the keyboard to this
+            //  window -- the same path RvDocument and the Mu commands use.
+            //
+            //  Skipped when this window already holds focus: QWindowContainer
+            //  clears the container's widget focus once it has handed focus
+            //  over, so a repeat FocusIn would take its "return to the normal
+            //  focus chain" branch and push the keyboard to the next widget in
+            //  the tab chain instead. QWidget::setFocus()'s own focusWidget()
+            //  early-out did this for us on the widget-based viewport.
+            //
+            if (QGuiApplication::focusWindow() != this)
+            {
+                if (GLView* view = m_doc ? m_doc->view() : nullptr)
+                    view->setFocus(Qt::MouseFocusReason);
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        if (session && session->outputVideoDevice()
+            && session->outputVideoDevice()->displayMode() == TwkApp::VideoDevice::MirrorDisplayMode)
+        {
+            if (const TwkApp::VideoDevice* cdv = session->controlVideoDevice())
+            {
+                const TwkApp::VideoDevice* odv = session->outputVideoDevice();
+
+                if (odv && cdv != odv && cdv == m_videoDevice)
+                {
+                    const float w = width();
+                    const float h = height();
+                    const float ow = odv->width();
+                    const float oh = odv->height();
+
+                    const float aspect = w / h;
+                    const float oaspect = ow / oh;
+
+                    m_videoDevice->translator().setRelativeDomain(ow, oh);
+
+                    if (aspect >= oaspect)
+                    {
+                        const float yscale = oh / h;
+                        const float xscale = yscale;
+                        const float xoffset = -(w * yscale - ow) / 2.0;
+                        m_videoDevice->translator().setScaleAndOffset(xoffset, 0.0, xscale, yscale);
+                    }
+                    else
+                    {
+                        const float xscale = ow / w;
+                        const float yscale = xscale;
+                        const float yoffset = -(xscale * h - oh) / 2.0;
+                        m_videoDevice->translator().setScaleAndOffset(0.0, yoffset, xscale, yscale);
+                    }
+                }
+                else
+                {
+                    m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0, 1.0);
+                    m_videoDevice->translator().setRelativeDomain(width(), height());
+                }
+            }
+            else
+            {
+                m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0, 1.0);
+                m_videoDevice->translator().setRelativeDomain(width(), height());
+            }
+        }
+        else
+        {
+            m_videoDevice->translator().setScaleAndOffset(0, 0, 1.0, 1.0);
+            m_videoDevice->translator().setRelativeDomain(width(), height());
+        }
+
+        if (session)
+            session->setEventVideoDevice(m_videoDevice);
+
+        if (m_videoDevice->translator().sendQTEvent(event, activationTime))
+        {
+            event->accept();
+            return true;
+        }
+
+        return QOpenGLWindow::event(event);
+    }
+
+} // namespace Rv

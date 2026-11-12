@@ -63,8 +63,8 @@ RUN dnf groupinstall "Development Tools" -y \
     libxkbfile \
     mesa-libGLU \
     mesa-libGLU-devel \
-    mesa-libOSMesa \
-    mesa-libOSMesa-devel \
+    mesa-compat-libOSMesa \
+    mesa-compat-libOSMesa-devel \
     meson \
     nasm \
     ncurses-devel \

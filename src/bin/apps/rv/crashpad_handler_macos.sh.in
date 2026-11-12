@@ -1,0 +1,10 @@
+#!/bin/sh
+# Thin wrapper around crashpad_handler that redirects its stderr to a log file.
+#
+# Keeps crashpad_handler diagnostics out of the terminal while preserving them
+# on disk next to the crash dumps for debugging.
+#
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOG_DIR="${RV_CRASH_DUMPS_DIR:-$HOME/Library/Logs/@RV_INTERNAL_ORGANIZATION_NAME@/Crashes}"
+mkdir -p "$LOG_DIR"
+exec "${SCRIPT_DIR}/crashpad_handler" "$@" 2>>"${LOG_DIR}/crashpad_handler.log"

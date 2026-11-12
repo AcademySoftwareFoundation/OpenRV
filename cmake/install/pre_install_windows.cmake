@@ -5,6 +5,8 @@
 #
 
 FUNCTION(before_copy_platform FILE_PATH RET_VAL)
+  # PDB debug symbols are not shipped to customers; they are archived separately for offline crash symbolication via the 'symbols_archive' build target (see
+  # docs/crash-reporting.md, section 7). Strip them from Release (customer) installs while keeping them for local Debug installs.
   IF(FILE_PATH MATCHES "\\.pdb$")
     IF(CMAKE_INSTALL_CONFIG_NAME MATCHES "^Release$")
       SET(${RET_VAL}

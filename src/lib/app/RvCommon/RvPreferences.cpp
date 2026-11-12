@@ -38,6 +38,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <TwkQtCoreUtil/QtConvert.h>
+#include <RvApp/Options.h>
 #include <RvApp/RvSession.h>
 #include <TwkApp/Bundle.h>
 #include <TwkApp/VideoDevice.h>
@@ -127,6 +128,9 @@ namespace Rv
         connect(m_ui.exrAutoThreadsToggle, SIGNAL(stateChanged(int)), this, SLOT(exrAutoThreads(int)));
         connect(m_ui.exrNumThreadsEdit, SIGNAL(textChanged(const QString&)), this, SLOT(exrThreadNumChanged(const QString&)));
         setWindowTitle(UI_APPLICATION_NAME " Preferences");
+
+        // Auxiliary window: never keeps RV alive.
+        setAttribute(Qt::WA_QuitOnClose, false);
 
 #ifndef PLATFORM_DARWIN
         m_ui.appleClientStorageToggle->setEnabled(false);
@@ -1870,7 +1874,7 @@ namespace Rv
     {
         if (m_ui.exrNumThreadsEdit->text() == "0")
         {
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+            Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
         }
         else
         {
@@ -1885,7 +1889,7 @@ namespace Rv
             m_ui.exrNumThreadsEdit->setText("0");
             m_ui.exrNumThreadsEdit->setEnabled(false);
             m_ui.exrThreadsLabel->setEnabled(false);
-            Imf::setGlobalThreadCount(TwkUtil::SystemInfo::numCPUs() > 1 ? (TwkUtil::SystemInfo::numCPUs() - 1) : 1);
+            Imf::setGlobalThreadCount(Rv::automaticExrThreadCount());
         }
         else
         {
@@ -2970,13 +2974,8 @@ namespace Rv
         if (p.version != "")
             str << "<tr><td align=right> <b>Version</b> </td><td> " << p.version.toUtf8().data() << " </td></tr>";
 
-        if (p.requires != "")
-        str << "<tr><td align=right> <b>Requires</b> </td><td> "
-            << p.
-                   requires
-            .toUtf8()
-            .data()
-            << " </td></tr>";
+        if (p.requiresList != "")
+            str << "<tr><td align=right> <b>Requires</b> </td><td> " << p.requiresList.toUtf8().data() << " </td></tr>";
 
         if (p.rvversion != "")
             str << "<tr><td align=right> <b>RV Version</b> </td><td> " << p.rvversion.toUtf8().data() << " </td></tr>";
@@ -3000,20 +2999,13 @@ namespace Rv
         {
             str << "<li>" << p.modes[q].file.toUtf8().data() << "</li>\n";
 
-            if (p.modes[q].requires.size())
+            if (p.modes[q].requiresList.size())
             {
                 str << "\nRequires<ul>";
 
-                for (int i = 0; i < p.modes[q].requires.size(); i++)
+                for (int i = 0; i < p.modes[q].requiresList.size(); i++)
                 {
-                    str << "<li>"
-                        << p.modes[q]
-                               .
-                               requires[
-                                       i]
-                               .toUtf8()
-                               .data()
-                        << "</li>\n";
+                    str << "<li>" << p.modes[q].requiresList[i].toUtf8().data() << "</li>\n";
                 }
 
                 str << "</ul>\n";

@@ -16,6 +16,7 @@
 #endif
 #endif
 
+#include <type_traits>
 #include <QtCore/QtCore>
 #include <QtGui/QtGui>
 #include <QtWidgets/QtWidgets>
@@ -42,20 +43,124 @@
 #include <MuQt6/QPointType.h>
 #include <MuQt6/QRectType.h>
 #include <MuQt6/QItemSelectionType.h>
+//
+//  The QSignalSpy-based implementation reads QSignalSpy's private members,
+//  hence the "private" hack. RV_MUQT_SIGNALSPY_OWN_CONNECT comes from the
+//  command line (see MuQt6/CMakeLists.txt), so it is already visible here.
+//
+#ifndef RV_MUQT_SIGNALSPY_OWN_CONNECT
 #define private public
+#endif
 #include <MuQt6/SignalSpy.h>
+#ifndef RV_MUQT_SIGNALSPY_OWN_CONNECT
 #undef private
+#endif
 
 namespace Mu
 {
     using namespace std;
 
+#ifdef RV_MUQT_SIGNALSPY_OWN_CONNECT
+
+    const QList<int>& SignalSpy::signalArgTypes() const { return _signalArgTypes; }
+
+    //
+    //  Resolve the signal and connect it to this object. This is what
+    //  QSignalSpy's constructor used to do for us before Qt 6.8 made it a
+    //  non-QObject; the incoming string is in SIGNAL() form, i.e. the
+    //  QSIGNAL_CODE digit followed by the normalized signature (see
+    //  signalName() in qtModule.cpp).
+    //
+    bool SignalSpy::connectToSignal(QObject* sender, const char* sig)
+    {
+        if (!sender || !sig)
+        {
+            cout << "WARNING: SignalSpy: null sender or signal" << endl;
+            return false;
+        }
+
+        //  Skip the SIGNAL() code digit if present.
+        const char* signature = sig;
+        if (((signature[0] - '0') & 0x03) == QSIGNAL_CODE)
+            signature++;
+
+        const QByteArray name = QMetaObject::normalizedSignature(signature);
+        const QMetaObject* mo = sender->metaObject();
+        const int index = mo->indexOfMethod(name.constData());
+
+        if (index < 0)
+        {
+            cout << "WARNING: SignalSpy: no such signal: " << name.constData() << endl;
+            return false;
+        }
+
+        const QMetaMethod member = mo->method(index);
+
+        //
+        //  Remember the metatypes of the signal's arguments. qt_metacall()
+        //  needs them to turn the void** it receives into QVariants. Enum and
+        //  flag arguments are often not registered metatypes, so fall back to
+        //  asking the sender to register them, exactly as QSignalSpy did.
+        //
+        _signalArgTypes.reserve(member.parameterCount());
+
+        for (int i = 0; i < member.parameterCount(); i++)
+        {
+            QMetaType type = member.parameterMetaType(i);
+
+            if (!type.isValid())
+            {
+                void* argv[] = {&type, &i};
+                QMetaObject::metacall(sender, QMetaObject::RegisterMethodArgumentMetaType, member.methodIndex(), argv);
+            }
+
+            if (!type.isValid())
+            {
+                cout << "WARNING: SignalSpy: unhandled argument type " << member.parameterTypeName(i).constData() << " of "
+                     << name.constData() << ": use qRegisterMetaType to register it" << endl;
+            }
+
+            _signalArgTypes << type.id();
+        }
+
+        if (!QMetaObject::connect(sender, index, this, QObject::staticMetaObject.methodCount(), Qt::DirectConnection, nullptr))
+        {
+            cout << "WARNING: SignalSpy: failed to connect to " << name.constData() << endl;
+            return false;
+        }
+
+        return true;
+    }
+
+#else // !RV_MUQT_SIGNALSPY_OWN_CONNECT
+
+    static_assert(std::is_base_of<QObject, QSignalSpy>::value,
+                  "QSignalSpy is not a QObject with this Qt version, so SignalSpy cannot derive from it. "
+                  "Lower the QT_VERSION bound guarding RV_MUQT_SIGNALSPY_OWN_CONNECT in SignalSpy.h.");
+
+    //  QSignalSpy::args is private; reachable here thanks to the "private" hack above.
+    const QList<int>& SignalSpy::signalArgTypes() const { return args; }
+
+#endif // RV_MUQT_SIGNALSPY_OWN_CONNECT
+
     SignalSpy::SignalSpy(QObject* o, const char* sig, const Function* F, Process* p)
+#ifdef RV_MUQT_SIGNALSPY_OWN_CONNECT
+        : QObject(nullptr)
+        , _F(F)
+        , _process(p)
+        , _env(p->callEnv())
+        , _valid(false)
+#else
         : QSignalSpy(o, sig)
         , _F(F)
         , _process(p)
         , _env(p->callEnv())
+#endif
     {
+#ifdef RV_MUQT_SIGNALSPY_OWN_CONNECT
+        _valid = connectToSignal(o, sig);
+#endif
+
         const MuLangContext* c = static_cast<const MuLangContext*>(p->context());
         _argTypes.resize(F->numArgs());
 
@@ -142,7 +247,7 @@ namespace Mu
 
             for (size_t i = 0; i < _argTypes.size(); i++)
             {
-                // QMetaType type = QMetaType(this->args.at(i));
+                // QMetaType type = QMetaType(signalArgTypes().at(i));
                 // cout << "type = " << QMetaType::typeName(type) << endl;
 
                 switch (_argTypes[i])
@@ -199,7 +304,7 @@ namespace Mu
 
                 case TreeItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QTreeWidgetItem* o = v.value<QTreeWidgetItem*>();
                     args[i]._Pointer = !o ? NULL : makeqpointer<QTreeWidgetItemType>((QTreeWidgetItemType*)_F->argType(i), o);
@@ -208,7 +313,7 @@ namespace Mu
 
                 case TableItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QTableWidgetItem* o = v.value<QTableWidgetItem*>();
                     args[i]._Pointer = !o ? NULL : makeqpointer<QTableWidgetItemType>((QTableWidgetItemType*)_F->argType(i), o);
@@ -217,7 +322,7 @@ namespace Mu
 
                 case ListItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QListWidgetItem* o = v.value<QListWidgetItem*>();
                     args[i]._Pointer = !o ? NULL : makeqpointer<QListWidgetItemType>((QListWidgetItemType*)_F->argType(i), o);
@@ -226,7 +331,7 @@ namespace Mu
 
                 case StandardItemArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QStandardItem* o = v.value<QStandardItem*>();
                     args[i]._Pointer = !o ? NULL : makeqpointer<QStandardItemType>((QStandardItemType*)_F->argType(i), o);
@@ -235,7 +340,7 @@ namespace Mu
 
                 case ModelIndexArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QModelIndex o = v.value<QModelIndex>();
                     args[i]._Pointer = makeqtype<QModelIndexType>((Context*)c, o, "qt.QModelIndex");
@@ -244,7 +349,7 @@ namespace Mu
 
                 case ItemSelectionArg:
                 {
-                    QMetaType type = QMetaType(this->args.at(i));
+                    QMetaType type = QMetaType(signalArgTypes().at(i));
                     QVariant v(type, a[i + 1]);
                     QItemSelection o = v.value<QItemSelection>();
                     args[i]._Pointer = makeqtype<QItemSelectionType>((Context*)c, o, "qt.QItemSelection");

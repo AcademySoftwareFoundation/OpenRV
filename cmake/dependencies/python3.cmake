@@ -42,6 +42,25 @@ SET(_numpy_version
     "${RV_DEPS_NUMPY_VERSION}"
 )
 
+SET(_cryptography_version
+    "${RV_DEPS_CRYPTOGRAPHY_VERSION}"
+)
+
+SET(_pydantic_version
+    "${RV_DEPS_PYDANTIC_VERSION}"
+)
+
+# Cython is only constrained on the VFX platforms whose numpy leaves its own Cython build requirement unbounded. See src/build/pip-build-constraints.txt.in.
+IF(RV_DEPS_CYTHON_VERSION)
+  SET(_cython_constraint
+      "Cython==${RV_DEPS_CYTHON_VERSION}"
+  )
+ELSE()
+  SET(_cython_constraint
+      "# Cython intentionally unconstrained: this platform's numpy pins its own Cython upper bound."
+  )
+ENDIF()
+
 SET(_python3_download_url
     "https://github.com/python/cpython/archive/refs/tags/v${_python3_version}.zip"
 )
@@ -68,11 +87,28 @@ SET(_build_dir
     ${RV_DEPS_BASE_DIR}/${_python3_target}/build
 )
 
+# PySide6's pyside-tools and standalone packaging assume Qt Designer/Assistant/Linguist were bundled. macOS .app installs, Linux patchelf rpath patching, and
+# Windows/Linux designer-plugin copies all fail when the Qt build does not ship those tools. CY2026's Qt 6.8 build omits Designer; the patch makes each step
+# skip-with-warning like the individual tool file install loop. It also backports the PySide 6.10 fix that finds Windows debug modules (QtCore_d.pyd), which pyi
+# generation needs.
+SET(_pyside_patch_command
+    ${CMAKE_COMMAND} -E true
+)
+IF(RV_VFX_PLATFORM STREQUAL CY2026)
+  SET(_pyside_patch_script
+      "${PROJECT_SOURCE_DIR}/src/build/apply_pyside6_tools_patch.py"
+  )
+  SET(_pyside_patch_command
+      python3 "${_pyside_patch_script}" "<SOURCE_DIR>" "${CMAKE_CURRENT_LIST_DIR}/patch"
+  )
+ENDIF()
+
 FETCHCONTENT_DECLARE(
   ${_pyside_target}
   URL ${_pyside_archive_url}
   URL_HASH MD5=${_pyside_download_hash}
   SOURCE_SUBDIR "sources" # Avoids the top level CMakeLists.txt
+  PATCH_COMMAND ${_pyside_patch_command}
 )
 
 FETCHCONTENT_MAKEAVAILABLE(${_pyside_target})
@@ -250,6 +286,26 @@ SET(_requirements_output_file
 
 CONFIGURE_FILE(${_requirements_input_file} ${_requirements_output_file} @ONLY)
 
+# Generate pip-build-constraints.txt from template. Unlike requirements.txt this one is exported as PIP_CONSTRAINT/PIP_BUILD_CONSTRAINT so that pip's PEP 517
+# build-isolation environments inherit our pins: format control propagates into those environments but version pins do not.
+SET(_pip_build_constraints_input_file
+    "${PROJECT_SOURCE_DIR}/src/build/pip-build-constraints.txt.in"
+)
+SET(_pip_constraint_file
+    "${CMAKE_BINARY_DIR}/pip-build-constraints.txt"
+)
+
+CONFIGURE_FILE(${_pip_build_constraints_input_file} ${_pip_constraint_file} @ONLY)
+
+# Both env vars point at the same file and must be absolute paths: pip's build-environment subprocesses run with their working directory inside the unpacked
+# source distribution. The python -s -E -I flags below do not strip either, -E only ignores PYTHON* variables. PIP_CONSTRAINT pins the outer/main resolve
+# (requirements.txt itself, and build-isolation envs on pip < 26.2). PIP_BUILD_CONSTRAINT pins build-isolation envs on pip >= 26.2, where PIP_CONSTRAINT was
+# deprecated for that purpose (pip issue: build constraints must be requested explicitly via --build-constraint / PIP_BUILD_CONSTRAINT). RV_PYTHON_BUILD_DEPS
+# installs an unpinned "pip", so the newest pip is always in play and both variables are needed for the fix to hold across pip versions.
+SET(_pip_constraint_env
+    "PIP_CONSTRAINT=${_pip_constraint_file}" "PIP_BUILD_CONSTRAINT=${_pip_constraint_file}"
+)
+
 # OpenTimelineIO needs to be built from source with CMAKE_ARGS to ensure it uses the correct custom-built Python libraries. This is required for both old and
 # new versions of pybind11, especially pybind11 v2.13.6+ which has stricter detection. Note: pybind11's FindPythonLibsNew.cmake uses PYTHON_LIBRARY (all caps),
 # PYTHON_INCLUDE_DIR, and PYTHON_EXECUTABLE variables. --no-cache-dir: Don't use pip's wheel cache (prevents using wheels built for wrong Python version)
@@ -316,12 +372,13 @@ ENDIF()
 
 # Phase 1: Install build dependencies for phase 2. Note: RV_PYTHON_BUILD_DEPS is kept as a CMake list (semicolon-separated) so it expands to separate arguments.
 SET(_build_deps_install_command
-    ${CMAKE_COMMAND} -E env ${_sdkroot_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir ${RV_PYTHON_BUILD_DEPS}
+    ${CMAKE_COMMAND} -E env ${_sdkroot_env} ${_pip_constraint_env} "${_python3_executable}" -s -E -I -m pip install --upgrade --no-cache-dir
+    ${RV_PYTHON_BUILD_DEPS}
 )
 
 # Phase 2: Install main requirements (with build-from-source for native extensions)
 SET(_requirements_install_command
-    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env}
+    ${CMAKE_COMMAND} -E env ${_otio_debug_env} ${_sdkroot_env} ${_pip_constraint_env}
 )
 # On Windows, the MinGW cmake (from msys2) appears before the Windows cmake in PATH. MinGW cmake defaults to MinGW Makefiles and cannot find the MSVC compiler.
 # OTIO's setup.py always calls "cmake" by name from PATH; it does not read CMAKE_GENERATOR. Prepend the directory of our outer build's cmake binary (the Windows
@@ -334,6 +391,13 @@ SET(_requirements_install_command
 IF(RV_TARGET_WINDOWS)
   CMAKE_PATH(GET CMAKE_COMMAND PARENT_PATH _cmake_bin_dir)
   LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_cmake_bin_dir}")
+
+  # pip clones git+ requirements with "git" from PATH, which inside msys2 is msys2's git. Prepend the directory of the git CMake found (GIT_EXECUTABLE, which
+  # honors CMAKE_PROGRAM_PATH) so pip clones with the same git as the rest of the build.
+  IF(GIT_EXECUTABLE)
+    CMAKE_PATH(GET GIT_EXECUTABLE PARENT_PATH _git_bin_dir)
+    LIST(APPEND _requirements_install_command "--modify" "PATH=path_list_prepend:${_git_bin_dir}")
+  ENDIF()
 
   # Also prepend the MSVC compiler directory so nested CMake invocations (e.g. from OTIO's setup.py / scikit-build) can find cl.exe. On MSVC, CMAKE_C_COMPILER
   # and CMAKE_CXX_COMPILER both point to cl.exe in the same HostX64\x64 directory, so a single PATH prepend covers both C and C++ compilation. We use
@@ -360,6 +424,12 @@ IF(RV_TARGET_WINDOWS)
   )
   FILE(MAKE_DIRECTORY "${_pip_tmp_dir}")
   LIST(APPEND _requirements_install_command "TMP=${_pip_tmp_dir}" "TEMP=${_pip_tmp_dir}" "TMPDIR=${_pip_tmp_dir}")
+
+  # OTIO's C++ extensions compile against debug Python headers, which #pragma-link python<ver>_d.lib. Pip builds under D:/_t/..., so MSVC must search our libs
+  # directory via LIB (cmake -E env --modify avoids MSBuild semicolon issues with $ENV{LIB}).
+  IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    LIST(APPEND _requirements_install_command "--modify" "LIB=path_list_prepend:${_lib_dir}")
+  ENDIF()
 ENDIF()
 
 # Only set OPENSSL_DIR if we built OpenSSL ourselves (not for Rocky Linux 8 CY2023 which uses system OpenSSL)
@@ -431,7 +501,7 @@ IF(RV_TARGET_WINDOWS)
        patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/patch/python-${RV_DEPS_PYTHON_VERSION}/python.${RV_DEPS_PYTHON_VERSION}.get_externals.bat.patch"
   )
 
-  # TODO: Above patches are for Python 3.11.9, need to add other versions.
+  # The patches above exist per Python version in patch/python-<version>/ (CY2024 and CY2025). CY2026 builds without them.
   RV_VFX_SET_VARIABLE(
     _patch_command
     CY2023
@@ -480,7 +550,7 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-build-deps-flag}
   COMMAND ${_build_deps_install_command}
   COMMAND cmake -E touch ${${_python3_target}-build-deps-flag}
-  DEPENDS ${_python3_target}
+  DEPENDS ${_python3_target} ${_pip_constraint_file} ${_pip_build_constraints_input_file}
 )
 
 # Phase 2 flag: Main requirements (depends on build deps being installed first)
@@ -493,7 +563,8 @@ ADD_CUSTOM_COMMAND(
   OUTPUT ${${_python3_target}-requirements-flag}
   COMMAND ${_requirements_install_command}
   COMMAND cmake -E touch ${${_python3_target}-requirements-flag}
-  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file}
+  DEPENDS ${_python3_target} ${${_python3_target}-build-deps-flag} ${_requirements_output_file} ${_requirements_input_file} ${_pip_constraint_file}
+          ${_pip_build_constraints_input_file}
 )
 
 # Test Python package imports after requirements are installed. This validates that all pip-installed packages (numpy, opentimelineio, OpenGL, cryptography,

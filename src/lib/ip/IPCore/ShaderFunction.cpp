@@ -29,8 +29,10 @@ namespace IPCore
 
         namespace
         {
-            const char* global_glsl = "#version 150\n"
-                                      "#extension GL_ARB_texture_rectangle : require\n";
+            // GLSL 1.50+ core includes sampler2DRect; no extension directive needed.
+            // GL 2.x + GLSL >= 150 still requires GL_ARB_texture_rectangle (global_glsl_gl2).
+            // GL 2.1 / GLSL 1.20 uses global_glsl_lt_150 (RV's default context on all platforms).
+            const char* global_glsl = "#version 150\n";
             const char* global_glsl_gl2 = "#extension GL_ARB_texture_rectangle : require\n";
             const char* global_glsl_lt_150 = "#version 120\n";
         } // namespace

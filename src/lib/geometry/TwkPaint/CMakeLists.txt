@@ -10,8 +10,13 @@ SET(_target
     "TwkPaint"
 )
 
+# Sources and headers come from the standalone twkpaint submodule.
+SET(_twkpaint_src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../twkpaint-src/TwkPaint
+)
+
 SET(_sources
-    Path.cpp
+    ${_twkpaint_src}/Path.cpp ${_twkpaint_src}/Smoother.cpp ${_twkpaint_src}/StampPath.cpp
 )
 
 ADD_LIBRARY(
@@ -21,7 +26,7 @@ ADD_LIBRARY(
 
 TARGET_INCLUDE_DIRECTORIES(
   ${_target}
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC ${_twkpaint_src}
 )
 
 TARGET_LINK_LIBRARIES(${_target} TwkMath)

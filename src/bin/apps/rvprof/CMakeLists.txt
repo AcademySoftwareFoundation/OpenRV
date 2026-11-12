@@ -50,7 +50,7 @@ TARGET_LINK_LIBRARIES(
   ${_target}
   PRIVATE TwkMath
           TwkGLText
-          OpenGL::GLU
+          OpenGL::GL
           Qt::Gui
           Qt::OpenGL
           Qt::Widgets

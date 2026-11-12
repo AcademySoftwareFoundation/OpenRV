@@ -238,7 +238,11 @@ def download_file(url, file_path):
     """
 
     print(f"Downloading {url} into {file_path}")
-    req = requests.get(url, stream=True)
+    try:
+        req = requests.get(url, stream=True)
+    except requests.exceptions.RequestException as e:
+        print(f"WARNING: Could not connect to {url}: {e}")
+        return False
 
     with open(file_path, "wb") as file:
         total = req.headers.get("content-length")
@@ -393,7 +397,7 @@ def source_widows_msvc_env(msvc_year: str) -> None:
 
 
 def get_mingw64_path_on_windows(winpath: str) -> str:
-    """
+    r"""
     On Windows: returns the mingw64 path corresponding to the windows passed as parameter.
     On other platforms: simply returns the path passed as parameter
     :param string winpath: winpath to be translated. Example: C:\git\OpenRV\_build

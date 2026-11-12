@@ -6,7 +6,7 @@
 #extension GL_ARB_texture_rectangle : require
 
 #if __VERSION__ >= 150
-out vec4 FragColor; 
+out vec4 FragColor;
 #define FRAGCOLOR FragColor
 #else
 #define FRAGCOLOR gl_FragColor

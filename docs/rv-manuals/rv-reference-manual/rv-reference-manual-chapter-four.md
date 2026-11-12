@@ -236,7 +236,9 @@ import rv.qtutils
 # Gets the current RV session windows as a PySide QMainWindow.
 rvSessionWindow = rv.qtutils.sessionWindow()
 
-# Gets the current RV session GL view as a PySide QGLWidget.
+# Gets the current RV session view host as a PySide QWidget. Note: the GL
+# viewport is now a native child window embedded in this host (via
+# createWindowContainer), so this is a plain QWidget, not a QOpenGLWidget.
 rvSessionGLView = rv.qtutils.sessionGLView()
 
 # Gets the current RV session top tool bar as a PySide QToolBar.

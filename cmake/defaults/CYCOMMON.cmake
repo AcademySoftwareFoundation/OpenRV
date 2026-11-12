@@ -19,6 +19,20 @@ SET(RV_DEPS_LIBDEFLATE_VERSION
     "1.25"
 )
 
+# breakpad https://github.com/google/breakpad
+SET(RV_DEPS_BREAKPAD_VERSION
+    "v2024.02.16"
+)
+SET(RV_DEPS_BREAKPAD_DOWNLOAD_HASH
+    "ae8c55b23c157771922b5ddca3803055"
+)
+
+# crashpad https://github.com/getsentry/crashpad (getsentry fork, native CMake). Pinned by commit since the repo has no versioned releases; mini_chromium is a
+# git submodule so this is cloned via GIT_REPOSITORY (no download hash needed).
+SET(RV_DEPS_CRASHPAD_GIT_TAG
+    "38617eb5a0799acade5dc4312f206e0e43642566"
+)
+
 # dav1d https://github.com/videolan/dav1d
 SET(RV_DEPS_DAV1D_VERSION
     "1.5.3"
@@ -147,6 +161,21 @@ SET(RV_DEPS_GLEW_DOWNLOAD_HASH
 )
 SET(RV_DEPS_GLEW_VERSION_LIB
     "2.3.1"
+)
+
+# vulkan https://github.com/KhronosGroup/Vulkan-Headers + https://github.com/KhronosGroup/Vulkan-Loader
+SET(RV_DEPS_VULKAN_VERSION
+    "1.4.350.0"
+)
+SET(RV_DEPS_VULKAN_HEADERS_DOWNLOAD_HASH
+    "74d68465ca2ef442397dc159edaa3b9c"
+)
+SET(RV_DEPS_VULKAN_LOADER_DOWNLOAD_HASH
+    "6ec91c673b48bbdffc923cce9d6a1a85"
+)
+# libvulkan.so SONAME major (libvulkan.so.1)
+SET(RV_DEPS_VULKAN_VERSION_LIB
+    "1"
 )
 
 # imgui https://github.com/pthom/imgui

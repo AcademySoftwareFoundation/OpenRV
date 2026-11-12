@@ -7,6 +7,7 @@
 
 #include <Mu/ClassInstance.h>
 #include <Mu/Exception.h>
+#include <Mu/ExecutionObserver.h>
 #include <Mu/FunctionObject.h>
 #include <Mu/FunctionType.h>
 #include <Mu/GarbageCollector.h>
@@ -38,6 +39,10 @@ namespace Mu
 {
     using namespace std;
     using namespace stl_ext;
+
+    // Optional execution hook (see ExecutionObserver.h). Null unless an
+    // observer is installed by a higher layer (e.g. MuTwkApp's crash observer).
+    ExecutionObserver* executionObserver = nullptr;
 
     GenericMachine::GenericMachine()
     {
@@ -339,6 +344,7 @@ namespace Mu
     NODE_IMPLEMENTATION(CLASS::functionActivationFunc, TYPE)                                    \
     {                                                                                           \
         const Function* f = static_cast<const Function*>(NODE_THIS.symbol());                   \
+        Mu::ActivationScope _muActivationScope(f, &NODE_THIS, NODE_THREAD);                     \
         int n = NODE_NUM_ARGS();                                                                \
         int s = f->stackSize();                                                                 \
         Thread::StackRecord record(NODE_THREAD);                                                \
@@ -1123,6 +1129,7 @@ namespace Mu
     NODE_IMPLEMENTATION(VoidRep::functionActivationFunc, void)
     {
         const Function* f = static_cast<const Function*>(NODE_THIS.symbol());
+        Mu::ActivationScope _muActivationScope(f, &NODE_THIS, NODE_THREAD);
         int n = NODE_NUM_ARGS();
         int s = f->stackSize();
         Thread::StackRecord record(NODE_THREAD);

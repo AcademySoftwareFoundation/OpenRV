@@ -8,6 +8,11 @@
 #include <RvCommon/DesktopVideoModule.h>
 #include <RvCommon/DesktopVideoDevice.h>
 #include <RvCommon/GLView.h>
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+#include <RvCommon/VulkanDesktopVideoDevice.h>
+#elif defined(PLATFORM_DARWIN) && defined(USE_METAL)
+#include <RvCommon/MetalDesktopVideoDevice.h>
+#endif
 #include <IPCore/ImageRenderer.h>
 #include <stl_ext/string_algo.h>
 #include <QtGui/QtGui>
@@ -38,6 +43,66 @@ namespace Rv
     }
 
     DesktopVideoModule::~DesktopVideoModule() {}
+
+    bool DesktopVideoModule::rebuildDevices(const QTGLVideoDevice* shareDevice, bool targetNative)
+    {
+#if !defined(PLATFORM_LINUX) && !defined(PLATFORM_WINDOWS) && !(defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        targetNative = false;
+#endif
+
+        bool currentNative = false;
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS) || (defined(PLATFORM_DARWIN) && defined(USE_METAL))
+        for (TwkApp::VideoDevice* device : m_devices)
+        {
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_WINDOWS)
+            if (dynamic_cast<VulkanDesktopVideoDevice*>(device))
+#else
+            if (dynamic_cast<MetalDesktopVideoDevice*>(device))
+#endif
+            {
+                currentNative = true;
+                break;
+            }
+        }
+#endif
+
+        if (!m_devices.empty() && currentNative == targetNative)
+        {
+            return false;
+        }
+
+        //
+        //  Retire the old devices rather than destroying them here: closing an
+        //  open device destroys its top-level window, which pumps the event loop
+        //  and repaints the main window while the graph's display groups still
+        //  point at these devices. The caller purges them once the graph has
+        //  been refreshed.
+        //
+        m_retiredDevices.insert(m_retiredDevices.end(), m_devices.begin(), m_devices.end());
+        m_devices.clear();
+
+        m_devices = DesktopVideoDevice::createDesktopVideoDevices(this, shareDevice, targetNative);
+
+        return true;
+    }
+
+    void DesktopVideoModule::purgeRetiredDevices()
+    {
+        //  Work from a local copy: close() destroys a native window, which
+        //  pumps the event loop and can re-enter this module.
+        VideoDevices retired;
+        retired.swap(m_retiredDevices);
+
+        // close() releases the swapchain, IOSurface ring or GL ScreenView before the delete.
+        for (TwkApp::VideoDevice* device : retired)
+        {
+            if (device->isOpen())
+            {
+                device->close();
+            }
+            delete device;
+        }
+    }
 
     string DesktopVideoModule::name() const { return "Desktop"; }
 

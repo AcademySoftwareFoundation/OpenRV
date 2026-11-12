@@ -618,13 +618,28 @@ namespace IPCore
 
     void FileSourceIPNode::testEvaluate(const Context& context, TestEvaluationResult& result)
     {
+        //
+        //  Random-access performance only matters for the media that actually
+        //  supplies the image at this frame. A single source can carry several
+        //  media -- example: an EXR image sequence with a MOV attached purely
+        //  for its audio track. That MOV has a video track
+        //  (info.video == true) and may be a slow-random-access codec, but its
+        //  images are never decoded during caching (evaluate() only decodes the
+        //  media returned by getMediaFromContext(), i.e. the EXR here).
+        //  Test only the image-supplying media so fast image sequences keep
+        //  decoding in parallel.
+        //
         bool slow = false;
 
-        for (size_t i = 0, s = numMedia(); i < s; i++)
+        ImageComponent selection;
+        const MediaPointer selectedMedia = getMediaFromContext(selection, context);
+        if (selectedMedia && selectedMedia->hasVideo())
         {
-            const MovieInfo& info = mediaMovieInfo(i);
-            if (info.slowRandomAccess && info.video)
-                slow = true;
+            if (const Movie* mov = selectedMedia->primaryMovie())
+            {
+                const MovieInfo& info = mov->info();
+                slow = info.slowRandomAccess && info.video;
+            }
         }
 
         result.poorRandomAccessPerformance = slow || result.poorRandomAccessPerformance;

@@ -365,7 +365,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDateTime arg0 = getqtype<QDateTimeType>(param_this);
         std::chrono::milliseconds arg1 = (std::chrono::milliseconds)(param_duration);
-        return makeqtype<QDateTimeType>(c, arg0.operator+=(arg1), "qt.QDateTime");
+        return makeqtype<QDateTimeType>(c, arg0 += arg1, "qt.QDateTime");
     }
 
     Pointer qt_QDateTime_operatorMinus_EQ__QDateTime_QDateTime_int(Mu::Thread& NODE_THREAD, Pointer param_this, int param_duration)
@@ -373,7 +373,7 @@ namespace Mu
         MuLangContext* c = static_cast<MuLangContext*>(NODE_THREAD.context());
         QDateTime arg0 = getqtype<QDateTimeType>(param_this);
         std::chrono::milliseconds arg1 = (std::chrono::milliseconds)(param_duration);
-        return makeqtype<QDateTimeType>(c, arg0.operator-=(arg1), "qt.QDateTime");
+        return makeqtype<QDateTimeType>(c, arg0 -= arg1, "qt.QDateTime");
     }
 
     Pointer qt_QDateTime_currentDateTime_QDateTime_QTimeZone(Mu::Thread& NODE_THREAD, Pointer param_zone)

@@ -22,7 +22,7 @@ env:
 
 jobs:
   rocky-linux:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: 'Rocky Linux ${{ matrix.rocky-version }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
        python=${{ matrix.python-version }},
@@ -48,7 +48,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # CY2024
+          # CY2025
           - os: "ubuntu-latest"
             rocky-version: "8"
             image: "amd64/rockylinux:8"
@@ -57,7 +57,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "powertools"
             conan-profile: "x86_64_rocky8"
 
@@ -69,7 +69,7 @@ jobs:
             qt-version: "6.5.3"
             cmake-version: "3.31.6"
             python-version: "3.11.8"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             extra_repo: "crb"
             conan-profile: "x86_64_rocky9"
             
@@ -97,28 +97,27 @@ jobs:
         run: |
           df -h /
 
-      # Rocky 9.8 dropped mesa-libOSMesa{,-devel} from the CRB repo. Pin all
-      # subsequent dnf calls in this container to the 9.7 minor release until
-      # OpenRV migrates off OSMesa. Remove this step once that's done.
-      - name: Pin Rocky 9 to 9.7 minor release
-        if: ${{ matrix.rocky-version == '9' }}
-        run: echo "9.7" > /etc/dnf/vars/releasever
-
       - name: Install system dependencies
         run: |
           dnf install -y epel-release
           dnf config-manager --set-enabled ${{ matrix.extra_repo }} devel
           dnf install -y which findutils
           dnf groupinstall "Development Tools" -y
-          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor mesa-libOSMesa mesa-libOSMesa-devel meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Digest-SHA
+          dnf install -y alsa-lib-devel autoconf automake avahi-compat-libdns_sd-devel bison bzip2-devel cmake-gui curl-devel flex gcc gcc-c++ git libXcomposite libXi-devel libaio-devel libffi-devel nasm ncurses-devel nss libtool libxkbcommon libXcomposite libXdamage libXrandr libXtst libXcursor meson openssl-devel patch pulseaudio-libs pulseaudio-libs-glib2 ocl-icd ocl-icd-devel opencl-headers qt5-qtbase-devel readline-devel sqlite-devel systemd-devel tcl-devel tcsh tk-devel yasm zip zlib-devel wget patchelf pcsc-lite libxkbfile perl-IPC-Cmd perl-Digest-SHA
           dnf install -y libX11-devel libXext-devel libXrender-devel libXrandr-devel libXcursor-devel libXi-devel libXxf86vm-devel libxkbcommon-devel
           dnf install -y xz-devel mesa-libGLU mesa-libGLU-devel
+          if [ "${{ matrix.rocky-version }}" = "9" ]; then \
+            dnf install -y mesa-compat-libOSMesa mesa-compat-libOSMesa-devel; \
+          else \
+            dnf install -y mesa-libOSMesa mesa-libOSMesa-devel; \
+          fi && \
           dnf clean all
 
       - name: Install other system dependencies
         if: ${{ matrix.rocky-version == '9' }}
         run: |
           dnf install -y perl-CPAN
+
           cpan FindBin
 
       - name: Install GCC 11 toolchain for Rocky Linux 8
@@ -250,7 +249,7 @@ jobs:
           python3 -c "import site; print(f'Site packages dirs: {site.getsitepackages()}')"
           
           echo "=== Installed packages location check ==="
-          python3 -c "import six; import dateutil; import yaml;"
+          python3 -c "import six; import yaml;"
           
           echo "=== Verifying Conan installation ==="
           # Try to find conan in the Python environment first
@@ -262,7 +261,7 @@ jobs:
             echo "Found Conan in user bin: /github/home/.local/bin/conan"
             /github/home/.local/bin/conan --version || {
               echo "ERROR: Conan in user bin failed, attempting to reinstall to pyenv environment..."
-              python3 -m pip install --force-reinstall six python-dateutil setuptools
+              python3 -m pip install --force-reinstall six setuptools
               python3 -m pip install --force-reinstall conan
               # Try again with pyenv conan
               NEW_CONAN_PATH=$(python3 -c "import sys, os; print(os.path.join(sys.prefix, 'bin', 'conan'))" 2>/dev/null)
@@ -313,7 +312,7 @@ jobs:
             echo "ERROR: Failed to get Conan home path with $CONAN_CMD"
             echo "Conan output: $CONAN_HOME_OUTPUT"
             echo "Last attempt - trying to import required modules..."
-            python3 -c "import six; import dateutil;"
+            python3 -c "import six;"
             exit 1
           }
           echo "Conan home path: $CONAN_HOME_OUTPUT"
@@ -332,7 +331,7 @@ jobs:
           $CONAN_EXECUTABLE remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
 
       - name: Export OpenRVCore recipe to Conan's cache
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        if: ${{ matrix.vfx-platform == 'CY2025' }}
         run: |
           export QT_HOME=/__w/OpenRV/OpenRV/deps/Qt/${{ matrix.qt-version}}/gcc_64
           echo "QT_HOME=$QT_HOME" >> $GITHUB_ENV
@@ -381,7 +380,7 @@ jobs:
           cmake --install build/Release --prefix $(pwd)/_install --config ${{ matrix.build-type }}
 
   macos:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: '${{ matrix.os }} ${{ matrix.arch-type }} ${{ matrix.vfx-platform }}
       <qt=${{ matrix.qt-version }},
        python=${{ matrix.python-version }},
@@ -401,15 +400,15 @@ jobs:
             #qt-version-short: "6.5"
             #python-version: "3.11"
             #cmake-version: "3.31.6"
-            #vfx-platform: "CY2024"
-          - os: "macos-14"
+            #vfx-platform: "CY2025"
+          - os: "macos-15"
             arch-type: "arm64"
             build-type: "Release"
             qt-version: "6.5.3"
             qt-version-short: "6.5"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
 
     steps:
       - name: Check if it is a schedule job
@@ -524,7 +523,7 @@ jobs:
           /Users/runner/Library/Python/3.11/bin/conan remote add aswftesting https://linuxfoundation.jfrog.io/artifactory/api/conan/aswf-conan-dev --index 0
 
       - name: Export OpenRVCore recipe
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        if: ${{ matrix.vfx-platform == 'CY2025' }}
         run: |
           /Users/runner/Library/Python/3.11/bin/conan export openrvcore-conanfile.py
 
@@ -551,7 +550,7 @@ jobs:
           cmake --install build/Release --prefix $(pwd)/_install --config ${{ matrix.build-type }}
 
   windows:
-    #if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
+    if : ${{ github.repository_owner == 'AcademySoftwareFoundation' }}
     name: 'Windows ${{ matrix.vfx-platform }}
       <${{ matrix.os }}
        msvc=${{ matrix.msvc-component }},
@@ -575,7 +574,7 @@ jobs:
             qt-version: "6.5.3"
             python-version: "3.11"
             cmake-version: "3.31.6"
-            vfx-platform: "CY2024"
+            vfx-platform: "CY2025"
             msvc-component: "14.40.17.10.x86.x64"
             msvc-compiler: "14.40.33807"
 
@@ -607,6 +606,7 @@ jobs:
           arch: '${{ matrix.arch-type }}'
 
       - name: Setup msys2 and install dependencies
+        id: msys2
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -670,13 +670,13 @@ jobs:
         run: |
           CMAKE_BIN=$(cygpath -u "C:/Program Files/CMake/bin")
           WIN_PYTHON_DIR=$(cygpath -u "$WIN_PYTHON_DIR")
-          echo "export PATH=\"$CMAKE_BIN:$WIN_PYTHON_DIR:/c/msys64/mingw64/bin:\$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/ProgramData/Chocolatey/bin:/c/ProgramData/Chocolatey/lib/jom/tools\"" >> ~/.bash_profile
+          echo "export PATH=\"$CMAKE_BIN:$WIN_PYTHON_DIR:\$PATH:/c/Strawberry/c/bin:/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/ProgramData/Chocolatey/bin:/c/ProgramData/Chocolatey/lib/jom/tools\"" >> ~/.bash_profile
           echo "export WIN_PYTHON_DIR=\"$WIN_PYTHON_DIR\"" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Set ACLOCAL_PATH environment variable
         run: |
-          echo "export ACLOCAL_PATH=/c/msys64/usr/share/aclocal" >> ~/.bash_profile
+          echo "export ACLOCAL_PATH=/usr/share/aclocal" >> ~/.bash_profile
         shell: msys2 {0}
 
       - name: Add MSVC compiler to PATH for msys2
@@ -777,7 +777,7 @@ jobs:
         shell: msys2 {0}
 
       - name: Export OpenRVCore recipe
-        if: ${{ matrix.vfx-platform == 'CY2024' }}
+        if: ${{ matrix.vfx-platform == 'CY2025' }}
         run: |
           conan export openrvcore-conanfile.py
         shell: msys2 {0}
@@ -802,12 +802,18 @@ jobs:
       - name: Build and install OpenRV dependencies
         run: |
           source ~/.bash_profile
-          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
+          # Dependency builds clone with the git CMake finds, which in this shell is msys2's own: started from native cmake and MSBuild it intermittently
+          # hangs on its first clone with no output until the job times out. find_program searches CMAKE_PROGRAM_PATH before PATH, in every CMake below this
+          # one, so this points them all at Git for Windows. PATH itself is left alone: putting Git for Windows first on it broke FFmpeg's build.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
+          conan install conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path="$(cygpath -m '${{ steps.msys2.outputs.msys2-location }}')/usr/bin/bash.exe" -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Build OpenRV main executable
         run: |
-          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path=C:/msys64/usr/bin/bash.exe -c tools.microsoft.bash:subsystem=msys2
+          # Git for Windows for every CMake below this one; see the step above.
+          export CMAKE_PROGRAM_PATH="C:/Program Files/Git/cmd"
+          conan build conanfile.py --build=missing -pr:a ./conan/profiles/x86_64_windows -c tools.microsoft.bash:path="$(cygpath -m '${{ steps.msys2.outputs.msys2-location }}')/usr/bin/bash.exe" -c tools.microsoft.bash:subsystem=msys2
         shell: msys2 {0}
 
       - name: Tests

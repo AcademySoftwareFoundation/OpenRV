@@ -6,6 +6,7 @@
 //******************************************************************************
 
 #include <IPCore/ImageFBO.h>
+#include <TwkGLF/GLContextScope.h>
 #include <algorithm>
 
 namespace
@@ -162,7 +163,10 @@ namespace IPCore
             size_t loc = imageFBO->identifier.find("paintCmdNo");
             if (loc != string::npos)
             {
-                if (strncmp(imageFBO->identifier.c_str(), identifier.c_str(), loc) == 0)
+                // Note that we must also compare cache key length in order for them to be equal,
+                // since some cache keys may have "frameN" if they are frame dependent and we don't
+                // want to match on keys that are identical aside from the frameN suffix.
+                if (loc == identifier.find("paintCmdNo") && strncmp(imageFBO->identifier.c_str(), identifier.c_str(), loc) == 0)
                 {
                     // this means we found a fbo containing the IPImage and a
                     // number of commands (could be zero) we need to find out
@@ -235,6 +239,11 @@ namespace IPCore
 
     void ImageFBOManager::destroyImageFBO(ImageFBO* imageFBO)
     {
+        //
+        //  Reached from destructors and event callbacks, not only renders.
+        //
+        const TwkGLF::GLContextScope contextScope;
+
         m_totalSizeInBytes -= imageFBO->fbo()->totalSizeInBytes();
         deleteFBOFence(imageFBO->fbo());
         delete imageFBO->fbo();
@@ -542,6 +551,11 @@ namespace IPCore
 
     void ImageFBOManager::flushImageFBOs()
     {
+        //
+        //  Acquire once for the whole flush rather than per FBO.
+        //
+        const TwkGLF::GLContextScope contextScope;
+
         for (size_t i = 0; i < m_outputImageFBOs.size(); i++)
             destroyImageFBO(m_outputImageFBOs[i]);
 

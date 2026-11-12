@@ -1,0 +1,11 @@
+#!/bin/sh
+# Wrapper around crashpad_handler: redirect stderr to a log file, and cap CPU
+# time (ulimit -t) so a stuck handler is killed instead of hanging RV forever.
+# Idle handlers use almost no CPU; a runaway read loop burns CPU and hits the
+# limit quickly. 120s is enough for normal dump capture on slow CI kernels.
+#
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOG_DIR="${RV_CRASH_DUMPS_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/@RV_INTERNAL_ORGANIZATION_NAME@/@RV_INTERNAL_APPLICATION_NAME@/Crashes}"
+mkdir -p "$LOG_DIR"
+ulimit -t 120
+exec "${SCRIPT_DIR}/crashpad_handler" "$@" 2>>"${LOG_DIR}/crashpad_handler.log"

@@ -29,9 +29,11 @@
 #include <stl_ext/string_algo.h>
 #include <string>
 #include <set>
+#include <list>
 #include <limits>
 #include <cmath>
 #include <mutex>
+#include <optional>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/thread/mutex.hpp>
@@ -63,6 +65,7 @@ extern "C"
 #endif
 
 static ENVVAR_BOOL(evUseUploadedMovieForStreaming, "RV_SHOTGRID_USE_UPLOADED_MOVIE_FOR_STREAMING", false);
+static ENVVAR_INT(evContextPoolSize, "TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE", 500); // max open decoder threads; 0 disables the pool
 
 namespace TwkMovie
 {
@@ -513,7 +516,7 @@ namespace TwkMovie
         //  this context.
         //
 
-        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads)
+        while (gcp.m_currentOpenThreads >= gcp.m_maxOpenThreads && !gcp.m_openContexts.empty())
         {
             Context& closeContext = *gcp.m_openContexts.back();
             gcp.m_openContexts.pop_back();
@@ -538,10 +541,22 @@ namespace TwkMovie
 
                 avcodec_free_context(&closeContext.avContext);
 
+                //
+                //  The track still points at the freed context; clear it so
+                //  openAVCodec() allocates a new one (FFmpeg 6 cannot reopen
+                //  a closed context).
+                //
+
                 if (closeContext.vTrack)
+                {
+                    closeContext.vTrack->avCodecContext = nullptr;
                     closeContext.vTrack->isOpen = false;
+                }
                 if (closeContext.aTrack)
+                {
+                    closeContext.aTrack->avCodecContext = nullptr;
                     closeContext.aTrack->isOpen = false;
+                }
             }
         }
     }
@@ -803,19 +818,80 @@ namespace TwkMovie
             return (smallest != -1 && (smallest < (frameDur * 0.5) || finalPacket)) ? diffs[smallest] : goalTS;
         }
 
-        bool fpsEquals(double& fps, double f)
+        bool fpsMatches(double fps, double standardFps)
         {
-            //
-            //  We get fps from all kinds of places, may have varying sig figs,
-            //  so compare to "standard" values loosely.
-            //
+            constexpr double kFpsTolerance = 0.01;
+            return fabs(fps - standardFps) < kFpsTolerance;
+        }
 
-            if (fabs(fps - f) < 0.01)
+        //
+        //  The NTSC rates are the integer rates scaled by 1000/1001. Return the exact rational if fps is one of them.
+        //
+        std::optional<AVRational> ntscFrameRate(double fps)
+        {
+            struct NtscFrameRate
             {
-                fps = f;
-                return true;
+                double fps;
+                AVRational rate;
+            };
+
+            static constexpr std::array<NtscFrameRate, 7> kNtscFrameRates = {{
+                {23.976, {24000, 1001}},
+                {29.97, {30000, 1001}},
+                {47.952, {48000, 1001}},
+                {59.94, {60000, 1001}},
+                {71.928, {72000, 1001}},
+                {95.904, {96000, 1001}},
+                {119.88, {120000, 1001}},
+            }};
+
+            const auto match = std::find_if(kNtscFrameRates.begin(), kNtscFrameRates.end(),
+                                            [fps](const NtscFrameRate& entry) { return fpsMatches(fps, entry.fps); });
+            if (match == kNtscFrameRates.end())
+            {
+                return std::nullopt;
             }
-            return false;
+
+            return match->rate;
+        }
+
+        AVRational frameRateFromFps(double fps)
+        {
+            if (const std::optional<AVRational> ntscRate = ntscFrameRate(fps))
+            {
+                return *ntscRate;
+            }
+
+            return av_d2q(fps, INT_MAX);
+        }
+
+        struct TimeScaleAndDuration
+        {
+            int timeScale;
+            int duration;
+        };
+
+        //
+        //  Writer time base for fps: one frame lasts duration / timeScale seconds. The integer rates keep their legacy
+        //  x100 values rather than e.g. 24/1, since MOV derives its track timescale from the time base denominator.
+        //
+        TimeScaleAndDuration timeScaleAndDurationFromFps(double fps)
+        {
+            if (const std::optional<AVRational> ntscRate = ntscFrameRate(fps))
+            {
+                return {ntscRate->num, ntscRate->den};
+            }
+
+            constexpr int kIntegerRateDuration = 100;
+            const double wholeFps = std::round(fps);
+            if (wholeFps >= 1.0 && fpsMatches(fps, wholeFps))
+            {
+                return {static_cast<int>(wholeFps) * kIntegerRateDuration, kIntegerRateDuration};
+            }
+
+            constexpr int kFractionalRateDuration = 1000;
+            const int timeScale = static_cast<int>(std::lround(fps * kFractionalRateDuration));
+            return {timeScale, kFractionalRateDuration};
         }
 
         AVPixelFormat getBestAVFormat(AVPixelFormat native)
@@ -1154,11 +1230,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_audioTracks.size(); i++)
         {
             AudioTrack* track = m_audioTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_audioTracks.resize(0);
@@ -1166,11 +1242,11 @@ namespace TwkMovie
         for (unsigned int i = 0; i < m_videoTracks.size(); i++)
         {
             VideoTrack* track = m_videoTracks[i];
+            ContextPool::flushContext(this, track->number);
             if (track->isOpen)
             {
                 avcodec_free_context(&track->avCodecContext);
             }
-            ContextPool::flushContext(this, track->number);
             delete track;
         }
         m_videoTracks.resize(0);
@@ -2304,6 +2380,13 @@ namespace TwkMovie
 
         collectPlaybackTiming(heroVideoTracks, heroAudioTracks);
 
+        //
+        //  Keep the video contexts reserved until initializeVideo() below is done
+        //  with them, so the pool cannot close them in the meantime.
+        //
+
+        std::list<ContextPool::Reservation> videoReservations;
+
         for (int i = 0; i < m_avFormatContext->nb_streams; i++)
         {
             AVStream* tsStream = m_avFormatContext->streams[i];
@@ -2318,7 +2401,7 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Video Track: " << i);
                 if (heroVideoTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
+                    videoReservations.emplace_back(this, i);
                     VideoTrack* track = new VideoTrack;
                     track->useOpenJPH = isJ2K;
 #if defined(RV_USE_APPLE_PRORES_SDK)
@@ -2441,7 +2524,12 @@ namespace TwkMovie
                 DBL(DB_METADATA, "Audio Track: " << i);
                 if (heroAudioTracks[i])
                 {
-                    ContextPool::Reservation reserve(this, i);
+                    //
+                    //  No pool reservation: this context is only opened to read
+                    //  the stream parameters and initializeAudio() frees it.
+                    //  Decoding reopens it under a reservation in audioFillBuffer().
+                    //
+
                     AudioTrack* track = new AudioTrack;
                     if (openAVCodec(i, &track->avCodecContext))
                     {
@@ -2740,8 +2828,7 @@ namespace TwkMovie
             AVChannelLayout layout = audioCodecContext->ch_layout;
             audioChannels = idAudioChannels(layout, numChannels);
 
-            // XXX Assume this thread will never decode audio
-            avcodec_free_context(&audioCodecContext);
+            avcodec_free_context(&track->avCodecContext); // the track's pointer, so it does not dangle
             track->isOpen = false;
         }
 
@@ -4428,7 +4515,7 @@ namespace TwkMovie
         {
             avStream->time_base.num = m_duration;
             avStream->time_base.den = m_timeScale;
-            avStream->avg_frame_rate = av_d2q(m_info.fps, INT_MAX);
+            avStream->avg_frame_rate = frameRateFromFps(m_info.fps);
             avCodecContext->time_base.num = m_duration;
             avCodecContext->time_base.den = m_timeScale;
             avCodecContext->codec_id = avCodec->id;
@@ -4877,56 +4964,11 @@ namespace TwkMovie
                     m_request.parameters[movflagsIdx].second += "|write_colr";
             }
 
-            double fps = m_info.fps;
-            if (timeScale && duration)
+            if (timeScale == 0 || duration == 0)
             {
-            }
-            else if (fpsEquals(fps, 60))
-            {
-                timeScale = 6000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 59.94))
-            {
-                timeScale = 5994;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 50))
-            {
-                timeScale = 5000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 30))
-            {
-                timeScale = 3000;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 29.97))
-            {
-                timeScale = 30000;
-                duration = 1001;
-            }
-            else if (fpsEquals(fps, 25))
-            {
-                timeScale = 2500;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 24))
-            {
-                timeScale = 2400;
-                duration = 100;
-            }
-            else if (fpsEquals(fps, 23.98) || fpsEquals(fps, 23.97599))
-            {
-                timeScale = 23976;
-                duration = 1000;
-            }
-            else
-            {
-                // Must add 0.001 so that 29.969... gets properly cropped
-                // to 29.97
-                timeScale = (fps + 0.001) * 1000;
-                duration = timeScale / fps;
+                const TimeScaleAndDuration timeBase = timeScaleAndDurationFromFps(m_info.fps);
+                timeScale = timeBase.timeScale;
+                duration = timeBase.duration;
             }
             m_timeScale = timeScale;
             m_duration = duration;
@@ -5944,28 +5986,25 @@ namespace TwkMovie
             addType(formatsItr->first, formatsItr->second.first, formatsItr->second.second, video, audio, separams, sdparams);
         }
 
-        // Note : No longer using the global context pool (since FFmpeg 6.0)
-        // Rationale: The global context pool was based on the premise that a
-        // context could be opened and closed multiple times. However, with
-        // FFmpeg 6.0, this premise is no longer valid and was causing crashes.
-        // As per the FFmpeg 6 documentation:
-        // https://ffmpeg.org/doxygen/trunk/deprecated.html: "Opening and
-        // closing a codec context multiple times is not supported anymore – use
-        // multiple codec contexts instead."
+        // The global context pool caps the number of decoder threads kept open across all
+        // readers. Without it every reader keeps its decoder (and its per-thread frame
+        // buffers) open until the source is unloaded, so memory grows with each clip played.
+        // FFmpeg 6 does not support reopening a closed codec context, so when the pool closes
+        // a context it frees it and nulls the track's pointer; openAVCodec() then allocates a
+        // fresh context on next use.
 
-        // if (!globalContextPool)
-        // {
-        //     int poolSize = 500;
-        //     if (const char* c = getenv("TWK_MOVIEFFMPEG_CONTEXT_POOL_SIZE"))
-        //     {
-        //         int poolSize = atoi(c);
-        //     }
-        //     if (poolSize > 0) globalContextPool = new ContextPool(poolSize);
-        //     else
-        //     {
-        //         report("Disabling mio_ffmpeg context thread pool.", true);
-        //     }
-        // }
+        if (globalContextPool == nullptr)
+        {
+            const int poolSize = evContextPoolSize.getValue();
+            if (poolSize > 0)
+            {
+                globalContextPool = new ContextPool(poolSize);
+            }
+            else
+            {
+                report("Disabling mio_ffmpeg context thread pool.", true);
+            }
+        }
     }
 
     MovieFFMpegIO::~MovieFFMpegIO()

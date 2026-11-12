@@ -9,11 +9,11 @@
 #ifdef PLATFORM_WINDOWS
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <TwkGLF/GL.h>
 #include <TwkGLF/GLVBO.h>
 #include <TwkGLF/GLPipeline.h>
 #include <TwkGLF/GLState.h>
-#endif
 #endif
 
 #include <TwkPython/PyLockObject.h>
@@ -241,7 +241,14 @@ namespace Rv
 
         s->receivingEvents(false);
 
-        QPoint p = rvDoc->view()->mapToGlobal(location);
+        // viewWidget() is briefly null while the presentation view is being (re)built
+        const QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            return;
+        }
+
+        const QPoint p = view->mapToGlobal(location);
 
         if (pylist)
         {
@@ -271,13 +278,20 @@ namespace Rv
 
         QPoint lp;
 
+        const QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            Py_XINCREF(Py_None);
+            return Py_None;
+        }
+
         if (const TwkApp::PointerEvent* pevent = dynamic_cast<const TwkApp::PointerEvent*>(event->event))
         {
-            lp = QPoint(pevent->x(), rvDoc->view()->height() - pevent->y() - 1);
+            lp = QPoint(pevent->x(), view->height() - pevent->y() - 1);
         }
         else
         {
-            lp = QPoint(0, rvDoc->view()->height() - 1);
+            lp = QPoint(0, view->height() - 1);
         }
 
         popupMenuInternal(pylist, lp);
@@ -299,7 +313,14 @@ namespace Rv
             return NULL;
         }
 
-        QPoint lp(x, rvDoc->view()->height() - y - 1);
+        const QWidget* view = rvDoc->viewWidget();
+        if (!view)
+        {
+            Py_XINCREF(Py_None);
+            return Py_None;
+        }
+
+        QPoint lp(x, view->height() - y - 1);
 
         popupMenuInternal(pylist, lp);
 
@@ -418,6 +439,41 @@ namespace Rv
 
 #endif
 
+    static PyObject* consoleWrite(PyObject*, PyObject* args)
+    {
+        PyLockObject locker;
+        const char* message = nullptr;
+        bool foundConsole = false;
+
+        if (!PyArg_ParseTuple(args, "s", &message))
+            return nullptr;
+
+        Py_BEGIN_ALLOW_THREADS;
+
+        if (RvApplication* app = RvApp())
+        {
+            if (RvConsoleWindow* console = app->console())
+            {
+                foundConsole = true;
+                size_t size = strlen(message);
+                console->append(message, size);
+
+                // Invoke processTextBuffer using AutoConnection to automatically
+                // use queued connection if we're not on the main thread
+                QMetaObject::invokeMethod(console, "processTextBuffer", Qt::AutoConnection);
+            }
+        }
+
+        if (!foundConsole)
+        {
+            cout << message;
+        }
+
+        Py_END_ALLOW_THREADS;
+
+        Py_RETURN_NONE;
+    }
+
     static PyMethodDef localmethods[] = {
 
         {"readSettings", readSettings, METH_VARARGS, ""},
@@ -437,6 +493,8 @@ namespace Rv
         {"sessionBottomToolBar", sessionBottomToolBar, METH_NOARGS, ""},
 
         {"javascriptExport", javascriptExport, METH_VARARGS, ""},
+
+        {"consoleWrite", consoleWrite, METH_VARARGS, "Write a message to the RV console window."},
 
         {NULL}};
 

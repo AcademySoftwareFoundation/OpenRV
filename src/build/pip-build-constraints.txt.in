@@ -1,0 +1,36 @@
+# This file constrains the versions pip is allowed to resolve, including inside the PEP 517
+# build-isolation environments it creates for every source distribution it builds.
+# NOTE: This is a CMake template file. The actual pip-build-constraints.txt is generated during
+#       CMake configuration and exported to pip as PIP_CONSTRAINT and PIP_BUILD_CONSTRAINT (see below).
+#
+# WHY THIS FILE EXISTS: when pip builds a package from source it creates a fresh, isolated
+#       environment for that package's build requirements. The --no-binary / --only-binary format
+#       control from python3.cmake does propagate into that environment, but the version pins from
+#       requirements.txt do NOT. PyOpenGL_accelerate declares an unbounded "numpy" build
+#       requirement, so without this file it compiles against whatever numpy is newest on PyPI
+#       instead of the numpy we ship, and drags in a source build of that numpy along the way.
+#
+# KEEP THIS FILE MINIMAL. A constraint applies to every environment pip resolves, nested build
+#       environments included. Constraining setuptools, wheel or meson-python here would make the
+#       build unsatisfiable on CY2023-CY2025, whose numpy versions hard-pin their own
+#       setuptools==59.2.0 / wheel==0.37.0 / meson-python<0.16.0 build requirements.
+#
+# Constraint files may not contain direct references (name @ url), extras or markers, unlike
+#       requirements files. Bare "name==version" entries only.
+#
+# To update these versions, edit RV_DEPS_NUMPY_VERSION / RV_DEPS_CYTHON_VERSION in
+#       cmake/defaults/CY*.cmake
+#
+# This file is exported to pip as BOTH PIP_CONSTRAINT and PIP_BUILD_CONSTRAINT. On pip < 26.2, PIP_CONSTRAINT alone reaches build-isolation environments; pip
+#       >= 26.2 deprecated that and requires PIP_BUILD_CONSTRAINT to constrain them instead. Since RV_PYTHON_BUILD_DEPS installs an unpinned "pip", the
+#       version actually in play at build time can be either, so both variables must be set.
+
+numpy==@_numpy_version@
+@_cython_constraint@
+
+# OpenTimelineIO is built from source against our custom Python. Its setup.py runs find_package(Python ...
+#       Interpreter Development.Module) using the cmake wheel pip installs into the isolated build environment,
+#       not the cmake driving the outer OpenRV build. That resolution is unpinned and floats with PyPI.
+#       CMake 4.4.1+ changed Windows FindPython ABI handling and breaks Development.Module against our custom
+#       debug Python (python311_d.lib). Pin to the same cmake line as the outer OpenRV build.
+cmake==3.31.6

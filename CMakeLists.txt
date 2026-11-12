@@ -10,7 +10,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 # These variables are parsed by sphinx for the documentation. One-line formatting facilitates parsing and readability.
 # cmake-format: off
 SET(RV_MAJOR_VERSION "4" CACHE STRING "RV's version major")
-SET(RV_MINOR_VERSION "0" CACHE STRING "RV's version minor")
+SET(RV_MINOR_VERSION "1" CACHE STRING "RV's version minor")
 SET(RV_REVISION_NUMBER "0" CACHE STRING "RV's revision number")
 SET(RV_VERSION_YEAR "2026" CACHE STRING "RV's year of release.")
 # cmake-format: on
@@ -94,6 +94,7 @@ INCLUDE(rv_targets) # RV's build platform definitions
 INCLUDE(rv_compiler_cache) # RV's compiler cache (ccache/sccache) support
 INCLUDE(rv_globals) # RV's CMake-build global variables
 INCLUDE(rv_stage) # RV's local appplication packaging
+INCLUDE(rv_archive_symbols) # RV's crash-reporting symbol archive target
 INCLUDE(rv_vfx)
 INCLUDE(CTest)
 
@@ -119,3 +120,6 @@ ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(packages)
 
 ADD_SUBDIRECTORY(cmake/install)
+
+# Define the 'symbols_archive' target (run after a full build). Must come after the stage directories and version are known.
+RV_CREATE_SYMBOLS_ARCHIVE_TARGET()

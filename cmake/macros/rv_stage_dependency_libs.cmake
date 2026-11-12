@@ -130,6 +130,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
      AND NOT _ARG_OUTPUTS
   )
     SET(_rsdl_resolved_outputs)
+    SET(_rsdl_source_files)
     SET(_rsdl_failed
         FALSE
     )
@@ -142,6 +143,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
       RV_RESOLVE_IMPORTED_LOCATION(${_rsdl_tgt} _rsdl_loc _rsdl_resolved_tgt)
 
       IF(_rsdl_loc)
+        LIST(APPEND _rsdl_source_files "${_rsdl_loc}")
         GET_FILENAME_COMPONENT(_rsdl_fname "${_rsdl_loc}" NAME)
         IF(RV_TARGET_WINDOWS)
           LIST(APPEND _rsdl_resolved_outputs "${RV_STAGE_BIN_DIR}/${_rsdl_fname}")
@@ -157,6 +159,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
             ENDIF()
           ENDFOREACH()
           IF(_rsdl_implib)
+            LIST(APPEND _rsdl_source_files "${_rsdl_implib}")
             GET_FILENAME_COMPONENT(_rsdl_impfname "${_rsdl_implib}" NAME)
             LIST(APPEND _rsdl_resolved_outputs "${_ARG_STAGE_LIB_DIR}/${_rsdl_impfname}")
           ENDIF()
@@ -513,6 +516,18 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
     SET(_tracking_outputs
         ${_ARG_OUTPUTS}
     )
+    # Mark the staged files as up to date. Without this, any file that copy_if_different skipped (because it was already identical) keeps its old timestamp, so
+    # the build system still sees this step as pending and re-runs the whole staging on every build. touch_nocreate is used rather than touch so a file that
+    # failed to stage is never replaced by an empty placeholder.
+    LIST(
+      APPEND
+      _commands
+      COMMAND
+      ${CMAKE_COMMAND}
+      -E
+      touch_nocreate
+      ${_tracking_outputs}
+    )
   ELSE()
     MESSAGE(FATAL_ERROR "RV_STAGE_DEPENDENCY_LIBS: Either OUTPUTS or USE_FLAG_FILE is required")
   ENDIF()
@@ -523,7 +538,7 @@ FUNCTION(RV_STAGE_DEPENDENCY_LIBS)
   ADD_CUSTOM_COMMAND(
     COMMENT "Staging ${_ARG_TARGET} libs into ${_ARG_STAGE_LIB_DIR}"
     OUTPUT ${_tracking_outputs} ${_commands}
-    DEPENDS ${_ARG_DEPENDS}
+    DEPENDS ${_ARG_DEPENDS} ${_rsdl_source_files}
     VERBATIM
   )
 

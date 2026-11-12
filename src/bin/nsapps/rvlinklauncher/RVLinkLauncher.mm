@@ -13,10 +13,25 @@
 }
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 - (void)processRVLinkURL:(NSString *)rvlinkURL;
+- (void)copyURLToClipboard:(id)sender;
 - (BOOL)hasProcessedURL;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingMDFind;
 - (NSMutableArray<NSURL *> *)findRVAppsUsingWorkspace:(NSString *)rvlinkURL;
 @end
+
+static NSString *RVLinkDisplayURL(NSString *url) {
+    static const NSUInteger kMaxDisplayLength = 120;
+    if (url == nil) {
+        return @"";
+    }
+    if ([url length] <= kMaxDisplayLength) {
+        return url;
+    }
+    NSUInteger head = kMaxDisplayLength - 1;
+    return [NSString stringWithFormat:@"%@… (%lu characters)",
+                                      [url substringToIndex:head],
+                                      (unsigned long)[url length]];
+}
 
 @implementation RVLinkURLHandler
 - (instancetype)init {
@@ -31,6 +46,14 @@
 
 - (BOOL)hasProcessedURL {
     return urlProcessed;
+}
+
+- (void)copyURLToClipboard:(id)sender {
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    [pasteboard clearContents];
+    [pasteboard setString:(latestRVLinkURL != nil ? latestRVLinkURL : @"")
+                  forType:NSPasteboardTypeString];
+    NSLog(@"Copied rvlink URL to clipboard: %@", latestRVLinkURL);
 }
 
 - (void)dealloc {
@@ -61,7 +84,7 @@
 
                 if (currentAlert != nil) {
                     // Update the existing dialog in place and bring it to the front
-                    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
+                    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", RVLinkDisplayURL(latestRVLinkURL)]];
                     [[currentAlert window] makeKeyAndOrderFront:nil];
                 } else {
                     // No dialog is currently shown – process normally
@@ -229,7 +252,7 @@
     // Present chooser UI for multiple apps
     currentAlert = [[NSAlert alloc] init];
     [currentAlert setMessageText:@"Choose RV Application"];
-    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", latestRVLinkURL]];
+    [currentAlert setInformativeText:[NSString stringWithFormat:@"Opening: %@", RVLinkDisplayURL(latestRVLinkURL)]];
     [currentAlert addButtonWithTitle:@"Open"];
     [currentAlert addButtonWithTitle:@"Cancel"];
 
@@ -265,14 +288,59 @@
         [popup addItemWithTitle:itemTitle];
         [[popup lastItem] setRepresentedObject:appURL];
     }
-    [currentAlert setAccessoryView:popup];
+
+    static NSString * const kRVLinkLauncherDefaultsSuite =
+        @"com.autodesk.RVLinkLauncher";
+
+    static NSString * const kLastSelectedRVAppPathKey =
+        @"LastSelectedRVAppPath";
+    
+    NSUserDefaults *defaults =
+        [[NSUserDefaults alloc]
+            initWithSuiteName:kRVLinkLauncherDefaultsSuite];
+
+    NSString *lastSelectedPath =
+        [defaults stringForKey:kLastSelectedRVAppPathKey];
+
+    if (lastSelectedPath != nil) {
+        for (NSInteger i = 0; i < [popup numberOfItems]; ++i) {
+            NSURL *appURL = [[popup itemAtIndex:i] representedObject];
+            if ([[appURL path] isEqualToString:lastSelectedPath]) {
+                [popup selectItemAtIndex:i];
+                break;
+            }
+        }
+    }
+
+    [defaults release];
+
+    NSButton *copyButton = [[NSButton alloc] initWithFrame:NSMakeRect(404, 0, 90, 24)];
+    [copyButton setTitle:@"Copy URL"];
+    [copyButton setBezelStyle:NSBezelStyleRounded];
+    [copyButton setTarget:self];
+    [copyButton setAction:@selector(copyURLToClipboard:)];
+
+    NSView *accessory = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 500, 24)];
+    [accessory addSubview:popup];
+    [accessory addSubview:copyButton];
+    [currentAlert setAccessoryView:accessory];
 
     NSInteger result = [currentAlert runModal];
     NSAlert *alert = currentAlert;
     currentAlert = nil;
-    
+
     if (result == NSAlertFirstButtonReturn) {
         NSURL *selectedAppURL = [[popup selectedItem] representedObject];
+
+        NSUserDefaults *defaults =
+            [[NSUserDefaults alloc]
+                initWithSuiteName:kRVLinkLauncherDefaultsSuite];
+
+        [defaults setObject:[selectedAppURL path]
+                    forKey:kLastSelectedRVAppPathKey];
+
+        [defaults release];
+
         NSURL *targetURL = [NSURL URLWithString:latestRVLinkURL];
         if (targetURL != nil) {
             NSWorkspaceOpenConfiguration *config = [NSWorkspaceOpenConfiguration configuration];
@@ -291,6 +359,8 @@
             NSLog(@"Invalid rvlink URL: %@", rvlinkURL);
         }
     }
+    [copyButton release];
+    [accessory release];
     [popup release];
     [alert release];
 }

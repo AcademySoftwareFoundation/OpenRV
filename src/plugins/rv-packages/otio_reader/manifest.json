@@ -30,6 +30,42 @@
       "name": "Point",
       "execution_scope": "in process",
       "filepath": "point_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Position",
+      "execution_scope": "in process",
+      "filepath": "position_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Rectangle",
+      "execution_scope": "in process",
+      "filepath": "rectangle_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Ellipse",
+      "execution_scope": "in process",
+      "filepath": "ellipse_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Arrow",
+      "execution_scope": "in process",
+      "filepath": "arrow_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Line",
+      "execution_scope": "in process",
+      "filepath": "line_schema.py"
+    },
+    {
+      "OTIO_SCHEMA": "SchemaDef.1",
+      "name": "Text",
+      "execution_scope": "in process",
+      "filepath": "text_schema.py"
     }
   ],
   "hook_scripts": [
