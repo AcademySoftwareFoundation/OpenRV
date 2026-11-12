@@ -43,7 +43,7 @@ RUN dnf groupinstall "Development Tools" -y \
     flex \
     gcc \
     gcc-c++ \
-    gcc-toolset-${GCC_TOOLSET_VERSION}-toolchain \
+    gcc-toolset-${GCC_TOOLSET_VERSION} \
     git \
     libX11-devel \
     libXcomposite \

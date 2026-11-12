@@ -130,7 +130,7 @@ Install the compiler for your VFX reference platform. CY2026 uses GCC 14 from gc
 
 ````{tabs}
 ```{code-tab} bash VFX-CY2026
-sudo dnf install -y gcc-toolset-14-toolchain
+sudo dnf install -y gcc-toolset-14
 # Enable it in every shell used to configure and build Open RV
 source /opt/rh/gcc-toolset-14/enable
 ```

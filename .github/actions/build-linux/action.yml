@@ -132,13 +132,19 @@ runs:
       env:
         GCC_TOOLSET: ${{ inputs.gcc-toolset || '11' }}
       run: |
+        # gcc-toolset-13 and later have no -toolchain subpackage, their metapackage installs the compilers
+        toolset_package="gcc-toolset-${GCC_TOOLSET}"
+        if [ "${GCC_TOOLSET}" -lt 13 ]; then
+          toolset_package="${toolset_package}-toolchain"
+        fi
+
         retry_count=0
         max_retries=5
 
         until [ $retry_count -ge $max_retries ]; do
           echo "Attempt $((retry_count + 1)) of $max_retries"
 
-          if dnf install -y gcc-toolset-${GCC_TOOLSET}-toolchain; then
+          if dnf install -y ${toolset_package}; then
             echo "GCC ${GCC_TOOLSET} toolchain installed successfully"
             break
           else
