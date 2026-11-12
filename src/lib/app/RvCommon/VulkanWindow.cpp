@@ -2778,6 +2778,44 @@ namespace Rv
         }
     }
 
+    bool VulkanWindow::isRepeatedKey(const QKeyEvent* kevent)
+    {
+        const bool repeated =
+            m_lastKey == kevent->key()
+            && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || m_lastKeyType == kevent->type());
+        m_lastKey = kevent->key();
+        m_lastKeyType = kevent->type();
+        return repeated;
+    }
+
+    bool VulkanWindow::eventFilter(QObject* /*object*/, QEvent* event)
+    {
+        if (event->type() != QEvent::KeyPress && event->type() != QEvent::KeyRelease && event->type() != QEvent::Shortcut
+            && event->type() != QEvent::ShortcutOverride)
+        {
+            return false;
+        }
+
+        if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
+        {
+            if (isRepeatedKey(kevent))
+            {
+                event->accept();
+                return true;
+            }
+        }
+
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (session && m_videoDevice && m_videoDevice->hasTranslator())
+        {
+            session->setEventVideoDevice(m_videoDevice);
+            m_videoDevice->translator().sendQTEvent(event);
+        }
+
+        event->accept();
+        return true;
+    }
+
     //--------------------------------------------------------------------------
     // event()
     //--------------------------------------------------------------------------
@@ -2845,18 +2883,13 @@ namespace Rv
             }
         }
 
-        if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+        if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
         {
-            if (m_lastKey == kevent->key()
-                && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
+            if (isRepeatedKey(kevent))
             {
-                m_lastKey = kevent->key();
-                m_lastKeyType = kevent->type();
                 event->accept();
                 return true;
             }
-            m_lastKeyType = kevent->type();
-            m_lastKey = kevent->key();
         }
 
         switch (event->type())

@@ -40,6 +40,8 @@ namespace Rv
 
         void stopProcessingEvents();
 
+        bool eventFilter(QObject* object, QEvent* event) override;
+
         bool firstPaintCompleted() const;
 
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }
