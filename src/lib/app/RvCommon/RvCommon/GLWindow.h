@@ -85,8 +85,7 @@ namespace Rv
         //  without a change of logical size. See the definition.
         void syncDevicePixelRatio();
 
-        //  Closes the -debug profile sample opened by paintGL() once the window has presented.
-        void endProfilingSwap();
+        void onFrameSwapped();
 
         RvDocument* m_doc;
         QTGLVideoDevice* m_videoDevice;
@@ -106,6 +105,7 @@ namespace Rv
         float m_devicePixelRatio;
         bool m_syncingDevicePixelRatio;
         bool m_profilingSwapPending;
+        bool m_syncSamplePending;
         QOpenGLContext* m_sharedContext;
     };
 
