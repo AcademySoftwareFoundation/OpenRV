@@ -23,7 +23,7 @@ namespace IPCore::Paint
         bool rotateToStroke = false;
         float angle = 0.0f;
         float squish = 1.0f;
-        float hardness = 1.0f;
+        float hardness = 0.5f;
         float flow = 1.0f;
     };
 

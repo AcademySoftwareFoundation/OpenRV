@@ -18,10 +18,20 @@
 
 namespace IPCore::Paint
 {
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BrushDefaults, spacingBias, spacingJitter, opacityJitter, radiusJitter, rotationJitter,
-                                       rotateToStroke, angle, squish, hardness, flow)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(BrushDefaults, spacingBias, spacingJitter, opacityJitter, radiusJitter, rotationJitter,
+                                                    rotateToStroke, angle, squish, hardness, flow)
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BrushEntry, name, tip, params)
+    void from_json(const nlohmann::json& json, BrushEntry& entry) // NOLINT(misc-use-internal-linkage)
+    {
+        json.at("name").get_to(entry.name);
+        json.at("tip").get_to(entry.tip);
+        entry.params = json.value("params", BrushDefaults{});
+
+        if (entry.name.empty() || entry.tip.empty())
+        {
+            throw std::invalid_argument("'name' and 'tip' cannot be empty");
+        }
+    }
 
     namespace
     {
@@ -56,7 +66,22 @@ namespace IPCore::Paint
                 throw std::runtime_error("Unsupported catalogue version " + std::to_string(version) + " in " + path);
             }
 
-            return {directory, catalogue.at("brushes").get<std::vector<BrushEntry>>()};
+            std::vector<BrushEntry> entries;
+            const nlohmann::json& brushes = catalogue.at("brushes");
+
+            for (const auto& brush : brushes)
+            {
+                try
+                {
+                    entries.push_back(brush.get<BrushEntry>());
+                }
+                catch (const std::exception& exception)
+                {
+                    std::cerr << "WARNING: Skipping a brush catalogue entry." << exception.what() << "\n";
+                }
+            }
+
+            return {directory, std::move(entries)};
         }
     } // namespace
 
