@@ -28,6 +28,7 @@ SET(_target
 )
 
 SET(_sources
+    BrushCatalogue.cpp
     BrushTextureManager.cpp
     Session.cpp
     Exception.cpp
@@ -283,6 +284,7 @@ TARGET_LINK_LIBRARIES(
           IPBaseNodes
           PNG::PNG
           Qt::Core
+          nlohmann_json::nlohmann_json
 )
 
 IF(RV_TARGET_WINDOWS)

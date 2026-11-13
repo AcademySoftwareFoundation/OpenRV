@@ -183,7 +183,7 @@ namespace IPCore
             enum StampBlendMode
             {
                 BlendNormal,   ///< GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
-                BlendMarker,   ///< marker wetness approximation (same GL blend as Normal)
+                BlendMarker,   ///< marker wetness approximation: GL_MAX into a cleared buffer so stamps don't accumulate opacity
                 BlendAdditive, ///< glow: GL_SRC_ALPHA, GL_ONE
                 BlendEraser    ///< reserved; stamp erasure not yet implemented
             };
@@ -264,10 +264,10 @@ namespace IPCore
             int debug;
             bool ownPoints;
 
-            // Stamp brush properties, set directly from the stroke's own properties
+            // Stamp brush properties, set from the brush catalogue unless the stroke overrides them
             StampBlendMode stampBlendMode{BlendNormal};
-            float hardness{100.0f};   ///< edge hardness 0-100; drives the `hardness` uniform in soft_stamp_frag.glsl
-            std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time; empty = procedural
+            float hardness{1.0f};     ///< edge hardness 0-1
+            std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time
 
             mutable HashValue idhash;
 

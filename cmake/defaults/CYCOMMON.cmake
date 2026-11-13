@@ -211,6 +211,14 @@ SET(RV_DEPS_JPEGTURBO_VERSION_LIB
     "62.3.0"
 )
 
+# nlohmann_json https://github.com/nlohmann/json
+SET(RV_DEPS_NLOHMANN_JSON_VERSION
+    "3.12.0"
+)
+SET(RV_DEPS_NLOHMANN_JSON_DOWNLOAD_HASH
+    "e155202b2a589137f6804724bd182f12"
+)
+
 # oiio https://github.com/AcademySoftwareFoundation/OpenImageIO
 SET(RV_DEPS_OIIO_VERSION
     "3.1.12.0"
