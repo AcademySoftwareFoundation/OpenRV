@@ -40,6 +40,16 @@ class Brush(StrEnum):
     PEN = auto()
 
 
+BRUSH_DISPLAY_NAMES = {
+    "pen": "Pen",
+    "pencil": "Pencil",
+    "coarse_watercolor": "Watercolor",
+    "camo": "Camo",
+    "charcoal": "Charcoal",
+    "hr": "HR",
+}
+
+
 class BrushSetting(StrEnum):
     """Brush parameters the settings sliders edit, named as in the catalogue."""
 
