@@ -202,11 +202,11 @@ namespace IPCore
                 , built(false)
                 , idhash(0)
             {
-                color = color;
+                this->color = color;
 
                 if (ownPoints)
                 {
-                    points.assign(vector2d->begin(), vector2d->end());
+                    points.assign(vector2d, vector2d + npoints);
                 }
                 else
                 {
