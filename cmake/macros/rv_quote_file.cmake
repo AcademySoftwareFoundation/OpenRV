@@ -96,12 +96,12 @@ FUNCTION(quote_file OUTPUT_FILENAME)
   MESSAGE(DEBUG "--- UNPARSED_ARGUMENTS      : '${arg_UNPARSED_ARGUMENTS}'")
   MESSAGE(DEBUG "--- KEYWORDS_MISSING_VALUES : '${arg_KEYWORDS_MISSING_VALUES}'")
 
-  CMAKE_PATH(GET arg_INPUT_FILENAME FILENAME _stem)
+  CMAKE_PATH(GET arg_INPUT_FILENAME FILENAME _filename)
   SET(_src_name
       "${CMAKE_CURRENT_SOURCE_DIR}/${arg_INPUT_FILENAME}"
   )
   SET(_dest_name
-      "${CMAKE_CURRENT_BINARY_DIR}/${_stem}.cpp"
+      "${CMAKE_CURRENT_BINARY_DIR}/${_filename}.cpp"
   )
 
   # Use ADD_CUSTOM_COMMAND to track the dependency properly
@@ -109,7 +109,7 @@ FUNCTION(quote_file OUTPUT_FILENAME)
     OUTPUT ${_dest_name}
     COMMAND python3 ${_quote_file} "${_src_name}" "${_dest_name}" "${arg_CPP_SYMBOL}"
     DEPENDS ${_src_name}
-    COMMENT "Quoting '${arg_INPUT_FILENAME}' as '${_stem}.cpp'"
+    COMMENT "Quoting '${arg_INPUT_FILENAME}' as '${_filename}.cpp'"
     VERBATIM
   )
 
