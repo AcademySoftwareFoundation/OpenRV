@@ -17,6 +17,7 @@ from rv import commands, qtutils
 
 from annotate_beta_color_picker import ColorPickerPopup, add_next_custom_slot_highlight
 import annotate_beta_constants as constants
+import annotate_beta_brushes as brushes
 
 
 class _Page(Enum):
@@ -278,7 +279,7 @@ class _SliderSection(QtWidgets.QWidget):
         with QtCore.QSignalBlocker(self._slider):
             self._slider.setValue(value)
         if not self._input.hasFocus():
-            self._input.setText(f"{value}{self._suffix}")
+            self._input.setText(f"{self._slider.value()}{self._suffix}")
 
 
 class _SliderPanel(QtWidgets.QWidget):
@@ -513,11 +514,11 @@ class _BrushSettingInfo:
 
 _BRUSH_SETTINGS = {
     constants.BrushSetting.HARDNESS: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Hardness"),
-    constants.BrushSetting.SPACING: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Spacing"),
-    constants.BrushSetting.SIZE_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Size"),
-    constants.BrushSetting.OPACITY_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Opacity"),
-    constants.BrushSetting.ROTATION_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Rotation"),
-    constants.BrushSetting.SPACING_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Spacing"),
+    constants.BrushSetting.SPACING_BIAS: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Spacing"),
+    constants.BrushSetting.RADIUS_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Size"),
+    constants.BrushSetting.OPACITY_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Opacity"),
+    constants.BrushSetting.ROTATION_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Rotation"),
+    constants.BrushSetting.SPACING_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Spacing"),
 }
 
 
@@ -543,16 +544,16 @@ class _BrushSettings(QtWidgets.QWidget):
                 info.label,
                 constants.BRUSH_SETTING_MIN,
                 constants.BRUSH_SETTING_MAX,
-                constants.DEFAULT_BRUSH_SETTINGS[setting],
+                constants.BRUSH_SETTING_MIN,
                 suffix="%",
                 orientation=QtCore.Qt.Horizontal,
             )
             layout.addWidget(section)
             self._sections[setting] = section
 
-    def reset(self):
+    def set_brush(self, brush):
         for setting, section in self._sections.items():
-            section.set_value(constants.DEFAULT_BRUSH_SETTINGS[setting])
+            section.set_value(brush.default_slider_percent(setting))
 
 
 class _BrushSettingsButton(_PopupToolButton):
@@ -575,10 +576,15 @@ class _BrushSettingsButton(_PopupToolButton):
             self._groups.append(settings)
         menu.addAction("Reset all to default", self._reset)
         self.setMenu(menu)
+        self._brush = None
+
+    def set_brush(self, brush):
+        self._brush = brush
+        self._reset()
 
     def _reset(self):
         for settings in self._groups:
-            settings.reset()
+            settings.set_brush(self._brush)
 
 
 class _WidePopupComboBox(QtWidgets.QComboBox):
@@ -646,7 +652,10 @@ class _BrushPanel(_PenPanel):
     def __init__(self, parent=None):
         super().__init__(parent)
         _insert_divider(self._layout, 0)
-        self._layout.insertWidget(0, _BrushSettingsButton())
+        catalogue = brushes.load_brush_catalogue()
+        settings_button = _BrushSettingsButton()
+        settings_button.set_brush(catalogue[0])
+        self._layout.insertWidget(0, settings_button)
         self._layout.insertSpacing(0, 8)
         self._layout.insertWidget(0, _BrushTypeComboBox())
 
