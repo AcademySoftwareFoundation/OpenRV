@@ -11,6 +11,7 @@ import annotate_beta_constants as constants
 @dataclass(frozen=True)
 class BrushEntry:
     name: str
+    display_name: str
     tip_path: str
     defaults: dict[str, float | bool]
 
@@ -22,5 +23,10 @@ class BrushEntry:
 
 
 def load_brush_catalogue() -> list[BrushEntry]:
-    brush_catalogue = commands.brushCatalogue()
-    return [BrushEntry(entry["name"], entry["tipPath"], entry["defaults"]) for entry in brush_catalogue]
+    catalogue = {entry["name"]: entry for entry in commands.brushCatalogue()}
+    entries = []
+    for name, display_name in constants.BRUSH_DISPLAY_NAMES.items():
+        if name in catalogue:
+            entry = catalogue[name]
+            entries.append(BrushEntry(name, display_name, entry["tipPath"], entry["defaults"]))
+    return entries

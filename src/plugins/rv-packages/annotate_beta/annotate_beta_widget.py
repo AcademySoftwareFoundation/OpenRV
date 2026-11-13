@@ -4,6 +4,7 @@
 import collections
 import math
 import os
+import random
 import sys
 import time
 
@@ -604,35 +605,81 @@ class _WidePopupComboBox(QtWidgets.QComboBox):
 class _BrushTypeComboBox(_WidePopupComboBox):
     """Combo box whose closed field shows the selected brush's image instead of its name."""
 
-    _STAMP_SIZE = 10
-    _STROKE_STEP = _STAMP_SIZE // 4
-    _STROKE_AMPLITUDE = _STAMP_SIZE // 2
-    _STROKE_COUNT = 40
+    _ICON_STAMP_SIZE = 10
+    _STROKE_STAMP_SIZE_RATIO = 0.4
+    _STROKE_LENGTH_RATIO = 5
+    _STROKE_AMPLITUDE_RATIO = 0.4
+    _SPACING_PER_RADIUS = 0.5
+    _MIN_SPACING_PER_RADIUS = 0.001
+    _PREVIEW_SEED = 1
 
-    def __init__(self, parent=None):
+    brush_changed = QtCore.Signal(object)
+
+    def __init__(self, entries, parent=None):
         super().__init__(parent)
         self.setToolTip("Brush types")
-        self._icon = _load_icon("erase_gauss")  # placeholder icon
-        self.setItemDelegate(_BrushItemDelegate(self))
-        preview = self._paint_stroke_preview()
-        for name in ["BrushNameHere"] * 20:  # placeholder brush items
-            self.addItem(name)
+        self._entries = entries
+        self._icons = []
+        stroke_stamp_size = self.fontMetrics().height() * self._STROKE_STAMP_SIZE_RATIO
+        for entry in entries:
+            icon_stamp = self._load_stamp(entry.tip_path, self._ICON_STAMP_SIZE)
+            stroke_stamp = self._load_stamp(entry.tip_path, stroke_stamp_size)
+            self._icons.append(QtGui.QIcon(icon_stamp))
+            self.addItem(entry.display_name)
+            preview = self._paint_stroke_preview(stroke_stamp, entry.defaults)
             self.setItemData(self.count() - 1, preview, _BrushItemDelegate.PREVIEW_ROLE)
+        self.setItemDelegate(_BrushItemDelegate(self))
+        self.currentIndexChanged.connect(self._on_index_changed)
 
-    def _paint_stroke_preview(self):
+    def _on_index_changed(self, index):
+        self.brush_changed.emit(self._entries[index])
+
+    def _load_stamp(self, tip_path, size):
         device_pixel_ratio = self.devicePixelRatioF()
-        width = (self._STROKE_COUNT - 1) * self._STROKE_STEP + self._STAMP_SIZE
-        height = self._STAMP_SIZE + 2 * self._STROKE_AMPLITUDE
+        stamp_pixels = round(size * device_pixel_ratio)
+        scaled_tip = QtGui.QImage(tip_path).scaled(
+            stamp_pixels, stamp_pixels, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation
+        )
+        stamp_image = QtGui.QImage(scaled_tip.size(), QtGui.QImage.Format_ARGB32)
+        stamp_image.fill(self.palette().color(self.foregroundRole()))
+        stamp_image.setAlphaChannel(scaled_tip)  # Set the tip's brightness as the stamp's opacity
+        stamp = QtGui.QPixmap.fromImage(stamp_image)
+        stamp.setDevicePixelRatio(device_pixel_ratio)
+        return stamp
+
+    def _paint_stroke_preview(self, stamp, defaults):
+        font_height = self.fontMetrics().height()
+        length = font_height * self._STROKE_LENGTH_RATIO
+        amplitude = font_height * self._STROKE_AMPLITUDE_RATIO
+
+        stamp_size = stamp.deviceIndependentSize().width()
+        device_pixel_ratio = self.devicePixelRatioF()
+        width = length + stamp_size
+        height = stamp_size + 2 * amplitude
         pixmap = QtGui.QPixmap(round(width * device_pixel_ratio), round(height * device_pixel_ratio))
         pixmap.setDevicePixelRatio(device_pixel_ratio)
         pixmap.fill(QtCore.Qt.transparent)
         painter = QtGui.QPainter(pixmap)
-        for i in range(self._STROKE_COUNT):
-            x = i * self._STROKE_STEP
-            y = self._STROKE_AMPLITUDE - round(
-                self._STROKE_AMPLITUDE * math.sin(2 * math.pi * i / (self._STROKE_COUNT - 1))
-            )
-            self._icon.paint(painter, QtCore.QRect(x, y, self._STAMP_SIZE, self._STAMP_SIZE))
+        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+
+        radius = stamp_size / 2
+        random_source = random.Random(self._PREVIEW_SEED)
+        base_gap = radius * self._SPACING_PER_RADIUS * defaults[constants.BrushSetting.SPACING_BIAS]
+        spacing_jitter = defaults[constants.BrushSetting.SPACING_JITTER]
+        rotation_jitter = defaults[constants.BrushSetting.ROTATION_JITTER]
+
+        stamp_x = 0.0
+        while stamp_x <= length:
+            stamp_y = amplitude * (1 - math.sin(2 * math.pi * stamp_x / length))
+            painter.save()
+            painter.translate(stamp_x + radius, stamp_y + radius)
+            painter.rotate(random_source.uniform(-rotation_jitter, rotation_jitter))
+            painter.drawPixmap(QtCore.QPointF(-radius, -radius), stamp)
+            painter.restore()
+
+            gap = base_gap * (1 + random_source.uniform(-spacing_jitter, spacing_jitter))
+            stamp_x += max(gap, radius * self._MIN_SPACING_PER_RADIUS)
+
         painter.end()
         return pixmap
 
@@ -641,7 +688,7 @@ class _BrushTypeComboBox(_WidePopupComboBox):
         style_option = QtWidgets.QStyleOptionComboBox()
         self.initStyleOption(style_option)
         style_option.currentText = ""
-        style_option.currentIcon = self._icon
+        style_option.currentIcon = self._icons[self.currentIndex()]
         painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, style_option)
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
@@ -651,13 +698,17 @@ class _BrushPanel(_PenPanel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        _insert_divider(self._layout, 0)
-        catalogue = brushes.load_brush_catalogue()
+        entries = brushes.load_brush_catalogue()
+        if not entries:
+            return
         settings_button = _BrushSettingsButton()
-        settings_button.set_brush(catalogue[0])
+        brush_type = _BrushTypeComboBox(entries)
+        brush_type.brush_changed.connect(settings_button.set_brush)
+        settings_button.set_brush(entries[0])
+        _insert_divider(self._layout, 0)
         self._layout.insertWidget(0, settings_button)
         self._layout.insertSpacing(0, 8)
-        self._layout.insertWidget(0, _BrushTypeComboBox())
+        self._layout.insertWidget(0, brush_type)
 
 
 class _ShapeOptionsPanel(_SliderPanel):
