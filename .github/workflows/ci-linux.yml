@@ -292,6 +292,7 @@ jobs:
             python-version: "3.13.9"
             vfx-platform: "CY2026"
             qt-arch: "linux_gcc_64"
+            gcc-toolset: "14"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -303,6 +304,7 @@ jobs:
             python-version: "3.13.9"
             vfx-platform: "CY2026"
             qt-arch: "linux_gcc_64"
+            gcc-toolset: "14"
             extra_repo: "crb"
           - os: "ubuntu-latest"
             rocky-version: "8"
@@ -314,6 +316,7 @@ jobs:
             python-version: "3.13.9"
             vfx-platform: "CY2026"
             qt-arch: "linux_gcc_64"
+            gcc-toolset: "14"
             extra_repo: "powertools"
           - os: "ubuntu-latest"
             rocky-version: "9"
@@ -325,6 +328,7 @@ jobs:
             python-version: "3.13.9"
             vfx-platform: "CY2026"
             qt-arch: "linux_gcc_64"
+            gcc-toolset: "14"
             extra_repo: "crb"
     steps:
       - name: Install git
@@ -344,3 +348,4 @@ jobs:
           vfx-platform: ${{ matrix.vfx-platform }}
           extra_repo: ${{ matrix.extra_repo }}
           qt-arch: ${{ matrix.qt-arch }}
+          gcc-toolset: ${{ matrix.gcc-toolset }}

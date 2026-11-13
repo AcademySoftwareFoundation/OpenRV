@@ -1,4 +1,4 @@
-FROM rockylinux/rockylinux:8.9
+FROM rockylinux/rockylinux:8.10
 
 LABEL maintainer="Open RV maintainer - https://github.com/AcademySoftwareFoundation/OpenRV"
 
@@ -24,6 +24,7 @@ RUN dnf upgrade -y \
     git \
     gcc \
     gcc-c++ \
+    gcc-toolset-11-toolchain \
     libXcomposite \
     libXi-devel \
     libaio-devel \
@@ -75,6 +76,9 @@ ENV PATH=/home/rv/.local/bin:/usr/local/bin:$PATH \
 RUN useradd -u 1001 -ms /bin/bash rv
 WORKDIR /home/rv
 USER rv
+
+# The Rocky 8 system GCC is 8, so make gcc-toolset-11 the default compiler in interactive shells
+RUN echo 'source /opt/rh/gcc-toolset-11/enable' >> ~/.bashrc
 
 # Download ninja from GitHub to get a more recent version.
 RUN wget https://github.com/ninja-build/ninja/releases/download/v1.11.1/ninja-linux.zip

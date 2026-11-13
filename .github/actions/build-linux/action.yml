@@ -19,6 +19,10 @@ inputs:
   qt-arch:
     required: false
     default: 'gcc_64'
+  gcc-toolset:
+    description: 'gcc-toolset major version to use (e.g. 14). Empty uses gcc-toolset-11 on Rocky 8 and the system GCC on Rocky 9.'
+    required: false
+    default: ''
   rocky_qt6_modules:
     required: false
     default: 'debug_info qt3d qt5compat qtcharts qtconnectivity qtdatavis3d qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3d qtquick3dphysics qtquickeffectmaker qtquicktimeline qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtshadertools qtspeech qtvirtualkeyboard qtwaylandcompositor qtwebchannel qtwebengine qtwebsockets qtwebview'
@@ -123,17 +127,25 @@ runs:
         fi
       shell: bash
 
-    - name: Install GCC 11 toolchain for Rocky Linux 8
-      if: ${{ inputs.rocky-version == '8' }}
+    - name: Install GCC ${{ inputs.gcc-toolset || '11' }} toolchain
+      if: ${{ inputs.gcc-toolset != '' || inputs.rocky-version == '8' }}
+      env:
+        GCC_TOOLSET: ${{ inputs.gcc-toolset || '11' }}
       run: |
+        # gcc-toolset-13 and later have no -toolchain subpackage, their metapackage installs the compilers
+        toolset_package="gcc-toolset-${GCC_TOOLSET}"
+        if [ "${GCC_TOOLSET}" -lt 13 ]; then
+          toolset_package="${toolset_package}-toolchain"
+        fi
+
         retry_count=0
         max_retries=5
 
         until [ $retry_count -ge $max_retries ]; do
           echo "Attempt $((retry_count + 1)) of $max_retries"
 
-          if dnf install -y gcc-toolset-11-toolchain; then
-            echo "GCC 11 toolchain installed successfully"
+          if dnf install -y ${toolset_package}; then
+            echo "GCC ${GCC_TOOLSET} toolchain installed successfully"
             break
           else
             retry_count=$((retry_count + 1))
@@ -145,18 +157,20 @@ runs:
         done
 
         if [ $retry_count -ge $max_retries ]; then
-          echo "Failed to install GCC 11 toolchain after $max_retries attempts"
+          echo "Failed to install GCC ${GCC_TOOLSET} toolchain after $max_retries attempts"
           exit 1
         fi
       shell: bash
 
-    - name: Enable GCC 11 toolchain for Rocky Linux 8
-      if: ${{ inputs.rocky-version == '8' }}
+    - name: Enable GCC ${{ inputs.gcc-toolset || '11' }} toolchain
+      if: ${{ inputs.gcc-toolset != '' || inputs.rocky-version == '8' }}
+      env:
+        GCC_TOOLSET: ${{ inputs.gcc-toolset || '11' }}
       run: |
-        source /opt/rh/gcc-toolset-11/enable
-        echo "/opt/rh/gcc-toolset-11/root/usr/bin" >> $GITHUB_PATH
-        echo "CC=/opt/rh/gcc-toolset-11/root/usr/bin/gcc" >> $GITHUB_ENV
-        echo "CXX=/opt/rh/gcc-toolset-11/root/usr/bin/g++" >> $GITHUB_ENV
+        source /opt/rh/gcc-toolset-${GCC_TOOLSET}/enable
+        echo "/opt/rh/gcc-toolset-${GCC_TOOLSET}/root/usr/bin" >> $GITHUB_PATH
+        echo "CC=/opt/rh/gcc-toolset-${GCC_TOOLSET}/root/usr/bin/gcc" >> $GITHUB_ENV
+        echo "CXX=/opt/rh/gcc-toolset-${GCC_TOOLSET}/root/usr/bin/g++" >> $GITHUB_ENV
         echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
         gcc --version
         g++ --version

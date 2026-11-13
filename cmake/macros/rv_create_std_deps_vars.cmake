@@ -132,6 +132,8 @@ MACRO(RV_CREATE_STANDARD_DEPS_VARIABLES target_name version make_command configu
   LIST(APPEND _configure_options "-DCMAKE_INSTALL_PREFIX=${_install_dir}")
   LIST(APPEND _configure_options "-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}")
   LIST(APPEND _configure_options "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+  # No dependency uses C++20 modules. Turn off CMake's module scanning, which GCC 14 enables and which fails when ccache wraps the compiler.
+  LIST(APPEND _configure_options "-DCMAKE_CXX_SCAN_FOR_MODULES=OFF")
   LIST(APPEND _configure_options "-S ${_source_dir}")
   LIST(APPEND _configure_options "-B ${_build_dir}")
 
