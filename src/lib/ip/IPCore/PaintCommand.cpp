@@ -860,23 +860,18 @@ namespace IPCore
                 document.setPlainText(text);
             }
 
-            // Caret rectangle in document pixels, or nullopt without a caret or outside the text.
+            // Caret rectangle in document pixels, or nullopt outside the text.
             // Drawn by hand because QTextLayout::drawCursor inverts the destination, which leaves a
             // transparent texture unchanged.
-            std::optional<QRectF> caretRect(const QTextDocument& document, std::optional<int> position, qreal caretWidth)
+            std::optional<QRectF> caretRect(const QTextDocument& document, int position, qreal caretWidth)
             {
-                if (!position)
-                {
-                    return std::nullopt;
-                }
-
-                const QTextBlock block = document.findBlock(*position);
+                const QTextBlock block = document.findBlock(position);
                 if (!block.isValid())
                 {
                     return std::nullopt;
                 }
 
-                const int positionInBlock = *position - block.position();
+                const int positionInBlock = position - block.position();
                 const QTextLine line = block.layout()->lineForTextPosition(positionInBlock);
                 if (!line.isValid())
                 {
@@ -977,8 +972,12 @@ namespace IPCore
                 constexpr int kImagePaddingPixels = 4;
                 // 1pt like a native caret, rounded to whole pixels because fillRect is not antialiased
                 const qreal caretWidth = std::max<qreal>(1.0, std::round(context.devicePixelRatio));
-                const std::optional<QRectF> caretArea = caretRect(document, caret, caretWidth);
-                const qreal contentWidth = std::max(document.idealWidth(), caretArea.value_or(QRectF()).right());
+                const std::optional<QRectF> caretArea = caret.has_value() ? caretRect(document, *caret, caretWidth) : std::nullopt;
+                qreal contentWidth = document.idealWidth();
+                if (caretArea.has_value())
+                {
+                    contentWidth = std::max(contentWidth, caretArea->right());
+                }
                 const int imgW = static_cast<int>(std::ceil(contentWidth)) + kImagePaddingPixels;
                 const int imgH = static_cast<int>(std::ceil(document.documentLayout()->documentSize().height())) + kImagePaddingPixels;
 
