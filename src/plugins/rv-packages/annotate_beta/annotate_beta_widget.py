@@ -767,6 +767,9 @@ class _CheckedItemDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         super().paint(painter, option, index)
+        self._paint_check(painter, option, index)
+
+    def _paint_check(self, painter, option, index):
         if index.row() != self.parent().currentIndex():
             return
         style = QtWidgets.QApplication.style()
@@ -792,12 +795,15 @@ class _BrushItemDelegate(_CheckedItemDelegate):
         preview = index.data(self.PREVIEW_ROLE)
         size = preview.deviceIndependentSize().toSize()
         name_option = QtWidgets.QStyleOptionViewItem(option)
-        name_option.rect.setHeight(option.rect.height() - size.height())
-        super().paint(painter, name_option, index)
         self.initStyleOption(name_option, index)
+        name_option.rect.setHeight(option.rect.height() - size.height())
+        self._paint_check(painter, name_option, index)
         text_rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemText, name_option, None)
-        x = text_rect.left() + (text_rect.width() - size.width()) // 2
-        painter.drawPixmap(x, name_option.rect.bottom() + 1, preview)
+        text_rect.adjust(style.pixelMetric(QtWidgets.QStyle.PM_FocusFrameHMargin, None, option.widget) + 1, 0, 0, 0)
+        selected = bool(option.state & QtWidgets.QStyle.State_Selected)
+        painter.setPen(option.palette.color(QtGui.QPalette.HighlightedText if selected else QtGui.QPalette.Text))
+        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, name_option.text)
+        painter.drawPixmap(text_rect.left(), name_option.rect.bottom() + 1, preview)
 
     def sizeHint(self, option, index):
         size = super().sizeHint(option, index)
