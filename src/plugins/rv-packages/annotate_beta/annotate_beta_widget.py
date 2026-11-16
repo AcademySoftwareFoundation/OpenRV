@@ -610,13 +610,16 @@ class _BrushSettingsButton(_PopupToolButton):
 class _WidePopupComboBox(QtWidgets.QComboBox):
     """Combo box whose popup is as wide as its widest item, even when the closed field is narrow."""
 
+    _MAX_VISIBLE_ITEMS = 10
+
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.setMaxVisibleItems(self._MAX_VISIBLE_ITEMS)
+        self.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
     def showPopup(self):
         view = self.view()
-        scrollbar_width = view.verticalScrollBar().sizeHint().width()
+        scrollbar_width = view.verticalScrollBar().sizeHint().width() if self.count() > self.maxVisibleItems() else 0
         view.setMinimumWidth(view.sizeHintForColumn(0) + scrollbar_width + 2 * view.frameWidth())
         super().showPopup()
 
@@ -973,7 +976,6 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
         self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
-        self._font_combo.setMaxVisibleItems(10)
         # A placeholder keeps the first loaded font from being auto-selected.
         self._font_combo.setPlaceholderText("Aa")
         self._font_combo.currentTextChanged.connect(self._on_font_selected)
