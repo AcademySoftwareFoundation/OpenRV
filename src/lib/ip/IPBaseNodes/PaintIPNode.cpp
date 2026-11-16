@@ -12,6 +12,7 @@
 #include <TwkGLText/TwkGLText.h>
 #include <exception>
 #include <mutex>
+#include <optional>
 #include <stl_ext/string_algo.h>
 #include <cstdlib>
 #include <IPCore/ShaderCommon.h>
@@ -451,7 +452,7 @@ namespace IPCore
     void PaintIPNode::LocalText::hash(std::ostream& o) const
     {
         Paint::Text::hash(o);
-        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration;
+        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration << caret.value_or(-1);
     }
 
     void PaintIPNode::compileTextComponent(Component* c)
@@ -489,6 +490,7 @@ namespace IPCore
         p.fontWeight = readProp<StringProperty>(c, "fontWeight", string("normal"));
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));
+        p.caret = readProp<IntProperty>(c, "caret", std::optional<int>{});
     }
 
     void PaintIPNode::compileRectComponent(Component* c)

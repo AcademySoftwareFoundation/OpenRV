@@ -11,6 +11,7 @@
 #include <TwkPaint/StampPath.h>
 #include <map>
 #include <memory>
+#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -117,6 +118,9 @@ namespace IPCore
             std::string fontWeight{FontWeight::Normal};
             std::string fontStyle{FontStyle::Normal};
             std::string textDecoration{TextDecoration::None};
+            // Editing caret as a QTextCursor position (UTF-16 code units), not an index into the UTF-8 text.
+            // Only set while the text box is being edited.
+            std::optional<int> caret;
 
             void hash(std::ostream& o) const override;
         };
