@@ -32,13 +32,12 @@ class ColorModifier(StrEnum):
     DARKEN = auto()
 
 
-class Brush(StrEnum):
-    """Paint brush names. CIRCLE and GAUSS use PaintIPNode's ribbon path. PEN is a brush catalogue entry for the stamp path."""
-
+class EraserBrush(StrEnum):
     CIRCLE = auto()
     GAUSS = auto()
-    PEN = auto()
 
+
+PEN_BRUSH = "pen"
 
 BRUSH_DISPLAY_NAMES = {
     "pen": "Pen",
