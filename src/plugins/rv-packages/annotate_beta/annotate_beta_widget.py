@@ -409,17 +409,17 @@ class _MenuToolButton(_PopupToolButton):
 class _EraserPanel(_SliderPanel):
     """Brush-type dropdown + size/opacity sliders for the eraser tool."""
 
-    eraser_brush_changed = QtCore.Signal(str)  # Brush value
+    eraser_brush_changed = QtCore.Signal(str)  # Eraser brush value
 
     _BRUSHES = (
-        (constants.Brush.CIRCLE, "Circle (Hard)", "erase_circle"),
-        (constants.Brush.GAUSS, "Gauss (Soft)", "erase_gauss"),
+        (constants.EraserBrush.CIRCLE, "Circle (Hard)", "erase_circle"),
+        (constants.EraserBrush.GAUSS, "Gauss (Soft)", "erase_gauss"),
     )
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._brush_button = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
-        self._brush_button.set_selection(constants.Brush.CIRCLE)
+        self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
         self._brush_button.selection_changed.connect(self.eraser_brush_changed)
         self._layout.addWidget(self._brush_button)
         _add_divider(self._layout)
@@ -431,10 +431,10 @@ class _EraserPanel(_SliderPanel):
 
     def set_soft_erase_enabled(self, enabled):
         """Enable or disable the Gauss (soft) eraser brush option."""
-        self._brush_button.set_item_enabled(constants.Brush.GAUSS, enabled)
-        if not enabled and self._brush_button.selection() == constants.Brush.GAUSS:
-            self._brush_button.set_selection(constants.Brush.CIRCLE)
-            self.eraser_brush_changed.emit(constants.Brush.CIRCLE)
+        self._brush_button.set_item_enabled(constants.EraserBrush.GAUSS, enabled)
+        if not enabled and self._brush_button.selection() == constants.EraserBrush.GAUSS:
+            self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
+            self.eraser_brush_changed.emit(constants.EraserBrush.CIRCLE)
 
 
 class _BlendModeGroup(QtWidgets.QWidget):
@@ -526,6 +526,8 @@ _BRUSH_SETTINGS = {
 class _BrushSettings(QtWidgets.QWidget):
     """Titled group of brush settings sliders shown in the brush settings dropdown."""
 
+    setting_changed = QtCore.Signal(object, int)
+
     def __init__(self, group, parent=None):
         super().__init__(parent)
         layout = QtWidgets.QVBoxLayout(self)
@@ -549,6 +551,7 @@ class _BrushSettings(QtWidgets.QWidget):
                 suffix="%",
                 orientation=QtCore.Qt.Horizontal,
             )
+            section.value_changed.connect(partial(self.setting_changed.emit, setting))
             layout.addWidget(section)
             self._sections[setting] = section
 
@@ -560,6 +563,8 @@ class _BrushSettings(QtWidgets.QWidget):
 class _BrushSettingsButton(_PopupToolButton):
     """Tool button whose drop-down holds the brush settings sliders and a reset action."""
 
+    values_changed = QtCore.Signal(object)
+
     def __init__(self, parent=None):
         super().__init__("Brush settings", parent)
         self.setIcon(_load_icon("brush_settings"))
@@ -570,6 +575,7 @@ class _BrushSettingsButton(_PopupToolButton):
         self._groups = []
         for group in _BrushSettingGroup:
             settings = _BrushSettings(group)
+            settings.setting_changed.connect(self._on_setting_changed)
             settings_action = QtWidgets.QWidgetAction(menu)
             settings_action.setDefaultWidget(settings)
             menu.addAction(settings_action)
@@ -578,14 +584,27 @@ class _BrushSettingsButton(_PopupToolButton):
         menu.addAction("Reset all to default", self._reset)
         self.setMenu(menu)
         self._brush = None
+        self._values = {}
+
+    def name(self):
+        return self._brush.name
+
+    def values(self):
+        return dict(self._values)
 
     def set_brush(self, brush):
         self._brush = brush
         self._reset()
 
     def _reset(self):
+        self._values = {setting: self._brush.defaults[setting] for setting in constants.BrushSetting}
         for settings in self._groups:
             settings.set_brush(self._brush)
+        self.values_changed.emit(self.values())
+
+    def _on_setting_changed(self, setting, percent):
+        self._values[setting] = brushes.slider_percent_to_value(setting, percent)
+        self.values_changed.emit(self.values())
 
 
 class _WidePopupComboBox(QtWidgets.QComboBox):
@@ -696,19 +715,26 @@ class _BrushTypeComboBox(_WidePopupComboBox):
 class _BrushPanel(_PenPanel):
     """Brush type and settings dropdowns, size and opacity sliders, and the blend mode buttons."""
 
+    brush_changed = QtCore.Signal(str, object)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         entries = brushes.load_brush_catalogue()
-        if not entries:
-            return
-        settings_button = _BrushSettingsButton()
+        self._settings_button = _BrushSettingsButton()
         brush_type = _BrushTypeComboBox(entries)
-        brush_type.brush_changed.connect(settings_button.set_brush)
-        settings_button.set_brush(entries[0])
+        brush_type.brush_changed.connect(self._settings_button.set_brush)
+        self._settings_button.values_changed.connect(self._emit_brush)
+        self._settings_button.set_brush(entries[0])
         _insert_divider(self._layout, 0)
-        self._layout.insertWidget(0, settings_button)
+        self._layout.insertWidget(0, self._settings_button)
         self._layout.insertSpacing(0, 8)
         self._layout.insertWidget(0, brush_type)
+
+    def brush(self):
+        return self._settings_button.name(), self._settings_button.values()
+
+    def _emit_brush(self, values):
+        self.brush_changed.emit(self._settings_button.name(), values)
 
 
 class _ShapeOptionsPanel(_SliderPanel):
@@ -1055,6 +1081,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
     filled_changed = QtCore.Signal(bool)
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
+    brush_changed = QtCore.Signal(str, object)
     font_family_changed = QtCore.Signal(str)
     font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
@@ -1105,6 +1132,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
             panel.color_modifier_changed.connect(partial(self._on_color_modifier_changed, panel))
         self._shape_panel.filled_changed.connect(self.filled_changed)
         self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
+        self._brush_panel.brush_changed.connect(self.brush_changed)
         self._text_panel.font_family_changed.connect(self.font_family_changed)
         self._text_panel.font_size_changed.connect(self.font_size_changed)
         self._text_panel.font_bold_changed.connect(self.font_bold_changed)
@@ -1149,6 +1177,9 @@ class AnnotateSecondaryPanel(_StyledWidget):
 
     def set_eraser_brush(self, brush):
         self._eraser_panel.set_eraser_brush(brush)
+
+    def brush(self):
+        return self._brush_panel.brush()
 
     def set_soft_erase_enabled(self, enabled):
         self._eraser_panel.set_soft_erase_enabled(enabled)
@@ -1334,6 +1365,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     filled_changed = QtCore.Signal(bool)
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
+    brush_changed = QtCore.Signal(str, object)
     font_family_changed = QtCore.Signal(str)
     font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
@@ -1379,6 +1411,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._panel.filled_changed.connect(self.filled_changed)
         self._panel.color_modifier_changed.connect(self.color_modifier_changed)
         self._panel.eraser_brush_changed.connect(self.eraser_brush_changed)
+        self._panel.brush_changed.connect(self.brush_changed)
         self._panel.font_family_changed.connect(self.font_family_changed)
         self._panel.font_size_changed.connect(self.font_size_changed)
         self._panel.font_bold_changed.connect(self.font_bold_changed)
