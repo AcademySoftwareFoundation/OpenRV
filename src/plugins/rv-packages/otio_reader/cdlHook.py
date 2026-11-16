@@ -3,14 +3,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import extra_commands, commands
-from effectHook import set_rv_effect_props, add_otio_metadata
+from effectHook import add_otio_metadata, set_rv_effect_props
+from rv import commands, extra_commands
 
 
 def modify_source(source, otio_cdl):
     rv_cdl = extra_commands.associatedNode("RVLinearize", source)
 
-    node_component = "{}.CDL".format(rv_cdl)
+    node_component = f"{rv_cdl}.CDL"
     set_rv_effect_props(
         node_component,
         {
@@ -27,7 +27,7 @@ def modify_source(source, otio_cdl):
 def add_cdl_node(otio_cdl):
     rv_cdl = commands.newNode("RVLinearize", otio_cdl.name or "linearize")
 
-    node_component = "{}.CDL".format(rv_cdl)
+    node_component = f"{rv_cdl}.CDL"
     set_rv_effect_props(
         node_component,
         {

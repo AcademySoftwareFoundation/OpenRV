@@ -3,19 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from __future__ import print_function
+
+import os
+import platform
+import re
+import select
+import subprocess
+import sys
+import threading
+import time
 
 import nuke
 import nukescripts
-import os
-import re
-import platform
-import subprocess
 import rvNetwork
-import time
-import sys
-import select
-import threading
 
 protocolVersion = 115
 

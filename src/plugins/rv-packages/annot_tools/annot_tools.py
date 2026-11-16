@@ -56,26 +56,26 @@ class RVAnnotTools(rv.rvtypes.MinorMode):
         paint_node = rvec.associatedNode("RVPaint", source_node)
 
         for frame in range(source_data["startFrame"], source_data["endFrame"] + 1):
-            paint_prop = "{}.paint".format(paint_node)
-            text_name = "text:{}:{}:annotation".format(rvc.getIntProperty("{}.nextId".format(paint_prop))[0], frame)
-            text_prop = "{}.{}".format(paint_node, text_name)
+            paint_prop = f"{paint_node}.paint"
+            text_name = "text:{}:{}:annotation".format(rvc.getIntProperty(f"{paint_prop}.nextId")[0], frame)
+            text_prop = f"{paint_node}.{text_name}"
 
             rvc.setIntProperty("{}.{}".format(paint_prop, "show"), [1])
             rvc.newProperty("{}.{}".format(text_prop, "text"), rvc.StringType, 1)
             rvc.newProperty("{}.{}".format(text_prop, "position"), rvc.FloatType, 2)
             rvc.newProperty("{}.{}".format(text_prop, "color"), rvc.FloatType, 4)
             rvc.newProperty("{}.{}".format(text_prop, "size"), rvc.FloatType, 1)
-            rvc.newProperty("{}.frame:{}.order".format(paint_node, frame), rvc.StringType, 1)
+            rvc.newProperty(f"{paint_node}.frame:{frame}.order", rvc.StringType, 1)
 
             rvc.setStringProperty(
                 "{}.{}".format(text_prop, "text"),
-                ["This is frame {}".format(frame)],
+                [f"This is frame {frame}"],
                 True,
             )
             rvc.setFloatProperty("{}.{}".format(text_prop, "position"), [-0.6, 0.24], True)
             rvc.setFloatProperty("{}.{}".format(text_prop, "color"), [1.0, 1.0, 1.0, 1.0], True)
             rvc.setFloatProperty("{}.{}".format(text_prop, "size"), [0.01], True)
-            rvc.setStringProperty("{}.frame:{}.order".format(paint_node, frame), [text_name], True)
+            rvc.setStringProperty(f"{paint_node}.frame:{frame}.order", [text_name], True)
 
 
 g_the_mode = None

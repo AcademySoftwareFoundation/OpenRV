@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import rvtypes, commands
+from rv import commands, rvtypes
 
 
 class PyHello(rvtypes.MinorMode):

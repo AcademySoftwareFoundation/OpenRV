@@ -5,11 +5,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-import rvNetwork
+import select
 import sys
 import time
-import select
 import tty
+
+import rvNetwork
 
 
 class PlayControl:

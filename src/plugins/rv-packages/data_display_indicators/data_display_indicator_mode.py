@@ -3,19 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-import re
 import math
+import re
 
-import rv.rvtypes as rvt
 import rv.commands as rvc
 import rv.extra_commands as rvec
-
+import rv.rvtypes as rvt
 from OpenGL.GL import *
-from OpenGL.GLUT import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import *
 
 
-class WireBox(object):
+class WireBox:
     def render(self):
         glColor(self.r, self.g, self.b, 1.0)
         glBegin(GL_LINE_LOOP)
