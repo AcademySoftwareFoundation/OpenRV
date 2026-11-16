@@ -15,9 +15,6 @@ class BrushEntry:
     tip_path: str
     defaults: dict[str, float | bool]
 
-    def default_slider_percent(self, setting: constants.BrushSetting) -> int:
-        return value_to_slider_percent(setting, self.defaults[setting])
-
 
 def value_to_slider_percent(setting: constants.BrushSetting, catalogue_value: float) -> int:
     setting_min, setting_max = constants.BRUSH_SETTING_RANGES[setting]
