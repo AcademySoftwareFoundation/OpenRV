@@ -555,9 +555,9 @@ class _BrushSettings(QtWidgets.QWidget):
             layout.addWidget(section)
             self._sections[setting] = section
 
-    def set_brush(self, brush):
+    def set_values(self, values):
         for setting, section in self._sections.items():
-            section.set_value(brush.default_slider_percent(setting))
+            section.set_value(brushes.value_to_slider_percent(setting, values[setting]))
 
 
 class _BrushSettingsButton(_PopupToolButton):
@@ -584,26 +584,31 @@ class _BrushSettingsButton(_PopupToolButton):
         menu.addAction("Reset all to default", self._reset)
         self.setMenu(menu)
         self._brush = None
-        self._values = {}
+        self._values_by_brush = {}
 
     def name(self):
         return self._brush.name
 
     def values(self):
-        return dict(self._values)
+        return dict(self._current_values())
 
     def set_brush(self, brush):
         self._brush = brush
-        self._reset()
-
-    def _reset(self):
-        self._values = {setting: self._brush.defaults[setting] for setting in constants.BrushSetting}
+        if brush.name not in self._values_by_brush:
+            self._values_by_brush[brush.name] = {setting: brush.defaults[setting] for setting in constants.BrushSetting}
         for settings in self._groups:
-            settings.set_brush(self._brush)
+            settings.set_values(self._current_values())
         self.values_changed.emit(self.values())
 
+    def _current_values(self):
+        return self._values_by_brush[self._brush.name]
+
+    def _reset(self):
+        del self._values_by_brush[self._brush.name]
+        self.set_brush(self._brush)
+
     def _on_setting_changed(self, setting, percent):
-        self._values[setting] = brushes.slider_percent_to_value(setting, percent)
+        self._current_values()[setting] = brushes.slider_percent_to_value(setting, percent)
         self.values_changed.emit(self.values())
 
 
