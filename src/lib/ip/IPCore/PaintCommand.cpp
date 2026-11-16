@@ -938,9 +938,9 @@ namespace IPCore
 
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.
-                constexpr int imagePaddingPixels = 4;
-                const int imgW = static_cast<int>(std::ceil(document.idealWidth())) + imagePaddingPixels;
-                const int imgH = static_cast<int>(std::ceil(document.documentLayout()->documentSize().height())) + imagePaddingPixels;
+                constexpr int kImagePaddingPixels = 4;
+                const int imgW = static_cast<int>(std::ceil(document.idealWidth())) + kImagePaddingPixels;
+                const int imgH = static_cast<int>(std::ceil(document.documentLayout()->documentSize().height())) + kImagePaddingPixels;
 
                 if (imgW <= 0 || imgH <= 0)
                     return;
@@ -951,9 +951,9 @@ namespace IPCore
                 {
                     QPainter painter(&img);
                     painter.setRenderHint(QPainter::TextAntialiasing, true);
-                    constexpr int maxColorComponent = 255;
+                    constexpr int kMaxColorComponent = 255;
                     auto toQColorComponent = [](float value)
-                    { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * maxColorComponent); };
+                    { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * kMaxColorComponent); };
                     QAbstractTextDocumentLayout::PaintContext paintContext;
                     paintContext.palette.setColor(QPalette::Text, QColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y),
                                                                          toQColorComponent(textColor.z), toQColorComponent(textColor.w)));
