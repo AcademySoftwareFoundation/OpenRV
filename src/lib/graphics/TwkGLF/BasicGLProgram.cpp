@@ -24,9 +24,10 @@ extern const char* ReplaceFrag_glsl;
 // Stamp brush shaders embedded from OpenRV-annotation/assets/shaders/.
 // compat_gl21.glsl is prepended at program-build time
 extern const char* ap_compat_gl21;
-extern const char* ap_stamp_vert;
-extern const char* ap_stamp_frag;
-extern const char* ap_soft_stamp_frag;
+extern const char* ap_stamp_soft_procedural_vert;
+extern const char* ap_stamp_soft_procedural_frag;
+extern const char* ap_stamp_texture_vert;
+extern const char* ap_stamp_texture_frag;
 extern const char* EraseVertex_glsl;
 extern const char* EraseFrag_glsl;
 extern const char* SoftEraseFrag_glsl;
@@ -258,7 +259,8 @@ namespace TwkGLF
     {
         static const GLProgram* prog = nullptr;
         if (!prog)
-            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_vert, std::string(ap_compat_gl21) + ap_soft_stamp_frag);
+            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_soft_procedural_vert,
+                                          std::string(ap_compat_gl21) + ap_stamp_soft_procedural_frag);
         return prog;
     }
 
@@ -284,7 +286,8 @@ namespace TwkGLF
     {
         static const GLProgram* prog = nullptr;
         if (!prog)
-            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_vert, std::string(ap_compat_gl21) + ap_stamp_frag);
+            prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_texture_vert,
+                                          std::string(ap_compat_gl21) + ap_stamp_texture_frag);
         return prog;
     }
 

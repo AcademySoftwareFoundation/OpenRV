@@ -33,6 +33,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     container: 
       image: ${{ matrix.image }}
+      # amd64/rockylinux:9 stopped setting PATH in its image config, so steps that add to GITHUB_PATH lost /usr/bin.
+      env:
+        PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       volumes:
         - /usr/local/lib/android:/github/home/android
         - /usr/share/dotnet:/github/home/dotnet

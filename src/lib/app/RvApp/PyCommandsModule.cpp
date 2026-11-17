@@ -11,6 +11,7 @@
 
 #include <Python.h>
 #include <IPBaseNodes/ImageSourceIPNode.h>
+#include <IPCore/BrushCatalogue.h>
 #include <IPCore/Exception.h>
 #include <PyTwkApp/PyEventType.h>
 #include <TwkApp/Event.h>
@@ -90,13 +91,68 @@ namespace Rv
         return Py_None;
     }
 
+    namespace
+    {
+        PyObject* brushCatalogue(PyObject* /*self*/, PyObject* /*args*/)
+        {
+            PyObject* brushes = PyList_New(0);
+
+            if (brushes == nullptr)
+            {
+                return nullptr;
+            }
+
+            const Paint::BrushCatalogue& catalogue = Paint::bundledCatalogue();
+
+            for (const Paint::BrushEntry& entry : catalogue.entries())
+            {
+                const Paint::BrushDefaults& brushDefaults = entry.params;
+
+                PyObject* defaults =
+                    Py_BuildValue("{s:d,s:d,s:d,s:d,s:d,s:O,s:d,s:d,s:d,s:d}", "spacingBias", brushDefaults.spacingBias, "spacingJitter",
+                                  brushDefaults.spacingJitter, "opacityJitter", brushDefaults.opacityJitter, "radiusJitter",
+                                  brushDefaults.radiusJitter, "rotationJitter", brushDefaults.rotationJitter, "rotateToStroke",
+                                  brushDefaults.rotateToStroke ? Py_True : Py_False, "angle", brushDefaults.angle, "squish",
+                                  brushDefaults.squish, "hardness", brushDefaults.hardness, "flow", brushDefaults.flow);
+
+                if (defaults == nullptr)
+                {
+                    Py_DECREF(brushes);
+                    return nullptr;
+                }
+
+                PyObject* brush = Py_BuildValue("{s:s,s:s,s:N}", "name", entry.name.c_str(), "tipPath",
+                                                catalogue.tipPath(entry.tip).c_str(), "defaults", defaults);
+
+                if (brush == nullptr)
+                {
+                    Py_DECREF(brushes);
+                    return nullptr;
+                }
+
+                const int result = PyList_Append(brushes, brush);
+                Py_DECREF(brush);
+
+                if (result < 0)
+                {
+                    Py_DECREF(brushes);
+                    return nullptr;
+                }
+            }
+
+            return brushes;
+        }
+    } // namespace
+
     static PyMethodDef localmethods[] = {
 
         {"data", data, METH_NOARGS, "return session data object."},
 
         {"insertCreatePixelBlock", insertCreatePixelBlock, METH_VARARGS, "insert block of pixels into image source."},
 
-        {NULL}};
+        {"brushCatalogue", brushCatalogue, METH_NOARGS, "return the brush catalogue as a list of dicts."},
+
+        {nullptr}};
 
     void* pyRvAppCommands() { return (void*)localmethods; }
 
