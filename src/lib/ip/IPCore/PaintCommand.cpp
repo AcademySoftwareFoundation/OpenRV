@@ -37,12 +37,15 @@
 #include <QRectF>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QTextCharFormat>
+#include <QTextCursor>
 #include <QTextLayout>
 #include <algorithm>
 #include <functional>
 #include <iostream>
 #include <mutex>
 #include <optional>
+#include <utility>
 
 // Shader source strings embedded at compile time via quote_file() in
 // IPCore/CMakeLists.txt.  Defined at global scope by the generated .cpp files.
@@ -898,6 +901,40 @@ namespace IPCore
                 return QRectF(blockOrigin.x() + line.cursorToX(positionInBlock), blockOrigin.y() + line.y(), caretWidth, line.height());
             }
 
+            struct TextEditingState
+            {
+                std::optional<int> caret;
+                std::optional<std::pair<int, int>> selection;
+            };
+
+            // The caret is hidden while text is selected.
+            TextEditingState editingState(const PaintIPNode::LocalText* localText)
+            {
+                if (localText == nullptr)
+                {
+                    return {};
+                }
+                return {localText->selection ? std::nullopt : localText->caret, localText->selection};
+            }
+
+            // Text color, plus the selected range highlighted with the system selection color.
+            QAbstractTextDocumentLayout::PaintContext textPaintContext(QTextDocument& document, const QColor& textColor,
+                                                                       std::optional<std::pair<int, int>> selection)
+            {
+                QAbstractTextDocumentLayout::PaintContext paintContext;
+                paintContext.palette.setColor(QPalette::Text, textColor);
+                if (selection)
+                {
+                    QTextCursor cursor(&document);
+                    cursor.setPosition(selection->first);
+                    cursor.setPosition(selection->second, QTextCursor::KeepAnchor);
+                    QTextCharFormat format;
+                    format.setBackground(QGuiApplication::palette().color(QPalette::Highlight));
+                    paintContext.selections.append({cursor, format});
+                }
+                return paintContext;
+            }
+
         } // namespace
 
         void Text::execute(CommandContext& context) const
@@ -917,7 +954,7 @@ namespace IPCore
             const std::string& effectiveFontWeight = localText ? localText->fontWeight : PaintIPNode::FontWeight::Normal;
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;
-            const std::optional<int> caret = localText ? localText->caret : std::nullopt;
+            const auto [caret, selection] = editingState(localText);
 
             {
                 const GLFBO* currentFBO = context.currentRender;
@@ -986,7 +1023,7 @@ namespace IPCore
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.
                 constexpr int kImagePaddingPixels = 4;
-                // 1pt like a native caret, rounded to whole pixels because fillRect is not antialiased
+                // 1pt wide, rounded to whole pixels because fillRect is not antialiased
                 const qreal caretWidth = std::max<qreal>(1.0, std::round(context.devicePixelRatio));
                 const std::optional<QRectF> caretArea = caret.has_value() ? caretRect(document, *caret, caretWidth) : std::nullopt;
                 qreal contentWidth = document.idealWidth();
@@ -1011,9 +1048,7 @@ namespace IPCore
                     { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * kMaxColorComponent); };
                     const QColor qtextColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y), toQColorComponent(textColor.z),
                                             toQColorComponent(textColor.w));
-                    QAbstractTextDocumentLayout::PaintContext paintContext;
-                    paintContext.palette.setColor(QPalette::Text, qtextColor);
-                    document.documentLayout()->draw(&painter, paintContext);
+                    document.documentLayout()->draw(&painter, textPaintContext(document, qtextColor, selection));
                     if (caretArea)
                     {
                         painter.fillRect(*caretArea, qtextColor);
