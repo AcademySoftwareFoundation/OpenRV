@@ -891,7 +891,7 @@ namespace IPCore
                 std::optional<std::pair<int, int>> selection;
             };
 
-            // Like macOS TextEdit, the caret is hidden while text is selected.
+            // The caret is hidden while text is selected.
             TextEditingState editingState(const PaintIPNode::LocalText* localText)
             {
                 if (localText == nullptr)
@@ -901,7 +901,7 @@ namespace IPCore
                 return {localText->selection ? std::nullopt : localText->caret, localText->selection};
             }
 
-            // Text color, plus the selected range highlighted with the system selection color like macOS TextEdit.
+            // Text color, plus the selected range highlighted with the system selection color.
             QAbstractTextDocumentLayout::PaintContext textPaintContext(QTextDocument& document, const QColor& textColor,
                                                                        std::optional<std::pair<int, int>> selection)
             {
@@ -1007,7 +1007,7 @@ namespace IPCore
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.
                 constexpr int kImagePaddingPixels = 4;
-                // 1pt like a native caret, rounded to whole pixels because fillRect is not antialiased
+                // 1pt wide, rounded to whole pixels because fillRect is not antialiased
                 const qreal caretWidth = std::max<qreal>(1.0, std::round(context.devicePixelRatio));
                 const std::optional<QRectF> caretArea = caret.has_value() ? caretRect(document, *caret, caretWidth) : std::nullopt;
                 qreal contentWidth = document.idealWidth();
