@@ -233,11 +233,9 @@ namespace IPCore
 
         virtual ~AuxAudioRenderer() {}
 
-        virtual void* audioForFrame(int frame, size_t index, size_t& n) const;
+        void* audioForFrame(int frame, size_t index, size_t& n) const override;
 
-        virtual bool isAvailable() const { return session->isUpdating(); }
-
-        // virtual bool isAvailable() const { return session->isPlaying(); }
+        [[nodiscard]] bool isAvailable() const override { return session->isPlaying() || session->isScrubbingAudio(); }
 
         Session* session;
     };

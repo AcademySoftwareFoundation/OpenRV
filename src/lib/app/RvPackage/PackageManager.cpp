@@ -2313,7 +2313,6 @@ namespace Rv
         //  comes from user settings, unless it is clobbered.
         //
         m_userSettings->setValue(key, value);
-        sync();
     }
 
     void RvSettings::sync()

@@ -20,6 +20,7 @@
 #include <vector>
 
 QT_BEGIN_NAMESPACE
+class QKeyEvent;
 class QPlatformWindow;
 class QWidget;
 QT_END_NAMESPACE
@@ -61,6 +62,8 @@ namespace Rv
         void stopProcessingEvents();
 
         bool event(QEvent* event) override;
+
+        bool eventFilter(QObject* object, QEvent* event) override;
 
         bool firstPaintCompleted() const { return m_firstPaintCompleted; }
 
@@ -200,6 +203,10 @@ namespace Rv
 
         // Once per session. Unconditional: needed in logs without -debug gpu.
         void emitPresentationRecord();
+
+        //  Qt can deliver both ShortcutOverride and KeyPress for one key; true
+        //  for the duplicate. Records the key either way, so auto-repeat works.
+        bool isRepeatedKey(const QKeyEvent* kevent);
 
         RvDocument* m_doc;
         QTVulkanVideoDevice* m_videoDevice{nullptr};
