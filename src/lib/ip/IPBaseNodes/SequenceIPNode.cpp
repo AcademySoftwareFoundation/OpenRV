@@ -902,6 +902,7 @@ namespace IPCore
             return context.buffer.size();
         }
 
+        const IPNodes& ins = inputs();
         const double rate = context.buffer.rate();
         const int numChannels = context.buffer.numChannels();
         const size_t requestedSamples = context.buffer.size();
@@ -938,13 +939,20 @@ namespace IPCore
             //
 
             int index = indexAtSample(readSample, rate, context.fps);
-            if (index < 0)
+            if (index < 0 || index >= m_edlGlobalIn->size() - 1)
             {
-                cerr << "ERROR: no samples read from input node" << endl;
+                cerr << "ERROR: no samples read from input node index: " << index << endl;
                 break;
             }
 
             int sourceIndex = (*m_edlSource)[index];
+            bool validSourceIndex = true;
+
+            if (sourceIndex < 0 || sourceIndex >= ins.size())
+            {
+                cerr << "WARNING: invalid source index: " << sourceIndex << endl;
+                validSourceIndex = false;
+            }
 
             //
             //  Measured in Sequence "global" scope;
@@ -956,6 +964,7 @@ namespace IPCore
             //
 
             int inputFrame = (*m_edlGlobalIn)[index] - globalOffset;
+            int outputFrame = (*m_edlGlobalIn)[index + 1] - globalOffset;
             SampleTime inputStart = frameToSample(inputFrame, context.fps, rate);
 
             //
@@ -984,13 +993,19 @@ namespace IPCore
             //
             //  sourceReadStart   - Target sample in Source (where to read
             //  from).
-            //
 
             int firstFrame = (*m_edlSourceIn)[index];
             SampleTime sourceStartSample = frameToSample(firstFrame, context.fps, rate);
-            SampleTime sourceCutInSample = frameToSample(m_rangeInfos[sourceIndex].start, context.fps, rate);
-            int lastFrame = (*m_edlSourceOut)[index];
-            int sourceDuration = m_rangeInfos[sourceIndex].end - m_rangeInfos[sourceIndex].start + 1;
+
+            SampleTime sourceCutInSample = sourceStartSample;
+            int sourceDuration = outputFrame - inputFrame;
+
+            if (validSourceIndex)
+            {
+                sourceCutInSample = frameToSample(m_rangeInfos[sourceIndex].start, context.fps, rate);
+                sourceDuration = m_rangeInfos[sourceIndex].end - m_rangeInfos[sourceIndex].start + 1;
+            }
+
             SampleTime samplesInSource = frameToSample(sourceDuration, context.fps, rate);
             SampleTime samplesIntoSource = sourceStartSample - sourceCutInSample;
             SampleTime sourceReadStart = samplesIntoInput + samplesIntoSource;
@@ -1011,8 +1026,17 @@ namespace IPCore
                 AudioBuffer audioBuffer(numSamples, channels, rate, samplesToTime(sourceReadStart, rate));
 
                 AudioContext subContext(audioBuffer, context.fps);
-                const size_t numRead = inputs()[sourceIndex]->audioFillBuffer(subContext);
-
+                size_t numRead;
+                if (validSourceIndex)
+                {
+                    numRead = ins[sourceIndex]->audioFillBuffer(subContext);
+                }
+                else
+                {
+                    // If the source index is invalid create silence
+                    subContext.buffer.zero();
+                    numRead = numSamples;
+                }
                 //
                 // If we got something back then copy it into the context buffer
                 // and advance the read location.
