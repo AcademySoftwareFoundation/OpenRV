@@ -164,7 +164,7 @@ ELSE()
   IF(NOT TARGET minizip::minizip)
     MESSAGE(
       FATAL_ERROR
-        "zlib was found, but minizip was not. Provide the minizip package that matches zlib ${_version} (Conan: minizip), or set RV_DEPS_ZLIB_FORCE_BUILD=ON to build both from source."
+        "zlib was found, but minizip was not. Provide the minizip package that matches the found zlib (Conan: minizip), or set RV_DEPS_ZLIB_FORCE_BUILD=ON to build both from source."
     )
   ENDIF()
   ADD_LIBRARY(minizip INTERFACE)

@@ -17,6 +17,7 @@
 
 [replace_requires]
 zlib/*: zlib/1.3.2@openrv/common
+minizip/*: minizip/1.3.2@openrv/common
 libatomic_ops/*: libatomic_ops/7.10.0@openrv/common
 libwebp/*: libwebp/1.2.4@openrv/common
 dav1d/*: dav1d/1.5.3@openrv/common
