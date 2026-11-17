@@ -2583,13 +2583,20 @@ namespace Rv
             }
         }
 
+        //  True once this frame has opened a -debug profile sample.
+        bool profiling = false;
+
         if (m_doc && session && m_videoDevice)
         {
             m_videoDevice->makeCurrent();
 
             if (m_userActive && m_activityTimer.elapsed() > 1.0)
             {
-                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && m_eventWidget && m_eventWidget->hasFocus())
+                //  Once this window has focus, QWindowContainer clears the
+                //  container's focus, so check both.
+                const bool viewportHasFocus = m_eventWidget && (m_eventWidget->hasFocus() || QGuiApplication::focusWindow() == this);
+
+                if (m_doc->mainPopup() && !m_doc->mainPopup()->isVisible() && viewportHasFocus)
                 {
                     TwkApp::ActivityChangeEvent aevent("user-inactive", m_videoDevice);
                     m_videoDevice->sendEvent(aevent);
@@ -2601,9 +2608,24 @@ namespace Rv
             absolutePosition(x, y);
             m_videoDevice->setAbsolutePosition(x, y);
 
+            //  Session::render() writes into the current profiling sample.
+            if (IPCore::debugProfile)
+            {
+                Session::ProfilingRecord& profilingRecord = session->beginProfilingSample();
+                profilingRecord.renderStart = session->profilingElapsedTime();
+                profiling = true;
+            }
+
             {
                 ScopedDiagTimer diagTimer(s_diag.renderMs, IPCore::ImageRenderer::debugGpu());
                 session->render();
+            }
+
+            if (profiling)
+            {
+                Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+                profilingRecord.renderEnd = session->profilingElapsedTime();
+                profilingRecord.swapStart = profilingRecord.renderEnd;
             }
 
             if (!m_postFirstNonEmptyRender && session->postFirstNonEmptyRender())
@@ -2644,6 +2666,13 @@ namespace Rv
                 //  The output made its own GL context current; restore ours.
                 m_videoDevice->makeCurrent();
             }
+        }
+
+        if (profiling)
+        {
+            Session::ProfilingRecord& profilingRecord = session->currentProfilingSample();
+            profilingRecord.swapEnd = session->profilingElapsedTime();
+            session->endProfilingSample();
         }
 
         if (session)
@@ -2749,6 +2778,44 @@ namespace Rv
         }
     }
 
+    bool VulkanWindow::isRepeatedKey(const QKeyEvent* kevent)
+    {
+        const bool repeated =
+            m_lastKey == kevent->key()
+            && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || m_lastKeyType == kevent->type());
+        m_lastKey = kevent->key();
+        m_lastKeyType = kevent->type();
+        return repeated;
+    }
+
+    bool VulkanWindow::eventFilter(QObject* /*object*/, QEvent* event)
+    {
+        if (event->type() != QEvent::KeyPress && event->type() != QEvent::KeyRelease && event->type() != QEvent::Shortcut
+            && event->type() != QEvent::ShortcutOverride)
+        {
+            return false;
+        }
+
+        if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
+        {
+            if (isRepeatedKey(kevent))
+            {
+                event->accept();
+                return true;
+            }
+        }
+
+        IPCore::Session* session = m_doc ? m_doc->session() : nullptr;
+        if (session && m_videoDevice && m_videoDevice->hasTranslator())
+        {
+            session->setEventVideoDevice(m_videoDevice);
+            m_videoDevice->translator().sendQTEvent(event);
+        }
+
+        event->accept();
+        return true;
+    }
+
     //--------------------------------------------------------------------------
     // event()
     //--------------------------------------------------------------------------
@@ -2802,7 +2869,8 @@ namespace Rv
             }
         }
 
-        if (event->type() != QEvent::Paint)
+        //  Playback posts an UpdateRequest every frame; it is not user activity.
+        if (event->type() != QEvent::Paint && event->type() != QEvent::UpdateRequest)
         {
             m_activityTimer.stop();
             m_activityTimer.start();
@@ -2815,18 +2883,13 @@ namespace Rv
             }
         }
 
-        if (QKeyEvent* kevent = dynamic_cast<QKeyEvent*>(event))
+        if (const auto* kevent = dynamic_cast<const QKeyEvent*>(event))
         {
-            if (m_lastKey == kevent->key()
-                && ((m_lastKeyType == QEvent::ShortcutOverride && kevent->type() == QEvent::KeyPress) || (m_lastKeyType == kevent->type())))
+            if (isRepeatedKey(kevent))
             {
-                m_lastKey = kevent->key();
-                m_lastKeyType = kevent->type();
                 event->accept();
                 return true;
             }
-            m_lastKeyType = kevent->type();
-            m_lastKey = kevent->key();
         }
 
         switch (event->type())
