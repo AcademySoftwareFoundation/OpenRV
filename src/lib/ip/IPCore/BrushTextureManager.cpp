@@ -1,167 +1,148 @@
 //
-// Copyright (C) 2025 Autodesk, Inc. All Rights Reserved.
+// Copyright (C) 2026 Autodesk, Inc. All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
 #include <IPCore/BrushTextureManager.h>
-#include <TwkApp/Bundle.h>
+#include <IPCore/BrushCatalogue.h>
 #include <TwkGLF/GL.h>
-#include <QDir>
-#include <QFileInfo>
-#include <QString>
-#include <QStringList>
+#include <TwkUtil/File.h>
 #include <png.h>
-#include <cstdio>
-#include <cstring>
+#include <fstream>
 #include <iostream>
+#include <iterator>
+#include <optional>
+#include <utility>
 #include <vector>
 
-namespace IPCore
+namespace IPCore::Paint
 {
-    namespace Paint
+
+    namespace
     {
 
-        // ── helpers ───────────────────────────────────────────────────────────────────
-
-        /// Load an 8-bit grayscale PNG and upload it as a GL_LUMINANCE texture.
-        /// Returns the GL texture name, or 0 on failure.
-        static unsigned int uploadGrayscalePng(const std::string& path)
+        struct BrushTipImage
         {
-            FILE* fp = std::fopen(path.c_str(), "rb");
-            if (!fp)
+            int width;
+            int height;
+            std::vector<png_byte> pixels;
+        };
+
+        std::vector<png_byte> readFileBytes(const std::string& path)
+        {
+            std::ifstream file(UNICODE_C_STR(path.c_str()), std::ios::binary);
+            return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+        }
+
+        std::optional<BrushTipImage> decodeBrushTipPng(const std::string& path)
+        {
+            const std::vector<png_byte> fileBytes = readFileBytes(path);
+            if (fileBytes.empty())
             {
-                std::cerr << "[BrushTextureManager] cannot open: " << path << "\n";
-                return 0;
+                std::cerr << "[BrushTextureManager] cannot read: " << path << "\n";
+                return std::nullopt;
             }
 
-            png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-            if (!png)
+            png_image pngImage{};
+            pngImage.version = PNG_IMAGE_VERSION;
+
+            if (png_image_begin_read_from_memory(&pngImage, fileBytes.data(), fileBytes.size()) == 0)
             {
-                std::fclose(fp);
-                return 0;
+                std::cerr << "[BrushTextureManager] libpng error reading: " << path << ": " << std::data(pngImage.message) << "\n";
+                png_image_free(&pngImage);
+                return std::nullopt;
             }
 
-            png_infop info = png_create_info_struct(png);
-            if (!info)
+            pngImage.format = PNG_FORMAT_RGBA;
+            std::vector<png_byte> rgba(PNG_IMAGE_SIZE(pngImage));
+            if (png_image_finish_read(&pngImage, nullptr, rgba.data(), 0, nullptr) == 0)
             {
-                png_destroy_read_struct(&png, nullptr, nullptr);
-                std::fclose(fp);
-                return 0;
+                std::cerr << "[BrushTextureManager] libpng error reading: " << path << ": " << std::data(pngImage.message) << "\n";
+                return std::nullopt;
             }
 
-            if (setjmp(png_jmpbuf(png)))
+            constexpr size_t kRgbaChannelCount = 4;
+            std::vector<png_byte> red(rgba.size() / kRgbaChannelCount);
+            for (size_t pixel = 0; pixel < red.size(); ++pixel)
             {
-                std::cerr << "[BrushTextureManager] libpng error reading: " << path << "\n";
-                png_destroy_read_struct(&png, &info, nullptr);
-                std::fclose(fp);
-                return 0;
+                red[pixel] = rgba[pixel * kRgbaChannelCount];
             }
 
-            png_init_io(png, fp);
-            png_read_info(png, info);
+            return BrushTipImage{static_cast<int>(pngImage.width), static_cast<int>(pngImage.height), std::move(red)};
+        }
 
-            // Normalise to 8-bit grayscale regardless of source format
-            png_set_strip_16(png);
-            png_set_expand(png);
-            png_set_rgb_to_gray_fixed(png, 1, -1, -1);
-            png_set_strip_alpha(png);
-            png_read_update_info(png, info);
-
-            const int w = static_cast<int>(png_get_image_width(png, info));
-            const int h = static_cast<int>(png_get_image_height(png, info));
-
-            std::vector<std::vector<png_byte>> rows(h, std::vector<png_byte>(w));
-            std::vector<png_bytep> rowPtrs(h);
-            for (int y = 0; y < h; ++y)
-                rowPtrs[y] = rows[y].data();
-            png_read_image(png, rowPtrs.data());
-
-            png_destroy_read_struct(&png, &info, nullptr);
-            std::fclose(fp);
-
-            // Flatten row-per-row data into a contiguous buffer
-            std::vector<unsigned char> pixels(w * h);
-            for (int y = 0; y < h; ++y)
-                std::memcpy(pixels.data() + y * w, rows[y].data(), w);
-
-            GLuint texId = 0;
-            glGenTextures(1, &texId);
-            glBindTexture(GL_TEXTURE_2D, texId);
+        unsigned int uploadLuminanceTexture(const BrushTipImage& image)
+        {
+            GLuint textureId = 0;
+            glGenTextures(1, &textureId);
+            glBindTexture(GL_TEXTURE_2D, textureId);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels.data());
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, image.width, image.height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, image.pixels.data());
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            return static_cast<unsigned int>(texId);
+            return static_cast<unsigned int>(textureId);
         }
 
-        // ── BrushTextureManager ───────────────────────────────────────────────────────
-
-        BrushTextureManager& BrushTextureManager::instance()
+        std::optional<unsigned int> uploadBrushTipPng(const std::string& path)
         {
-            static BrushTextureManager s;
-            return s;
-        }
-
-        std::string BrushTextureManager::tipDir()
-        {
-            if (const char* env = std::getenv("RV_BRUSH_DIR"))
-                return env;
-            if (TwkApp::Bundle* b = TwkApp::Bundle::mainBundle())
+            const std::optional<BrushTipImage> image = decodeBrushTipPng(path);
+            if (!image.has_value())
             {
-#if defined(PLATFORM_DARWIN)
-                // DarwinBundle::top() is RV.app/; keep brush assets under Contents/Resources for codesign.
-                return b->top() + "/Contents/Resources/assets/brushes";
-#else
-                return b->top() + "/assets/brushes";
-#endif
+                return std::nullopt;
             }
-            return "";
+
+            return uploadLuminanceTexture(*image);
         }
 
-        unsigned int BrushTextureManager::getTexture(const std::string& tipFile)
+    } // namespace
+
+    BrushTextureManager& BrushTextureManager::instance()
+    {
+        static BrushTextureManager singleton;
+        return singleton;
+    }
+
+    unsigned int BrushTextureManager::getTexture(const std::string& tipFile)
+    {
+        if (tipFile.empty())
         {
-            if (tipFile.empty())
-                return 0;
-
-            std::lock_guard<std::mutex> lock(m_mutex);
-            const auto it = m_textures.find(tipFile);
-            if (it != m_textures.end())
-                return it->second;
-
-            const QString path = QString::fromStdString(tipDir()) + "/" + QString::fromStdString(tipFile);
-            const unsigned int texId = uploadGrayscalePng(path.toStdString());
-            if (!texId)
-                std::cerr << "[BrushTextureManager] failed to load tip: " << path.toStdString() << "\n";
-
-            m_textures[tipFile] = texId; // cache failures too, so a bad path isn't retried every frame
-            return texId;
+            return 0;
         }
 
-        std::vector<std::string> BrushTextureManager::listTipFiles() const
+        std::scoped_lock lock(m_mutex);
+        const auto cached = m_textures.find(tipFile);
+        if (cached != m_textures.end())
         {
-            std::vector<std::string> files;
-            const QDir dir(QString::fromStdString(tipDir()));
-            for (const QFileInfo& fi : dir.entryInfoList(QStringList() << "*.png", QDir::Files, QDir::Name))
-                files.push_back(fi.fileName().toStdString());
-            return files;
+            return cached->second;
         }
 
-        void BrushTextureManager::clear()
+        const std::string path = bundledCatalogue().tipPath(tipFile);
+        const std::optional<unsigned int> uploadedPng = uploadBrushTipPng(path);
+        if (!uploadedPng.has_value())
         {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            for (auto& kv : m_textures)
+            std::cerr << "[BrushTextureManager] failed to load tip: " << path << "\n";
+        }
+
+        const unsigned int textureId = uploadedPng.value_or(0);
+        m_textures[tipFile] = textureId; // cache failures too, so a bad path isn't retried every frame
+        return textureId;
+    }
+
+    void BrushTextureManager::clear()
+    {
+        std::scoped_lock lock(m_mutex);
+        for (const auto& [tipFile, cachedTextureId] : m_textures)
+        {
+            if (cachedTextureId != 0)
             {
-                if (kv.second)
-                {
-                    GLuint texId = kv.second;
-                    glDeleteTextures(1, &texId);
-                }
+                GLuint textureId = cachedTextureId;
+                glDeleteTextures(1, &textureId);
             }
-            m_textures.clear();
         }
+        m_textures.clear();
+    }
 
-    } // namespace Paint
-} // namespace IPCore
+} // namespace IPCore::Paint

@@ -340,6 +340,7 @@ SET(_versions_list
     "expat:${RV_DEPS_EXPAT_VERSION}"
     "nanobind:${RV_DEPS_NANOBIND_VERSION}"
     "pcre2:${RV_DEPS_PCRE2_VERSION}"
+    "nlohmann_json:${RV_DEPS_NLOHMANN_JSON_VERSION}"
 )
 
 # Add commercial RV-specific SDK versions if they exist
