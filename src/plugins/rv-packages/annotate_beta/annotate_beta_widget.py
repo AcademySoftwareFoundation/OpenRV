@@ -649,8 +649,9 @@ class _BrushTypeComboBox(_WidePopupComboBox):
         self._icons = []
         stroke_stamp_size = self.fontMetrics().height() * self._STROKE_STAMP_SIZE_RATIO
         for entry in entries:
-            icon_stamp = self._load_stamp(entry.tip_path, self._ICON_STAMP_SIZE)
-            stroke_stamp = self._load_stamp(entry.tip_path, stroke_stamp_size)
+            tip = QtGui.QImage(entry.tip_path)
+            icon_stamp = self._make_stamp(tip, self._ICON_STAMP_SIZE)
+            stroke_stamp = self._make_stamp(tip, stroke_stamp_size)
             self._icons.append(QtGui.QIcon(icon_stamp))
             self.addItem(entry.display_name)
             preview = self._paint_stroke_preview(stroke_stamp, entry.defaults)
@@ -661,12 +662,10 @@ class _BrushTypeComboBox(_WidePopupComboBox):
     def _on_index_changed(self, index):
         self.brush_changed.emit(self._entries[index])
 
-    def _load_stamp(self, tip_path, size):
+    def _make_stamp(self, tip, size):
         device_pixel_ratio = self.devicePixelRatioF()
         stamp_pixels = round(size * device_pixel_ratio)
-        scaled_tip = QtGui.QImage(tip_path).scaled(
-            stamp_pixels, stamp_pixels, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation
-        )
+        scaled_tip = tip.scaled(stamp_pixels, stamp_pixels, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         stamp_image = QtGui.QImage(scaled_tip.size(), QtGui.QImage.Format_ARGB32)
         stamp_image.fill(self.palette().color(self.foregroundRole()))
         stamp_image.setAlphaChannel(scaled_tip)  # Set the tip's brightness as the stamp's opacity
