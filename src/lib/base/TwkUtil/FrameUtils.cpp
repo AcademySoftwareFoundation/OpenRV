@@ -599,13 +599,16 @@ struct LexinumericCompare
     {
         std::string seqName = pathConform(inSeqName);
 
+        // Early check if the file exists due to files that could be mistaken for a sequence.
+        bool seqNameExists = fileExists(seqName.c_str());
+
         DB("existingFilesInSequence seqName '" << seqName << "'");
         ExistingFileList existingFiles;
 
         string timeStr = "";
         string pattern = "";
 
-        if (splitSequenceName(seqName, timeStr, pattern))
+        if (!seqNameExists && splitSequenceName(seqName, timeStr, pattern))
         {
             if (timeStr != "")
             {
@@ -772,10 +775,10 @@ struct LexinumericCompare
         }
         else
         {
-            DB("    splitSequenceName returned false");
+            DB("    splitSequenceName returned false or file exists.");
             ExistingFile ef;
             ef.name = seqName;
-            ef.exists = fileExists(seqName.c_str());
+            ef.exists = seqNameExists;
             ef.frame = -1;
             existingFiles.push_back(ef);
         }
