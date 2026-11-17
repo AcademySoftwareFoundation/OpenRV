@@ -40,6 +40,8 @@ namespace Rv
 
         void stopProcessingEvents();
 
+        bool eventFilter(QObject* object, QEvent* event) override;
+
         bool firstPaintCompleted() const;
 
         void setContentSize(int w, int h) { m_csize = QSize(w, h); }
@@ -67,6 +69,8 @@ namespace Rv
 
     protected:
         void showEvent(QShowEvent* event) override;
+
+        bool event(QEvent* event) override;
 
     private:
         RvDocument* m_doc;
