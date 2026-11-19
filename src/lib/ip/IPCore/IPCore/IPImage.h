@@ -408,6 +408,14 @@ namespace IPCore
 
         Matrix33 textureMatrix;
 
+        // Target regions to which we write our paint annotations to.
+        // Default is the entire view, but for certain modes (e.g. side-by-side)
+        // regions are clamped to not clobber the cache.
+        float paintTargetRegionX = 0.0f;
+        float paintTargetRegionY = 0.0f;
+        float paintTargetRegionW = 1.0f;
+        float paintTargetRegionH = 1.0f;
+
         Box2 viewport;   // viewport
         Box2 stencilBox; // box in image space
 
@@ -463,7 +471,7 @@ namespace IPCore
         mutable HashValue m_renderIDHash; // 32 bit crc
         mutable HashValue m_fbHash;       // 32 bit crc
         mutable std::string m_renderID;
-        mutable std::string m_renderIDWithPartialPaint;
+        mutable std::string m_renderIDWithPartialPaint; // Used as cache key for painting annotations
         mutable std::string m_graphID;
         mutable size_t m_coordID;
     };
