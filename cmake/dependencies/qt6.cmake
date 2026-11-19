@@ -305,36 +305,53 @@ ENDIF()
 IF(RV_TARGET_WINDOWS)
   # Note: On windows, the Qt distribution has both the debug and release versions of its libs, dlls, and plugins into the same directories. This will prevent RV
   # from working correctly. We need to only copy the ones matching the CMAKE_BUILD_TYPE
+
+  # Some Qt distributions only ship release files, in which case there is nothing to filter out.
+  IF(EXISTS "${RV_DEPS_QT_LOCATION}/bin/Qt6Cored.dll")
+    SET(_qt_has_debug_libs
+        TRUE
+    )
+  ELSE()
+    SET(_qt_has_debug_libs
+        FALSE
+    )
+    IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+      MESSAGE(WARNING "The Qt distribution in ${RV_DEPS_QT_LOCATION} has no debug libraries, its release libraries will be used for this Debug build.")
+    ENDIF()
+  ENDIF()
+
   FUNCTION(COPY_ONLY_LIBS_MATCHING_BUILD_TYPE SRC_DIR DST_DIR)
 
     IF(NOT EXISTS (${DST_DIR}))
       FILE(MAKE_DIRECTORY ${DST_DIR})
     ENDIF()
 
-    # A file is a debug build when its name ends with a 'd' before the extension and a release file without that 'd' sits next to it (e.g. Qt6Cored.dll,
-    # Qt6Cored.pdb next to Qt6Core.dll). Release files that happen to end with a 'd', such as qschannelbackend.dll, have no such sibling and are kept.
-    FILE(
-      GLOB _qt_d_suffixed_libs
-      RELATIVE ${SRC_DIR}
-      ${SRC_DIR}/*d.*
-    )
-
     SET(_qt_debug_libs
         ""
     )
-    FOREACH(
-      _qt_d_suffixed_lib
-      ${_qt_d_suffixed_libs}
-    )
-      STRING(
-        REGEX
-        REPLACE "d\\.[^.]*$" "" _qt_release_stem "${_qt_d_suffixed_lib}"
+    IF(_qt_has_debug_libs)
+      # A file is a debug build when its name ends with a 'd' before the extension and a release file without that 'd' sits next to it (e.g. Qt6Cored.dll,
+      # Qt6Cored.pdb next to Qt6Core.dll). Release files that happen to end with a 'd', such as qschannelbackend.dll, have no such sibling and are kept.
+      FILE(
+        GLOB _qt_d_suffixed_libs
+        RELATIVE ${SRC_DIR}
+        ${SRC_DIR}/*d.*
       )
-      FILE(GLOB _qt_release_siblings ${SRC_DIR}/${_qt_release_stem}.*)
-      IF(_qt_release_siblings)
-        LIST(APPEND _qt_debug_libs ${_qt_d_suffixed_lib})
-      ENDIF()
-    ENDFOREACH()
+
+      FOREACH(
+        _qt_d_suffixed_lib
+        ${_qt_d_suffixed_libs}
+      )
+        STRING(
+          REGEX
+          REPLACE "d\\.[^.]*$" "" _qt_release_stem "${_qt_d_suffixed_lib}"
+        )
+        FILE(GLOB _qt_release_siblings ${SRC_DIR}/${_qt_release_stem}.*)
+        IF(_qt_release_siblings)
+          LIST(APPEND _qt_debug_libs ${_qt_d_suffixed_lib})
+        ENDIF()
+      ENDFOREACH()
+    ENDIF()
 
     # Remove Qt6 executables that are not needed.
     FILE(
@@ -353,7 +370,9 @@ IF(RV_TARGET_WINDOWS)
       ENDIF()
     ENDFOREACH()
 
-    IF(CMAKE_BUILD_TYPE MATCHES "^Debug$")
+    IF(_qt_has_debug_libs
+       AND CMAKE_BUILD_TYPE MATCHES "^Debug$"
+    )
       SET(_qt_libs_to_copy
           ${_qt_debug_libs}
       )
