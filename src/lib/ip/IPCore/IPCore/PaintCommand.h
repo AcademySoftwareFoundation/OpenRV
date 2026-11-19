@@ -14,6 +14,7 @@
 #include <TwkGLF/GLRenderPrimitives.h>
 #include <TwkPaint/Path.h>
 #include <IPCore/IPImage.h>
+#include <cstdint>
 #include <vector>
 
 namespace IPCore
@@ -177,15 +178,11 @@ namespace IPCore
                 TessellateMode // each triangle can have its own color
             };
 
-            // Blend mode for stamp brushes — set from the stroke's own "blendMode"
-            // property (see PaintIPNode::compilePenComponent) so PaintCommand::execute()
-            // can set the correct glBlendFunc without inspecting the brush name.
-            enum StampBlendMode
+            enum class StampBlendMode : std::uint8_t
             {
-                BlendNormal,   ///< GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
-                BlendMarker,   ///< marker wetness approximation: GL_MAX into a cleared buffer so stamps don't accumulate opacity
-                BlendAdditive, ///< glow: GL_SRC_ALPHA, GL_ONE
-                BlendEraser    ///< reserved; stamp erasure not yet implemented
+                Normal,
+                Eraser,
+                Additive
             };
 
             explicit PolyLine(const Vec2* vector2d = nullptr, size_t npoints = 0, float width = 0, Color color = Color(0.0),
@@ -265,7 +262,7 @@ namespace IPCore
             bool ownPoints;
 
             // Stamp brush properties, set from the brush catalogue unless the stroke overrides them
-            StampBlendMode stampBlendMode{BlendNormal};
+            StampBlendMode stampBlendMode{StampBlendMode::Normal};
             float hardness{1.0f};     ///< edge hardness 0-1
             std::string tipTexture{}; ///< tip PNG filename resolved to a GL texture at render time
 

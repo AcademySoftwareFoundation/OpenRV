@@ -439,54 +439,18 @@ namespace IPCore
 
                 auto stampQuads = buildStampQuads(localPoly->stampInstances);
 
-                // BlendMarker uses two-pass isolation: GL_MAX into a cleared currentFBO
-                // (prevents intra-stroke opacity accumulation), then composite the
-                // background under the result via ONE_MINUS_DST_ALPHA.
-                if (stampBlendMode == BlendMarker)
+                glEnable(GL_BLEND);
+                if (stampBlendMode == StampBlendMode::Additive)
                 {
-
-                    // Pass 1: stamps into cleared currentFBO
-                    glDisable(GL_BLEND);
-                    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-                    glClear(GL_COLOR_BUFFER_BIT);
-                    glEnable(GL_BLEND);
-                    glBlendEquationSeparate(GL_MAX, GL_MAX);
-                    glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ONE);
-                    {
-                        RenderPrimitives rpStamp(glState->activeGLProgram(), stampQuads.primitiveData, stampQuads.vertexAttributes,
-                                                 glState->vboList());
-                        rpStamp.setupAndRender();
-                    }
-                    glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-
-                    // Pass 2: composite background under stamps
-                    GLPipeline* bgPipeline = glState->useGLProgram(textureRectGLProgram());
-                    bgPipeline->setModelview(identity);
-                    bgPipeline->setProjection(projMat);
-                    bgPipeline->setViewport(0, 0, w, h);
-                    int bgUnit = 0;
-                    bgPipeline->setUniformInt("texture0", 1, &bgUnit);
-                    glActiveTexture(GL_TEXTURE0);
-                    textureFBO->bindColorTexture(0);
-                    glEnable(GL_BLEND);
-                    glBlendFuncSeparate(GL_ONE_MINUS_DST_ALPHA, GL_ONE, GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-                    {
-                        RenderPrimitives rpBg(glState->activeGLProgram(), buffer, attributeInfo2, glState->vboList());
-                        rpBg.setupAndRender();
-                    }
-                    textureFBO->unbindColorTexture();
+                    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
                 }
                 else
                 {
-                    glEnable(GL_BLEND);
-                    if (stampBlendMode == BlendAdditive)
-                        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
-                    else
-                        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-                    RenderPrimitives rpStamp(glState->activeGLProgram(), stampQuads.primitiveData, stampQuads.vertexAttributes,
-                                             glState->vboList());
-                    rpStamp.setupAndRender();
+                    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
                 }
+                RenderPrimitives renderPrimitiveStampe(glState->activeGLProgram(), stampQuads.primitiveData, stampQuads.vertexAttributes,
+                                                       glState->vboList());
+                renderPrimitiveStampe.setupAndRender();
 
                 if (context.hasStencil)
                     glDisable(GL_SCISSOR_TEST);

@@ -377,7 +377,9 @@ namespace IPCore
             rotateToStrokeP != nullptr && rotateToStrokeP->size() > 0 ? rotateToStrokeP->front() != 0 : defaults.rotateToStroke;
         const float angle = angleP != nullptr && angleP->size() > 0 ? angleP->front() : defaults.angle;
         const float squish = squishP != nullptr && squishP->size() > 0 ? squishP->front() : defaults.squish;
-        const unsigned int blendMode = blendModeP && blendModeP->size() ? blendModeP->front() : Paint::PolyLine::BlendNormal;
+        const auto blendMode = (blendModeP != nullptr && blendModeP->size() != 0)
+                                   ? static_cast<Paint::PolyLine::StampBlendMode>(blendModeP->front())
+                                   : Paint::PolyLine::StampBlendMode::Normal;
 
         p.width = width;
         p.color = color;
@@ -394,7 +396,7 @@ namespace IPCore
         p.duration = duration;
         p.hardness = hardness;
         p.tipTexture = brushEntry.has_value() ? brushEntry->tip : "";
-        p.stampBlendMode = (Paint::PolyLine::StampBlendMode)blendMode;
+        p.stampBlendMode = blendMode;
 
         // Per-point widths are present when widthP has one entry per point.
         // Allow widthP to lag pointsP by one: the Mu layer inserts the point and
