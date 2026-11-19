@@ -26,6 +26,21 @@ def _set_tool_cursor(tool):
     commands.setCursor(_TOOL_CURSORS.get(tool, QtCore.Qt.CrossCursor).value)
 
 
+class _ViewKeyForwarder(QtCore.QObject):
+    """Sends key events the dock widgets ignore to RV's view, so hotkeys keep working while the dock is focused.
+
+    On macOS, clicking the floating dock makes it the active window. The Session Manager dock does the same.
+    """
+
+    _KEY_EVENTS = frozenset({QtCore.QEvent.KeyPress, QtCore.QEvent.KeyRelease})
+
+    def eventFilter(self, obj, event):
+        if event.type() not in self._KEY_EVENTS:
+            return False
+        view = qtutils.sessionGLView()
+        return view is not None and view.eventFilter(obj, event)
+
+
 def _menu_state(checked):
     return commands.CheckedMenuState if checked else commands.NeutralMenuState
 
@@ -264,6 +279,8 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         session_window = qtutils.sessionWindow()
         self._dock = AnnotateToolbarDockWidget(session_window)
         self._dock.close_requested.connect(self._on_close_requested)
+        self._key_forwarder = _ViewKeyForwarder(self._dock)
+        self._dock.installEventFilter(self._key_forwarder)
 
         self._dock.dockLocationChanged.connect(self._on_dock_location_changed)
         self._dock_area = QtCore.Qt.DockWidgetArea(
