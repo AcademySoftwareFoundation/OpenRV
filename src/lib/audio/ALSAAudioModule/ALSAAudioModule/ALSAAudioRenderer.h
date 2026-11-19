@@ -13,6 +13,7 @@
 #include <TwkUtil/Timer.h>
 
 #include <alsa/asoundlib.h>
+#include <mutex>
 
 namespace IPCore
 {
@@ -92,7 +93,7 @@ namespace IPCore
         snd_pcm_uframes_t m_bufferSize;
         pthread_t m_audioThread;
         bool m_audioThreadRunning;
-        pthread_mutex_t m_runningLock;
+        std::mutex m_runningLock;
     };
 
 } // namespace IPCore
