@@ -311,27 +311,29 @@ IF(RV_TARGET_WINDOWS)
       FILE(MAKE_DIRECTORY ${DST_DIR})
     ENDIF()
 
-    # First make a list of problematic libs: the ones ending up with d (which means they end with dd in debug)
+    # A file is a debug build when its name ends with a 'd' before the extension and a release file without that 'd' sits next to it (e.g. Qt6Cored.dll,
+    # Qt6Cored.pdb next to Qt6Core.dll). Release files that happen to end with a 'd', such as qschannelbackend.dll, have no such sibling and are kept.
     FILE(
-      GLOB _qt_dd_libs
-      RELATIVE ${SRC_DIR}
-      ${SRC_DIR}/*dd.*
-    )
-
-    FILE(
-      GLOB _qt_debug_libs
+      GLOB _qt_d_suffixed_libs
       RELATIVE ${SRC_DIR}
       ${SRC_DIR}/*d.*
     )
 
-    # If we have dd libs then we need to remove the single d ones from the _qt_debug_libs
-    FOREACH(
-      _qt_dd_lib
-      ${_qt_dd_libs}
+    SET(_qt_debug_libs
+        ""
     )
-      # Determine the name of the associated single d lib so we can remove it from the _qt_debug_libs
-      STRING(REPLACE "dd." "d." _d_lib ${_qt_dd_lib})
-      LIST(REMOVE_ITEM _qt_debug_libs ${_d_lib})
+    FOREACH(
+      _qt_d_suffixed_lib
+      ${_qt_d_suffixed_libs}
+    )
+      STRING(
+        REGEX
+        REPLACE "d\\.[^.]*$" "" _qt_release_stem "${_qt_d_suffixed_lib}"
+      )
+      FILE(GLOB _qt_release_siblings ${SRC_DIR}/${_qt_release_stem}.*)
+      IF(_qt_release_siblings)
+        LIST(APPEND _qt_debug_libs ${_qt_d_suffixed_lib})
+      ENDIF()
     ENDFOREACH()
 
     # Remove Qt6 executables that are not needed.
