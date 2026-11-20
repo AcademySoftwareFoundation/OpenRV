@@ -193,7 +193,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._settings.tool = saved_tool
 
         self._settings.eraser_brush = commands.readSettings(
-            constants.SETTINGS_GROUP, "eraser_brush", constants.Brush.CIRCLE
+            constants.SETTINGS_GROUP, "eraser_brush", constants.EraserBrush.CIRCLE
         )
 
         self._settings.font_family = commands.readSettings(
@@ -220,6 +220,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         toolbar.strip.set_active_tool(self._settings.tool)
         toolbar.panel.set_page_for_tool(self._settings.tool)
         toolbar.panel.set_eraser_brush(self._settings.eraser_brush)
+        self._settings.brush_name, self._settings.brush_values = toolbar.panel.brush()
         toolbar.panel.set_font_family(self._settings.font_family)
         toolbar.panel.set_font_size(self._settings.font_size)
         toolbar.panel.set_bold(self._settings.font_bold)
@@ -300,6 +301,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         toolbar.clear_requested.connect(self._engine.clear_frame)
         toolbar.clear_all_requested.connect(self._engine.clear_all_frames)
         toolbar.eraser_brush_changed.connect(self._on_eraser_brush_changed)
+        toolbar.brush_changed.connect(self._on_brush_changed)
 
         self._load_settings()
 
@@ -346,6 +348,10 @@ class AnnotateBetaMode(rvtypes.MinorMode):
     def _on_eraser_brush_changed(self, brush):
         self._settings.eraser_brush = brush
         commands.writeSettings(constants.SETTINGS_GROUP, "eraser_brush", brush)
+
+    def _on_brush_changed(self, name, values):
+        self._settings.brush_name = name
+        self._settings.brush_values = values
 
     def _on_font_setting_changed(self, attribute, value):
         self._engine.commit_text_if_active()
@@ -395,7 +401,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         else:
             self._dock.hide()
 
-        airbrush_on = commands.isEventCategoryEnabled("annotate_airbrush_category")
         burn_on = commands.isEventCategoryEnabled("annotate_burn_category")
         dodge_on = commands.isEventCategoryEnabled("annotate_dodge_category")
         soft_erase_on = commands.isEventCategoryEnabled("annotate_softerase_category")
@@ -403,7 +408,6 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         text_on = commands.isEventCategoryEnabled("annotate_text_category")
         sample_on = commands.isEventCategoryEnabled("annotate_sample_category")
 
-        toolbar.set_tool_enabled(constants.Tool.BRUSH, airbrush_on)
         toolbar.set_blend_mode_enabled(constants.ColorModifier.DARKEN, burn_on)
         toolbar.set_blend_mode_enabled(constants.ColorModifier.ADDITIVE, dodge_on)
         toolbar.set_soft_erase_enabled(soft_erase_on)

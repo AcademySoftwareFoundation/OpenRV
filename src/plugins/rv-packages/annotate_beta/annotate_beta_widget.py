@@ -4,6 +4,7 @@
 import collections
 import math
 import os
+import random
 import sys
 import time
 
@@ -17,6 +18,7 @@ from rv import commands, qtutils
 
 from annotate_beta_color_picker import ColorPickerPopup, add_next_custom_slot_highlight
 import annotate_beta_constants as constants
+import annotate_beta_brushes as brushes
 
 
 class _Page(Enum):
@@ -278,7 +280,7 @@ class _SliderSection(QtWidgets.QWidget):
         with QtCore.QSignalBlocker(self._slider):
             self._slider.setValue(value)
         if not self._input.hasFocus():
-            self._input.setText(f"{value}{self._suffix}")
+            self._input.setText(f"{self._slider.value()}{self._suffix}")
 
 
 class _SliderPanel(QtWidgets.QWidget):
@@ -407,17 +409,17 @@ class _MenuToolButton(_PopupToolButton):
 class _EraserPanel(_SliderPanel):
     """Brush-type dropdown + size/opacity sliders for the eraser tool."""
 
-    eraser_brush_changed = QtCore.Signal(str)  # Brush value
+    eraser_brush_changed = QtCore.Signal(str)  # Eraser brush value
 
     _BRUSHES = (
-        (constants.Brush.CIRCLE, "Circle (Hard)", "erase_circle"),
-        (constants.Brush.GAUSS, "Gauss (Soft)", "erase_gauss"),
+        (constants.EraserBrush.CIRCLE, "Circle (Hard)", "erase_circle"),
+        (constants.EraserBrush.GAUSS, "Gauss (Soft)", "erase_gauss"),
     )
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._brush_button = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
-        self._brush_button.set_selection(constants.Brush.CIRCLE)
+        self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
         self._brush_button.selection_changed.connect(self.eraser_brush_changed)
         self._layout.addWidget(self._brush_button)
         _add_divider(self._layout)
@@ -429,10 +431,10 @@ class _EraserPanel(_SliderPanel):
 
     def set_soft_erase_enabled(self, enabled):
         """Enable or disable the Gauss (soft) eraser brush option."""
-        self._brush_button.set_item_enabled(constants.Brush.GAUSS, enabled)
-        if not enabled and self._brush_button.selection() == constants.Brush.GAUSS:
-            self._brush_button.set_selection(constants.Brush.CIRCLE)
-            self.eraser_brush_changed.emit(constants.Brush.CIRCLE)
+        self._brush_button.set_item_enabled(constants.EraserBrush.GAUSS, enabled)
+        if not enabled and self._brush_button.selection() == constants.EraserBrush.GAUSS:
+            self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
+            self.eraser_brush_changed.emit(constants.EraserBrush.CIRCLE)
 
 
 class _BlendModeGroup(QtWidgets.QWidget):
@@ -513,16 +515,18 @@ class _BrushSettingInfo:
 
 _BRUSH_SETTINGS = {
     constants.BrushSetting.HARDNESS: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Hardness"),
-    constants.BrushSetting.SPACING: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Spacing"),
-    constants.BrushSetting.SIZE_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Size"),
-    constants.BrushSetting.OPACITY_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Opacity"),
-    constants.BrushSetting.ROTATION_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Rotation"),
-    constants.BrushSetting.SPACING_VARIATION: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Spacing"),
+    constants.BrushSetting.SPACING_BIAS: _BrushSettingInfo(_BrushSettingGroup.BRUSH, "Spacing"),
+    constants.BrushSetting.RADIUS_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Size"),
+    constants.BrushSetting.OPACITY_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Opacity"),
+    constants.BrushSetting.ROTATION_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Rotation"),
+    constants.BrushSetting.SPACING_JITTER: _BrushSettingInfo(_BrushSettingGroup.VARIATION, "Spacing"),
 }
 
 
 class _BrushSettings(QtWidgets.QWidget):
     """Titled group of brush settings sliders shown in the brush settings dropdown."""
+
+    setting_changed = QtCore.Signal(object, int)
 
     def __init__(self, group, parent=None):
         super().__init__(parent)
@@ -543,20 +547,23 @@ class _BrushSettings(QtWidgets.QWidget):
                 info.label,
                 constants.BRUSH_SETTING_MIN,
                 constants.BRUSH_SETTING_MAX,
-                constants.DEFAULT_BRUSH_SETTINGS[setting],
+                constants.BRUSH_SETTING_MIN,
                 suffix="%",
                 orientation=QtCore.Qt.Horizontal,
             )
+            section.value_changed.connect(partial(self.setting_changed.emit, setting))
             layout.addWidget(section)
             self._sections[setting] = section
 
-    def reset(self):
+    def set_values(self, values):
         for setting, section in self._sections.items():
-            section.set_value(constants.DEFAULT_BRUSH_SETTINGS[setting])
+            section.set_value(brushes.value_to_slider_percent(setting, values[setting]))
 
 
 class _BrushSettingsButton(_PopupToolButton):
     """Tool button whose drop-down holds the brush settings sliders and a reset action."""
+
+    values_changed = QtCore.Signal(object)
 
     def __init__(self, parent=None):
         super().__init__("Brush settings", parent)
@@ -568,6 +575,7 @@ class _BrushSettingsButton(_PopupToolButton):
         self._groups = []
         for group in _BrushSettingGroup:
             settings = _BrushSettings(group)
+            settings.setting_changed.connect(self._on_setting_changed)
             settings_action = QtWidgets.QWidgetAction(menu)
             settings_action.setDefaultWidget(settings)
             menu.addAction(settings_action)
@@ -575,22 +583,48 @@ class _BrushSettingsButton(_PopupToolButton):
             self._groups.append(settings)
         menu.addAction("Reset all to default", self._reset)
         self.setMenu(menu)
+        self._brush = None
+        self._values_by_brush = {}
+
+    def name(self):
+        return self._brush.name
+
+    def values(self):
+        return dict(self._current_values())
+
+    def set_brush(self, brush):
+        self._brush = brush
+        if brush.name not in self._values_by_brush:
+            self._values_by_brush[brush.name] = {setting: brush.defaults[setting] for setting in constants.BrushSetting}
+        for settings in self._groups:
+            settings.set_values(self._current_values())
+        self.values_changed.emit(self.values())
+
+    def _current_values(self):
+        return self._values_by_brush[self._brush.name]
 
     def _reset(self):
-        for settings in self._groups:
-            settings.reset()
+        del self._values_by_brush[self._brush.name]
+        self.set_brush(self._brush)
+
+    def _on_setting_changed(self, setting, percent):
+        self._current_values()[setting] = brushes.slider_percent_to_value(setting, percent)
+        self.values_changed.emit(self.values())
 
 
 class _WidePopupComboBox(QtWidgets.QComboBox):
     """Combo box whose popup is as wide as its widest item, even when the closed field is narrow."""
 
+    _MAX_VISIBLE_ITEMS = 10
+
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.setMaxVisibleItems(self._MAX_VISIBLE_ITEMS)
+        self.view().setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
     def showPopup(self):
         view = self.view()
-        scrollbar_width = view.verticalScrollBar().sizeHint().width()
+        scrollbar_width = view.verticalScrollBar().sizeHint().width() if self.count() > self.maxVisibleItems() else 0
         view.setMinimumWidth(view.sizeHintForColumn(0) + scrollbar_width + 2 * view.frameWidth())
         super().showPopup()
 
@@ -598,35 +632,80 @@ class _WidePopupComboBox(QtWidgets.QComboBox):
 class _BrushTypeComboBox(_WidePopupComboBox):
     """Combo box whose closed field shows the selected brush's image instead of its name."""
 
-    _STAMP_SIZE = 10
-    _STROKE_STEP = _STAMP_SIZE // 4
-    _STROKE_AMPLITUDE = _STAMP_SIZE // 2
-    _STROKE_COUNT = 40
+    _ICON_STAMP_SIZE = 10
+    _STROKE_STAMP_SIZE_RATIO = 0.4
+    _STROKE_LENGTH_RATIO = 5
+    _STROKE_AMPLITUDE_RATIO = 0.4
+    _SPACING_PER_RADIUS = 0.5
+    _MIN_SPACING_PER_RADIUS = 0.001
+    _PREVIEW_SEED = 1
 
-    def __init__(self, parent=None):
+    brush_changed = QtCore.Signal(object)
+
+    def __init__(self, entries, parent=None):
         super().__init__(parent)
         self.setToolTip("Brush types")
-        self._icon = _load_icon("erase_gauss")  # placeholder icon
-        self.setItemDelegate(_BrushItemDelegate(self))
-        preview = self._paint_stroke_preview()
-        for name in ["BrushNameHere"] * 20:  # placeholder brush items
-            self.addItem(name)
+        self._entries = entries
+        self._icons = []
+        stroke_stamp_size = self.fontMetrics().height() * self._STROKE_STAMP_SIZE_RATIO
+        for entry in entries:
+            tip = QtGui.QImage(entry.tip_path)
+            icon_stamp = self._make_stamp(tip, self._ICON_STAMP_SIZE)
+            stroke_stamp = self._make_stamp(tip, stroke_stamp_size)
+            self._icons.append(QtGui.QIcon(icon_stamp))
+            self.addItem(entry.display_name)
+            preview = self._paint_stroke_preview(stroke_stamp, entry.defaults)
             self.setItemData(self.count() - 1, preview, _BrushItemDelegate.PREVIEW_ROLE)
+        self.setItemDelegate(_BrushItemDelegate(self))
+        self.currentIndexChanged.connect(self._on_index_changed)
 
-    def _paint_stroke_preview(self):
+    def _on_index_changed(self, index):
+        self.brush_changed.emit(self._entries[index])
+
+    def _make_stamp(self, tip, size):
         device_pixel_ratio = self.devicePixelRatioF()
-        width = (self._STROKE_COUNT - 1) * self._STROKE_STEP + self._STAMP_SIZE
-        height = self._STAMP_SIZE + 2 * self._STROKE_AMPLITUDE
+        stamp_pixels = round(size * device_pixel_ratio)
+        scaled_tip = tip.scaled(stamp_pixels, stamp_pixels, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        stamp_image = QtGui.QImage(scaled_tip.size(), QtGui.QImage.Format_ARGB32)
+        stamp_image.fill(self.palette().color(self.foregroundRole()))
+        stamp_image.setAlphaChannel(scaled_tip)  # Set the tip's brightness as the stamp's opacity
+        stamp = QtGui.QPixmap.fromImage(stamp_image)
+        stamp.setDevicePixelRatio(device_pixel_ratio)
+        return stamp
+
+    def _paint_stroke_preview(self, stamp, defaults):
+        font_height = self.fontMetrics().height()
+        length = font_height * self._STROKE_LENGTH_RATIO
+        amplitude = font_height * self._STROKE_AMPLITUDE_RATIO
+
+        stamp_size = stamp.deviceIndependentSize().width()
+        device_pixel_ratio = self.devicePixelRatioF()
+        width = length + stamp_size
+        height = stamp_size + 2 * amplitude
         pixmap = QtGui.QPixmap(round(width * device_pixel_ratio), round(height * device_pixel_ratio))
         pixmap.setDevicePixelRatio(device_pixel_ratio)
         pixmap.fill(QtCore.Qt.transparent)
         painter = QtGui.QPainter(pixmap)
-        for i in range(self._STROKE_COUNT):
-            x = i * self._STROKE_STEP
-            y = self._STROKE_AMPLITUDE - round(
-                self._STROKE_AMPLITUDE * math.sin(2 * math.pi * i / (self._STROKE_COUNT - 1))
-            )
-            self._icon.paint(painter, QtCore.QRect(x, y, self._STAMP_SIZE, self._STAMP_SIZE))
+        painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform)
+
+        radius = stamp_size / 2
+        random_source = random.Random(self._PREVIEW_SEED)
+        base_gap = radius * self._SPACING_PER_RADIUS * defaults[constants.BrushSetting.SPACING_BIAS]
+        spacing_jitter = defaults[constants.BrushSetting.SPACING_JITTER]
+        rotation_jitter = defaults[constants.BrushSetting.ROTATION_JITTER]
+
+        stamp_x = 0.0
+        while stamp_x <= length:
+            stamp_y = amplitude * (1 - math.sin(2 * math.pi * stamp_x / length))
+            painter.save()
+            painter.translate(stamp_x + radius, stamp_y + radius)
+            painter.rotate(random_source.uniform(-rotation_jitter, rotation_jitter))
+            painter.drawPixmap(QtCore.QPointF(-radius, -radius), stamp)
+            painter.restore()
+
+            gap = base_gap * (1 + random_source.uniform(-spacing_jitter, spacing_jitter))
+            stamp_x += max(gap, radius * self._MIN_SPACING_PER_RADIUS)
+
         painter.end()
         return pixmap
 
@@ -635,7 +714,7 @@ class _BrushTypeComboBox(_WidePopupComboBox):
         style_option = QtWidgets.QStyleOptionComboBox()
         self.initStyleOption(style_option)
         style_option.currentText = ""
-        style_option.currentIcon = self._icon
+        style_option.currentIcon = self._icons[self.currentIndex()]
         painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, style_option)
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
@@ -643,12 +722,26 @@ class _BrushTypeComboBox(_WidePopupComboBox):
 class _BrushPanel(_PenPanel):
     """Brush type and settings dropdowns, size and opacity sliders, and the blend mode buttons."""
 
+    brush_changed = QtCore.Signal(str, object)
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        entries = brushes.load_brush_catalogue()
+        self._settings_button = _BrushSettingsButton()
+        brush_type = _BrushTypeComboBox(entries)
+        brush_type.brush_changed.connect(self._settings_button.set_brush)
+        self._settings_button.values_changed.connect(self._emit_brush)
+        self._settings_button.set_brush(entries[0])
         _insert_divider(self._layout, 0)
-        self._layout.insertWidget(0, _BrushSettingsButton())
+        self._layout.insertWidget(0, self._settings_button)
         self._layout.insertSpacing(0, 8)
-        self._layout.insertWidget(0, _BrushTypeComboBox())
+        self._layout.insertWidget(0, brush_type)
+
+    def brush(self):
+        return self._settings_button.name(), self._settings_button.values()
+
+    def _emit_brush(self, values):
+        self.brush_changed.emit(self._settings_button.name(), values)
 
 
 class _ShapeOptionsPanel(_SliderPanel):
@@ -678,6 +771,9 @@ class _CheckedItemDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         super().paint(painter, option, index)
+        self._paint_check(painter, option, index)
+
+    def _paint_check(self, painter, option, index):
         if index.row() != self.parent().currentIndex():
             return
         style = QtWidgets.QApplication.style()
@@ -703,12 +799,15 @@ class _BrushItemDelegate(_CheckedItemDelegate):
         preview = index.data(self.PREVIEW_ROLE)
         size = preview.deviceIndependentSize().toSize()
         name_option = QtWidgets.QStyleOptionViewItem(option)
-        name_option.rect.setHeight(option.rect.height() - size.height())
-        super().paint(painter, name_option, index)
         self.initStyleOption(name_option, index)
+        name_option.rect.setHeight(option.rect.height() - size.height())
+        self._paint_check(painter, name_option, index)
         text_rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemText, name_option, None)
-        x = text_rect.left() + (text_rect.width() - size.width()) // 2
-        painter.drawPixmap(x, name_option.rect.bottom() + 1, preview)
+        text_rect.adjust(style.pixelMetric(QtWidgets.QStyle.PM_FocusFrameHMargin, None, option.widget) + 1, 0, 0, 0)
+        selected = bool(option.state & QtWidgets.QStyle.State_Selected)
+        painter.setPen(option.palette.color(QtGui.QPalette.HighlightedText if selected else QtGui.QPalette.Text))
+        painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, name_option.text)
+        painter.drawPixmap(text_rect.left(), name_option.rect.bottom() + 1, preview)
 
     def sizeHint(self, option, index):
         size = super().sizeHint(option, index)
@@ -887,7 +986,6 @@ class _TextOptionsPanel(QtWidgets.QWidget):
         self._font_combo = _FontComboBox()
         self._font_combo.setToolTip("Font")
         self._font_combo.setItemDelegate(_FontNameDelegate(self._font_combo))
-        self._font_combo.setMaxVisibleItems(10)
         # A placeholder keeps the first loaded font from being auto-selected.
         self._font_combo.setPlaceholderText("Aa")
         self._font_combo.currentTextChanged.connect(self._on_font_selected)
@@ -995,6 +1093,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
     filled_changed = QtCore.Signal(bool)
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
+    brush_changed = QtCore.Signal(str, object)
     font_family_changed = QtCore.Signal(str)
     font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
@@ -1045,6 +1144,7 @@ class AnnotateSecondaryPanel(_StyledWidget):
             panel.color_modifier_changed.connect(partial(self._on_color_modifier_changed, panel))
         self._shape_panel.filled_changed.connect(self.filled_changed)
         self._eraser_panel.eraser_brush_changed.connect(self.eraser_brush_changed)
+        self._brush_panel.brush_changed.connect(self.brush_changed)
         self._text_panel.font_family_changed.connect(self.font_family_changed)
         self._text_panel.font_size_changed.connect(self.font_size_changed)
         self._text_panel.font_bold_changed.connect(self.font_bold_changed)
@@ -1089,6 +1189,9 @@ class AnnotateSecondaryPanel(_StyledWidget):
 
     def set_eraser_brush(self, brush):
         self._eraser_panel.set_eraser_brush(brush)
+
+    def brush(self):
+        return self._brush_panel.brush()
 
     def set_soft_erase_enabled(self, enabled):
         self._eraser_panel.set_soft_erase_enabled(enabled)
@@ -1274,6 +1377,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
     filled_changed = QtCore.Signal(bool)
     color_modifier_changed = QtCore.Signal(str)
     eraser_brush_changed = QtCore.Signal(str)
+    brush_changed = QtCore.Signal(str, object)
     font_family_changed = QtCore.Signal(str)
     font_size_changed = QtCore.Signal(int)
     font_bold_changed = QtCore.Signal(bool)
@@ -1319,6 +1423,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._panel.filled_changed.connect(self.filled_changed)
         self._panel.color_modifier_changed.connect(self.color_modifier_changed)
         self._panel.eraser_brush_changed.connect(self.eraser_brush_changed)
+        self._panel.brush_changed.connect(self.brush_changed)
         self._panel.font_family_changed.connect(self.font_family_changed)
         self._panel.font_size_changed.connect(self.font_size_changed)
         self._panel.font_bold_changed.connect(self.font_bold_changed)

@@ -32,11 +32,44 @@ class ColorModifier(StrEnum):
     DARKEN = auto()
 
 
-class Brush(StrEnum):
-    """Paint brush names understood by PaintIPNode's ribbon (non-stamp) path."""
-
+class EraserBrush(StrEnum):
     CIRCLE = auto()
     GAUSS = auto()
+
+
+PEN_BRUSH = "pen"
+
+BRUSH_DISPLAY_NAMES = {
+    "pen": "Pen",
+    "pencil": "Pencil",
+    "coarse_watercolor": "Watercolor",
+    "camo": "Camo",
+    "charcoal": "Charcoal",
+    "hr": "HR",
+}
+
+
+class BrushSetting(StrEnum):
+    """Brush parameters the settings sliders edit, named as in the catalogue."""
+
+    HARDNESS = "hardness"
+    SPACING_BIAS = "spacingBias"
+    RADIUS_JITTER = "radiusJitter"
+    OPACITY_JITTER = "opacityJitter"
+    ROTATION_JITTER = "rotationJitter"
+    SPACING_JITTER = "spacingJitter"
+
+
+BRUSH_SETTING_MIN = 0
+BRUSH_SETTING_MAX = 100
+BRUSH_SETTING_RANGES = {
+    BrushSetting.HARDNESS: (0, 1),
+    BrushSetting.SPACING_BIAS: (0.1, 4),
+    BrushSetting.RADIUS_JITTER: (0, 1),
+    BrushSetting.OPACITY_JITTER: (0, 1),
+    BrushSetting.ROTATION_JITTER: (0, 180),
+    BrushSetting.SPACING_JITTER: (0, 4),
+}
 
 
 class FontSize(IntEnum):
@@ -45,15 +78,6 @@ class FontSize(IntEnum):
     SMALL = 24
     MEDIUM = 48
     LARGE = 72
-
-
-class BrushSetting(StrEnum):
-    HARDNESS = auto()
-    SPACING = auto()
-    SIZE_VARIATION = auto()
-    OPACITY_VARIATION = auto()
-    ROTATION_VARIATION = auto()
-    SPACING_VARIATION = auto()
 
 
 FONT_SIZE_MIN = 1
@@ -73,14 +97,3 @@ DEFAULT_SIZE = 32
 OPACITY_MIN = 0
 OPACITY_MAX = 100
 DEFAULT_OPACITY = 50
-
-BRUSH_SETTING_MIN = 0
-BRUSH_SETTING_MAX = 100
-DEFAULT_BRUSH_SETTINGS = {
-    BrushSetting.HARDNESS: 100,
-    BrushSetting.SPACING: 25,
-    BrushSetting.SIZE_VARIATION: 0,
-    BrushSetting.OPACITY_VARIATION: 0,
-    BrushSetting.ROTATION_VARIATION: 0,
-    BrushSetting.SPACING_VARIATION: 0,
-}
