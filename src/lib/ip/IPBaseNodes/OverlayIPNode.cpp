@@ -138,7 +138,7 @@ namespace IPCore
                                const string& brush)
         {
             // these polyline owns the memory of their own points
-            outline.points.assign(points->begin(), points->end());
+            outline.points.assign(points, points + npoints);
             outline.ownPoints = true;
 
             outline.npoints = npoints;
