@@ -234,8 +234,11 @@ def update_shape(component: PaintComponent, prefix, anchor, current):
 # ----------------------------------------------------------------------
 
 
-def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> PaintComponent:
-    """Create an empty text component at position and return it."""
+def new_text_node(paint_frame: PaintFrame, position, settings, font_size, wrap_width) -> PaintComponent:
+    """Create an empty text component at position and return it.
+
+    wrap_width is the line width in the same units as font_size, 0 for no wrapping.
+    """
     _ensure_visible(paint_frame.paint_node)
     component = _new_component(paint_frame, "text")
     node_name = _node_name(component)
@@ -257,6 +260,8 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
         (".font", commands.StringType, 1),
         (".text", commands.StringType, 1),
         (".caret", commands.IntType, 1),
+        (".selection", commands.IntType, 1),
+        (".runs", commands.IntType, 1),
         (".origin", commands.StringType, 1),
         (".debug", commands.IntType, 1),
         (".startFrame", commands.IntType, 1),
@@ -274,6 +279,8 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     commands.setStringProperty(f"{node_name}.font", [""], True)
     commands.setStringProperty(f"{node_name}.text", [""], True)
     commands.setIntProperty(f"{node_name}.caret", [0], True)
+    commands.setIntProperty(f"{node_name}.selection", [], True)
+    commands.setIntProperty(f"{node_name}.runs", [], True)
     commands.setStringProperty(f"{node_name}.origin", [""], True)
     commands.setIntProperty(f"{node_name}.debug", [0], True)
     commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
@@ -283,6 +290,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     for suffix, property_type, width in (
         (".fontFamily", commands.StringType, 1),
         (".fontSize", commands.FloatType, 1),
+        (".wrapWidth", commands.FloatType, 1),
         (".fontWeight", commands.StringType, 1),
         (".fontStyle", commands.StringType, 1),
         (".textDecoration", commands.StringType, 1),
@@ -292,6 +300,7 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
 
     commands.setStringProperty(f"{node_name}.fontFamily", [settings.font_family], True)
     commands.setFloatProperty(f"{node_name}.fontSize", [font_size], True)
+    commands.setFloatProperty(f"{node_name}.wrapWidth", [wrap_width], True)
     commands.setStringProperty(f"{node_name}.fontWeight", [font_weight], True)
     commands.setStringProperty(f"{node_name}.fontStyle", [font_style], True)
     commands.setStringProperty(f"{node_name}.textDecoration", [text_decoration], True)
@@ -307,18 +316,25 @@ def new_text_node(paint_frame: PaintFrame, position, settings, font_size) -> Pai
     return component
 
 
-def set_text(component: PaintComponent, text: str, caret: int):
-    """Update an active text box. caret is a QTextCursor position (UTF-16 code units), not an index into text."""
+def set_text(component: PaintComponent, text: str, caret: int, selection: tuple[int, int] | None, runs: list[int]):
+    """Update an active text box.
+
+    caret, selection (start, end) and runs ([start, length, flags] triples) are QTextCursor positions
+    (UTF-16 code units), not indices into text.
+    """
     node_name = _node_name(component)
     commands.setIntProperty(f"{node_name}.caret", [caret], True)
+    commands.setIntProperty(f"{node_name}.selection", list(selection) if selection else [], True)
+    commands.setIntProperty(f"{node_name}.runs", runs, True)
     commands.setStringProperty(f"{node_name}.text", [text], True)
     commands.redraw()
 
 
 def finish_text(component: PaintComponent, text: str):
-    """Remove the caret and write the final text."""
+    """Remove the caret and selection and write the final text."""
     node_name = _node_name(component)
     commands.deleteProperty(f"{node_name}.caret")
+    commands.deleteProperty(f"{node_name}.selection")
     # Deleting a property doesn't recompile the paint node, so the text must be set after it.
     commands.setStringProperty(f"{node_name}.text", [text], True)
     commands.redraw()

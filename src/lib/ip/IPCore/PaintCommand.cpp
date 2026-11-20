@@ -37,12 +37,16 @@
 #include <QRectF>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QTextCharFormat>
+#include <QTextCursor>
 #include <QTextLayout>
 #include <algorithm>
 #include <functional>
 #include <iostream>
 #include <mutex>
 #include <optional>
+#include <utility>
+#include <vector>
 
 // Shader source strings embedded at compile time via quote_file() in
 // IPCore/CMakeLists.txt.  Defined at global scope by the generated .cpp files.
@@ -866,14 +870,40 @@ namespace IPCore
                 return family;
             }
 
-            // Lays out plain text with the annotation font and no margin, so the
-            // first line's top-left corner is at (0, 0).
-            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice)
+            // Lays out plain text with the annotation font and no margin, so the first line's top-left corner is at (0, 0).
+            // Annotation text also wraps at its wrapWidth, breaking long words, and its runs inside the text are styled.
+            void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice,
+                                   const PaintIPNode::LocalText* localText, float pixelsPerUnit)
             {
                 document.documentLayout()->setPaintDevice(paintDevice);
                 document.setDocumentMargin(0);
                 document.setDefaultFont(font);
+                if (localText != nullptr && localText->wrapWidth > 0)
+                {
+                    document.setTextWidth(localText->wrapWidth * pixelsPerUnit);
+                }
                 document.setPlainText(text);
+                if (localText == nullptr)
+                {
+                    return;
+                }
+
+                const int textLength = document.characterCount() - 1;
+                QTextCursor cursor(&document);
+                for (const PaintIPNode::TextRun& run : localText->runs)
+                {
+                    if (run.start < 0 || run.length <= 0 || run.start + run.length > textLength)
+                    {
+                        continue;
+                    }
+                    cursor.setPosition(run.start);
+                    cursor.setPosition(run.start + run.length, QTextCursor::KeepAnchor);
+                    QTextCharFormat format;
+                    format.setFontWeight((run.flags & PaintIPNode::TextRunFlags::kBold) != 0 ? QFont::Bold : QFont::Normal);
+                    format.setFontItalic((run.flags & PaintIPNode::TextRunFlags::kItalic) != 0);
+                    format.setFontUnderline((run.flags & PaintIPNode::TextRunFlags::kUnderline) != 0);
+                    cursor.mergeCharFormat(format);
+                }
             }
 
             // Caret rectangle in document pixels, or nullopt outside the text.
@@ -898,6 +928,40 @@ namespace IPCore
                 return QRectF(blockOrigin.x() + line.cursorToX(positionInBlock), blockOrigin.y() + line.y(), caretWidth, line.height());
             }
 
+            struct TextEditingState
+            {
+                std::optional<int> caret;
+                std::optional<std::pair<int, int>> selection;
+            };
+
+            // The caret is hidden while text is selected.
+            TextEditingState editingState(const PaintIPNode::LocalText* localText)
+            {
+                if (localText == nullptr)
+                {
+                    return {};
+                }
+                return {localText->selection ? std::nullopt : localText->caret, localText->selection};
+            }
+
+            // Text color, plus the selected range highlighted with the system selection color.
+            QAbstractTextDocumentLayout::PaintContext textPaintContext(QTextDocument& document, const QColor& textColor,
+                                                                       std::optional<std::pair<int, int>> selection)
+            {
+                QAbstractTextDocumentLayout::PaintContext paintContext;
+                paintContext.palette.setColor(QPalette::Text, textColor);
+                if (selection)
+                {
+                    QTextCursor cursor(&document);
+                    cursor.setPosition(selection->first);
+                    cursor.setPosition(selection->second, QTextCursor::KeepAnchor);
+                    QTextCharFormat format;
+                    format.setBackground(QGuiApplication::palette().color(QPalette::Highlight));
+                    paintContext.selections.append({cursor, format});
+                }
+                return paintContext;
+            }
+
         } // namespace
 
         void Text::execute(CommandContext& context) const
@@ -917,7 +981,7 @@ namespace IPCore
             const std::string& effectiveFontWeight = localText ? localText->fontWeight : PaintIPNode::FontWeight::Normal;
             const std::string& effectiveFontStyle = localText ? localText->fontStyle : PaintIPNode::FontStyle::Normal;
             const std::string& effectiveTextDecor = localText ? localText->textDecoration : PaintIPNode::TextDecoration::None;
-            const std::optional<int> caret = localText ? localText->caret : std::nullopt;
+            const auto [caret, selection] = editingState(localText);
 
             {
                 const GLFBO* currentFBO = context.currentRender;
@@ -981,12 +1045,12 @@ namespace IPCore
                 }
                 QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
                 QTextDocument document;
-                setUpTextDocument(document, qfont, qtext, &refImg);
+                setUpTextDocument(document, qfont, qtext, &refImg, localText, fbH);
 
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.
                 constexpr int kImagePaddingPixels = 4;
-                // 1pt like a native caret, rounded to whole pixels because fillRect is not antialiased
+                // 1pt wide, rounded to whole pixels because fillRect is not antialiased
                 const qreal caretWidth = std::max<qreal>(1.0, std::round(context.devicePixelRatio));
                 const std::optional<QRectF> caretArea = caret.has_value() ? caretRect(document, *caret, caretWidth) : std::nullopt;
                 qreal contentWidth = document.idealWidth();
@@ -1011,9 +1075,7 @@ namespace IPCore
                     { return static_cast<int>(std::max(0.0f, std::min(1.0f, value)) * kMaxColorComponent); };
                     const QColor qtextColor(toQColorComponent(textColor.x), toQColorComponent(textColor.y), toQColorComponent(textColor.z),
                                             toQColorComponent(textColor.w));
-                    QAbstractTextDocumentLayout::PaintContext paintContext;
-                    paintContext.palette.setColor(QPalette::Text, qtextColor);
-                    document.documentLayout()->draw(&painter, paintContext);
+                    document.documentLayout()->draw(&painter, textPaintContext(document, qtextColor, selection));
                     if (caretArea)
                     {
                         painter.fillRect(*caretArea, qtextColor);

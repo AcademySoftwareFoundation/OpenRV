@@ -20,6 +20,8 @@
 #include <IPCore/ShaderCommon.h>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 namespace
 {
@@ -489,8 +491,35 @@ namespace IPCore
     void PaintIPNode::LocalText::hash(std::ostream& o) const
     {
         Paint::Text::hash(o);
-        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration << caret.value_or(-1);
+        const auto [selectionStart, selectionEnd] = selection.value_or(std::pair{-1, -1});
+        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration << caret.value_or(-1) << selectionStart << selectionEnd;
+        for (const TextRun& run : runs)
+        {
+            o << ';' << run.start << ',' << run.length << ',' << run.flags;
+        }
+        o << ';' << wrapWidth;
     }
+
+    namespace
+    {
+        // Parses the "runs" property, a flat list of [start, length, flags] triples.
+        std::vector<PaintIPNode::TextRun> readTextRuns(const Component* component)
+        {
+            constexpr size_t kValuesPerRun = 3;
+            std::vector<PaintIPNode::TextRun> runs;
+            const auto* runsProp = component->property<IntProperty>("runs");
+            if (runsProp == nullptr)
+            {
+                return runs;
+            }
+            const std::vector<int>& values = runsProp->valueContainer();
+            for (size_t index = 0; index + kValuesPerRun <= values.size(); index += kValuesPerRun)
+            {
+                runs.push_back({values[index], values[index + 1], values[index + 2]});
+            }
+            return runs;
+        }
+    } // namespace
 
     void PaintIPNode::compileTextComponent(Component* c)
     {
@@ -528,6 +557,12 @@ namespace IPCore
         p.fontStyle = readProp<StringProperty>(c, "fontStyle", string("normal"));
         p.textDecoration = readProp<StringProperty>(c, "textDecoration", string("none"));
         p.caret = readProp<IntProperty>(c, "caret", std::optional<int>{});
+        const IntProperty* selectionProp = c->property<IntProperty>("selection");
+        p.selection = (selectionProp != nullptr && selectionProp->size() == 2)
+                          ? std::optional{std::pair{(*selectionProp)[0], (*selectionProp)[1]}}
+                          : std::nullopt;
+        p.runs = readTextRuns(c);
+        p.wrapWidth = readProp<FloatProperty>(c, "wrapWidth", 0.0f);
     }
 
     void PaintIPNode::compileRectComponent(Component* c)

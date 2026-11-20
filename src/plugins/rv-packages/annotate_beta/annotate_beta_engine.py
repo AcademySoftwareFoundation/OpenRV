@@ -1,14 +1,16 @@
 # Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import itertools
 import math
 from collections.abc import Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
+from enum import IntFlag
 from functools import partial
 from typing import NamedTuple
 
-from PySide6 import QtGui
+from PySide6 import QtCore, QtGui
 from rv import commands, extra_commands
 
 import annotate_beta_constants as constants
@@ -45,6 +47,34 @@ _SHIFT_MODIFIER = 1 << 0
 #   - new text has the same initial screen size regardless of zoom
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
 _FONT_SIZE_REFERENCE_HEIGHT = 1080.0
+
+
+class TextStyle(IntFlag):
+    """Bold/italic/underline bits of a text run. Values match PaintIPNode::TextRunFlags."""
+
+    BOLD = 1
+    ITALIC = 2
+    UNDERLINE = 4
+
+
+def _text_style(bold: bool, italic: bool, underline: bool) -> TextStyle:
+    style = TextStyle(0)
+    for flag, enabled in ((TextStyle.BOLD, bold), (TextStyle.ITALIC, italic), (TextStyle.UNDERLINE, underline)):
+        if enabled:
+            style |= flag
+    return style
+
+
+def _style_format(style: TextStyle, enabled: bool) -> QtGui.QTextCharFormat:
+    """Char format that turns one style on or off."""
+    char_format = QtGui.QTextCharFormat()
+    if style == TextStyle.BOLD:
+        char_format.setFontWeight(QtGui.QFont.Weight.Bold if enabled else QtGui.QFont.Weight.Normal)
+    elif style == TextStyle.ITALIC:
+        char_format.setFontItalic(enabled)
+    else:
+        char_format.setFontUnderline(enabled)
+    return char_format
 
 
 class _Vec2(NamedTuple):
@@ -94,6 +124,10 @@ class DrawSettings:
 
 
 class AnnotateDrawEngine:
+    # Pixel size of the editing document's font. Layout scales with the font size, so the
+    # document maps to the rendered text by _TEXT_EDIT_PIXEL_SIZE / font size per WCS unit.
+    _TEXT_EDIT_PIXEL_SIZE = 100
+
     def __init__(self, settings, on_history_changed, on_draw_started, on_eyedropper):
         self._settings = settings
         self._on_history_changed = on_history_changed
@@ -115,6 +149,11 @@ class AnnotateDrawEngine:
         self._text_active = False
         self._text_document: QtGui.QTextDocument | None = None
         self._text_cursor: QtGui.QTextCursor | None = None
+        self._text_origin: _Vec2 | None = None  # image-space anchor of the active text box
+        self._text_font_size = 0.0  # WCS font size of the active text box
+        self._text_depth_limit: float | None = None  # document pixels from the first baseline to the image bottom
+        self._text_selecting = False  # True while the pointer drags a selection
+        self._text_base_style = TextStyle(0)  # toolbar style of the active text box
         self._text_component: PaintComponent | None = None
         self._text_registered = False
 
@@ -175,6 +214,7 @@ class AnnotateDrawEngine:
         commit = partial(self.on_text_commit, reject=False)
         commit_and_propagate = partial(self.on_text_commit, reject=True)
         insert_new_line = partial(self._append_text, text="\n")
+        select_to = partial(self.on_text_move, keep_anchor=True)
         return [
             # Shape shift-constraint tracking
             ("key-down--shift--shift", self.on_shift_down, "Constrain shape"),
@@ -196,6 +236,23 @@ class AnnotateDrawEngine:
                 partial(self.on_text_move, move=QtGui.QTextCursor.MoveOperation.EndOfLine),
                 "Cursor to line end",
             ),
+            ("key-down--shift--left", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Left), "Select left"),
+            ("key-down--shift--right", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Right), "Select right"),
+            ("key-down--shift--up", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Up), "Select up"),
+            ("key-down--shift--down", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Down), "Select down"),
+            (
+                "key-down--shift--home",
+                partial(select_to, move=QtGui.QTextCursor.MoveOperation.StartOfLine),
+                "Select to line start",
+            ),
+            (
+                "key-down--shift--end",
+                partial(select_to, move=QtGui.QTextCursor.MoveOperation.EndOfLine),
+                "Select to line end",
+            ),
+            ("key-down--control--b", partial(self.on_text_style, style=TextStyle.BOLD), "Toggle bold text"),
+            ("key-down--control--i", partial(self.on_text_style, style=TextStyle.ITALIC), "Toggle italic text"),
+            ("key-down--control--u", partial(self.on_text_style, style=TextStyle.UNDERLINE), "Toggle underlined text"),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
             ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
@@ -254,21 +311,25 @@ class AnnotateDrawEngine:
     def _font_size(self):
         return self._settings.font_size / _FONT_SIZE_REFERENCE_HEIGHT * self._screen_scale()
 
-    def _new_text_document(self) -> QtGui.QTextDocument:
-        """Editing document for a new text box, with the renderer's font settings."""
-        # Only relative glyph widths matter here (Up/Down keep the caret's column), so any fixed size works.
-        TEXT_EDIT_PIXEL_SIZE = 100
+    def _new_text_document(self, line_width: float) -> QtGui.QTextDocument:
+        """Editing document for a new text box, with the renderer's font and wrap settings.
+
+        line_width is in document pixels, 0 for no wrapping.
+        """
         font = QtGui.QFont()
         if self._settings.font_family:
             font.setFamily(self._settings.font_family)
-        font.setPixelSize(TEXT_EDIT_PIXEL_SIZE)
+        font.setPixelSize(self._TEXT_EDIT_PIXEL_SIZE)
         font.setBold(self._settings.font_bold)
         font.setItalic(self._settings.font_italic)
         font.setUnderline(self._settings.font_underline)
         font.setKerning(False)
+        font.setHintingPreference(QtGui.QFont.HintingPreference.PreferVerticalHinting)
         document = QtGui.QTextDocument()
         document.setDocumentMargin(0)
         document.setDefaultFont(font)
+        if line_width > 0:
+            document.setTextWidth(line_width)
         return document
 
     def _border_width(self):
@@ -378,13 +439,83 @@ class AnnotateDrawEngine:
         return self._text_document.toPlainText()
 
     def _update_text_display(self):
-        paint.set_text(self._text_component, self._text(), self._text_cursor.position())
+        cursor = self._text_cursor
+        selection = (cursor.selectionStart(), cursor.selectionEnd()) if cursor.hasSelection() else None
+        paint.set_text(self._text_component, self._text(), cursor.position(), selection, self._text_runs())
+
+    def _style_of(self, char_format: QtGui.QTextCharFormat) -> TextStyle:
+        """Style of a char format, falling back to the box's base style for what it doesn't set."""
+        base = self._text_base_style
+        bold = (
+            char_format.fontWeight() >= QtGui.QFont.Weight.Bold
+            if char_format.hasProperty(QtGui.QTextFormat.Property.FontWeight)
+            else TextStyle.BOLD in base
+        )
+        italic = (
+            char_format.fontItalic()
+            if char_format.hasProperty(QtGui.QTextFormat.Property.FontItalic)
+            else TextStyle.ITALIC in base
+        )
+        underline = (
+            char_format.fontUnderline()
+            if char_format.hasProperty(QtGui.QTextFormat.Property.TextUnderlineStyle)
+            else TextStyle.UNDERLINE in base
+        )
+        return _text_style(bold, italic, underline)
+
+    def _char_styles(self) -> list[TextStyle | None]:
+        """Style of each character of the text, None for line breaks."""
+        PARAGRAPH_SEPARATOR = "\u2029"
+        document = self._text_document
+        cursor = QtGui.QTextCursor(document)
+        styles = []
+        for position in range(document.characterCount() - 1):
+            if document.characterAt(position) == PARAGRAPH_SEPARATOR:
+                styles.append(None)
+                continue
+            # charFormat() is the format of the character before the cursor.
+            cursor.setPosition(position + 1)
+            styles.append(self._style_of(cursor.charFormat()))
+        return styles
+
+    def _text_runs(self) -> list[int]:
+        """[start, length, flags] for each range whose style differs from the base style."""
+        base = self._text_base_style
+        runs = []
+        position = 0
+        for style, characters in itertools.groupby(base if style is None else style for style in self._char_styles()):
+            length = len(list(characters))
+            if style != base:
+                runs += [position, length, int(style)]
+            position += length
+        return runs
+
+    def _text_position_at(self, image_point, inside_only):
+        """Cursor position under image_point, or None when inside_only and the point is outside the box."""
+        layout = self._text_document.documentLayout()
+        first_line = self._text_document.firstBlock().layout().lineAt(0)
+        pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
+        # The renderer puts the first baseline at the box origin, with y going up in image space.
+        x = (image_point.x - self._text_origin.x) * pixels_per_unit
+        y = first_line.ascent() - (image_point.y - self._text_origin.y) * pixels_per_unit
+        if inside_only:
+            size = layout.documentSize()
+            margin = first_line.height() / 2
+            # documentSize() spans the whole wrap width, idealWidth() only the widest line.
+            inside_horizontally = -margin <= x <= self._text_document.idealWidth() + margin
+            inside_vertically = 0 <= y <= size.height()
+            if not (inside_horizontally and inside_vertically):
+                return None
+        return layout.hitTest(QtCore.QPointF(x, y), QtCore.Qt.HitTestAccuracy.FuzzyHit)
 
     def _reset_text(self):
         self._text_active = False
         self._text_component = None
         self._text_document = None
         self._text_cursor = None
+        self._text_origin = None
+        self._text_depth_limit = None
+        self._text_selecting = False
         self._text_registered = False
 
     def _commit_text(self):
@@ -577,7 +708,7 @@ class AnnotateDrawEngine:
             return
         self._on_draw_started()
         if tool == constants.Tool.TEXT:
-            if not constrained:
+            if not constrained and not self._place_text_cursor(event):
                 self._start_text(event)
             return
         if tool in constants.BRUSH_TOOLS:
@@ -600,7 +731,8 @@ class AnnotateDrawEngine:
     def on_drag(self, event, constrained=False):
         tool = self._settings.tool
         if tool == constants.Tool.TEXT:
-            return  # consume without action during text placement
+            self._drag_text_selection(event)
+            return
         if tool in constants.BRUSH_TOOLS:
             self._pen_drag(event)
             return
@@ -618,6 +750,7 @@ class AnnotateDrawEngine:
     def on_release(self, event, constrained=False):
         tool = self._settings.tool
         if tool == constants.Tool.TEXT:
+            self._text_selecting = False
             return
         if tool in constants.BRUSH_TOOLS:
             self._pen_release(event)
@@ -650,10 +783,92 @@ class AnnotateDrawEngine:
             event.reject()
             return
         self._text_active = True
-        self._text_document = self._new_text_document()
+        self._text_origin = image_point
+        self._text_font_size = self._font_size()
+        pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
+        wrap_width = 0.0
+        edges = self._image_edges(source_name)
+        if edges:
+            right_edge, bottom_edge = edges
+            wrap_width = max(0.0, right_edge - image_point.x)
+            self._text_depth_limit = (image_point.y - bottom_edge) * pixels_per_unit
+        self._text_document = self._new_text_document(wrap_width * pixels_per_unit)
         self._text_cursor = QtGui.QTextCursor(self._text_document)
+        self._text_base_style = _text_style(
+            self._settings.font_bold, self._settings.font_italic, self._settings.font_underline
+        )
         with self._sync_batch(force=False):
-            self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._font_size())
+            self._text_component = paint.new_text_node(
+                paint_frame, image_point, self._settings, self._text_font_size, wrap_width
+            )
+
+    @staticmethod
+    def _image_edges(source_name) -> tuple[float, float] | None:
+        """Image-space (right x, bottom y) of the image, or None when they are unknown."""
+        # imageGeometry() returns the on-screen corners in the viewport space eventToImageSpace() takes.
+        try:
+            corners = [
+                commands.eventToImageSpace(source_name, corner, True) for corner in commands.imageGeometry(source_name)
+            ]
+            return max(corner[0] for corner in corners), min(corner[1] for corner in corners)
+        except Exception:
+            return None
+
+    def _insert_text(self, text) -> bool:
+        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom."""
+        document, cursor = self._text_document, self._text_cursor
+        height_before = document.size().height()
+        anchor, position, pending_format = cursor.anchor(), cursor.position(), cursor.charFormat()
+        # One edit block per insertion so undo() reverts only this one.
+        cursor.beginEditBlock()
+        cursor.insertText(text)
+        cursor.endEditBlock()
+        if self._text_fits_in_image(height_before):
+            return True
+        document.undo(cursor)
+        cursor.setPosition(anchor)
+        cursor.setPosition(position, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        if not cursor.hasSelection():
+            cursor.setCharFormat(pending_format)
+        return False
+
+    def _text_fits_in_image(self, height_before) -> bool:
+        if self._text_depth_limit is None:
+            return True
+        document = self._text_document
+        # Edits that don't add lines are always allowed, so a box started at the bottom edge keeps one line.
+        if document.size().height() <= height_before:
+            return True
+        first_line_ascent = document.firstBlock().layout().lineAt(0).ascent()
+        last_block = document.lastBlock()
+        last_line = last_block.layout().lineAt(last_block.layout().lineCount() - 1)
+        last_baseline = document.documentLayout().blockBoundingRect(last_block).y() + last_line.y() + last_line.ascent()
+        # Compare baselines rather than line boxes: the descent and line gap of the last line may be clipped.
+        return last_baseline - first_line_ascent <= self._text_depth_limit
+
+    def _place_text_cursor(self, event) -> bool:
+        """Move the caret to a push inside the active text box and start a drag selection."""
+        if not self._text_active:
+            return False
+        _, image_point = self._pointer_location(event)
+        position = self._text_position_at(image_point, inside_only=True) if image_point else None
+        if position is None:
+            return False
+        self._text_cursor.setPosition(position)
+        self._text_selecting = True
+        self._update_text_display()
+        return True
+
+    def _drag_text_selection(self, event):
+        if not self._text_selecting:
+            return
+        _, image_point = self._pointer_location(event)
+        if image_point is None:
+            return
+        self._text_cursor.setPosition(
+            self._text_position_at(image_point, inside_only=False), QtGui.QTextCursor.MoveMode.KeepAnchor
+        )
+        self._update_text_display()
 
     def on_shift_down(self, event):
         if self._text_active:
@@ -679,7 +894,8 @@ class AnnotateDrawEngine:
         if not self._text_active:
             event.reject()
             return
-        self._text_cursor.insertText(text)
+        if not self._insert_text(text):
+            return
         self._register_text_undo()
         self._update_text_display()
 
@@ -697,13 +913,29 @@ class AnnotateDrawEngine:
         self._text_cursor.deleteChar()
         self._update_text_display()
 
-    def on_text_move(self, event, move):
+    def on_text_style(self, event, style):
+        """Toggle style on the selection, or for the next characters typed when nothing is selected."""
+        if not self._text_active:
+            event.reject()
+            return
+        cursor = self._text_cursor
+        if cursor.hasSelection():
+            selected = self._char_styles()[cursor.selectionStart() : cursor.selectionEnd()]
+            enable = not all(style in character for character in selected if character is not None)
+        else:
+            enable = style not in self._style_of(cursor.charFormat())
+        cursor.mergeCharFormat(_style_format(style, enable))
+        self._update_text_display()
+
+    def on_text_move(self, event, move, keep_anchor=False):
         if not self._text_active:
             event.reject()
             return
         # The document lays out lazily, and Up/Down/Home/End need line geometry.
         self._text_document.size()
-        self._text_cursor.movePosition(move)
+        self._text_cursor.movePosition(
+            move, QtGui.QTextCursor.MoveMode.KeepAnchor if keep_anchor else QtGui.QTextCursor.MoveMode.MoveAnchor
+        )
         self._update_text_display()
 
     def on_text_commit(self, event, reject):
