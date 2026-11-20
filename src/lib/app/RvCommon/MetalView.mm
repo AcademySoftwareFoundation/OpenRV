@@ -278,6 +278,9 @@ namespace Rv
 
         [nsView setWantsLayer:YES];
         [nsView setLayer:caLayer];
+        // AppKit resets masksToBounds from clipsToBounds (NO since macOS 14) when the backing scale changes,
+        // which lets the oversized surface spill over the toolbars after moving to another screen.
+        nsView.clipsToBounds = YES;
 
         const void* oldLayer = m_caLayer;
         m_caLayer = (__bridge_retained void*)caLayer;
