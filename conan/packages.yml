@@ -31,6 +31,15 @@ deps:
     options:
       "zlib/*:shared": "True"
 
+  - name: minizip
+    # zlib's contrib/minizip, same version as zlib above. Static, without bzip2, like the minizip OpenRV builds from zlib sources.
+    version: "1.3.2"
+    channel: common
+    cci_folder: all
+    options:
+      "minizip/*:shared": "False"
+      "minizip/*:bzip2": "False"
+
   - name: libatomic_ops
     version: "7.10.0"
     channel: common

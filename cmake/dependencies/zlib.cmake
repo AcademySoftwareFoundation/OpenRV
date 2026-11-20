@@ -72,6 +72,15 @@ IF(RV_TARGET_WINDOWS)
 ENDIF()
 
 IF(NOT ${_target}_FOUND)
+  # minizip sources from zlib's contrib folder, extracted with zlib and built into the minizip target below.
+  SET(_minizip_source_dir
+      ${RV_DEPS_BASE_DIR}/${_target}/src/contrib/minizip
+  )
+  SET(_minizip_sources
+      ${_minizip_source_dir}/ioapi.c ${_minizip_source_dir}/unzip.c
+  )
+  LIST(APPEND _zlib_byproducts ${_minizip_sources})
+
   INCLUDE(${CMAKE_CURRENT_LIST_DIR}/build/zlib.cmake)
 
   IF(RV_TARGET_WINDOWS)
@@ -130,6 +139,40 @@ SET(RV_DEPS_ZLIB_INCLUDE_DIR
     ${_include_dir}
     CACHE STRING "Path to installed includes for ${_target}"
 )
+
+# minizip for the package manager: a static library built from zlib's contrib/minizip, or the matching minizip package when zlib is found.
+IF(NOT ${_target}_FOUND)
+  ADD_LIBRARY(
+    minizip STATIC
+    ${_minizip_sources}
+  )
+  TARGET_INCLUDE_DIRECTORIES(
+    minizip
+    PUBLIC ${_minizip_source_dir}
+  )
+  TARGET_LINK_LIBRARIES(
+    minizip
+    PUBLIC ZLIB::ZLIB
+  )
+  # Linked into shared libraries (RvPackage, RvCommon).
+  SET_TARGET_PROPERTIES(
+    minizip
+    PROPERTIES POSITION_INDEPENDENT_CODE ON
+  )
+ELSE()
+  FIND_PACKAGE(minizip CONFIG QUIET)
+  IF(NOT TARGET minizip::minizip)
+    MESSAGE(
+      FATAL_ERROR
+        "zlib was found, but minizip was not. Provide the minizip package that matches the found zlib (Conan: minizip), or set RV_DEPS_ZLIB_FORCE_BUILD=ON to build both from source."
+    )
+  ENDIF()
+  ADD_LIBRARY(minizip INTERFACE)
+  TARGET_LINK_LIBRARIES(
+    minizip
+    INTERFACE minizip::minizip
+  )
+ENDIF()
 
 # FFmpeg customization
 SET_PROPERTY(
