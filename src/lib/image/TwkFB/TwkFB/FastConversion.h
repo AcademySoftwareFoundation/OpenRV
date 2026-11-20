@@ -139,20 +139,22 @@ extern "C"
     /// @param width The number of bytes per row.
     /// @param height The number of rows.
     /// @param inBuf The input buffer.
+    /// @param inStride The stride of the input buffer in bytes.
     /// @param outY The output channel buffer of the Y component.
     /// @param outCb The output channel buffer of the Cb component.
     /// @param outCr The output channel buffer of the Cr component.
     /// @param outA The output channel buffer of the A component.
-    /// @param strideY The stride of the output channel buffer of the Y
+    /// @param outStrideY The stride of the output channel buffer of the Y
     /// component in bytes.
-    /// @param strideCb The stride of the output channel buffer of the Cb
+    /// @param outStrideCb The stride of the output channel buffer of the Cb
     /// component in bytes.
-    /// @param strideCr The stride of the output channel buffer of the Cr
+    /// @param outStrideCr The stride of the output channel buffer of the Cr
     /// component in bytes.
-    /// @param strideA The stride of the output channel buffer of the A
+    /// @param outStrideA The stride of the output channel buffer of the A
     /// component in bytes.
-    TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(size_t width, size_t height, const uint8_t* inBuf, uint16_t* outY, uint16_t* outCb,
-                                                   uint16_t* outCr, uint16_t* outA);
+    TWKFB_EXPORT void packedAYUV64_to_planarYUVA16(size_t width, size_t height, const uint8_t* inBuf, size_t inStride, uint16_t* outY,
+                                                   uint16_t* outCb, uint16_t* outCr, uint16_t* outA, size_t outStrideY, size_t outStrideCb,
+                                                   size_t outStrideCr, size_t outStrideA);
 
     /// @brief Converts packed UYVY 16-bits to planar YUV 16-bits.
     ///

@@ -3171,7 +3171,8 @@ namespace TwkMovie
             auto* dstCr = reinterpret_cast<std::uint16_t*>(dstFrame->data[2]);
             auto* dstA = reinterpret_cast<std::uint16_t*>(dstFrame->data[3]);
 
-            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], dstY, dstCb, dstCr, dstA);
+            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], srcFrame->linesize[0], dstY, dstCb, dstCr, dstA,
+                                         dstFrame->linesize[0], dstFrame->linesize[1], dstFrame->linesize[2], dstFrame->linesize[3]);
             return;
         }
 #endif
