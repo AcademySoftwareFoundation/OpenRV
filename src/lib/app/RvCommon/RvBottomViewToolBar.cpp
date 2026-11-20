@@ -387,7 +387,7 @@ namespace Rv
         }
 
         m_playButtonIconUpdatePending = true;
-        QTimer::singleShot(0, this, [this]() { updatePlayButtonIcons(); });
+        QTimer::singleShot(0, this, &RvBottomViewToolBar::updatePlayButtonIcons);
     }
 
     void RvBottomViewToolBar::updatePlayButtonIcons()

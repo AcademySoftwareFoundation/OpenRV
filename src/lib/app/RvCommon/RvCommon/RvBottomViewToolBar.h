@@ -88,9 +88,9 @@ namespace Rv
         void schedulePlayButtonIconUpdate();
         void updatePlayButtonIcons();
 
-        bool m_playButtonIconUpdatePending = false;
-        bool m_backwardShowsPause = false;
-        bool m_forwardShowsPause = false;
+        bool m_playButtonIconUpdatePending{false};
+        bool m_backwardShowsPause{false};
+        bool m_forwardShowsPause{false};
 
         IPCore::Session* m_session;
         QString m_customCannotUseTooltip;

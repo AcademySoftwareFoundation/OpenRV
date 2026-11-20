@@ -87,25 +87,25 @@ namespace Rv
 
         void onFrameSwapped();
 
-        RvDocument* m_doc;
-        QTGLVideoDevice* m_videoDevice;
-        unsigned int m_lastKey;
-        QEvent::Type m_lastKeyType;
+        RvDocument* m_doc{nullptr};
+        QTGLVideoDevice* m_videoDevice{nullptr};
+        unsigned int m_lastKey{0};
+        QEvent::Type m_lastKeyType{QEvent::None};
         Timer m_activityTimer;
         QTimer m_eventProcessingTimer;
-        bool m_userActive;
+        bool m_userActive{true};
         Timer m_activationTimer;
-        bool m_firstPaintCompleted;
-        int m_red;
-        int m_green;
-        int m_blue;
-        int m_alpha;
-        bool m_postFirstNonEmptyRender;
-        bool m_stopProcessingEvents;
-        float m_devicePixelRatio;
-        bool m_syncingDevicePixelRatio;
-        bool m_profilingSwapPending;
-        bool m_syncSamplePending;
+        bool m_firstPaintCompleted{false};
+        int m_red{0};
+        int m_green{0};
+        int m_blue{0};
+        int m_alpha{0};
+        bool m_postFirstNonEmptyRender{false};
+        bool m_stopProcessingEvents{false};
+        float m_devicePixelRatio{1.0f};
+        bool m_syncingDevicePixelRatio{false};
+        bool m_profilingSwapPending{false};
+        bool m_syncSamplePending{false};
     };
 
 } // namespace Rv

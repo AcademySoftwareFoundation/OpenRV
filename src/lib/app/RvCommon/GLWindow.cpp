@@ -135,20 +135,10 @@ namespace Rv
         , m_green(green)
         , m_blue(blue)
         , m_alpha(alpha)
-        , m_lastKey(0)
-        , m_lastKeyType(QEvent::None)
-        , m_userActive(true)
-        , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
-        , m_stopProcessingEvents(false)
         , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
-        , m_syncingDevicePixelRatio(false)
-        , m_profilingSwapPending(false)
-        , m_syncSamplePending(false)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
-
-        m_videoDevice = nullptr; // set later by the hosting GLView
 
         m_activityTimer.start();
 
@@ -168,11 +158,13 @@ namespace Rv
 
     void GLWindow::onFrameSwapped()
     {
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+
         if (m_syncSamplePending)
         {
             m_syncSamplePending = false;
 
-            if (IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr)
+            if (session != nullptr)
             {
                 session->addSyncSample();
             }
@@ -185,7 +177,6 @@ namespace Rv
 
         m_profilingSwapPending = false;
 
-        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
         if (session != nullptr)
         {
             Session::ProfilingRecord& trecord = session->currentProfilingSample();
