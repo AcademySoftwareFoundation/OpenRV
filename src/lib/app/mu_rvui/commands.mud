@@ -661,6 +661,27 @@ is converted to Rec. 709 RGBA form. The coordinates passed in are
 relative to the original image pixel space.
 """
 
+requestPaintPixelSample """
+Asks the next render to read back the pixel at the given position of the
+named RVPaint node. The position is in the paint node's coordinate space
+(the same space as annotation stroke points, e.g. as returned by
+eventToImageSpace). The value is read from the buffer the annotations are
+drawn into (the image plus existing annotations), before the transforms
+that follow the paint stage, such as the display transform. A stroke drawn
+with this color therefore looks the same as the sampled pixel. Unlike
+framebufferPixelValue(), it is not quantized or clamped. Triggers a redraw.
+Read the result with
+paintPixelSample() once the render has happened (e.g. on post-render).
+"""
+
+paintPixelSample """
+Returns the RGBA value read back for the last requestPaintPixelSample()
+call on the named RVPaint node, as four floats (not clamped). Returns an
+empty array if no render has serviced the request yet. The value is
+returned once: later calls return an empty array until a new request is
+serviced.
+"""
+
 sourceAttributes """
 Returns an array of image attribute name/value pairs at the current
 frame. The sourceName can be the node name or the source path as

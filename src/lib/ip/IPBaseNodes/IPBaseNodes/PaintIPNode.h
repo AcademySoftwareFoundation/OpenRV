@@ -11,6 +11,8 @@
 #include <TwkPaint/StampPath.h>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -182,6 +184,20 @@ namespace IPCore
         void propertyChanged(const Property* proprety) override;
         void readCompleted(const std::string& typeName, unsigned int version) override;
 
+        /// Ask the next render of this node to read back the composited pixel at
+        /// `position` (paint-node space, the same space as stroke points). The
+        /// value is read from the buffer strokes are drawn into (image plus
+        /// existing annotations), so every transform applied afterwards (e.g. the
+        /// display transform) affects it exactly as it affects a stroke, and a
+        /// stroke drawn with it renders as the same color. Fetch the result with
+        /// takePixelSample().
+        void requestPixelSample(const Vec2& position);
+
+        /// Return the RGBA value read back since the last requestPixelSample(),
+        /// or std::nullopt if no render has serviced the request yet. The stored
+        /// value is cleared once returned.
+        [[nodiscard]] std::optional<Vec4> takePixelSample();
+
     protected:
         void compilePenComponent(Component*);
         void compileTextComponent(Component*);
@@ -206,6 +222,10 @@ namespace IPCore
         Component* m_tag;
         std::mutex m_commandsMutex;
         PaintEffects m_paintEffects;
+        Paint::SamplePixel m_pixelProbe;
+        bool m_pixelProbePending{false};
+        std::optional<Vec4> m_pixelSample;
+        std::mutex m_pixelProbeMutex;
         // TODO: add per-node GL texture cache for QPainter text to avoid per-frame rasterization
     };
 

@@ -156,6 +156,7 @@ class: AnnotateMinorMode : MinorMode
     bool              _activeSampleColor;
     Color             _sampleColor;
     int               _sampleCount;
+    string            _sampleNode;
 
     QWidget           _managePane;
     QWidget           _drawPane;
@@ -915,24 +916,44 @@ class: AnnotateMinorMode : MinorMode
         push(event);
     }
 
+    //
+    //  The dropper samples at the paint node, in the buffer strokes are drawn
+    //  into, not in the final framebuffer: the transforms after the paint
+    //  stage (e.g. the display transform) also apply to strokes, so a
+    //  display-referred sample would be transformed twice. The value arrives
+    //  after the next render (see dropperPostRender).
+    //
+
     method: dropperSample (void; Event event)
     {
-        State state = data();
-        recordPixelInfo(event);
-        if (state.pixelInfo eq nil || state.pixelInfo.empty()) return;
+        if (_currentNode eq nil || _currentNode == "") return;
 
-        let pinfo  = state.pixelInfo.front(),
-            sName  = sourceNameWithoutFrame(pinfo.name),
-            ip     = state.pointerPosition*devicePixelRatio();
+        let (name, ip) = pointerLocation(event);
+        if (name == "") return;
 
-        let pixels = framebufferPixelValue(ip.x, ip.y);
-        let c = Color(pixels[0], pixels[1], pixels[2], pixels[3]);
-        _sampleColor += c;
+        requestPaintPixelSample(_currentNode, eventToImageSpace(name, ip, true));
+        _sampleNode = _currentNode;
+    }
+
+    method: dropperPostRender (void; Event event)
+    {
+        event.reject();
+        if (_sampleNode == "") return;
+
+        if (!nodeExists(_sampleNode))
+        {
+            _sampleNode = "";
+            return;
+        }
+
+        let sample = paintPixelSample(_sampleNode);
+        if (sample.size() < 4) return; // not rendered yet
+
+        _sampleNode = "";
+        _sampleColor += Color(sample[0], sample[1], sample[2], sample[3]);
         _sampleCount++;
         setColor(_sampleColor / float(_sampleCount));
         _activeSampleColor = true;
-        //let v = sourcePixelValue(sName, pinfo.px, pinfo.py);
-        //setColor(v);
     }
 
     method: dropperStartSample (void; Event event)
@@ -3144,6 +3165,7 @@ class: AnnotateMinorMode : MinorMode
         _setColorLock      = false;
         _activeSampleColor = false;
         _sampleCount       = 0;
+        _sampleNode        = "";
         _showBrush         = true;
         _scaleBrush        = true;
         _pointerGone       = false;
@@ -3651,6 +3673,7 @@ class: AnnotateMinorMode : MinorMode
               ("pointer--leave", leave, ""),
               ("before-session-deletion", shutdown, ""),
               ("graph-node-inputs-changed", nodeInputsChanged, "Update UI"),
+              ("post-render", dropperPostRender, "Apply color dropper sample"),
               ("before-graph-view-change", beforeGraphViewChange, "Update UI"),
               ("after-graph-view-change", afterGraphViewChange, "Update UI"),
               ("frame-changed", updateFrameDependentStateEvent, ""),
