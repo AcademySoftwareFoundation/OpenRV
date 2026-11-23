@@ -401,9 +401,14 @@ namespace Rv
         qInstallMessageHandler(myMsgHandlerQT);
         init();
 
+        // Tooltip animations run on main-thread timers and delay viewer paints (late frames) during playback.
+        QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
+        QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
+
         pthread_mutex_init(&m_deleteLock, 0);
         m_timer = new QTimer(this);
         m_timer->setObjectName("RvApplication::m_timer");
+        m_timer->setTimerType(Qt::PreciseTimer);
         connect(m_timer, SIGNAL(timeout()), this, SLOT(heartbeat()));
         m_timer->start(int(1.0 / 120.0 * 1000.0));
         m_fireTimer.start();
