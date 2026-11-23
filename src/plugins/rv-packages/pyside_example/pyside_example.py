@@ -6,28 +6,27 @@
 import os
 
 try:
-    from PySide2 import QtGui, QtCore, QtWidgets
-    from PySide2.QtGui import *
+    from PySide2 import QtCore, QtGui, QtWidgets
     from PySide2.QtCore import *
-    from PySide2.QtWidgets import *
+    from PySide2.QtGui import *
     from PySide2.QtUiTools import QUiLoader
+    from PySide2.QtWidgets import *
 except ImportError:
     try:
-        from PySide6 import QtGui, QtCore, QtWidgets
-        from PySide6.QtGui import *
+        from PySide6 import QtCore, QtGui, QtWidgets
         from PySide6.QtCore import *
-        from PySide6.QtWidgets import *
+        from PySide6.QtGui import *
         from PySide6.QtUiTools import QUiLoader
+        from PySide6.QtWidgets import *
     except ImportError:
         pass
 
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
+import pyside_example  # need to get at the module itself
 import rv
 import rv.qtutils
-
-import pyside_example  # need to get at the module itself
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from OpenGL.GLUT import *
 
 
 class PySideDockTest(rv.rvtypes.MinorMode):
@@ -121,10 +120,8 @@ class PySideDockTest(rv.rvtypes.MinorMode):
             try:
                 p = rv.commands.getFloatProperty(prop, 0, 1231231)
                 p[0] += diff
-                if p[0] > spins[index].maximum():
-                    p[0] = spins[index].maximum()
-                if p[0] < spins[index].minimum():
-                    p[0] = spins[index].minimum()
+                p[0] = min(p[0], spins[index].maximum())
+                p[0] = max(p[0], spins[index].minimum())
                 spins[index].setValue(p[0])
                 rv.commands.setFloatProperty(prop, p, True)
             except Exception:
@@ -158,7 +155,7 @@ class PySideDockTest(rv.rvtypes.MinorMode):
 
     def hookup(self, checkbox, spins, dials, prop, last):
         checkbox.released.connect(self.checkBoxPressed(checkbox, "%s.node.active" % prop))
-        for i in range(0, 3):
+        for i in range(3):
             dial = dials[i]
             spin = spins[i]
             propName = "%s.warp.k%d" % (prop, i + 1)

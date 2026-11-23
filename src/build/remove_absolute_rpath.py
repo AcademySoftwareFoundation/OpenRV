@@ -12,10 +12,9 @@ import concurrent.futures
 import logging
 import os
 import pathlib
-from pathlib import Path
 import subprocess
 import threading
-
+from pathlib import Path
 
 future_lock = threading.Lock()
 

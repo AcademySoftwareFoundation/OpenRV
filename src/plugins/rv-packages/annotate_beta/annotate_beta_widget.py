@@ -6,17 +6,14 @@ import math
 import os
 import sys
 import time
-
 from dataclasses import dataclass
 from enum import Enum, StrEnum, auto
 from functools import partial
 
-from PySide6 import QtCore, QtWidgets, QtGui
-
-from rv import commands, qtutils
-
-from annotate_beta_color_picker import ColorPickerPopup, add_next_custom_slot_highlight
 import annotate_beta_constants as constants
+from annotate_beta_color_picker import ColorPickerPopup, add_next_custom_slot_highlight
+from PySide6 import QtCore, QtGui, QtWidgets
+from rv import commands, qtutils
 
 
 class _Page(Enum):

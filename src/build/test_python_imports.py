@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # *****************************************************************************
 # Copyright 2025 Autodesk, Inc. All rights reserved.

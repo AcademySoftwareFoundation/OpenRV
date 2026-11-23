@@ -139,8 +139,8 @@ namespace IPCore
             CacheThreadMarker = (1 << 8),
             CacheEvalThread = (1 << 9),
 
-            DisplayThread =
-                DisplayNoEvalThread | DisplayEvalThread | DisplayPassThroughThread | DisplayMaybeEvalThread | DisplayCacheEvalThread
+            DisplayThread = DisplayNoEvalThread | DisplayEvalThread | DisplayPassThroughThread | DisplayMaybeEvalThread
+                | DisplayCacheEvalThread
         };
 
         //
@@ -168,7 +168,7 @@ namespace IPCore
 
             // same event propagation behaviour then RV 7.6
             LegacyPropagateTarget = GroupPropagateTarget | GraphPropagateTarget | OutputPropagateTarget | MemberPropagateTarget
-                                    | GroupAndGraphInOutputPropagateTarget,
+                | GroupAndGraphInOutputPropagateTarget,
 
             // new fast event propagation behaviour
             // we avoid to propagate in graph and group after an output is

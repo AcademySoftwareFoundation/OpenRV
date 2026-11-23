@@ -2,7 +2,7 @@
 # from rvio because rvio does not support modes.
 
 from ast import literal_eval
-from typing import Dict, Iterable
+from collections.abc import Iterable
 
 plugin_enabled = True
 try:
@@ -41,7 +41,7 @@ def is_redirecting(url: str) -> bool:
     return bool(literal_eval(sendInternalEvent("media-library-is-streaming", url) or "False"))
 
 
-def get_http_cookies(url: str) -> Iterable[Dict]:
+def get_http_cookies(url: str) -> Iterable[dict]:
     """
     Returns a list of cookies to be used for the given url.
 
@@ -72,7 +72,7 @@ def get_http_cookies(url: str) -> Iterable[Dict]:
     yield from ()
 
 
-def get_http_headers(url: str) -> Iterable[Dict]:
+def get_http_headers(url: str) -> Iterable[dict]:
     """
     Returns a list of headers to be used for the given url.
 

@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-from rv import commands, extra_commands
-from effectHook import get_otio_metadata
 import opentimelineio as otio
+from effectHook import get_otio_metadata
+from rv import commands, extra_commands
 
 
 def hook_function(in_timeline, argument_map):
@@ -40,23 +40,23 @@ def hook_function(in_timeline, argument_map):
     # for releases >= 0.15
     if hasattr(clip.media_reference, "available_image_bounds"):
         transform = extra_commands.associatedNode("RVTransform2D", source)
-        if commands.getIntProperty("{}.transform.active".format(transform))[0] != 0:
+        if commands.getIntProperty(f"{transform}.transform.active")[0] != 0:
             global_translate_vec = otio.schema.V2d(0.0, 0.0)
             global_scale_vec = otio.schema.V2d(1.0, 1.0)
 
-            if commands.propertyExists("{}.otio.global_translate".format(transform)) and commands.propertyExists(
-                "{}.otio.global_scale".format(transform)
+            if commands.propertyExists(f"{transform}.otio.global_translate") and commands.propertyExists(
+                f"{transform}.otio.global_scale"
             ):
-                global_translate = commands.getFloatProperty("{}.otio.global_translate".format(transform))
-                global_scale = commands.getFloatProperty("{}.otio.global_scale".format(transform))
+                global_translate = commands.getFloatProperty(f"{transform}.otio.global_translate")
+                global_scale = commands.getFloatProperty(f"{transform}.otio.global_scale")
                 global_translate_vec = otio.schema.V2d(global_translate[0], global_translate[1])
                 global_scale_vec = otio.schema.V2d(global_scale[0], global_scale[1])
 
             translate = commands.getFloatProperty(
-                "{}.transform.translate".format(transform),
+                f"{transform}.transform.translate",
             )
             scale = commands.getFloatProperty(
-                "{}.transform.scale".format(transform),
+                f"{transform}.transform.scale",
             )
 
             translate_vec = otio.schema.V2d(translate[0], translate[1])

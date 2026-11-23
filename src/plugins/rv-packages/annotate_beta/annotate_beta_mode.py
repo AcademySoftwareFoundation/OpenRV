@@ -4,15 +4,13 @@
 import math
 from functools import partial
 
-from rv import commands, extra_commands, rvtypes, qtutils
-
-from OpenGL import GL, GLU
-from PySide6 import QtCore, QtWidgets, QtGui
-
 import annotate_beta_constants as constants
 import annotate_beta_paint as paint
 from annotate_beta_engine import AnnotateDrawEngine, DrawSettings, ToolState
 from annotate_beta_widget import AnnotateToolbarDockWidget
+from OpenGL import GL, GLU
+from PySide6 import QtCore, QtGui, QtWidgets
+from rv import commands, extra_commands, qtutils, rvtypes
 
 # The last dot lands on the first, closing the loop like the Mu package.
 _RING_DOT_COUNT = 21

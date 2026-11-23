@@ -3,10 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-import rv.commands
+import math
 import os
 import sys
-import math
+
+import rv.commands
 
 
 def concat_seperator():
@@ -26,7 +27,7 @@ class State:
         self.minorModes = []
 
 
-class Mode(object):
+class Mode:
     """A mode is a feature unit. It comes in two varieties: major and
     minor. The mode can be declared in its own file and provide key bindings, a
     menu, multiple event tables if needed, a render function, and is
@@ -57,12 +58,10 @@ class Mode(object):
     def activate(self):
         "Called right after activation"
         self._active = True
-        pass
 
     def deactivate(self):
         "Called right before deactivation"
         self._active = False
-        pass
 
     def toggle(self):
         self._active = not self._active
@@ -79,11 +78,9 @@ class Mode(object):
 
     def layout(self, event):
         "Layout any margins or precompute anything necessary for rendering"
-        pass
 
     def render(self, event):
         "The render function is called on each active minor mode."
-        pass
 
     def supportPath(self, module, packageName=None):
         if packageName is None:

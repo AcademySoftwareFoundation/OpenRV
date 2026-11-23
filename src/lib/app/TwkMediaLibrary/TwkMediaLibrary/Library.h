@@ -144,8 +144,8 @@ namespace TwkMediaLibrary
         RawExportCapabilityFlag = 1 << 3,   // can export raw media files
         EditCapabilityFlag = 1 << 4,        // can edit library
 
-        DefaultCapabiliesFlag =
-            AdministratorCapabilityFlag | NoWatermarkCapabilityFlag | ExportCapabilityFlag | RawExportCapabilityFlag | EditCapabilityFlag
+        DefaultCapabiliesFlag = AdministratorCapabilityFlag | NoWatermarkCapabilityFlag | ExportCapabilityFlag | RawExportCapabilityFlag
+            | EditCapabilityFlag
     };
 
     enum TaskType
