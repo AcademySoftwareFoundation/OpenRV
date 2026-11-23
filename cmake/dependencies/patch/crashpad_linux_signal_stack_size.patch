@@ -1,0 +1,80 @@
+--- a/client/crashpad_client_linux.cc
++++ b/client/crashpad_client_linux.cc
+@@ -20,6 +20,7 @@
+ #include <linux/futex.h>
+ #include <pthread.h>
+ #include <stdlib.h>
++#include <sys/auxv.h>
+ #include <sys/mman.h>
+ #include <sys/prctl.h>
+ #include <sys/socket.h>
+@@ -28,6 +29,7 @@
+ #include <sys/wait.h>
+ #include <unistd.h>
+ 
++#include <algorithm>
+ #include <atomic>
+ 
+ #include "base/check_op.h"
+@@ -538,6 +540,34 @@
+ }
+ 
+ #if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
++namespace {
++
++size_t ComputeSignalStackSize(size_t page_size) {
++  // On glibc < 2.34, SIGSTKSZ is a fixed 8 KiB constant that neither accounts
++  // for AT_MINSIGSTKSZ (e.g. AVX-512 XSAVE state in rt_sigframe) nor for
++  // ClientToServerMessage's PATH_MAX union and unoptimized Debug stack frames.
++  constexpr size_t kMinHandlerStackSize = 64 * 1024;
++  const long sys_sigstksz = SIGSTKSZ;
++  const size_t sigstksz =
++      sys_sigstksz > 0 ? static_cast<size_t>(sys_sigstksz) : 0;
++  const int saved_errno = errno;
++#ifndef AT_MINSIGSTKSZ
++#define AT_MINSIGSTKSZ 51
++#endif
++  const size_t min_sigstksz = static_cast<size_t>(getauxval(AT_MINSIGSTKSZ));
++  errno = saved_errno;
++  const size_t base_size =
++      std::max(sigstksz, kMinHandlerStackSize) + min_sigstksz;
++#if defined(ADDRESS_SANITIZER)
++  const size_t stack_size = 2 * base_size;
++#else
++  const size_t stack_size = base_size;
++#endif  // ADDRESS_SANITIZER
++  return (stack_size + page_size - 1) & ~(page_size - 1);
++}
++
++}  // namespace
++
+ // static
+ bool CrashpadClient::GetHandlerSocket(int* sock, pid_t* pid) {
+   auto signal_handler = RequestCrashDumpHandler::Get();
+@@ -560,11 +590,7 @@
+   DCHECK_EQ(stack.ss_flags & SS_ONSTACK, 0);
+ 
+   const size_t page_size = getpagesize();
+-#if defined(ADDRESS_SANITIZER)
+-  const size_t kStackSize = 2 * ((SIGSTKSZ + page_size - 1) & ~(page_size - 1));
+-#else
+-  const size_t kStackSize = (SIGSTKSZ + page_size - 1) & ~(page_size - 1);
+-#endif  // ADDRESS_SANITIZER
++  const size_t kStackSize = ComputeSignalStackSize(page_size);
+   if (stack.ss_flags & SS_DISABLE || stack.ss_size < kStackSize) {
+     const size_t kGuardPageSize = page_size;
+     const size_t kStackAllocSize = kStackSize + 2 * kGuardPageSize;
+@@ -572,12 +598,7 @@
+     static void (*stack_destructor)(void*) = [](void* stack_mem) {
+       const size_t page_size = getpagesize();
+       const size_t kGuardPageSize = page_size;
+-#if defined(ADDRESS_SANITIZER)
+-      const size_t kStackSize =
+-          2 * ((SIGSTKSZ + page_size - 1) & ~(page_size - 1));
+-#else
+-      const size_t kStackSize = (SIGSTKSZ + page_size - 1) & ~(page_size - 1);
+-#endif  // ADDRESS_SANITIZER
++      const size_t kStackSize = ComputeSignalStackSize(page_size);
+       const size_t kStackAllocSize = kStackSize + 2 * kGuardPageSize;
+ 
+       stack_t stack;
