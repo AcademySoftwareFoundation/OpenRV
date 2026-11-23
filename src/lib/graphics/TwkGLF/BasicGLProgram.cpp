@@ -31,6 +31,7 @@ extern const char* ap_stamp_texture_frag;
 extern const char* EraseVertex_glsl;
 extern const char* EraseFrag_glsl;
 extern const char* SoftEraseFrag_glsl;
+extern const char* StampEraseFrag_glsl;
 extern const char* CloneVertex_glsl;
 extern const char* CloneFrag_glsl;
 extern const char* SoftCloneFrag_glsl;
@@ -289,6 +290,17 @@ namespace TwkGLF
             prog = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_texture_vert,
                                           std::string(ap_compat_gl21) + ap_stamp_texture_frag);
         return prog;
+    }
+
+    const GLProgram* texturePaintEraseGLProgram()
+    {
+        static const GLProgram* program = nullptr;
+        if (program == nullptr)
+        {
+            program = BasicGLProgram::select(std::string(ap_compat_gl21) + ap_stamp_texture_vert,
+                                             std::string(ap_compat_gl21) + StampEraseFrag_glsl);
+        }
+        return program;
     }
 
 } // namespace TwkGLF
