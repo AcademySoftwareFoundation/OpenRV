@@ -220,7 +220,9 @@ class AnnotateBetaMode(rvtypes.MinorMode):
         toolbar.strip.set_active_tool(self._settings.tool)
         toolbar.panel.set_page_for_tool(self._settings.tool)
         toolbar.panel.set_eraser_brush(self._settings.eraser_brush)
-        self._settings.brush_name, self._settings.brush_values = toolbar.panel.brush()
+        brush = toolbar.panel.brush()
+        if brush is not None:
+            self._settings.brush_name, self._settings.brush_values = brush
         toolbar.panel.set_font_family(self._settings.font_family)
         toolbar.panel.set_font_size(self._settings.font_size)
         toolbar.panel.set_bold(self._settings.font_bold)

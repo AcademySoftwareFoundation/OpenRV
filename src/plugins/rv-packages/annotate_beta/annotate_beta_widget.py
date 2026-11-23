@@ -726,7 +726,10 @@ class _BrushPanel(_PenPanel):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._settings_button = None
         entries = brushes.load_brush_catalogue()
+        if not entries:
+            return
         self._settings_button = _BrushSettingsButton()
         brush_type = _BrushTypeComboBox(entries)
         brush_type.brush_changed.connect(self._settings_button.set_brush)
@@ -738,6 +741,8 @@ class _BrushPanel(_PenPanel):
         self._layout.insertWidget(0, brush_type)
 
     def brush(self):
+        if self._settings_button is None:
+            return None
         return self._settings_button.name(), self._settings_button.values()
 
     def _emit_brush(self, values):
