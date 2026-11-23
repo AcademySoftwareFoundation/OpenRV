@@ -79,10 +79,12 @@ namespace Rv
     static const char* CompositeRenderer = "Composite";
     static const char* DirectRenderer = "Direct";
     static const char* AppleRenderer = "Apple Composite";
-    static const char* Area = "area";
-    static const char* Cubic = "cubic";
-    static const char* Linear = "linear";
-    static const char* Nearest = "nearest";
+    // Const pointers: Apple clang -O3 on x86_64 with Qt 6.8 otherwise emits
+    // undefined references to these internal symbols and RV fails to link.
+    static const char* const kArea = "area";
+    static const char* const kCubic = "cubic";
+    static const char* const kLinear = "linear";
+    static const char* const kNearest = "nearest";
     static const char* StereoAnaglyph = "anaglyph";
     static const char* StereoLumAnaglyph = "lumanaglyph";
     static const char* StereoPair = "pair";
@@ -942,21 +944,33 @@ namespace Rv
 
         s = settings.value("resampleMethod", QString(opts.resampleMethod)).toString();
 
-        if (s == Area)
-            opts.resampleMethod = (char*)Area;
-        else if (s == Linear)
-            opts.resampleMethod = (char*)Linear;
-        else if (s == Cubic)
-            opts.resampleMethod = (char*)Cubic;
-        else if (s == Nearest)
-            opts.resampleMethod = (char*)Nearest;
+        if (s == kArea)
+        {
+            opts.resampleMethod = const_cast<char*>(kArea);
+        }
+        else if (s == kLinear)
+        {
+            opts.resampleMethod = const_cast<char*>(kLinear);
+        }
+        else if (s == kCubic)
+        {
+            opts.resampleMethod = const_cast<char*>(kCubic);
+        }
+        else if (s == kNearest)
+        {
+            opts.resampleMethod = const_cast<char*>(kNearest);
+        }
 
         s = settings.value("imageFilter", opts.imageFilter).toString();
 
-        if (s == Linear)
+        if (s == kLinear)
+        {
             opts.imageFilter = GL_LINEAR;
-        else if (s == Nearest)
+        }
+        else if (s == kNearest)
+        {
             opts.imageFilter = GL_NEAREST;
+        }
 
         s = settings.value("backgroundPattern", (opts.bgpattern ? opts.bgpattern : "black")).toString();
 
@@ -1273,22 +1287,22 @@ namespace Rv
 
         settings.setValue("maxBitDepth", n);
 
-        char* method = 0;
+        const char* method = nullptr;
 
         switch (m_ui.resampleMethodCombo->currentIndex())
         {
         default:
         case 0:
-            method = (char*)Area;
+            method = kArea;
             break;
         case 1:
-            method = (char*)Cubic;
+            method = kCubic;
             break;
         case 2:
-            method = (char*)Linear;
+            method = kLinear;
             break;
         case 3:
-            method = (char*)Nearest;
+            method = kNearest;
             break;
         }
 
@@ -1298,10 +1312,10 @@ namespace Rv
         {
         default:
         case 0:
-            method = (char*)Linear;
+            method = kLinear;
             break;
         case 1:
-            method = (char*)Nearest;
+            method = kNearest;
             break;
         }
 
