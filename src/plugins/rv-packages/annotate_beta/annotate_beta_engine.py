@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import NamedTuple
 
-from PySide6 import QtGui
+from PySide6 import QtCore, QtGui
 from rv import commands, extra_commands
 
 import annotate_beta_constants as constants
@@ -94,6 +94,10 @@ class DrawSettings:
 
 
 class AnnotateDrawEngine:
+    # Pixel size of the editing document's font. Layout scales with the font size, so the
+    # document maps to the rendered text by _TEXT_EDIT_PIXEL_SIZE / font size per WCS unit.
+    _TEXT_EDIT_PIXEL_SIZE = 100
+
     def __init__(self, settings, on_history_changed, on_draw_started, on_eyedropper):
         self._settings = settings
         self._on_history_changed = on_history_changed
@@ -115,6 +119,9 @@ class AnnotateDrawEngine:
         self._text_active = False
         self._text_document: QtGui.QTextDocument | None = None
         self._text_cursor: QtGui.QTextCursor | None = None
+        self._text_origin: _Vec2 | None = None  # image-space anchor of the active text box
+        self._text_font_size = 0.0  # WCS font size of the active text box
+        self._text_selecting = False  # True while the pointer drags a selection
         self._text_component: PaintComponent | None = None
         self._text_registered = False
 
@@ -175,6 +182,7 @@ class AnnotateDrawEngine:
         commit = partial(self.on_text_commit, reject=False)
         commit_and_propagate = partial(self.on_text_commit, reject=True)
         insert_new_line = partial(self._append_text, text="\n")
+        select_to = partial(self.on_text_move, keep_anchor=True)
         return [
             # Shape shift-constraint tracking
             ("key-down--shift--shift", self.on_shift_down, "Constrain shape"),
@@ -195,6 +203,20 @@ class AnnotateDrawEngine:
                 "key-down--end",
                 partial(self.on_text_move, move=QtGui.QTextCursor.MoveOperation.EndOfLine),
                 "Cursor to line end",
+            ),
+            ("key-down--shift--left", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Left), "Select left"),
+            ("key-down--shift--right", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Right), "Select right"),
+            ("key-down--shift--up", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Up), "Select up"),
+            ("key-down--shift--down", partial(select_to, move=QtGui.QTextCursor.MoveOperation.Down), "Select down"),
+            (
+                "key-down--shift--home",
+                partial(select_to, move=QtGui.QTextCursor.MoveOperation.StartOfLine),
+                "Select to line start",
+            ),
+            (
+                "key-down--shift--end",
+                partial(select_to, move=QtGui.QTextCursor.MoveOperation.EndOfLine),
+                "Select to line end",
             ),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
@@ -256,16 +278,15 @@ class AnnotateDrawEngine:
 
     def _new_text_document(self) -> QtGui.QTextDocument:
         """Editing document for a new text box, with the renderer's font settings."""
-        # Only relative glyph widths matter here (Up/Down keep the caret's column), so any fixed size works.
-        TEXT_EDIT_PIXEL_SIZE = 100
         font = QtGui.QFont()
         if self._settings.font_family:
             font.setFamily(self._settings.font_family)
-        font.setPixelSize(TEXT_EDIT_PIXEL_SIZE)
+        font.setPixelSize(self._TEXT_EDIT_PIXEL_SIZE)
         font.setBold(self._settings.font_bold)
         font.setItalic(self._settings.font_italic)
         font.setUnderline(self._settings.font_underline)
         font.setKerning(False)
+        font.setHintingPreference(QtGui.QFont.HintingPreference.PreferVerticalHinting)
         document = QtGui.QTextDocument()
         document.setDocumentMargin(0)
         document.setDefaultFont(font)
@@ -378,13 +399,34 @@ class AnnotateDrawEngine:
         return self._text_document.toPlainText()
 
     def _update_text_display(self):
-        paint.set_text(self._text_component, self._text(), self._text_cursor.position())
+        cursor = self._text_cursor
+        selection = (cursor.selectionStart(), cursor.selectionEnd()) if cursor.hasSelection() else None
+        paint.set_text(self._text_component, self._text(), cursor.position(), selection)
+
+    def _text_position_at(self, image_point, inside_only):
+        """Cursor position under image_point, or None when inside_only and the point is outside the box."""
+        layout = self._text_document.documentLayout()
+        first_line = self._text_document.firstBlock().layout().lineAt(0)
+        pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
+        # The renderer puts the first baseline at the box origin, with y going up in image space.
+        x = (image_point.x - self._text_origin.x) * pixels_per_unit
+        y = first_line.ascent() - (image_point.y - self._text_origin.y) * pixels_per_unit
+        if inside_only:
+            size = layout.documentSize()
+            margin = first_line.height() / 2
+            inside_horizontally = -margin <= x <= size.width() + margin
+            inside_vertically = 0 <= y <= size.height()
+            if not (inside_horizontally and inside_vertically):
+                return None
+        return layout.hitTest(QtCore.QPointF(x, y), QtCore.Qt.HitTestAccuracy.FuzzyHit)
 
     def _reset_text(self):
         self._text_active = False
         self._text_component = None
         self._text_document = None
         self._text_cursor = None
+        self._text_origin = None
+        self._text_selecting = False
         self._text_registered = False
 
     def _commit_text(self):
@@ -577,7 +619,7 @@ class AnnotateDrawEngine:
             return
         self._on_draw_started()
         if tool == constants.Tool.TEXT:
-            if not constrained:
+            if not constrained and not self._place_text_cursor(event):
                 self._start_text(event)
             return
         if tool in constants.BRUSH_TOOLS:
@@ -600,7 +642,8 @@ class AnnotateDrawEngine:
     def on_drag(self, event, constrained=False):
         tool = self._settings.tool
         if tool == constants.Tool.TEXT:
-            return  # consume without action during text placement
+            self._drag_text_selection(event)
+            return
         if tool in constants.BRUSH_TOOLS:
             self._pen_drag(event)
             return
@@ -618,6 +661,7 @@ class AnnotateDrawEngine:
     def on_release(self, event, constrained=False):
         tool = self._settings.tool
         if tool == constants.Tool.TEXT:
+            self._text_selecting = False
             return
         if tool in constants.BRUSH_TOOLS:
             self._pen_release(event)
@@ -652,8 +696,34 @@ class AnnotateDrawEngine:
         self._text_active = True
         self._text_document = self._new_text_document()
         self._text_cursor = QtGui.QTextCursor(self._text_document)
+        self._text_origin = image_point
+        self._text_font_size = self._font_size()
         with self._sync_batch(force=False):
-            self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._font_size())
+            self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._text_font_size)
+
+    def _place_text_cursor(self, event) -> bool:
+        """Move the caret to a push inside the active text box and start a drag selection."""
+        if not self._text_active:
+            return False
+        _, image_point = self._pointer_location(event)
+        position = self._text_position_at(image_point, inside_only=True) if image_point else None
+        if position is None:
+            return False
+        self._text_cursor.setPosition(position)
+        self._text_selecting = True
+        self._update_text_display()
+        return True
+
+    def _drag_text_selection(self, event):
+        if not self._text_selecting:
+            return
+        _, image_point = self._pointer_location(event)
+        if image_point is None:
+            return
+        self._text_cursor.setPosition(
+            self._text_position_at(image_point, inside_only=False), QtGui.QTextCursor.MoveMode.KeepAnchor
+        )
+        self._update_text_display()
 
     def on_shift_down(self, event):
         if self._text_active:
@@ -697,13 +767,15 @@ class AnnotateDrawEngine:
         self._text_cursor.deleteChar()
         self._update_text_display()
 
-    def on_text_move(self, event, move):
+    def on_text_move(self, event, move, keep_anchor=False):
         if not self._text_active:
             event.reject()
             return
         # The document lays out lazily, and Up/Down/Home/End need line geometry.
         self._text_document.size()
-        self._text_cursor.movePosition(move)
+        self._text_cursor.movePosition(
+            move, QtGui.QTextCursor.MoveMode.KeepAnchor if keep_anchor else QtGui.QTextCursor.MoveMode.MoveAnchor
+        )
         self._update_text_display()
 
     def on_text_commit(self, event, reject):
