@@ -109,9 +109,9 @@ namespace IPCore
         // Style bits of a text run, shared with annotate_beta's TextStyle
         struct TextRunFlags
         {
-            static constexpr int kBold = 1;
-            static constexpr int kItalic = 2;
-            static constexpr int kUnderline = 4;
+            static constexpr int kBold{1 << 0};
+            static constexpr int kItalic{1 << 1};
+            static constexpr int kUnderline{1 << 2};
         };
 
         // Range of a text component styled differently from its base font

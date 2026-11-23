@@ -52,9 +52,9 @@ _FONT_SIZE_REFERENCE_HEIGHT = 1080.0
 class TextStyle(IntFlag):
     """Bold/italic/underline bits of a text run. Values match PaintIPNode::TextRunFlags."""
 
-    BOLD = 1
-    ITALIC = 2
-    UNDERLINE = 4
+    BOLD = 1 << 0
+    ITALIC = 1 << 1
+    UNDERLINE = 1 << 2
 
 
 def _text_style(bold: bool, italic: bool, underline: bool) -> TextStyle:
@@ -68,12 +68,13 @@ def _text_style(bold: bool, italic: bool, underline: bool) -> TextStyle:
 def _style_format(style: TextStyle, enabled: bool) -> QtGui.QTextCharFormat:
     """Char format that turns one style on or off."""
     char_format = QtGui.QTextCharFormat()
-    if style == TextStyle.BOLD:
-        char_format.setFontWeight(QtGui.QFont.Weight.Bold if enabled else QtGui.QFont.Weight.Normal)
-    elif style == TextStyle.ITALIC:
-        char_format.setFontItalic(enabled)
-    else:
-        char_format.setFontUnderline(enabled)
+    match style:
+        case TextStyle.BOLD:
+            char_format.setFontWeight(QtGui.QFont.Weight.Bold if enabled else QtGui.QFont.Weight.Normal)
+        case TextStyle.ITALIC:
+            char_format.setFontItalic(enabled)
+        case TextStyle.UNDERLINE:
+            char_format.setFontUnderline(enabled)
     return char_format
 
 

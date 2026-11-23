@@ -281,6 +281,24 @@ namespace
         return entry;
     }
 
+    // Parses the "runs" property, a flat list of [start, length, flags] triples.
+    std::vector<PaintIPNode::TextRun> readTextRuns(const TwkContainer::Component* component)
+    {
+        constexpr size_t kValuesPerRun = 3;
+        std::vector<PaintIPNode::TextRun> runs;
+        const auto* runsProp = component->property<TwkContainer::IntProperty>("runs");
+        if (runsProp == nullptr)
+        {
+            return runs;
+        }
+        const std::vector<int>& values = runsProp->valueContainer();
+        for (size_t index = 0; index + kValuesPerRun <= values.size(); index += kValuesPerRun)
+        {
+            runs.push_back({values[index], values[index + 1], values[index + 2]});
+        }
+        return runs;
+    }
+
 } // namespace
 
 namespace IPCore
@@ -498,27 +516,6 @@ namespace IPCore
             o << ';' << run.start << ',' << run.length << ',' << run.flags;
         }
     }
-
-    namespace
-    {
-        // Parses the "runs" property, a flat list of [start, length, flags] triples.
-        std::vector<PaintIPNode::TextRun> readTextRuns(const Component* component)
-        {
-            constexpr size_t kValuesPerRun = 3;
-            std::vector<PaintIPNode::TextRun> runs;
-            const auto* runsProp = component->property<IntProperty>("runs");
-            if (runsProp == nullptr)
-            {
-                return runs;
-            }
-            const std::vector<int>& values = runsProp->valueContainer();
-            for (size_t index = 0; index + kValuesPerRun <= values.size(); index += kValuesPerRun)
-            {
-                runs.push_back({values[index], values[index + 1], values[index + 2]});
-            }
-            return runs;
-        }
-    } // namespace
 
     void PaintIPNode::compileTextComponent(Component* c)
     {
