@@ -878,9 +878,10 @@ namespace IPCore
                 document.documentLayout()->setPaintDevice(paintDevice);
                 document.setDocumentMargin(0);
                 document.setDefaultFont(font);
-                if (localText != nullptr && localText->wrapWidth > 0)
+                const float wrapWidthPixels = localText != nullptr ? localText->wrapWidth * pixelsPerUnit : 0.0f;
+                if (wrapWidthPixels > 0)
                 {
-                    document.setTextWidth(localText->wrapWidth * pixelsPerUnit);
+                    document.setTextWidth(wrapWidthPixels);
                 }
                 document.setPlainText(text);
                 if (localText == nullptr)

@@ -494,13 +494,14 @@ class AnnotateDrawEngine:
     def _text_position_at(self, image_point, inside_only):
         """Cursor position under image_point, or None when inside_only and the point is outside the box."""
         layout = self._text_document.documentLayout()
+        # documentSize() lays the document out, so the first line exists even in an empty box.
+        size = layout.documentSize()
         first_line = self._text_document.firstBlock().layout().lineAt(0)
         pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
         # The renderer puts the first baseline at the box origin, with y going up in image space.
         x = (image_point.x - self._text_origin.x) * pixels_per_unit
         y = first_line.ascent() - (image_point.y - self._text_origin.y) * pixels_per_unit
         if inside_only:
-            size = layout.documentSize()
             margin = first_line.height() / 2
             # documentSize() spans the whole wrap width, idealWidth() only the widest line.
             inside_horizontally = -margin <= x <= self._text_document.idealWidth() + margin
@@ -788,9 +789,9 @@ class AnnotateDrawEngine:
         self._text_font_size = self._font_size()
         pixels_per_unit = self._TEXT_EDIT_PIXEL_SIZE / self._text_font_size
         wrap_width = 0.0
-        edges = self._image_edges(source_name)
-        if edges:
-            right_edge, bottom_edge = edges
+        bottom_right = self._image_bottom_right(source_name)
+        if bottom_right:
+            right_edge, bottom_edge = bottom_right
             wrap_width = max(0.0, right_edge - image_point.x)
             self._text_depth_limit = (image_point.y - bottom_edge) * pixels_per_unit
         self._text_document = self._new_text_document(wrap_width * pixels_per_unit)
@@ -804,7 +805,7 @@ class AnnotateDrawEngine:
             )
 
     @staticmethod
-    def _image_edges(source_name) -> tuple[float, float] | None:
+    def _image_bottom_right(source_name) -> tuple[float, float] | None:
         """Image-space (right x, bottom y) of the image, or None when they are unknown."""
         # imageGeometry() returns the on-screen corners in the viewport space eventToImageSpace() takes.
         try:
