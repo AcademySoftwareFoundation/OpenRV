@@ -480,19 +480,16 @@ class AnnotateDrawEngine:
         # zoom's _screen_scale(), not the stale value from the previous stroke.
         self._pen_stroke_width = self._stroke_width(source_name)
         tool = self._settings.tool
-        brush_values = {}
-        if self._stylus_erasing:
-            erase = True
-            brush = self._settings.eraser_brush
+        erase = self._stylus_erasing or tool == constants.Tool.ERASER
+        if erase:
+            brush = constants.PEN_BRUSH
+            brush_values = constants.ERASER_BRUSH_VALUES[self._settings.eraser_brush]
+        elif tool == constants.Tool.BRUSH:
+            brush = self._settings.brush_name
+            brush_values = self._settings.brush_values
         else:
-            erase = tool == constants.Tool.ERASER
-            if tool == constants.Tool.BRUSH:
-                brush = self._settings.brush_name
-                brush_values = self._settings.brush_values
-            elif tool == constants.Tool.ERASER:
-                brush = self._settings.eraser_brush
-            else:
-                brush = constants.PEN_BRUSH
+            brush = constants.PEN_BRUSH
+            brush_values = {}
         self._pen_stroke = paint.new_stroke(
             paint_frame,
             image_point,

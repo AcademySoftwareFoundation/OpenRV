@@ -32,9 +32,10 @@ class ColorModifier(StrEnum):
     DARKEN = auto()
 
 
-class EraserBrush(StrEnum):
-    CIRCLE = auto()
-    GAUSS = auto()
+class StampBlendMode(IntEnum):
+    NORMAL = 0
+    ERASER = 1
+    ADDITIVE = 2
 
 
 PEN_BRUSH = "pen"
@@ -59,6 +60,16 @@ class BrushSetting(StrEnum):
     ROTATION_JITTER = "rotationJitter"
     SPACING_JITTER = "spacingJitter"
 
+
+class EraserBrush(StrEnum):
+    HARD = auto()
+    SOFT = auto()
+
+
+ERASER_BRUSH_VALUES = {
+    EraserBrush.HARD: {},
+    EraserBrush.SOFT: {BrushSetting.HARDNESS: 0.5},
+}
 
 BRUSH_SETTING_MIN = 0
 BRUSH_SETTING_MAX = 100
