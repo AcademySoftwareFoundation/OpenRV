@@ -415,12 +415,24 @@ namespace IPCore
                 // resolve the tip texture at render time since that's the only place with a GL context.
                 const unsigned int textureId = BrushTextureManager::instance().getTexture(tipTexture);
 
-                GLPipeline* stampPipeline = glState->useGLProgram(texturePaintReplaceGLProgram());
+                int originalTextureUnit = 2;
+
+                GLPipeline* stampPipeline =
+                    glState->useGLProgram(mode == EraseMode ? texturePaintEraseGLProgram() : texturePaintReplaceGLProgram());
                 stampPipeline->setProjection(context.projMatrix);
                 stampPipeline->setModelview(context.modelviewMatrix);
                 stampPipeline->setViewport(0, 0, w, h);
 
-                stampPipeline->setUniformFloat("uniformColor", 3, &(pcolor[0]));
+                if (mode == EraseMode)
+                {
+                    stampPipeline->setUniformInt("original", 1, &originalTextureUnit);
+                    glActiveTexture(GL_TEXTURE0 + originalTextureUnit);
+                    originalFBO->bindColorTexture(0);
+                }
+                else
+                {
+                    stampPipeline->setUniformFloat("uniformColor", 3, &(pcolor[0]));
+                }
 
                 int tipUnit = 1;
                 stampPipeline->setUniformInt("brushTip", 1, &tipUnit);
@@ -454,6 +466,12 @@ namespace IPCore
 
                 if (context.hasStencil)
                     glDisable(GL_SCISSOR_TEST);
+
+                if (mode == EraseMode)
+                {
+                    glActiveTexture(GL_TEXTURE0 + originalTextureUnit);
+                    originalFBO->unbindColorTexture();
+                }
             }
             else
             {

@@ -387,7 +387,8 @@ namespace IPCore
         p.debug = debug;
         p.join = (Path::JoinStyle)join;
         p.cap = (Path::CapStyle)cap;
-        p.mode = (Paint::PolyLine::Mode)mode;
+        p.mode =
+            blendMode == Paint::PolyLine::StampBlendMode::Eraser ? Paint::PolyLine::EraseMode : static_cast<Paint::PolyLine::Mode>(mode);
         p.splat = splat ? true : false;
         p.smoothingWidth = p.splat ? 0.25 : 1.0;
         p.version = version;
