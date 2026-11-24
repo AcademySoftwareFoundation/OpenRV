@@ -629,13 +629,22 @@ class _WidePopupComboBox(QtWidgets.QComboBox):
         super().showPopup()
 
 
+def _tinted_pixmap(pixmap, color):
+    tinted = QtGui.QPixmap(pixmap)
+    painter = QtGui.QPainter(tinted)
+    painter.setCompositionMode(QtGui.QPainter.CompositionMode_SourceIn)
+    painter.fillRect(tinted.rect(), color)
+    painter.end()
+    return tinted
+
+
 class _BrushTypeComboBox(_WidePopupComboBox):
     """Combo box whose closed field shows the selected brush's image instead of its name."""
 
     _ICON_STAMP_SIZE = 10
-    _STROKE_STAMP_SIZE_RATIO = 0.4
-    _STROKE_LENGTH_RATIO = 5
-    _STROKE_AMPLITUDE_RATIO = 0.4
+    _STROKE_STAMP_SIZE_RATIO = 0.2
+    _STROKE_LENGTH_RATIO = 2.5
+    _STROKE_AMPLITUDE_RATIO = 0.2
     _SPACING_PER_RADIUS = 0.5
     _MIN_SPACING_PER_RADIUS = 0.001
     _PREVIEW_SEED = 1
@@ -646,37 +655,46 @@ class _BrushTypeComboBox(_WidePopupComboBox):
         super().__init__(parent)
         self.setToolTip("Brush types")
         self._entries = entries
-        self._icons = []
-        stroke_stamp_size = self.fontMetrics().height() * self._STROKE_STAMP_SIZE_RATIO
+        self._tips = [QtGui.QImage(entry.tip_path) for entry in entries]
+        self._icon_stamps = [self._make_stamp(tip, self._ICON_STAMP_SIZE) for tip in self._tips]
+        self._previews = None
         for entry in entries:
-            tip = QtGui.QImage(entry.tip_path)
-            icon_stamp = self._make_stamp(tip, self._ICON_STAMP_SIZE)
-            stroke_stamp = self._make_stamp(tip, stroke_stamp_size)
-            self._icons.append(QtGui.QIcon(icon_stamp))
             self.addItem(entry.display_name)
-            preview = self._paint_stroke_preview(stroke_stamp, entry.defaults)
-            self.setItemData(self.count() - 1, preview, _BrushItemDelegate.PREVIEW_ROLE)
         self.setItemDelegate(_BrushItemDelegate(self))
         self.currentIndexChanged.connect(self._on_index_changed)
 
     def _on_index_changed(self, index):
         self.brush_changed.emit(self._entries[index])
 
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() in (QtCore.QEvent.FontChange, QtCore.QEvent.StyleChange):
+            self._previews = None
+
+    def preview(self, row):
+        if self._previews is None:
+            stamp_size = self.sizeHint().height() * self._STROKE_STAMP_SIZE_RATIO
+            self._previews = [
+                self._paint_stroke_preview(self._make_stamp(tip, stamp_size), entry.defaults)
+                for entry, tip in zip(self._entries, self._tips)
+            ]
+        return self._previews[row]
+
     def _make_stamp(self, tip, size):
         device_pixel_ratio = self.devicePixelRatioF()
         stamp_pixels = round(size * device_pixel_ratio)
         scaled_tip = tip.scaled(stamp_pixels, stamp_pixels, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         stamp_image = QtGui.QImage(scaled_tip.size(), QtGui.QImage.Format_ARGB32)
-        stamp_image.fill(self.palette().color(self.foregroundRole()))
+        stamp_image.fill(QtCore.Qt.black)
         stamp_image.setAlphaChannel(scaled_tip)  # Set the tip's brightness as the stamp's opacity
         stamp = QtGui.QPixmap.fromImage(stamp_image)
         stamp.setDevicePixelRatio(device_pixel_ratio)
         return stamp
 
     def _paint_stroke_preview(self, stamp, defaults):
-        font_height = self.fontMetrics().height()
-        length = font_height * self._STROKE_LENGTH_RATIO
-        amplitude = font_height * self._STROKE_AMPLITUDE_RATIO
+        combo_height = self.sizeHint().height()
+        length = combo_height * self._STROKE_LENGTH_RATIO
+        amplitude = combo_height * self._STROKE_AMPLITUDE_RATIO
 
         stamp_size = stamp.deviceIndependentSize().width()
         device_pixel_ratio = self.devicePixelRatioF()
@@ -714,7 +732,8 @@ class _BrushTypeComboBox(_WidePopupComboBox):
         style_option = QtWidgets.QStyleOptionComboBox()
         self.initStyleOption(style_option)
         style_option.currentText = ""
-        style_option.currentIcon = self._icons[self.currentIndex()]
+        text_color = self.palette().color(self.foregroundRole())
+        style_option.currentIcon = QtGui.QIcon(_tinted_pixmap(self._icon_stamps[self.currentIndex()], text_color))
         painter.drawComplexControl(QtWidgets.QStyle.CC_ComboBox, style_option)
         painter.drawControl(QtWidgets.QStyle.CE_ComboBoxLabel, style_option)
 
@@ -796,12 +815,12 @@ class _CheckedItemDelegate(QtWidgets.QStyledItemDelegate):
 class _BrushItemDelegate(_CheckedItemDelegate):
     """Draws the brush name with its preview stroke underneath."""
 
-    PREVIEW_ROLE = QtCore.Qt.UserRole
+    _STROKE_RIGHT_MARGIN = 8
 
     def paint(self, painter, option, index):
         style = QtWidgets.QApplication.style()
         style.drawPrimitive(QtWidgets.QStyle.PE_PanelItemViewItem, option, painter, option.widget)
-        preview = index.data(self.PREVIEW_ROLE)
+        preview = self.parent().preview(index.row())
         size = preview.deviceIndependentSize().toSize()
         name_option = QtWidgets.QStyleOptionViewItem(option)
         self.initStyleOption(name_option, index)
@@ -810,14 +829,22 @@ class _BrushItemDelegate(_CheckedItemDelegate):
         text_rect = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemText, name_option, None)
         text_rect.adjust(style.pixelMetric(QtWidgets.QStyle.PM_FocusFrameHMargin, None, option.widget) + 1, 0, 0, 0)
         selected = bool(option.state & QtWidgets.QStyle.State_Selected)
-        painter.setPen(option.palette.color(QtGui.QPalette.HighlightedText if selected else QtGui.QPalette.Text))
+        text_color = option.palette.color(QtGui.QPalette.HighlightedText if selected else QtGui.QPalette.Text)
+        painter.setPen(text_color)
         painter.drawText(text_rect, QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter, name_option.text)
-        painter.drawPixmap(text_rect.left(), name_option.rect.bottom() + 1, preview)
+        painter.drawPixmap(text_rect.left(), name_option.rect.bottom() + 1, _tinted_pixmap(preview, text_color))
 
     def sizeHint(self, option, index):
         size = super().sizeHint(option, index)
-        preview_size = index.data(self.PREVIEW_ROLE).deviceIndependentSize().toSize()
-        return QtCore.QSize(max(size.width(), preview_size.width()), size.height() + preview_size.height())
+        preview_size = self.parent().preview(index.row()).deviceIndependentSize().toSize()
+        style = QtWidgets.QApplication.style()
+        text_option = QtWidgets.QStyleOptionViewItem(option)
+        self.initStyleOption(text_option, index)
+        text_option.rect = QtCore.QRect(0, 0, size.width(), size.height())
+        text_left = style.subElementRect(QtWidgets.QStyle.SE_ItemViewItemText, text_option, None).left()
+        text_left += style.pixelMetric(QtWidgets.QStyle.PM_FocusFrameHMargin, None, option.widget) + 1
+        stroke_width = text_left + preview_size.width() + self._STROKE_RIGHT_MARGIN
+        return QtCore.QSize(max(size.width(), stroke_width), size.height() + preview_size.height())
 
 
 class _FontNameDelegate(_CheckedItemDelegate):
