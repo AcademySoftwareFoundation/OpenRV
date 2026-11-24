@@ -1,10 +1,12 @@
 # Copyright (c) 2025 Autodesk, Inc. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import itertools
 import math
 from collections.abc import Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
+from enum import IntFlag
 from functools import partial
 from typing import NamedTuple
 
@@ -45,6 +47,35 @@ _SHIFT_MODIFIER = 1 << 0
 #   - new text has the same initial screen size regardless of zoom
 #   - existing text scales with the image as you zoom in (fixed WCS stored)
 _FONT_SIZE_REFERENCE_HEIGHT = 1080.0
+
+
+class TextStyle(IntFlag):
+    """Bold/italic/underline bits of a text run. Values match PaintIPNode::TextRunFlags."""
+
+    BOLD = 1 << 0
+    ITALIC = 1 << 1
+    UNDERLINE = 1 << 2
+
+
+def _text_style(bold: bool, italic: bool, underline: bool) -> TextStyle:
+    style = TextStyle(0)
+    for flag, enabled in ((TextStyle.BOLD, bold), (TextStyle.ITALIC, italic), (TextStyle.UNDERLINE, underline)):
+        if enabled:
+            style |= flag
+    return style
+
+
+def _style_format(style: TextStyle, enabled: bool) -> QtGui.QTextCharFormat:
+    """Char format that turns one style on or off."""
+    char_format = QtGui.QTextCharFormat()
+    match style:
+        case TextStyle.BOLD:
+            char_format.setFontWeight(QtGui.QFont.Weight.Bold if enabled else QtGui.QFont.Weight.Normal)
+        case TextStyle.ITALIC:
+            char_format.setFontItalic(enabled)
+        case TextStyle.UNDERLINE:
+            char_format.setFontUnderline(enabled)
+    return char_format
 
 
 class _Vec2(NamedTuple):
@@ -122,6 +153,7 @@ class AnnotateDrawEngine:
         self._text_origin: _Vec2 | None = None  # image-space anchor of the active text box
         self._text_font_size = 0.0  # WCS font size of the active text box
         self._text_selecting = False  # True while the pointer drags a selection
+        self._text_base_style = TextStyle(0)  # toolbar style of the active text box
         self._text_component: PaintComponent | None = None
         self._text_registered = False
 
@@ -218,6 +250,9 @@ class AnnotateDrawEngine:
                 partial(select_to, move=QtGui.QTextCursor.MoveOperation.EndOfLine),
                 "Select to line end",
             ),
+            ("key-down--control--b", partial(self.on_text_style, style=TextStyle.BOLD), "Toggle bold text"),
+            ("key-down--control--i", partial(self.on_text_style, style=TextStyle.ITALIC), "Toggle italic text"),
+            ("key-down--control--u", partial(self.on_text_style, style=TextStyle.UNDERLINE), "Toggle underlined text"),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
             ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
@@ -401,7 +436,54 @@ class AnnotateDrawEngine:
     def _update_text_display(self):
         cursor = self._text_cursor
         selection = (cursor.selectionStart(), cursor.selectionEnd()) if cursor.hasSelection() else None
-        paint.set_text(self._text_component, self._text(), cursor.position(), selection)
+        paint.set_text(self._text_component, self._text(), cursor.position(), selection, self._text_runs())
+
+    def _style_of(self, char_format: QtGui.QTextCharFormat) -> TextStyle:
+        """Style of a char format, falling back to the box's base style for what it doesn't set."""
+        base = self._text_base_style
+        bold = (
+            char_format.fontWeight() >= QtGui.QFont.Weight.Bold
+            if char_format.hasProperty(QtGui.QTextFormat.Property.FontWeight)
+            else TextStyle.BOLD in base
+        )
+        italic = (
+            char_format.fontItalic()
+            if char_format.hasProperty(QtGui.QTextFormat.Property.FontItalic)
+            else TextStyle.ITALIC in base
+        )
+        underline = (
+            char_format.fontUnderline()
+            if char_format.hasProperty(QtGui.QTextFormat.Property.TextUnderlineStyle)
+            else TextStyle.UNDERLINE in base
+        )
+        return _text_style(bold, italic, underline)
+
+    def _char_styles(self) -> list[TextStyle | None]:
+        """Style of each character of the text, None for line breaks."""
+        PARAGRAPH_SEPARATOR = "\u2029"
+        document = self._text_document
+        cursor = QtGui.QTextCursor(document)
+        styles = []
+        for position in range(document.characterCount() - 1):
+            if document.characterAt(position) == PARAGRAPH_SEPARATOR:
+                styles.append(None)
+                continue
+            # charFormat() is the format of the character before the cursor.
+            cursor.setPosition(position + 1)
+            styles.append(self._style_of(cursor.charFormat()))
+        return styles
+
+    def _text_runs(self) -> list[int]:
+        """[start, length, flags] for each range whose style differs from the base style."""
+        base = self._text_base_style
+        runs = []
+        position = 0
+        for style, characters in itertools.groupby(base if style is None else style for style in self._char_styles()):
+            length = len(list(characters))
+            if style != base:
+                runs += [position, length, int(style)]
+            position += length
+        return runs
 
     def _text_position_at(self, image_point, inside_only):
         """Cursor position under image_point, or None when inside_only and the point is outside the box."""
@@ -698,6 +780,9 @@ class AnnotateDrawEngine:
         self._text_cursor = QtGui.QTextCursor(self._text_document)
         self._text_origin = image_point
         self._text_font_size = self._font_size()
+        self._text_base_style = _text_style(
+            self._settings.font_bold, self._settings.font_italic, self._settings.font_underline
+        )
         with self._sync_batch(force=False):
             self._text_component = paint.new_text_node(paint_frame, image_point, self._settings, self._text_font_size)
 
@@ -765,6 +850,20 @@ class AnnotateDrawEngine:
             event.reject()
             return
         self._text_cursor.deleteChar()
+        self._update_text_display()
+
+    def on_text_style(self, event, style):
+        """Toggle style on the selection, or for the next characters typed when nothing is selected."""
+        if not self._text_active:
+            event.reject()
+            return
+        cursor = self._text_cursor
+        if cursor.hasSelection():
+            selected = self._char_styles()[cursor.selectionStart() : cursor.selectionEnd()]
+            enable = not all(style in character for character in selected if character is not None)
+        else:
+            enable = style not in self._style_of(cursor.charFormat())
+        cursor.mergeCharFormat(_style_format(style, enable))
         self._update_text_display()
 
     def on_text_move(self, event, move, keep_anchor=False):

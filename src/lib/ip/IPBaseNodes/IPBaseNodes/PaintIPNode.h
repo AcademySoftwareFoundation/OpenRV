@@ -106,6 +106,22 @@ namespace IPCore
             static constexpr const char* Underline = "underline";
         };
 
+        // Style bits of a text run, shared with annotate_beta's TextStyle
+        struct TextRunFlags
+        {
+            static constexpr int kBold{1 << 0};
+            static constexpr int kItalic{1 << 1};
+            static constexpr int kUnderline{1 << 2};
+        };
+
+        // Range of a text component styled differently from its base font
+        struct TextRun
+        {
+            int start{0}; // UTF-16 offset
+            int length{0};
+            int flags{0}; // TextRunFlags bits
+        };
+
         class LocalText
             : public Paint::Text
             , public LocalCommand
@@ -124,6 +140,7 @@ namespace IPCore
             std::optional<int> caret;
             // Selected range [start, end) as QTextCursor positions (UTF-16 code units). Only set while text is selected.
             std::optional<std::pair<int, int>> selection;
+            std::vector<TextRun> runs;
 
             void hash(std::ostream& o) const override;
         };
