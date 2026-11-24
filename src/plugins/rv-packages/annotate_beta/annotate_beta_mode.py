@@ -193,7 +193,7 @@ class AnnotateBetaMode(rvtypes.MinorMode):
             self._settings.tool = saved_tool
 
         self._settings.eraser_brush = commands.readSettings(
-            constants.SETTINGS_GROUP, "eraser_brush", constants.EraserBrush.CIRCLE
+            constants.SETTINGS_GROUP, "eraser_brush", constants.EraserBrush.HARD
         )
 
         self._settings.font_family = commands.readSettings(

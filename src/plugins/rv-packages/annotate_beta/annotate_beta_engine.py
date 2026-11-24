@@ -76,7 +76,7 @@ class DrawSettings:
 
     tool_states: dict
     tool: constants.Tool = constants.Tool.PEN
-    eraser_brush: constants.EraserBrush = constants.EraserBrush.CIRCLE
+    eraser_brush: constants.EraserBrush = constants.EraserBrush.HARD
     brush_name: str = constants.PEN_BRUSH
     brush_values: dict[constants.BrushSetting, float] = field(default_factory=dict)
     font_family: str = constants.DEFAULT_FONT_FAMILY
