@@ -36,7 +36,6 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <stl_ext/thread_group.h>
 #include <boost/algorithm/string.hpp>
 #include <ImfHeader.h>
 #include <yaml-cpp/yaml.h>

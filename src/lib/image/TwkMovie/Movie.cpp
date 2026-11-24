@@ -15,7 +15,6 @@
 #include <libswresample/swresample.h>
 #include <pthread.h>
 #include <stl_ext/stl_ext_algo.h>
-#include <stl_ext/thread_group.h>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
