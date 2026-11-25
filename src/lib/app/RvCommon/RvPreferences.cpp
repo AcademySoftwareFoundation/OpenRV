@@ -79,12 +79,12 @@ namespace Rv
     static const char* CompositeRenderer = "Composite";
     static const char* DirectRenderer = "Direct";
     static const char* AppleRenderer = "Apple Composite";
-    // Const pointers: Apple clang -O3 on x86_64 with Qt 6.8 otherwise emits
+    // Constexpr pointers: Apple clang -O3 on x86_64 with Qt 6.8 otherwise emits
     // undefined references to these internal symbols and RV fails to link.
-    static const char* const kArea = "area";
-    static const char* const kCubic = "cubic";
-    static const char* const kLinear = "linear";
-    static const char* const kNearest = "nearest";
+    static constexpr const char* kArea = "area";
+    static constexpr const char* kCubic = "cubic";
+    static constexpr const char* kLinear = "linear";
+    static constexpr const char* kNearest = "nearest";
     static const char* StereoAnaglyph = "anaglyph";
     static const char* StereoLumAnaglyph = "lumanaglyph";
     static const char* StereoPair = "pair";
