@@ -12,6 +12,7 @@
 #include <TwkUtil/sgcHop.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 
 using namespace ILMTHREAD_NAMESPACE;
@@ -948,8 +949,13 @@ void planarP416_to_planarYUV444P16(size_t width, size_t height, const uint16_t* 
 // AV_PIX_FMT_YUVA444P16LE - planar YUVA 4:4:4:4, 64bpp, (1 Cr & Cb sample per
 // 1x1 Y samples & A samples), little-endian
 //
-void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height, const uint8_t* const inBuf, std::uint16_t* outY,
-                                  std::uint16_t* outCb, std::uint16_t* outCr, std::uint16_t* outA)
+// Rows are addressed through the strides: the decoded frame's rows can be
+// padded (e.g. FFmpeg aligns them to 32 or 64 bytes), so the pixels are not one
+// contiguous width * height block.
+//
+void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height, const uint8_t* const inBuf, std::size_t inStride,
+                                  std::uint16_t* outY, std::uint16_t* outCb, std::uint16_t* outCr, std::uint16_t* outA,
+                                  std::size_t outStrideY, std::size_t outStrideCb, std::size_t outStrideCr, std::size_t outStrideA)
 {
 #pragma pack(push, 1)
 
@@ -963,14 +969,22 @@ void packedAYUV64_to_planarYUVA16(std::size_t width, std::size_t height, const u
 
 #pragma pack(pop)
 
-    const auto* pixelsBuf = reinterpret_cast<const components*>(inBuf);
+    constexpr std::size_t kBytesPerSample = sizeof(std::uint16_t);
 
-    std::size_t pixelCount = width * height;
-    for (std::size_t i = 0; i < pixelCount; ++i)
+    for (std::size_t row = 0; row < height; ++row)
     {
-        outA[i] = pixelsBuf[i].A;
-        outY[i] = pixelsBuf[i].Y;
-        outCb[i] = pixelsBuf[i].Cb;
-        outCr[i] = pixelsBuf[i].Cr;
+        const auto* inPixels = reinterpret_cast<const components*>(inBuf + (row * inStride));
+        std::uint16_t* outRowY = outY + (row * outStrideY / kBytesPerSample);
+        std::uint16_t* outRowCb = outCb + (row * outStrideCb / kBytesPerSample);
+        std::uint16_t* outRowCr = outCr + (row * outStrideCr / kBytesPerSample);
+        std::uint16_t* outRowA = outA + (row * outStrideA / kBytesPerSample);
+
+        for (std::size_t column = 0; column < width; ++column)
+        {
+            outRowA[column] = inPixels[column].A;
+            outRowY[column] = inPixels[column].Y;
+            outRowCb[column] = inPixels[column].Cb;
+            outRowCr[column] = inPixels[column].Cr;
+        }
     }
 }

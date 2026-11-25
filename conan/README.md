@@ -25,6 +25,10 @@ conan/
 │   ├── x86_64_apple_release      # macOS x86_64 Release
 │   ├── x86_64_rocky8             # Linux Rocky 8 Release
 │   ├── x86_64_rocky8_debug       # Linux Rocky 8 Debug
+│   ├── x86_64_rocky8_cy2026      # Linux Rocky 8 Release, CY2026 (GCC 14, gcc-toolset-14)
+│   ├── x86_64_rocky8_cy2026_debug # Linux Rocky 8 Debug, CY2026 (GCC 14, gcc-toolset-14)
+│   ├── x86_64_rocky9_cy2026      # Linux Rocky 9 Release, CY2026 (GCC 14, gcc-toolset-14)
+│   ├── x86_64_rocky9_cy2026_debug # Linux Rocky 9 Debug, CY2026 (GCC 14, gcc-toolset-14)
 │   ├── x86_64_windows            # Windows x64 Release
 │   └── x86_64_windows_debug      # Windows x64 Debug
 └── README.md

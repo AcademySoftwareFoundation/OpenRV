@@ -894,6 +894,11 @@ namespace TwkMovie
             return {timeScale, kFractionalRateDuration};
         }
 
+        //
+        // Number of significant bits per sample of the first component.
+        //
+        int sampleBitDepth(const AVPixFmtDescriptor* desc) { return desc->comp[0].depth; }
+
         AVPixelFormat getBestAVFormat(AVPixelFormat native)
         {
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
@@ -917,7 +922,7 @@ namespace TwkMovie
             //
 
             const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(native);
-            int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+            const int bitSize = sampleBitDepth(desc);
             bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
             bool isPlanar = (desc->flags & AV_PIX_FMT_FLAG_PLANAR);
             bool isRGB = (desc->flags & AV_PIX_FMT_FLAG_RGB);
@@ -940,14 +945,15 @@ namespace TwkMovie
             // Excludes gray, palette, Bayer, hardware and XYZ formats, which
             // also lack the RGB and planar flags but are not YUV.
             //
-            bool isPackedYUV = !isPlanar && !isRGB && desc->nb_components >= 3
-                               && !(desc->flags & (AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_BAYER | AV_PIX_FMT_FLAG_HWACCEL))
-                               && native != AV_PIX_FMT_XYZ12LE && native != AV_PIX_FMT_XYZ12BE;
+            const bool isPackedYUV = !isPlanar && !isRGB && desc->nb_components >= 3
+                                     && (desc->flags & (AV_PIX_FMT_FLAG_PAL | AV_PIX_FMT_FLAG_BAYER | AV_PIX_FMT_FLAG_HWACCEL)) == 0
+                                     && native != AV_PIX_FMT_XYZ12LE && native != AV_PIX_FMT_XYZ12BE;
 
             // Planar YUV+, and packed YUV mapped to its planar equivalent
             if ((isPlanar && !isRGB) || isPackedYUV)
             {
-                int log2w, log2h;
+                int log2w = 0;
+                int log2h = 0;
                 av_pix_fmt_get_chroma_sub_sample(native, &log2w, &log2h);
 
                 if (bitSize == 8 && !isPackedYUV)
@@ -2751,7 +2757,7 @@ namespace TwkMovie
         AVCodecContext* firstVideoCodecContext = m_videoTracks[0]->avCodecContext;
         AVPixelFormat nativeFormat = firstVideoCodecContext->pix_fmt;
         const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(nativeFormat);
-        int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+        const int bitSize = sampleBitDepth(desc);
         m_info.numChannels = desc->nb_components;
         m_info.dataType = (bitSize > 8) ? FrameBuffer::USHORT : FrameBuffer::UCHAR;
 
@@ -3165,7 +3171,8 @@ namespace TwkMovie
             auto* dstCr = reinterpret_cast<std::uint16_t*>(dstFrame->data[2]);
             auto* dstA = reinterpret_cast<std::uint16_t*>(dstFrame->data[3]);
 
-            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], dstY, dstCb, dstCr, dstA);
+            packedAYUV64_to_planarYUVA16(width, height, srcFrame->data[0], srcFrame->linesize[0], dstY, dstCb, dstCr, dstA,
+                                         dstFrame->linesize[0], dstFrame->linesize[1], dstFrame->linesize[2], dstFrame->linesize[3]);
             return;
         }
 #endif
@@ -4058,7 +4065,7 @@ namespace TwkMovie
             desc = av_pix_fmt_desc_get(nativeFormat);
         }
 
-        int bitSize = desc->comp[0].depth - desc->comp[0].shift;
+        const int bitSize = sampleBitDepth(desc);
         int numPlanes = 0;
         bool hasAlpha = (desc->flags & AV_PIX_FMT_FLAG_ALPHA);
         bool convertFormat = false;
@@ -4113,9 +4120,9 @@ namespace TwkMovie
             // Describe the format we are converting *to*. For packed YUV this
             // differs from the decoded format: it has been mapped to planar.
             const AVPixFmtDescriptor* bestDesc = av_pix_fmt_desc_get(nativeFormat);
-            const bool bestIsPlanar = (bestDesc->flags & AV_PIX_FMT_FLAG_PLANAR);
-            const bool bestIsRGB = (bestDesc->flags & AV_PIX_FMT_FLAG_RGB);
-            const bool bestHasAlpha = (bestDesc->flags & AV_PIX_FMT_FLAG_ALPHA);
+            const bool bestIsPlanar = (bestDesc->flags & AV_PIX_FMT_FLAG_PLANAR) != 0;
+            const bool bestIsRGB = (bestDesc->flags & AV_PIX_FMT_FLAG_RGB) != 0;
+            const bool bestHasAlpha = (bestDesc->flags & AV_PIX_FMT_FLAG_ALPHA) != 0;
 
             if (bestIsPlanar && !bestIsRGB)
             {

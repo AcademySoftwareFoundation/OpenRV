@@ -100,14 +100,15 @@ LIST(APPEND _configure_options "-DZLIB_LIBRARY=${_crashpad_zlib_library}")
 LIST(APPEND _configure_options "-DZLIB_INCLUDE_DIR=${_crashpad_zlib_include_dir}")
 
 # On Linux, crashpad defaults to libcurl for HTTP uploads. RV stores dumps locally only, so a patch replaces the libcurl transport with a stub (no
-# libcurl/libldap/OpenSSL).
+# libcurl/libldap/OpenSSL). A second patch raises Crashpad's Linux sigaltstack floor above glibc < 2.34's fixed 8 KiB SIGSTKSZ so AVX-512 signal frames plus
+# ClientToServerMessage's PATH_MAX union do not overflow into the guard page in Debug builds.
 SET(_crashpad_patch_command
     ${CMAKE_COMMAND} -E true
 )
 IF(RV_TARGET_LINUX)
   SET(_crashpad_patch_command
       sh -c
-      "${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/patch/crashpad_http_transport_disabled.cc util/net/http_transport_disabled.cc && patch -p1 -N < ${CMAKE_CURRENT_LIST_DIR}/patch/crashpad_linux_disable_http_transport.patch"
+      "git checkout -- util/CMakeLists.txt client/crashpad_client_linux.cc && ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/patch/crashpad_http_transport_disabled.cc util/net/http_transport_disabled.cc && patch -p1 -N < ${CMAKE_CURRENT_LIST_DIR}/patch/crashpad_linux_disable_http_transport.patch && patch -p1 -N < ${CMAKE_CURRENT_LIST_DIR}/patch/crashpad_linux_signal_stack_size.patch"
   )
 ENDIF()
 
