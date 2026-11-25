@@ -135,19 +135,10 @@ namespace Rv
         , m_green(green)
         , m_blue(blue)
         , m_alpha(alpha)
-        , m_lastKey(0)
-        , m_lastKeyType(QEvent::None)
-        , m_userActive(true)
-        , m_firstPaintCompleted(false)
         , m_postFirstNonEmptyRender(noResize)
-        , m_stopProcessingEvents(false)
         , m_devicePixelRatio(static_cast<float>(devicePixelRatio()))
-        , m_syncingDevicePixelRatio(false)
-        , m_profilingSwapPending(false)
     {
         setFormat(GLView::rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, alpha));
-
-        m_videoDevice = nullptr; // set later by the hosting GLView
 
         m_activityTimer.start();
 
@@ -158,15 +149,27 @@ namespace Rv
         //  reports the new value.
         connect(this, &QWindow::screenChanged, this, [this](QScreen*) { syncDevicePixelRatio(); }, Qt::QueuedConnection);
 
-        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::endProfilingSwap);
+        connect(this, &QOpenGLWindow::frameSwapped, this, &GLWindow::onFrameSwapped);
     }
 
     GLWindow::~GLWindow() {}
 
     void GLWindow::stopProcessingEvents() { m_stopProcessingEvents = true; }
 
-    void GLWindow::endProfilingSwap()
+    void GLWindow::onFrameSwapped()
     {
+        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
+
+        if (m_syncSamplePending)
+        {
+            m_syncSamplePending = false;
+
+            if (session != nullptr)
+            {
+                session->addSyncSample();
+            }
+        }
+
         if (!m_profilingSwapPending)
         {
             return;
@@ -174,7 +177,6 @@ namespace Rv
 
         m_profilingSwapPending = false;
 
-        IPCore::Session* session = (m_doc != nullptr) ? m_doc->session() : nullptr;
         if (session != nullptr)
         {
             Session::ProfilingRecord& trecord = session->currentProfilingSample();
@@ -483,7 +485,8 @@ namespace Rv
             m_profilingSwapPending = true;
         }
 
-        session->addSyncSample();
+        //  The sync sample is taken in onFrameSwapped().
+        m_syncSamplePending = true;
         session->postRender();
 
         //  No mainPresent term: QOpenGLWindow swaps after paintGL returns.
