@@ -1298,7 +1298,7 @@ class AnnotateToolbarWidget(QtWidgets.QWidget):
         self._panel = AnnotateSecondaryPanel()
         layout.addWidget(self._panel)
 
-        # Floating color picker popup (no parent — truly floating)
+        # Floating color picker popup, parented to the toolbar's current window each time it is shown
         self._picker_popup = ColorPickerPopup(_load_icon("palette_settings"))
         self._picker_popup.color_changed.connect(self._on_color_changed)
         self._picker_popup.dialog_requested.connect(self._on_color_dialog_requested)
