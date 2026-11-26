@@ -871,27 +871,26 @@ namespace IPCore
             }
 
             // Lays out plain text with the annotation font and no margin, so the first line's top-left corner is at (0, 0).
-            // Annotation text also wraps at its wrapWidth, breaking long words, and its runs inside the text are styled.
+            // A positive wrapWidthPixels wraps the text at that width, breaking long words.
             void setUpTextDocument(QTextDocument& document, const QFont& font, const QString& text, QPaintDevice* paintDevice,
-                                   const PaintIPNode::LocalText* localText, float pixelsPerUnit)
+                                   float wrapWidthPixels)
             {
                 document.documentLayout()->setPaintDevice(paintDevice);
                 document.setDocumentMargin(0);
                 document.setDefaultFont(font);
-                const float wrapWidthPixels = localText != nullptr ? localText->wrapWidth * pixelsPerUnit : 0.0f;
                 if (wrapWidthPixels > 0)
                 {
                     document.setTextWidth(wrapWidthPixels);
                 }
                 document.setPlainText(text);
-                if (localText == nullptr)
-                {
-                    return;
-                }
+            }
 
+            // Styles the runs that fall inside the document text over its default font; other runs are skipped.
+            void applyTextRuns(QTextDocument& document, const std::vector<PaintIPNode::TextRun>& runs)
+            {
                 const int textLength = document.characterCount() - 1;
                 QTextCursor cursor(&document);
-                for (const PaintIPNode::TextRun& run : localText->runs)
+                for (const PaintIPNode::TextRun& run : runs)
                 {
                     if (run.start < 0 || run.length <= 0 || run.start + run.length > textLength)
                     {
@@ -1046,7 +1045,12 @@ namespace IPCore
                 }
                 QImage refImg(1, 1, QImage::Format_ARGB32_Premultiplied);
                 QTextDocument document;
-                setUpTextDocument(document, qfont, qtext, &refImg, localText, fbH);
+                const float wrapWidthPixels = localText != nullptr ? localText->wrapWidth * fbH : 0.0f;
+                setUpTextDocument(document, qfont, qtext, &refImg, wrapWidthPixels);
+                if (localText != nullptr)
+                {
+                    applyTextRuns(document, localText->runs);
+                }
 
                 // idealWidth() includes italic overhang past the last advance, so
                 // slanted glyphs are not clipped at the right edge of the image.
