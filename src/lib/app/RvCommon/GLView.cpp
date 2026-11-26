@@ -30,6 +30,14 @@
 #include <sstream>
 #include <cstdlib>
 
+#ifdef PLATFORM_LINUX
+#include <QtGui/QGuiApplication>
+//  X11 headers define macros such as None and Bool: keep them last.
+#include <GL/glx.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#endif
+
 namespace Rv
 {
     using namespace std;
@@ -39,6 +47,46 @@ namespace Rv
         const char* value = std::getenv(name);
         return value ? value : "<unset>";
     }
+
+#ifdef PLATFORM_LINUX
+    namespace
+    {
+        //
+        //  Qt does not update QSurfaceFormat::swapBehavior() from the GLX
+        //  visual it picks, so ask the X server which visual the window got.
+        //  Returns false when it cannot tell (e.g. not on the xcb platform).
+        //
+        bool isSingleBufferedX11Window(const QWindow* window)
+        {
+            const auto* x11 = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+            Display* display = x11 != nullptr ? x11->display() : nullptr;
+            if (display == nullptr)
+            {
+                return false;
+            }
+
+            XWindowAttributes attributes{};
+            if (XGetWindowAttributes(display, static_cast<::Window>(window->winId()), &attributes) == 0)
+            {
+                return false;
+            }
+
+            XVisualInfo visualTemplate{};
+            visualTemplate.visualid = XVisualIDFromVisual(attributes.visual);
+            int visualCount = 0;
+            XVisualInfo* visualInfo = XGetVisualInfo(display, VisualIDMask, &visualTemplate, &visualCount);
+            if (visualInfo == nullptr)
+            {
+                return false;
+            }
+
+            int doubleBuffered = 0;
+            const bool queried = glXGetConfig(display, visualInfo, GLX_DOUBLEBUFFER, &doubleBuffered) == 0;
+            XFree(visualInfo);
+            return queried && doubleBuffered == 0;
+        }
+    } // namespace
+#endif
 
     std::string glDebugFormatSummary(const QSurfaceFormat& format)
     {
@@ -86,6 +134,28 @@ namespace Rv
         //  is shown, so the surface must exist by then.
         //
         m_glWindow->create();
+
+#ifdef PLATFORM_LINUX
+        //
+        //  Qt's GLX config search drops double buffering before it drops
+        //  alpha. On a deep-color X screen (Depth 30) with no window visual
+        //  that has 8 alpha bits, an 8-bit request then lands on a
+        //  single-buffered visual and the viewport flickers black. Trade the
+        //  alpha channel for double buffering. The format set here is also
+        //  used if Qt later recreates the native window.
+        //
+        if (doubleBuffer && alpha > 0 && isSingleBufferedX11Window(m_glWindow))
+        {
+            if (IPCore::ImageRenderer::debugGpu())
+            {
+                cout << "INFO: GLView got a single-buffered surface, recreating it without alpha\n";
+            }
+
+            m_glWindow->destroy();
+            m_glWindow->setFormat(rvGLFormat(stereo, vsync, doubleBuffer, red, green, blue, 0));
+            m_glWindow->create();
+        }
+#endif
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
