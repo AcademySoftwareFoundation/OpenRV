@@ -3,6 +3,7 @@
 
 import itertools
 import math
+import time
 from collections.abc import Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -155,6 +156,7 @@ class AnnotateDrawEngine:
         self._text_depth_limit: float | None = None  # document pixels from the first baseline to the image bottom
         self._text_wrap_width = 0.0  # WCS line width of the active text box, 0 for no wrapping
         self._text_selecting = False  # True while the pointer drags a selection
+        self._text_double_click_time: float | None = None  # time.monotonic() of the last word-selecting double click
         self._text_base_style = TextStyle(0)  # toolbar style of the active text box
         self._text_component: PaintComponent | None = None
         self._text_registered = False
@@ -197,12 +199,14 @@ class AnnotateDrawEngine:
             ("pointer-1--push", self.on_push, "Start shape/text"),
             ("pointer-1--drag", self.on_drag, "Update shape"),
             ("pointer-1--release", self.on_release, "Commit shape"),
+            ("pointer-1--double", self.on_double_click, "Select word (text)"),
             ("pointer-1--shift--push", push_constrained, "Start shape (constrained)"),
             ("pointer-1--shift--drag", drag_constrained, "Update shape (constrained)"),
             ("pointer-1--shift--release", release_constrained, "Commit shape (constrained)"),
             ("stylus-pen--push", self.on_push, "Start shape/text (stylus)"),
             ("stylus-pen--drag", self.on_drag, "Update shape (stylus)"),
             ("stylus-pen--release", self.on_release, "Commit shape (stylus)"),
+            ("stylus-pen--double", self.on_double_click, "Select word (text, stylus)"),
             ("stylus-pen--shift--push", push_constrained, "Start shape (stylus, constrained)"),
             ("stylus-pen--shift--drag", drag_constrained, "Update shape (stylus, constrained)"),
             ("stylus-pen--shift--release", release_constrained, "Commit shape (stylus, constrained)"),
@@ -255,6 +259,10 @@ class AnnotateDrawEngine:
             ("key-down--control--b", partial(self.on_text_style, style=TextStyle.BOLD), "Toggle bold text"),
             ("key-down--control--i", partial(self.on_text_style, style=TextStyle.ITALIC), "Toggle italic text"),
             ("key-down--control--u", partial(self.on_text_style, style=TextStyle.UNDERLINE), "Toggle underlined text"),
+            ("key-down--control--a", self.on_text_select_all, "Select all text"),
+            ("key-down--control--c", self.on_text_copy, "Copy text"),
+            ("key-down--control--x", self.on_text_cut, "Cut text"),
+            ("key-down--control--v", self.on_text_paste, "Paste text"),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
             ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
@@ -520,6 +528,7 @@ class AnnotateDrawEngine:
         self._text_depth_limit = None
         self._text_wrap_width = 0.0
         self._text_selecting = False
+        self._text_double_click_time = None
         self._text_registered = False
 
     def _commit_text(self):
@@ -744,7 +753,9 @@ class AnnotateDrawEngine:
             return
         self._on_draw_started()
         if tool == constants.Tool.TEXT:
-            if not constrained and not self._place_text_cursor(event):
+            if not constrained and self._is_triple_click(event):
+                self._select_all_text()
+            elif not constrained and not self._place_text_cursor(event):
                 self._start_text(event)
             return
         if tool in constants.BRUSH_TOOLS:
@@ -851,8 +862,11 @@ class AnnotateDrawEngine:
         except Exception:
             return None
 
-    def _insert_text(self, text) -> bool:
-        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom."""
+    def _insert_text(self, text, dry_run=False) -> bool:
+        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom.
+
+        With dry_run, the text is never kept: this only reports whether it would fit.
+        """
         document, cursor = self._text_document, self._text_cursor
         height_before = document.size().height()
         anchor, position, pending_format = cursor.anchor(), cursor.position(), cursor.charFormat()
@@ -860,14 +874,29 @@ class AnnotateDrawEngine:
         cursor.beginEditBlock()
         cursor.insertText(text)
         cursor.endEditBlock()
-        if self._text_fits_in_image(height_before):
+        fits = self._text_fits_in_image(height_before)
+        if fits and not dry_run:
             return True
         document.undo(cursor)
         cursor.setPosition(anchor)
         cursor.setPosition(position, QtGui.QTextCursor.MoveMode.KeepAnchor)
         if not cursor.hasSelection():
             cursor.setCharFormat(pending_format)
-        return False
+        return fits
+
+    def _insert_fitting_start(self, text) -> bool:
+        """Insert the longest start of text that fits above the image bottom. Returns False when nothing fits."""
+        if self._insert_text(text):
+            return True
+        # More text never takes fewer lines, so the longest start that fits can be found by bisection.
+        fitting_length, too_long_length = 0, len(text)
+        while too_long_length - fitting_length > 1:
+            length = (fitting_length + too_long_length) // 2
+            if self._insert_text(text[:length], dry_run=True):
+                fitting_length = length
+            else:
+                too_long_length = length
+        return fitting_length > 0 and self._insert_text(text[:fitting_length])
 
     def _text_fits_in_image(self, height_before) -> bool:
         if self._text_depth_limit is None:
@@ -883,18 +912,42 @@ class AnnotateDrawEngine:
         # Compare baselines rather than line boxes: the descent and line gap of the last line may be clipped.
         return last_baseline - first_line_ascent <= self._text_depth_limit
 
+    def _text_position_of(self, event) -> int | None:
+        """Cursor position under the pointer, or None when there is no active box or the pointer is outside it."""
+        if not self._text_active:
+            return None
+        _, image_point = self._pointer_location(event)
+        return self._text_position_at(image_point, inside_only=True) if image_point else None
+
     def _place_text_cursor(self, event) -> bool:
         """Move the caret to a push inside the active text box and start a drag selection."""
-        if not self._text_active:
-            return False
-        _, image_point = self._pointer_location(event)
-        position = self._text_position_at(image_point, inside_only=True) if image_point else None
+        position = self._text_position_of(event)
         if position is None:
             return False
         self._text_cursor.setPosition(position)
         self._text_selecting = True
         self._update_text_display()
         return True
+
+    def _is_triple_click(self, event) -> bool:
+        """True for a push inside the active box within the double-click interval of a word-selecting double click."""
+        double_click_time = self._text_double_click_time
+        self._text_double_click_time = None
+        if double_click_time is None:
+            return False
+        interval = QtGui.QGuiApplication.styleHints().mouseDoubleClickInterval() / 1000
+        return time.monotonic() - double_click_time <= interval and self._text_position_of(event) is not None
+
+    def on_double_click(self, event):
+        """Select the word under a double click inside the active text box."""
+        position = self._text_position_of(event)
+        if position is None:
+            event.reject()
+            return
+        self._text_cursor.setPosition(position)
+        self._text_cursor.select(QtGui.QTextCursor.SelectionType.WordUnderCursor)
+        self._text_double_click_time = time.monotonic()
+        self._update_text_display()
 
     def _drag_text_selection(self, event):
         if not self._text_selecting:
@@ -962,6 +1015,50 @@ class AnnotateDrawEngine:
         else:
             enable = style not in self._style_of(cursor.charFormat())
         cursor.mergeCharFormat(_style_format(style, enable))
+        self._update_text_display()
+
+    def on_text_select_all(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        self._select_all_text()
+
+    def _select_all_text(self):
+        self._text_cursor.select(QtGui.QTextCursor.SelectionType.Document)
+        self._update_text_display()
+
+    def on_text_copy(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        self._copy_selection()
+
+    def on_text_cut(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        if self._copy_selection():
+            self._text_cursor.removeSelectedText()
+            self._update_text_display()
+
+    def _copy_selection(self) -> bool:
+        """Put the selected text on the clipboard as plain text. Returns False when nothing is selected."""
+        cursor = self._text_cursor
+        if not cursor.hasSelection():
+            return False
+        # selection().toPlainText() gives \n between lines, where selectedText() gives U+2029.
+        QtGui.QGuiApplication.clipboard().setText(cursor.selection().toPlainText())
+        return True
+
+    def on_text_paste(self, event):
+        """Paste the clipboard's plain text, or as much of its start as fits above the image bottom."""
+        if not self._text_active:
+            event.reject()
+            return
+        text = QtGui.QGuiApplication.clipboard().text().replace("\r\n", "\n").replace("\r", "\n")
+        if not text or not self._insert_fitting_start(text):
+            return
+        self._register_text_undo()
         self._update_text_display()
 
     def on_text_move(self, event, move, keep_anchor=False):
