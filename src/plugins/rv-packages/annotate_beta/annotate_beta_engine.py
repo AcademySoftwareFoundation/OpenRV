@@ -255,6 +255,10 @@ class AnnotateDrawEngine:
             ("key-down--control--b", partial(self.on_text_style, style=TextStyle.BOLD), "Toggle bold text"),
             ("key-down--control--i", partial(self.on_text_style, style=TextStyle.ITALIC), "Toggle italic text"),
             ("key-down--control--u", partial(self.on_text_style, style=TextStyle.UNDERLINE), "Toggle underlined text"),
+            ("key-down--control--a", self.on_text_select_all, "Select all text"),
+            ("key-down--control--c", self.on_text_copy, "Copy text"),
+            ("key-down--control--x", self.on_text_cut, "Cut text"),
+            ("key-down--control--v", self.on_text_paste, "Paste text"),
             ("key-down--space", partial(self._append_text, text=" "), "Insert space"),
             ("key-down--shift--enter", insert_new_line, "Insert a new line"),
             ("key-down--shift--keypad-enter", insert_new_line, "Insert a new line"),
@@ -851,8 +855,11 @@ class AnnotateDrawEngine:
         except Exception:
             return None
 
-    def _insert_text(self, text) -> bool:
-        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom."""
+    def _insert_text(self, text, dry_run=False) -> bool:
+        """Insert text at the caret, unless it starts a line whose baseline is below the image bottom.
+
+        With dry_run, the text is never kept: this only reports whether it would fit.
+        """
         document, cursor = self._text_document, self._text_cursor
         height_before = document.size().height()
         anchor, position, pending_format = cursor.anchor(), cursor.position(), cursor.charFormat()
@@ -860,14 +867,29 @@ class AnnotateDrawEngine:
         cursor.beginEditBlock()
         cursor.insertText(text)
         cursor.endEditBlock()
-        if self._text_fits_in_image(height_before):
+        fits = self._text_fits_in_image(height_before)
+        if fits and not dry_run:
             return True
         document.undo(cursor)
         cursor.setPosition(anchor)
         cursor.setPosition(position, QtGui.QTextCursor.MoveMode.KeepAnchor)
         if not cursor.hasSelection():
             cursor.setCharFormat(pending_format)
-        return False
+        return fits
+
+    def _insert_fitting_start(self, text) -> bool:
+        """Insert the longest start of text that fits above the image bottom. Returns False when nothing fits."""
+        if self._insert_text(text):
+            return True
+        # More text never takes fewer lines, so the longest start that fits can be found by bisection.
+        fitting_length, too_long_length = 0, len(text)
+        while too_long_length - fitting_length > 1:
+            length = (fitting_length + too_long_length) // 2
+            if self._insert_text(text[:length], dry_run=True):
+                fitting_length = length
+            else:
+                too_long_length = length
+        return fitting_length > 0 and self._insert_text(text[:fitting_length])
 
     def _text_fits_in_image(self, height_before) -> bool:
         if self._text_depth_limit is None:
@@ -962,6 +984,47 @@ class AnnotateDrawEngine:
         else:
             enable = style not in self._style_of(cursor.charFormat())
         cursor.mergeCharFormat(_style_format(style, enable))
+        self._update_text_display()
+
+    def on_text_select_all(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        self._text_cursor.select(QtGui.QTextCursor.SelectionType.Document)
+        self._update_text_display()
+
+    def on_text_copy(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        self._copy_selection()
+
+    def on_text_cut(self, event):
+        if not self._text_active:
+            event.reject()
+            return
+        if self._copy_selection():
+            self._text_cursor.removeSelectedText()
+            self._update_text_display()
+
+    def _copy_selection(self) -> bool:
+        """Put the selected text on the clipboard as plain text. Returns False when nothing is selected."""
+        cursor = self._text_cursor
+        if not cursor.hasSelection():
+            return False
+        # selection().toPlainText() gives \n between lines, where selectedText() gives U+2029.
+        QtGui.QGuiApplication.clipboard().setText(cursor.selection().toPlainText())
+        return True
+
+    def on_text_paste(self, event):
+        """Paste the clipboard's plain text, or as much of its start as fits above the image bottom."""
+        if not self._text_active:
+            event.reject()
+            return
+        text = QtGui.QGuiApplication.clipboard().text().replace("\r\n", "\n").replace("\r", "\n")
+        if not text or not self._insert_fitting_start(text):
+            return
+        self._register_text_undo()
         self._update_text_display()
 
     def on_text_move(self, event, move, keep_anchor=False):
