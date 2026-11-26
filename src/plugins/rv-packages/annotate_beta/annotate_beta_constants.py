@@ -56,8 +56,8 @@ class BrushSetting(StrEnum):
     SPACING_VARIATION = auto()
 
 
-FONT_SIZE_MIN = 1
-FONT_SIZE_MAX = 100
+FONT_SIZE_MIN = 8
+FONT_SIZE_MAX = 72
 DEFAULT_FONT_SIZE = FontSize.MEDIUM
 
 
