@@ -352,11 +352,12 @@ namespace Rv
 
         PyObject* ret = Py_None;
 
+        // Same widget as Mu's mainViewWidget(): the GL, Metal or Vulkan view, whichever is active.
         if (RvDocument* rvDoc = (RvDocument*)s->opaquePointer())
         {
-            if (void* glview = (void*)rvDoc->view())
+            if (void* viewWidget = static_cast<void*>(rvDoc->viewWidget()))
             {
-                ret = PyLong_FromVoidPtr(glview);
+                ret = PyLong_FromVoidPtr(viewWidget);
             }
         }
 

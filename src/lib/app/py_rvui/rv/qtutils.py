@@ -36,7 +36,8 @@ def sessionWindow():
 
 def sessionGLView():
     """
-    Returns the QWidget hosting the current RV session GL view.
+    Returns the QWidget hosting the current RV session view, whether it is the
+    GL, Metal or Vulkan view. Same widget as Mu's mainViewWidget().
 
     Note: as of the native-GL-window change (Direction C) the session view is a
     plain QWidget host (it embeds the GL surface via createWindowContainer), no
