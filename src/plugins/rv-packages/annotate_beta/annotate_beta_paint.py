@@ -346,25 +346,21 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, brush_values,
         (".duration", commands.IntType, 1),
         (".blendMode", commands.IntType, 1),
     ]
-    if erase_mode:
-        properties += [
-            (".join", commands.IntType, 1),
-            (".cap", commands.IntType, 1),
-            (".splat", commands.IntType, 1),
-            (".debug", commands.IntType, 1),
-        ]
-    else:
-        properties += [(f".{setting}", commands.FloatType, 1) for setting in brush_values]
+    properties += [(f".{setting}", commands.FloatType, 1) for setting in brush_values]
     for suffix, property_type, width in properties:
         _ensure_property(f"{node_name}{suffix}", property_type, width)
 
-    # mode: 0=OverMode, 1=EraseMode, 2=ScaleMode (burn/dodge use ScaleMode)
-    if erase_mode:
-        stroke_mode = 1
-    elif blend_mode in (constants.ColorModifier.ADDITIVE, constants.ColorModifier.DARKEN):
+    if blend_mode in (constants.ColorModifier.ADDITIVE, constants.ColorModifier.DARKEN):
         stroke_mode = 2
     else:
         stroke_mode = 0
+
+    if erase_mode:
+        stamp_blend_mode = constants.StampBlendMode.ERASER
+    elif blend_mode == constants.ColorModifier.ADDITIVE:
+        stamp_blend_mode = constants.StampBlendMode.ADDITIVE
+    else:
+        stamp_blend_mode = constants.StampBlendMode.NORMAL
 
     # Write every other property before .points: writing .points fires
     # graph-state-change, and listeners may read the whole stroke at that point.
@@ -379,22 +375,14 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, brush_values,
     commands.insertFloatProperty(f"{node_name}.width", [first_point_width])  # insert, see above
     commands.setStringProperty(f"{node_name}.brush", [brush], True)
     commands.setIntProperty(f"{node_name}.mode", [stroke_mode], True)
+    commands.setIntProperty(f"{node_name}.blendMode", [stamp_blend_mode], True)
     commands.setIntProperty(f"{node_name}.startFrame", [paint_frame.frame], True)
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setStringProperty(f"{node_name}.uuid", [stroke_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
-    if erase_mode:
-        commands.setIntProperty(f"{node_name}.join", [3], True)  # RoundJoin
-        commands.setIntProperty(f"{node_name}.cap", [1], True)  # SquareCap, rendered round by the radial shader
-        commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.EraserBrush.GAUSS else 0], True)
-        commands.setIntProperty(f"{node_name}.debug", [0], True)
-    else:
-        for setting, value in brush_values.items():
-            commands.setFloatProperty(f"{node_name}.{setting}", [value], True)
+    for setting, value in brush_values.items():
+        commands.setFloatProperty(f"{node_name}.{setting}", [value], True)
     commands.insertFloatProperty(f"{node_name}.points", [first_point.x, first_point.y])  # insert, see above
-    commands.setIntProperty(
-        f"{node_name}.blendMode", [2 if blend_mode == constants.ColorModifier.ADDITIVE else 0], True
-    )
 
     _add_to_order(component)
     commands.redraw()

@@ -50,6 +50,7 @@ SET(_shaders
     ReplaceFrag
     SoftCloneFrag
     SoftEraseFrag
+    StampEraseFrag
     StereoScanlineFrag
     StereoCheckerFrag
     CrosshatchBGFrag

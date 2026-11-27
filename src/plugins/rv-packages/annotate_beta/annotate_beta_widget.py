@@ -412,14 +412,14 @@ class _EraserPanel(_SliderPanel):
     eraser_brush_changed = QtCore.Signal(str)  # Eraser brush value
 
     _BRUSHES = (
-        (constants.EraserBrush.CIRCLE, "Circle (Hard)", "erase_circle"),
-        (constants.EraserBrush.GAUSS, "Gauss (Soft)", "erase_gauss"),
+        (constants.EraserBrush.HARD, "Hard", "erase_hard"),
+        (constants.EraserBrush.SOFT, "Soft", "erase_soft"),
     )
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._brush_button = _MenuToolButton("Brush Type", self._BRUSHES, icon_size=20)
-        self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
+        self._brush_button.set_selection(constants.EraserBrush.HARD)
         self._brush_button.selection_changed.connect(self.eraser_brush_changed)
         self._layout.addWidget(self._brush_button)
         _add_divider(self._layout)
@@ -430,11 +430,11 @@ class _EraserPanel(_SliderPanel):
         self._brush_button.set_selection(brush)
 
     def set_soft_erase_enabled(self, enabled):
-        """Enable or disable the Gauss (soft) eraser brush option."""
-        self._brush_button.set_item_enabled(constants.EraserBrush.GAUSS, enabled)
-        if not enabled and self._brush_button.selection() == constants.EraserBrush.GAUSS:
-            self._brush_button.set_selection(constants.EraserBrush.CIRCLE)
-            self.eraser_brush_changed.emit(constants.EraserBrush.CIRCLE)
+        """Enable or disable the soft eraser brush option."""
+        self._brush_button.set_item_enabled(constants.EraserBrush.SOFT, enabled)
+        if not enabled and self._brush_button.selection() == constants.EraserBrush.SOFT:
+            self._brush_button.set_selection(constants.EraserBrush.HARD)
+            self.eraser_brush_changed.emit(constants.EraserBrush.HARD)
 
 
 class _BlendModeGroup(QtWidgets.QWidget):
