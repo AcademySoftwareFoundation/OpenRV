@@ -501,9 +501,11 @@ IF(RV_TARGET_LINUX)
     COMPONENTS ${_rvcommon_qt_components}
     REQUIRED
   )
+  # GLView queries the GLX visual of the viewport window.
+  FIND_PACKAGE(OpenGL REQUIRED)
   TARGET_LINK_LIBRARIES(
     ${_target}
-    PRIVATE X11 ${_rvcommon_link_libraries}
+    PRIVATE X11 OpenGL::GLX ${_rvcommon_link_libraries}
   )
 ENDIF()
 
