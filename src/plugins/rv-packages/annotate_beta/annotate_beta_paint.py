@@ -315,8 +315,8 @@ def set_text(component: PaintComponent, text: str):
 # ----------------------------------------------------------------------
 
 
-def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, style):
-    """Create a new pen/eraser stroke component and return it."""
+def new_stroke(paint_frame, first_point, first_point_width, brush, brush_values, erase_mode, style):
+    """Create a new pen/custom brush/eraser stroke component and return it."""
     _ensure_visible(paint_frame.paint_node)
     component = _new_component(paint_frame, "pen")
     node_name = _node_name(component)
@@ -335,28 +335,27 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, s
     else:
         rgba = [color.redF(), color.greenF(), color.blueF(), alpha]
 
-    for suffix, property_type, width in (
+    properties = [
         (".color", commands.FloatType, 4),
         (".width", commands.FloatType, 1),
         (".brush", commands.StringType, 1),
         (".uuid", commands.StringType, 1),
         (".points", commands.FloatType, 2),
-        (".join", commands.IntType, 1),
-        (".cap", commands.IntType, 1),
-        (".splat", commands.IntType, 1),
         (".mode", commands.IntType, 1),
-        (".debug", commands.IntType, 1),
-        (".smoothingWidth", commands.FloatType, 1),
         (".startFrame", commands.IntType, 1),
         (".duration", commands.IntType, 1),
-        # Stamp-brush properties (only take effect for brush names other than
-        # "circle"/"gauss" — see PaintIPNode::compilePenComponent). Not yet
-        # exposed in this UI; written here so future sliders/pickers have a
-        # ready-made property to set.
-        (".hardness", commands.FloatType, 1),
-        (".tipTexture", commands.StringType, 1),
         (".blendMode", commands.IntType, 1),
-    ):
+    ]
+    if erase_mode:
+        properties += [
+            (".join", commands.IntType, 1),
+            (".cap", commands.IntType, 1),
+            (".splat", commands.IntType, 1),
+            (".debug", commands.IntType, 1),
+        ]
+    else:
+        properties += [(f".{setting}", commands.FloatType, 1) for setting in brush_values]
+    for suffix, property_type, width in properties:
         _ensure_property(f"{node_name}{suffix}", property_type, width)
 
     # mode: 0=OverMode, 1=EraseMode, 2=ScaleMode (burn/dodge use ScaleMode)
@@ -384,14 +383,15 @@ def new_stroke(paint_frame, first_point, first_point_width, brush, erase_mode, s
     commands.setIntProperty(f"{node_name}.duration", [1], True)
     commands.setStringProperty(f"{node_name}.uuid", [stroke_uuid], True)
     commands.setIntProperty(f"{node_name}.softDeleted", [0], True)
+    if erase_mode:
+        commands.setIntProperty(f"{node_name}.join", [3], True)  # RoundJoin
+        commands.setIntProperty(f"{node_name}.cap", [1], True)  # SquareCap, rendered round by the radial shader
+        commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.EraserBrush.GAUSS else 0], True)
+        commands.setIntProperty(f"{node_name}.debug", [0], True)
+    else:
+        for setting, value in brush_values.items():
+            commands.setFloatProperty(f"{node_name}.{setting}", [value], True)
     commands.insertFloatProperty(f"{node_name}.points", [first_point.x, first_point.y])  # insert, see above
-    commands.setIntProperty(f"{node_name}.join", [3], True)  # RoundJoin
-    commands.setIntProperty(f"{node_name}.cap", [1], True)  # SquareCap, rendered round by the radial shader
-    commands.setIntProperty(f"{node_name}.splat", [1 if brush == constants.Brush.GAUSS else 0], True)
-    commands.setIntProperty(f"{node_name}.debug", [0], True)
-    commands.setFloatProperty(f"{node_name}.smoothingWidth", [1.0], True)
-    commands.setFloatProperty(f"{node_name}.hardness", [100.0], True)
-    commands.setStringProperty(f"{node_name}.tipTexture", [""], True)
     commands.setIntProperty(
         f"{node_name}.blendMode", [2 if blend_mode == constants.ColorModifier.ADDITIVE else 0], True
     )

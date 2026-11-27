@@ -4,7 +4,7 @@
 import math
 from collections.abc import Iterable
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
 from typing import NamedTuple
 
@@ -76,7 +76,9 @@ class DrawSettings:
 
     tool_states: dict
     tool: constants.Tool = constants.Tool.PEN
-    eraser_brush: constants.Brush = constants.Brush.CIRCLE
+    eraser_brush: constants.EraserBrush = constants.EraserBrush.CIRCLE
+    brush_name: str = constants.PEN_BRUSH
+    brush_values: dict[constants.BrushSetting, float] = field(default_factory=dict)
     font_family: str = constants.DEFAULT_FONT_FAMILY
     font_size: int = constants.DEFAULT_FONT_SIZE
     font_bold: bool = False
@@ -478,22 +480,25 @@ class AnnotateDrawEngine:
         # zoom's _screen_scale(), not the stale value from the previous stroke.
         self._pen_stroke_width = self._stroke_width(source_name)
         tool = self._settings.tool
+        brush_values = {}
         if self._stylus_erasing:
             erase = True
             brush = self._settings.eraser_brush
         else:
             erase = tool == constants.Tool.ERASER
             if tool == constants.Tool.BRUSH:
-                brush = constants.Brush.GAUSS
+                brush = self._settings.brush_name
+                brush_values = self._settings.brush_values
             elif tool == constants.Tool.ERASER:
                 brush = self._settings.eraser_brush
             else:
-                brush = constants.Brush.CIRCLE
+                brush = constants.PEN_BRUSH
         self._pen_stroke = paint.new_stroke(
             paint_frame,
             image_point,
             self._pressure_width(event),
             brush,
+            brush_values,
             erase,
             self._settings.tool_state,
         )
