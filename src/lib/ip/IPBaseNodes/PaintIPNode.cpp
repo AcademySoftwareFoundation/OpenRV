@@ -11,8 +11,10 @@
 #include <IPCore/IPGraph.h>
 #include <TwkGLF/GL.h>
 #include <TwkGLText/TwkGLText.h>
+#include <TwkMath/Iostream.h>
 #include <exception>
 #include <optional>
+#include <ostream>
 #include <mutex>
 #include <stl_ext/string_algo.h>
 #include <cstdlib>
@@ -485,10 +487,19 @@ namespace IPCore
         p.built = false;
     }
 
-    void PaintIPNode::LocalText::hash(std::ostream& o) const
+    void PaintIPNode::LocalCommand::hashGhostState(std::ostream& ostream) const
     {
-        Paint::Text::hash(o);
-        o << fontFamily << fontSize << fontWeight << fontStyle << textDecoration;
+        ostream << "g" << ghostOn;
+        if (ghostOn)
+        {
+            ostream << ghostColor;
+        }
+    }
+
+    void PaintIPNode::LocalText::hash(std::ostream& ostream) const
+    {
+        LocalPaintCommand<Paint::Text>::hash(ostream);
+        ostream << fontFamily << fontSize << fontWeight << fontStyle << textDecoration;
     }
 
     void PaintIPNode::compileTextComponent(Component* c)

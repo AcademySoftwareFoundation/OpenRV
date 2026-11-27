@@ -11,6 +11,7 @@
 #include <TwkPaint/StampPath.h>
 #include <map>
 #include <memory>
+#include <ostream>
 #include <tuple>
 #include <vector>
 
@@ -61,11 +62,27 @@ namespace IPCore
 
             bool ghostOn{};
             TwkMath::Col4f ghostColor{Color(0.0)};
+
+        protected:
+            void hashGhostState(std::ostream& ostream) const;
         };
 
-        class LocalPolyLine
-            : public Paint::PolyLine
+        template <typename Base>
+        class LocalPaintCommand
+            : public Base
             , public LocalCommand
+        {
+        public:
+            LocalPaintCommand() = default;
+
+            void hash(std::ostream& ostream) const override
+            {
+                Base::hash(ostream);
+                hashGhostState(ostream);
+            }
+        };
+
+        class LocalPolyLine : public LocalPaintCommand<Paint::PolyLine>
         {
         public:
             LocalPolyLine() = default;
@@ -104,9 +121,7 @@ namespace IPCore
             static constexpr const char* Underline = "underline";
         };
 
-        class LocalText
-            : public Paint::Text
-            , public LocalCommand
+        class LocalText : public LocalPaintCommand<Paint::Text>
         {
         public:
             LocalText() = default;
@@ -118,44 +133,20 @@ namespace IPCore
             std::string fontStyle{FontStyle::Normal};
             std::string textDecoration{TextDecoration::None};
 
-            void hash(std::ostream& o) const override;
+            void hash(std::ostream& ostream) const override;
         };
 
         /// Axis-aligned rectangle
-        class LocalRect
-            : public Paint::ShapeRect
-            , public LocalCommand
-        {
-        public:
-            LocalRect() = default;
-        };
+        using LocalRect = LocalPaintCommand<Paint::ShapeRect>;
 
         /// Axis-aligned ellipse
-        class LocalEllipse
-            : public Paint::ShapeEllipse
-            , public LocalCommand
-        {
-        public:
-            LocalEllipse() = default;
-        };
+        using LocalEllipse = LocalPaintCommand<Paint::ShapeEllipse>;
 
         /// Arrow with shaft and arrowhead at endPos
-        class LocalArrow
-            : public Paint::ShapeArrow
-            , public LocalCommand
-        {
-        public:
-            LocalArrow() = default;
-        };
+        using LocalArrow = LocalPaintCommand<Paint::ShapeArrow>;
 
         /// Straight line with no arrowhead
-        class LocalLine
-            : public Paint::ShapeLine
-            , public LocalCommand
-        {
-        public:
-            LocalLine() = default;
-        };
+        using LocalLine = LocalPaintCommand<Paint::ShapeLine>;
 
         using Vec4 = TwkMath::Vec4f;
         using Vec3 = TwkMath::Vec3f;
