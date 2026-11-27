@@ -35,6 +35,7 @@ class: LayerSelect : Widget
     int     _selectLayerIndex;
     bool    _default;
     float   _th;
+    float   _rowY;
     int     _nLayers;
     Vec2    _tbox;
     float   _nw;
@@ -100,11 +101,8 @@ class: LayerSelect : Widget
 
     method: eventToIndex(int; Point p)
     {
-        State state = data();
-        let margin  = state.config.bevelMargin;
-
-
-        return _nLayers - int(((p.y - _y + margin ) / _th )) + 1;
+        //  Rows are drawn bottom up from _rowY, Default is the top row
+        return _nLayers - 1 - int(floor((p.y - _rowY) / _th));
     }
 
     method: releaseSelect(void; Event event)
@@ -294,11 +292,14 @@ class: LayerSelect : Widget
 
         attrs.push_back(("        ", "Default"));
 
-        gltext.size(state.config.infoTextSize);
+        //  Draw in device pixels like RV's own HUD widgets, keeping _x, _y and the
+        //  bounds in logical pixels to match pointer events
+        let devicePixelRatio = devicePixelRatio();
+        gltext.size(state.config.infoTextSize*devicePixelRatio);
         setupProjection(domain.x, domain.y, event.domainVerticalFlip());
 
-        let margin  = state.config.bevelMargin,
-            x       = if (_drawInMargin) then 0 else _x + margin,
+        let margin  = state.config.bevelMargin*devicePixelRatio,
+            x       = if (_drawInMargin) then 0 else _x*devicePixelRatio + margin,
             vMargins= margins(),
             nvb1    = nameValuePairBounds(expandNameValuePairs(attrs), margin),
             vs      = viewSize(),
@@ -310,7 +311,7 @@ class: LayerSelect : Widget
 
         if (_drawInMargin) 
         {
-            _y = targetY - margin;
+            _y = (targetY - margin)/devicePixelRatio;
             let w = max (vMargins[0], targetW);
             glColor(Color(0,0,0,1));
             glBegin(GL_QUADS);
@@ -321,28 +322,31 @@ class: LayerSelect : Widget
             glEnd();
         }
 
-        let y       = _y + margin,
+        let y       = _y*devicePixelRatio + margin,
             nvb     = drawNameValuePairs(expandNameValuePairs(attrs), fg, bg, x, y, margin, 
                     0, 0, 0, 0, _drawInMargin),
             tbox    = nvb._0,
             emin    = vec2f(if (_drawInMargin) then 0 else _x, _y),
-            emax    = emin + tbox + vec2f(margin + (if (_drawInMargin) then margin/4 else margin), 0.0);
+            emax    = emin + (tbox + vec2f(margin + (if (_drawInMargin) then margin/4 else margin), 0.0))/devicePixelRatio;
 
-        let fa = int(gltext.ascenderHeight()),
-            fd = int(gltext.descenderDepth()),
-            th = fa - fd,
-            gx = x + margin/2;
+        let fa   = gltext.ascenderHeight(),
+            fd   = gltext.descenderDepth(),
+            th   = fa - fd,
+            gx   = x + margin/2,
+            rowY = int(y);
 
-        _th = th;
-        _tbox = tbox;
-        _nw = nvb._3;
+        //  Stored in logical pixels
+        _th = th/devicePixelRatio;
+        _rowY = (rowY + fd)/devicePixelRatio;
+        _tbox = tbox/devicePixelRatio;
+        _nw = nvb._3/devicePixelRatio;
 
         glEnable(GL_POINT_SMOOTH);
-        glPointSize(6.0);
+        glPointSize(6.0*devicePixelRatio);
         glBegin(GL_POINTS);
 
         glColor(Color(.75,.75,.15,1));
-        let gy = y + th * (layers.size() - _selectLayerIndex ) + fd + th/2 + 2.0;
+        let gy = rowY + th * (layers.size() - _selectLayerIndex ) + fd + th/2 + 2.0*devicePixelRatio;
         glVertex(gx, gy);
 
         glColor(Color(.15,.75,.75,1));
@@ -350,7 +354,7 @@ class: LayerSelect : Widget
         for_index(a; ai)
         {
 
-            let gy = y + th * (layers.size() - ai[a] - 1) + fd + th/2 + 2.0;
+            let gy = rowY + th * (layers.size() - ai[a] - 1) + fd + th/2 + 2.0*devicePixelRatio;
             glVertex(gx, gy);
 
         }
