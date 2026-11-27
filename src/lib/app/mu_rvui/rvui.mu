@@ -2183,7 +2183,11 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
 {
     State state = data();
 
-    let dp = event.pointer() - event.reference(),
+    let devicePixelRatio = devicePixelRatio();
+    let pointer   = event.pointer() * devicePixelRatio,
+        reference = event.reference() * devicePixelRatio;
+
+    let dp = pointer - reference,
         d  = event.domain(),
         ds = state.downScale,
         m  = abs(dp.x / d.x) * ds * 2.0,
@@ -2196,7 +2200,7 @@ global let enterFrame = startTextEntryMode(\: (string;) {"Go To Frame: ";}, goto
                        float(viewSize().y - ms[2] - ms[3])/2.0 + float(ms[3]));
 
     let normalizer = math.max(float(viewSize().y - ms[2] - ms[3]), 0.01),
-        focus      = (center - event.reference())/(ds*normalizer),
+        focus      = (center - reference)/(ds*normalizer),
         diff       = (focus/ds - focus/ns)*ds + state.downPoint;
 
     setScale(ns);
