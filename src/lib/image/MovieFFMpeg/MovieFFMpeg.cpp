@@ -1859,10 +1859,10 @@ namespace TwkMovie
         rotation = (rotEntry) ? atoi(rotEntry->value) : 0;
 
         // If rotation metadata not in metadata, try to get it from side data
-        if (!rotEntry && videoCodecContext->nb_coded_side_data > 0)
+        if (!rotEntry && videoStream->codecpar->nb_coded_side_data > 0)
         {
             double rotationFromSideData = 0;
-            for (int i = 0; i < videoCodecContext->nb_coded_side_data; ++i)
+            for (int i = 0; i < videoStream->codecpar->nb_coded_side_data; ++i)
             {
                 const AVPacketSideData* sd = &videoStream->codecpar->coded_side_data[i];
                 if (sd->type == AV_PKT_DATA_DISPLAYMATRIX)
@@ -1871,8 +1871,14 @@ namespace TwkMovie
                 }
             }
 
-            // Getting rid of negative rotation metadata
-            rotation = rotationFromSideData < 0 ? lround(rotationFromSideData) + 360 : lround(rotationFromSideData);
+            // av_display_rotation_get() gives the angle the frame is rotated
+            // counterclockwise by the display matrix. The switch below, like
+            // the old "rotate" tag, wants the clockwise angle (an iPhone
+            // portrait clip's matrix gives -90, i.e. "rotate" 90), so negate
+            // it, as ffplay does, and bring it into [0, 360).
+            if (std::isnan(rotationFromSideData))
+                rotationFromSideData = 0;
+            rotation = ((-lround(rotationFromSideData) % 360) + 360) % 360;
 
             // Setting rotation
             char charRotation[5]; // Expecting a number between -360 and 360
