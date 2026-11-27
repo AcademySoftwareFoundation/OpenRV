@@ -335,6 +335,12 @@ class ColorPickerPopup(QtWidgets.QFrame):
         x = max(screen.x(), min(x, screen_right - self.width()))
         y = max(screen.y(), min(anchor.y(), screen_bottom - self.height()))
 
+        # Parent to the anchor's current window (main window or floating dock) so Qt makes the popup
+        # transient for it and X11 window managers keep the popup on top of it.
+        anchor_window = anchor_widget.window()
+        if self.parentWidget() is not anchor_window:
+            self.setParent(anchor_window, self.windowFlags())
+
         self.move(x, y)
         self.show()
         self.raise_()
